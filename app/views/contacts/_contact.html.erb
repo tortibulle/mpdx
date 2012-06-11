@@ -1,0 +1,31 @@
+<% exhibit(contact, self).tap do |contact_exhibit| %>
+  <tr id="<%= dom_id(contact) %>" data-hook="contact">
+    
+    <td class="profile">
+      <div class="avatar">
+        <%= link_to(image_tag(contact_exhibit.avatar, class: "avatar small"), contact_path(contact))%>
+      </div>
+      <div class="key">
+        <span class="name"><%= link_to(contact_exhibit, contact_path(contact), data: {name: contact_exhibit.to_s}) %></span>
+        <div class="people">
+          <%== contact.people.collect do |person|
+            link_to(exhibit(person, self), person_path(person))
+          end.join(', ') %>
+        </div>
+        <!--      <div class="tags">
+        <%= link_to("Recurring Donor", "", class: "tag")%>
+        <%= link_to("One Time Donor", "", class: "tag")%>
+        <%= link_to("New Donor", "", class: "tag")%>
+        </div> -->
+      </div>
+    </td>
+    <td class="qaction" id="<%= dom_id(contact) %>_quick">
+      <a href="" class="btn smallbtn quick"><%= t('g.quick') %></a>
+      <ul style="display:none" class="quick_action_list">
+        <li><%= link_to(t('g.show'), contact_path(contact), :class => "none") %></li>
+        <li><%= link_to(t('g.edit'), edit_contact_path(contact), :class => "none") %></li>
+      </ul>
+    </td>
+    <td class="checks"><input type="checkbox" /></td>
+  </tr>
+<% end %>

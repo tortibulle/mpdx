@@ -1,0 +1,21 @@
+.ico {background: image-url("sprite.png") no-repeat 50% 0; width: 16px; height: 16px; display: inline-block; overflow: hidden; text-indent: -100000px;}
+.icos {background: image-url("sprite_social.png") no-repeat 50% 0; width: 16px; height: 16px; display: inline-block; overflow: hidden; text-indent: -100000px;}
+
+.ico_fav {background-position: 50% -610px;}
+.ico_fav_off {background-position: 50% -679px;}
+.ico_edit {background-position: 50% -543px;}
+.ico_trash {background-position: 0 0; background-image: image-url("trash-gray.png") }
+.ico_trash:hover {background-position: 0 0; background-image: image-url("trash-blue.png") }
+
+.ico_individual {background-position: 50% -467px;}
+.ico_comment {background-position: 0 0; background-image: image-url("comments.png"); }
+.ico_close {background-position: 0 0; background-image: image-url("close.png"); }
+
+.ico_google {background-position: 0 0; }
+.ico_fb {background-position: 0 -103px; }
+.ico_twitter {background-position: 0 -51px; }
+.ico_linkedin {background-position: 0 -154px; }
+.ico_skype {background-position: 0 -206px; }
+.ico_key {background-position: 0 -257px; }
+
+

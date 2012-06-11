@@ -1,0 +1,3 @@
+<% exhibit(@contact, self).tap do |contact_exhibit| %>
+  $('#notes-tab .saved_at').html('<%= contact_exhibit.notes_saved_at %>')
+<% end %>

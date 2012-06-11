@@ -1,0 +1,215 @@
+@import "elements.css.scss";
+
+/* ************************************************************************ */
+@font-face {
+    font-family: 'FreightSansProSemibold';
+    src: font-url('freigsanprosem-webfont.eot');
+    src: font-url('freigsanprosem-webfont.eot?#iefix') format('embedded-opentype'),
+         font-url('freigsanprosem-webfont.woff') format('woff'),
+         font-url('freigsanprosem-webfont.ttf') format('truetype'),
+         font-url('freigsanprosem-webfont.svg#FreightSansProSemibold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'FreightSansProLight';
+    src: font-url('freigsanprolig-webfont.eot');
+    src: font-url('freigsanprolig-webfont.eot?#iefix') format('embedded-opentype'),
+         font-url('freigsanprolig-webfont.woff') format('woff'),
+         font-url('freigsanprolig-webfont.ttf') format('truetype'),
+         font-url('freigsanprolig-webfont.svg#FreightSansProLight') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'FreightSansProMedium';
+    src: font-url('freigsanpromed-webfont.eot');
+    src: font-url('freigsanpromed-webfont.eot?#iefix') format('embedded-opentype'),
+         font-url('freigsanpromed-webfont.woff') format('woff'),
+         font-url('freigsanpromed-webfont.ttf') format('truetype'),
+         font-url('freigsanpromed-webfont.svg#FreightSansProMedium') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+/* ************************************************************************ */
+
+$font_heading: FreightSansProSemibold;
+$font_highlight: FreightSansProMedium;
+$font_buttons: FreightSansProSemibold;
+$font_basic: Arial, Helvetica, sans-serif;
+
+/* ************************************************************************ */
+
+
+
+html, body {font-family: $font_basic; font-size: 12px; line-height: 1.25em; color: $type;}
+
+h1, h2, h3, h4, h5, h6 {font-family: $font_heading; letter-spacing: -1px; line-height: 1em; color: #333; color: $type;}
+
+a {color: $links; text-decoration: none;}
+
+p {margin: 0 0 1em 0;}
+
+p:last-child {margin-bottom: 0;}
+
+/* ************************************************************************ */
+
+.smallhead {font-size: 16px; font-weight: normal;}
+
+/* ************************************************************************ */
+
+#global {
+  font-family: $font_highlight;
+  #mainmenu {font-size: 14px; a {color: $white; text-shadow: 1px 1px 1px #111;} a:hover {color: $gray_mid;} .active a {color: $black;;}}
+  #submenu {font-size: 12px;}
+  .bal {
+    font-size: 15px;
+    .balance {
+      font-weight: bold;
+      letter-spacing: -1px;
+      font-size: 14px;
+    }
+  }
+}
+
+#user {
+  color: $white;
+  .links a {
+    background: $blue_dark;
+    color: $white;
+    font-size: 13px;
+  }
+}
+
+.indicator {
+  font-family: Arial;
+  font-size: 12px;
+  font-weight: bold;
+  color: $white !important;
+}
+
+.btn {
+  text-align: center;
+  text-shadow: 0 1px 0 #eee;
+  font: normal 12px $font_buttons;
+  color: #000;
+  line-height: 1;
+}
+
+.btndark, .btndark:hover {
+  text-shadow: 0 1px 0 #111 !important;
+  color: #fff;
+}
+
+.indicator {
+  font-family: Arial;
+  font-size: 11px;
+  font-weight: normal;
+  text-shadow: 0 1px 0 #000;
+}
+
+/* ************************************************************************ */
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.tasklist {
+  li {
+    line-height: 2.0em;
+  }
+  .date {font-weight: normal;}
+  .high a {color: red;}
+  .mid a {color: #F6921E;}
+}
+
+/* ************************************************************************ */
+
+.tablelist {
+  th {text-align: left;}
+  td.profile {
+    font-size: 11px;
+    .name {
+      font-size: 13px;
+      font-weight: bold;
+    }
+  }
+  .status h4 {
+    margin: 0 0 .5em;
+    font-size: 12px;
+  }
+}
+
+
+.tags,
+#leftmenu ul li .tags {
+  a {
+    background: $blue; 
+    color: $white; 
+    display: inline-block; 
+    font-weight: normal;
+    height: 18px; 
+    font-size: 11px;
+    border-radius: 5px;
+    line-height: 18px;
+    text-align: center;
+    padding: 0 5px;
+  }
+  a.selected {
+    background: $blue_dark;
+  }
+}
+
+/* ************************************************************************ */
+
+.taskgroup {
+  line-height: 2.25em;
+  height: 2.25em;
+  color: $white;
+  font-weight: bold;
+  font-family: 'FreightSansProMedium';
+  font-size: 15px;
+  letter-spacing: -1px;
+}
+
+.comment_status {
+  background: image-url("comments.png") no-repeat 0 -2px;
+  padding-left: 17px;
+  font-size: 10px;
+  line-height: 1.5em;
+  height: 1.5em;
+  margin-left: 8px;
+}
+
+.translation_missing {
+  color: red; 
+  font-weight: bold; 
+  font-size: 16px; 
+  text-decoration: blink;
+}
+
+.messages {
+  tr {border-bottom: 1px solid $gray_light;}
+  tr:last-child {border-bottom: 0px;}
+  tr td {padding-bottom: 10px; padding-top: 10px;}
+  tr:last-child td {padding-bottom: 0px;}
+  
+  .profilepic {padding-right: 10px;}
+  .data {color: $gray;}
+  .messagebody {margin-bottom: 5px;}
+  .actions a {margin-right: 6px;}
+  
+  header {margin-bottom: 3px;}
+  
+}
+
+.socstatus {
+  .hl {color: $gray_dark;}
+  .hl.amt {font-weight: bold;}
+}

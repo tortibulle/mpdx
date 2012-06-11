@@ -1,0 +1,6 @@
+<% if current_user.setup_mode? %>
+  $('#org_connection_box').html('<%= j(spinner(visible: true)) %>');
+  document.location = '<%= setup_path(:social_accounts) %>';
+<% else %>
+  document.location = '<%= accounts_path %>'
+<% end %>

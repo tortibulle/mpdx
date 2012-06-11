@@ -1,0 +1,168 @@
+<% exhibit(@contact, self).tap do |contact_exhibit| %>
+  <div id="contentbody" class="withright" data-contact-id="<%= contact.id %>">
+    <div class="contact_controls">
+      <% @contacts.index(contact_exhibit.to_model).tap do |current_index| %>
+        <% if current_index > 0 %>
+          <%= link_to('&lt;'.html_safe, @contacts[current_index - 1], class: 'flatbtn', remote: true) %>
+        <% end %>
+        <span class="contact_paging"><%== _('Navigate contacts: <strong>%{index} of %{total}</strong>') %{index: current_index + 1, total: @contacts.length} %></span>
+        <% if current_index < @contacts.length - 1 %>
+          <%= link_to('&gt;'.html_safe, @contacts[current_index + 1], class: 'flatbtn', remote: true) %>
+        <% end %>
+      <% end %>
+
+      <div class="actions">
+        <%#= link_to("Show Contacts", "#", :id =>'drawer', :class=> "btn smallbtn") %>
+        <%= link_to(_('Log Task'), new_task_path(contact_id: contact.id, completed: true), class: "btn smallbtn") %>
+        <%= link_to(_('Add Task'), new_task_path(contact_id: contact.id), class: "btn smallbtn") %>
+        <%= link_to(_('Edit'), edit_contact_path(contact_exhibit), :class=> "btn smallbtn") %>
+        <%#= link_to(_('Quick'), "", :class => "btn smallbtn quick")%>
+      </div>
+    </div>
+    <div class="wpp">
+
+      <div class="profiletop">
+
+
+        <div class="avatar"><%= image_tag(contact_exhibit.avatar, class: "mid") %></div>
+        <div class="quickprofile">
+          <h1><%= contact_exhibit %></h1>
+          <div class="metaset"><%= contact_exhibit.location %></div>
+        </div>
+
+        <div class="cols col_30">
+          <table class="meta">
+            <tr>
+              <td class="meta_name"><%= _('Status') %></td>
+              <td class="meta_data"><%= _(contact_exhibit.status) if  contact_exhibit.status.present? %></td>
+            </tr>
+            <tr>
+              <td class="meta_name"><%= _('People:') %> </td>
+              <td class="meta_data"><%= contact_exhibit.contact_info %></td>
+            </tr>
+            <tr>
+              <td class="meta_name"><%= _('Pledge') %>: </td>
+              <td class="meta_data"><%= contact_exhibit.pledge_as_currency %></td>
+            </tr>
+            <% if contact_exhibit.referrals_to_me.present? %>
+              <tr>
+                <td class="meta_name"><%= _('Referrer') %></td>
+                <td class="meta_data"><%= contact_exhibit.referrer_links %></td>
+              </tr>
+            <% end %>
+            <tr>
+              <td class="meta_name"><%= _('Tags') %>: </td>
+              <td class="meta_data">
+                <!--              <div class="tags">
+                  <%= link_to("Recurring Donor", "", class: "tag")%>
+                  <%= link_to("One Time Donor", "", class: "tag")%>
+                </div> -->
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="cols col_30">
+          <table class="meta">
+
+          </table>
+        </div>
+        <div class="clr"></div>
+
+      </div>
+
+      <div id="contact" class="tabgroup">
+        <ul>
+          <li><a href="#donations-tab"><%= _('Donations') %></a></li>
+          <li><a href="#contact-details"><%= _('Contact Details') %></a></li>
+          <li><a href="#tasks-tab"><%= _('Tasks') %></a></li>
+          <li><a href="#history-tab"><%= _('History') %></a></li>
+          <li><a href="#notes-tab"><%= _('Notes') %></a></li>
+          <!-- <li><a href="#stream-tab"><%= _('Social') %></a></li> -->
+        </ul>
+        <div id="contact-details">
+          <div class="cols col_50">
+            <table class="meta">
+              <tr>
+                <th colspan="2"><%= _('Address') %></th>
+              </tr>
+              <% contact_exhibit.addresses.each do |address| %>
+                <% exhibit(address, self).tap do |address_exhibit| %>
+                  <tr>
+                    <td class="meta_name"><%= _(address.location) %></td>
+                    <td class="meta_data">
+                      <%= address_exhibit.to_html %>
+                      <br />
+                      <%= link_to(_('Map It'), "http://maps.google.com?q=#{address_exhibit.to_google}", target: '_blank', class: 'mapit') %>
+                    </td>
+                  </tr>
+                <% end %>
+              <% end %>
+            </table>
+          </div>
+
+          <div class="cols col_50">
+            <table class="meta">
+              <tr>
+                <th><%= _('People') %></th>
+              </tr>
+              <tr>
+                <td>
+                  <% contact_exhibit.people.each do |person| %>
+                    <div class="smallperson">
+                      <div class="name"><%= link_to(person.to_s, person) %></div>
+                      <%= render 'people/contact_details_compact', person: person %>
+                    </div>
+                  <% end %>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="clr"></div>
+
+        </div>
+        <div id="tasks-tab">
+          <% contact_exhibit.tasks.uncompleted.tap do |tasks| %>
+            <% if tasks.present? %>
+              <table class="tablelist tasks">
+                <%= render partial: 'tasks/task', collection: tasks %>
+              </table>
+            <% else %>
+              <%= _("You don't have any outstanding tasks for this contact.") %>
+              <%= link_to(_('Create one now.'), new_task_path(contact_id: contact.id)) %>
+            <% end %>
+          <% end %>
+        </div>
+        <div id="history-tab">
+          <% contact_exhibit.tasks.completed.tap do |tasks| %>
+            <% if tasks.present? %>
+              <table class="tablelist tasks">
+                <%= render partial: 'tasks/task', collection: tasks %>
+              </table>
+            <% else %>
+              <%= _("You don't have any tasks logged for this contact.") %>
+              <%= link_to(_('Log one now.'), new_task_path(contact_id: contact.id, completed: true)) %>
+            <% end %>
+          <% end %>
+        </div>
+        <div id="notes-tab">
+          <%= form_for @contact, remote: true do |f| %>
+            <%= f.submit _('Save Notes'), disabled: true %>
+            <span class="saved_at">
+              <%= contact_exhibit.notes_saved_at %>
+            </span>
+            <br />
+            <%= f.text_area :notes, rows: 10, class: 'contact_notes' %>
+          <% end %>
+        </div>
+
+        <div id="donations-tab">
+          <%= spinner(extra: 'donations', visible: true) %>
+          <div id="donations">
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- contentbody -->
+<% end %>

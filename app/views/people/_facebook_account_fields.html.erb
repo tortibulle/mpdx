@@ -1,0 +1,14 @@
+<div class="field social_field" data-behavior="field-wrapper social-field" data-network="facebook">
+  <div class="ls"><%= builder.label :url, _('Facebook Url') %></div>
+  <div class="rs">
+    <% if builder.object.authenticated? %>
+      <%= link_to(builder.object.url, builder.object.url, target: '_blank') %>
+    <% else %>
+      <%= builder.text_field :url, placeholder: 'http://' %>
+    <% end %>
+    <div class="field_action" style="<%= no_remove ? 'display:none' : '' %>">
+      <%= link_to_remove_fields(builder, no_remove) %>
+    </div>
+  </div>
+
+</div>

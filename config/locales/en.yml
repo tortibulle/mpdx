@@ -1,0 +1,192 @@
+# Sample localization file for English. Add more files in this directory for other locales.
+# See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
+
+en:
+  g:
+    currently_downloading: 'MPDX is currently downloading your data from the donation system. This message will go away when the download is complete.'
+    contact_filter_prompt: 'Type to filter'
+    Address: 'Address'
+    Tags: 'Tags'
+    delete: 'delete'
+    continue: 'continue'
+    log_out: 'Log out'
+    Back: 'Back'
+    Male: 'Male'
+    Female: 'Female'
+    Settings: 'Settings'
+    Dashboard: 'Dashboard'
+    Contacts: 'Contacts'
+    Messages: 'Messages'
+    Notifications: Notifications
+    Tasks: 'Tasks'
+    Social: 'Social'
+    social_snapshot: Social Snapshot
+    add_task: 'Add Task'
+    log_task: 'Log Task'
+    status_update: 'Status Update'
+    send_message: 'Send Message'
+    titles: [Mr., Mrs., Ms., Rev., Hon., Dr.]
+    suffixes: [Jr., Sr.]
+    relationships_male: [Husband, Son, Father, Brother, Uncle, Nephew, Cousin (Male), Grandfather, Grandson]
+    relationships_female: [Wife, Daughter, Mother, Sister, Aunt, Niece, Cousin (Female), Grandmother, Granddaughter]
+    marital_statuses: [Single, Engaged, Married, Separated, Divorced, Widowed]
+    address_types: [Home, Mailing, Work, Other]
+    mobile: 'Mobile'
+    home: 'Home'
+    work: 'Work'
+    email: 'Email'
+    phone: 'Phone'
+    number: 'Number'
+    text_message: 'Text Message'
+    send_email: 'Send Email'
+    facebook_message: 'Facebook Message'
+    direct_message: 'Direct Message'
+    show: 'Show'
+    edit: 'Edit'
+    quick: 'Quick'
+    continue: 'Continue'
+    cancel: 'Cancel'
+    Partners: 'Partners'
+    remove: 'Remove'
+    primary: 'Primary:'
+    all: 'All'
+    people: 'People'
+    companies: 'Companies'
+    add_contact: 'Add Contact'
+    search_placeholder: 'Search for...'
+    see_all: 'See All'
+    confirm: 'Are you sure?'
+  home:
+    index:
+      hi: 'Hi'
+      happening: "Here's whats happening..."
+      top_partner_html: '<span class="name">%{link}</span> has given <span class="hl amt">%{total}</span> since <span class="hl date">%{since}</span>'
+      no_tasks: "Good news! You don't have any pending tasks."
+      top_ten: 'Top 10 Ministry Partners'
+  accounts:
+    add_an_account: "Add an Account"
+    add_another_account: "Add another Account"
+    unable_to_connect: "We were unnable to connect your account. Please try again."
+  setup:
+    org_account_required: "You need to be connected to an organization to use MPDX."
+    social_accounts:
+      title: 'Sweet! Your Account is activated!'
+      connect: 'Just need to connect some social accounts'
+      intro_html:
+        <p>Easily connect all of your contacts, calendars, communications and social conversations. MPDX will automatically identify contact's social profiles on Facebook, LinkedIn, and </p>
+        <p>Twitter so that you connect, listen, and engage with your minitry partners. </p>
+    org_accounts:
+      title: 'Welcome to MPDX!'
+      connect: 'Connect to your organization'
+      intro_html: "To use MPDX, you need to connect to your organization's donation system. If you raise funds through more than one organization, you can connect to multiple accounts."
+      connect_to_org: 'Connect to selected organization'
+  person:
+    organization_accounts:
+      new:
+        connect_to: "Connect to %{org}"
+        connect: "Connect!"
+
+      form:
+        connecting: "Connecting..."
+  time:
+    formats:
+      default: "%b %d, %Y %l:%M %p"
+  date:
+    formats:
+      default: "%m/%d/%Y"
+      short: "%b %d"
+      long: "%B %d, %Y"
+      time: "%l:%M %p"
+      month_abbrv: "%b"
+
+    day_names: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
+    abbr_day_names: [Sun, Mon, Tue, Wed, Thu, Fri, Sat]
+
+    month_names: [~, January, February, March, April, May, June, July, August, September, October, November, December]
+    abbr_month_names: [~, Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec]
+    order:
+      - :month
+      - :day
+      - :year
+  contacts:
+    index:
+    form:
+      add_address: 'Add Address'
+      add_person: 'Add Person'
+      add_referral: 'Add Referral'
+    contact_body:
+      People: 'People'
+      navigate_contacts_html: "Navigate contacts: <strong>%{index} of %{total}</strong>"
+      pledge: 'Pledge'
+      status: 'Status:'
+      referrer: 'Referrer:'
+      donations: 'Donations'
+      contact_details: 'Contact Details'
+      history: 'History'
+  people:
+    form:
+      add_email_address: 'Add Email'
+      add_phone_number: 'Add Phone Number'
+      add_relationship: 'Add Relationship'
+      add_facebook_account: 'Add Facebook Account'
+      add_twitter_account: 'Add Twitter Account'
+      add_linkedin_account: 'Add LinkedIn Account'
+      basic_information: 'Basic Information'
+    facebook_account_fields:
+      facebook_url: 'Facebook Url'
+    linkedin_account_fields:
+      linkedin_url: 'LinkedIn Url'
+      need_linkedin: 'Connect to your LinkedIn account to add a url for your contact'
+    twitter_account_fields:
+      handle: 'Twitter Handle'
+    family_relationship_fields:
+      related_to: 'Related To'
+    index:
+      new_contact: 'New Contact'
+    show:
+      age: 'Age:'
+      marital_status: 'Marital:'
+    contact_details:
+      add_phone_number: 'Click here to add a phone number'
+      add_email_address: 'Click here to add an email address'
+      phone_numbers: 'Phone Numbers'
+    contact_details_compact:
+      phone_numbers: 'Phone Numbers'
+  data_server:
+    missing_username_password: "Your username and password are missing for this account."
+    invalid_username_password: "Your username and password for %{org} are invalid."
+  siebel:
+    donation_missing_parameters: "Start Date and End Date are required."
+  donations:
+    donations:
+      motivation: Motivation
+      method: Method
+  activities:
+    activity_contact:
+      related_to: 'Related To'
+  tasks:
+    new:
+      new_task: 'New task'
+    form:
+      completed_on: 'Completed On'
+      add_contact: 'Associate another contact with this task'
+      save_task: 'Save Task'
+      log_task: 'Log Task'
+    show:
+      due_date: 'Due date:'
+    task:
+      add_comments: 'Add comments here'
+      add_comment: 'Add Comment'
+
+  helpers:
+    label:
+      contact:
+        legal_first_name: 'Legal first name (if different)'
+        birthday: 'Birthday'
+        anniversary: 'Anniversary'
+        number: 'Phone Number'
+      person_organization_account:
+        username: Username
+        password: Password
+      task:
+        start_at: 'Due Date:'

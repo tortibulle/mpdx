@@ -1,0 +1,102 @@
+<% @account_list_exhibit = exhibit(current_account_list, self) %>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+    <title>Mpdx</title>
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
+    <%= stylesheet_link_tag    "application", :media => "all" %>
+    <%= stylesheet_link_tag    "jquery-ui", :media => "all" %>
+    <%= javascript_include_tag "application" %>
+    <%= csrf_meta_tags %>
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-325725-27']);
+      _gaq.push(['_setDomainName', 'mpdx.org']);
+      _gaq.push(['_setSiteSpeedSampleRate', 100]);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+  </head>
+  <body id="<%= controller.controller_name %>_<%= controller.action_name %>" class="<%= controller.controller_name %>_controller">
+    <header id="global">
+    <hgroup id="user">
+    <div class="outer">
+      <div id="brand"><%= link_to("", "/", :class=> "logo") %></div>
+      <div class="links">
+        <div class="section lists" data-behavior="account_selector" style="<%= 'display:none' unless current_user.account_lists.length > 1 %>">
+          <a data-behavior="current_account"><span class='cur'><%= current_account_list.name %></span><%= image_tag("list_select.png") %></a>
+          <div style="display:none" class="switcher">
+            <ul>
+              <% (current_user.account_lists - [current_account_list]).each do |al| %>
+                <li><%= link_to(al.name, "/home/change_account_list?id=#{al.id}") %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+
+        <div class="section"><%= link_to(_('Settings'), "/preferences", :class => "") %></div>
+        <div class="section"><%= link_to(_('Log out'), '/logout', :class => "") %></div>
+      </div>
+    </div>
+    </hgroup>
+    <hgroup id="menu">
+    <div id="mainmenu">
+      <div class="outer">
+        <div class="item <%= request.path == '/' ? 'active' : '' %>"><%= link_to(_('Dashboard'), "/") %></div>
+        <div class="item <%= request.path =~ /\/contacts/ ? 'active' : '' %>"><%= link_to(_('Contacts'), "/contacts") %></div> 
+        <!-- <div class="item <%= request.path =~ /\/messages/ ? 'active' : '' %>"><%= link_to((_('Messages') + ' ' + content_tag(:span, 3, class: 'indicator')).html_safe, '') %></div> -->
+        <div class="item last <%= request.path =~ /\/tasks/ ? 'active' : '' %>"><%= link_to(_('Tasks'), "/tasks") %></div>
+        <!-- <div class="item last <%= request.path =~ /\/social/ ? 'active' : '' %>"><%= link_to(_('Social'), "") %></div> -->
+        <%#<div class="items search">%>
+          <%#<div id="searchform">%>
+            <%#<form>%>
+              <%#<div class="wrap">%>
+                <!-- <input type="text" class="searchfield" placeholder="<%= _('Search for...') %>"/> -->
+                <%#<button type="submit">Search</button>%>
+              <%#</div>%>
+            <%#</form>%>
+          <%#</div>%>
+        <%#</div>%>
+        <div class="right">
+          <%= @account_list_exhibit.balances %>
+        </div>
+      </div>
+    </div>
+    <div id="submenu">
+      <div class="outer">
+        <div class="section"><%= link_to(_('Add Task'), new_task_path, :class => "btn") %></div>
+        <!-- <div class="section"><%= link_to(_('Status Update'), "", :class => "btn") %></div> -->
+        <!-- <div class="section"><%= link_to(_('Send Message'), "", :class => "btn") %></div> -->
+        <div class="section"><%= link_to(_('Add Contact'), new_contact_path, class: 'btn') %></div>
+        <div class="section"><%= link_to(_('Import Contacts'), accounts_path, class: 'btn') %></div>
+      </div>
+    </div>
+    </hgroup>
+    </header>
+
+    <div id="body" class="outer">
+      <%#<aside id="tipside">%>
+      <%#<section class="tipbox">%>
+      <%#blah blah blah%>
+      <%#</section>%>
+      <%#<section class="tipbox">%>
+      <%#blah blah blah%>
+      <%#</section>%>
+      <%#</aside>%>
+
+      <div id="content"> 
+        <%= render 'notices' %>
+        <%= yield %>
+      </div>
+    </div>
+  </body>
+
+</html>

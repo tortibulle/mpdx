@@ -1,0 +1,114 @@
+<%= render 'settings_sidebar' %>
+<div id="contentbody" class="withleft">
+  <div class="wpp">
+
+    <% %w[google facebook twitter linkedin key relay].each do |provider| %>
+      <div class="network_connect">
+
+        <table>
+          <tr>
+            <td class="identify">
+
+              <div class="network_logo">
+                <%= image_tag("logos/#{provider}_logo.png", alt: provider) %>
+              </div>
+
+              <div class="network_button">
+                <%= auth_link(provider) %>
+              </div>
+            </td>
+            <td class="connections">
+              <%= render 'network_connections', provider: provider %>
+            </td>
+          </tr>
+        </table>
+      </div>
+    <% end %>
+    <% provider = 'organization' %>
+    <div class="network_connect">
+      <table>
+        <tr>
+          <td class="identify">
+
+            <div class="network_logo">
+              <%= image_tag("logos/#{provider}_logo.png", alt: provider) %>
+            </div>
+
+            <div class="network_button">
+              <%= link_to(_('Add another Account'), '#', data: {behavior: 'add_org_account'}, :class => "btn") %>
+            </div>
+          </td>
+          <td class="connections">
+            <%= render 'network_connections', provider: provider %>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <% %w[tnt].each do |provider| %>
+      <div class="network_connect">
+
+        <table>
+          <tr>
+            <td class="identify">
+
+              <div class="network_logo">
+                <h1>
+                  <%= image_tag("logos/#{provider}_logo.png", alt: provider) %> <br />
+                  TntMPD
+                </h1>
+              </div>
+            </td>
+            <td class="connections" data-behavior="account">
+
+              <div class="importoptions formstyles" data-behavior="import_options" style="display:none">
+                <%= form_for Import.new(source: provider) do |f| %>
+                  <%= f.hidden_field :source %>
+
+                  <div class="field">
+                    <%= f.file_field :file %>
+                    <%= f.hidden_field :file_cache %>
+                  </div>
+
+                  <div class="field radiocheck">
+                    <%= f.radio_button :override, false %>
+                    <%= f.label 'override_false', _('Only add CSV data to matched contact records when the current field is blank.') %>
+                  </div>
+                  <div class="field radiocheck">
+                    <%= f.radio_button :override, true %>
+                    <%= f.label 'override_true', _('Override existing contact fields with data in the CSV.') %>
+                  </div>
+                  <div class="field">
+                  <input   type="hidden" name="default_csv_override" value="false">
+                    <input type="hidden" name="default_csv_file">
+                    <div class="importtags">
+                      <input type="text" placeholder="<%= _('Add tags to these contacts') %>"/>
+                    </div>
+                  </div>
+                  <div class="hint">
+                    <%= _('Not sure how to export your data from TNT?') %>
+                    <%= link_to(_('Watch this video'), 'http://screencast.com/t/lFiYn0EA4', target: '_blank') %>.
+                  </div>
+                  <a href="#" class="btn btngreen" data-behavior="import_button"><%= _('Import') %></a>
+                <% end %>
+              </div>
+              <div><a href="#" class="btn" data-behavior="show_import"><%= _('Import Contacts') %></a></div>
+
+            </td>
+          </tr>
+        </table>
+      </div>
+    <% end %>
+
+    <div data-behavior="new_org_account" style="display:none" title="<%= _('Connect to your organization') %>">
+      <div id="account_list" style="<% current_user.organization_accounts.blank? ? '' : 'display:none' %>">
+        <%= select_tag(:organization_id, options_for_select(Organization.active.order('name').collect {|o| [o.name, o.id]}), include_blank: true) %>
+        <br /><br />
+        <%= link_to(_('Connect to selected organization'), new_person_organization_account_path, class: 'btn', id: 'connect_to_org') %>
+      </div>
+    </div>
+    <div id="org_connection_box">
+    </div>
+
+  </div>
+</div>

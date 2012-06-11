@@ -1,0 +1,77 @@
+<aside id="leftmenu">
+  <ul>
+    <li class="selected"><%= link_to('Active/Upcoming', '', class: "inbox") %></li>
+    <li><%= link_to("Starred", "", class: "starred") %></li>
+    <li><%= link_to("Completed", "", class: "completed") %></li>
+  </ul>
+</aside>
+
+<div id="contentbody" class="withleft">
+  <div class="wpp">
+    <h1>Listing contacts</h1>
+
+    <div class="padded">
+      <table class="tablelist">
+        <tr>
+          <th class="checks"></th>
+          <th class="profile">Name</th>
+          <th class="qaction"></th>
+          <th class="tags"></th>
+        </tr>
+
+        <% @contacts.each do |contact| %>
+        <% contact = exhibit(contact, self) %>
+        <tr id="<%= dom_id(contact) %>">
+          <td class="checks"><input type="checkbox" /></td>
+          <td class="profile">
+            <div class="avatar">
+              <%= link_to(image_tag(contact.avatar, class: "avatar small"), contact)%>
+            </div>
+            <div class="key">
+              <span class="name"><%= link_to(contact, contact) %></span>
+              <% if contact.company_position %>
+                <span class="title etc"><%= contact.company_position %></span>
+                <span class="company etc"><%= contact.company_position.company %></span>
+              <% end %>
+              <span class="phone etc"><%= exhibit(contact.phone_number, self) %></span>
+              <span class="email etc"><%= exhibit(contact.email, self) %></span>
+            </div>
+            <%#<div class="status">%>
+              <%#<h4>Notifications</h4>%>
+              <%#<ul>%>
+                <%#<li>David made a huge donation to you.</li>%>
+                <%#<li>It's David's birthday tomorrow.</li>%>
+              <%#</ul>%>
+            <%#</div>%>
+          </td>
+          <td class="qaction" id="<%= dom_id(contact) %>_quick">
+            <a href="" class="btn smallbtn quick"><%= t('g.quick') %></a>
+            <ul style="display:none" class="quick_action_list">
+              <!-- <li><%= link_to(t('g.text_message'), '', :class => "text") %></li> -->
+              <% if contact.email %>
+                <li><%= mail_to(contact.email, t('g.send_email'), :class => "email") %></li>
+              <% end %>
+              <% if contact.facebook_account %>
+                <li><%= link_to(t('g.facebook_message'), '', :class => "fb") %></li>
+              <% end %>
+              <% if contact.twitter_account %>
+                <li><%= link_to(t('g.direct_message'), '', :class => "tweet") %></li>
+              <% end %>
+              <li><%= link_to(t('g.show'), contact, :class => "none") %></li>
+              <li><%= link_to(t('g.edit'), edit_contact_path(contact), :class => "none") %></li>
+            </ul>
+          </td>
+          <td class="tags">
+            <%#= link_to("F", "", class: "tag")%>
+            <%#= link_to("T", "", class: "tag")%>
+          </td>
+        </tr>
+       <% end %>
+      </table>
+
+      <br />
+
+      <%= link_to(t('.new_contact'), new_contact_path, class: 'btn') %>
+    </div>
+  </div>
+</div>

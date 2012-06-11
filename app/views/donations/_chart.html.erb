@@ -1,0 +1,95 @@
+<% @contact = exhibit(@contact, self) %>
+<%#<div class="donation-filters">%>
+  <%#<form>%>
+    <%#<select>%>
+      <%#<option>Designation<option>%>
+      <%#<option>-----------------------</option>%>
+      <%#<option>1123456722 [Cru]</option>%>
+      <%#<option>112342155 [Summer Project]</option>%>
+    <%#</select>%>
+    <%#<select>%>
+      <%#<option>Appeal<option>%>
+      <%#<option>-----------------------</option>%>
+      <%#<option>Dinner</option>%>
+      <%#<option>Christmas Gift</option>%>
+    <%#</select>%>
+  <%#</form>%>
+<%#</div>%>
+
+<% if @by_month.present? %>
+  <% average =  (@by_month.values.collect {|v| v.sum(&:amount)}.reverse[0..11].sum / 12).round %>
+  <% prior_average =  (@prior_year.values.collect {|v| v.sum(&:amount)}.reverse[0..11].sum / 12).round %>
+
+  <script type="text/javascript" charset="utf-8">
+    var chart;
+    $(document).ready(function() {
+      chart = new Highcharts.Chart({
+        chart: {
+          renderTo: 'donation_chart',
+          height: 250
+        },
+        colors: [
+          '#DB843D', 
+          '#4572A7',
+          '#89A54E',  
+          '#AA4643', 
+          '#80699B', 
+          '#3D96AE',
+          '#92A8CD', 
+          '#A47D7C', 
+          '#B5CA92'
+        ],
+        title: {
+          text: 'Donation History'
+        },
+        subtitle: {
+          text: '<%== if prior_average > average 
+                       "Average donations down <span style=\"color:red\">#{number_to_current_currency(prior_average - average)}</span> from last year"
+                     elsif average > prior_average
+                       "Average donations up <span style=\"color:green\">#{number_to_current_currency(average - prior_average)}</span> from last year"
+                     else
+                       ''
+                      end %>'
+        },
+        xAxis: {
+          categories: [
+          <%== 12.downto(0).collect {|i| l(i.months.ago.to_date, format: :month_abbrv).inspect}.join(",\n") %>
+          ]
+        },
+        yAxis: {
+          min: 0,
+          title: {
+            text: 'Amount (USD)'
+          }
+        },
+        tooltip: {
+          formatter: function() {
+            return this.y;
+          }
+        },
+        plotOptions: {
+          column: {
+            pointPadding: 0.2,
+            borderWidth: 0
+          }
+        },
+        series: [{
+          name: '<%= 'Donations' %>',
+          data: [<%= @by_month_index.collect {|month| @by_month[month] || []}.collect {|v| v.sum(&:amount)}.join(',') %>],
+          type: 'column'
+        },{
+          name: '<%= 'Last Year' %>',
+          data: [<%= @prior_year_index.collect {|month| @prior_year[month] || []}.collect {|v| v.sum(&:amount)}.join(',') %>],
+          type: 'column'
+        },{
+  name: '<%= 'Average' %>',
+        data: [<%= 0.upto(12).collect {|i| average}.join(',') %>],
+          type: 'line'
+        }]
+      });
+    });
+  </script>
+<% end %>
+<div class="donation-charts" id="donation_chart">
+  No donations have been received from <%= @contact || 'this person' %> in the past 13 months
+</div>

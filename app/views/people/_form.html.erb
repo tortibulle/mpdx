@@ -1,0 +1,139 @@
+<div class="sfield inside_person" data-behavior="field-wrapper add-wrapper">
+  <% person = builder.object %>
+  <% if person.errors.any? %>
+    <div id="error_explanation">
+      <ul>
+        <% person.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+
+  <div class="col_50 cols">
+    <div class="fieldset_label">
+      <%= t('.basic_information') %>
+    </div>
+
+    <div class="field">
+      <%= builder.label :first_name %>
+      <%= builder.text_field :first_name, class: 'first_name' %>
+    </div>
+    <div class="field">
+      <%= builder.label :last_name %>
+      <%= builder.text_field :last_name, class: 'last_name' %>
+    </div>
+    <div class="field">
+      <%= builder.label :legal_first_name %>
+      <%= builder.text_field :legal_first_name %>
+    </div>
+    <div class="fieldset">
+      <div class="field">
+        <%= builder.label :title %>
+        <%= builder.select :title, t('g.titles'), include_blank: true %>
+      </div>
+      <div class="field">
+        <%= builder.label :suffix %>
+        <%= builder.select :suffix, t('g.suffixes'), include_blank: true %>
+      </div>  
+    </div>
+    <div class="fieldset">
+      <div class="field radiocheck">
+        <%= builder.radio_button :gender, 'male' %> <%= builder.label :gender_male, t('g.Male') %>
+      </div>
+      <div class="field radiocheck">
+        <%= builder.radio_button :gender, 'female' %> <%= builder.label :gender_female, t('g.Female') %>
+      </div>
+    </div>
+
+    <div class="field">
+      <%= builder.label :birthday %>
+      <%= builder.select :birthday_month, t('date.month_names')[1..-1].collect.with_index {|m, i| [m,i]}, include_blank: true %>
+      <%= builder.select :birthday_day, (1..31).to_a, include_blank: true %>
+      <%= builder.select :birthday_year, Time.now.year.downto(1900).to_a, include_blank: true %>
+    </div><br />
+    <div class="field">
+      <%= builder.label :marital_status %>
+      <%= builder.select :marital_status, t('g.marital_statuses'), include_blank: true %>
+    </div><br />
+
+    <div class="field">
+      <%= builder.label :anniversary %>
+      <%= builder.select :anniversary_month, t('date.month_names')[1..-1].collect.with_index {|m, i| [m,i]}, include_blank: true %>
+      <%= builder.select :anniversary_day, (1..31).to_a, include_blank: true %>
+      <%= builder.select :anniversary_year, Time.now.year.downto(1900).to_a, include_blank: true %>
+    </div>
+    <div class="spacer"></div>
+    <% if builder.parent_builder.object.is_a?(Contact) %>
+      <%= link_to_remove_fields(builder, no_remove) %>
+    <% end %>
+  </div>
+
+  <div class="col_50 cols">
+
+
+    <div class="fieldset">
+      <label class="fieldset_label"><%= t('g.email') %></label>
+      <%# person.email_addresses.build if person.email_addresses.blank? %>
+      <%= builder.fields_for :email_addresses do |builder| %>
+        <%= render 'people/email_address_fields', builder: builder, object: person, no_remove: person.email_addresses.length <= 1 %>
+      <% end %>
+      <div class="sfield field_indent" data-behavior="add-wrapper">
+        <%= link_to_add_fields(t('.add_email_address'), builder, :email_addresses, partial: 'people/email_address_fields') %>
+      </div>
+
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="fieldset">
+      <label class="fieldset_label"><%= t('g.phone') %></label>
+      <%# person.phone_numbers.build if person.phone_numbers.blank? %>
+      <%= builder.fields_for :phone_numbers do |pf| %>
+        <%= render 'people/phone_number_fields', builder: pf, object: person, no_remove: person.phone_numbers.length <= 1 %>
+      <% end %>
+      <div class="sfield field_indent" data-behavior="add-wrapper">
+        <%= link_to_add_fields(t('.add_phone_number'), builder, :phone_numbers, partial: 'people/phone_number_fields') %>
+      </div>
+
+    </div>
+    
+    <div class="spacer"></div>
+
+    <div class="fieldset">
+      <label class="fieldset_label"><%= t('g.Social') %></label>
+      <% %w[facebook twitter linkedin].each do |network| %>
+        <% relationship = person.send(:"#{network}_accounts") %>
+        <%= builder.fields_for :"#{network}_accounts" do |pf| %>
+          <%= render "people/#{network}_account_fields", builder: pf, object: person, no_remove: false %>
+        <% end %>
+        <div class="sfield field_indent" data-behavior="add-wrapper">
+          <%= link_to_add_fields(t(".add_#{network}_account"), builder, :"#{network}_accounts", partial: "people/#{network}_account_fields") %>
+        </div>
+        
+        <hr class="thin"/>
+        
+      <% end %>
+    </div>
+
+    <div class="spacer"></div>
+
+    <% if (current_account_list.contacts - [person]).present? %> 
+      <div class="fieldset">
+        <label class="fieldset_label">Relationships</label>
+        <%# person.family_relationships.build if person.family_relationships.blank? %>
+        <%= builder.fields_for :family_relationships do |builder| %>
+          <%= render 'people/family_relationship_fields', builder: builder, object: person, no_remove: person.family_relationships.length <= 1 %>
+        <% end %>
+      </div>
+      <div class="sfield" data-behavior="add-wrapper">
+        <div class="ls"></div>
+        <div class="rs">
+          <%= link_to_add_fields(t('.add_relationship'), builder, :family_relationships, partial: 'people/family_relationship_fields') %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div class="clr"></div>
+</div>

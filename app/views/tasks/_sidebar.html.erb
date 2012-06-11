@@ -1,0 +1,8 @@
+<aside id="leftmenu">
+<ul>
+  <li class="<%= 'selected' if params[:action] == 'index' %>"><%= link_to('Active/Upcoming', tasks_path, class: "inbox") %></li>
+  <li class="<%= 'selected' if params[:action] == 'starred' %>"><%= link_to("Starred", starred_tasks_path, class: "starred") %></li>
+  <li class="<%= 'selected' if params[:action] == 'completed' %>"><%= link_to("Completed", completed_tasks_path, class: "completed") %></li>
+</ul>
+</aside>
+

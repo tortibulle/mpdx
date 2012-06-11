@@ -1,0 +1,17 @@
+<div class="field social_field" data-behavior="field-wrapper social-field" data-network="linkedin">
+    <%#= builder.label :url, t('.linkedin_url') %>
+    <div class="ls">
+      <%= builder.label :url, 'LinkedIn' %>
+    </div>
+    <div class="rs">
+      <% if current_user.linkedin_account %>
+        <%= builder.text_field :url, placeholder: 'http://' %>
+      <% else %>
+        <%= link_to(t('.need_linkedin'), '/auth/linkedin') %>
+      <% end %>
+      <div class="field_action" style="<%= no_remove ? 'display:none' : '' %>">
+        <%= link_to_remove_fields(builder, no_remove) %>
+      </div>
+    </div>
+</div>
+

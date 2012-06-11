@@ -1,0 +1,46 @@
+<% if current_user.organization_accounts.any?(&:downloading?) %>
+  <div id="dismissable">
+    <div class="item" id="data_downloading">
+      <%#<a href="" class="dismiss_item corner_close">Close</a>%>
+      <div class="dismiss_content">
+        <%= _('MPDX is currently downloading your data from the donation system. This message will go away when the download is complete.') %>
+      </div>
+    </div>
+  </div>
+<% end %>
+<% if current_user.facebook_accounts.any?(&:downloading?) %>
+  <div id="dismissable">
+    <div class="item" id="facebook_downloading">
+      <%#<a href="" class="dismiss_item corner_close">Close</a>%>
+      <div class="dismiss_content">
+        <%= _('MPDX is currently importing your contacts from Facebook. This message will go away when the import is complete.') %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<% if current_user.imports.any?(&:importing?) %>
+  <div id="dismissable">
+    <div class="item" id="file_importing">
+      <%#<a href="" class="dismiss_item corner_close">Close</a>%>
+      <div class="dismiss_content">
+        <%= _('MPDX is currently importing your contacts from a .csv file you uploaded. This message will go away when the import is complete.') %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<% if notice %>
+  <div class="mwrap">
+    <div class="inside notice">
+      <p><%= notice %></p>
+    </div>
+  </div>
+<% end %>
+<% if alert %>
+  <div class="mwrap">
+    <div class="inside alert">
+      <p><%= alert %></p>
+    </div>
+  </div>
+<% end %>

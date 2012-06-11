@@ -1,0 +1,8 @@
+<aside id="leftmenu">
+<ul>
+  <li><%= link_to(_('Preferences'), preferences_path, class: request.path == preferences_path ? 'completed' : '') %></li>
+  <li><%= link_to(_('Networks & Imports'), accounts_path, class: request.path == accounts_path ? 'completed' : '') %></li>
+<!--  <li><%= link_to("Signature", "", class: "") %></li>
+  <li><%= link_to("Export", "", class: "") %></li> -->
+</ul>
+</aside>

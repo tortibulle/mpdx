@@ -1,0 +1,9 @@
+<div class="sfield address_field">
+
+  <div class="ls">
+    <%= builder.label :referred_by_id %>
+    <%= builder.select :referred_by_id, current_account_list.contacts.order('name').collect { |c| [c.name, c.id] }, include_blank: true %>
+  </div>
+
+</div>
+

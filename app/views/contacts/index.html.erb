@@ -1,0 +1,35 @@
+<aside id="leftmenu">
+<ul>
+  <li class="<%= 'selected' if params[:filter].blank? %>"><%= link_to(t('g.all'), contacts_path, class: "all") %></li>
+  <li class="<%= 'selected' if params[:filter] == 'people' %>"><%= link_to(t('g.people'), contacts_path(filter: 'people'), class: "people") %></li>
+  <li class="<%= 'selected' if params[:filter] == 'companies' %>"><%= link_to(t('g.companies'), contacts_path(filter: 'companies'), class: "companies") %></li>
+<!--  <li class="selected">
+    <%= link_to("Tags", contacts_path(filter: 'companies'), class: "tags") %>
+    <ul class="left_taglist tags">
+      <li><%= link_to("Recurring Donor", "", class: "tag selected")%></li>
+      <li><%= link_to("One Time Donor", "", class: "tag")%></li>
+      <li><%= link_to("New Donor", "", class: "tag")%></li>
+    </ul>
+    </li> -->
+</ul>
+</aside>
+
+<div id="contentbody" class="withleft">
+  <div class="filters">
+    <%= text_field_tag :contact_name, '', autocomplete: 'off', placeholder: t('g.contact_filter_prompt'), class: 'search_filter' %>
+    <div class="right">
+      <%= link_to("Actions", "Actions", class: "btn smallbtn") %>
+      <span class="btn smallbtn"><input type="checkbox" /></span>
+    </div>
+  </div>
+  <div class="">
+    <div class="padded">
+      <table class="tablelist">
+
+        <%= render partial: 'contact', collection: @contacts %>
+      </table>
+      <%#= will_paginate @contacts %>
+
+    </div>
+  </div>
+</div>

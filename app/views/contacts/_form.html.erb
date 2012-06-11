@@ -1,0 +1,83 @@
+<% if contact.errors.any? %>
+  <div id="error_explanation">
+    <ul>
+      <% contact.errors.each do |attribute, error| %>
+        <% next if attribute.to_s.include?('.') %>
+        <li><%= contact.errors.full_message(attribute, error) %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+
+<div class="col_50 cols">
+  <div class="fieldset_label">
+    Basic Information
+  </div>
+
+  <div class="field">
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </div>
+
+  <div class="field">
+    <%= f.label :pledge_amount %>
+    <%= f.text_field :pledge_amount %>
+  </div>
+
+  <div class="field">
+    <%= f.label :status %>
+    <%= f.select :status, f.object.assignable_statuses.collect { |s| [_(s), s] }, include_blank: true %>
+  </div>
+
+  <div class="sfield referrers_field">
+    <label class="fieldset_label">Referrals</label>
+    <% contact.contact_referrals_to_me.build if contact.contact_referrals_to_me.blank? %>
+    <%= f.fields_for :contact_referrals_to_me do |builder| %>
+      <%= render 'contact_referral_fields', builder: builder, object: contact, no_remove: contact.contact_referrals_to_me.length <= 1 %>
+    <% end %>
+    <div class="sfield field_indent address_indent">
+      <div class="rs"><%= link_to_add_fields(_('Add Referral'), f, :contact_referrals_to_me, partial: 'contacts/contact_referral_fields') %></div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="col_50 cols">
+
+  <div class="fieldset">
+    <label class="fieldset_label">Address</label>
+    <% contact.addresses.build if contact.addresses.blank? %>
+    <%= f.fields_for :addresses do |builder| %>
+      <%= render 'address_fields', builder: builder, object: contact, no_remove: contact.addresses.length <= 1 %>
+    <% end %>
+    <div class="sfield field_indent address_indent">
+      <div class="ls"></div>
+      <div class="rs"><%= link_to_add_fields(_('Add Address'), f, :addresses) %></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="cols">
+
+  <div class="fieldset">
+    <label class="fieldset_label">People</label>
+    <% contact.people.build if contact.people.blank? %>
+    <%= f.fields_for :people do |builder| %>
+      <div class="inside_person">
+      <%= render 'people/form', builder: builder, object: contact, no_remove: false %>
+      </div>
+    <% end %>
+    <div class="sfield">
+      <div class="ls"></div>
+      <div class="rs"><%= link_to_add_fields(_('Add Person'), f, :people, partial: 'people/form') %></div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="clr"></div>
+<div class="spacer"></div>

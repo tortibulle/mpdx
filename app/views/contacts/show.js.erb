@@ -1,0 +1,6 @@
+$('#contentbody').replaceWith('<%= j(render('contact_body', contacts: @contacts, contact: @contact)) %>')
+$('.contact_list a').removeClass('active')
+$('[data-id=<%= @contact.id %>]').addClass('active')
+$.mpdx.activateTabs()
+$.mpdx.loadDonations()
+History.pushState({contact_id: <%= @contact.id %>}, "<%== sanitize @contact.name %>", '<%= contact_path(@contact) %>' + document.location.hash)

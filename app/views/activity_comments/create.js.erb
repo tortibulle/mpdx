@@ -1,0 +1,9 @@
+<% if @comment.errors.empty? %>
+  $('#comment_list_<%= @activity.id %>').append('<%= j(render 'comment', comment: @comment) %>')
+$('#comment_count_<%= @activity.id %>').html('<%= @activity.activity_comments.count %>')
+$('#activity_<%= @activity.id %>_activity_comment_body').val('')
+<% else %>
+  alert('<%= j @comment.errors.full_messages.join("\n") %>')
+<% end %>
+$('.new_activity_comment').show()
+

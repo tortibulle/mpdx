@@ -1,0 +1,86 @@
+<div id="contentbody">
+  <div class="wpp">
+    <h1><%= _('Hi') %> <%= current_user.first_name %>! <span class="smallhead"><%= _("Here's whats happening...") %></span></h1>
+
+    <div id="dash_tasks" class="tabgroup">
+      <ul>
+        <!-- <li class="killround"><a href="#dash_tasks-notifications"><%= _('Notifications') %></a></li> -->
+        <li class="killround"><a href="#dash_tasks-tasks"><%= _('Tasks') %></a></li>
+        <!-- <li class="killround"><a href="#top5-soc"><%= _('Social Snapshot') %></a></li> -->
+      </ul>
+      <%#<div id="dash_tasks-notifications">%>
+        <%#<p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>%>
+        <%#<p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>%>
+        <%#</div>%>
+      <div id="dash_tasks-tasks">
+        <% if current_account_list.tasks.uncompleted.present? %>
+          <ul class="list tasklist">
+            <% current_account_list.tasks.uncompleted.limit(5).each do |task|
+              task = exhibit(task, self) %>
+              <li class="<%= task.css_class %>" id="<%= dom_id(task) %>">
+                <%= form_for task, remote: true, namespace: dom_id(task) do |f| %>
+                  <input type="checkbox" data-behavior="complete_task" data-id="<%= task.id %>" />
+                  <%= f.hidden_field :completed %>
+                  <%= link_to(tasks_path(anchor: dom_id(task))) do %>
+                    <span class="date"><%= l(task.start_at) %></span> - <span><%= task %></span>
+                  <% end %> 
+                  (<%= task.contact_links %>)
+                  <%= link_to('Destroy', task, confirm: _('Are you sure?'), method: :delete, :class=> "ico ico_trash", remote: true) %>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <%= _("Good news! You don't have any pending tasks.") %>
+        <% end %>
+      </div>
+      <%#<div id="top5-soc">%>
+        <%#<p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>%>
+        <%#<p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>%>
+        <%#</div>%>
+      <% if current_account_list.tasks.uncompleted.count > 5 %>
+        <div class="seemore">
+          <%= link_to(_('See All'), tasks_path) if current_account_list.tasks.present? %>
+        </div>
+      <% end %>
+    </div>
+
+    <div id="top5" class="tabgroup">
+      <ul>
+        <li class="killround"><a href="#top5-mp"><%= _('Top 10 Ministry Partners') %></a></li>
+        <%#<li class="killround"><a href="#snapshot-fin">Snapshot</a></li>%>
+        <%#<li class="killround"><a href="#snapshot-chart">Charts</a></li>%>
+      </ul>
+      <div id="top5-mp">
+        <ul class="list socstatus">
+          <% current_account_list.top_partners.each do |contact| %>
+            <li>
+              <!-- <div class="profile_close"><%= link_to("Close", "Close", :class=> "corner_close") %></div> -->
+              <div class="profile_content">
+                <%== _('<span class="name">%{link}</span> has given <span class="hl amt">%{total}</span> since <span class="hl date">%{since}</span>') %{link: link_to(contact.name, contact, :class => "profile_name"), total: number_to_current_currency(contact.total_donations), since: contact.first_donation_date ? l(contact.first_donation_date) : '' } %>
+                <p class="desc"></p>
+                <!-- <ul class="network_tags list">
+                  <li><%= link_to("Facebook","#", :class => "icos ico_fb") %></li>
+                  <li><%= link_to("LinkedIn","#", :class => "icos ico_linkedin") %></li>
+                  <li><%= link_to("Twitter","#", :class => "icos ico_twitter") %></li>
+                  <li><%= link_to("Gmail","#", :class => "icos ico_google") %></li>
+                </ul> -->
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+      <!-- <div id="snapshot-fin">
+        <ul>
+          <li><%= link_to("#") do %> do <strong>Line Item</strong> - <span>Check it out!</span><% end %></li>
+        </ul>
+      </div>
+      <div id="snapshot-chart">
+        <p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
+        <p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
+      </div>
+      -->
+    </div>
+
+  </div>
+</div>

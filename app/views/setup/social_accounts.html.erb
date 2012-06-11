@@ -1,0 +1,32 @@
+<div class="network_wrap">
+
+  <% %w[google facebook twitter linkedin key relay].each do |provider| %>
+    <% next if %w{relay key}.include?(provider) && current_user.send("#{provider}_accounts".to_sym).present? %>
+    <div class="network_connect">
+      <div class="network_logo">
+        <%= image_tag("logos/#{provider}_logo.png", alt: provider) %>
+      </div>
+
+      <div class="network_button">
+        <%= auth_link(provider) %>
+      </div>
+
+      <div class="network_connections">
+        <% current_user.send("#{provider}_accounts".to_sym).each do |account| %>
+          <div class="account_single">
+            <%= account %>
+            <div class="actions">
+              <%= link_to(t('delete'), account_path(account, provider: provider), method: :delete, :class => "inlineaction delete") %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+
+    </div>
+  <% end %>
+
+  <div class="continue">
+    <%= link_to(t('g.continue'), next_wizard_path, :class => "btn") %>
+  </div>
+</div>

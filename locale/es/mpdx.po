@@ -1,0 +1,168 @@
+# Spanish translations for version package.
+# Copyright (C) 2012 THE version'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the version package.
+# Josh Starcher <>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: version 0.0.1\n"
+"POT-Creation-Date: 2012-05-23 14:16-0400\n"
+"PO-Revision-Date: 2012-06-01 15:26-0400\n"
+"Last-Translator: Josh Starcher <>\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid ""
+"<span class=\"name\">%{link}</span> has given <span class=\"hl amt\">%{total}"
+"</span> since <span class=\"hl date\">%{since}</span>"
+msgstr ""
+
+msgid "Add Contact"
+msgstr ""
+
+msgid "Add Task"
+msgstr ""
+
+msgid "Add an Account"
+msgstr ""
+
+msgid "Add another Account"
+msgstr ""
+
+msgid "Appointment Scheduled"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr ""
+
+msgid "Ask in Future"
+msgstr ""
+
+msgid "Call for Appointment"
+msgstr ""
+
+msgid "Call for Decision"
+msgstr ""
+
+msgid "Connect to selected organization"
+msgstr ""
+
+msgid "Connect to your organization"
+msgstr ""
+
+msgid "Contact List"
+msgstr ""
+
+msgid "Contacts"
+msgstr ""
+
+msgid "Dashboard"
+msgstr ""
+
+msgid "Good news! You don't have any pending tasks."
+msgstr ""
+
+msgid "Here's whats happening..."
+msgstr ""
+
+msgid "Hi"
+msgstr ""
+
+msgid "Language"
+msgstr ""
+
+msgid "Log out"
+msgstr ""
+
+msgid ""
+"MPDX is currently downloading your data from the donation system. This "
+"message will go away when the download is complete."
+msgstr ""
+
+msgid "Messages"
+msgstr ""
+
+msgid "Navigate contacts: <strong>%{index} of %{total}</strong>"
+msgstr ""
+
+msgid "Networks"
+msgstr ""
+
+msgid "Never Ask"
+msgstr ""
+
+msgid "Never Contacted"
+msgstr ""
+
+msgid "Not Interested"
+msgstr ""
+
+msgid "Notifications"
+msgstr ""
+
+msgid "Partner - Financial"
+msgstr ""
+
+msgid "Partner - Pray"
+msgstr ""
+
+msgid "Partner - Special"
+msgstr ""
+
+msgid "Preferences"
+msgstr ""
+
+msgid "Preferences saved"
+msgstr ""
+
+msgid "Related To"
+msgstr ""
+
+msgid "Remove"
+msgstr ""
+
+msgid "Save Preferences"
+msgstr ""
+
+msgid "Search for..."
+msgstr ""
+
+msgid "See All"
+msgstr ""
+
+msgid "Send Message"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Social"
+msgstr ""
+
+msgid "Social Snapshot"
+msgstr ""
+
+msgid "Status Update"
+msgstr ""
+
+msgid "Tasks"
+msgstr ""
+
+msgid "Time zone"
+msgstr ""
+
+msgid "Top 10 Ministry Partners"
+msgstr ""
+
+msgid "Type to filter"
+msgstr ""
+
+msgid "Unresponsive"
+msgstr ""
+
+msgid "delete"
+msgstr ""

@@ -1,0 +1,26 @@
+<div class="sfield address_field" data-behavior="field-wrapper">
+  <div class="ls">
+    <%= builder.label :location %>
+    <%= builder.select :location, builder.object.assignable_locations.collect { |l| [_(l), l] }, include_blank: true %>
+  </div>
+  <div class="rs">
+    
+    <%= builder.label :street %>
+    <%= builder.text_area :street, rows: 3, placeholder: "Street address" %>
+    <%= builder.label :city %>
+    <%= builder.text_field :city, placeholder: "City" %>
+    <%= builder.label :state %>
+    <%= builder.text_field :state, placeholder: "State" %>
+    <%= builder.label :postal_code %>
+    <%= builder.text_field :postal_code, placeholder: "Postal Code" %>
+    <%= builder.label :country %>
+    <%= builder.country_select :country, nil, {include_blank: true}, {class: 'country_select'} %><br/>
+    <div class="field_action" style="<%= no_remove ? 'display:none' : '' %>">
+      <%= builder.check_box :primary_mailing_address, class: 'primary' %>
+      <%= builder.label :primary_mailing_address %>
+      <%= link_to_remove_fields(builder, no_remove) %>
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,7 @@
+<div class="sfield email_field">
+  <div class="field">
+    <%= builder.label :contact_id, _('Related To') %>
+    <%= builder.select :contact_id, current_account_list.contacts.order('name').collect {|c| [c.to_s, c.id]}, include_blank: true %>
+  </div>
+</div>
+

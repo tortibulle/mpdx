@@ -1,0 +1,41 @@
+<% @contact = exhibit(@contact, self) %>
+<% multiple_designations = current_account_list.designation_accounts.length > 1 ? true : false %>
+<% unless params[:page] %>
+<table class="tablelist donations" id="donations_table">
+  <thead>
+    <tr>
+      <th class="date">Date</th>
+      <% unless @contact %>
+        <th>Donor</th>
+      <% end %>
+      <th class="right">Amount</th>
+      <% if multiple_designations %>
+        <th>Designation</th>
+      <% end %>
+      <th><%= t('.method') %></th>
+      <th><%= t('.motivation') %></th>
+      <%#<th class="appeal">Appeal</th>%>
+    </tr>
+  </thead>
+  <tbody>
+<% end %>
+    <% donations.map {|d| exhibit(d, self)}.each do |donation| %>
+      <tr>
+        <td class="date"><%= l donation.donation_date %></td>
+        <% unless @contact %>
+          <td><%= donation.donor_account.name %></td>
+        <% end %>
+        <td class="right"><%= donation.amount %></td>
+        <% if multiple_designations %>
+          <td><%= donation.designation_account.designation_number %></td>
+        <% end %>
+        <td><%= donation.payment_method %></td>
+        <td><%= donation.motivation %></td>
+        <%#<td class="appeal">Dinner</td>%>
+      </tr>
+    <% end %>
+<% unless params[:page] %>
+  </tbody>
+</table>
+<% end %>
+

@@ -1,0 +1,12 @@
+<div id="contentbody">
+  <div class="wpp">
+    <h1>Editing person</h1>
+    <%= form_for(@person) do |f| %>
+      <%= render 'form', builder: f %>
+      <div class="actions">
+        <%= f.submit "Save Contact", class: "btn" %>
+        <%= link_to(t('g.Back'), request.referrer ? :back : @person, class: "btn") %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+<%= render 'sidebar' %>
+<div id="contentbody" class="withleft">
+  <div class="wpp">
+
+    <h1></h1>
+
+    <table class="tablelist tasks">
+
+      <tr class="clear">
+        <td colspan="4"><div class="taskgroup red">Overdue</div></td>
+      </tr>
+
+      <%= render partial: 'task', collection: @overdue %>
+
+      <tr class="clear">
+        <td colspan="4"><div class="taskgroup orange">Tomorrow</div></td>
+      </tr>
+
+      <%= render partial: 'task', collection: @tomorrow %>
+
+      <tr class="clear">
+        <td colspan="4"><div class="taskgroup gray">Upcoming</div></td>
+      </tr>
+
+      <%= render partial: 'task', collection: @upcoming %>
+    </table>
+  </div>
+</div>

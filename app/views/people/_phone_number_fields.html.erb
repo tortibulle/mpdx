@@ -1,0 +1,12 @@
+<div class="field phone_field" data-behavior="field-wrapper">
+  <div class="ls"><%= builder.label :number, t('g.number') %></div>
+  <div class="rs">
+    <%= builder.phone_field :number %>
+    <%= builder.select :location, %w[mobile home work].collect {|l| [t("g.#{l}"), l]} %>
+    <div class="field_action" style="<%= no_remove ? 'display:none' : '' %>">
+      <%= builder.check_box :primary, class: 'primary' %>
+      <%= builder.label :primary %>
+      <%= link_to_remove_fields(builder, no_remove) %>
+    </div>
+  </div>
+</div>

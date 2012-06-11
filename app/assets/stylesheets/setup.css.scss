@@ -1,0 +1,131 @@
+@import "typography.css.scss";
+@import "jquery-ui.css.scss";
+
+body {
+  background: image-url("splash/bg_blue.jpg");
+}
+
+.setupwrap {
+  width: 870px;
+  margin: 20px auto;
+  padding: 20px 0;
+}
+
+#body {
+  width: $bodywidth;
+  background: $content_bg;
+  float: left;
+  box-shadow: 0 0 20px #333;
+  position: relative;
+}
+
+#right {
+  width: $sidebarwidth - 1px;
+  float: right;
+  margin-top: 210px;
+  background: $white;
+  border: 1px solid $gray;
+  border-left: 0px;
+  border-radius: 0 8px 8px 0;
+  z-index: -1;
+}
+
+.modcontent {
+  padding: 15px 20px;
+}
+
+.network_wrap {overflow: hidden;}
+
+.network_connect {
+  border-bottom: 1px solid $gray_light;
+  padding: 8px 20px;
+  height: auto;
+  min-height: 55px;
+  .network_logo {
+    display: block;
+    float: left;
+    width: 135px;
+      img {
+        max-height: 30px;
+        padding-top: 4px;
+      }
+    }
+  .network_connections {display: block; margin-left: 135px; width: 370px; padding-top: 0px;}
+  .actions { float: right;}
+  .network_button {
+    display: block; 
+    padding-bottom: 8px;
+    .btn {
+      padding: 4px 8px;
+    }
+  }
+ .account_single {
+   display: block;
+   background: #eee;
+   border: 1px dotted $gray_mid;
+   padding: 5px;
+   border-radius: 4px;
+   font-weight: bold;
+   margin: 0 8px 8px 0;
+   font-size: 11px;
+ }  
+}
+
+.continue {
+  background: image-url("splash/bg_gray.jpg");
+  padding: 15px;
+  text-align: left;
+  border-top: 1px solid $white;
+  box-shadow: 0 0 15px #555;
+  .btn {
+    font-size: 16px;
+  }
+}
+
+header#global {
+  height: 100px;
+  background: image-url("splash/bg_gray.jpg");
+  line-height: 100px;
+  padding: 0 20px;
+}
+
+#logo {
+  background: image-url("splash/logo.png") no-repeat 50% 50%;
+  background-size:126px 50px;
+  width: 126px;
+  height: 50px;
+  text-indent: -1000px;
+  overflow: hidden;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+.links {
+  float: right;
+  .section {
+    margin-left: 10px;
+    display: inline-block;
+  }
+}
+
+#callout {
+  background: image-url("callout_bg_blue.png") no-repeat;
+  margin-left: -18px;
+  height: 110px;
+  width: 906px;
+  .in {
+    background: image-url("bigcheck.png") no-repeat 0 21px;
+    height: 47px;
+    font-family: $font_heading;
+    color: $white;
+    font-size: 29px;
+    padding: 31px 0 0 60px;
+    margin-left: 27px;
+    .small {
+      padding-top: 5px;
+      display: inline-block;
+      font-size: 16px;
+      font-family: $font_highlight;
+    }
+  }
+}

@@ -1,0 +1,9 @@
+<div class="comment">
+  <%= link_to(_('delete'), activity_comment_path(comment, activity_id: comment.activity.id), confirm: t('g.confirm'), method: :delete, remote: true, data: {selector: '.comment'}, :class => "corner_close") %>
+  <span class="ico ico_comment"></span>
+  <div class="body">
+    <%= link_to(comment.person, comment.person) %>: <%= comment.body %>
+  </div>
+  <span class="time"><%= l(comment.created_at) %></span>
+</div>
+

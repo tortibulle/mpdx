@@ -1,0 +1,26 @@
+<div class="set phone">
+  <% if person.phone_numbers.present? %>
+    <% person.phone_numbers.map {|pn| exhibit(pn, self)}.each do |phone_number| %>
+      <%= phone_number.to_s %> <%= t('g.' + (phone_number.location || 'mobile')) %><br/>
+    <% end %>
+  <% else %>
+    <%= link_to(t('people.contact_details.add_phone_number'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %>
+  <% end %>
+</div>
+
+<div class="set email">
+  <% if person.email_addresses.present? %>
+    <% person.email_addresses.each do |email| %>
+      <% email = exhibit(email, self) %>
+      <%= t('g.primary') if email.primary? %>
+      <%= email %><br/>
+    <% end %>
+  <% else %>
+    <%= link_to(t('people.contact_details.add_email_address'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %>
+  <% end %>
+</div>
+
+
+<%#<a href="" class="icos ico_fb"></a>%>
+<%#<a href="" class="icos ico_twitter"></a>%>
+<%#<a href="" class="icos ico_linkedin"></a>%>

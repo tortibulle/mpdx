@@ -1,0 +1,26 @@
+<div class="network_wrap">
+  <% %w[organization].each do |provider| %>
+    <div class="network_connect">
+      <div class="network_logo">
+        <%= image_tag("logos/#{provider}_logo.png", alt: provider) %>
+      </div>
+
+      <%= render 'network_connections', provider: provider %>
+      <div class="network_button">
+        <div id="account_list" style="<% current_user.organization_accounts.blank? ? '' : 'display:none' %>">
+          <%= select_tag(:organization_id, options_for_select(Organization.active.order('name').collect {|o| [o.name, o.id]}), include_blank: true) %>
+          <br />
+          <%= link_to(t('.connect_to_org'), new_person_organization_account_path, class: 'btn', id: 'connect_to_org') %>
+        </div>
+      </div>
+
+
+    </div>
+  <% end %>
+
+  <div class="continue">
+    <%= link_to(t('g.continue'), next_wizard_path, :class => "btn") %>
+  </div>
+</div>
+
+<div id="org_connection_box" style="display:none;" title=""><%= spinner(visible: true) %></div>

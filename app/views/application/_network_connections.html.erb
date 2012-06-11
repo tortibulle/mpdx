@@ -1,0 +1,29 @@
+<div class="network_connections">
+  <% current_user.send("#{provider}_accounts".to_sym).each do |account| %>
+    <div class="account_single" data-behavior="account">
+      <div class="actions">
+        <%= link_to(t('delete'), account_path(account, provider: provider), method: :delete, :class => "inlineaction delete") %>
+      </div>
+      <span class="account_name"><%= account %></span>
+
+      <% if provider == 'facebook' %>
+        <% if account.downloading? %>
+          <%= _("Contacts are currently being imported") %>
+        <% else %>
+          <div class="importoptions formstyles" data-behavior="import_options" style="display:none">
+            <%= form_for Import.new(source: provider) do |f| %>
+              <%= f.hidden_field :source %>
+              <div class="importtags">
+                <input type="text" placeholder="<%= _('Add tags to these contacts') %>"/>
+              </div>
+              <a href="#" class="btn btngreen" data-behavior="import_button"><%= _('Import') %></a>
+            <% end %>
+          </div>
+          <div><a href="#" class="btn smallbtn" data-behavior="show_import"><%= _('Import Contacts') %></a></div>
+        <% end %>
+
+      <% end %>
+
+    </div>
+  <% end %>
+</div>

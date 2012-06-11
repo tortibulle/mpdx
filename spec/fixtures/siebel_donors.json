@@ -1,0 +1,708 @@
+[
+  {
+    "id": "000381188",
+    "accountName": "Gross, Timothy M \u0026 Sandra",
+    "primary": {
+      "id": "1-82-3430",
+      "firstName": "Timothy",
+      "preferredName": "Tim",
+      "middleName": "Merlin",
+      "lastName": "Gross",
+      "title": "Mr.",
+      "suffix": "",
+      "sex": "M",
+      "phoneNumbers": [
+        {
+          "type": "Home",
+          "primary": true,
+          "phone": "970/304-1150"
+        }
+      ]
+    },
+    "spouse": {
+      "id": "1-82-3431",
+      "firstName": "Sandra",
+      "preferredName": "Sandy",
+      "middleName": "Louise",
+      "lastName": "Gross",
+      "title": "Mrs.",
+      "suffix": "",
+      "sex": "F",
+      "phoneNumbers": [
+        {
+          "type": "Home",
+          "primary": true,
+          "phone": "970/304-1150"
+        }
+      ]
+    },
+    "addresses": [
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "9030 E.Lehigh Ave",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Denver",
+        "state": "CO",
+        "zip": "80237"
+      },
+      {
+        "type": "Mailing",
+        "primary": true,
+        "seasonal": false,
+        "address1": "1626 29th Ave",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Greeley",
+        "state": "CO",
+        "zip": "80634-5720"
+      }
+    ],
+    "type": "Household"
+  },
+  {
+    "id": "000408767",
+    "accountName": "Kocher, Brian Edward",
+    "primary": {
+      "id": "1-86-235",
+      "firstName": "Brian",
+      "preferredName": "Brian",
+      "middleName": "Edward",
+      "lastName": "Kocher",
+      "title": "Mr.",
+      "suffix": "",
+      "sex": "M",
+      "phoneNumbers": [
+        {
+          "type": "Home",
+          "primary": true,
+          "phone": "952/882-9435"
+        }
+      ],
+      "emailAddresses": [
+        {
+          "type": "Personal",
+          "primary": true,
+          "email": "bekocher@comcast.net"
+        }
+      ]
+    },
+    "addresses": [
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "6013 5th Ave S",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Minneapolis",
+        "state": "MN",
+        "zip": "55419-2513"
+      },
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "6013 5th Ave. S.",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Minneapolis",
+        "state": "MN",
+        "zip": "55419"
+      },
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "12905 16th Ave S",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Burnsville",
+        "state": "MN",
+        "zip": "55337-3736"
+      },
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "12905 16th Ave S",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Burnsville",
+        "state": "MN",
+        "zip": "55337-3736"
+      },
+      {
+        "type": "Mailing",
+        "primary": true,
+        "seasonal": false,
+        "address1": "445 Moers Cir",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Chaska",
+        "state": "MN",
+        "zip": "55318-4609"
+      }
+    ],
+    "type": "Household"
+  },
+  {
+    "id": "402016669",
+    "accountName": "Sather, Allen \u0026 Genelle",
+    "primary": {
+      "id": "1-9H-3805",
+      "firstName": "Allen",
+      "preferredName": "Allen",
+      "middleName": "",
+      "lastName": "Sather",
+      "title": "Mr.",
+      "suffix": "",
+      "sex": "M",
+      "phoneNumbers": [
+        {
+          "type": "Home",
+          "primary": true,
+          "phone": "218/342-2417"
+        }
+      ],
+      "emailAddresses": [
+        {
+          "type": "Personal",
+          "primary": true,
+          "email": "agsather@arvig.net"
+        }
+      ]
+    },
+    "spouse": {
+      "id": "1-9H-3804",
+      "firstName": "Genelle",
+      "preferredName": "Genelle",
+      "middleName": "",
+      "lastName": "Sather",
+      "title": "Mrs.",
+      "suffix": "",
+      "sex": "F",
+      "phoneNumbers": [
+        {
+          "type": "Home",
+          "primary": true,
+          "phone": "218/342-2417"
+        }
+      ]
+    },
+    "addresses": [
+      {
+        "type": "Mailing",
+        "primary": true,
+        "seasonal": false,
+        "address1": "7532 Florida Ave N",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Minneapolis",
+        "state": "MN",
+        "zip": "55428-1447"
+      },
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "138 Jandel Ave NE",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Hanover",
+        "state": "MN",
+        "zip": "55341-4006"
+      },
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "50042 Leek Lake Bnd",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Vergas",
+        "state": "MN",
+        "zip": "56587-9434"
+      }
+    ],
+    "type": "Household"
+  },
+  {
+    "id": "404138974",
+    "accountName": "Green, Bruce S \u0026 Karlene",
+    "primary": {
+      "id": "1-9H-4697",
+      "firstName": "Bruce",
+      "preferredName": "Bruce",
+      "middleName": "S",
+      "lastName": "Green",
+      "title": "Mr.",
+      "suffix": "",
+      "sex": "M",
+      "phoneNumbers": [
+        {
+          "type": "Home",
+          "primary": true,
+          "phone": "612/207-5219"
+        }
+      ],
+      "emailAddresses": [
+        {
+          "type": "Personal",
+          "primary": true,
+          "email": "bakgreen@charter.net"
+        }
+      ]
+    },
+    "spouse": {
+      "id": "1-9H-4696",
+      "firstName": "Karlene",
+      "preferredName": "Karlene",
+      "middleName": "",
+      "lastName": "Green",
+      "title": "Mrs.",
+      "suffix": "",
+      "sex": "F"
+    },
+    "addresses": [
+      {
+        "type": "Mailing",
+        "primary": true,
+        "seasonal": false,
+        "address1": "9672 172nd St W",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Lakeville",
+        "state": "MN",
+        "zip": "55044-9291"
+      },
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "11262 Kenworth Ln",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Lakeville",
+        "state": "MN",
+        "zip": "55044-8427"
+      },
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "333 S 7th St Ste 500",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Minneapolis",
+        "state": "MN",
+        "zip": "55402-3210"
+      },
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "901 Marquette Ave Ste 1600",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Minneapolis",
+        "state": "MN",
+        "zip": "55402-3210"
+      },
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "16552 Gunflint Ct",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Lakeville",
+        "state": "MN",
+        "zip": "55044-5242"
+      },
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "15658 Egret Pl",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Apple Valley",
+        "state": "MN",
+        "zip": "55124-7862"
+      }
+    ],
+    "type": "Household"
+  },
+  {
+    "id": "414726584",
+    "accountName": "Blake, Timothy G",
+    "primary": {
+      "id": "1-9N-2831",
+      "firstName": "Timothy",
+      "preferredName": "Timothy",
+      "middleName": "G",
+      "lastName": "Blake",
+      "title": "Mr.",
+      "suffix": "",
+      "sex": "M",
+      "phoneNumbers": [
+        {
+          "type": "Home",
+          "primary": true,
+          "phone": "651/748-2814"
+        }
+      ]
+    },
+    "addresses": [
+      {
+        "type": "Mailing",
+        "primary": true,
+        "seasonal": false,
+        "address1": "3660 County Road 90",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Maple Plain",
+        "state": "MN",
+        "zip": "55359-9766"
+      },
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "14500 - 34th Ave N # 141",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Plymouth",
+        "state": "MN",
+        "zip": "55447"
+      },
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "3035 Eagandale Pl #210",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Eagan",
+        "state": "MN",
+        "zip": "55121-1237"
+      },
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "2343 Larpenteur Ave E Apt 303",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Saint Paul",
+        "state": "MN",
+        "zip": "55109-4927"
+      },
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "1220 Cambridge St Apt 68",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Hopkins",
+        "state": "MN",
+        "zip": "55343-1930"
+      },
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "12664 43rd St NE",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Saint Michael",
+        "state": "MN",
+        "zip": "55376-8432"
+      }
+    ],
+    "type": "Household"
+  },
+  {
+    "id": "434361456",
+    "accountName": "Thrivent Financial for Lutherans",
+    "primary": {
+      "id": "1-9Z-1270",
+      "firstName": "Friend",
+      "preferredName": "",
+      "middleName": "",
+      "lastName": "of the Ministry",
+      "title": "",
+      "suffix": "",
+      "sex": "Unspecified"
+    },
+    "addresses": [
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "Insufficient Address",
+        "address2": "Campus Crusade for Christ",
+        "address3": "",
+        "address4": "",
+        "city": "Orlando",
+        "state": "FL",
+        "zip": "32832"
+      },
+      {
+        "type": "Mailing",
+        "primary": true,
+        "seasonal": false,
+        "address1": "Employee Gift Matching",
+        "address2": "4321 N Ballard Rd",
+        "address3": "",
+        "address4": "",
+        "city": "Appleton",
+        "state": "WI",
+        "zip": "54919-0001"
+      }
+    ],
+    "type": "Church"
+  },
+  {
+    "id": "437181698",
+    "accountName": "Avalon Baptist Church",
+    "primary": {
+      "id": "1-9Z-4206",
+      "firstName": "Lori",
+      "preferredName": "Lori",
+      "middleName": "",
+      "lastName": "Molloy",
+      "title": "Mrs.",
+      "suffix": "",
+      "sex": "Unspecified",
+      "phoneNumbers": [
+        {
+          "type": "Work",
+          "primary": true,
+          "phone": "407/275-5499"
+        }
+      ],
+      "emailAddresses": [
+        {
+          "type": "Business",
+          "primary": true,
+          "email": "lori@avalonchurch.org"
+        }
+      ]
+    },
+    "addresses": [
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "1921 Stone Abbey Blvd",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Orlando",
+        "state": "FL",
+        "zip": "32825-4614"
+      },
+      {
+        "type": "Mailing",
+        "primary": true,
+        "seasonal": false,
+        "address1": "13000 Avalon Lake Dr Ste 302",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Orlando",
+        "state": "FL",
+        "zip": "32828-6451"
+      },
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "PO Box 780422",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Orlando",
+        "state": "FL",
+        "zip": "32878-0422"
+      }
+    ],
+    "type": "Church"
+  },
+  {
+    "id": "800000008",
+    "accountName": "Totally Anonymous",
+    "primary": {
+      "id": "1-AE-3317",
+      "firstName": "Totally",
+      "preferredName": "",
+      "middleName": "",
+      "lastName": "Anonymous",
+      "title": "",
+      "suffix": "",
+      "sex": "Unspecified"
+    },
+    "addresses": [
+      {
+        "type": "Mailing",
+        "primary": true,
+        "seasonal": false,
+        "address1": "Campus Crusade for Christ",
+        "address2": "100 Lake Hart Dr",
+        "address3": "",
+        "address4": "",
+        "city": "Orlando",
+        "state": "FL",
+        "zip": "32832-0100"
+      },
+      {
+        "type": "Mailing",
+        "primary": false,
+        "seasonal": false,
+        "address1": "Insufficient Address",
+        "address2": "Campus Crusade for Christ",
+        "address3": "",
+        "address4": "",
+        "city": "Orlando",
+        "state": "FL",
+        "zip": "32832"
+      },
+      {
+        "type": "Mailing Address",
+        "primary": false,
+        "seasonal": false,
+        "address1": "7250 Morris Road",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Orlando",
+        "state": "FL",
+        "zip": "32888"
+      },
+      {
+        "type": "",
+        "primary": false,
+        "seasonal": false,
+        "address1": "143 Do Not Tell Way",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Orlando",
+        "state": "FL",
+        "zip": "32822"
+      },
+      {
+        "type": "Mailing Address",
+        "primary": false,
+        "seasonal": false,
+        "address1": "143 Do Not Tell Way",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Orlando",
+        "state": "FL",
+        "zip": "32822"
+      },
+      {
+        "type": "Mailing Address",
+        "primary": false,
+        "seasonal": false,
+        "address1": "143 Do Not Tell Way",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Orlando",
+        "state": "FL",
+        "zip": "32822"
+      },
+      {
+        "type": "Mailing Address",
+        "primary": false,
+        "seasonal": false,
+        "address1": "7305 Gateshead Cir Apt 2",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Orlando",
+        "state": "FL",
+        "zip": "32822-6122"
+      },
+      {
+        "type": "Mailing Address",
+        "primary": false,
+        "seasonal": false,
+        "address1": "7305 Gateshead Cir Apt 2",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Orlando",
+        "state": "FL",
+        "zip": "32822-6122"
+      },
+      {
+        "type": "Mailing Address",
+        "primary": false,
+        "seasonal": false,
+        "address1": "7305 Gateshead Cir Apt 2",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Orlando",
+        "state": "FL",
+        "zip": "32822-6122"
+      },
+      {
+        "type": "Mailing Address",
+        "primary": false,
+        "seasonal": false,
+        "address1": "7305 Gateshead Cir Apt 2",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Orlando",
+        "state": "FL",
+        "zip": "32822-6122"
+      },
+      {
+        "type": "Mailing Address",
+        "primary": false,
+        "seasonal": false,
+        "address1": "7305 Gateshead Cir Apt 2",
+        "address2": "",
+        "address3": "",
+        "address4": "",
+        "city": "Orlando",
+        "state": "FL",
+        "zip": "32822-6122"
+      }
+    ],
+    "type": "Household"
+  }
+]

@@ -1,0 +1,123 @@
+<% exhibit(@person, self).tap do |person_exhibit| %>
+<div id="contentbody" data-person-id="<%= @person.id %>">
+  <div class="wpp">
+    
+    <div class="backline">
+    <% if @contact %>
+      <% @contact = exhibit(@contact, self) %>
+      <%= link_to(@contact, @contact, :class=> "back") %>
+    <% else %>
+      <% @person.contacts.each do |contact|
+        contact = exhibit(contact, self) %>
+        Back to <%= link_to(contact, contact, :class=> "back") %>
+      <% end %>
+    <% end %>
+    </div>
+
+    <div class="profiletop">
+
+      <div class="actions">
+        <%= link_to(t('g.edit'), edit_person_path(@person), :class=> "btn smallbtn") %>
+      </div>
+      <div class="avatar"><%= image_tag(person_exhibit.avatar, class: "mid") %></div>
+      <div class="quickprofile">
+        <h1><%= person_exhibit %></h1>
+        <% if person_exhibit.company_position %>
+          <div class="metaset"><%= person_exhibit.company_position_description %></div>
+        <% end %>
+      </div>
+
+      <div class="cols col_30">
+        <table class="meta">
+
+          <tr>
+            <td class="meta_name">Contact:</td>
+            <td class="meta_data"><%= person_exhibit.contact_info %></td>
+          </tr>
+        </table>
+      </div>
+      <div class="cols col_30">
+        <table class="meta">
+          <% if person_exhibit.age %>
+            <tr>
+              <td class="meta_name"><%= t('.age') %></td>
+              <td class="meta_data"><%= person_exhibit.age %></td>
+            </tr>
+          <% end %>
+          <% if person_exhibit.marital_status %>
+            <tr>
+              <td class="meta_name"><%= t('.marital_status') %></td>
+              <td class="meta_data"><%= person_exhibit.marital_status %></td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+      <div class="clr"></div>
+
+    </div>
+
+    <div id="person" class="tabgroup">
+      <div class="tabaction">
+        <%#= link_to("Send Message", "", class: "btn smallbtn") %>
+      </div>
+      <ul>
+        <li class="killround"><a href="#person-details">Details</a></li>
+        <%#<li class="killround"><a href="#messages-tab">Messages</a></li>%>
+        <%#<li class="killround"><a href="#stream-tab">Social Stream</a></li>%>
+      </ul>
+      <div id="person-details">
+        <%= render 'contact_details', person: person_exhibit %>
+      </div>
+      <!-- 
+      <div id="messages-tab">
+        <div class="tabdata">
+          <table class="messages snapshot">
+            <tr>
+              <td class="profilepic"><%= link_to(image_tag("avatar.png", class: "avatar small"), "/")%></td>
+              <td class="data">
+                <div class="primary">
+                  <header>
+                  <span class="icos ico_fb"></span>
+                  <strong><%= link_to("Maxine Sudarma", "/") %> to David Sudarma</strong> on Jan 17
+                  </header>
+                  <div class="messagebody">
+                    <p>It was good we went to Roscoe's House of Chicken and Waffles. Are we planning to do anything else while we are down in Southern California? Hey Josh hows it going? I haven'ted tweeted in a while. It was good we went to Roscoe's House of Chicken and Waffles. Are we planning to do anything else while we are down in Southern California? Hey Josh hows it going? I haven'ted tweeted in a while. </p>
+                  </div>
+                  <div class="actions">
+                    <%= link_to("", "", class: "ico ico_go") %>
+                    <%= link_to("", "", class: "ico ico_fav") %>
+                    <%= link_to("", "", class: "ico ico_trash") %>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="profilepic"><%= link_to(image_tag("avatar.png", class: "avatar small"), "/")%></td>
+              <td class="data">
+                <div class="primary">
+                  <header>
+                  <span class="icos ico_fb"></span>
+                  <strong><%= link_to("Maxine Sudarma", "/") %> to David Sudarma</strong> on Jan 17
+                  </header>
+                  <div class="messagebody">
+                    <p>It was good we went to Roscoe's House of Chicken and Waffles. Are we planning to do anything else while we are down in Southern California? Hey Josh hows it going? I haven'ted tweeted in a while. It was good we went to Roscoe's House of Chicken and Waffles. Are we planning to do anything else while we are down in Southern California? Hey Josh hows it going? I haven'ted tweeted in a while. </p>
+                  </div>
+                  <div class="actions">
+                    <%= link_to("", "", class: "ico ico_go") %>
+                    <%= link_to("", "", class: "ico ico_fav") %>
+                    <%= link_to("", "", class: "ico ico_trash") %>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div id="stream-tab">
+      </div>
+      -->
+    </div>
+
+  </div>
+</div>
+<% end %>

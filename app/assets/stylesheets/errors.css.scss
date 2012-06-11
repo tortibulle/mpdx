@@ -1,0 +1,12 @@
+#error_explanation {
+  background: #ffe9e9;
+  margin-bottom: 10px;
+  font-weight: bold;
+  border: 1px solid #c63333;
+  ul {
+    margin: 0;
+    padding: 0;
+    li {margin: 0; padding: 7px; border-bottom: 1px dotted silver; list-style: none;}
+    li:last-child {border: none;}
+  }
+}

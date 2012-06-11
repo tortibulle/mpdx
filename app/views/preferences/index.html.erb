@@ -1,0 +1,20 @@
+<%= render 'settings_sidebar' %>
+<div id="contentbody" class="withleft">
+  <div class="wpp">
+    <%= form_for current_user, url: preference_path(current_user), method: :put do |f| %>
+        <div class="field">
+          <%= f.label :first_name, _('Your first name') %>
+          <%= f.text_field :first_name %>
+        </div>
+        <div class="field">
+          <%= f.label :time_zone, _('Time zone') %>
+          <%= f.time_zone_select :time_zone %>
+        </div>
+        <div class="field">
+          <%= f.label :locale, _('Language') %>
+          <%= f.select :locale, TwitterCldr::Shared::Languages.all_for(locale).select { |k, _| TwitterCldr.supported_locales.include?(k) }.invert, selected: locale %>
+        </div>
+      <%= f.submit _('Save Preferences') %>
+    <% end %>
+  </div>
+</div>

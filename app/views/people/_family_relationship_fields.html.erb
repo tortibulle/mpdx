@@ -1,0 +1,7 @@
+<div class="sfield email_field" data-behavior="field-wrapper">
+  <div class="ls"><%= builder.label :related_person_id, t('.related_to') %></div>
+  <div class="rs">
+    <%= builder.select :related_person_id, (current_account_list.people.order('last_name, first_name') - [object]).collect {|c| [c.to_s, c.id]}, include_blank: true %>
+    <%= builder.select :relationship, (t('g.relationships_male') + t('g.relationships_female')), include_blank: true  %>
+  </div>
+</div>

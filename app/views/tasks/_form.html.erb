@@ -1,0 +1,53 @@
+<%= form_for(task) do |f| %>
+  <% if task && task.errors.any? %>
+    <div id="error_explanation">
+      <ul>
+        <% task.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+
+  <div class="field">
+    <%= f.label :subject %>
+    <%= f.text_field :subject %>
+  </div>
+
+  <% if @task.completed? %>
+    <%= f.hidden_field :completed %>
+    <div class="field">
+      <%= f.label :start_at, t('.completed_on') %>
+      <%= f.date_select :start_at, ampm: true, default: Date.today %>
+    </div>
+
+  <% else %>
+    <div class="field">
+      <%= f.label :start_at %>
+      <%= f.datetime_select :start_at, ampm: true, default: 1.day.from_now %>
+    </div>
+  <% end %>
+
+  <div style="<%= params[:contact_id] ? 'display:none' : '' %>">
+    <% task.activity_contacts.build if task.activity_contacts.blank? %>
+    <%= f.fields_for :activity_contacts do |builder| %>
+      <%= render 'activities/activity_contact', builder: builder, object: task, no_remove: task.activity_contacts.length <= 1 %>
+    <% end %>
+    <div class="sfield field_indent">
+      <div class="rs"><%= link_to_add_fields(t('.add_contact'), f, :activity_contacts, partial: 'activities/activity_contact') %></div>
+    </div>
+  </div>
+
+
+  <div class="spacer"></div>
+
+  <div class="actions">
+    <%= f.submit @task.completed? ? t('.log_task') : t('.save_task'), :class => "btn" %>
+    <%= link_to t('g.cancel'), tasks_path, :class=> "btn" %>
+  </div>
+  
+  
+  
+  
+<% end %>

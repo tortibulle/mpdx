@@ -1,0 +1,11 @@
+<div class="field email_field" data-behavior="field-wrapper">
+  <div class="ls"><%= builder.label :email, t('g.email') %></div>
+  <div class="rs">
+    <%= builder.email_field :email %>
+    <div class="field_action" style="<%= no_remove ? 'display:none' : '' %>">
+      <%= builder.check_box :primary, class: 'primary' %>
+      <%= builder.label :primary %>
+      <%= link_to_remove_fields(builder, no_remove) %>
+    </div>
+  </div>
+</div>

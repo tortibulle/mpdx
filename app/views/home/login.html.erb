@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>MPDX: Ministry Partner Development Connexion</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
+  <%= stylesheet_link_tag    "splash", :media => "all" %>
+</head>
+
+<body>
+
+  <header>
+    <div class="margin pagewidth headercontent">
+		  <%= image_tag("splash/logo.png", id: "logo")%>
+    </div>
+  </header>
+    
+  <div id="mainwrap" class="pagewidth margin">
+    <div role="main" id="main" class="pagewidth">
+    <h1>Welcome to MPDX!</h1>
+    <p>Please choose your preferred <br/> method of logging in:</p>
+    
+    <div id="login_links">
+      <%= link_to(image_tag('splash/relay_logo.png'), '/auth/relay', class: "loginlink relay") %>
+      &nbsp;
+      &nbsp;
+      <%= link_to(image_tag('splash/key_logo.png'), '/auth/key', class: "loginlink relay") %>
+    
+    </div>
+    
+    </div>
+  </div>
+
+
+  <footer class="margin pagewidth">
+    Ministry Partner Development ConneXion | Support | Feedback<br/>&copy; Copyright 2012
+  </footer>
+
+</body>
+</html>

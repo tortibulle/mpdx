@@ -1,0 +1,19 @@
+test: &common
+  twitter_key: oBYut4wPD3y2U0hr5rkqVAQ
+  twitter_secret: aDpC7Ir14aUvwtE5X6bkqmZ42bMEdIet2U9bfaxwjo
+  facebook_key: 274502345456950784
+  facebook_secret: 9003f0fb1232b4141e91b0e4aaac595b7e1
+  linkedin_key: qmuzrw1v97pfah
+  linkedin_secret: f1o6SLoXXZ135qTTOzc
+  google_key: '105346371fda1496.apps.googleusercontent.com'
+  google_secret: '1mEoMZBF2ar73nlhXdvdtZuxybva'
+
+development:
+  <<: *common
+
+
+production:
+  <<: *common
+
+staging:
+  <<: *common
