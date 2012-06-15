@@ -6,6 +6,8 @@ class Person::OrganizationAccount < ActiveRecord::Base
   extend Person::Account
   include Async
 
+  serialize :password, Encryptor.new
+
   def self.queue() :import; end
 
   has_many :designation_profiles, finder_sql: Proc.new {

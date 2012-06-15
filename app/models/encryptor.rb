@@ -1,5 +1,5 @@
 class Encryptor
-  def initialize(default = '')
+  def initialize(default = nil)
     @default = default
   end
 
@@ -8,10 +8,12 @@ class Encryptor
   end
 
   def load(s)
-    s.present? ? cipher.dec(s) : @default.clone
+    s.present? ? cipher.dec(s) : @default
   end
 
   def dump(s)
-    cipher.enc(s || @default)
+    if val = (s || @default)
+      cipher.enc(val)
+    end
   end
 end
