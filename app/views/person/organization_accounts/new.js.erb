@@ -1,12 +1,16 @@
-$('#org_connection_box').dialog('option', 
-                                {
-                                  title: '<%= j(t('.connect_to', org: @organization)) %>',
-                                  buttons: {
-                                    '<%= j(t('.connect')) %>': function() { $('.ui-dialog-buttonset button:first').button('disable'); $('form', this).submit(); },
-                                    '<%= j(t('g.cancel')) %>': function() { $(this).dialog("close"); $(this).html(''); }
+<%#If they are trying to connect to US Donor, redirect to relay%>
+<% if @organization.api_class.include?('Siebel') %>
+  document.location = '/auth/relay'
+<% else %>
+  $('#org_connection_box').dialog('option', 
+                                  {
+                                    title: '<%= j(t('.connect_to', org: @organization)) %>',
+                                    buttons: {
+                                      '<%= j(t('.connect')) %>': function() { $('.ui-dialog-buttonset button:first').button('disable'); $('form', this).submit(); },
+                                      '<%= j(t('g.cancel')) %>': function() { $(this).dialog("close"); $(this).html(''); }
+                                    }
                                   }
-                                }
-                               );
-$('.ui-dialog-buttonset button:first').addClass('desired_action');
-$('#org_connection_box').html('<%= j(render 'form', organization_account: @organization_account) %>');
-
+                                 );
+  $('.ui-dialog-buttonset button:first').addClass('desired_action');
+  $('#org_connection_box').html('<%= j(render 'form', organization_account: @organization_account) %>');
+<% end %>
