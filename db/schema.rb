@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120609125936) do
+ActiveRecord::Schema.define(:version => 20120717195403) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -202,7 +202,6 @@ ActiveRecord::Schema.define(:version => 20120609125936) do
   end
 
   add_index "contacts", ["account_list_id"], :name => "index_contacts_on_account_list_id"
-  add_index "contacts", ["account_list_id"], :name => "index_contacts_on_donor_account_id_and_account_list_id", :unique => true
   add_index "contacts", ["last_donation_date"], :name => "index_contacts_on_last_donation_date"
   add_index "contacts", ["total_donations"], :name => "index_contacts_on_total_donations"
 
@@ -216,7 +215,7 @@ ActiveRecord::Schema.define(:version => 20120609125936) do
     t.string   "name"
   end
 
-  add_index "designation_accounts", ["organization_id", "designation_number"], :name => "unique_designation_org", :unique => true
+  add_index "designation_accounts", ["organization_id"], :name => "index_designation_accounts_on_organization_id"
 
   create_table "designation_profile_accounts", :force => true do |t|
     t.integer  "designation_profile_id"
@@ -240,7 +239,7 @@ ActiveRecord::Schema.define(:version => 20120609125936) do
   end
 
   add_index "designation_profiles", ["organization_id"], :name => "index_designation_profiles_on_organization_id"
-  add_index "designation_profiles", ["user_id", "organization_id", "remote_id"], :name => "unique_remote_id", :unique => true
+  add_index "designation_profiles", ["user_id", "organization_id", "remote_id"], :name => "user_id", :unique => true
 
   create_table "donations", :force => true do |t|
     t.string   "remote_id"
@@ -261,7 +260,6 @@ ActiveRecord::Schema.define(:version => 20120609125936) do
   end
 
   add_index "donations", ["designation_account_id", "remote_id"], :name => "unique_donation_designation", :unique => true
-  add_index "donations", ["donation_date"], :name => "index_donations_on_donation_date"
   add_index "donations", ["donor_account_id"], :name => "index_donations_on_donor_account_id"
 
   create_table "donor_accounts", :force => true do |t|
@@ -347,14 +345,13 @@ ActiveRecord::Schema.define(:version => 20120609125936) do
     t.datetime "updated_at",       :null => false
   end
 
-  add_index "master_person_sources", ["master_person_id", "organization_id"], :name => "master_person_organization", :unique => true
   add_index "master_person_sources", ["organization_id", "remote_id"], :name => "organization_remote_id", :unique => true
 
   create_table "organizations", :force => true do |t|
     t.string   "name"
     t.string   "query_ini_url"
     t.string   "iso3166"
-    t.string   "minimum_gift_date"
+    t.string   "minimum_gift_date",             :limit => 24
     t.string   "logo"
     t.string   "code"
     t.boolean  "query_authentication"
@@ -379,15 +376,15 @@ ActiveRecord::Schema.define(:version => 20120609125936) do
     t.string   "profiles_url"
     t.string   "profiles_params"
     t.string   "redirect_query_ini"
-    t.datetime "created_at",                    :null => false
-    t.datetime "updated_at",                    :null => false
+    t.datetime "created_at",                                  :null => false
+    t.datetime "updated_at",                                  :null => false
     t.string   "api_class"
   end
 
   add_index "organizations", ["query_ini_url"], :name => "index_organizations_on_query_ini_url", :unique => true
 
   create_table "people", :force => true do |t|
-    t.string   "first_name",                        :null => false
+    t.string   "first_name",                                      :null => false
     t.string   "legal_first_name"
     t.string   "last_name"
     t.integer  "birthday_month"
@@ -401,15 +398,16 @@ ActiveRecord::Schema.define(:version => 20120609125936) do
     t.string   "gender"
     t.string   "marital_status"
     t.text     "preferences"
-    t.integer  "sign_in_count",      :default => 0
+    t.integer  "sign_in_count",                    :default => 0
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
-    t.datetime "created_at",                        :null => false
-    t.datetime "updated_at",                        :null => false
-    t.integer  "master_person_id",                  :null => false
+    t.datetime "created_at",                                      :null => false
+    t.datetime "updated_at",                                      :null => false
+    t.integer  "master_person_id",                                :null => false
     t.string   "middle_name"
+    t.string   "access_token",       :limit => 32
   end
 
   add_index "people", ["first_name"], :name => "index_people_on_first_name"
@@ -557,6 +555,15 @@ ActiveRecord::Schema.define(:version => 20120609125936) do
   end
 
   add_index "phone_numbers", ["person_id"], :name => "index_phone_numbers_on_person_id"
+
+  create_table "prod_people", :force => true do |t|
+    t.string "globallyUniqueId"
+    t.string "username"
+    t.string "firstName"
+    t.string "lastName"
+    t.string "middleName"
+    t.string "accountNo"
+  end
 
   create_table "taggings", :force => true do |t|
     t.integer  "tag_id"

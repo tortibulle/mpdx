@@ -1,5 +1,9 @@
 require 'resque/server'
 Mpdx::Application.routes.draw do
+  api_version(module: "V1", header: "Accept", value: "application/vnd.mpdx.org; version=v1", default: true) do
+    resources :contacts
+  end
+
   resources :imports
 
   resources :activity_comments

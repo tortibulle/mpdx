@@ -25,3 +25,5 @@ Narrow_Region_*
 .rake_tasks~
 .rails_footnotes
 .rspec
+public/docs
+public/uploads

@@ -51,6 +51,23 @@ class User < Person
     user
   end
 
+  def self.from_access_token(token)
+    User.find_by_access_token(token) ||
+    get_user_from_cas_oauth(token)
+  end
+
+  def self.get_user_from_cas_oauth(token)
+    response = RestClient.get("http://casoauth.ccci.us/users/#{token}")
+    json = JSON.parse(response.to_str)
+    if account = Person::KeyAccount.find_by_remote_id(json['guid'])
+      user = account.person.to_user
+      user.update_attribute(:access_token, token)
+      user
+    else
+      raise 'User has not logged into MPDX using Relay'
+    end
+  end
+
   private
     def set_setup_mode
       if preferences[:setup].nil?
