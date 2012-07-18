@@ -410,6 +410,7 @@ ActiveRecord::Schema.define(:version => 20120717195403) do
     t.string   "access_token",       :limit => 32
   end
 
+  add_index "people", ["access_token"], :name => "index_people_on_access_token", :unique => true
   add_index "people", ["first_name"], :name => "index_people_on_first_name"
   add_index "people", ["last_name"], :name => "index_people_on_last_name"
   add_index "people", ["master_person_id"], :name => "index_people_on_master_person_id"

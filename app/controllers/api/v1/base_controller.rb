@@ -1,4 +1,4 @@
-class V1::BaseController < ApplicationController
+class Api::V1::BaseController < ApplicationController
   skip_before_filter :ensure_login, :ensure_setup_finished
 
   protected

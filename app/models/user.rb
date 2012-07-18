@@ -38,6 +38,18 @@ class User < Person
     designation_accounts.where(organization_id: organization_id).pluck('designation_number')
   end
 
+  def contact_addresses
+    Address.where(addressable_type: 'Contact', addressable_id: contacts.pluck('contacts.id'))
+  end
+
+  def contact_phone_numbers
+    PhoneNumber.where(person_id: people.pluck('people.id'))
+  end
+
+  def contact_email_addresses
+    EmailAddress.where(person_id: people.pluck('people.id'))
+  end
+
   def self.from_omniauth(provider, auth_hash)
     # look for an authenticated record from this provider
     user = provider.find_authenticated_user(auth_hash)

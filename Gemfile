@@ -72,6 +72,7 @@ gem 'fb_graph'
 gem "acts-as-taggable-on", :git => "git://github.com/mbleigh/acts-as-taggable-on.git"
 gem "fog", "~> 1.3.1"
 gem 'gibberish'
+gem 'active_model_serializers'
 
 group :development do
   gem 'unicorn'
