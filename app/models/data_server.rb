@@ -231,7 +231,7 @@ class DataServer
 
   def add_or_update_person(account_list, user, line, donor_account, remote_id, prefix = '')
     organization = donor_account.organization
-    master_person_from_source = organization.master_people.where('master_person_sources.remote_id' => remote_id).first
+    master_person_from_source = organization.master_people.where('master_person_sources.remote_id' => remote_id.to_s).first
     person = donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
 
     person ||= Person.new({master_person: master_person_from_source}, without_protection: true)
@@ -253,7 +253,7 @@ class DataServer
 
     # create the master_person_source if needed
     unless master_person_from_source
-      organization.master_person_sources.where(remote_id: remote_id).first_or_create({master_person_id: person.master_person.id}, without_protection: true)
+      organization.master_person_sources.where(remote_id: remote_id.to_s).first_or_create({master_person_id: person.master_person.id}, without_protection: true)
     end
 
     [person, contact_person]

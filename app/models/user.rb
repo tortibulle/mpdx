@@ -71,7 +71,7 @@ class User < Person
   def self.get_user_from_cas_oauth(token)
     response = RestClient.get("http://casoauth.ccci.us/users/#{token}")
     json = JSON.parse(response.to_str)
-    if account = Person::KeyAccount.find_by_remote_id(json['guid'])
+    if account = Person::RelayAccount.find_by_remote_id(json['guid'])
       user = account.person.to_user
       user.update_attribute(:access_token, token)
       user

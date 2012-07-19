@@ -8,6 +8,7 @@ Mpdx::Application.routes.draw do
       resources :addresses
       resources :email_addresses
       resources :phone_numbers
+      resources :tasks
     end
   end
 

@@ -32,7 +32,7 @@ class AccountList < ActiveRecord::Base
 
   def self.find_with_designation_numbers(numbers)
     designation_account_ids = DesignationAccount.where(designation_number: numbers).pluck(:id).sort
-    results = AccountList.connection.select_all("select account_list_id, group_concat(designation_account_id) as designation_account_ids from account_list_entries group by account_list_id")
+    results = AccountList.connection.select_all("select account_list_id,array_to_string(array_agg(designation_account_id), ',') as designation_account_ids from account_list_entries group by account_list_id")
     results.each do |hash|
       if hash['designation_account_ids'].split(',').map(&:to_i).sort == designation_account_ids
         return AccountList.find(hash['account_list_id'])

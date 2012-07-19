@@ -1,5 +1,5 @@
 class ContactSerializer < ActiveModel::Serializer
-  embed :ids
+  embed :ids, include: true
 
   attributes :id, :name, :pledge_amount, :pledge_frequency, :pledge_start_date, :status, :deceased,
              :notes, :notes_saved_at, :next_ask, :never_ask, :likely_to_give, :church_name, :send_newsletter,

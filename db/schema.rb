@@ -215,7 +215,7 @@ ActiveRecord::Schema.define(:version => 20120717195403) do
     t.string   "name"
   end
 
-  add_index "designation_accounts", ["organization_id"], :name => "index_designation_accounts_on_organization_id"
+  add_index "designation_accounts", ["organization_id", "designation_number"], :name => "unique_designation_org", :unique => true
 
   create_table "designation_profile_accounts", :force => true do |t|
     t.integer  "designation_profile_id"
@@ -239,7 +239,7 @@ ActiveRecord::Schema.define(:version => 20120717195403) do
   end
 
   add_index "designation_profiles", ["organization_id"], :name => "index_designation_profiles_on_organization_id"
-  add_index "designation_profiles", ["user_id", "organization_id", "remote_id"], :name => "user_id", :unique => true
+  add_index "designation_profiles", ["user_id", "organization_id", "remote_id"], :name => "unique_remote_id", :unique => true
 
   create_table "donations", :force => true do |t|
     t.string   "remote_id"
@@ -260,6 +260,7 @@ ActiveRecord::Schema.define(:version => 20120717195403) do
   end
 
   add_index "donations", ["designation_account_id", "remote_id"], :name => "unique_donation_designation", :unique => true
+  add_index "donations", ["donation_date"], :name => "index_donations_on_donation_date"
   add_index "donations", ["donor_account_id"], :name => "index_donations_on_donor_account_id"
 
   create_table "donor_accounts", :force => true do |t|
@@ -351,7 +352,7 @@ ActiveRecord::Schema.define(:version => 20120717195403) do
     t.string   "name"
     t.string   "query_ini_url"
     t.string   "iso3166"
-    t.string   "minimum_gift_date",             :limit => 24
+    t.string   "minimum_gift_date"
     t.string   "logo"
     t.string   "code"
     t.boolean  "query_authentication"
@@ -376,8 +377,8 @@ ActiveRecord::Schema.define(:version => 20120717195403) do
     t.string   "profiles_url"
     t.string   "profiles_params"
     t.string   "redirect_query_ini"
-    t.datetime "created_at",                                  :null => false
-    t.datetime "updated_at",                                  :null => false
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
     t.string   "api_class"
   end
 
@@ -556,15 +557,6 @@ ActiveRecord::Schema.define(:version => 20120717195403) do
   end
 
   add_index "phone_numbers", ["person_id"], :name => "index_phone_numbers_on_person_id"
-
-  create_table "prod_people", :force => true do |t|
-    t.string "globallyUniqueId"
-    t.string "username"
-    t.string "firstName"
-    t.string "lastName"
-    t.string "middleName"
-    t.string "accountNo"
-  end
 
   create_table "taggings", :force => true do |t|
     t.integer  "tag_id"

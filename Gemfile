@@ -21,14 +21,15 @@ gem 'jquery-rails'
 # gem 'jbuilder'
 
 # the javascript engine for execjs gem
-platforms :jruby do
-  gem 'activerecord-jdbcmysql-adapter'
+#platforms :jruby do
+  #gem 'activerecord-jdbcmysql-adapter'
 
-  gem 'jruby-openssl'
-end
+  #gem 'jruby-openssl'
+#end
 
 platforms :mri do
-  gem 'mysql2'
+  #gem 'mysql2'
+  gem 'pg'
   group :test do
     gem 'spork-rails', '~> 3.2.0'
     gem 'rb-fsevent', :require => false
