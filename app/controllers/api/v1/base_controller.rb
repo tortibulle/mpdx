@@ -1,23 +1,34 @@
 class Api::V1::BaseController < ApplicationController
-  skip_before_filter :ensure_login, :ensure_setup_finished
+  skip_before_filter :ensure_setup_finished
 
   rescue_from ActiveRecord::RecordNotFound, with: :render_404
 
   protected
 
-    def current_user
-      unless @current_user
-        if token = oauth_access_token
-          @current_user = User.from_access_token(token)
-        else
-          @current_user = super
-        end
+    def ensure_login
+      unless oauth_access_token
+        render json: {errors: ['Missing access token']}, status: :unauthorized, callback: params[:callback]
+        return false
       end
-      @current_user
+      begin
+        unless current_user
+          render json: {errors: ['Please go to http://mpdx.org and log in using Relay before trying to use the mobile app.']},
+                 status: :unauthorized,
+                 callback: params[:callback]
+          return false
+        end
+      rescue RestClient::Unauthorized
+        render json: {errors: ['Invalid access token']}, status: :unauthorized, callback: params[:callback]
+        return false
+      end
+    end
+
+    def current_user
+      @current_user ||= User.from_access_token(oauth_access_token)
     end
 
     def oauth_access_token
-      params[:access_token] || oauth_access_token_from_header
+      oauth_access_token ||= (params[:access_token] || oauth_access_token_from_header)
     end
 
 
