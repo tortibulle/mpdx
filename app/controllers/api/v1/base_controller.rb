@@ -1,6 +1,8 @@
 class Api::V1::BaseController < ApplicationController
   skip_before_filter :ensure_login, :ensure_setup_finished
 
+  rescue_from ActiveRecord::RecordNotFound, with: :render_404
+
   protected
 
     def current_user
@@ -25,5 +27,9 @@ class Api::V1::BaseController < ApplicationController
       match       = auth_header.match(/^token\s(.*)/) || auth_header.match(/^Bearer\s(.*)/)
       return match[1] if match.present?
       false
+    end
+
+    def render_404
+      render nothing: true, status: 404
     end
 end

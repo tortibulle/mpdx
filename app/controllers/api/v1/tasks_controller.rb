@@ -26,6 +26,12 @@ class Api::V1::TasksController < Api::V1::BaseController
     end
   end
 
+  def destroy
+    task = tasks.find(params[:id])
+    task.destroy
+    render json: task, callback: params[:callback]
+  end
+
   protected
 
   def tasks
