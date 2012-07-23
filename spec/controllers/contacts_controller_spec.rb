@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe ContactsController do
   describe 'when signed in' do
-    before(:each) do 
+    before(:each) do
       @user = create(:user_with_account)
       sign_in(:user, @user)
       @contact = create(:contact, account_list: @user.account_lists.first)

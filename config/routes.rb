@@ -2,7 +2,7 @@ require 'resque/server'
 Mpdx::Application.routes.draw do
 
   namespace :api do
-    api_version(module: "V1", header: "Accept", value: "application/vnd.mpdx.org; version=v1", default: true) do
+    api_version(module: "V1", header: "API-VERSION", value: "v1", parameter: "version", path: 'v1') do
       resources :contacts
       resources :people
       resources :addresses
