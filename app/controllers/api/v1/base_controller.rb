@@ -27,6 +27,12 @@ class Api::V1::BaseController < ApplicationController
       @current_user ||= User.from_access_token(oauth_access_token)
     end
 
+    def current_account_list
+      account_list = current_user.account_lists.find(params[:account_list_id]) if params[:account_list_id].present?
+      account_list ||= super
+      account_list
+    end
+
     def oauth_access_token
       oauth_access_token ||= (params[:access_token] || oauth_access_token_from_header)
     end
