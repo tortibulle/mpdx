@@ -20,7 +20,7 @@ class Api::V1::TasksController < Api::V1::BaseController
   def create
     task = tasks.new(params[:task])
     if task.save
-      render json: task, callback: params[:callback], status: :status
+      render json: task, callback: params[:callback], status: :created
     else
       render json: {errors: task.errors.full_messages}, callback: params[:callback], status: :bad_request
     end
