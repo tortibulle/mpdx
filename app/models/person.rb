@@ -120,8 +120,7 @@ class Person < ActiveRecord::Base
   end
 
   def self.clone(person)
-    new_person = new(person.attributes.with_indifferent_access.except(:id, :preferences, :sign_in_count, :current_sign_in_at, :last_sign_in_at, :current_sign_in_ip, :last_sign_in_ip, :created_at, :updated_at, :master_person_id))
-    new_person.master_person_id = person.master_person_id
+    new_person = new(person.attributes.with_indifferent_access.except(:id), without_protection: true)
     person.email_addresses.each { |e| new_person.email = e.email }
     person.phone_numbers.each { |pn| new_person.phone_number = pn.attributes.slice(:number, :country_code, :location) }
     new_person.save!

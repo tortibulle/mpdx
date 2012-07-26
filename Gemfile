@@ -21,14 +21,15 @@ gem 'jquery-rails'
 # gem 'jbuilder'
 
 # the javascript engine for execjs gem
-platforms :jruby do
-  gem 'activerecord-jdbcmysql-adapter'
+#platforms :jruby do
+  #gem 'activerecord-jdbcmysql-adapter'
 
-  gem 'jruby-openssl'
-end
+  #gem 'jruby-openssl'
+#end
 
 platforms :mri do
-  gem 'mysql2'
+  #gem 'mysql2'
+  gem 'pg'
   group :test do
     gem 'spork-rails', '~> 3.2.0'
     gem 'rb-fsevent', :require => false
@@ -50,12 +51,13 @@ gem 'omniauth-cas', '~> 0.0.6'
 gem 'rake'
 gem 'newrelic_rpm'
 gem 'assignable_values'
+gem 'charlock_holmes'
 gem 'awesome_print'
 gem 'koala'
 gem 'typhoeus'
 gem 'country_select', git: 'git://github.com/26am/country_select.git'
 gem 'iniparse'
-gem 'versionist'
+gem 'versionist', git: 'git://github.com/twinge/versionist.git', branch: 'multiple_versioning_strategies'
 gem 'rest-client'
 gem 'airbrake'
 gem 'wicked'
@@ -71,6 +73,7 @@ gem 'fb_graph'
 gem "acts-as-taggable-on", :git => "git://github.com/mbleigh/acts-as-taggable-on.git"
 gem "fog", "~> 1.3.1"
 gem 'gibberish'
+gem 'active_model_serializers'
 
 group :development do
   gem 'unicorn'

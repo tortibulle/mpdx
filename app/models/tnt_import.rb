@@ -4,62 +4,81 @@ class TntImport
     @import = import
   end
 
-  def import_contacts
-    Contact.transaction do
-    contents = @import.file.read.force_encoding('UTF-8')
-    account_list = @import.account_list
-    user = @import.user
-    designation_profile = account_list.designation_profile || user.designation_profiles.first
-
-    tnt_contacts = {}
-
+  def get_lines(contents)
     # Strip annoying tnt unicode character
     contents = contents[1..-1] if TwitterCldr::Utils::CodePoints.from_string(contents.first).first == "FEFF"
+    CSV.parse(contents, headers: true)
+  end
 
-    lines = CSV.parse(contents, headers: true)
-    lines.each do |line|
-      donor_accounts, contact = add_or_update_donor_accounts(line, account_list, designation_profile)
-      tnt_contacts[line['ContactID']] = contact
+  def import_contacts
+    @file = nil
+    Contact.transaction do
+      # we need to take some extra steps to get the file opened with the right encoding
+      @import.file.cache_stored_file!
+      begin
+        @file = File.open(@import.file.file.file, "r:utf-8")
+        lines = get_lines(@file.read)
+      rescue ArgumentError
+        @file = File.open(@import.file.file.file, "r:windows-1251:utf-8")
+        lines = get_lines(@file.read)
+      end
 
-      # add additional data to contact
-      update_contact(contact, line)
+      unless lines.first['Organization Account IDs']
+        raise "export didn't include Organization Account IDs'"
+      end
 
-      unless is_true?(line['Is Organization'])
-        # person
-        donor_accounts.each do |donor_account|
-          primary_person, primary_contact_person = add_or_update_primary_contact(account_list, user, line, donor_account, contact)
+      account_list = @import.account_list
+      user = @import.user
+      designation_profile = account_list.designation_profile || user.designation_profiles.first
 
-          # Now the secondary person (persumably spouse)
-          if line['Spouse First/Given Name'].present?
-            line['Spouse Last/Family Name'] = line['Last/Family Name'] if line['Spouse Last/Family Name'].blank?
-            spouse, contact_spouse = add_or_update_spouse(account_list, user, line, donor_account, contact)
+      tnt_contacts = {}
 
-            # Wed the two peple
-            primary_person.add_spouse(spouse)
-            primary_contact_person.add_spouse(contact_spouse)
+      lines.each do |line|
+        donor_accounts, contact = add_or_update_donor_accounts(line, account_list, designation_profile)
+        tnt_contacts[line['ContactID']] = contact
+
+        # add additional data to contact
+        update_contact(contact, line)
+
+        unless is_true?(line['Is Organization'])
+          # person
+          donor_accounts.each do |donor_account|
+            primary_person, primary_contact_person = add_or_update_primary_contact(account_list, user, line, donor_account, contact)
+
+            # Now the secondary person (persumably spouse)
+            if line['Spouse First/Given Name'].present?
+              line['Spouse Last/Family Name'] = line['Last/Family Name'] if line['Spouse Last/Family Name'].blank?
+              spouse, contact_spouse = add_or_update_spouse(account_list, user, line, donor_account, contact)
+
+              # Wed the two peple
+              primary_person.add_spouse(spouse)
+              primary_contact_person.add_spouse(contact_spouse)
+            end
+            # TODO: handle children
+
           end
-          # TODO: handle children
-
+        else
+          # organization
+          donor_accounts.each do |donor_account|
+            add_or_update_company(account_list, user, line, donor_account)
+          end
         end
-      else
-        # organization
-        donor_accounts.each do |donor_account|
-          add_or_update_company(account_list, user, line, donor_account)
+      end
+
+      # set referrals
+      # Loop over the whole list again now that we've added everyone and try to link up referrals
+      lines.each do |line|
+        if line['Referred By'].present? &&
+           referred_by = account_list.contacts.where("name = ? OR full_name = ? OR greeting = ?",
+                                                      line['Referred By'], line['Referred By'], line['Referred By']).first
+          contact = tnt_contacts[line['ContactID']]
+          contact.referrals_to_me << referred_by unless contact.referrals_to_me.include?(referred_by)
         end
       end
     end
-
-    # set referrals
-    # Loop over the whole list again now that we've added everyone and try to link up referrals
-    lines.each do |line|
-      if line['Referred By'].present? &&
-         referred_by = account_list.contacts.where("name = ? OR full_name = ? OR greeting = ?",
-                                                    line['Referred By'], line['Referred By'], line['Referred By']).first
-        contact = tnt_contacts[line['ContactID']]
-        contact.referrals_to_me << referred_by unless contact.referrals_to_me.include?(referred_by)
-      end
-    end
-    end
+  ensure
+    @file.close if @file
+    CarrierWave.clean_cached_files!
   end
 
   private

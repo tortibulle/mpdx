@@ -20,12 +20,8 @@ class DonorAccount < ActiveRecord::Base
   def link_to_contact_for(account_list)
     contact = account_list.contacts.where('donor_accounts.id' => id).includes(:donor_accounts).first # already linked
 
-    unless contact
-      # Try to find a contact for this user that matches based on name, address, or person details
-      account_list.contacts.each do |c|
-        contact = c if c.name == name
-      end
-    end
+    # Try to find a contact for this user that matches based on name, address, or person details
+    contact ||= account_list.contacts.detect { |c| c.name == name }
 
     unless contact
       # Try to find a contact for this user that matches based on address
@@ -33,6 +29,7 @@ class DonorAccount < ActiveRecord::Base
         next unless a.not_blank? && a.city.present?
         if address = account_list.addresses.where(a.attributes.with_indifferent_access.slice(:street, :city, :state, :country, :postal_code)).first
           contact = address.addressable
+          break
         end
       end
     end

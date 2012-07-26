@@ -79,10 +79,8 @@
                     <%= f.label 'override_true', _('Override existing contact fields with data in the CSV.') %>
                   </div>
                   <div class="field">
-                  <input   type="hidden" name="default_csv_override" value="false">
-                    <input type="hidden" name="default_csv_file">
                     <div class="importtags">
-                      <input type="text" placeholder="<%= _('Add tags to these contacts') %>"/>
+                      <%= f.text_field :tags, placeholder: _('Add tags to these contacts') %>
                     </div>
                   </div>
                   <div class="hint">

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe ContactsController do
   describe 'when signed in' do
-    before(:each) do 
+    before(:each) do
       @user = create(:user_with_account)
       sign_in(:user, @user)
       @contact = create(:contact, account_list: @user.account_lists.first)
@@ -11,7 +11,7 @@ describe ContactsController do
     describe 'GET index' do
       before do
         donor_account = create(:donor_account, master_company: create(:master_company))
-        @contact2 = create(:contact, account_list: @user.account_lists.first)
+        @contact2 = create(:contact, name: 'Z', account_list: @user.account_lists.first)
         @contact2.donor_accounts << donor_account
       end
       it "should get all" do

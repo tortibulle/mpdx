@@ -26,3 +26,6 @@ Narrow_Region_*
 .rails_footnotes
 .rspec
 public/mobile
+public/docs
+public/uploads
+.project
