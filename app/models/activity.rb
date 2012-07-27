@@ -12,7 +12,7 @@ class Activity < ActiveRecord::Base
   scope :starred, where(starred: true).order('start_at')
 
 
-  accepts_nested_attributes_for :activity_contacts, :activity_comments
+  accepts_nested_attributes_for :activity_contacts, :activity_comments, allow_destroy: true
 
   attr_accessible :starred, :location, :subject, :start_at, :end_at, :completed, :activity_contacts_attributes, :activity_comments_attributes
 

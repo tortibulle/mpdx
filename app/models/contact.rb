@@ -27,6 +27,7 @@ class Contact < ActiveRecord::Base
   validates :name, presence: true
 
   accepts_nested_attributes_for :people, reject_if: :all_blank, allow_destroy: true
+  accepts_nested_attributes_for :contact_people, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :contact_referrals_to_me, reject_if: :all_blank, allow_destroy: true
 
   before_destroy :delete_people
@@ -37,8 +38,11 @@ class Contact < ActiveRecord::Base
     'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Not Interested', 'Unresponsive', 'Never Ask']
   end
 
-  attr_accessible :name, :addresses_attributes, :pledge_amount, :status, :contact_referrals_to_me_attributes, 
-                  :people_attributes, :notes
+  attr_accessible :name, :addresses_attributes, :pledge_amount, :status, :contact_referrals_to_me_attributes,
+                  :people_attributes, :notes, :contact_people_attributes, :full_name, :greeting, :website,
+                  :pledge_frequency, :pledge_start_date, :deceased, :next_ask, :never_ask, :likely_to_give,
+                  :church_name, :send_newsletter, :direct_deposit, :magazine, :last_activity, :last_appointment,
+                  :last_letter, :last_phone_call, :last_pre_call, :last_thank
 
   def to_s() name; end
 

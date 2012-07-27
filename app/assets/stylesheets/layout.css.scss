@@ -452,8 +452,10 @@ div.name {font-size: 14px; margin-bottom: 4px;}
 
   tr, tr:nth-child(odd) {background: none; min-height: 2em; display: block; border-top: 1px dotted $gray_mid;}
   tr:first-child {border-top: none;}
-  tr .actions {display: none;}
-  tr:hover .actions {display: inline-block;}
+  tr .actions {
+    /*a {padding-left: 2px}*/
+  }
+  /*tr:hover .actions {display: inline-block;}*/
   tr.clear {border: none; background: none; padding: 0; margin: 0;}
   .primary {height: auto; line-height: 1.5em;}
 }
