@@ -25,6 +25,7 @@ Narrow_Region_*
 .rake_tasks~
 .rails_footnotes
 .rspec
+public/mobile
 public/docs
 public/uploads
 .project
