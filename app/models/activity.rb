@@ -24,6 +24,7 @@ class Activity < ActiveRecord::Base
   def to_s() subject; end
 
   def contacts_attributes=(contacts_array)
+    contacts_array = contacts_array.values if contacts_array.is_a?(Hash)
     contacts_array.each do |contact_attributes|
       contact = Contact.find(contact_attributes['id'])
       if contact_attributes['_destroy'].to_s == 'true'
