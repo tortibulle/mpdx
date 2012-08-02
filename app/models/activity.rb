@@ -24,8 +24,11 @@ class Activity < ActiveRecord::Base
 
   def contacts_attributes=(contacts_array)
     contacts_array.each do |contact_attributes|
+      contact = Contact.find(contact_attributes['id'])
       if contact_attributes['_destroy'].to_s == 'true'
-        self.contacts.delete(Contact.find(contact_attributes['id']))
+        contacts.delete(contact) if contacts.include?(contact)
+      else
+        contacts << contact unless contacts.include?(contact)
       end
     end
   end
