@@ -14,11 +14,20 @@ class Activity < ActiveRecord::Base
 
   accepts_nested_attributes_for :activity_contacts, :activity_comments, allow_destroy: true
 
-  attr_accessible :starred, :location, :subject, :start_at, :end_at, :completed, :activity_contacts_attributes, :activity_comments_attributes
+  attr_accessible :starred, :location, :subject, :start_at, :end_at, :completed,
+                  :activity_contacts_attributes, :activity_comments_attributes,
+                  :contacts_attributes
 
   validates :subject, :start_at, presence: true
 
   def to_s() subject; end
 
+  def contacts_attributes=(contacts_array)
+    contacts_array.each do |contact_attributes|
+      if contact_attributes['_destroy'].to_s == 'true'
+        self.contacts.delete(Contact.find(contact_attributes['id']))
+      end
+    end
+  end
 
 end
