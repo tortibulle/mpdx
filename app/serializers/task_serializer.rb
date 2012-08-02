@@ -7,6 +7,7 @@ class TaskSerializer < ActiveModel::Serializer
   attribute :start_at, key: :due_date
 
   has_many :activity_comments, key: :comments
+  has_many :people
 
   private
 

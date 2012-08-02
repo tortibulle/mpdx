@@ -3,6 +3,7 @@ class Activity < ActiveRecord::Base
   has_many :activity_contacts, dependent: :destroy
   has_many :contacts, through: :activity_contacts
   has_many :activity_comments, dependent: :destroy
+  has_many :people, through: :activity_comments
 
   scope :overdue, where('start_at < ?', Time.now).order('start_at')
   scope :tomorrow, where("start_at BETWEEN ? AND ?", Time.now, 1.day.from_now).order('start_at')
