@@ -31,7 +31,7 @@ describe SetupController do
 
     it "should mark setup false when finished" do
       FactoryGirl.create(:organization_account, person: @user)
-      @user.update_attribute(:preferences, {setup: true})
+      @user.update_attributes(preferences: {setup: true})
       get :show, id: :finish
       response.should redirect_to('/')
       @user.reload.setup_mode?.should == false

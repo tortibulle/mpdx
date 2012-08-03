@@ -11,7 +11,7 @@ class DonorAccount < ActiveRecord::Base
   belongs_to :organization
   belongs_to :master_company
 
-  attr_accessible :name, :total_donations
+  attr_accessible :name, :total_donations, :master_company_id
 
   def primary_master_person
     master_people.where('master_person_donor_accounts.primary' => true).first

@@ -14,7 +14,7 @@ module Person::Account
     else
       # if creating this authentication record is a duplicate, we have a duplicate person to merge
       if other_account = find_by_remote_id_and_authenticated(@remote_id, true)
-        other_account.update_attribute(:person_id, person.id)
+        other_account.update_attributes({person_id: person.id}, without_protection: true)
         @account = other_account
       else
         @account = @rel.create!(@attributes, without_protection: true)

@@ -90,7 +90,7 @@ class Person::OrganizationAccount < ActiveRecord::Base
 
         # look for an existing account list with the same designation numbers in it
         if account_list = AccountList.find_with_designation_numbers(profile[:designation_numbers]) 
-          account_list.update_attribute(:designation_profile_id, designation_profile.id)
+          account_list.update_attributes({designation_profile_id: designation_profile.id}, without_protection: true)
         else
           # create a new list for this profile
           account_list = AccountList.where(designation_profile_id: designation_profile.id).first_or_create!(name: profile[:name], creator_id: person.id)

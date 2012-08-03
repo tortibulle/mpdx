@@ -42,7 +42,7 @@ describe HomeController do
       end
 
       it 'should redirect to setup if user is still in setup mode' do
-        @user.update_attribute(:preferences, {setup: true})
+        @user.update_attributes(preferences: {setup: true})
         get 'index'
         response.should redirect_to('/setup/org_accounts')
       end

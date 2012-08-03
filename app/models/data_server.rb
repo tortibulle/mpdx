@@ -272,7 +272,7 @@ class DataServer
                                 postal_code: line['ZIP'],
                                 country: line['CNTRY_DESCR']}, without_protection: true )
     company.save!
-    donor_account.update_attribute(:master_company_id, company.master_company_id) unless donor_account.master_company_id == company.master_company.id
+    donor_account.update_attributes(master_company_id: company.master_company_id) unless donor_account.master_company_id == company.master_company.id
     company
   end
 
