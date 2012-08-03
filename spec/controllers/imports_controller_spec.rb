@@ -12,5 +12,10 @@ describe ImportsController do
       @file = fixture_file_upload('/tnt_export.csv', 'text/csv')
       post :create, import: { file: @file, override: false, source: 'tnt' }
     end
+
+    it 'should fail on a non .csv upload for tnt' do
+      @file = fixture_file_upload('/tnt_export.txt', 'text/plain')
+      post :create, import: { file: @file, override: false, source: 'tnt' }
+    end
   end
 end
