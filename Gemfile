@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.2.3'
+gem 'rails', '~> 3.2.3'
 
 # Gems used only for assets and not required
 # in production environments by default.
@@ -55,9 +55,9 @@ gem 'charlock_holmes'
 gem 'awesome_print'
 gem 'koala'
 gem 'typhoeus'
-gem 'country_select', git: 'git://github.com/26am/country_select.git'
+gem 'country_select', git: 'git://github.com/26am/country_select.git' # My fork has the meta data for the fancy select
 gem 'iniparse'
-gem 'versionist', git: 'git://github.com/twinge/versionist.git', branch: 'multiple_versioning_strategies'
+gem 'versionist', git: 'git://github.com/twinge/versionist.git', branch: 'multiple_versioning_strategies' # Switch back to gem once multiple_strategies are supported
 gem 'rest-client'
 gem 'airbrake'
 gem 'wicked'
@@ -66,11 +66,11 @@ gem 'resque'
 gem 'resque-retry'
 gem 'resque-lock'
 gem 'deadlock_retry'
-gem 'linkedin', git: 'git://github.com/twinge/linkedin.git'
+gem 'linkedin'
 gem 'redis-objects'
-gem 'carrierwave', git: 'git://github.com/twinge/carrierwave.git'
+gem 'carrierwave', git: 'git://github.com/jnicklas/carrierwave.git' # tracking master because of fixes made since last gem version
 gem 'fb_graph'
-gem "acts-as-taggable-on", :git => "git://github.com/mbleigh/acts-as-taggable-on.git"
+gem "acts-as-taggable-on", '~> 2.3.3'
 gem "fog", "~> 1.3.1"
 gem 'gibberish'
 gem 'active_model_serializers'
