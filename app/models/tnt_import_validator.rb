@@ -1,15 +1,15 @@
 class TntImportValidator < ActiveModel::Validator
   def validate(import)
     if import.file.file
+      tnt_import = TntImport.new(import)
       begin
         @file = File.open(import.file.file.file, "r:utf-8")
-        lines = get_lines(@file.read)
+        lines = tnt_import.get_lines(@file.read)
       rescue ArgumentError
         @file = File.open(import.file.file.file, "r:windows-1251:utf-8")
-        lines = get_lines(@file.read)
+        lines = tnt_import.get_lines(@file.read)
       end
-      contents = @file.read
-      contents = contents[1..-1] if TwitterCldr::Utils::CodePoints.from_string(contents.first).first == "FEFF"
+
       # Make sure required columns are present
       required_columns = ['ContactID', 'Is Organization', 'Organization Account IDs']
 
@@ -21,9 +21,4 @@ class TntImportValidator < ActiveModel::Validator
     end
   end
 
-  def get_lines(contents)
-    # Strip annoying tnt unicode character
-    contents = contents[1..-1] if TwitterCldr::Utils::CodePoints.from_string(contents.first).first == "FEFF"
-    CSV.parse(contents, headers: true)
-  end
 end
