@@ -3,8 +3,12 @@
 FactoryGirl.define do
   factory :import do
     association :account_list
-    source "tnt"
     importing false
+    source 'facebook'
+  end
+
+  factory :tnt_import, parent: :import do
     file { File.new(Rails.root.join('spec/fixtures/tnt_export.csv')) }
+    source "tnt"
   end
 end

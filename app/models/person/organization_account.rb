@@ -10,13 +10,7 @@ class Person::OrganizationAccount < ActiveRecord::Base
 
   def self.queue() :import; end
 
-  has_many :designation_profiles, finder_sql: Proc.new {
-    %Q{
-      SELECT DISTINCT *
-      FROM designation_profiles d
-      WHERE d.organization_id = #{organization_id} AND d.user_id = #{person_id}
-    }
-  }
+  has_many :designation_profiles
 
   after_create :set_up_account_list, :queue_import_data
   validates :organization_id, :person_id, presence: true

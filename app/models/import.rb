@@ -1,5 +1,6 @@
 require 'async'
 require 'csv'
+require 'tnt_import_validator'
 
 class Import < ActiveRecord::Base
   include Async
@@ -10,8 +11,8 @@ class Import < ActiveRecord::Base
 
   mount_uploader :file, ImportUploader
   belongs_to :account_list
-  attr_accessible :file, :importing, :source, :file_cache, :override
-  validates :file, presence: true, if: lambda {|import| %w[tnt].include?(import.source) }
+  attr_accessible :file, :importing, :source, :file_cache, :override, :tags
+  validates_with TntImportValidator, if: lambda {|import| 'tnt' == import.source }
 
   def queue_import_contacts
     async(:import_contacts)

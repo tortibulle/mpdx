@@ -34,5 +34,7 @@ describe Person::OrganizationAccount do
         @org_account.send(:set_up_account_list)
       }.should_not change(AccountList, :count)
     end
+
+    # it 'should not show duplicate designation_profiles'
   end
 end

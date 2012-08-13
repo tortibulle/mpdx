@@ -8,7 +8,7 @@ class ImportsController < ApplicationController
       if import.save
         current_user.import_contacts_from(import)
       else
-        flash[:alert] = _('Please choose a file that ends with .csv')
+        flash[:alert] = import.errors.full_messages.join('<br>').html_safe
       end
     end
 
