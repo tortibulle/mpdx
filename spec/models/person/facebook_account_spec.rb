@@ -38,6 +38,61 @@ describe Person::FacebookAccount do
     account.to_s.should == 'John Doe'
   end
 
+  it "should generate a facebook url if there is a remote_id" do
+    account = Person::FacebookAccount.new(remote_id: 1)
+    account.url.should == "http://facebook.com/profile.php?id=1"
+  end
+
+  describe 'setting facebook id from a url' do
+    before do
+      @account = Person::FacebookAccount.new
+    end
+
+    it "should get an id from a url containing a name" do
+      @account.should_receive(:get_id_from_url).and_return(1)
+      @account.url = 'https://www.facebook.com/john.doe'
+      @account.remote_id.should == 1
+    end
+
+    it "should get an id from a url containing a profile id" do
+      @account.should_receive(:get_id_from_url).and_return(1)
+      @account.url = 'https://www.facebook.com/profile.php?id=1'
+      @account.remote_id.should == 1
+    end
+
+    it "delete the account if the name is not found" do
+      #stub_request(:get, /https:\/\/graph.facebook.com\/.*/).
+         #with(:headers => {'Accept'=>'application/json'}).to_return(:status => 404)
+      @account.should_receive(:get_id_from_url).and_raise(RestClient::ResourceNotFound)
+      @account.url = 'https://www.facebook.com/john.doe'
+      @account.frozen?.should == true # deleted
+    end
+
+  end
+
+  describe 'get id from url' do
+    before do
+      @account = Person::FacebookAccount.new
+    end
+
+    it "when url contains profile id" do
+      @account.get_id_from_url('https://www.facebook.com/profile.php?id=1').should == 1
+    end
+
+    it "when url contains permalink" do
+      stub_request(:get, /https:\/\/graph.facebook.com\/.*/).
+         with(:headers => {'Accept'=>'application/json'}).to_return(:status => 200, :body => '{"id": 1}')
+      @account.get_id_from_url('https://www.facebook.com/john.doe').should == 1
+    end
+
+    it "should raise an exception if the url is bad" do
+      stub_request(:get, /https:\/\/graph.facebook.com\/.*/).
+         with(:headers => {'Accept'=>'application/json'}).to_return(:status => 404)
+      lambda {@account.get_id_from_url('https://www.facebook.com/john.doe')}.should raise_error(RestClient::ResourceNotFound)
+    end
+
+  end
+
   describe 'when importing contacts' do
     before do
       @account_list = create(:account_list)

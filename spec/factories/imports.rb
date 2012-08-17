@@ -3,6 +3,7 @@
 FactoryGirl.define do
   factory :import do
     association :account_list
+    association :user
     importing false
     source 'facebook'
   end

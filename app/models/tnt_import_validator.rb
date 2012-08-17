@@ -11,9 +11,7 @@ class TntImportValidator < ActiveModel::Validator
       end
 
       # Make sure required columns are present
-      required_columns = ['ContactID', 'Is Organization', 'Organization Account IDs']
-
-      unless (lines.headers & required_columns).length == required_columns.length
+      unless (lines.headers & TntImport.required_columns).length == TntImport.required_columns.length
         import.errors[:base] << _('You need to export all the available fields from TNT')
       end
     else

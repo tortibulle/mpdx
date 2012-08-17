@@ -42,15 +42,7 @@ class Person::FacebookAccount < ActiveRecord::Base
 
   def url=(value)
     begin
-      fb_user_id = get_id_from_url(value)
-      if fb_user_id.present? && (url.blank? || fb_user_id != get_id_from_url(url))
-        logger.ap fb_user_id
-        response = RestClient.get("https://graph.facebook.com/#{fb_user_id}", { accept: :json})
-        logger.ap response
-        json = JSON.parse(response)
-        raise RestClient::ResourceNotFound unless json['id'].to_i > 0
-        self.remote_id = json['id']
-      end
+      self.remote_id = get_id_from_url(value)
     rescue RestClient::ResourceNotFound
       self.destroy
     end
@@ -61,8 +53,12 @@ class Person::FacebookAccount < ActiveRecord::Base
     if url.include?("id=")
       url.split('id=').last
     else
-      url.split('/').last
-    end
+      name = url.split('/').last
+      response = RestClient.get("https://graph.facebook.com/#{name}", { accept: :json})
+      json = JSON.parse(response)
+      raise RestClient::ResourceNotFound unless json['id'].to_i > 0
+      json['id']
+    end.to_i
   end
 
   def queue_import_contacts(import)

@@ -247,4 +247,8 @@ class TntImport
     addresses
   end
 
+  def self.required_columns
+    ['ContactID', 'Is Organization', 'Organization Account IDs']
+  end
+
 end
