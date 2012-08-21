@@ -2,17 +2,27 @@ require 'spec_helper'
 
 describe DataServer do
   before(:each) do
+    stub_request(:post, "http://example.com/").
+      with(:body => {"Action"=>"Profiles", "Password"=>"Test1234", "UserName"=>"test@test.com"}).
+      to_return(:status => 200, body: "\"PROFILE_CODE\",\"PROFILE_DESCRIPTION\"\n\"93830923\",\"Ministry Account\"\n\"\",\"Staff Account\"")
+    stub_request(:post, "http://example.com/").
+      with(:body => {"Action"=>"AccountBalance", "Password"=>"bar", "Profile"=>"93830923", "UserName"=>"foo"}).
+      to_return(:status => 200, :body => "\"EMPLID\",\"ACCT_NAME\",\"BALANCE\"\n\"\"\"112235\"\",\"\"112234\"\",\"\"112233\"\"\",\"Dell SM / Holding\nDell SM / Project\nDell, Stefan and Marie\",\"(multiple accounts): 95649.14 (ZAR)\"")
+    stub_request(:post, "http://example.com/").
+      with(:body => {"Action"=>"AccountBalance", "Password"=>"bar", "Profile"=>"", "UserName"=>"foo"}).
+      to_return(:status => 200, :body => "\"EMPLID\",\"ACCT_NAME\",\"BALANCE\"\n\"\",\"\",\"(multiple accounts): 5112.03 (ZAR)\"")
     @org = create(:organization)
     @person = create(:person)
     @org_account = build(:organization_account, person: @person, organization: @org)
     @profile = create(:designation_profile, organization: @org, user: @person.to_user)
-    @org_account.designation_profiles << @profile
+    #@org_account.designation_profiles << @profile
+    #@org_account.save!
     @data_server = DataServer.new(@org_account)
   end
 
   it "should import all" do
     date_from = '01/01/1951'
-    @data_server.should_receive(:import_profiles)
+    @data_server.should_receive(:import_profiles).and_return([@profile])
     @data_server.should_receive(:import_profile_balance).with(@profile)
     @data_server.should_receive(:import_donors).with(@profile, date_from)
     @data_server.should_receive(:import_donations).with(@profile, date_from)

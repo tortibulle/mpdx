@@ -10,8 +10,8 @@ class DataServer
 
   def import_all(date_from)
     Rails.logger.debug 'Importing Profiles'
-    import_profiles
-    @org_account.designation_profiles.each do |p|
+    designation_profiles = import_profiles
+    designation_profiles.each do |p|
       Rails.logger.debug 'Importing balances'
       import_profile_balance(p)
       Rails.logger.debug 'Importing Donors'
@@ -24,10 +24,11 @@ class DataServer
   def import_profiles
     check_credentials!
 
+    designation_profiles = []
     profiles.each do |profile|
-      @org.designation_profiles.where(user_id: @org_account.person_id, name: profile[:name], code: profile[:code]).first_or_create
+      designation_profiles << @org.designation_profiles.where(user_id: @org_account.person_id, name: profile[:name], code: profile[:code]).first_or_create
     end
-    true
+    designation_profiles
   end
 
   def get_account_list(profile)

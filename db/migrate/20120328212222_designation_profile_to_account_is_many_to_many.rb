@@ -4,6 +4,6 @@ class DesignationProfileToAccountIsManyToMany < ActiveRecord::Migration
   end
 
   def down
-    add :designation_accounts, :designation_profile_id, :integer
+    add_column :designation_accounts, :designation_profile_id, :integer
   end
 end

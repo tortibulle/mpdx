@@ -43,6 +43,10 @@ class Person::OrganizationAccount < ActiveRecord::Base
     async(:import_all_data)
   end
 
+  #def designation_profiles
+    #organization.designation_profiles.where(user_id: person_id)
+  #end
+
   def create_default_profile
     account_list =  if user.designation_profiles.empty?
                       organization.designation_profiles.create({name: user.to_s, user_id: user.id}, without_protection: true).account_list
