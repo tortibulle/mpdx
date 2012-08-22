@@ -65,6 +65,10 @@ class Person::FacebookAccount < ActiveRecord::Base
     async(:import_contacts, import.id)
   end
 
+  def token_missing_or_expired?
+    token.blank? || !token_expires_at || token_expires_at < Time.now
+  end
+
   private
 
   def import_contacts(import_id)

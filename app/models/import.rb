@@ -13,6 +13,7 @@ class Import < ActiveRecord::Base
   belongs_to :account_list
   attr_accessible :file, :importing, :source, :file_cache, :override, :tags
   validates_with TntImportValidator, if: lambda {|import| 'tnt' == import.source }
+  validates_with FacebookImportValidator, if: lambda {|import| 'facebook' == import.source }
 
   def queue_import_contacts
     async(:import_contacts)
