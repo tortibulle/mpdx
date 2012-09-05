@@ -73,7 +73,7 @@ gem 'fb_graph'
 gem "acts-as-taggable-on", '~> 2.3.3'
 gem "fog", "~> 1.3.1"
 gem 'gibberish'
-gem 'active_model_serializers'
+gem 'active_model_serializers', git: 'git://github.com/josevalim/active_model_serializers.git'
 
 group :development do
   gem 'unicorn'
@@ -88,6 +88,7 @@ group :development, :test do
   gem 'simplecov', :require => false
   #only used for mo/po file generation in development, !do not load(:require=>false)! since it will only eat 7mb ram
   gem "gettext", '>= 1.9.3', :require => false
+  gem 'mailcatcher'
 end
 group :test do
   gem 'webmock', '= 1.8.3'

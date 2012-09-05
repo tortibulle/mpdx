@@ -86,7 +86,7 @@ class Person < ActiveRecord::Base
   end
 
   def email
-    primary_email_address
+    primary_email_address || email_addresses.first
   end
 
   def family_relationships_attributes=(hash)

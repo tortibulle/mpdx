@@ -6,7 +6,6 @@ class FacebookImport
     self.import = import
   end
 
-
   def import_contacts
     account_list = import.account_list
 
@@ -72,6 +71,7 @@ class FacebookImport
       end
 
     end
+    ImportMailer.complete(import).deliver
   end
 
 

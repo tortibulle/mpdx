@@ -7,6 +7,7 @@ class ImportsController < ApplicationController
 
       if import.save
         current_user.import_contacts_from(import)
+        flash[:notice] = _("MPDX is currently importing your contacts from #{params[:import][:source]}. You will receive an email when the import is complete.")
       else
         flash[:alert] = import.errors.full_messages.join('<br>').html_safe
       end
