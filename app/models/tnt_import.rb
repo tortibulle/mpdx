@@ -6,8 +6,10 @@ class TntImport
 
   def get_lines(contents)
     # Strip annoying tnt unicode character
-    contents = contents[1..-1] if TwitterCldr::Utils::CodePoints.from_string(contents.first).first == "FEFF"
+    contents = contents[1..-1] if contents.first.localize.code_points.first == 65279
     CSV.parse(contents, headers: true)
+  rescue CSV::MalformedCSVError
+    raise TwitterCldr::Utils::CodePoints.from_string(contents.first).inspect
   end
 
   def import_contacts
