@@ -24,7 +24,7 @@
                   <%= link_to(tasks_path(anchor: dom_id(task))) do %>
                     <span class="date"><%= l(task.start_at) %></span> - <span><%= task %></span>
                   <% end %> 
-                  <%= "(#{task.contact_links})" if task.contact_links.present? %>
+                  <%== "(#{task.contact_links})" if task.contact_links.present? %>
                   <%= link_to('Destroy', task, confirm: _('Are you sure?'), method: :delete, :class=> "ico ico_trash", remote: true) %>
                 <% end %>
               </li>
