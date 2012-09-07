@@ -12,7 +12,8 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require jquery-ui
+//= require jquery.ui.dialog
+//= require jquery.ui.tabs
 //= require jquery.cookie
 //= require jquery.observe_field
 //= require history
