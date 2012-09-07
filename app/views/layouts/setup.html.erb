@@ -18,14 +18,19 @@
           <div id="logo"><%= link_to("MPDX", "MPDX") %></div>
           <div class="links">
             <div class="section"><%= current_user %></div>
-            <div class="section"><%= link_to(t('g.log_out'), "/logout", :class => "btn btndark") %></div>
+            <div class="section"><%= link_to(_('Log out'), "/logout", :class => "btn btndark") %></div>
           </div>
           
         </header>
         <div id="callout">
           <div class="in">
-            <%= t("#{wizard_scope}.title") %> <br/>
-            <span class="small"><%= t("#{wizard_scope}.connect") %></span>
+            <% if wizard_scope == 'setup.org_accounts' %>
+              <%= _('Welcome to MPDX!') %> <br/>
+              <span class="small"><%= _('Connect to your organization') %></span>
+            <% else %>
+              <%= _('Sweet! Your Account is activated!') %> <br/>
+              <span class="small"><%= _('Just need to connect some social accounts') %></span>
+            <% end %>
           </div>
         </div>
         <div id="content"> 
@@ -45,7 +50,12 @@
       <aside id="right" style="display: none;">
 
         <div class="modcontent">
-          <%= t("#{wizard_scope}.intro_html") %>
+          <% if wizard_scope == 'setup.org_accounts' %>
+            <%= _("To use MPDX, you need to connect to your organization's donation system. If you raise funds through more than one organization, you can connect to multiple accounts.") %>
+          <% else %>
+            <%== _("<p>Easily connect all of your contacts, calendars, communications and social conversations. MPDX will automatically identify contact's social profiles on Facebook, LinkedIn, and </p>
+                    <p>Twitter so that you connect, listen, and engage with your minitry partners. </p>") %>
+          <% end %>
         </div>
 
       </aside>

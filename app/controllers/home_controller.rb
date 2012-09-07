@@ -1,10 +1,14 @@
 class HomeController < ApplicationController
-  skip_before_filter :ensure_login, only: :login
+  skip_before_filter :ensure_login, only: [:login, :privacy]
 
   def index
   end
 
   def login
+    render layout: false
+  end
+
+  def privacy
     render layout: false
   end
 
