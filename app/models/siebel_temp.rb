@@ -25,7 +25,7 @@ class SiebelTemp < DataServer
       Rails.logger.ap request
       Rails.logger.ap response
       # check for error response
-      raise DataServerError, request.inspect if response.blank?
+      raise DataServerError, "No data for #{params}" if response.blank?
       first_line = response.split("\n").first.to_s.upcase
       if response.code.to_i == 500 || first_line.include?('ERROR') || first_line.include?('BAD_PASSWORD') || first_line.include?('HTML')
         raise DataServerError, response.to_str
