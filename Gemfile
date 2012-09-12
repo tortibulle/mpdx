@@ -31,12 +31,6 @@ gem 'jquery-rails'
 platforms :mri do
   #gem 'mysql2'
   gem 'pg'
-  group :test do
-    gem 'spork-rails', '~> 3.2.0'
-    gem 'rb-fsevent', :require => false
-    gem 'guard-spork'
-    gem 'growl'
-  end
 end
 gem 'resque-ensure-connected'
 gem 'devise', '~> 2.0.0'
@@ -93,4 +87,8 @@ group :development, :test do
 end
 group :test do
   gem 'webmock', '= 1.8.3'
+  gem 'spork-rails', '~> 3.2.0'
+  gem 'rb-fsevent', :require => false
+  gem 'guard-spork'
+  gem 'growl'
 end
