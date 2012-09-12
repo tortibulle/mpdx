@@ -6,6 +6,7 @@
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width">
   <%= stylesheet_link_tag    "splash", :media => "all" %>
+  <%= render 'google_analytics' %>
 </head>
 
 <body>
@@ -15,20 +16,20 @@
 		  <%= image_tag("splash/logo.png", id: "logo")%>
     </div>
   </header>
-    
+
   <div id="mainwrap" class="pagewidth margin">
     <div role="main" id="main" class="pagewidth">
       <h1><%= _('Welcome to MPDX!') %></h1>
       <p><%= _('Please choose your preferred <br/> method of logging in:') %></p>
-    
-    <div id="login_links">
-      <%= link_to(image_tag('splash/relay_logo.png'), '/auth/relay', class: "loginlink relay") %>
-      &nbsp;
-      &nbsp;
-      <%= link_to(image_tag('splash/key_logo.png'), '/auth/key', class: "loginlink relay") %>
-    
-    </div>
-    
+
+      <div id="login_links">
+        <%= link_to(image_tag('splash/relay_logo.png'), '/auth/relay', class: "loginlink relay") %>
+        &nbsp;
+        &nbsp;
+        <%= link_to(image_tag('splash/key_logo.png'), '/auth/key', class: "loginlink relay") %>
+
+      </div>
+
     </div>
   </div>
 

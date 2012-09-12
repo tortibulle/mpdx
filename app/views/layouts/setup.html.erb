@@ -8,6 +8,7 @@
     <%= stylesheet_link_tag    "errors", :media => "all" %>
     <%= javascript_include_tag "application" %>
     <%= csrf_meta_tags %>
+    <%= render 'google_analytics' %>
   </head>
   <body>
 
@@ -20,8 +21,8 @@
             <div class="section"><%= current_user %></div>
             <div class="section"><%= link_to(_('Log out'), "/logout", :class => "btn btndark") %></div>
           </div>
-          
         </header>
+
         <div id="callout">
           <div class="in">
             <% if wizard_scope == 'setup.org_accounts' %>
@@ -40,9 +41,9 @@
           <% end %>
           <% if alert %>
             <p class="alert"><%= alert %></p>
-          <% end %>   
+          <% end %>
 
-          <%= yield %>      
+          <%= yield %>
 
         </div>
       </div>
