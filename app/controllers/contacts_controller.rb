@@ -18,13 +18,35 @@ class ContactsController < ApplicationController
       @contacts = @contacts.tagged_with(@tags)
     end
 
+    if params[:city].present? && params[:city].first != ''
+      @contacts = @contacts.includes(:addresses).where('addresses.city' => params[:city])
+    end
+
+    if params[:state].present? && params[:state].first != ''
+      @contacts = @contacts.includes(:addresses).where('addresses.state' => params[:state])
+    end
+
+    if params[:newsletter]
+      @contacts = @contacts.where('send_newsletter is not null')
+      case params[:newsletter]
+      when 'address'
+        @contacts = @contacts.joins(:addresses).where('street is not null')
+      when 'email'
+        @contacts = @contacts.joins(people: :email_addresses)
+      end
+    end
+
+    @contacts = @contacts.uniq
+
+
     respond_to do |wants|
       wants.html do
         @contacts = @contacts.page(params[:page])
       end
       wants.csv do
         @headers = ['Full Name','Greeting','Mailing Street Address','Mailing City',
-                    'Mailing State','Mailing Postal Code', 'Mailing Country']
+                    'Mailing State','Mailing Postal Code', 'Mailing Country',
+                    'Email 1','Email 2','Email 3','Email 4']
         render_csv("contacts-#{Time.now.strftime("%Y%m%d")}")
       end
     end

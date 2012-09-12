@@ -336,26 +336,38 @@ div.name {font-size: 14px; margin-bottom: 4px;}
   ul {
     @include listclear;
     li {border-bottom: 1px solid $borders;}
-    li.selected {background: $white; a{border-left: 1px solid $borders;}}
-    li a {display: block; line-height: 3em; padding: 0 15px 0 35px;}
+    li.selected {background: $white; a, span{border-left: 1px solid $borders;}}
+    li a, li span {display: block; line-height: 3em; padding: 0 15px 0 35px;}
   }
   
   ul li {
-    a {background: image-url("sprite.png") no-repeat 0 50%; color: #000; font-weight: bold; font-size: 13px; font-family: 'FreightSansProMedium';}
+    a, span {background: image-url("sprite.png") no-repeat 0 50%; color: #000; font-weight: bold; font-size: 13px; font-family: 'FreightSansProMedium';}
     a.inbox {background-position: 5px 10px;}
     a.starred {background-position: 5px -55px;}
     a.completed {background-position: 5px -119px;}
     a.all {background-position: 5px -914px;}
     a.people {background-position: 5px -834px;}
     a.companies {background-position: 5px -749px;}
-    a.tags {background-position: 5px -995px;}
+    span.tags {background-position: 5px -995px;}
   }
   
-  ul.tags li {
+  ul.tags li, ul.left_filters li {
     border: none;
     padding-left: 35px;
     padding-bottom: 5px;
+    select {
+      width: 150px;
+    }
+  }
+  .selected ul.tags li {
     border-left: 1px solid $borders;
+  }
+
+  ul.left_filters li {
+    label {
+      font-weight: bold;
+    }
+    font-size: 11px;
   }
 }
 

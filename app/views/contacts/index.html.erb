@@ -3,22 +3,67 @@
   <li class="<%= 'selected' if params[:filter].blank? %>"><%= link_to(t('g.all'), contacts_path, class: "all") %></li>
   <li class="<%= 'selected' if params[:filter] == 'people' %>"><%= link_to(t('g.people'), contacts_path(filter: 'people'), class: "people") %></li>
   <li class="<%= 'selected' if params[:filter] == 'companies' %>"><%= link_to(t('g.companies'), contacts_path(filter: 'companies'), class: "companies") %></li>
-  <li class="selected">
-    <%= link_to("Tags", '#', onclick: "return false;", class: "tags") %>
+  <li class="<%= 'selected' if @tags %>">
+  <span class="tags"><%= _('Tags') %></span>
     <ul class="left_taglist tags">
-      <% current_account_list.tags.each do |tag| 
-        # toggle tag on / off
-        tag_params = params.except(:action, :controller)
-        if @tags && @tags.include?(tag)
-          tag_params[:tags] = (@tags - [tag]).join(',')
-        else
-          tag_params[:tags] = (Array.wrap(@tags) + [tag]).join(',')
-        end
-        tag_params.delete(:tags) if tag_params[:tags].blank? %>
+      <li>
+        <% current_account_list.tags.each do |tag| 
+          # toggle tag on / off
+          tag_params = params.except(:action, :controller)
+          if @tags && @tags.include?(tag)
+            tag_params[:tags] = (@tags - [tag]).join(',')
+          else
+            tag_params[:tags] = (Array.wrap(@tags) + [tag]).join(',')
+          end
+          tag_params.delete(:tags) if tag_params[:tags].blank? %>
 
-        <li><%= link_to(tag, tag_params, class: "tag #{'selected' if @tags && @tags.include?(tag)}")%></li>
-      <% end %>
+          <%= link_to(tag, tag_params, class: "tag #{'selected' if @tags && @tags.include?(tag)}")%>
+        <% end %>
+      </li>
     </ul>
+  </li>
+  <li>
+    <%= form_tag '/contacts', method: :get do %>
+      <span class="left_filters" onclick="return false;"><%= _('Filters') %></span>
+      
+      <ul class="left_filters">
+        <li>
+          <label><%= _('City') %></label>
+          <%= select_tag :city, options_for_select([[_('-- Any --'), '']] + current_account_list.cities.select(&:present?), params[:city]), multiple: true, size: 5 %>
+        </li>
+
+        <li>
+          <label><%= _('State') %></label>
+          <%= select_tag :state, options_for_select([[_('-- Any --'), '']] + current_account_list.states.select(&:present?), params[:state]), multiple: true, size: 5 %>
+        </li>
+
+        <li>
+          <label><%= _('Newsletter Recipients') %></label>
+          <%= radio_button_tag :newsletter, 'all', params[:newsletter] == 'all' %> <%= _('All') %><br />
+          <%= radio_button_tag :newsletter, 'address', params[:newsletter] == 'address' %> <%= _('With Mailing Address') %><br />
+          <%= radio_button_tag :newsletter, 'email', params[:newsletter] == 'email' %> <%= _('With Valid Email') %>
+        </li>
+
+        <li>
+          <label><%= _('Status') %></label>
+          <%= select_tag :status, options_for_select([[_('-- Any --'), '']] + Contact.new.assignable_statuses.collect { |s| [_(s), s] }, params[:status]), multiple: true, size: 5 %>
+        </li>
+
+        <li>
+          <label><%= _('Church') %></label>
+          <%= select_tag :church, options_for_select([[_('-- Any --'), '']] + current_account_list.churches.select(&:present?), params[:church]), multiple: true, size: 5 %>
+        </li>
+
+        <li>
+          <label><%= _('Referrer') %></label>
+          <%= select_tag :referrer, options_for_select([[_('-- Any --'), '']] + current_account_list.contacts.order('name').collect { |c| [c.name, c.id] }, params[:referrer]), multiple: true, size: 5 %>
+        </li>
+        <li>
+        <%= submit_tag _('Filter') %><br />
+        <%= link_to(_('Clear Filters'), contacts_path, style: 'font-size: 11px;color:red') %>
+        </li>
+      </ul>
+    <% end %>
   </li>
 </ul>
 </aside>

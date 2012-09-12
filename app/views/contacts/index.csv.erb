@@ -9,6 +9,10 @@
     row << contact.mailing_address.state
     row << contact.mailing_address.postal_code
     row << contact.mailing_address.country
+    email_addresses = contact.people.collect(&:email_addresses).flatten.collect(&:email)[0..3]
+    email_addresses.each do |email|
+      row << email
+    end
     csv << row
   end
 end %>

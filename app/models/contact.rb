@@ -35,7 +35,8 @@ class Contact < ActiveRecord::Base
 
   assignable_values_for :status, :allow_blank => true do
     ['Never Contacted', 'Ask in Future', 'Call for Appointment', 'Appointment Scheduled', 'Call for Decision',
-    'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Not Interested', 'Unresponsive', 'Never Ask']
+    'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Not Interested', 'Unresponsive', 'Never Ask',
+    'Research Abandoned','Expired Referral']
   end
 
   attr_accessible :name, :addresses_attributes, :pledge_amount, :status, :contact_referrals_to_me_attributes,
