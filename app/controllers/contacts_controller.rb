@@ -15,7 +15,7 @@ class ContactsController < ApplicationController
 
     if params[:tags].present?
       @tags = params[:tags].split(',')
-      @contacts = @contacts.tagged_with(params[:tags])
+      @contacts = @contacts.tagged_with(@tags)
     end
   end
 

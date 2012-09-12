@@ -178,10 +178,16 @@ class TntImport
 
   def add_or_update_person(account_list, user, line, donor_account, remote_id, contact, prefix = '')
     organization = donor_account.organization
-    master_person_from_source = organization.master_people.where('master_person_sources.remote_id' => remote_id).first
-    person = donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
+    # See if there's already a person by this name on this contact (This is a contact with multiple donation accounts)
+    contact_person = contact.people.where(first_name: line[prefix + 'First/Given Name'], last_name: line[prefix + 'Last/Family Name'], middle_name: line[prefix + 'Middle Name']).first
+    if contact_person
+      person = Person.new({master_person: contact_person.master_person}, without_protection: true)
+    else
+      master_person_from_source = organization.master_people.where('master_person_sources.remote_id' => remote_id).first
+      person = donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
 
-    person ||= Person.new({master_person: master_person_from_source}, without_protection: true)
+      person ||= Person.new({master_person: master_person_from_source}, without_protection: true)
+    end
     person.attributes = {first_name: line[prefix + 'First/Given Name'], last_name: line[prefix + 'Last/Family Name'], middle_name: line[prefix + 'Middle Name'],
                           title: line[prefix + 'Title'], suffix: line[prefix + 'Suffix'], gender: prefix.present? ? 'female' : 'male'}
     # Phone numbers
@@ -201,12 +207,12 @@ class TntImport
 
     # TODO: deal with other TNT fields
 
-    person.master_person_id ||= MasterPerson.find_or_create_for_person(person, donor_account: donor_account).try(:id)
+    person.master_person_id ||= MasterPerson.find_or_create_for_person(person, donor_account: donor_account, remote_id: remote_id).try(:id)
     person.save!
 
     donor_account.master_people << person.master_person unless donor_account.master_people.include?(person.master_person)
 
-    contact_person = contact.add_person(person)
+    contact_person ||= contact.add_person(person)
 
     # create the master_person_source if needed
     unless master_person_from_source

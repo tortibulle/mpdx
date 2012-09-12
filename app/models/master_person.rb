@@ -8,7 +8,11 @@ class MasterPerson < ActiveRecord::Base
     if master_person = find_for_person(person, extra = {})
       return master_person
     end
-    create!
+    mp = create!
+    if donor_account = extra[:donor_account]
+      mp.donor_accounts << donor_account
+      mp.master_person_sources.create(organization_id: donor_account.organization_id, remote_id: extra[:remote_id]) if extra[:remote_id]
+    end
   end
 
   def self.find_for_person(person, extra = {})

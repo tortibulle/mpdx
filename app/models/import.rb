@@ -27,6 +27,7 @@ class Import < ActiveRecord::Base
     begin
       "#{source.titleize}Import".constantize.new(self).import_contacts
       ImportMailer.complete(self).deliver
+      true
     rescue => e
       ImportMailer.failed(self).deliver
       raise e
