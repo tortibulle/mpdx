@@ -51,14 +51,18 @@ class Person < ActiveRecord::Base
   def add_spouse(spouse)
     relationship = case spouse.gender
                    when 'male'
-                     I18n.t('g.relationships_male')[0]
+                     'Husband'
                    when 'female'
-                     I18n.t('g.relationships_female')[0]
+                     'Wife'
                    else
-                     I18n.t('g.relationships_female')[0] # Default to wife
+                     'Wife' # Default to wife
                    end
 
     family_relationships.where(related_person_id: spouse.id).first_or_create(relationship: relationship)
+  end
+
+  def spouse
+    family_relationships.where(relationship: ['Husband','Wife']).first.try(:related_person)
   end
 
   def to_user

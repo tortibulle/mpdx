@@ -1,0 +1,14 @@
+"<%== @headers.map {|h| _(h)}.join('","') %>"
+<%== CSV.generate do |csv|
+  @contacts.each do |contact|
+    row = []
+    row << contact.name
+    row << contact.greeting
+    row << contact.mailing_address.street
+    row << contact.mailing_address.city
+    row << contact.mailing_address.state
+    row << contact.mailing_address.postal_code
+    row << contact.mailing_address.country
+    csv << row
+  end
+end %>

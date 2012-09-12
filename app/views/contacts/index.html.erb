@@ -27,17 +27,17 @@
   <div class="filters">
     <%= text_field_tag :contact_name, '', autocomplete: 'off', placeholder: t('g.contact_filter_prompt'), class: 'search_filter' %>
     <div class="right">
-      <%#<%= link_to("Actions", "Actions", class: "btn smallbtn") %>
+      <%= link_to(_('Download CSV'), params.merge(format: 'csv'), class: "btn smallbtn") %>
+      <%#= link_to("Actions", "Actions", class: "btn smallbtn") %>
       <%#<span class="btn smallbtn"><input type="checkbox" /></span>%>
     </div>
   </div>
   <div class="">
     <div class="padded">
       <table class="tablelist">
-
         <%= render partial: 'contact', collection: @contacts %>
       </table>
-      <%#= will_paginate @contacts %>
+      <%= will_paginate @contacts %>
 
     </div>
   </div>

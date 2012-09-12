@@ -17,6 +17,17 @@ class ContactsController < ApplicationController
       @tags = params[:tags].split(',')
       @contacts = @contacts.tagged_with(@tags)
     end
+
+    respond_to do |wants|
+      wants.html do
+        @contacts = @contacts.page(params[:page])
+      end
+      wants.csv do
+        @headers = ['Full Name','Greeting','Mailing Street Address','Mailing City',
+                    'Mailing State','Mailing Postal Code', 'Mailing Country']
+        render_csv("contacts-#{Time.now.strftime("%Y%m%d")}")
+      end
+    end
   end
 
   def show

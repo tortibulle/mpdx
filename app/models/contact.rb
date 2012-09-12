@@ -58,6 +58,10 @@ class Contact < ActiveRecord::Base
     new_person
   end
 
+  def mailing_address
+    addresses.where(primary_mailing_address: true).first || addresses.first || Address.new
+  end
+
   def self.create_from_donor_account(donor_account, account_list)
     contact = account_list.contacts.new({name: donor_account.name}, without_protection: true)
     contact.addresses_attributes = Hash[donor_account.addresses.collect.with_index { |address, i| [i, address.attributes.slice(*%w{street city state country postal_code})] }]
