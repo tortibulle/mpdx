@@ -4,7 +4,7 @@
   <li class="<%= 'selected' if params[:filter] == 'people' %>"><%= link_to(t('g.people'), contacts_path(filter: 'people'), class: "people") %></li>
   <li class="<%= 'selected' if params[:filter] == 'companies' %>"><%= link_to(t('g.companies'), contacts_path(filter: 'companies'), class: "companies") %></li>
   <li class="selected">
-    <%= link_to("Tags", contacts_path(filter: 'companies'), class: "tags") %>
+    <%= link_to("Tags", '#', onclick: "return false;", class: "tags") %>
     <ul class="left_taglist tags">
       <% current_account_list.tags.each do |tag| 
         # toggle tag on / off
