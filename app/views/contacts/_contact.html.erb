@@ -12,11 +12,11 @@
             link_to(exhibit(person, self), person_path(person))
           end.join(', ') %>
         </div>
-        <!--      <div class="tags">
-        <%= link_to("Recurring Donor", "", class: "tag")%>
-        <%= link_to("One Time Donor", "", class: "tag")%>
-        <%= link_to("New Donor", "", class: "tag")%>
-        </div> -->
+        <div class="tags">
+          <% contact.tags.each do |tag| %>
+            <%= link_to(tag, params.except(:action, :controller).merge(tags: tag.name), class: "tag")%>
+          <% end %>
+        </div>
       </div>
     </td>
     <td class="qaction" id="<%= dom_id(contact) %>_quick">
@@ -26,6 +26,6 @@
         <li><%= link_to(t('g.edit'), edit_contact_path(contact), :class => "none") %></li>
       </ul>
     </td>
-    <td class="checks"><input type="checkbox" /></td>
+    <%#<td class="checks"><input type="checkbox" /></td>%>
   </tr>
 <% end %>

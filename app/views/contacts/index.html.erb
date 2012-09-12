@@ -3,14 +3,23 @@
   <li class="<%= 'selected' if params[:filter].blank? %>"><%= link_to(t('g.all'), contacts_path, class: "all") %></li>
   <li class="<%= 'selected' if params[:filter] == 'people' %>"><%= link_to(t('g.people'), contacts_path(filter: 'people'), class: "people") %></li>
   <li class="<%= 'selected' if params[:filter] == 'companies' %>"><%= link_to(t('g.companies'), contacts_path(filter: 'companies'), class: "companies") %></li>
-<!--  <li class="selected">
+  <li class="selected">
     <%= link_to("Tags", contacts_path(filter: 'companies'), class: "tags") %>
     <ul class="left_taglist tags">
-      <li><%= link_to("Recurring Donor", "", class: "tag selected")%></li>
-      <li><%= link_to("One Time Donor", "", class: "tag")%></li>
-      <li><%= link_to("New Donor", "", class: "tag")%></li>
+      <% current_account_list.tags.each do |tag| 
+        # toggle tag on / off
+        tag_params = params.except(:action, :controller)
+        if @tags && @tags.include?(tag)
+          tag_params[:tags] = (@tags - [tag]).join(',')
+        else
+          tag_params[:tags] = (Array.wrap(@tags) + [tag]).join(',')
+        end
+        tag_params.delete(:tags) if tag_params[:tags].blank? %>
+
+        <li><%= link_to(tag, tag_params, class: "tag #{'selected' if @tags && @tags.include?(tag)}")%></li>
+      <% end %>
     </ul>
-    </li> -->
+  </li>
 </ul>
 </aside>
 
@@ -18,8 +27,8 @@
   <div class="filters">
     <%= text_field_tag :contact_name, '', autocomplete: 'off', placeholder: t('g.contact_filter_prompt'), class: 'search_filter' %>
     <div class="right">
-      <%= link_to("Actions", "Actions", class: "btn smallbtn") %>
-      <span class="btn smallbtn"><input type="checkbox" /></span>
+      <%#<%= link_to("Actions", "Actions", class: "btn smallbtn") %>
+      <%#<span class="btn smallbtn"><input type="checkbox" /></span>%>
     </div>
   </div>
   <div class="">

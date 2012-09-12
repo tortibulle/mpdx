@@ -39,7 +39,6 @@ class Person::OrganizationAccount < ActiveRecord::Base
   end
 
   def queue_import_data
-    update_column(:downloading, true)
     async(:import_all_data)
   end
 
@@ -59,6 +58,7 @@ class Person::OrganizationAccount < ActiveRecord::Base
   private
   def import_all_data
     return if locked_at
+    update_column(:downloading, true)
     begin
       update_attributes({downloading: true, locked_at: Time.now}, without_protection: true)
       date_from = last_download ? last_download.strftime("%m/%d/%Y") : ''

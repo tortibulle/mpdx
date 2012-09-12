@@ -41,6 +41,17 @@ class AccountList < ActiveRecord::Base
     nil
   end
 
+  def tags
+    #Rails.cache.fetch("account_tags/#{id}") do
+    @tags ||= AccountList.connection.select_values("select distinct(tags.name) from account_lists al inner join contacts c on c.account_list_id = al.id inner join taggings t on t.taggable_id = c.id AND t.taggable_type = 'Contact'
+                                            inner join tags on t.tag_id = tags.id where al.id = #{id}")
+    #end
+  end
+
+  #def clear_tag_cache
+    #Rails.cache.delete("account_tags/#{id}")
+  #end
+
   def top_partners
     contacts.order('total_donations desc')
             .where('total_donations > 0')

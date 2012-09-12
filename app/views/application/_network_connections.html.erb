@@ -14,7 +14,7 @@
             <%= form_for Import.new(source: provider) do |f| %>
               <%= f.hidden_field :source %>
               <div class="importtags">
-                <input type="text" placeholder="<%= _('Add tags to these contacts') %>"/>
+                <%= f.text_field :tags, placeholder: _('Add tags to these contacts') %>
               </div>
               <a href="#" class="btn btngreen" data-behavior="import_button"><%= _('Import') %></a>
             <% end %>

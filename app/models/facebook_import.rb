@@ -75,6 +75,7 @@ class FacebookImport
         end
       ensure
         facebook_account.update_column(:downloading, false)
+        facebook_account.update_column(:last_download, Time.now)
       end
     end
   end

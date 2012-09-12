@@ -4,13 +4,18 @@ class ContactsController < ApplicationController
   before_filter :get_contacts, only: [:show, :index]
 
   def index
-    @contacts = @contacts.includes(:people).order('contacts.name')
+    @contacts = @contacts.includes(:people, :tags).order('contacts.name')
     if params[:filter] == 'people'
       @contacts = @contacts.people
     end
 
     if params[:filter] == 'companies'
       @contacts = @contacts.companies
+    end
+
+    if params[:tags].present?
+      @tags = params[:tags].split(',')
+      @contacts = @contacts.tagged_with(params[:tags])
     end
   end
 
