@@ -1,0 +1,11 @@
+MPDX encountered errors while trying to import your <%= @import.source %> contacts.
+
+<% case @import.source %>
+<% when 'tnt' %>
+If you can send an email to support@mpdx.org with your tnt export attached it will greatly help us in trying to determine why the import failed.
+<% else %>
+Please send us an email at support@mpdx.org and we will investigate what went wrong.
+<% end %>
+
+Thanks!
+MPDX Support Team

@@ -6,6 +6,14 @@ class ImportMailer < ActionMailer::Base
     @import = import
     I18n.locale = user.locale || 'en'
 
-    mail(to: user.email, subject: _("Importing your #{import.source} contacts"))
+    mail(to: user.email, subject: _("Importing your #{import.source} contacts completed"))
+  end
+
+  def failed(import)
+    user = import.user
+    @import = import
+    I18n.locale = user.locale || 'en'
+
+    mail(to: user.email, subject: _("Importing your #{import.source} contacts failed"))
   end
 end

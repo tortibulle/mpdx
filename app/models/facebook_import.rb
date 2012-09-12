@@ -1,77 +1,82 @@
 class FacebookImport
-  attr_accessor :facebook_account, :import
 
-  def initialize(facebook_account, import)
-    self.facebook_account = facebook_account
-    self.import = import
+  def initialize(import)
+    @user = import.user
+    @import = import
+    @account_list = import.account_list
   end
 
   def import_contacts
-    account_list = import.account_list
-
-    FbGraph::User.new(facebook_account.remote_id, access_token: facebook_account.token).friends.each do |f|
-      # Add to friend set
+    @user.facebook_accounts.each do |facebook_account|
       begin
-        begin
-          sleep 1 unless Rails.env.test? # facebook apparently limits api calls to 600 calls every 600s
-          friend = f.fetch
-        rescue OpenSSL::SSL::SSLError, HTTPClient::ConnectTimeoutError, HTTPClient::ReceiveTimeoutError
-          puts "retrying on line #{__LINE__}"
-          sleep 5
-          retry
-        rescue FbGraph::Unauthorized
-          puts "retrying on line #{__LINE__}"
-          sleep 60
-          retry
+        facebook_account.update_column(:downloading, true)
+
+        FbGraph::User.new(facebook_account.remote_id, access_token: facebook_account.token).friends.each do |f|
+          # Add to friend set
+          begin
+            begin
+              sleep 1 unless Rails.env.test? # facebook apparently limits api calls to 600 calls every 600s
+              friend = f.fetch
+            rescue OpenSSL::SSL::SSLError, HTTPClient::ConnectTimeoutError, HTTPClient::ReceiveTimeoutError
+              puts "retrying on line #{__LINE__}"
+              sleep 5
+              retry
+            rescue FbGraph::Unauthorized
+              puts "retrying on line #{__LINE__}"
+              sleep 60
+              retry
+            end
+
+            facebook_account.friends << friend.identifier
+
+            # Try to match an existing person
+            fb_person = create_or_update_person(friend, @account_list)
+
+            contact = @account_list.contacts.with_person(fb_person).first
+
+            # Look for a spouse
+            if friend.relationship_status == 'Married' && friend.significant_other.present?
+              # skip this person if they're my spouse
+              next if friend.significant_other.identifier == facebook_account.remote_id.to_s
+
+              spouse = friend.significant_other.fetch(access_token: facebook_account.token)
+              sleep 1 unless Rails.env.test?
+
+              fb_spouse = create_or_update_person(spouse, @account_list)
+
+              # if we don't already have a contact, maybe the spouse is one
+              contact ||= @account_list.contacts.with_person(fb_spouse).first
+
+              fb_person.add_spouse(fb_spouse)
+            end
+
+            unless contact
+              # Create a contact
+              name = "#{fb_person.last_name}, #{fb_person.first_name}"
+              name += " & #{fb_spouse.first_name}" if fb_spouse
+
+              contact = @account_list.contacts.find_or_create_by_name(name)
+            end
+
+            contact.tag_list.add(@import.tags, parse: true) if @import.tags.present?
+            contact.save
+
+            contact.people.reload
+            if fb_spouse
+              contact.people << fb_spouse unless contact.person_ids.include?(fb_spouse.id)
+            end
+            contact.people << fb_person unless contact.person_ids.include?(fb_person.id)
+
+          rescue => e
+            Airbrake.raise_or_notify(e)
+            next
+          end
+
         end
-
-        facebook_account.friends << friend.identifier
-
-        # Try to match an existing person
-        fb_person = create_or_update_person(friend, account_list)
-
-        contact = account_list.contacts.with_person(fb_person).first
-
-        # Look for a spouse
-        if friend.relationship_status == 'Married' && friend.significant_other.present?
-          # skip this person if they're my spouse
-          next if friend.significant_other.identifier == facebook_account.remote_id.to_s
-
-          spouse = friend.significant_other.fetch(access_token: facebook_account.token)
-          sleep 1 unless Rails.env.test?
-
-          fb_spouse = create_or_update_person(spouse, account_list)
-
-          # if we don't already have a contact, maybe the spouse is one
-          contact ||= account_list.contacts.with_person(fb_spouse).first
-
-          fb_person.add_spouse(fb_spouse)
-        end
-
-        unless contact
-          # Create a contact
-          name = "#{fb_person.last_name}, #{fb_person.first_name}"
-          name += " & #{fb_spouse.first_name}" if fb_spouse
-
-          contact = account_list.contacts.find_or_create_by_name(name)
-        end
-
-        contact.tag_list.add(import.tags, parse: true) if import.tags.present?
-        contact.save
-
-        contact.people.reload
-        if fb_spouse
-          contact.people << fb_spouse unless contact.person_ids.include?(fb_spouse.id)
-        end
-        contact.people << fb_person unless contact.person_ids.include?(fb_person.id)
-
-      rescue => e
-        Airbrake.raise_or_notify(e)
-        next
+      ensure
+        facebook_account.update_column(:downloading, false)
       end
-
     end
-    ImportMailer.complete(import).deliver
   end
 
 

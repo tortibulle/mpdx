@@ -6,7 +6,7 @@ describe Person::FacebookAccount do
     @account = create(:facebook_account, person_id: @user.id)
     @account_list = create(:account_list, creator: @user)
     @import = create(:import, source: 'facebook', account_list: @account_list, user: @user)
-    @facebook_import = FacebookImport.new(@account, @import)
+    @facebook_import = FacebookImport.new(@import)
   end
 
   describe 'when importing contacts' do
@@ -98,6 +98,7 @@ describe Person::FacebookAccount do
       }.should change(MasterPerson, :count)
 
     end
+
   end
 
 end

@@ -1,5 +1,4 @@
 class ContactSerializer < ActiveModel::Serializer
-  include ActionView::Helpers::AssetTagHelper
 
   embed :ids, include: true
 

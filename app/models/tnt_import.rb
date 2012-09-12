@@ -12,18 +12,26 @@ class TntImport
     raise TwitterCldr::Utils::CodePoints.from_string(contents.first).inspect
   end
 
+  def read_csv(import_file)
+    lines = []
+    begin
+      File.open(import_file, "r:utf-8") do |file|
+        lines = get_lines(file.read)
+      end
+    rescue ArgumentError
+      File.open(import_file, "r:windows-1251:utf-8") do |file|
+        lines = get_lines(file.read)
+      end
+    end
+    lines
+  end
+
   def import_contacts
-    @file = nil
     Contact.transaction do
       # we need to take some extra steps to get the file opened with the right encoding
       @import.file.cache_stored_file!
-      begin
-        @file = File.open(@import.file.file.file, "r:utf-8")
-        lines = get_lines(@file.read)
-      rescue ArgumentError
-        @file = File.open(@import.file.file.file, "r:windows-1251:utf-8")
-        lines = get_lines(@file.read)
-      end
+
+      lines = read_csv(@import.file.file.file)
 
       unless lines.first['Organization Account IDs']
         raise "export didn't include Organization Account IDs'"

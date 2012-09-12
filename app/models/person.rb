@@ -48,22 +48,6 @@ class Person < ActiveRecord::Base
     [first_name, last_name].join(' ')
   end
 
-  def import_contacts_from(import)
-    raise "BadArgument: #{import.source}" unless %[facebook twitter linkedin tnt].include?(import.source)
-    case
-    when %[facebook twitter linkedin].include?(import.source)
-      send(:"#{import.source}_accounts").each do |account|
-        account.update_column(:downloading, true)
-        account.queue_import_contacts(import)
-      end
-    when import.file.present?
-      import.update_column(:importing, true)
-      import.queue_import_contacts
-    else
-      # No idea what to do.
-    end
-  end
-
   def add_spouse(spouse)
     relationship = case spouse.gender
                    when 'male'
