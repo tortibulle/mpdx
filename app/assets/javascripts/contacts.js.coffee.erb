@@ -28,7 +28,18 @@ $ ->
         else
           document.location = State.url
 
-      $.mpdx.loadDonations()
+      $(document).on 'tabsshow', '#contact', (event, ui)->
+        switch ui.tab.hash
+          when '#donations-tab'
+            $.mpdx.loadDonations()
+          when '#stream-tab'
+            $.mpdx.loadStream()
+
+      switch window.location.hash
+        when '#donations-tab', ''
+            $.mpdx.loadDonations()
+          when '#stream-tab'
+            $.mpdx.loadSocialStream()
 
       $(document).on 'click', '.next_page', ->
         $(this).replaceWith('<%= image_tag('spinner.gif', class: 'spinner') %>')

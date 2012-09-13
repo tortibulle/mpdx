@@ -69,6 +69,7 @@ gem "acts-as-taggable-on", '~> 2.3.3'
 gem "fog", "~> 1.3.1"
 gem 'gibberish'
 gem 'active_model_serializers', git: 'git://github.com/josevalim/active_model_serializers.git'
+gem 'rails_autolink'
 
 group :development do
   gem 'unicorn'

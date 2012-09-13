@@ -1,6 +1,8 @@
 require 'resque/server'
 Mpdx::Application.routes.draw do
 
+  resources :social_streams, only: :index
+
   namespace :api do
     api_version(module: "V1", header: "API-VERSION", value: "v1", parameter: "version", path: 'v1') do
       resources :contacts

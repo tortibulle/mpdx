@@ -80,3 +80,11 @@ $.mpdx.loadDonations = ->
     dataType: 'script'
   }
 
+$.mpdx.loadSocialStream = ->
+  $.ajax {
+    url: '/social_streams',
+    data: {contact_id: $('#contentbody').attr('data-contact-id')},
+    dataType: 'script'
+  }
+
+

@@ -1,0 +1,23 @@
+<% unless params[:page] %>
+<table class="tablelist social" id="social_stream_table">
+  <tbody>
+<% end %>
+    <% @items.each do |item| %>
+      <tr>
+        <td class="image"><%= link_to(image_tag("https://graph.facebook.com/#{item.from.id}/picture?type=square"), "http://facebook.com/profile.php?id=#{item.from.id}", target: '_blank') %></td>
+        <td>
+          <%= auto_link(item.body, target: '_blank') %>
+          <% if item.picture %>
+            <br /><%= link_to(image_tag(item.picture), item.link, html: {target: '_blank'}) %>
+          <% end %>
+          <br />
+          <%= l(item.created_time) %>
+        </td>
+      </tr>
+    <% end %>
+<% unless params[:page] %>
+  </tbody>
+</table>
+<% end %>
+
+

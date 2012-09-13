@@ -1,4 +1,4 @@
-$('.spinner').hide();
+$('#spinner_donations').hide();
 <% if params[:page] %>
   $('#donations_table').append('<%= j(render('donations', donations: @donations)) %>');
 <% else %>

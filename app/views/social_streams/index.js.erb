@@ -1,0 +1,7 @@
+$('#spinner_social').hide();
+<% if params[:page] %>
+  $('#stream_table').append('<%= j(render('items', items: @items)) %>');
+<% else %>
+  $('#social').html('<%= j(render('items', items: @items)) %>');
+<% end %>
+
