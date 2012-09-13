@@ -37,12 +37,9 @@ class ContactsController < ApplicationController
       end
     end
 
-
-
     respond_to do |wants|
       wants.html do
         @contacts = @contacts.page(params[:page])
-    #raise @contacts.to_sql.inspect
       end
       wants.csv do
         @headers = ['Full Name','Greeting','Mailing Street Address','Mailing City',
