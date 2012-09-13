@@ -59,7 +59,7 @@ describe Person::FacebookAccount do
     it "should add tags from the import" do
       @import.update_column(:tags, 'hi, mom')
       @facebook_import.send(:import_contacts)
-      Contact.last.tag_list.sort.should == ['hi', 'mom']
+      Contact.last.tag_list.sort.should == ['facebook', 'hi', 'mom']
     end
   end
 

@@ -1,4 +1,4 @@
-class AddressExhibit < Exhibit
+class AddressExhibit < DisplayCase::Exhibit
 
   def self.applicable_to?(object)
     object.is_a?(Address)
@@ -19,3 +19,4 @@ class AddressExhibit < Exhibit
     [street, city, state, postal_code, country].select(&:present?).join(', ')
   end
 end
+ 

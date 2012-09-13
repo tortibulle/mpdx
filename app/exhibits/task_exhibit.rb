@@ -1,4 +1,4 @@
-class TaskExhibit < Exhibit
+class TaskExhibit < DisplayCase::Exhibit
 
   def self.applicable_to?(object)
     object.is_a?(Task)

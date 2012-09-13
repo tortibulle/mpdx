@@ -1,4 +1,6 @@
 class PersonSerializer < ActiveModel::Serializer
+  include DisplayCase::ExhibitsHelper
+  
   embed :ids, include: true
   attributes :id, :first_name, :last_name, :middle_name, :birthday_month, :birthday_year,
              :anniversary_month, :anniversary_year, :anniversary_day, :title, :suffix, :gender,
@@ -7,7 +9,7 @@ class PersonSerializer < ActiveModel::Serializer
   has_many :phone_numbers, :email_addresses
 
   def avatar
-    person_exhibit = Exhibit.exhibit(object, nil)
+    person_exhibit = exhibit(object)
     '/assets/' + person_exhibit.avatar
   end
 end

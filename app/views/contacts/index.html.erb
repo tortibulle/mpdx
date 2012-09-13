@@ -4,10 +4,10 @@
   <li class="<%= 'selected' if params[:filter] == 'people' %>"><%= link_to(t('g.people'), contacts_path(filter: 'people'), class: "people") %></li>
   <li class="<%= 'selected' if params[:filter] == 'companies' %>"><%= link_to(t('g.companies'), contacts_path(filter: 'companies'), class: "companies") %></li>
   <li class="<%= 'selected' if @tags %>">
-  <span class="tags"><%= _('Tags') %></span>
+    <span class="tags"><%= _('Tags') %></span>
     <ul class="left_taglist tags">
       <li>
-        <% current_account_list.tags.each do |tag| 
+        <% current_account_list.contact_tags.each do |tag| 
           # toggle tag on / off
           tag_params = params.except(:action, :controller)
           if @tags && @tags.include?(tag)

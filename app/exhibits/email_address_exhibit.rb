@@ -1,4 +1,4 @@
-class EmailAddressExhibit < Exhibit
+class EmailAddressExhibit < DisplayCase::Exhibit
 
   def self.applicable_to?(object)
     object.is_a?(EmailAddress)

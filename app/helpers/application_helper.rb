@@ -1,4 +1,6 @@
 module ApplicationHelper
+  include DisplayCase::ExhibitsHelper
+
   def auth_link(provider)
     if current_user.send("#{provider}_accounts".to_sym).length == 0
       prompt = _('Add an Account')

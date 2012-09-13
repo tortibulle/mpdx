@@ -2,9 +2,16 @@ class TasksController < ApplicationController
   respond_to :html, :js
 
   def index
-    @overdue = current_account_list.tasks.uncompleted.overdue
-    @tomorrow = current_account_list.tasks.uncompleted.tomorrow
-    @upcoming = current_account_list.tasks.uncompleted.upcoming
+    base_scope = current_account_list.tasks.uncompleted
+
+    if params[:tags].present?
+      @tags = params[:tags].split(',')
+      base_scope = base_scope.tagged_with(@tags)
+    end
+
+    @overdue = base_scope.overdue
+    @tomorrow = base_scope.tomorrow
+    @upcoming = base_scope.upcoming
   end
 
   def starred

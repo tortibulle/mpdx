@@ -1,4 +1,4 @@
-class PhoneNumberExhibit < Exhibit
+class PhoneNumberExhibit < DisplayCase::Exhibit
 
   def self.applicable_to?(object)
     object.is_a?(PhoneNumber)

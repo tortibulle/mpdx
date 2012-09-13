@@ -1,7 +1,7 @@
 require 'spec_helper'
 describe ContactExhibit do
 
-  subject { ContactExhibit.exhibit(contact, context) }
+  subject { ContactExhibit.new(contact, context) }
   let(:contact) { build(:contact)}
   let(:context) { double }
 

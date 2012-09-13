@@ -1,7 +1,7 @@
 require 'spec_helper'
 describe EmailAddressExhibit do
 
-  subject { EmailAddressExhibit.exhibit(email_address, context) }
+  subject { EmailAddressExhibit.new(email_address, context) }
   let(:email_address) { build(:email_address)}
   let(:context) { double }
 

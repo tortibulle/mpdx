@@ -1,4 +1,4 @@
-class DonationExhibit < Exhibit
+class DonationExhibit < DisplayCase::Exhibit
 
   def self.applicable_to?(object)
     object.is_a?(Donation)

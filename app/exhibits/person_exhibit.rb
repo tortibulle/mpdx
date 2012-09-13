@@ -1,5 +1,5 @@
-class PersonExhibit < Exhibit
-  include ExhibitsHelper
+class PersonExhibit < DisplayCase::Exhibit
+  include DisplayCase::ExhibitsHelper
 
   def self.applicable_to?(object)
     object.is_a?(Person)

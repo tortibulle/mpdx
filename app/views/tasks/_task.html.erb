@@ -1,44 +1,46 @@
-<% task = exhibit(task, self) %>
-<tr id="<%= dom_id(task) %>" class="task">
-  <td class="check">
-    <a name="<%= dom_id(task) %>" />
-    <input type="checkbox" data-behavior="complete_task" data-id="<%= task.id %>" <%= 'checked="checked"' if task.completed? %> />
-  </td>
-  <td class="data">
-    <div class="primary">
-      <%= form_for task, remote: true, namespace: dom_id(task) do |f| %>
-        <%= f.hidden_field :starred %>
-        <%= f.hidden_field :completed %>
-        <span class="ico <%= task.starred? ? 'ico_fav' : 'ico_fav_off' %> fav">Fav</span>
-        <%= l(task.start_at) %> - 
-        <strong><span class="tasktitle"><%= task %></span></strong>
-        <% if task.contacts.present? %>
-          <span class="people">(<%= task.contact_links %>)</span>
-        <% end %>
-        <a class="comment_status" href=""><span id="comment_count_<%= task.id %>"><%= task.activity_comments.length  %></span></a>
-        <div class="actions">
-          <%= link_to 'Edit', edit_task_path(task), :class=> "ico ico_edit" %>
-          <%= link_to('Destroy', task, confirm: t('g.confirm'), method: :delete, :class=> "ico ico_trash") %>
+<% exhibit(task, self).tap do |task_exhibit| %>
+  <tr id="<%= dom_id(task) %>" class="task">
+    <td class="check">
+      <a name="<%= dom_id(task) %>" />
+        <input type="checkbox" data-behavior="complete_task" data-id="<%= task.id %>" <%= 'checked="checked"' if task.completed? %> />
+      </td>
+      <td class="data">
+        <div class="primary">
+          <%= form_for task, remote: true, namespace: dom_id(task) do |f| %>
+            <%= f.hidden_field :starred %>
+            <%= f.hidden_field :completed %>
+            <span class="ico <%= task.starred? ? 'ico_fav' : 'ico_fav_off' %> fav">Fav</span>
+            <%= l(task.start_at) %> - 
+            <strong><span class="tasktitle"><%= task_exhibit %></span></strong> - 
+            <span class="taskaction"><%= _(task.activity_type) %></span>
+            <div style="display:inline" class="tags"><%= task_exhibit.tag_links %></div>
+            <% if task.contacts.present? %>
+              <span class="people">(<%= task_exhibit.contact_links %>)</span>
+            <% end %>
+            <a class="comment_status" href=""><span id="comment_count_<%= task.id %>"><%= task.activity_comments.length  %></span></a>
+            <div class="actions">
+              <%= link_to 'Edit', edit_task_path(task), :class=> "ico ico_edit" %>
+              <%= link_to('Destroy', task, confirm: t('g.confirm'), method: :delete, :class=> "ico ico_trash") %>
+            </div>
+          <% end %>
         </div>
-      <% end %>
-    </div>
-    <div class="comments">
-      <header></header>
+        <div class="comments">
+          <header></header>
 
-      <div id="comment_list_<%= task.id %>">
-        <%= render partial: 'activity_comments/comment', collection: task.activity_comments %>
-      </div>
-
-      <div class="comment_form">
-        <%= form_for task.activity_comments.new, namespace: "activity_#{task.id}", remote: true do |f| %>
-          <%= hidden_field_tag :activity_id, task.id %>
-          <%= f.text_area :body, placeholder: t('.add_comments') %>
-          <div class="buttons">
-            <button class="btn smallbtn"><%= t('.add_comment') %></button>
+          <div id="comment_list_<%= task.id %>">
+            <%= render partial: 'activity_comments/comment', collection: task.activity_comments %>
           </div>
-        <% end %>
-      </div>
-    </div>
-  </td>
-</tr>
 
+          <div class="comment_form">
+            <%= form_for task.activity_comments.new, namespace: "activity_#{task.id}", remote: true do |f| %>
+              <%= hidden_field_tag :activity_id, task.id %>
+              <%= f.text_area :body, placeholder: t('.add_comments') %>
+              <div class="buttons">
+                <button class="btn smallbtn"><%= t('.add_comment') %></button>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </td>
+    </tr>
+  <% end %>

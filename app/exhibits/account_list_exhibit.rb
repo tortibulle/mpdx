@@ -1,4 +1,4 @@
-class AccountListExhibit < Exhibit
+class AccountListExhibit < DisplayCase::Exhibit
 
   def self.applicable_to?(object)
     object.is_a?(AccountList)

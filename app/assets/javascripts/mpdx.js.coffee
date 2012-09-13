@@ -74,17 +74,19 @@ $.mpdx.activateTabs = ->
   })
 
 $.mpdx.loadDonations = ->
-  $.ajax {
-    url: '/donations',
-    data: {contact_id: $('#contentbody').attr('data-contact-id')},
-    dataType: 'script'
-  }
+  if $('#donations').html() == ''
+    $.ajax {
+      url: '/donations',
+      data: {contact_id: $('#contentbody').attr('data-contact-id')},
+      dataType: 'script'
+    }
 
 $.mpdx.loadSocialStream = ->
-  $.ajax {
-    url: '/social_streams',
-    data: {contact_id: $('#contentbody').attr('data-contact-id')},
-    dataType: 'script'
-  }
+  if $('#social').html() == ''
+    $.ajax {
+      url: '/social_streams',
+      data: {contact_id: $('#contentbody').attr('data-contact-id')},
+      dataType: 'script'
+    }
 
 
