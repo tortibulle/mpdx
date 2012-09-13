@@ -2,7 +2,7 @@ class PersonExhibit < DisplayCase::Exhibit
   include DisplayCase::ExhibitsHelper
 
   def self.applicable_to?(object)
-    object.is_a?(Person)
+    object.class.name == 'Person'
   end
 
   def age(now = Time.now.utc.to_date)

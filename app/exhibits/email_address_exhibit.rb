@@ -1,7 +1,7 @@
 class EmailAddressExhibit < DisplayCase::Exhibit
 
   def self.applicable_to?(object)
-    object.is_a?(EmailAddress)
+    object.class.name == 'EmailAddress'
   end
 
   def to_s

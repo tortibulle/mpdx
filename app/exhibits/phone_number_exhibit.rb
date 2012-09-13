@@ -1,7 +1,7 @@
 class PhoneNumberExhibit < DisplayCase::Exhibit
 
   def self.applicable_to?(object)
-    object.is_a?(PhoneNumber)
+    object.class.name == 'PhoneNumber'
   end
 
   def to_s() number; end

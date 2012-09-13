@@ -1,7 +1,7 @@
 class DonationExhibit < DisplayCase::Exhibit
 
   def self.applicable_to?(object)
-    object.is_a?(Donation)
+    object.class.name == 'Donation'
   end
 
   def to_s() amount; end

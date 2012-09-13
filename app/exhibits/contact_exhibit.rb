@@ -2,7 +2,7 @@ class ContactExhibit < DisplayCase::Exhibit
   include DisplayCase::ExhibitsHelper
 
   def self.applicable_to?(object)
-    object.is_a?(Contact)
+    object.class.name == 'Contact'
   end
 
   def referrer_links

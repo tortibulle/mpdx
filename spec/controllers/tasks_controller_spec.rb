@@ -17,6 +17,12 @@ describe TasksController do
       get :index, {}
       assigns(:overdue).should eq([task])
     end
+
+    it "filters by tag" do
+      task = @account_list.tasks.create! valid_attributes.merge(tag_list: 'foo')
+      get :index, tags: 'foo'
+      assigns(:tags).should eq(['foo'])
+    end
   end
 
   describe "GET new" do

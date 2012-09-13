@@ -1,7 +1,7 @@
 class AccountListExhibit < DisplayCase::Exhibit
 
   def self.applicable_to?(object)
-    object.is_a?(AccountList)
+    object.class.name == 'AccountList'
   end
 
   def to_s

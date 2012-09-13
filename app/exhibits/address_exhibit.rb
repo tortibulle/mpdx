@@ -1,7 +1,7 @@
 class AddressExhibit < DisplayCase::Exhibit
 
   def self.applicable_to?(object)
-    object.is_a?(Address)
+    object.class.name == 'Address'
   end
 
   def to_s() number; end
