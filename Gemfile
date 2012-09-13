@@ -81,7 +81,7 @@ group :development, :test do
   gem 'factory_girl_rails'
   gem "guard-rspec"
   gem 'simplecov', :require => false
-  #only used for mo/po file generation in development, !do not load(:require=>false)! since it will only eat 7mb ram
+  #only used for mo/po file generation in development, !do not load(:require=>false)! since it will eat 7mb ram
   gem "gettext", '>= 1.9.3', :require => false
   gem 'mailcatcher'
 end
@@ -91,4 +91,5 @@ group :test do
   gem 'rb-fsevent', :require => false
   gem 'guard-spork'
   gem 'growl'
+  gem 'capybara'
 end

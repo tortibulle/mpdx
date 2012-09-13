@@ -33,15 +33,16 @@ class ContactsController < ApplicationController
         @contacts = @contacts.joins(:addresses).where('street is not null')
       when 'email'
         @contacts = @contacts.joins(people: :email_addresses)
+        @contacts = @contacts.uniq unless @contacts.to_sql.include?('"addresses"')
       end
     end
 
-    @contacts = @contacts.uniq
 
 
     respond_to do |wants|
       wants.html do
         @contacts = @contacts.page(params[:page])
+    #raise @contacts.to_sql.inspect
       end
       wants.csv do
         @headers = ['Full Name','Greeting','Mailing Street Address','Mailing City',

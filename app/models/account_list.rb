@@ -42,24 +42,24 @@ class AccountList < ActiveRecord::Base
   end
 
   def tags
-    @tags ||= AccountList.connection.select_values("select distinct(tags.name) from account_lists al inner join contacts c on c.account_list_id = al.id inner join taggings t on t.taggable_id = c.id AND t.taggable_type = 'Contact'
+    @tags ||= ActiveRecord::Base.connection.select_values("select distinct(tags.name) from account_lists al inner join contacts c on c.account_list_id = al.id inner join taggings t on t.taggable_id = c.id AND t.taggable_type = 'Contact'
                                             inner join tags on t.tag_id = tags.id where al.id = #{id} order by tags.name")
   end
 
   def cities
-     @cities ||= AccountList.connection.select_values("select distinct(a.city) from account_lists al inner join contacts c on c.account_list_id = al.id
+     @cities ||= ActiveRecord::Base.connection.select_values("select distinct(a.city) from account_lists al inner join contacts c on c.account_list_id = al.id
                                                        inner join addresses a on a.addressable_id = c.id AND a.addressable_type = 'Contact' where al.id = #{id}
                                                        order by a.city")
   end
 
   def states
-     @states ||= AccountList.connection.select_values("select distinct(a.state) from account_lists al inner join contacts c on c.account_list_id = al.id
+     @states ||= ActiveRecord::Base.connection.select_values("select distinct(a.state) from account_lists al inner join contacts c on c.account_list_id = al.id
                                                        inner join addresses a on a.addressable_id = c.id AND a.addressable_type = 'Contact' where al.id = #{id}
                                                        order by a.state")
   end
 
   def churches
-     @churches ||= AccountList.connection.select_values("select distinct(c.church_name) from account_lists al inner join contacts c on c.account_list_id = al.id
+     @churches ||= ActiveRecord::Base.connection.select_values("select distinct(c.church_name) from account_lists al inner join contacts c on c.account_list_id = al.id
                                                        where al.id = #{id} order by c.church_name")
   end
 

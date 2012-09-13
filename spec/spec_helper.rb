@@ -12,6 +12,7 @@ Spork.prefork do
   require 'rspec/rails'
   require 'rspec/autorun'
   require 'webmock/rspec'
+  require 'capybara/rspec'
 
   require 'simplecov'
   SimpleCov.start 'rails' do
