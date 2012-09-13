@@ -19,9 +19,10 @@ describe TasksController do
     end
 
     it "filters by tag" do
-      task = @account_list.tasks.create! valid_attributes.merge(tag_list: 'foo')
+      task1 = @account_list.tasks.create! valid_attributes.merge(tag_list: 'foo')
+      task2 = @account_list.tasks.create! valid_attributes.merge(tag_list: 'bar')
       get :index, tags: 'foo'
-      assigns(:tags).should eq(['foo'])
+      assigns(:overdue).should eq([task1])
     end
   end
 

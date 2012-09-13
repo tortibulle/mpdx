@@ -5,8 +5,11 @@ class TasksController < ApplicationController
     base_scope = current_account_list.tasks.uncompleted
 
     if params[:tags].present?
-      @tags = params[:tags].split(',')
-      base_scope = base_scope.tagged_with(@tags)
+      base_scope = base_scope.tagged_with(params[:tags])
+    end
+
+    if params[:activity_type].present? && params[:activity_type].first != ''
+      base_scope = base_scope.where(activity_type: params[:activity_type])
     end
 
     @overdue = base_scope.overdue

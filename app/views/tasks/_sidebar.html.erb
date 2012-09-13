@@ -3,24 +3,44 @@
   <li class="<%= 'selected' if params[:action] == 'index' %>"><%= link_to('Active/Upcoming', tasks_path, class: "inbox") %></li>
   <li class="<%= 'selected' if params[:action] == 'starred' %>"><%= link_to("Starred", starred_tasks_path, class: "starred") %></li>
   <li class="<%= 'selected' if params[:action] == 'completed' %>"><%= link_to("Completed", completed_tasks_path, class: "completed") %></li>
-  <li class="<%= 'selected' if @tags %>">
+  <li class="<%= 'selected' if params[:tags] %>">
     <span class="tags"><%= _('Tags') %></span>
     <ul class="left_taglist tags">
       <li>
         <% current_account_list.activity_tags.each do |tag| 
           # toggle tag on / off
           tag_params = params.except(:action, :controller)
-          if @tags && @tags.include?(tag)
-            tag_params[:tags] = (@tags - [tag]).join(',')
+          if params[:tags] && params[:tags].include?(tag)
+            tag_params[:tags] = (params[:tags] - [tag])
           else
-            tag_params[:tags] = (Array.wrap(@tags) + [tag]).join(',')
+            tag_params[:tags] = (Array.wrap(params[:tags]) + [tag])
           end
           tag_params.delete(:tags) if tag_params[:tags].blank? %>
 
-          <%= link_to(tag, tag_params, class: "tag #{'selected' if @tags && @tags.include?(tag)}")%>
+          <%= link_to(tag, tag_params, class: "tag #{'selected' if params[:tags] && params[:tags].include?(tag)}")%>
         <% end %>
       </li>
     </ul>
+  </li>
+    <li>
+    <%= form_tag params.slice(:controller, :action), method: :get do %>
+      <span class="left_filters"><%= _('Filters') %></span>
+      
+      <ul class="left_filters">
+        <li>
+          <label><%= _('Tags') %></label>
+          <%= select_tag :tags, options_for_select([[_('-- Any --'), '']] + current_account_list.activity_tags, params[:tags]), multiple: true, size: 5 %>
+        </li>
+        <li>
+          <label><%= _('Action') %></label>
+          <%= select_tag :activity_type, options_for_select([[_('-- Any --'), '']] + (Task.new.assignable_activity_types & current_account_list.tasks.select(:activity_type).uniq.collect(&:activity_type)).collect { |a| [_(a), a] }, params[:activity_type]), multiple: true, size: 5 %>
+        </li>
+        <li>
+          <%= submit_tag _('Filter') %><br />
+          <%= link_to(_('Clear Filters'), tasks_path, style: 'font-size: 11px;color:red') %>
+        </li>
+      </ul>
+    <% end %>
   </li>
 </ul>
 </aside>
