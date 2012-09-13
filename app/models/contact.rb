@@ -39,6 +39,11 @@ class Contact < ActiveRecord::Base
     'Research Abandoned','Expired Referral']
   end
 
+  assignable_values_for :likely_to_give, :allow_blank => true do
+    [1,2,3]
+  end
+
+
   attr_accessible :name, :addresses_attributes, :pledge_amount, :status, :contact_referrals_to_me_attributes,
                   :people_attributes, :notes, :contact_people_attributes, :full_name, :greeting, :website,
                   :pledge_frequency, :pledge_start_date, :deceased, :next_ask, :never_ask, :likely_to_give,
@@ -85,6 +90,14 @@ class Contact < ActiveRecord::Base
   def monthly_pledge
     return 0 unless pledge_frequency.to_i > 0
     pledge_amount.to_f / pledge_frequency
+  end
+
+  def self.giving_likelihood_options
+    giving_likelihoods.collect.with_index { |l, i| [l, i+1] }
+  end
+
+  def self.giving_likelihoods
+    [_('Least Likely'), _('Likely'), _('Most Likely')]
   end
 
   private

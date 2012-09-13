@@ -34,14 +34,20 @@
           <table class="meta">
             <tr>
               <td class="meta_name"><%= _('Status') %></td>
-              <td class="meta_data"><%= _(contact_exhibit.status) if  contact_exhibit.status.present? %></td>
+              <td class="meta_data"><%= _(contact_exhibit.status) if contact_exhibit.status.present? %></td>
             </tr>
+            <% if contact_exhibit.likely_to_give.present? %>
+              <tr>
+                <td class="meta_name"><%= _('Likelihood') %></td>
+                <td class="meta_data"><%= _(contact_exhibit.likely_to_give) %></td>
+              </tr>
+            <% end %>
             <tr>
-              <td class="meta_name"><%= _('People:') %> </td>
+              <td class="meta_name"><%= _('People') %> </td>
               <td class="meta_data"><%= contact_exhibit.contact_info %></td>
             </tr>
             <tr>
-              <td class="meta_name"><%= _('Pledge') %>: </td>
+              <td class="meta_name"><%= _('Pledge') %> </td>
               <td class="meta_data"><%= contact_exhibit.pledge_as_currency %></td>
             </tr>
             <% if contact_exhibit.referrals_to_me.present? %>
@@ -51,12 +57,11 @@
               </tr>
             <% end %>
             <tr>
-              <td class="meta_name"><%= _('Tags') %>: </td>
+              <td class="meta_name"><%= _('Tags') %> </td>
               <td class="meta_data">
-                <!--              <div class="tags">
-                  <%= link_to("Recurring Donor", "", class: "tag")%>
-                  <%= link_to("One Time Donor", "", class: "tag")%>
-                </div> -->
+                <div class="tags">
+                  <%= contact_exhibit.tag_links %>
+                </div>
               </td>
             </tr>
           </table>

@@ -30,10 +30,21 @@ class ContactExhibit < Exhibit
     @context.number_to_currency(pledge_amount, precision: 0)
   end
 
+  def likely_to_give
+    return nil unless to_model.likely_to_give
+    Contact.giving_likelihoods[to_model.likely_to_give - 1]
+  end
+
   def notes_saved_at
     return '' unless to_model.notes_saved_at
     to_model.notes_saved_at.to_datetime.localize(@context.locale).to_medium_s
     #@context.l(to_model.notes_saved_at.to_datetime, :medium)
+  end
+
+  def tag_links
+    tags.collect do |tag|
+      @context.link_to(tag, @context.params.except(:action, :controller, :id).merge(action: :index, tags: tag.name), class: "tag")
+    end.join(' ').html_safe
   end
 
   def to_s

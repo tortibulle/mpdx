@@ -13,9 +13,7 @@
           end.join(', ') %>
         </div>
         <div class="tags">
-          <% contact.tags.each do |tag| %>
-            <%= link_to(tag, params.except(:action, :controller).merge(tags: tag.name), class: "tag")%>
-          <% end %>
+          <%= contact_exhibit.tag_links %>
         </div>
       </div>
     </td>

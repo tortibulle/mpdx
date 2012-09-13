@@ -26,14 +26,18 @@ class ContactsController < ApplicationController
       @contacts = @contacts.includes(:addresses).where('addresses.state' => params[:state])
     end
 
-    if params[:newsletter]
+    if params[:likely].present? && params[:likely].first != ''
+      @contacts = @contacts.where(likely_to_give: params[:likely])
+    end
+
+    if params[:newsletter].present?
       @contacts = @contacts.where('send_newsletter is not null')
       case params[:newsletter]
       when 'address'
         @contacts = @contacts.joins(:addresses).where('street is not null')
       when 'email'
         @contacts = @contacts.joins(people: :email_addresses)
-        @contacts = @contacts.uniq unless @contacts.to_sql.include?('"addresses"')
+        @contacts = @contacts.uniq unless @contacts.to_sql.include?('INNER JOIN')
       end
     end
 

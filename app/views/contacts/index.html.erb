@@ -39,6 +39,7 @@
 
         <li>
           <label><%= _('Newsletter Recipients') %></label>
+          <%= radio_button_tag :newsletter, '', params[:newsletter].blank? %> <%= _('-- Any --') %><br />
           <%= radio_button_tag :newsletter, 'all', params[:newsletter] == 'all' %> <%= _('All') %><br />
           <%= radio_button_tag :newsletter, 'address', params[:newsletter] == 'address' %> <%= _('With Mailing Address') %><br />
           <%= radio_button_tag :newsletter, 'email', params[:newsletter] == 'email' %> <%= _('With Valid Email') %>
@@ -47,6 +48,11 @@
         <li>
           <label><%= _('Status') %></label>
           <%= select_tag :status, options_for_select([[_('-- Any --'), '']] + Contact.new.assignable_statuses.collect { |s| [_(s), s] }, params[:status]), multiple: true, size: 5 %>
+        </li>
+
+        <li>
+          <label><%= _('Likely To Give') %></label>
+          <%= select_tag :likely, options_for_select([[_('-- Any --'), '']] + Contact.giving_likelihood_options, params[:likely]), multiple: true, size: 4 %>
         </li>
 
         <li>

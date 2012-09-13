@@ -16,13 +16,18 @@
   </div>
 
   <div class="field">
-    <%= f.label :name %>
+    <%= f.label :name, _('Name') %>
     <%= f.text_field :name %>
   </div>
 
   <div class="field">
-    <%= f.label :pledge_amount %>
+    <%= f.label :pledge_amount, _('Pledge Amount') %>
     <%= f.text_field :pledge_amount %>
+  </div>
+
+  <div class="field">
+    <%= f.label :likely_to_give, _('Likely to Give') %>
+    <%= f.select :likely_to_give, Contact.giving_likelihood_options, include_blank: true %>
   </div>
 
   <div class="field">

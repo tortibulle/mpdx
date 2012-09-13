@@ -19,7 +19,4 @@ _('Business')
 _('Mailing')
 _('Other')
 
-# Likely to Give
-_('Least Likely')
-_('Likely')
-_('Most Likely')
+
