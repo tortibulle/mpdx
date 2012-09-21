@@ -177,6 +177,7 @@ class TntImport
   end
 
   def add_or_update_person(account_list, user, line, donor_account, remote_id, contact, prefix = '')
+    line[prefix + 'First/Given Name'] = 'Anonymous' if line[prefix + 'Last/Family Name'].include?('Anonymous')
     organization = donor_account.organization
     # See if there's already a person by this name on this contact (This is a contact with multiple donation accounts)
     contact_person = contact.people.where(first_name: line[prefix + 'First/Given Name'], last_name: line[prefix + 'Last/Family Name'], middle_name: line[prefix + 'Middle Name']).first

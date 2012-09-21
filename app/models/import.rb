@@ -23,7 +23,6 @@ class Import < ActiveRecord::Base
   end
 
   def import_contacts
-    sleep(1)
     update_column(:importing, true)
     begin
       "#{source.titleize}Import".constantize.new(self).import_contacts
