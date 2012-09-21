@@ -11,7 +11,6 @@ module Person::Account
     @account = @rel.find_by_remote_id_and_authenticated(@remote_id, true)
     if @account
       @account.update_attributes(@attributes, without_protection: true)
-      person.update_attributes(@attributes.slice(:first_name, :last_name, :email))
     else
       # if creating this authentication record is a duplicate, we have a duplicate person to merge
       if other_account = find_by_remote_id_and_authenticated(@remote_id, true)
@@ -21,6 +20,7 @@ module Person::Account
         @account = @rel.create!(@attributes, without_protection: true)
       end
     end
+    person.update_attributes(@attributes.slice(:first_name, :last_name, :email))
 
     # start a data import in the background
     @account.queue_import_data if @account.respond_to?(:queue_import_data)

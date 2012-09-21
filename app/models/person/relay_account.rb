@@ -53,18 +53,4 @@ class Person::RelayAccount < ActiveRecord::Base
 
   end
 
-  private
-  #def find_or_create_designation_account(auth_hash)
-    #if designation = auth_hash.extra.attributes.first.designation
-      ## we need to create a designation account for this designation if we don't already have one
-      #unless user.designation_numbers(org.id).include?(designation)
-        #profile = user.designation_profiles.for_org(org.id).first ||
-                  #user.designation_profiles.create!(organization: org, name: "Staff Account (#{designation})")
-
-        #user.create_designation_account(designation_number: designation,
-                                        #organization: org,
-                                        #designation_profile: profile)
-      #end
-    #end
-  #end
 end
