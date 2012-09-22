@@ -15,5 +15,7 @@ $ ->
       $('[data-behavior="new_org_account"]').dialog
         resizable: false,
         modal:'true'
+      false
     $(document).on 'click', '#connect_to_org', ->
       $('[data-behavior="new_org_account"]').dialog('destroy')
+      false

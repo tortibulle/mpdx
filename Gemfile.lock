@@ -6,7 +6,7 @@ GIT
 
 GIT
   remote: git://github.com/jnicklas/carrierwave.git
-  revision: 06f9f65141256813612b0dafb1fb38416ea5e095
+  revision: 557528da6a08bc44fc8e9296791f57b4d2c516ef
   specs:
     carrierwave (0.6.2)
       activemodel (>= 3.2.0)
@@ -14,10 +14,10 @@ GIT
 
 GIT
   remote: git://github.com/josevalim/active_model_serializers.git
-  revision: a21529370cb1fef30af92393ee209c53a6c86ba8
+  revision: 3c5e58bf132be4c7111e1f96a6d471676511616e
   specs:
-    active_model_serializers (0.5.0)
-      activemodel (~> 3.0)
+    active_model_serializers (0.5.2)
+      activemodel (>= 3.0)
 
 GIT
   remote: git://github.com/twinge/versionist.git
@@ -61,8 +61,7 @@ GEM
     acts-as-taggable-on (2.3.3)
       rails (~> 3.0)
     addressable (2.3.2)
-    airbrake (3.1.3)
-      activesupport
+    airbrake (3.1.4)
       builder
       girl_friday
     arel (3.0.2)
@@ -114,9 +113,10 @@ GEM
       railties (>= 3.0.0)
     faraday (0.8.4)
       multipart-post (~> 1.1)
-    fast_gettext (0.6.9)
-    fb_graph (2.4.20)
+    fast_gettext (0.6.10)
+    fb_graph (2.5.0)
       httpclient (>= 2.2.0.2)
+      json
       rack-oauth2 (>= 0.14.4)
       tzinfo
     ffi (1.1.5)
@@ -131,7 +131,7 @@ GEM
       nokogiri (~> 1.5.0)
       ruby-hmac
     formatador (0.2.3)
-    gettext (2.3.0)
+    gettext (2.3.2)
       locale
     gettext_i18n_rails (0.7.1)
       fast_gettext (>= 0.4.8)
@@ -139,7 +139,7 @@ GEM
     girl_friday (0.10.0)
       connection_pool (~> 0.9.0)
     growl (1.0.3)
-    guard (1.3.2)
+    guard (1.3.3)
       listen (>= 0.4.2)
       thor (>= 0.14.6)
     guard-rspec (1.2.1)
@@ -163,6 +163,7 @@ GEM
     jquery-ui-rails (2.0.0)
       jquery-rails
       railties (>= 3.1.0)
+    jruby-pageant (1.1.1)
     json (1.7.5)
     jwt (0.1.5)
       multi_json (>= 1.0)
@@ -176,7 +177,7 @@ GEM
       hashie (~> 1.2)
       multi_json (~> 1.0)
       oauth (~> 0.4)
-    listen (0.5.0)
+    listen (0.5.1)
     locale (2.0.8)
     mail (2.4.4)
       i18n (>= 0.4.0)
@@ -196,8 +197,9 @@ GEM
     multipart-post (1.1.5)
     net-scp (1.0.4)
       net-ssh (>= 1.99.1)
-    net-ssh (2.5.2)
-    newrelic_rpm (3.4.2)
+    net-ssh (2.6.0)
+      jruby-pageant (>= 1.1.1)
+    newrelic_rpm (3.4.2.1)
     nokogiri (1.5.5)
     oauth (0.4.7)
     oauth2 (0.8.0)
@@ -223,7 +225,7 @@ GEM
     omniauth-oauth (1.0.1)
       oauth
       omniauth (~> 1.0)
-    omniauth-oauth2 (1.1.0)
+    omniauth-oauth2 (1.1.1)
       oauth2 (~> 0.8.0)
       omniauth (~> 1.0)
     omniauth-twitter (0.0.13)
@@ -302,7 +304,7 @@ GEM
     rspec-core (2.11.1)
     rspec-expectations (2.11.3)
       diff-lcs (~> 1.1.3)
-    rspec-mocks (2.11.2)
+    rspec-mocks (2.11.3)
     rspec-rails (2.11.0)
       actionpack (>= 3.0)
       activesupport (>= 3.0)

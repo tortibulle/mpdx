@@ -244,13 +244,13 @@ describe DataServer do
       stub_request(:post, 'http://example.com').to_return(body: "ERROR\nmessage")
       -> {
         @data_server.send(:get_response, 'http://example.com', {})
-      }.should raise_error(DataServerError, 'message')
+      }.should raise_error(DataServerError, "ERROR\nmessage")
     end
     it "should raise a DataServerError if the first line of the response is BAD_PASSWORD" do
       stub_request(:post, 'http://example.com').to_return(body: "BAD_PASSWORD\nmessage")
       -> {
         @data_server.send(:get_response, 'http://example.com', {})
-      }.should raise_error(DataServerError, 'message')
+      }.should raise_error(OrgAccountInvalidCredentialsError, 'Your username and password for MyString are invalid.')
     end
 
   end

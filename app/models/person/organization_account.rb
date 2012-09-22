@@ -42,10 +42,6 @@ class Person::OrganizationAccount < ActiveRecord::Base
     async(:import_all_data)
   end
 
-  #def designation_profiles
-    #organization.designation_profiles.where(user_id: person_id)
-  #end
-
   def create_default_profile
     account_list =  if user.designation_profiles.empty?
                       organization.designation_profiles.create({name: user.to_s, user_id: user.id}, without_protection: true).account_list
@@ -60,10 +56,16 @@ class Person::OrganizationAccount < ActiveRecord::Base
     return if locked_at
     update_column(:downloading, true)
     begin
+      # we only want to set the last_download date if at least one donation was downloaded
+      starting_donation_count = user.designation_profiles.where(organization_id: organization_id).collect(&:designation_accounts).flatten.sum { |da| da.donations.count }
+
       update_attributes({downloading: true, locked_at: Time.now}, without_protection: true)
       date_from = last_download ? last_download.strftime("%m/%d/%Y") : ''
       organization.api(self).import_all(date_from)
-      update_column(:last_download, Time.now)
+
+      ending_donation_count = user.designation_profiles.where(organization_id: organization_id).collect(&:designation_accounts).flatten.sum { |da| da.donations.count }
+
+      update_column(:last_download, Time.now) if ending_donation_count - starting_donation_count > 0
     ensure
       update_attributes({downloading: false, locked_at: nil}, without_protection: true)
     end

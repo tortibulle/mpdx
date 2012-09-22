@@ -6,11 +6,11 @@ describe Person::OrganizationAccount do
   end
 
   describe "import_all_data" do
-    it "should update the last_download column" do
+    it "should not update the last_download column if no donations are downloaded" do
       @org_account.downloading = false
       @org_account.last_download = nil
       @org_account.send(:import_all_data)
-      @org_account.reload.last_download.should_not be_nil
+      @org_account.reload.last_download.should be_nil
     end
   end
 

@@ -213,8 +213,11 @@ class DataServer
       Rails.logger.ap request
       # check for error response
       first_line = response.split("\n").first.upcase
-      if response.code.to_i == 500 || first_line.include?('ERROR') || first_line.include?('BAD_PASSWORD') || first_line.include?('HTML')
-        raise DataServerError, response.split("\n").last
+      case
+      when first_line.include?('BAD_PASSWORD')
+        raise OrgAccountInvalidCredentialsError, I18n.t('data_server.invalid_username_password', org: @org)
+      when response.code.to_i == 500 || first_line.include?('ERROR') || first_line.include?('HTML')
+        raise DataServerError, response
       end
       response.to_str
     }

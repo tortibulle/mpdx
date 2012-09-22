@@ -12,10 +12,6 @@ class Person::OrganizationAccountsController < ApplicationController
     end
   end
 
-  #def edit
-    #@organization_account = Person::OrganizationAccount.find(params[:id])
-  #end
-
   def create
     @organization_account = current_user.organization_accounts.new(params[:person_organization_account])
     @organization = @organization_account.organization
@@ -29,24 +25,4 @@ class Person::OrganizationAccountsController < ApplicationController
     end
   end
 
-  #def update
-    #@organization_account = Person::OrganizationAccount.find(params[:id])
-
-    #respond_to do |format|
-      #if @organization_account.update_attributes(params[:organization_account])
-        #format.html { redirect_to @organization_account, notice: 'Organization account was successfully updated.' }
-      #else
-        #format.html { render action: "edit" }
-      #end
-    #end
-  #end
-
-  #def destroy
-    #@organization_account = Person::OrganizationAccount.find(params[:id])
-    #@organization_account.destroy
-
-    #respond_to do |format|
-      #format.html { redirect_to person_organization_accounts_url }
-    #end
-  #end
 end
