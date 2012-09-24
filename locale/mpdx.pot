@@ -7,7 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: version 0.0.1\n"
-"POT-Creation-Date: 2012-05-23 14:16-0400\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-09-24 10:52+0300\n"
 "PO-Revision-Date: 2012-05-18 12:11-0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,10 +18,37 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
+msgid "\"Importing your #{import.source} contacts completed\""
+msgstr ""
+
+msgid "\"Importing your #{import.source} contacts failed\""
+msgstr ""
+
+msgid "\"MPDX is currently importing your contacts from #{params[:import][:source]}. You will receive an email when the import is complete.\""
+msgstr ""
+
+msgid "-- Any --"
+msgstr ""
+
+msgid "<p>Easily connect all of your contacts, calendars, communications and social conversations. MPDX will automatically identify contact's social profiles on Facebook, LinkedIn, and </p>\\n                    <p>Twitter so that you connect, listen, and engage with your minitry partners. </p>"
+msgstr ""
+
 msgid "<span class=\"name\">%{link}</span> has given <span class=\"hl amt\">%{total}</span> since <span class=\"hl date\">%{since}</span>"
 msgstr ""
 
+msgid "Action"
+msgstr ""
+
+msgid "Add Address"
+msgstr ""
+
 msgid "Add Contact"
+msgstr ""
+
+msgid "Add Person"
+msgstr ""
+
+msgid "Add Referral"
 msgstr ""
 
 msgid "Add Task"
@@ -32,6 +60,15 @@ msgstr ""
 msgid "Add another Account"
 msgstr ""
 
+msgid "Add tags to these contacts"
+msgstr ""
+
+msgid "Address"
+msgstr ""
+
+msgid "All"
+msgstr ""
+
 msgid "Appointment Scheduled"
 msgstr ""
 
@@ -41,10 +78,28 @@ msgstr ""
 msgid "Ask in Future"
 msgstr ""
 
+msgid "Business"
+msgstr ""
+
 msgid "Call for Appointment"
 msgstr ""
 
 msgid "Call for Decision"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Church"
+msgstr ""
+
+msgid "City"
+msgstr ""
+
+msgid "Clear Filters"
+msgstr ""
+
+msgid "Completed On"
 msgstr ""
 
 msgid "Connect to selected organization"
@@ -53,13 +108,46 @@ msgstr ""
 msgid "Connect to your organization"
 msgstr ""
 
-msgid "Contact List"
+msgid "Connect!"
+msgstr ""
+
+msgid "Contact Details"
 msgstr ""
 
 msgid "Contacts"
 msgstr ""
 
+msgid "Contacts are currently being imported"
+msgstr ""
+
+msgid "Create one now."
+msgstr ""
+
 msgid "Dashboard"
+msgstr ""
+
+msgid "Donations"
+msgstr ""
+
+msgid "Download CSV"
+msgstr ""
+
+msgid "Due Date"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Expired Referral"
+msgstr ""
+
+msgid "Facebook Url"
+msgstr ""
+
+msgid "Filter"
+msgstr ""
+
+msgid "Filters"
 msgstr ""
 
 msgid "Good news! You don't have any pending tasks."
@@ -71,7 +159,43 @@ msgstr ""
 msgid "Hi"
 msgstr ""
 
+msgid "History"
+msgstr ""
+
+msgid "Home"
+msgstr ""
+
+msgid "Import"
+msgstr ""
+
+msgid "Import Contacts"
+msgstr ""
+
+msgid "Just need to connect some social accounts"
+msgstr ""
+
 msgid "Language"
+msgstr ""
+
+msgid "Least Likely"
+msgstr ""
+
+msgid "Likelihood"
+msgstr ""
+
+msgid "Likely"
+msgstr ""
+
+msgid "Likely To Give"
+msgstr ""
+
+msgid "Likely to Give"
+msgstr ""
+
+msgid "Log Task"
+msgstr ""
+
+msgid "Log one now."
 msgstr ""
 
 msgid "Log out"
@@ -80,13 +204,25 @@ msgstr ""
 msgid "MPDX is currently downloading your data from the donation system. This message will go away when the download is complete."
 msgstr ""
 
+msgid "Mailing"
+msgstr ""
+
+msgid "Map It"
+msgstr ""
+
 msgid "Messages"
+msgstr ""
+
+msgid "Most Likely"
+msgstr ""
+
+msgid "Name"
 msgstr ""
 
 msgid "Navigate contacts: <strong>%{index} of %{total}</strong>"
 msgstr ""
 
-msgid "Networks"
+msgid "Networks & Imports"
 msgstr ""
 
 msgid "Never Ask"
@@ -95,10 +231,28 @@ msgstr ""
 msgid "Never Contacted"
 msgstr ""
 
+msgid "Newsletter Recipients"
+msgstr ""
+
 msgid "Not Interested"
 msgstr ""
 
+msgid "Not sure how to export your data from TNT?"
+msgstr ""
+
+msgid "Notes"
+msgstr ""
+
 msgid "Notifications"
+msgstr ""
+
+msgid "Only add CSV data to matched contact records when the current field is blank."
+msgstr ""
+
+msgid "Other"
+msgstr ""
+
+msgid "Override existing contact fields with data in the CSV."
 msgstr ""
 
 msgid "Partner - Financial"
@@ -110,16 +264,43 @@ msgstr ""
 msgid "Partner - Special"
 msgstr ""
 
+msgid "People"
+msgstr ""
+
+msgid "Please choose a file that ends with .csv"
+msgstr ""
+
+msgid "Please choose your preferred <br/> method of logging in:"
+msgstr ""
+
+msgid "Pledge"
+msgstr ""
+
+msgid "Pledge Amount"
+msgstr ""
+
 msgid "Preferences"
 msgstr ""
 
 msgid "Preferences saved"
 msgstr ""
 
+msgid "Privacy Policy"
+msgstr ""
+
+msgid "Referrer"
+msgstr ""
+
 msgid "Related To"
 msgstr ""
 
 msgid "Remove"
+msgstr ""
+
+msgid "Research Abandoned"
+msgstr ""
+
+msgid "Save Notes"
 msgstr ""
 
 msgid "Save Preferences"
@@ -143,13 +324,37 @@ msgstr ""
 msgid "Social Snapshot"
 msgstr ""
 
+msgid "State"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
 msgid "Status Update"
+msgstr ""
+
+msgid "Subject"
+msgstr ""
+
+msgid "Support"
+msgstr ""
+
+msgid "Sweet! Your Account is activated!"
+msgstr ""
+
+msgid "Tags"
 msgstr ""
 
 msgid "Tasks"
 msgstr ""
 
+msgid "The link to your facebook account needs to be refreshed. <a href=\"/auth/facebook\">Click here to re-connect to facebook</a> then try your import again."
+msgstr ""
+
 msgid "Time zone"
+msgstr ""
+
+msgid "To use MPDX, you need to connect to your organization's donation system. If you raise funds through more than one organization, you can connect to multiple accounts."
 msgstr ""
 
 msgid "Top 10 Ministry Partners"
@@ -159,6 +364,30 @@ msgid "Type to filter"
 msgstr ""
 
 msgid "Unresponsive"
+msgstr ""
+
+msgid "Watch this video"
+msgstr ""
+
+msgid "Welcome to MPDX!"
+msgstr ""
+
+msgid "With Mailing Address"
+msgstr ""
+
+msgid "With Valid Email"
+msgstr ""
+
+msgid "You don't have any outstanding tasks for this contact."
+msgstr ""
+
+msgid "You don't have any tasks logged for this contact."
+msgstr ""
+
+msgid "You need to export all the available fields from TNT"
+msgstr ""
+
+msgid "Your first name"
 msgstr ""
 
 msgid "delete"
