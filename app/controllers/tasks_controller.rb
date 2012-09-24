@@ -25,6 +25,10 @@ class TasksController < ApplicationController
     @tasks = current_account_list.tasks.completed.order('start_at desc')
   end
 
+  def history
+    
+  end
+
   def show
     @task = current_account_list.tasks.find(params[:id])
   end

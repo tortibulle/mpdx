@@ -35,6 +35,7 @@ Mpdx::Application.routes.draw do
     collection do
       get :starred
       get :completed
+      get :history
     end
   end
   resources :people 

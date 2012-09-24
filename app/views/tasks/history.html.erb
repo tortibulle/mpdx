@@ -1,0 +1,17 @@
+<%= render 'sidebar' %>
+<div id="contentbody" class="withleft">
+  <div class="wpp">
+
+    <h1></h1>
+
+    <table class="tablelist tasks">
+
+      <tr class="clear">
+        <td colspan="4"><div class="taskgroup gray">Completed</div></td>
+      </tr>
+
+      <%= render partial: 'task', collection: @tasks %>
+
+    </table>
+  </div>
+</div>
