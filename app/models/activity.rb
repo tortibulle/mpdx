@@ -18,7 +18,7 @@ class Activity < ActiveRecord::Base
 
   attr_accessible :starred, :location, :subject, :start_at, :end_at, :completed,
                   :activity_contacts_attributes, :activity_comments_attributes,
-                  :contacts_attributes, :tag_list
+                  :contacts_attributes, :tag_list, :result
 
   validates :subject, :start_at, presence: true
 
