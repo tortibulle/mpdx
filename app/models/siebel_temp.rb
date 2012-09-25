@@ -17,6 +17,7 @@ class SiebelTemp < DataServer
     params_string.sub!('$PERSONIDS$', options[:personid]) if options[:personid]
     params = Hash[params_string.split('&').collect {|p| p.split('=')}]
     params['access_token'] = @org_account.token
+    params['ssoGuid'] = @org_account.user.relay_accounts.first.remote_id
     params
   end
 
