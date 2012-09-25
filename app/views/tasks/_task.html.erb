@@ -5,24 +5,28 @@
         <input type="checkbox" data-behavior="complete_task" data-id="<%= task.id %>" <%= 'checked="checked"' if task.completed? %> />
       </td>
       <td class="data">
-        <div class="primary">
+        <div id="result_modal_<%= task.id %>" title="<%= task_exhibit %>" style="display:none">
           <%= form_for task, remote: true, namespace: dom_id(task) do |f| %>
+            <%= _('Result') %>
+            <%= f.select :result, f.object.assignable_results.collect { |s| [_(s), s] } %>
             <%= f.hidden_field :starred %>
-            <%= f.hidden_field :completed %>
-            <span class="ico <%= task.starred? ? 'ico_fav' : 'ico_fav_off' %> fav">Fav</span>
-            <%= l(task.start_at) %> - 
-            <strong><span class="tasktitle"><%= task_exhibit %></span></strong> - 
-            <span class="taskaction"><%= _(task.activity_type) %></span>
-            <div style="display:inline" class="tags"><%= task_exhibit.tag_links %></div>
-            <% if task.contacts.present? %>
-              <span class="people">(<%= task_exhibit.contact_links %>)</span>
-            <% end %>
-            <a class="comment_status" href=""><span id="comment_count_<%= task.id %>"><%= task.activity_comments.length  %></span></a>
-            <div class="actions">
-              <%= link_to 'Edit', edit_task_path(task), :class=> "ico ico_edit" %>
-              <%= link_to('Destroy', task, confirm: t('g.confirm'), method: :delete, :class=> "ico ico_trash") %>
-            </div>
+            <%= f.hidden_field :completed, value: true%>
           <% end %>
+        </div>
+        <div class="primary">
+          <span class="ico <%= task.starred? ? 'ico_fav' : 'ico_fav_off' %> fav">Fav</span>
+          <%= l(task.start_at) %> - 
+          <strong><span class="tasktitle"><%= task_exhibit %></span></strong> - 
+          <span class="taskaction"><%= _(task.activity_type) %></span>
+          <div style="display:inline" class="tags"><%= task_exhibit.tag_links %></div>
+          <% if task.contacts.present? %>
+            <span class="people">(<%= task_exhibit.contact_links %>)</span>
+          <% end %>
+          <a class="comment_status" href=""><span id="comment_count_<%= task.id %>"><%= task.activity_comments.length  %></span></a>
+          <div class="actions">
+            <%= link_to 'Edit', edit_task_path(task), :class=> "ico ico_edit" %>
+            <%= link_to('Destroy', task, confirm: t('g.confirm'), method: :delete, :class=> "ico ico_trash") %>
+          </div>
         </div>
         <div class="comments">
           <header></header>
