@@ -2,8 +2,8 @@
 <ul>
   <li class="<%= 'selected' if params[:action] == 'index' %>"><%= link_to(_('Active/Upcoming'), tasks_path, class: "inbox") %></li>
   <li class="<%= 'selected' if params[:action] == 'starred' %>"><%= link_to(_('Starred'), starred_tasks_path, class: "starred") %></li>
-  <li class="<%= 'selected' if params[:action] == 'completed' %>"><%= link_to(_('Completed'), completed_tasks_path, class: "completed") %></li>
-  <li class="<%= 'selected' if params[:action] == 'history' %>"><%= link_to(_('History'), history_tasks_path, class: "history") %></li>
+  <!-- <li class="<%= 'selected' if params[:action] == 'completed' %>"><%= link_to(_('Completed'), completed_tasks_path, class: "completed") %></li> -->
+  <li class="<%= 'selected' if params[:action] == 'history' %>"><%= link_to(_('History'), history_tasks_path, class: "completed") %></li>
   <% if current_account_list.activity_tags.present? %>
     <li class="<%= 'selected' if params[:tags] %>">
       <span class="tags"><%= _('Tags') %></span>

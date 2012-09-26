@@ -14,9 +14,8 @@ $ ->
   $(document).on 'click', '[data-behavior=complete_task]', ->
     id = $(this).attr('data-id')
     form = $('#task_' + id + '_edit_task_' + id)
-    if $(this).prop('checked') == false && $('#tasks_completed')[0]?
+    if $(this).prop('checked') == false && $('#tasks_history')[0]?
       # Uncomplete a task
-      $('[name="task[completed]"]', form).val(false)
       form.submit()
       $('#task_' + id).fadeOut()
     else 

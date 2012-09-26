@@ -8,7 +8,6 @@ class ApplicationController < ActionController::Base
 
   def ensure_login
     unless user_signed_in?
-      sign_in(:user, User.find(5))
       if $request_test
         sign_in(:user, $user)
       else

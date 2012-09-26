@@ -2,58 +2,50 @@
   <tr id="<%= dom_id(task) %>" class="task">
     <td class="check">
       <a name="<%= dom_id(task) %>" />
-        <input type="checkbox" data-behavior="complete_task" data-id="<%= task.id %>" <%= 'disabled="disabled"' if task.attempted? %> <%= 'checked="checked"' if task.completed? %> />
-      </td>
-      <td class="data">
-        <div id="result_modal_<%= task.id %>" title="<%= task_exhibit %>" style="display:none">
-          <%= form_for task, remote: true, namespace: dom_id(task) do |f| %>
-            <%= _('Result') %>
-            <%= f.select :result, f.object.assignable_results.collect { |s| [_(s), s] } %>
-            <%= f.hidden_field :starred %>
-            <%= f.hidden_field :completed, value: true%>
+      <input type="checkbox" data-behavior="complete_task" data-id="<%= task.id %>" <%= 'disabled="disabled"' if task.attempted? %> <%= 'checked="checked"' if task.completed? %> />
+    </td>
+    <td class="data">
+      <div id="result_modal_<%= task.id %>" title="<%= task_exhibit %>" style="display:none">
+        <%= form_for task, remote: true, namespace: dom_id(task) do |f| %>
+          <%= _('Result') %>
+          <%= f.select :result, f.object.assignable_results.collect { |s| [_(s), s] } %>
+          <%= f.hidden_field :starred %>
+          <%= f.hidden_field :completed, value: true%>
+        <% end %>
+      </div>
+      <div class="primary">
+        <span class="ico <%= task.starred? ? 'ico_fav' : 'ico_fav_off' %> fav">Fav</span>
+        <%= l(task.start_at) %> - 
+        <strong><span class="tasktitle"><%= task_exhibit %></span></strong> - 
+        <span class="taskaction"><%= _(task.activity_type) %></span>
+        <div style="display:inline" class="tags"><%= task_exhibit.tag_links %></div>
+        <% if task.contacts.present? %>
+          <span class="people">(<%= task_exhibit.contact_links %>)</span>
+        <% end %>
+
+        <a class="comment_status" href=""><span id="comment_count_<%= task.id %>"><%= task.activity_comments.length  %></span></a>
+        <div class="actions">
+          <%= link_to _('Edit'), edit_task_path(task), :class=> "ico ico_edit" %>
+          <%= link_to(_('Delete'), task, confirm: t('g.confirm'), method: :delete, :class=> "ico ico_trash") %>
+        </div>
+      </div>
+      <div class="comments">
+        <header></header>
+
+        <div id="comment_list_<%= task.id %>">
+          <%= render partial: 'activity_comments/comment', collection: task.activity_comments %>
+        </div>
+
+        <div class="comment_form">
+          <%= form_for task.activity_comments.new, namespace: "activity_#{task.id}", remote: true do |f| %>
+            <%= hidden_field_tag :activity_id, task.id %>
+            <%= f.text_area :body, placeholder: t('.add_comments') %>
+            <div class="buttons">
+              <button class="btn smallbtn"><%= t('.add_comment') %></button>
+            </div>
           <% end %>
         </div>
-        <div class="primary">
-          <span class="ico <%= task.starred? ? 'ico_fav' : 'ico_fav_off' %> fav">Fav</span>
-          <%= l(task.start_at) %> - 
-          <strong><span class="tasktitle"><%= task_exhibit %></span></strong> - 
-          <span class="taskaction"><%= _(task.activity_type) %></span>
-          <div style="display:inline" class="tags"><%= task_exhibit.tag_links %></div>
-          <% if task.contacts.present? %>
-            <span class="people">(<%= task_exhibit.contact_links %>)</span>
-          <% end %>
-          <% if task.completed? %>
-            -
-            <% if task.attempted? %>
-              <%= link_to(task_exhibit.result, new_task_path(from: task.id), title: _('Click here to reschedule this task'), class: 'tooltipsy') %>
-            <% else %>
-              <%= task_exhibit.result %>
-            <% end %>
-          <% end %>
-
-          <a class="comment_status" href=""><span id="comment_count_<%= task.id %>"><%= task.activity_comments.length  %></span></a>
-          <div class="actions">
-            <%= link_to 'Edit', edit_task_path(task), :class=> "ico ico_edit" %>
-            <%= link_to('Destroy', task, confirm: t('g.confirm'), method: :delete, :class=> "ico ico_trash") %>
-          </div>
-        </div>
-        <div class="comments">
-          <header></header>
-
-          <div id="comment_list_<%= task.id %>">
-            <%= render partial: 'activity_comments/comment', collection: task.activity_comments %>
-          </div>
-
-          <div class="comment_form">
-            <%= form_for task.activity_comments.new, namespace: "activity_#{task.id}", remote: true do |f| %>
-              <%= hidden_field_tag :activity_id, task.id %>
-              <%= f.text_area :body, placeholder: t('.add_comments') %>
-              <div class="buttons">
-                <button class="btn smallbtn"><%= t('.add_comment') %></button>
-              </div>
-            <% end %>
-          </div>
-        </div>
-      </td>
-    </tr>
-  <% end %>
+      </div>
+    </td>
+  </tr>
+<% end %>

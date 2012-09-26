@@ -22,11 +22,11 @@ class TasksController < ApplicationController
   end
 
   def completed
-    @tasks = current_account_list.tasks.completed.order('start_at desc')
+    @tasks = current_account_list.tasks.completed
   end
 
   def history
-    @tasks = current_account_list.tasks.completed.order('start_at desc')
+    @tasks = current_account_list.tasks.completed
     case params[:date_range]
     when 'last_month'
       @tasks = @tasks.where('completed_at > ?', 1.month.ago)
