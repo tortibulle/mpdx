@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120924065159) do
+ActiveRecord::Schema.define(:version => 20120926184516) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -58,6 +58,7 @@ ActiveRecord::Schema.define(:version => 20120924065159) do
     t.integer  "activity_comments_count", :default => 0
     t.string   "activity_type"
     t.string   "result"
+    t.datetime "completed_at"
   end
 
   add_index "activities", ["account_list_id"], :name => "index_activities_on_account_list_id"

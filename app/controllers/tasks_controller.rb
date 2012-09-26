@@ -26,7 +26,18 @@ class TasksController < ApplicationController
   end
 
   def history
-    
+    @tasks = current_account_list.tasks.completed.order('start_at desc')
+    case params[:date_range]
+    when 'last_month'
+      @tasks = @tasks.where('completed_at > ?', 1.month.ago)
+    when 'last_year'
+      @tasks = @tasks.where('completed_at > ?', 1.year.ago)
+    when 'last_two_years'
+      @tasks = @tasks.where('completed_at > ?', 2.years.ago)
+    when 'all'
+    else
+      @tasks = @tasks.where('completed_at > ?', 1.week.ago)
+    end
   end
 
   def show

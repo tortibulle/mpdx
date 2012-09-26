@@ -4,14 +4,31 @@
 
     <h1></h1>
 
-    <table class="tablelist tasks">
+    <table class="tablelist">
+      <thead>
+        <tr>
+          <th><%= _('Contact') %></th>
+          <th><%= _('Date') %></th>
+          <th><%= _('Time') %></th>
+          <th><%= _('Type') %></th>
+          <th><%= _('Result') %></th>
+          <th><%= _('Description') %></th>
+        </tr>
+      </thead>
 
-      <tr class="clear">
-        <td colspan="4"><div class="taskgroup gray">Completed</div></td>
-      </tr>
-
-      <%= render partial: 'task', collection: @tasks %>
-
+      <tbody>
+        <% @tasks.each do |task| 
+          task_exhibit = exhibit(task) %>
+          <tr>
+            <td><%= task_exhibit.contact_links %></td>
+            <td><%= task_exhibit.date %></td>
+            <td><%= task_exhibit.time %></td>
+            <td><%= _(task_exhibit.activity_type) %></td>
+            <td><%= _(task_exhibit.result) %></td>
+            <td><%= task_exhibit %></td>
+          </tr>
+        <% end %>
+      </tbody>
     </table>
   </div>
 </div>
