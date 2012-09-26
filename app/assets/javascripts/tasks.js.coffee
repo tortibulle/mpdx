@@ -16,6 +16,7 @@ $ ->
     form = $('#task_' + id + '_edit_task_' + id)
     if $(this).prop('checked') == false && $('#tasks_completed')[0]?
       # Uncomplete a task
+      $('[name="task[completed]"]', form).val(false)
       form.submit()
       $('#task_' + id).fadeOut()
     else 
@@ -26,9 +27,10 @@ $ ->
           modal:'true'
           buttons: [
             {
-              text: __('Connect!'),
+              text: __('Complete'),
               click: (e) ->
                 $('form', this).submit()
+                $('#task_' + id).fadeOut()
                 $(this).dialog("close")
             },
             {

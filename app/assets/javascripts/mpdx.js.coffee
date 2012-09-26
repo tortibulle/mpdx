@@ -89,4 +89,5 @@ $.mpdx.loadSocialStream = ->
       dataType: 'script'
     }
 
-
+window.__ = (val)->
+  val
