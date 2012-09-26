@@ -6,7 +6,7 @@ GIT
 
 GIT
   remote: git://github.com/jnicklas/carrierwave.git
-  revision: 557528da6a08bc44fc8e9296791f57b4d2c516ef
+  revision: 56592f35afc3b975b45794ca30ce2dd5c19542aa
   specs:
     carrierwave (0.6.2)
       activemodel (>= 3.2.0)
@@ -14,7 +14,7 @@ GIT
 
 GIT
   remote: git://github.com/josevalim/active_model_serializers.git
-  revision: 3c5e58bf132be4c7111e1f96a6d471676511616e
+  revision: bea38dd73a5129be97a491c6d06287ea7060c7e3
   specs:
     active_model_serializers (0.5.2)
       activemodel (>= 3.0)
@@ -135,6 +135,10 @@ GEM
       locale
     gettext_i18n_rails (0.7.1)
       fast_gettext (>= 0.4.8)
+    gettext_i18n_rails_js (0.0.2)
+      gettext (>= 2.3.0)
+      gettext_i18n_rails (>= 0.7.1)
+      rails (~> 3.2.0)
     gibberish (1.2.0)
     girl_friday (0.10.0)
       connection_pool (~> 0.9.0)
@@ -152,15 +156,15 @@ GEM
     haml (3.1.7)
     hashie (1.2.0)
     hike (1.2.1)
-    httpauth (0.1)
+    httpauth (0.2.0)
     httpclient (2.2.7)
     i18n (0.6.1)
     iniparse (1.1.5)
     journey (1.0.4)
-    jquery-rails (2.1.2)
+    jquery-rails (2.1.3)
       railties (>= 3.1.0, < 5.0)
       thor (~> 0.14)
-    jquery-ui-rails (2.0.0)
+    jquery-ui-rails (2.0.1)
       jquery-rails
       railties (>= 3.1.0)
     jruby-pageant (1.1.1)
@@ -177,7 +181,7 @@ GEM
       hashie (~> 1.2)
       multi_json (~> 1.0)
       oauth (~> 0.4)
-    listen (0.5.1)
+    listen (0.5.2)
     locale (2.0.8)
     mail (2.4.4)
       i18n (>= 0.4.0)
@@ -271,7 +275,7 @@ GEM
       thor (>= 0.14.6, < 2.0)
     raindrops (0.10.0)
     rake (0.9.2.2)
-    rb-fsevent (0.9.1)
+    rb-fsevent (0.9.2)
     rdoc (3.12)
       json (~> 1.4)
     redis (3.0.1)
@@ -348,7 +352,7 @@ GEM
     therubyrhino (2.0.1)
       therubyrhino_jar (>= 1.7.3)
     therubyrhino_jar (1.7.4)
-    thin (1.4.1)
+    thin (1.5.0)
       daemons (>= 1.0.9)
       eventmachine (>= 0.12.6)
       rack (>= 1.0.0)
@@ -408,8 +412,9 @@ DEPENDENCIES
   factory_girl_rails
   fb_graph
   fog (~> 1.3.1)
-  gettext (>= 1.9.3)
+  gettext (~> 2.3.2)
   gettext_i18n_rails
+  gettext_i18n_rails_js
   gibberish
   growl
   guard-rspec

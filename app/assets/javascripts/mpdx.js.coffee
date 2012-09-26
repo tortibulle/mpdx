@@ -1,5 +1,7 @@
 $ ->
 
+  $('.tooltipsy').tooltipsy()
+
   $(document).on 'mouseleave', 'div[data-behavior=account_selector]', ->
     $('div[data-behavior=account_selector] div').hide()
     false
@@ -89,4 +91,5 @@ $.mpdx.loadSocialStream = ->
       dataType: 'script'
     }
 
-
+window.__ = (val)->
+  val

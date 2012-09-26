@@ -53,8 +53,8 @@
   <div class="spacer"></div>
 
   <div class="actions">
-    <%= f.submit @task.completed? ? t('.log_task') : t('.save_task'), :class => "btn" %>
-    <%= link_to t('g.cancel'), tasks_path, :class=> "btn" %>
+    <%= f.submit @task.completed? ? _('Log Task') : _('Save Task'), :class => "btn" %>
+    <%= link_to _('Cancel'), tasks_path, :class=> "btn" %>
   </div>
   
   

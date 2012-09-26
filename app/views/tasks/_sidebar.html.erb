@@ -1,32 +1,44 @@
 <aside id="leftmenu">
 <ul>
-  <li class="<%= 'selected' if params[:action] == 'index' %>"><%= link_to('Active/Upcoming', tasks_path, class: "inbox") %></li>
-  <li class="<%= 'selected' if params[:action] == 'starred' %>"><%= link_to("Starred", starred_tasks_path, class: "starred") %></li>
-  <li class="<%= 'selected' if params[:action] == 'completed' %>"><%= link_to("Completed", completed_tasks_path, class: "completed") %></li>
-  <li class="<%= 'selected' if params[:tags] %>">
-    <span class="tags"><%= _('Tags') %></span>
-    <ul class="left_taglist tags">
-      <li>
-        <% current_account_list.activity_tags.each do |tag| 
-          # toggle tag on / off
-          tag_params = params.except(:action, :controller)
-          if params[:tags] && params[:tags].include?(tag)
-            tag_params[:tags] = (params[:tags] - [tag])
-          else
-            tag_params[:tags] = (Array.wrap(params[:tags]) + [tag])
-          end
-          tag_params.delete(:tags) if tag_params[:tags].blank? %>
+  <li class="<%= 'selected' if params[:action] == 'index' %>"><%= link_to(_('Active/Upcoming'), tasks_path, class: "inbox") %></li>
+  <li class="<%= 'selected' if params[:action] == 'starred' %>"><%= link_to(_('Starred'), starred_tasks_path, class: "starred") %></li>
+  <!-- <li class="<%= 'selected' if params[:action] == 'completed' %>"><%= link_to(_('Completed'), completed_tasks_path, class: "completed") %></li> -->
+  <li class="<%= 'selected' if params[:action] == 'history' %>"><%= link_to(_('History'), history_tasks_path, class: "completed") %></li>
+  <% if current_account_list.activity_tags.present? %>
+    <li class="<%= 'selected' if params[:tags] %>">
+      <span class="tags"><%= _('Tags') %></span>
+      <ul class="left_taglist tags">
+        <li>
+          <% current_account_list.activity_tags.each do |tag| 
+            # toggle tag on / off
+            tag_params = params.except(:action, :controller)
+            if params[:tags] && params[:tags].include?(tag)
+              tag_params[:tags] = (params[:tags] - [tag])
+            else
+              tag_params[:tags] = (Array.wrap(params[:tags]) + [tag])
+            end
+            tag_params.delete(:tags) if tag_params[:tags].blank? %>
 
-          <%= link_to(tag, tag_params, class: "tag #{'selected' if params[:tags] && params[:tags].include?(tag)}")%>
-        <% end %>
-      </li>
-    </ul>
-  </li>
-    <li>
+            <%= link_to(tag, tag_params, class: "tag #{'selected' if params[:tags] && params[:tags].include?(tag)}")%>
+          <% end %>
+        </li>
+      </ul>
+    </li>
+  <% end %>
+  <li>
     <%= form_tag params.slice(:controller, :action), method: :get do %>
       <span class="left_filters"><%= _('Filters') %></span>
-      
       <ul class="left_filters">
+        <% if params[:action] == 'history' %>
+          <li>
+            <label><%= _('Date Range') %></label>
+            <%= radio_button_tag :date_range, 'last_week', params[:date_range].blank? || params[:date_range] == 'last_week' %> <%= _('Last Week') %><br />
+            <%= radio_button_tag :date_range, 'last_month', params[:date_range] == 'last_month'  %> <%= _('Last 31 Days') %><br />
+            <%= radio_button_tag :date_range, 'last_year', params[:date_range] == 'last_year'  %> <%= _('Last 12 Months') %><br />
+            <%= radio_button_tag :date_range, 'last_two_years', params[:date_range] == 'last_two_years'  %> <%= _('Last Two Years') %><br />
+            <%= radio_button_tag :date_range, 'all', params[:date_range] == 'all'  %> <%= _('All') %><br />
+          </li>
+        <% end %>
         <li>
           <label><%= _('Tags') %></label>
           <%= select_tag :tags, options_for_select([[_('-- Any --'), '']] + current_account_list.activity_tags, params[:tags]), multiple: true, size: 5 %>

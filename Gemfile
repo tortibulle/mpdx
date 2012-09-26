@@ -37,6 +37,7 @@ gem 'devise', '~> 2.0.0'
 gem 'dalli'
 gem 'twitter_cldr'
 gem "gettext_i18n_rails"
+gem 'gettext_i18n_rails_js'#, path: '/Users/josh/htdocs/gettext_i18n_rails_js' #,git: 'git://github.com/twinge/gettext_i18n_rails_js.git'
 
 gem 'omniauth-twitter'
 gem 'omniauth-facebook'
@@ -84,7 +85,7 @@ group :development, :test do
   gem "guard-rspec"
   gem 'simplecov', :require => false
   #only used for mo/po file generation in development, !do not load(:require=>false)! since it will eat 7mb ram
-  gem "gettext", '>= 1.9.3', :require => false
+  gem "gettext", '~> 2.3.2', :require => false
   gem 'mailcatcher'
 end
 group :test do

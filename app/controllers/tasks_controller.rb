@@ -22,7 +22,22 @@ class TasksController < ApplicationController
   end
 
   def completed
-    @tasks = current_account_list.tasks.completed.order('start_at desc')
+    @tasks = current_account_list.tasks.completed
+  end
+
+  def history
+    @tasks = current_account_list.tasks.completed
+    case params[:date_range]
+    when 'last_month'
+      @tasks = @tasks.where('completed_at > ?', 1.month.ago)
+    when 'last_year'
+      @tasks = @tasks.where('completed_at > ?', 1.year.ago)
+    when 'last_two_years'
+      @tasks = @tasks.where('completed_at > ?', 2.years.ago)
+    when 'all'
+    else
+      @tasks = @tasks.where('completed_at > ?', 1.week.ago)
+    end
   end
 
   def show
@@ -31,6 +46,14 @@ class TasksController < ApplicationController
 
   def new
     @task = current_account_list.tasks.new
+    @old_task = current_account_list.tasks.find_by_id(params[:from]) if params[:from]
+    if @old_task
+      @task.attributes = @old_task.attributes.select { |k, v| [:starred, :location, :subject].include?(k.to_sym) }
+      @task.tag_list = @old_task.tag_list
+      @old_task.activity_contacts.each do |ac|
+        @task.activity_contacts.build(contact_id: ac.contact_id)
+      end
+    end
     if params[:contact_id]
       @task.activity_contacts.build(contact_id: params[:contact_id])
       session[:contact_redirect_to] = contact_path(params[:contact_id], anchor: 'tasks-tab')
