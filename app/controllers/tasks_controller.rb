@@ -35,6 +35,14 @@ class TasksController < ApplicationController
 
   def new
     @task = current_account_list.tasks.new
+    @old_task = current_account_list.tasks.find_by_id(params[:from]) if params[:from]
+    if @old_task
+      @task.attributes = @old_task.attributes.select { |k, v| [:starred, :location, :subject].include?(k.to_sym) }
+      @task.tag_list = @old_task.tag_list
+      @old_task.activity_contacts.each do |ac|
+        @task.activity_contacts.build(contact_id: ac.contact_id)
+      end
+    end
     if params[:contact_id]
       @task.activity_contacts.build(contact_id: params[:contact_id])
       session[:contact_redirect_to] = contact_path(params[:contact_id], anchor: 'tasks-tab')

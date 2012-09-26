@@ -2,13 +2,13 @@
   <tr id="<%= dom_id(task) %>" class="task">
     <td class="check">
       <a name="<%= dom_id(task) %>" />
-        <input type="checkbox" data-behavior="complete_task" data-id="<%= task.id %>" <%= 'checked="checked"' if task.completed? %> />
+        <input type="checkbox" data-behavior="complete_task" data-id="<%= task.id %>" <%= 'disabled="disabled"' if task.attempted? %> <%= 'checked="checked"' if task.completed? %> />
       </td>
       <td class="data">
         <div id="result_modal_<%= task.id %>" title="<%= task_exhibit %>" style="display:none">
           <%= form_for task, remote: true, namespace: dom_id(task) do |f| %>
             <%= _('Result') %>
-            <%= f.select :result, f.object.assignable_results.collect { |s| [_(s), s] }, selected: _('Done') %>
+            <%= f.select :result, f.object.assignable_results.collect { |s| [_(s), s] } %>
             <%= f.hidden_field :starred %>
             <%= f.hidden_field :completed, value: true%>
           <% end %>
@@ -22,6 +22,15 @@
           <% if task.contacts.present? %>
             <span class="people">(<%= task_exhibit.contact_links %>)</span>
           <% end %>
+          <% if task.completed? %>
+            -
+            <% if task.attempted? %>
+              <%= link_to(task_exhibit.result, new_task_path(from: task.id), title: _('Click here to reschedule this task'), class: 'tooltipsy') %>
+            <% else %>
+              <%= task_exhibit.result %>
+            <% end %>
+          <% end %>
+
           <a class="comment_status" href=""><span id="comment_count_<%= task.id %>"><%= task.activity_comments.length  %></span></a>
           <div class="actions">
             <%= link_to 'Edit', edit_task_path(task), :class=> "ico ico_edit" %>

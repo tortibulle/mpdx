@@ -9,4 +9,8 @@ class Task < Activity
   assignable_values_for :result, :allow_blank => true do
     ['Attempted', 'Done']
   end
+
+  def attempted?
+    'Attempted' == result
+  end
 end
