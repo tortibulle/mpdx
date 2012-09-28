@@ -25,4 +25,16 @@ class DesignationProfile < ActiveRecord::Base
     account_list
   end
 
+  def merge(other)
+    DesignationProfile.transaction do
+      other.designation_profile_accounts.each do |da|
+        designation_profile_accounts << da unless designation_profile_accounts.include?(da)
+      end
+
+      save(validate: false)
+      other.reload
+      other.destroy
+    end
+  end
+
 end

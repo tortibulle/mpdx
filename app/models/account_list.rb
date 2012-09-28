@@ -78,6 +78,8 @@ class AccountList < ActiveRecord::Base
 
   def merge(other)
     AccountList.transaction do
+      designation_profile.merge(other.designation_profile)
+
       other.users.each do |user|
         users << user unless users.include?(user)
       end
