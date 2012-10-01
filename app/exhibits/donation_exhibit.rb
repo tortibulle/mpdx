@@ -6,8 +6,8 @@ class DonationExhibit < DisplayCase::Exhibit
 
   def to_s() amount; end
 
-  def amount
-    @context.number_to_current_currency(self[:amount], {currency: currency})
+  def tendered_amount
+    @context.number_to_current_currency(self[:tendered_amount], {currency: currency})
   end
 
 end

@@ -57,7 +57,7 @@
             <li>
               <!-- <div class="profile_close"><%= link_to("Close", "Close", :class=> "corner_close") %></div> -->
               <div class="profile_content">
-                <%== _('<span class="name">%{link}</span> has given <span class="hl amt">%{total}</span> since <span class="hl date">%{since}</span>') %{link: link_to(contact.name, contact, :class => "profile_name"), total: number_to_current_currency(contact.total_donations), since: contact.first_donation_date ? l(contact.first_donation_date) : '' } %>
+                <%== _('<span class="name">%{link}</span> has given <span class="hl amt">%{total}</span> since <span class="hl date">%{since}</span>') % {link: link_to(contact.name, contact, :class => "profile_name"), total: number_to_current_currency(contact.total_donations), since: contact.first_donation_date ? l(contact.first_donation_date) : '' } %>
                 <p class="desc"></p>
                 <!-- <ul class="network_tags list">
                   <li><%= link_to("Facebook","#", :class => "icos ico_fb") %></li>

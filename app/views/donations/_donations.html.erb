@@ -25,7 +25,7 @@
         <% unless @contact %>
           <td><%= donation.donor_account.name %></td>
         <% end %>
-        <td class="right"><%= donation.amount %></td>
+        <td class="right"><%= donation.tendered_amount %></td>
         <% if multiple_designations %>
           <td><%= donation.designation_account.designation_number %></td>
         <% end %>

@@ -1,4 +1,4 @@
-<% exhibit(@contact, self).tap do |contact_exhibit| %>
+<% exhibit(contact, self).tap do |contact_exhibit| %>
   <div id="contentbody" class="withright" data-contact-id="<%= contact.id %>">
     <div class="contact_controls">
       <% @contacts.index(contact_exhibit.to_model).tap do |current_index| %>
@@ -15,7 +15,7 @@
         <%#= link_to("Show Contacts", "#", :id =>'drawer', :class=> "btn smallbtn") %>
         <%= link_to(_('Log Task'), new_task_path(contact_id: contact.id, completed: true), class: "btn smallbtn") %>
         <%= link_to(_('Add Task'), new_task_path(contact_id: contact.id), class: "btn smallbtn") %>
-        <%= link_to(_('Edit'), edit_contact_path(contact_exhibit), :class=> "btn smallbtn") %>
+        <%= link_to(_('Edit'), edit_contact_path(contact), :class=> "btn smallbtn") %>
         <%#= link_to(_('Quick'), "", :class => "btn smallbtn quick")%>
       </div>
     </div>
@@ -114,7 +114,7 @@
                 <td>
                   <% contact_exhibit.people.each do |person| %>
                     <div class="smallperson">
-                      <div class="name"><%= link_to(person.to_s, person) %></div>
+                      <div class="name"><%= link_to(person, contact_person_path(contact, person)) %></div>
                       <%= render 'people/contact_details_compact', person: person %>
                     </div>
                   <% end %>
@@ -150,7 +150,7 @@
           <% end %>
         </div>
         <div id="notes-tab">
-          <%= form_for @contact, remote: true do |f| %>
+          <%= form_for contact, remote: true do |f| %>
             <%= f.submit _('Save Notes'), disabled: true %>
             <span class="saved_at">
               <%= contact_exhibit.notes_saved_at %>
