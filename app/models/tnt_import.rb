@@ -106,7 +106,7 @@ class TntImport
     contact.likely_to_give = line['Likely To Give'] if (@import.override? || contact.likely_to_give.blank?) && line['Likely To Give'].to_i != 0
     contact.never_ask = is_true?(line['Never Ask']) if @import.override? || contact.never_ask.blank?
     contact.church_name = line['Church Name'] if @import.override? || contact.church_name.blank?
-    contact.send_newsletter = 'physical' if (@import.override? || contact.send_newsletter.blank?) && is_true?(line['Send Newsletter'])
+    contact.send_newsletter = 'Physical' if (@import.override? || contact.send_newsletter.blank?) && is_true?(line['Send Newsletter'])
     contact.direct_deposit = is_true?(line['Direct Deposit']) if @import.override? || contact.direct_deposit.blank?
     contact.magazine = is_true?(line['Magazine']) if @import.override? || contact.magazine.blank?
     contact.last_activity = parse_date(line['Last Activity']) if (@import.override? || contact.last_activity.blank?) && line['Last Activity'].present?

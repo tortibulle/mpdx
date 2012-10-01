@@ -33,14 +33,22 @@ class Contact < ActiveRecord::Base
   before_destroy :delete_people
   before_save    :set_notes_saved_at
 
-  assignable_values_for :status, :allow_blank => true do
+  assignable_values_for :status, allow_blank: true do
     ['Never Contacted', 'Ask in Future', 'Call for Appointment', 'Appointment Scheduled', 'Call for Decision',
     'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Not Interested', 'Unresponsive', 'Never Ask',
     'Research Abandoned','Expired Referral']
   end
 
-  assignable_values_for :likely_to_give, :allow_blank => true do
+  assignable_values_for :likely_to_give, allow_blank: true do
     [1,2,3]
+  end
+
+  assignable_values_for :likely_to_give, allow_blank: true do
+    ['Least Likely', 'Likely', 'Most Likely']
+  end
+
+  assignable_values_for :send_newsletter, allow_blank: true do
+    ['Physical', 'Email', 'Both']
   end
 
 
@@ -90,14 +98,6 @@ class Contact < ActiveRecord::Base
   def monthly_pledge
     return 0 unless pledge_frequency.to_i > 0
     pledge_amount.to_f / pledge_frequency
-  end
-
-  def self.giving_likelihood_options
-    giving_likelihoods.collect.with_index { |l, i| [l, i+1] }
-  end
-
-  def self.giving_likelihoods
-    [_('Least Likely'), _('Likely'), _('Most Likely')]
   end
 
   private
