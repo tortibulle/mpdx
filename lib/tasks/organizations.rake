@@ -5,20 +5,26 @@ require 'csv'
 namespace :organizations do
   task fetch: :environment do
     # Download the org csv from tnt and update orgs
-    CSV.new(open('http://download.tntware.com/tntmpd/TntMPD_Organizations.csv'), :headers => :first_row).each do |line|
-      attributes = {name: line[0], query_ini_url: line[1], iso3166: line[2]}
-      next unless attributes[:query_ini_url]
-      org = Organization.where(attributes.slice(:query_ini_url)).first_or_create(attributes)
+    organizations = open('http://download.tntware.com/tntmpd/TntMPD_Organizations.csv').read.unpack("C*").pack("U*")
+    CSV.new(organizations, :headers => :first_row).each do |line|
+
+      next unless line[1].present?
+
+      unless org = Organization.where(query_ini_url: line[1]).first
+        org = Organization.create(name: line[0], query_ini_url: line[1], iso3166: line[2])
+      end
       # Grab latest query.ini file for this org
       begin
         uri = URI.parse(org.query_ini_url)
-        ini_body = uri.read("r:UTF-8")
+        ini_body = uri.read("r:UTF-8").unpack("C*").pack("U*").force_encoding("UTF-8").encode!
         # remove unicode characters if present
-        ini_body = ini_body[1..-1] unless ini_body.first == '['
+        ini_body = ini_body[3..-1] if ini_body.first.localize.code_points.first == 239
+
+        #ini_body = ini_body[1..-1] unless ini_body.first == '['
         ini = IniParse.parse(ini_body)
+        attributes = {}
         attributes[:redirect_query_ini] = ini['ORGANIZATION']['RedirectQueryIni']
         attributes[:abbreviation] = ini['ORGANIZATION']['Abbreviation']
-        #attributes[:name] = ini['ORGANIZATION']['Name']
         attributes[:abbreviation] = ini['ORGANIZATION']['Abbreviation']
         attributes[:logo] = ini['ORGANIZATION']['WebLogo-JPEG-470x120']
         attributes[:account_help_url] = ini['ORGANIZATION']['AccountHelpUrl']
@@ -46,12 +52,16 @@ namespace :organizations do
             end
           end
         end
-        puts "\nSUCCESS: #{org.query_ini_url}\n\n"
+        begin
+          org.update_attributes(attributes)
+          puts "\nSUCCESS: #{org.query_ini_url}\n\n"
+        rescue => e
+          raise e.message + "\n\n" + attributes.inspect
+        end
       rescue => e
         puts "failed on #{org.query_ini_url}"
         puts e.message
       end
-      org.update_attributes(attributes)
     end
   end
 end
