@@ -12,7 +12,7 @@
 
 <div class="col_50 cols">
   <div class="fieldset_label">
-    Basic Information
+    <%= _('Basic Information') %>
   </div>
 
   <div class="field">
@@ -27,13 +27,19 @@
 
   <div class="field">
     <%= f.label :likely_to_give, _('Likely to Give') %>
-    <%= f.select :likely_to_give, Contact.giving_likelihood_options, include_blank: true %>
+    <%= f.select :likely_to_give, f.object.assignable_likely_to_gives.collect { |s| [_(s), s] }, include_blank: true %>
   </div>
 
   <div class="field">
-    <%= f.label :status %>
+    <%= f.label :status, _('Status') %>
     <%= f.select :status, f.object.assignable_statuses.collect { |s| [_(s), s] }, include_blank: true %>
   </div>
+
+  <div class="field">
+    <%= f.label :send_newsletter, _('Newsletter') %>
+    <%= f.select :status, f.object.assignable_send_newsletters.collect { |s| [_(s), s] }, include_blank: true %>
+  </div>
+
 
   <div class="sfield referrers_field">
     <label class="fieldset_label">Referrals</label>
@@ -52,7 +58,7 @@
 <div class="col_50 cols">
 
   <div class="fieldset">
-    <label class="fieldset_label">Address</label>
+    <label class="fieldset_label"><%= _('Address') %></label>
     <% contact.addresses.build if contact.addresses.blank? %>
     <%= f.fields_for :addresses do |builder| %>
       <%= render 'address_fields', builder: builder, object: contact, no_remove: contact.addresses.length <= 1 %>

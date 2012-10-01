@@ -41,6 +41,10 @@ class ContactsController < ApplicationController
       end
     end
 
+    if params[:send_newsletter].present? && params[:send_newsletter].first != ''
+      @contacts = @contacts.where(send_newsletter: params[:send_newsletter])
+    end
+
     respond_to do |wants|
       wants.html do
         @contacts = @contacts.page(params[:page])

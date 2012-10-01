@@ -19,4 +19,14 @@ _('Business')
 _('Mailing')
 _('Other')
 
+# Giving Likelihoods
+_('Least Likely')
+_('Likely')
+_('Most Likely')
+
+# Send Newsletter
+_('physical')
+_('email')
+_('both')
+
 

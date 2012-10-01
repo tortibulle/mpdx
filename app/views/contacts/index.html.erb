@@ -1,8 +1,9 @@
+<%= contact_instance = Contact.new %>
 <aside id="leftmenu">
 <ul>
-  <li class="<%= 'selected' if params[:filter].blank? %>"><%= link_to(t('g.all'), contacts_path, class: "all") %></li>
-  <li class="<%= 'selected' if params[:filter] == 'people' %>"><%= link_to(t('g.people'), contacts_path(filter: 'people'), class: "people") %></li>
-  <li class="<%= 'selected' if params[:filter] == 'companies' %>"><%= link_to(t('g.companies'), contacts_path(filter: 'companies'), class: "companies") %></li>
+  <li class="<%= 'selected' if params[:filter].blank? %>"><%= link_to(_('All'), contacts_path, class: "all") %></li>
+  <li class="<%= 'selected' if params[:filter] == 'people' %>"><%= link_to(_('People'), contacts_path(filter: 'people'), class: "people") %></li>
+  <li class="<%= 'selected' if params[:filter] == 'companies' %>"><%= link_to(_('Companies'), contacts_path(filter: 'companies'), class: "companies") %></li>
   <li class="<%= 'selected' if @tags %>">
     <span class="tags"><%= _('Tags') %></span>
     <ul class="left_taglist tags">
@@ -25,7 +26,6 @@
   <li>
     <%= form_tag '/contacts', method: :get do %>
       <span class="left_filters" onclick="return false;"><%= _('Filters') %></span>
-      
       <ul class="left_filters">
         <li>
           <label><%= _('City') %></label>
@@ -46,13 +46,18 @@
         </li>
 
         <li>
+          <label><%= _('Send Newsletter') %></label>
+          <%= select_tag :send_newsletter, options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_send_newsletters, params[:send_newsletter]), multiple: true, size: 4 %>
+        </li>
+
+        <li>
           <label><%= _('Status') %></label>
-          <%= select_tag :status, options_for_select([[_('-- Any --'), '']] + Contact.new.assignable_statuses.collect { |s| [_(s), s] }, params[:status]), multiple: true, size: 5 %>
+          <%= select_tag :status, options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_statuses.collect { |s| [_(s), s] }, params[:status]), multiple: true, size: 5 %>
         </li>
 
         <li>
           <label><%= _('Likely To Give') %></label>
-          <%= select_tag :likely, options_for_select([[_('-- Any --'), '']] + Contact.giving_likelihood_options, params[:likely]), multiple: true, size: 4 %>
+          <%= select_tag :likely, options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_likely_to_gives, params[:likely]), multiple: true, size: 4 %>
         </li>
 
         <li>

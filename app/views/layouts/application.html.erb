@@ -83,6 +83,9 @@
         <%= yield %>
       </div>
     </div>
+    <div id="feedback">
+      <h2><%= _('We listen!') %></h2>
+      <p><%= _('Have some feedback on how we can improve MPDX? Send us an email: %{address}') % {address: mail_to('support@mpdx.org')} %></div>
   </body>
 
 </html>
