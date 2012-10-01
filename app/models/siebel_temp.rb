@@ -34,7 +34,10 @@ class SiebelTemp < DataServer
       when response.code.to_i == 500 || first_line.include?('ERROR') || first_line.include?('HTML')
         raise DataServerError, response.to_str
       end
-      response.to_str
+      response = response.to_str.unpack("C*").pack("U*")
+      # Strip annoying extra unicode at the beginning of the file
+      response = response[3..-1] if response.first.localize.code_points.first == 239
+      response
     }
   end
 end
