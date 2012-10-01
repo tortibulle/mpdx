@@ -45,8 +45,7 @@ class DataServer
                             get_params(@org.addresses_params, {profile: profile.code.to_s, 
                                                                datefrom: (date_from || @org.minimum_gift_date).to_s,
                                                                personid: @org_account.remote_id}))
-    # Strip annoying extra unicode at the beginning of the file
-    response = response[3..-1] unless ['"','P'].include?(response[0])
+
     CSV.new(response, headers: :first_row).each do |line|
       line['LAST_NAME'] = line['LAST_NAME_ORG']
       line['FIRST_NAME'] = line['ACCT_NAME'] if line['FIRST_NAME'].blank?
@@ -98,8 +97,6 @@ class DataServer
                                                                dateto: date_to,
                                                                personid: @org_account.remote_id}))
 
-    # Strip annoying extra unicode at the beginning of the file
-    response = response[3..-1] unless ['"','D','P'].include?(response[0])
     CSV.new(response, headers: :first_row).each do |line|
       designation_account = find_or_create_designation_account(line['DESIGNATION'], profile)
       add_or_update_donation(line, designation_account, profile)
@@ -156,9 +153,6 @@ class DataServer
     response = get_response(@org.account_balance_url,
                             get_params(@org.account_balance_params, {profile: profile_code.to_s}))
 
-    # Strip annoying extra unicode at the beginning of the file
-    response = response[3..-1] unless ['"','E'].include?(response[0])
-
     # This csv should always only have one line (besides the headers)
     CSV.new(response, headers: :first_row).each do |line|
       balance[:designation_numbers] = line['EMPLID'].split(',').collect {|e| e.gsub('"','')}
@@ -185,8 +179,6 @@ class DataServer
       @profiles = []
       unless @org.profiles_url.blank?
         response = get_response(@org.profiles_url, get_params(@org.profiles_params))
-        # Strip annoying extra unicode at the beginning of the file
-        response = response[3..-1] unless ['"','R','P'].include?(response[0])
         CSV.new(response, headers: :first_row).each do |line|
           name = line['PROFILE_DESCRIPTION'] || line['ROLE_DESCRIPTION']
           code = line['PROFILE_CODE'] || line['ROLE_CODE']
@@ -219,7 +211,10 @@ class DataServer
       when response.code.to_i == 500 || first_line.include?('ERROR') || first_line.include?('HTML')
         raise DataServerError, response
       end
-      response.to_str
+      response = response.to_str.unpack("C*").pack("U*")
+      # Strip annoying extra unicode at the beginning of the file
+      response = response[3..-1] if response.first.localize.code_points.first == 239
+      response
     }
   end
 
