@@ -1,13 +1,13 @@
 <% exhibit(contact, self).tap do |contact_exhibit| %>
   <div id="contentbody" class="withright" data-contact-id="<%= contact.id %>">
     <div class="contact_controls">
-      <% @contacts.index(contact_exhibit.to_model).tap do |current_index| %>
+      <% contacts.index(contact_exhibit.to_model).tap do |current_index| %>
         <% if current_index > 0 %>
-          <%= link_to('&lt;'.html_safe, @contacts[current_index - 1], class: 'flatbtn', remote: true) %>
+          <%= link_to('&lt;'.html_safe, contacts[current_index - 1], class: 'flatbtn', remote: true) %>
         <% end %>
-        <span class="contact_paging"><%== _('Navigate contacts: <strong>%{index} of %{total}</strong>') %{index: current_index + 1, total: @contacts.length} %></span>
-        <% if current_index < @contacts.length - 1 %>
-          <%= link_to('&gt;'.html_safe, @contacts[current_index + 1], class: 'flatbtn', remote: true) %>
+        <span class="contact_paging"><%== _('Navigate contacts: <strong>%{index} of %{total}</strong>') %{index: current_index + 1, total: contacts.length} %></span>
+        <% if current_index < contacts.length - 1 %>
+          <%= link_to('&gt;'.html_safe, contacts[current_index + 1], class: 'flatbtn', remote: true) %>
         <% end %>
       <% end %>
 

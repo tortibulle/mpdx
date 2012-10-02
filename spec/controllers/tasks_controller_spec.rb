@@ -8,7 +8,7 @@ describe TasksController do
   end
 
   def valid_attributes
-    FactoryGirl.build(:task, account_list: @account_list).attributes.except('id', 'type', 'created_at', 'updated_at', 'account_list_id', 'activity_comments_count')
+    FactoryGirl.build(:task, account_list: @account_list).attributes.except('id', 'type', 'created_at', 'updated_at', 'account_list_id', 'activity_comments_count', 'completed_at')
   end
 
   describe "GET index" do

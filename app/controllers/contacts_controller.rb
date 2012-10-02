@@ -1,10 +1,12 @@
 class ContactsController < ApplicationController
   respond_to :html, :js
   before_filter :get_contact, only: [:show, :edit, :update]
-  before_filter :get_contacts, only: [:show, :index]
 
   def index
-    @contacts = @contacts.includes(:people, :tags).order('contacts.name')
+    @contacts = current_account_list.contacts.order('contacts.name')
+    @all_contacts = @contacts.select([:id, :name])
+
+    @contacts = @contacts.includes(:people, :tags)
     if params[:filter] == 'people'
       @contacts = @contacts.people
     end
@@ -59,7 +61,7 @@ class ContactsController < ApplicationController
   end
 
   def show
-    @contacts = @contacts.all
+    @all_contacts = current_account_list.contacts.order('contacts.name').select([:id, :name])
     respond_with(@contact)
   end
 
@@ -116,7 +118,4 @@ class ContactsController < ApplicationController
     @contact = current_account_list.contacts.includes({people: [:email_addresses, :phone_numbers, :family_relationships]}).find(params[:id])
   end
 
-  def get_contacts
-    @contacts = current_account_list.contacts.order('contacts.name')
-  end
 end

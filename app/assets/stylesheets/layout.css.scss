@@ -256,6 +256,14 @@ $userheight: 60px;
   cursor: pointer;
 }
 
+.ui-autocomplete {
+  max-height: 200px;
+  min-width: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 20px;
+}
+
 .filters {
   background: $gray_light;
   padding: 5px;

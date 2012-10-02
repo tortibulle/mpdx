@@ -1,4 +1,7 @@
 <%= contact_instance = Contact.new %>
+<script type="text/javascript" charset="utf-8">
+  var contacts_json = <%= @all_contacts.collect { |c| {value: c.id, label: c.name} }.to_json.html_safe %>
+</script>
 <aside id="leftmenu">
 <ul>
   <li class="<%= 'selected' if params[:filter].blank? %>"><%= link_to(_('All'), contacts_path, class: "all") %></li>
@@ -81,7 +84,7 @@
 
 <div id="contentbody" class="withleft">
   <div class="filters">
-    <%= text_field_tag :contact_name, '', autocomplete: 'off', placeholder: t('g.contact_filter_prompt'), class: 'search_filter' %>
+    <%= text_field_tag :contact_name, '', autocomplete: 'off', placeholder: _('Type to filter'), class: 'search_filter' %>
     <div class="right">
       <%= link_to(_('Download CSV'), params.merge(format: 'csv'), class: "btn smallbtn") %>
       <%#= link_to("Actions", "Actions", class: "btn smallbtn") %>

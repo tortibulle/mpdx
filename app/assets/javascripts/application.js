@@ -14,8 +14,9 @@
 //= require jquery_ujs
 //= require jquery.ui.dialog
 //= require jquery.ui.tabs
-//= require jquery.cookie
+//= require jquery.ui.autocomplete
 //= require jquery.observe_field
+//= require jquery.cookie
 //= require history
 //= require jquery.select-to-autocomplete
 //= require jquery.hoverIntent.minified

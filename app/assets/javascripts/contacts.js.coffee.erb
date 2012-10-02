@@ -1,16 +1,27 @@
 $ ->
   if $('.contacts_controller')[0]?
-    # Filter contact list
-    $(document).on 'keyup', '#contact_name', ->
-      name = $(this).val()
-      regex = new RegExp('.*' + name + '.*', 'i')
-      $('[data-hook=contact]').each ->
-        if regex.test($('[data-name]', this).attr('data-name'))
-          $(this).show()
-        else
-          $(this).hide()
+
+    if $('#contacts_index')[0]?
+      # quick search for contact
+      $('#contact_name').autocomplete({
+        source: contacts_json,
+        select: (event, ui) ->
+          document.location = '/contacts/' + ui.item.value
+          false
+      })
 
     if $('#contacts_show')[0]?
+
+      # Filter contact list
+      $(document).on 'keyup', '#contact_name', ->
+        name = $(this).val()
+        regex = new RegExp('.*' + name + '.*', 'i')
+        $('[data-hook=contact]').each ->
+          if regex.test($('[data-name]', this).attr('data-name'))
+            $(this).show()
+          else
+            $(this).hide()
+
       # autosave contact notes
       $(document).on 'keydown', 'textarea.contact_notes', ->
         $('input[type=submit]', $(this).closest('form')).prop('disabled', false)
@@ -37,9 +48,9 @@ $ ->
 
       switch window.location.hash
         when '#donations-tab', ''
-            $.mpdx.loadDonations()
-          when '#stream-tab'
-            $.mpdx.loadSocialStream()
+          $.mpdx.loadDonations()
+        when '#stream-tab'
+          $.mpdx.loadSocialStream()
 
       $(document).on 'click', '.next_page', ->
         $(this).replaceWith('<%= image_tag('spinner.gif', class: 'spinner') %>')

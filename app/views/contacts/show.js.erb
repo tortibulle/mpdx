@@ -1,6 +1,13 @@
-$('#contentbody').replaceWith('<%= j(render('contact_body', contacts: @contacts, contact: @contact)) %>')
+$('#contentbody').replaceWith('<%= j(render('contact_body', contacts: @all_contacts, contact: @contact)) %>')
 $('.contact_list a').removeClass('active')
 $('[data-id=<%= @contact.id %>]').addClass('active')
 $.mpdx.activateTabs()
-$.mpdx.loadDonations()
+switch (window.location.hash) {
+  case '#donations-tab':
+  case '':
+    $.mpdx.loadDonations();
+    break;
+  case '#stream-tab':
+    $.mpdx.loadSocialStream();
+}
 History.pushState({contact_id: <%= @contact.id %>}, "<%== sanitize @contact.name %>", '<%= contact_path(@contact) %>' + document.location.hash)
