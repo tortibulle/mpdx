@@ -90,6 +90,7 @@
       <%= hidden_field_tag :selected_ids %>
       <ul style="display:none" class="action_list">
         <li><%= link_to(_('Add Tag'), '#', class: 'none', data: {behavior: 'add_tag_to_list'}) %></li>
+        <li><%= link_to(_('Remove Tag'), '#', class: 'none', data: {behavior: 'remove_tag_from_list'}) %></li>
         <!-- <li><%= link_to(_('Add Task'), '#', class: 'none', data: {behavior: 'add_task_to_list'}) %></li> -->
       </ul>
 
@@ -118,4 +119,4 @@
     </div>
   </div>
 </div>
-<%= render 'tag_modal' %>
+<%= render 'tag_modals' %>

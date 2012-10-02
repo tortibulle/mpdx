@@ -56,13 +56,13 @@ $ ->
         false
 
       $(document).on 'click', '[data-behavior=add_tag_to_list]', ->
-        $('#tag_modal #contact_ids').val($('#selected_ids').val())
-        $('#tag_modal').dialog {
+        $('#add_tag_modal #add_tag_contact_ids').val($('#selected_ids').val())
+        $('#add_tag_modal').dialog {
           buttons: [
             {
               text: __('Add Tag')
               click: (e) ->
-                return false if $.trim($('#acts_as_taggable_on_tag_name').val()) == ''
+                return false if $.trim($('#add_tag_name').val()) == ''
                 $(this).dialog( "option", "title", '<%= image_tag('spinner.gif') %>')
                 $(this).dialog( "option", "buttons", [])
                 $('form', this).submit()
@@ -74,11 +74,35 @@ $ ->
             }
           ]
         }
+        $('#add_tag_name').focus()
         false
 
-      $(document).on 'click', '#tag_modal .tag', ->
-        $('#acts_as_taggable_on_tag_name').val($(this).attr('data-name'))
-        modal = $('#tag_modal')
+      $(document).on 'click', '[data-behavior=remove_tag_from_list]', ->
+        $('#remove_tag_modal #remove_tag_contact_ids').val($('#selected_ids').val())
+        $('#remove_tag_modal').dialog {
+          buttons: [
+            {
+              text: __('Cancel')
+              click: ->
+                $(this).dialog("close")
+            }
+          ]
+        }
+        $('a').blur()
+        false
+
+
+      $(document).on 'click', '#add_tag_modal .tag', ->
+        $('#add_tag_name').val($(this).attr('data-name'))
+        modal = $('#add_tag_modal')
+        modal.dialog( "option", "title", '<%= image_tag('spinner.gif') %>')
+        modal.dialog( "option", "buttons", [])
+        $('form', modal).submit()
+        false
+
+      $(document).on 'click', '#remove_tag_modal .tag', ->
+        $('#remove_tag_name').val($(this).attr('data-name'))
+        modal = $('#remove_tag_modal')
         modal.dialog( "option", "title", '<%= image_tag('spinner.gif') %>')
         modal.dialog( "option", "buttons", [])
         $('form', modal).submit()
