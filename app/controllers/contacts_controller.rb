@@ -6,7 +6,7 @@ class ContactsController < ApplicationController
     @contacts = current_account_list.contacts.order('contacts.name')
     @all_contacts = @contacts.select([:id, :name])
 
-    @contacts = @contacts.includes(:people, :tags)
+    @contacts = @contacts.includes({people: :facebook_account}, :tags)
     if params[:filter] == 'people'
       @contacts = @contacts.people
     end

@@ -24,7 +24,7 @@
       <div class="profiletop">
 
 
-        <div class="avatar"><%= image_tag(contact_exhibit.avatar, class: "mid") %></div>
+        <div class="avatar"><%= image_tag(contact_exhibit.avatar(:large), class: "mid") %></div>
         <div class="quickprofile">
           <h1><%= contact_exhibit %></h1>
           <div class="metaset"><%= contact_exhibit.location %></div>

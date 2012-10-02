@@ -22,8 +22,9 @@ class ContactExhibit < DisplayCase::Exhibit
     }.join('<br />').html_safe
   end
 
-  def avatar
-    'avatar.png'
+  def avatar(size = :square)
+    fb = people.collect(&:facebook_account).flatten.first
+    fb ? "https://graph.facebook.com/#{fb.remote_id}/picture?type=#{size}" : 'avatar.png'
   end
 
   def pledge_as_currency
