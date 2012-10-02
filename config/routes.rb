@@ -1,6 +1,8 @@
 require 'resque/server'
 Mpdx::Application.routes.draw do
 
+  resources :tags, only: [:create, :destroy]
+
   resources :social_streams, only: :index
 
   namespace :api do

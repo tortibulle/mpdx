@@ -10,8 +10,81 @@ $ ->
           false
       })
 
-    if $('#contacts_show')[0]?
+      # check all feature
+      $(document).on 'click', '.checkall', ->
+        $('.checks input[type=checkbox]').prop('checked', $(this).prop('checked'))
+        if $(this).prop('checked')
+          $('.actionbtn').show()
+          $('#select_more').show()
+        else
+          $('.actionbtn').hide()
+          $('#select_more').hide()
 
+        $.mpdx.updateSelectedContactIds()
+
+      $(document).on 'click', '.checks input[type=checkbox]', ->
+        if $('.checks input').is(':checked')
+          $('.actionbtn').show()
+        else
+          $('.actionbtn').hide()
+          $('#select_more').hide()
+          $('.checkall').prop('checked', false)
+
+        $.mpdx.updateSelectedContactIds()
+
+      $(document).on 'click', '[data-behavior=select_all]', ->
+        $('#select_all_prompt').hide()
+        $('#clear_selection_prompt').show()
+        ids = []
+        $.each(contacts_json, ->
+          ids.push(this.value)
+        )
+        $('#selected_ids').val(ids.join(','))
+
+      $(document).on 'click', '[data-behavior=clear_selection]', ->
+        $('#select_more').hide()
+        $('.checkall').prop('checked', false)
+        $('.checks input[type=checkbox]').prop('checked', false)
+        $('#select_all_prompt').show()
+        $('#clear_selection_prompt').hide()
+        $('#selected_ids').val('')
+
+      # Actions
+      $(document).on 'click', '.actionbtn', ->
+        $('.action_list').toggle()
+        $(this).toggleClass('on')
+        false
+
+      $(document).on 'click', '[data-behavior=add_tag_to_list]', ->
+        $('#tag_modal #contact_ids').val($('#selected_ids').val())
+        $('#tag_modal').dialog {
+          buttons: [
+            {
+              text: __('Add Tag')
+              click: (e) ->
+                return false if $.trim($('#acts_as_taggable_on_tag_name').val()) == ''
+                $(this).dialog( "option", "title", '<%= image_tag('spinner.gif') %>')
+                $(this).dialog( "option", "buttons", [])
+                $('form', this).submit()
+            },
+            {
+              text: __('Cancel')
+              click: ->
+                $(this).dialog("close")
+            }
+          ]
+        }
+        false
+
+      $(document).on 'click', '#tag_modal .tag', ->
+        $('#acts_as_taggable_on_tag_name').val($(this).attr('data-name'))
+        modal = $('#tag_modal')
+        modal.dialog( "option", "title", '<%= image_tag('spinner.gif') %>')
+        modal.dialog( "option", "buttons", [])
+        $('form', modal).submit()
+        false
+
+    if $('#contacts_show')[0]?
       # Filter contact list
       $(document).on 'keyup', '#contact_name', ->
         name = $(this).val()
@@ -69,15 +142,14 @@ $ ->
       $('td.qaction[id!='+td.attr('id')+'] a.quick').removeClass('on')
       $('.quick_action_list', td).toggle()
       $(this).toggleClass('on')
-
       false
-    $('td.qaction').hoverIntent { 
+
+    $('td.qaction').hoverIntent {
       over: ->{},
       timeout: 500,
       out: ->
         $('.quick_action_list', $(this)).hide()
         $('a.quick', $(this)).removeClass('on')
-
     }
 
     <%#$(document).on 'focus', '[data-behavior*=social-field]', ->%>
@@ -106,4 +178,9 @@ $ ->
 
     <%#$(document).on 'blur', '[data-behavior*=social-field]', ->%>
       <%#$('[data-behavior=suggestions]', this).hide()%>
+$.mpdx.updateSelectedContactIds = ->
+  ids = []
+  $('[name="contact_ids[]"]:checked').each ->
+    ids.push($(this).val())
+  $('#selected_ids').val(ids.join(','))
 

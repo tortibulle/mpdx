@@ -17,13 +17,13 @@
         </div>
       </div>
     </td>
-    <td class="qaction" id="<%= dom_id(contact) %>_quick">
-      <a href="" class="btn smallbtn quick"><%= t('g.quick') %></a>
+    <td class="qaction" id="<%= dom_id(contact) %>_quick" data-id="<%= contact.id %>">
+      <a href="#" class="btn smallbtn quick"><%= _('Quick') %></a>
       <ul style="display:none" class="quick_action_list">
-        <li><%= link_to(t('g.show'), contact_path(contact), :class => "none") %></li>
-        <li><%= link_to(t('g.edit'), edit_contact_path(contact), :class => "none") %></li>
+        <li><%= link_to(_('Show'), contact_path(contact), :class => "none") %></li>
+        <li><%= link_to(_('Edit'), edit_contact_path(contact), :class => "none") %></li>
       </ul>
     </td>
-    <td class="checks"><input type="checkbox" /></td>
+    <td class="checks"><input type="checkbox" name="contact_ids[]" value="<%= contact.id %>" /></td>
   </tr>
 <% end %>

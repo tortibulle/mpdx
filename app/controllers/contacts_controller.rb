@@ -4,7 +4,6 @@ class ContactsController < ApplicationController
 
   def index
     @contacts = current_account_list.contacts.order('contacts.name')
-    @all_contacts = @contacts.select([:id, :name])
 
     @contacts = @contacts.includes({people: :facebook_account}, :tags)
     if params[:filter] == 'people'
@@ -49,6 +48,7 @@ class ContactsController < ApplicationController
 
     respond_to do |wants|
       wants.html do
+        @all_contacts = @contacts.select([:id, :name])
         @contacts = @contacts.page(params[:page])
       end
       wants.csv do

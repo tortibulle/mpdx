@@ -70,7 +70,7 @@
 
         <li>
           <label><%= _('Referrer') %></label>
-          <%= select_tag :referrer, options_for_select([[_('-- Any --'), '']] + current_account_list.contacts.order('name').collect { |c| [c.name, c.id] }, params[:referrer]), multiple: true, size: 5 %>
+          <%= select_tag :referrer, options_for_select([[_('-- Any --'), '']] + @all_contacts.collect { |c| [c.name, c.id] }, params[:referrer]), multiple: true, size: 5 %>
         </li>
         <li>
         <%= submit_tag _('Filter') %><br />
@@ -86,14 +86,31 @@
   <div class="filters">
     <%= text_field_tag :contact_name, '', autocomplete: 'off', placeholder: _('Type to filter'), class: 'search_filter' %>
     <div class="right">
+      <%= link_to(_('Actions'), "#", class: "btn smallbtn actionbtn", style: 'display:none') %>
+      <%= hidden_field_tag :selected_ids %>
+      <ul style="display:none" class="action_list">
+        <li><%= link_to(_('Add Tag'), '#', class: 'none', data: {behavior: 'add_tag_to_list'}) %></li>
+        <!-- <li><%= link_to(_('Add Task'), '#', class: 'none', data: {behavior: 'add_task_to_list'}) %></li> -->
+      </ul>
+
       <%= link_to(_('Download CSV'), params.merge(format: 'csv'), class: "btn smallbtn") %>
-      <%#= link_to("Actions", "Actions", class: "btn smallbtn") %>
-      <%#<span class="btn smallbtn"><input type="checkbox" /></span>%>
+
+      <span style="margin-right:3px;margin-left:5px"><input type="checkbox" class="checkall" /></span>
     </div>
   </div>
   <div class="">
     <div class="padded">
       <table class="tablelist">
+        <tr id="select_more" style="display:none">
+          <td colspan="3">
+            <span id="select_all_prompt">
+              <%= _('All <strong>%{this_page}</strong> conversations on this page are selected. <a data-behavior="select_all">Select all <strong>%{total}</strong> contacts</a>') % {this_page: @contacts.length, total: @all_contacts.length} %>
+            </span>
+            <span id="clear_selection_prompt" style="display:none">
+              <%= _('All <strong>%{total}</strong> contacts are selected. <a data-behavior="clear_selection">Clear selection</a>') % {total: @all_contacts.length} %>
+            </span>
+          </td>
+        </tr>
         <%= render partial: 'contact', collection: @contacts %>
       </table>
       <%= will_paginate @contacts %>
@@ -101,3 +118,4 @@
     </div>
   </div>
 </div>
+<%= render 'tag_modal' %>

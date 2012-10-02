@@ -152,4 +152,9 @@ $leftmenuwidth: 200px;
   background-image: image-url("delete.png");
 }
 
-
+#select_more {
+  a {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
