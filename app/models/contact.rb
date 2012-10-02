@@ -56,7 +56,7 @@ class Contact < ActiveRecord::Base
                   :people_attributes, :notes, :contact_people_attributes, :full_name, :greeting, :website,
                   :pledge_frequency, :pledge_start_date, :deceased, :next_ask, :never_ask, :likely_to_give,
                   :church_name, :send_newsletter, :direct_deposit, :magazine, :last_activity, :last_appointment,
-                  :last_letter, :last_phone_call, :last_pre_call, :last_thank
+                  :last_letter, :last_phone_call, :last_pre_call, :last_thank, :tag_list
 
   def to_s() name; end
 

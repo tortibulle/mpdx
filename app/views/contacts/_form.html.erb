@@ -40,9 +40,19 @@
     <%= f.select :status, f.object.assignable_send_newsletters.collect { |s| [_(s), s] }, include_blank: true %>
   </div>
 
+  <div class="field">
+    <%= f.label :church_name, _('Church') %>
+    <%= f.text_field :church_name %>
+  </div>
+
+  <div class="field">
+    <%= f.label :tag_list, _('Tags') %>
+    <%= f.text_field :tag_list %>
+  </div>
+
 
   <div class="sfield referrers_field">
-    <label class="fieldset_label">Referrals</label>
+    <label class="fieldset_label"><%= _('Referrals') %></label>
     <% contact.contact_referrals_to_me.build if contact.contact_referrals_to_me.blank? %>
     <%= f.fields_for :contact_referrals_to_me do |builder| %>
       <%= render 'contact_referral_fields', builder: builder, object: contact, no_remove: contact.contact_referrals_to_me.length <= 1 %>
