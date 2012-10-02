@@ -1,15 +1,29 @@
 require 'resque/plugins/lock'
+require 'resque/plugins/retry'
 module Async
   module ClassMethods
-    extend Resque::Plugins::Lock
+    #extend Resque::Plugins::Lock
     #extend Resque::Plugins::Retry
     #@retry_limit = 3
     #@retry_delay = 60
 
+    #@retry_exceptions = [ActiveRecord::RecordNotFound]
+
     # This will be called by a worker when a job needs to be processed
     def perform(id, method, *args)
+      @retries = 0
       if id
-        find(id).send(method, *args)
+        begin
+          find(id).send(method, *args)
+        rescue ActiveRecord::RecordNotFound
+          if @retries < 3
+            @retries += 1
+            sleep(20)
+            retry
+          else
+            raise
+          end
+        end
       else
         new.send(method, *args)
       end

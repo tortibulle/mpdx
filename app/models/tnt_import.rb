@@ -27,8 +27,6 @@ class TntImport
   end
 
   def import_contacts
-    sleep(20) # give it some time to make sure the file upload finished
-
     Contact.transaction do
       # we need to take some extra steps to get the file opened with the right encoding
       @import.file.cache_stored_file!

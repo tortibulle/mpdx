@@ -3,6 +3,7 @@
 
 #Resque::Failure::MultipleWithRetrySuppression.classes = [Resque::Failure::Redis]
 #Resque::Failure.backend = Resque::Failure::MultipleWithRetrySuppression
+
 rails_root = ENV['RAILS_ROOT'] || File.dirname(__FILE__) + '/../..'
 rails_env = ENV['RAILS_ENV'] || 'development'
 
