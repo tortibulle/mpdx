@@ -390,11 +390,11 @@ div.name {font-size: 14px; margin-bottom: 4px;}
     @include listclear;
     li {border-bottom: 1px solid $borders;}
     li.selected {background: $white; a, span{border-left: 1px solid $borders;}}
-    li a, li span {display: block; line-height: 3em; padding: 0 15px 0 35px;}
+    li a.menu_item, li span.menu_item {display: block; line-height: 3em; padding: 0 15px 0 35px;}
   }
   
   ul li {
-    a, span {background: image-url("sprite.png") no-repeat 0 50%; color: #000; font-weight: bold; font-size: 13px; font-family: 'FreightSansProMedium';}
+    a.menu_item, span.menu_item {background: image-url("sprite.png") no-repeat 0 50%; color: #000; font-weight: bold; font-size: 13px; font-family: 'FreightSansProMedium';}
     a.inbox {background-position: 5px 10px;}
     a.starred {background-position: 5px -55px;}
     a.completed {background-position: 5px -119px;}

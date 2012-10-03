@@ -1,12 +1,11 @@
 <aside id="leftmenu">
 <ul>
-  <li class="<%= 'selected' if params[:action] == 'index' %>"><%= link_to(_('Active/Upcoming'), tasks_path, class: "inbox") %></li>
-  <li class="<%= 'selected' if params[:action] == 'starred' %>"><%= link_to(_('Starred'), starred_tasks_path, class: "starred") %></li>
-  <!-- <li class="<%= 'selected' if params[:action] == 'completed' %>"><%= link_to(_('Completed'), completed_tasks_path, class: "completed") %></li> -->
-  <li class="<%= 'selected' if params[:action] == 'history' %>"><%= link_to(_('History'), history_tasks_path, class: "completed") %></li>
+  <li class="<%= 'selected' if params[:action] == 'index' %>"><%= link_to(_('Active/Upcoming'), tasks_path, class: "inbox menu_item") %></li>
+  <li class="<%= 'selected' if params[:action] == 'starred' %>"><%= link_to(_('Starred'), starred_tasks_path, class: "starred menu_item") %></li>
+  <li class="<%= 'selected' if params[:action] == 'history' %>"><%= link_to(_('History'), history_tasks_path, class: "completed menu_item") %></li>
   <% if current_account_list.activity_tags.present? %>
     <li class="<%= 'selected' if params[:tags] %>">
-      <span class="tags"><%= _('Tags') %></span>
+      <span class="tags menu_item"><%= _('Tags') %></span>
       <ul class="left_taglist tags">
         <li>
           <% current_account_list.activity_tags.each do |tag| 
@@ -27,7 +26,7 @@
   <% end %>
   <li>
     <%= form_tag params.slice(:controller, :action), method: :get do %>
-      <span class="left_filters"><%= _('Filters') %></span>
+      <span class="left_filters menu_item"><%= _('Filters') %></span>
       <ul class="left_filters">
         <% if params[:action] == 'history' %>
           <li>

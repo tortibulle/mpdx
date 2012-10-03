@@ -1,6 +1,6 @@
 $ ->
 
-  $('.tooltipsy').tooltipsy()
+  $('.tip, .qtip').tooltipsy()
 
   $(document).on 'mouseleave', 'div[data-behavior=account_selector]', ->
     $('div[data-behavior=account_selector] div').hide()

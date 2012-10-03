@@ -23,6 +23,10 @@ module ApplicationHelper
     link_to_function(name, raw("addFields(this, \"#{association}\", \"#{escape_javascript(fields)}\")"), class: "add_field")
   end
 
+  def tip(tip, options = {})
+    tag('span', class: 'qtip', title: tip, style: options[:style])
+  end
+
   def spinner(options = {})
     id = options[:extra] ? "spinner_#{options[:extra]}" : 'spinner'
     style = options[:visible] ? '' : 'display:none'

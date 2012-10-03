@@ -34,7 +34,7 @@
             <td><%= _(task_exhibit.activity_type) %></td>
             <td>
               <% if task.attempted? %>
-                <%= link_to(_(task_exhibit.result), new_task_path(from: task.id), title: _('Click here to reschedule this task'), class: 'tooltipsy') %>
+                <%= link_to(_(task_exhibit.result), new_task_path(from: task.id), title: _('Click here to reschedule this task'), class: 'tip') %>
               <% else %>
                 <%= _(task_exhibit.result) %>
               <% end %>
