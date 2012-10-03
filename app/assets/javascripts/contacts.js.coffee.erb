@@ -108,6 +108,39 @@ $ ->
         $('form', modal).submit()
         false
 
+      $(document).on 'click', '[data-behavior=add_task_to_list]', ->
+        $('#add_task_modal #add_task_contact_ids').val($('#selected_ids').val())
+        $('#add_task_modal').dialog {
+          width: 'auto',
+          buttons: [
+            {
+              text: __('Add Task')
+              click: (e) ->
+                return false if $.trim($('#task_subject').val()) == ''
+                $('form', this).submit()
+                $('.form_wrapper', this).html('<%= image_tag('spinner.gif') %>')
+                $(this).dialog( "option", "buttons", [])
+            },
+            {
+              text: __('Cancel')
+              click: ->
+                $(this).dialog("close")
+            }
+          ]
+        }
+        $('#add_tag_name').focus()
+        false
+
+
+      $('#contacts_actions').hoverIntent {
+        over: ->{},
+        timeout: 500,
+        out: ->
+          $('.action_list', $(this)).hide()
+          $('a.actionbtn', $(this)).removeClass('on')
+      }
+
+
     if $('#contacts_show')[0]?
       # Filter contact list
       $(document).on 'keyup', '#contact_name', ->

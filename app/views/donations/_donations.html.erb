@@ -20,7 +20,7 @@
   <tbody>
 <% end %>
     <% donations.map {|d| exhibit(d, self)}.each do |donation| %>
-      <tr>
+      <tr id="<%= donation.id %>">
         <td class="date"><%= l donation.donation_date %></td>
         <% unless @contact %>
           <td><%= donation.donor_account.name %></td>

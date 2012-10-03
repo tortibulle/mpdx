@@ -71,14 +71,28 @@ class TasksController < ApplicationController
   def create
     @task = current_account_list.tasks.new(params[:task])
 
-    respond_to do |format|
-      if @task.save
-        format.html {
-          redirect_to (session[:contact_redirect_to] || tasks_path)
-          session[:contact_redirect_to] = nil
-        }
+    if params[:add_task_contact_ids].present?
+      # First validate the task fields
+      if @task.valid?
+        # Create a copy of the task for each contact selected
+        contacts = current_account_list.contacts.find_all_by_id(params[:add_task_contact_ids].split(','))
+        contacts.each do |c|
+          @task = current_account_list.tasks.create(params[:task])
+          ActivityContact.create(activity_id: @task.id, contact_id: c.id)
+        end
       else
-        format.html { render action: "new" }
+        render action: "new"
+      end
+    else
+      respond_to do |format|
+        if @task.save
+          format.html {
+            redirect_to (session[:contact_redirect_to] || tasks_path)
+            session[:contact_redirect_to] = nil
+          }
+        else
+          format.html { render action: "new" }
+        end
       end
     end
   end

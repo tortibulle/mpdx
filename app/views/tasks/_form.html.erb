@@ -1,43 +1,6 @@
 <%= form_for(task) do |f| %>
-  <% if task && task.errors.any? %>
-    <div id="error_explanation">
-      <ul>
-        <% task.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
 
-
-  <div class="field">
-    <%= f.label :subject, _('Subject') %>
-    <%= f.text_field :subject %>
-  </div>
-
-  <% if @task.completed? %>
-    <%= f.hidden_field :completed %>
-    <div class="field">
-      <%= f.label :start_at, _('Completed On') %>
-      <%= f.date_select :start_at, ampm: true, default: Date.today %>
-    </div>
-
-  <% else %>
-    <div class="field">
-      <%= f.label :start_at, _('Due Date') %>
-      <%= f.datetime_select :start_at, ampm: true, default: 1.day.from_now %>
-    </div>
-  <% end %>
-
-  <div class="field">
-    <%= f.label :activity_type, _('Action') %>
-    <%= f.select :activity_type, f.object.assignable_activity_types.collect { |s| [_(s), s] } %>
-  </div>
-
-  <div class="field">
-    <%= f.label :tag_list, _('Tags') %>
-    <%= f.text_field :tag_list %>
-  </div>
+  <%= render 'tasks/fields', task: task, f: f %>
 
   <div style="<%= params[:contact_id] ? 'display:none' : '' %>">
     <% task.activity_contacts.build if task.activity_contacts.blank? %>
@@ -53,11 +16,8 @@
   <div class="spacer"></div>
 
   <div class="actions">
-    <%= f.submit @task.completed? ? _('Log Task') : _('Save Task'), :class => "btn" %>
+    <%= f.submit task.completed? ? _('Log Task') : _('Save Task'), :class => "btn" %>
     <%= link_to _('Cancel'), tasks_path, :class=> "btn" %>
   </div>
-  
-  
-  
-  
+
 <% end %>

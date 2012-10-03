@@ -86,13 +86,13 @@
 <div id="contentbody" class="withleft">
   <div class="filters">
     <%= text_field_tag :contact_name, '', autocomplete: 'off', placeholder: _('Type to filter'), class: 'search_filter' %>
-    <div class="right">
+    <div class="right" id="contacts_actions">
       <%= link_to(_('Actions'), "#", class: "btn smallbtn actionbtn", style: 'display:none') %>
       <%= hidden_field_tag :selected_ids %>
       <ul style="display:none" class="action_list">
         <li><%= link_to(_('Add Tag'), '#', class: 'none', data: {behavior: 'add_tag_to_list'}) %></li>
         <li><%= link_to(_('Remove Tag'), '#', class: 'none', data: {behavior: 'remove_tag_from_list'}) %></li>
-        <!-- <li><%= link_to(_('Add Task'), '#', class: 'none', data: {behavior: 'add_task_to_list'}) %></li> -->
+        <li><%= link_to(_('Add Task'), '#', class: 'none', data: {behavior: 'add_task_to_list'}) %></li>
       </ul>
 
       <%= link_to(_('Download CSV'), params.merge(format: 'csv'), class: "btn smallbtn") %>
@@ -120,4 +120,6 @@
     </div>
   </div>
 </div>
+
 <%= render 'tag_modals' %>
+<%= render 'task_modal' %>
