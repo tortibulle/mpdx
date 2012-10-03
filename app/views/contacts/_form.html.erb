@@ -37,7 +37,7 @@
 
   <div class="field">
     <%= f.label :send_newsletter, _('Newsletter') %>
-    <%= f.select :status, f.object.assignable_send_newsletters.collect { |s| [_(s), s] }, include_blank: true %>
+    <%= f.select :send_newsletter, f.object.assignable_send_newsletters.collect { |s| [_(s), s] }, include_blank: true %>
   </div>
 
   <div class="field">
