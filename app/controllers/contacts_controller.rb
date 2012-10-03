@@ -48,7 +48,7 @@ class ContactsController < ApplicationController
 
     respond_to do |wants|
       wants.html do
-        @all_contacts = @contacts.select([:id, :name])
+        @all_contacts = @contacts.select(['contacts.id', 'contacts.name'])
         @contacts = @contacts.page(params[:page])
       end
       wants.csv do

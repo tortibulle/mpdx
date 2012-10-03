@@ -32,6 +32,13 @@ describe ContactsController do
         assigns(:contacts).should == [@contact2]
       end
 
+      it "should filter by tag" do
+        @contact.update_attributes(tag_list: 'asdf')
+        get :index, tags: 'asdf'
+        response.should be_success
+        assigns(:all_contacts).should == [@contact]
+      end
+
     end
 
     describe 'GET show' do
