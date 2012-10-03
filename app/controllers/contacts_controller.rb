@@ -32,18 +32,17 @@ class ContactsController < ApplicationController
     end
 
     if params[:newsletter].present?
-      @contacts = @contacts.where('send_newsletter is not null')
       case params[:newsletter]
       when 'address'
+        @contacts = @contacts.where(send_newsletter: 'Physical')
         @contacts = @contacts.joins(:addresses).where('street is not null')
       when 'email'
+        @contacts = @contacts.where(send_newsletter: 'Email')
         @contacts = @contacts.joins(people: :email_addresses)
         @contacts = @contacts.uniq unless @contacts.to_sql.include?('INNER JOIN')
+      else
+        @contacts = @contacts.where('send_newsletter is not null')
       end
-    end
-
-    if params[:send_newsletter].present? && params[:send_newsletter].first != ''
-      @contacts = @contacts.where(send_newsletter: params[:send_newsletter])
     end
 
     respond_to do |wants|

@@ -44,13 +44,8 @@
           <label><%= _('Newsletter Recipients') %></label>
           <%= radio_button_tag :newsletter, '', params[:newsletter].blank? %> <%= _('-- Any --') %><br />
           <%= radio_button_tag :newsletter, 'all', params[:newsletter] == 'all' %> <%= _('All') %><br />
-          <%= radio_button_tag :newsletter, 'address', params[:newsletter] == 'address' %> <%= _('With Mailing Address') %><br />
-          <%= radio_button_tag :newsletter, 'email', params[:newsletter] == 'email' %> <%= _('With Valid Email') %>
-        </li>
-
-        <li>
-          <label><%= _('Send Newsletter') %></label>
-          <%= select_tag :send_newsletter, options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_send_newsletters, params[:send_newsletter]), multiple: true, size: 4 %>
+          <%= radio_button_tag :newsletter, 'address', params[:newsletter] == 'address' %> <%= _('Physical - With Address') %><br />
+          <%= radio_button_tag :newsletter, 'email', params[:newsletter] == 'email' %> <%= _('Email - With Email Address') %>
         </li>
 
         <li>
