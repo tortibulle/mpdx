@@ -19,7 +19,7 @@
       <div class="actions">
         <%= link_to(t('g.edit'), edit_person_path(@person), :class=> "btn smallbtn") %>
       </div>
-      <div class="avatar"><%= image_tag(person_exhibit.avatar, class: "mid") %></div>
+      <div class="avatar"><%= image_tag(person_exhibit.avatar(:large), class: "mid") %></div>
       <div class="quickprofile">
         <h1><%= person_exhibit %></h1>
         <% if person_exhibit.company_position %>

@@ -24,7 +24,8 @@ class PersonExhibit < DisplayCase::Exhibit
     [phone_number, email].compact.map {|e| exhibit(e, @context)}.join('<br />').html_safe
   end
 
-  def avatar
+  def avatar(size = :square)
+    return "https://graph.facebook.com/#{facebook_account.remote_id}/picture?type=#{size}" if facebook_account
     if gender == 'female'
       'avatar_f.png'
     else
