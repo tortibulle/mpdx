@@ -1,27 +1,31 @@
 <div id="add_tag_modal" title="<%= _('Add Tag') %>" style="display:none">
-  <%= form_for ActsAsTaggableOn::Tag.new, url: tags_path, :namespace => 'add_tag' do |f| %>
-    <%= hidden_field_tag 'add_tag_contact_ids' %>
-    <p><%= _('Choose an existing tag, or create a new tag:') %></p>
-    <ul>
-      <% current_account_list.contact_tags.each do |tag| %>
-        <li><a href="#" class="tag" data-name="<%= tag %>"><%= tag %></a></li>
-      <% end %>
-    </ul>
-    <%= label_tag :add_tag_name, _('New Tag') %>
-    <%= text_field_tag :add_tag_name %>
-  <% end %>
+  <div class="form_wrapper">
+    <%= form_for ActsAsTaggableOn::Tag.new, url: tags_path, namespace: 'add_tag', remote: true do |f| %>
+      <%= hidden_field_tag 'add_tag_contact_ids' %>
+      <p><%= _('Choose an existing tag, or create a new tag:') %></p>
+      <ul>
+        <% current_account_list.contact_tags.each do |tag| %>
+          <li><a href="#" class="tag" data-name="<%= tag %>"><%= tag %></a></li>
+        <% end %>
+      </ul>
+      <%= label_tag :add_tag_name, _('New Tag') %>
+      <%= text_field_tag :add_tag_name %>
+    <% end %>
+  </div>
 </div>
 
 <div id="remove_tag_modal" title="<%= _('Remove Tag') %>" style="display:none">
-  <%= form_for ActsAsTaggableOn::Tag.new, url: '/tags/1', method: :delete, :namespace => 'remove_tag' do |f| %>
-    <%= hidden_field_tag 'remove_tag_contact_ids' %>
-    <p><%= _('Click on a tag to remove it from selected contacts.') %></p>
-    <ul>
-      <% current_account_list.contact_tags.each do |tag| %>
-        <li><a href="#" class="tag" data-name="<%= tag %>"><%= tag %></a></li>
-      <% end %>
-    </ul>
-    <%= hidden_field_tag :remove_tag_name %>
-  <% end %>
+  <div class="form_wrapper">
+    <%= form_for ActsAsTaggableOn::Tag.new, url: '/tags/1', method: :delete, namespace: 'remove_tag', remote: true do |f| %>
+      <%= hidden_field_tag 'remove_tag_contact_ids' %>
+      <p><%= _('Click on a tag to remove it from selected contacts.') %></p>
+      <ul>
+        <% current_account_list.contact_tags.each do |tag| %>
+          <li><a href="#" class="tag" data-name="<%= tag %>"><%= tag %></a></li>
+        <% end %>
+      </ul>
+      <%= hidden_field_tag :remove_tag_name %>
+    <% end %>
+  </div>
 </div>
 

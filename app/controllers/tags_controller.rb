@@ -7,7 +7,6 @@ class TagsController < ApplicationController
         c.save
       end
     end
-    redirect_to :back
   end
 
   def destroy
@@ -18,6 +17,5 @@ class TagsController < ApplicationController
         c.save
       end
     end
-    redirect_to :back
   end
 end

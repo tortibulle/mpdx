@@ -95,17 +95,17 @@ $ ->
       $(document).on 'click', '#add_tag_modal .tag', ->
         $('#add_tag_name').val($(this).attr('data-name'))
         modal = $('#add_tag_modal')
-        modal.dialog( "option", "title", '<%= image_tag('spinner.gif') %>')
-        modal.dialog( "option", "buttons", [])
         $('form', modal).submit()
+        $('.form_wrapper', modal).html('<%= image_tag('spinner.gif') %>')
+        modal.dialog( "option", "buttons", [])
         false
 
       $(document).on 'click', '#remove_tag_modal .tag', ->
         $('#remove_tag_name').val($(this).attr('data-name'))
         modal = $('#remove_tag_modal')
-        modal.dialog( "option", "title", '<%= image_tag('spinner.gif') %>')
-        modal.dialog( "option", "buttons", [])
         $('form', modal).submit()
+        $('.form_wrapper', modal).html('<%= image_tag('spinner.gif') %>')
+        modal.dialog( "option", "buttons", [])
         false
 
       $(document).on 'click', '[data-behavior=add_task_to_list]', ->
