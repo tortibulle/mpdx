@@ -40,13 +40,13 @@
           '#B5CA92'
         ],
         title: {
-          text: 'Donation History'
+          text: '<%= _('Donation History') %>'
         },
         subtitle: {
           text: '<%== if prior_average > average 
-                       "Average donations down <span style=\"color:red\">#{number_to_current_currency(prior_average - average)}</span> from last year"
+                       _("Average donations down <span style=\"color:red\">#{number_to_current_currency(prior_average - average)}</span> from last year")
                      elsif average > prior_average
-                       "Average donations up <span style=\"color:green\">#{number_to_current_currency(average - prior_average)}</span> from last year"
+                       _("Average donations up <span style=\"color:green\">#{number_to_current_currency(average - prior_average)}</span> from last year")
                      else
                        ''
                       end %>'
