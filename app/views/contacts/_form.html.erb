@@ -25,25 +25,7 @@
     <%= f.text_field :pledge_amount %>
   </div>
 
-  <div class="field">
-    <%= f.label :likely_to_give, _('Likely to Give') %>
-    <%= f.select :likely_to_give, f.object.assignable_likely_to_gives.collect { |s| [_(s), s] }, include_blank: true %>
-  </div>
-
-  <div class="field">
-    <%= f.label :status, _('Status') %>
-    <%= f.select :status, f.object.assignable_statuses.collect { |s| [_(s), s] }, include_blank: true %>
-  </div>
-
-  <div class="field">
-    <%= f.label :send_newsletter, _('Newsletter') %>
-    <%= f.select :send_newsletter, f.object.assignable_send_newsletters.collect { |s| [_(s), s] }, include_blank: true %>
-  </div>
-
-  <div class="field">
-    <%= f.label :church_name, _('Church') %>
-    <%= f.text_field :church_name %>
-  </div>
+  <%= render 'contacts/bulk_fields', f: f %>
 
   <div class="field">
     <%= f.label :tag_list, _('Tags') %>

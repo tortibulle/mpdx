@@ -93,6 +93,7 @@
         <li><%= link_to(_('Add Tag'), '#', class: 'none', data: {behavior: 'add_tag_to_list'}) %></li>
         <li><%= link_to(_('Remove Tag'), '#', class: 'none', data: {behavior: 'remove_tag_from_list'}) %></li>
         <li><%= link_to(_('Add Task'), '#', class: 'none', data: {behavior: 'add_task_to_list'}) %></li>
+        <li><%= link_to(_('Edit Fields'), '#', class: 'none', data: {behavior: 'bulk_edit'}) %></li>
       </ul>
 
       <%= link_to(_('Download CSV'), params.merge(format: 'csv'), class: "btn smallbtn") %>
@@ -123,3 +124,4 @@
 
 <%= render 'tag_modals' %>
 <%= render 'task_modal' %>
+<%= render 'edit_modal' %>

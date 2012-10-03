@@ -40,10 +40,6 @@ class Contact < ActiveRecord::Base
   end
 
   assignable_values_for :likely_to_give, allow_blank: true do
-    [1,2,3]
-  end
-
-  assignable_values_for :likely_to_give, allow_blank: true do
     ['Least Likely', 'Likely', 'Most Likely']
   end
 

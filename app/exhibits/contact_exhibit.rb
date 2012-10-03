@@ -31,11 +31,6 @@ class ContactExhibit < DisplayCase::Exhibit
     @context.number_to_currency(pledge_amount, precision: 0)
   end
 
-  def likely_to_give
-    return nil unless to_model.likely_to_give
-    Contact.giving_likelihoods[to_model.likely_to_give - 1]
-  end
-
   def notes_saved_at
     return '' unless to_model.notes_saved_at
     to_model.notes_saved_at.to_datetime.localize(@context.locale).to_medium_s

@@ -103,7 +103,7 @@ class TntImport
     contact.pledge_start_date = parse_date(line['Pledge Start Date']) if (@import.override? || contact.pledge_start_date.blank?) && line['Pledge Start Date'].present?
     contact.status = lookup_mpd_phase(line['MPD Phase']) if (@import.override? || contact.status.blank?) && lookup_mpd_phase(line['MPD Phase']).present?
     contact.next_ask = parse_date(line['Next Ask']) if (@import.override? || contact.next_ask.blank?) && line['Next Ask'].present?
-    contact.likely_to_give = line['Likely To Give'] if (@import.override? || contact.likely_to_give.blank?) && line['Likely To Give'].to_i != 0
+    contact.likely_to_give = contact.assignable_likely_to_gives[line['Likely To Give'].to_i - 1] if (@import.override? || contact.likely_to_give.blank?) && line['Likely To Give'].to_i != 0
     contact.never_ask = is_true?(line['Never Ask']) if @import.override? || contact.never_ask.blank?
     contact.church_name = line['Church Name'] if @import.override? || contact.church_name.blank?
     contact.send_newsletter = 'Physical' if (@import.override? || contact.send_newsletter.blank?) && is_true?(line['Send Newsletter'])

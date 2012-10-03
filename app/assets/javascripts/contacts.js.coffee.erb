@@ -63,9 +63,9 @@ $ ->
               text: __('Add Tag')
               click: (e) ->
                 return false if $.trim($('#add_tag_name').val()) == ''
-                $(this).dialog( "option", "title", '<%= image_tag('spinner.gif') %>')
-                $(this).dialog( "option", "buttons", [])
                 $('form', this).submit()
+                $('.form_wrapper', this).html('<%= image_tag('spinner.gif') %>')
+                $(this).dialog( "option", "buttons", [])
             },
             {
               text: __('Cancel')
@@ -117,6 +117,27 @@ $ ->
               text: __('Add Task')
               click: (e) ->
                 return false if $.trim($('#task_subject').val()) == ''
+                $('form', this).submit()
+                $('.form_wrapper', this).html('<%= image_tag('spinner.gif') %>')
+                $(this).dialog( "option", "buttons", [])
+            },
+            {
+              text: __('Cancel')
+              click: ->
+                $(this).dialog("close")
+            }
+          ]
+        }
+        $('#add_tag_name').focus()
+        false
+
+      $(document).on 'click', '[data-behavior=bulk_edit]', ->
+        $('#bulk_edit_modal #bulk_edit_contact_ids').val($('#selected_ids').val())
+        $('#bulk_edit_modal').dialog {
+          buttons: [
+            {
+              text: __('Update')
+              click: (e) ->
                 $('form', this).submit()
                 $('.form_wrapper', this).html('<%= image_tag('spinner.gif') %>')
                 $(this).dialog( "option", "buttons", [])

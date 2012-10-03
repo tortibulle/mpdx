@@ -29,6 +29,7 @@ Mpdx::Application.routes.draw do
   resources :contacts do
     collection do
       get :social_search
+      post :bulk_update
     end
     resources :people
   end

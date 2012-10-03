@@ -97,6 +97,11 @@ class ContactsController < ApplicationController
     end
   end
 
+  def bulk_update
+    contacts = current_account_list.contacts.where(id: params[:bulk_edit_contact_ids].split(','))
+    contacts.update_all(params[:contact].select { |_, v| v.present? })
+  end
+
   def destroy
     @contact = current_account_list.contacts.find(params[:id])
     @contact.destroy
