@@ -49,16 +49,24 @@ class Person::FacebookAccount < ActiveRecord::Base
   end
 
   def get_id_from_url(url)
+    tries ||= 3
     # e.g. https://graph.facebook.com/nmfdelacruz)
     if url.include?("id=")
-      url.split('id=').last
+      id = url.split('id=').last
+      id = id.split('&').first
     else
       name = url.split('/').last
+      name = name.split('?').first
       response = RestClient.get("https://graph.facebook.com/#{name}", { accept: :json})
       json = JSON.parse(response)
       raise RestClient::ResourceNotFound unless json['id'].to_i > 0
       json['id']
     end.to_i
+  rescue RestClient::Forbidden
+    if (tries -= 1) > 0
+      sleep(0.5)
+      retry
+    end
   end
 
   def queue_import_contacts(import)
