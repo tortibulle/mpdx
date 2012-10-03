@@ -168,8 +168,12 @@
         </div>
 
         <div id="stream-tab">
-          <%= spinner(extra: 'social', visible: true) %>
-          <div id="social"></div>
+          <% if current_user.facebook_account.try(:token) %>
+            <%= spinner(extra: 'social', visible: true) %>
+            <div id="social"></div>
+          <% else %>
+            <%= link_to(_('Click here to link your facebook account.'), '/auth/facebook') %>
+          <% end %>
         </div>
       </div>
 
