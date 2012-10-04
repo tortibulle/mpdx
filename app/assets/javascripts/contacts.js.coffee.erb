@@ -30,6 +30,12 @@ $ ->
           $('#select_more').hide()
           $('.checkall').prop('checked', false)
 
+        # Only show merge button if 2 checkboxes are checked
+        if $('.checks input:checked').length == 2
+          $('[data-behavior=merge]').show()
+        else
+          $('[data-behavior=merge]').hide()
+
         $.mpdx.updateSelectedContactIds()
 
       $(document).on 'click', '[data-behavior=select_all]', ->
@@ -150,6 +156,26 @@ $ ->
           ]
         }
         $('#add_tag_name').focus()
+        false
+
+      $(document).on 'click', '[data-behavior=merge]', ->
+        $('#merge_modal #merge_contact_ids').val($('#selected_ids').val())
+        $('#merge_modal').dialog {
+          buttons: [
+            {
+              text: __('Merge')
+              click: (e) ->
+                $('form', this).submit()
+                $('.form_wrapper', this).html('<%= image_tag('spinner.gif') %>')
+                $(this).dialog( "option", "buttons", [])
+            },
+            {
+              text: __('Cancel')
+              click: ->
+                $(this).dialog("close")
+            }
+          ]
+        }
         false
 
 

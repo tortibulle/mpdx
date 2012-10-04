@@ -1,0 +1,8 @@
+<div id="merge_modal" title="<%= _('Merge Contacts') %>" style="display:none">
+  <div class="form_wrapper">
+    <%= form_tag merge_contacts_path do |f| %>
+      <%= hidden_field_tag :merge_contact_ids %>
+    <% end %>
+    <%= _('Are you sure you want to merge the selected contacts? This action cannot be undone!') %>
+  </div>
+</div>

@@ -30,6 +30,7 @@ Mpdx::Application.routes.draw do
     collection do
       get :social_search
       post :bulk_update
+      post :merge
     end
     resources :people
   end

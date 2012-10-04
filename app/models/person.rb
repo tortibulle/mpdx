@@ -8,6 +8,7 @@ class Person < ActiveRecord::Base
   has_many :family_relationships, dependent: :destroy
   has_many :related_people, through: :family_relationships
   has_one :company_position, class_name: 'CompanyPosition', foreign_key: :person_id, conditions: "company_positions.end_date is null", order: "company_positions.start_date desc"
+  has_many :company_positions, dependent: :destroy
   has_many :twitter_accounts, class_name: 'Person::TwitterAccount', foreign_key: :person_id, dependent: :destroy
   has_one :twitter_account, class_name: 'Person::TwitterAccount', foreign_key: :person_id, conditions: {'person_twitter_accounts.primary' => true}
   has_many :facebook_accounts, class_name: 'Person::FacebookAccount', foreign_key: :person_id, dependent: :destroy
@@ -18,7 +19,6 @@ class Person < ActiveRecord::Base
   has_many :relay_accounts, class_name: 'Person::RelayAccount', foreign_key: :person_id, dependent: :destroy
   has_many :organization_accounts, class_name: 'Person::OrganizationAccount', foreign_key: :person_id, dependent: :destroy
   has_many :key_accounts, class_name: 'Person::KeyAccount', foreign_key: :person_id, dependent: :destroy
-  has_many :company_positions, dependent: :destroy
   has_many :companies, through: :company_positions
   has_many :donor_accounts, through: :master_person
   has_many :contact_people, dependent: :destroy
@@ -105,6 +105,27 @@ class Person < ActiveRecord::Base
 
   def phone_number
     primary_phone_number
+  end
+
+  def merge(other)
+    %w[email_addresses phone_numbers family_relationships company_positions twitter_accounts facebook_accounts linkedin_accounts
+      google_accounts relay_accounts organization_accounts contact_people].each do |relationships|
+      other.send(relationship.to_sym).update_all(person_id: id)
+    end
+    FamilyRelationship.where(related_person_id: other.id).update_all(related_person_id: id)
+
+    # Copy fields over updating any field that's blank on the winner
+    [:first_name, :last_name, :legal_first_name, :birthday_month, :birthday_year, :birthday_day, :anniversary_month,
+     :anniversary_year, :anniversary_day, :title, :suffix, :gender, :marital_status, :preferences,
+     :phone_number, :email_address, :middle_name, :email, :time_zone, :locale].each do |field|
+      if send(field).blank? && other.send(field).present?
+        send("#{field}=".to_sym, other.send(field))
+      end
+    end
+
+    save(validate: false)
+    other.reload
+    other.destroy
   end
 
   def self.clone(person)

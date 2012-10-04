@@ -88,6 +88,7 @@
     <%= text_field_tag :contact_name, '', autocomplete: 'off', placeholder: _('Type to filter'), class: 'search_filter' %>
     <div class="right" id="contacts_actions">
       <%= link_to(_('Actions'), "#", class: "btn smallbtn actionbtn", style: 'display:none') %>
+      <%= link_to(_('Merge'), '#', class: 'btn smallbtn', style: 'display:none', data: {behavior: 'merge'}) %>
       <%= hidden_field_tag :selected_ids %>
       <ul style="display:none" class="action_list">
         <li><%= link_to(_('Add Tag'), '#', class: 'none', data: {behavior: 'add_tag_to_list'}) %></li>
@@ -125,3 +126,4 @@
 <%= render 'tag_modals' %>
 <%= render 'task_modal' %>
 <%= render 'edit_modal' %>
+<%= render 'merge_modal' %>

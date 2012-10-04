@@ -102,6 +102,22 @@ class ContactsController < ApplicationController
     contacts.update_all(params[:contact].select { |_, v| v.present? })
   end
 
+
+  def merge
+    # When performing a merge we want to keep the contact with the most people
+    contacts = current_account_list.contacts.includes(:people).
+               where(id: params[:merge_contact_ids].split(','))
+    if contacts.length > 1
+      winner = contacts.max_by {|c| c.people.length}
+      Contact.transaction do
+        (contacts - [winner]).each do |loser|
+          winner.merge(loser)
+        end
+      end
+    end
+    redirect_to :back
+  end
+
   def destroy
     @contact = current_account_list.contacts.find(params[:id])
     @contact.destroy
