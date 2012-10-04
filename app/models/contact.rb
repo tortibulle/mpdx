@@ -100,7 +100,8 @@ class Contact < ActiveRecord::Base
     # Merge people that have the same name
     people.each do |person|
       if other_person = other.people.detect { |p| p.first_name == person.first_name &&
-                                                  p.last_name == person.last_name }
+                                                  p.last_name == person.last_name &&
+                                                  p.id != person.id }
         person.merge(other_person)
         # don't check this person next time through the loop
         other.people -= [other_person]
@@ -109,7 +110,12 @@ class Contact < ActiveRecord::Base
 
     # Update related records
     %w[contact_donor_accounts contact_people activity_contacts].each do |relationship|
-      other.send(relationship.to_sym).update_all(contact_id: id)
+      other.send(relationship.to_sym).each do |r|
+        begin
+          r.update_attributes(contact_id: id)
+        rescue ActiveRecord::RecordNotUnique
+        end
+      end
     end
     other.addresses.update_all(addressable_id: id)
     ContactReferral.where(referred_to_id: other.id).update_all(referred_to_id: id)
