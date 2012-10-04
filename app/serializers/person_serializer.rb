@@ -10,6 +10,6 @@ class PersonSerializer < ActiveModel::Serializer
 
   def avatar
     person_exhibit = exhibit(object)
-    '/assets/' + person_exhibit.avatar
+    person_exhibit.avatar
   end
 end

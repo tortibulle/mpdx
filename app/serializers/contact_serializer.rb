@@ -10,7 +10,8 @@ class ContactSerializer < ActiveModel::Serializer
   has_many :people, :addresses
 
   def avatar
-    '/assets/avatar.png'
+    contact_exhibit = exhibit(object)
+    contact_exhibit.avatar
   end
 
 end
