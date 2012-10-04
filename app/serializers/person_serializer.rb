@@ -10,6 +10,6 @@ class PersonSerializer < ActiveModel::Serializer
 
   def avatar
     person_exhibit = exhibit(object)
-    person_exhibit.avatar
+    person_exhibit.avatar(:large)
   end
 end

@@ -12,7 +12,7 @@ class ContactSerializer < ActiveModel::Serializer
 
   def avatar
     contact_exhibit = exhibit(object)
-    contact_exhibit.avatar
+    contact_exhibit.avatar(:large)
   end
 
 end
