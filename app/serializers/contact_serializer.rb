@@ -1,4 +1,5 @@
 class ContactSerializer < ActiveModel::Serializer
+  include DisplayCase::ExhibitsHelper
 
   embed :ids, include: true
 
