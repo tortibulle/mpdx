@@ -97,44 +97,49 @@ class Contact < ActiveRecord::Base
   end
 
   def merge(other)
-    # Merge people that have the same name
-    people.each do |person|
-      if other_person = other.people.detect { |p| p.first_name == person.first_name &&
-                                                  p.last_name == person.last_name &&
-                                                  p.id != person.id }
-        person.merge(other_person)
-        # don't check this person next time through the loop
-        other.people -= [other_person]
-      end
-    end
-
-    # Update related records
-    %w[contact_donor_accounts contact_people activity_contacts].each do |relationship|
-      other.send(relationship.to_sym).each do |r|
-        begin
-          r.update_attributes(contact_id: id)
-        rescue ActiveRecord::RecordNotUnique
+    Contact.transaction do
+      # Merge people that have the same name
+      people.each do |person|
+        if other_person = other.people.detect { |p| p.first_name == person.first_name &&
+                                                    p.last_name == person.last_name &&
+                                                    p.id != person.id }
+          person.merge(other_person)
+          # don't check this person next time through the loop
+          other.people -= [other_person]
         end
       end
-    end
-    other.addresses.update_all(addressable_id: id)
-    ContactReferral.where(referred_to_id: other.id).update_all(referred_to_id: id)
-    ContactReferral.where(referred_by_id: other.id).update_all(referred_by_id: id)
 
-    # Copy fields over updating any field that's blank on the winner
-    [:name, :pledge_amount, :status, :notes, :greeting, :website,
-     :pledge_frequency, :pledge_start_date, :deceased, :next_ask, :never_ask, :likely_to_give,
-     :church_name, :send_newsletter, :direct_deposit, :magazine, :last_activity, :last_appointment,
-     :last_letter, :last_phone_call, :last_pre_call, :last_thank].each do |field|
-      if send(field).blank? && other.send(field).present?
-        send("#{field}=".to_sym, other.send(field))
+      # Update related records
+      other.contact_people.each do |r|
+        unless contact_people.where(person_id: r.person_id).first
+          r.update_attributes({contact_id: id}, without_protection: true)
+        end
       end
-    end
-    self.tag_list += other.tag_list
 
-    save(validate: false)
-    other.reload
-    other.destroy
+      %w[contact_donor_accounts activity_contacts].each do |relationship|
+        other.send(relationship.to_sym).each do |r|
+          r.update_attributes({contact_id: id}, without_protection: true)
+        end
+      end
+      other.addresses.update_all(addressable_id: id)
+      ContactReferral.where(referred_to_id: other.id).update_all(referred_to_id: id)
+      ContactReferral.where(referred_by_id: other.id).update_all(referred_by_id: id)
+
+      # Copy fields over updating any field that's blank on the winner
+      [:name, :pledge_amount, :status, :notes, :greeting, :website,
+       :pledge_frequency, :pledge_start_date, :deceased, :next_ask, :never_ask, :likely_to_give,
+       :church_name, :send_newsletter, :direct_deposit, :magazine, :last_activity, :last_appointment,
+       :last_letter, :last_phone_call, :last_pre_call, :last_thank].each do |field|
+        if send(field).blank? && other.send(field).present?
+          send("#{field}=".to_sym, other.send(field))
+        end
+      end
+      self.tag_list += other.tag_list
+
+      save(validate: false)
+      other.reload
+      other.destroy
+    end
   end
 
   private

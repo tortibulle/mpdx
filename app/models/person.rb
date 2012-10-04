@@ -108,29 +108,37 @@ class Person < ActiveRecord::Base
   end
 
   def merge(other)
-    %w[email_addresses phone_numbers family_relationships company_positions twitter_accounts facebook_accounts linkedin_accounts
-      google_accounts relay_accounts organization_accounts contact_people].each do |relationship|
-      other.send(relationship.to_sym).each do |r|
-        begin
-          r.update_attributes(person_id: id)
-        rescue ActiveRecord::RecordNotUnique
+    Person.transaction do
+      %w[phone_numbers family_relationships company_positions twitter_accounts facebook_accounts linkedin_accounts
+        google_accounts relay_accounts organization_accounts contact_people].each do |relationship|
+        other.send(relationship.to_sym).update_all(person_id: id)
+      end
+
+      # handle emails separately to check for duplicates
+      other.email_addresses.each do |email_address|
+        unless email_addresses.find_by_email(email_address.email)
+          email_address.update_attributes({person_id: id}, without_protection: true)
         end
       end
-    end
-    FamilyRelationship.where(related_person_id: other.id).update_all(related_person_id: id)
-
-    # Copy fields over updating any field that's blank on the winner
-    [:first_name, :last_name, :legal_first_name, :birthday_month, :birthday_year, :birthday_day, :anniversary_month,
-     :anniversary_year, :anniversary_day, :title, :suffix, :gender, :marital_status,
-     :middle_name,].each do |field|
-      if send(field).blank? && other.send(field).present?
-        send("#{field}=".to_sym, other.send(field))
+      FamilyRelationship.where(related_person_id: other.id).each do |fr|
+        unless FamilyRelationship.where(person_id: fr.person_id, related_person_id: id).first
+          fr.update_attributes(related_person_id: id)
+        end
       end
-    end
 
-    save(validate: false)
-    other.reload
-    other.destroy
+      # Copy fields over updating any field that's blank on the winner
+      [:first_name, :last_name, :legal_first_name, :birthday_month, :birthday_year, :birthday_day, :anniversary_month,
+       :anniversary_year, :anniversary_day, :title, :suffix, :gender, :marital_status,
+       :middle_name,].each do |field|
+        if send(field).blank? && other.send(field).present?
+          send("#{field}=".to_sym, other.send(field))
+        end
+      end
+
+      save(validate: false)
+      other.reload
+      other.destroy
+    end
   end
 
   def self.clone(person)
