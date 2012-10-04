@@ -110,7 +110,10 @@ class Person < ActiveRecord::Base
   def merge(other)
     %w[email_addresses phone_numbers family_relationships company_positions twitter_accounts facebook_accounts linkedin_accounts
       google_accounts relay_accounts organization_accounts contact_people].each do |relationship|
-      other.send(relationship.to_sym).update_all(person_id: id)
+      begin
+        other.send(relationship.to_sym).update_all(person_id: id)
+      rescue ActiveRecord::RecordNotUnique
+      end
     end
     FamilyRelationship.where(related_person_id: other.id).update_all(related_person_id: id)
 
