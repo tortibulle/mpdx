@@ -31,7 +31,7 @@ $ ->
           $('.checkall').prop('checked', false)
 
         # Only show merge button if 2 checkboxes are checked
-        if $('.checks input:checked').length == 2
+        if $('.checks input:checked').length >= 2
           $('[data-behavior=merge]').show()
         else
           $('[data-behavior=merge]').hide()
@@ -159,6 +159,9 @@ $ ->
         false
 
       $(document).on 'click', '[data-behavior=merge]', ->
+        if $('.checks input:checked').length >= 5
+          alert(__('You can merge up to four contacts at a time. Please uncheck a contact and try again.'))
+          return false
         $('#merge_modal #merge_contact_ids').val($('#selected_ids').val())
         $('#merge_modal').dialog {
           buttons: [
