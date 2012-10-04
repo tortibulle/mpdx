@@ -44,12 +44,12 @@ class Person::FacebookAccount < ActiveRecord::Base
     begin
       self.remote_id = get_id_from_url(value)
     rescue RestClient::ResourceNotFound
-      self.destroy
     end
+    self.destroy unless remote_id
   end
 
   def get_id_from_url(url)
-    tries ||= 3
+    tries ||= 6
     # e.g. https://graph.facebook.com/nmfdelacruz)
     if url.include?("id=")
       id = url.split('id=').last
