@@ -91,5 +91,36 @@ $.mpdx.loadSocialStream = ->
       dataType: 'script'
     }
 
-window.__ = (val)->
+# Stub method for translation
+window.__ = (val) ->
   val
+
+# Replace built in rails confirmation method
+$.rails.allowAction = (element) ->
+  message = element.data('confirm')
+  if message
+    div = $('#confirmation_modal')
+    div.html(message)
+    div.dialog {
+      buttons: [
+        {
+          text: __('Yes'),
+          click: ->
+            $.rails.confirmed(element)
+            $(this).dialog("close")
+        },
+        {
+          text: __('No'),
+          click: ->
+            $(this).dialog("close")
+        },
+      ]
+    }
+    false
+  else
+    true
+
+$.rails.confirmed = (element) ->
+  element.removeAttr('data-confirm')
+  element.removeData('confirm')
+  element.trigger('click.rails')

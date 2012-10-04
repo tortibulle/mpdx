@@ -2,7 +2,8 @@
   <% current_user.send("#{provider}_accounts".to_sym).each do |account| %>
     <div class="account_single" data-behavior="account">
       <div class="actions">
-        <%= link_to(t('delete'), account_path(account, provider: provider), method: :delete, :class => "inlineaction delete") %>
+        <%= link_to(_('delete'), account_path(account, provider: provider), method: :delete, :class => "inlineaction delete",
+                    confirm: _('Are you sure you want to remove this connection?')) %>
       </div>
       <span class="account_name"><%= account %></span>
 
