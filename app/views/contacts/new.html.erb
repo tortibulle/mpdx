@@ -1,14 +1,2 @@
-<div id="contentbody">
-  <div class="wpp">
-    <h1>New contact</h1>
-    <%= form_for(@contact) do |f| %>
-      <%= render 'form', f: f, contact: @contact %>
-      <div class="actions">
-        <%= f.submit "Save Contact", class: "btn" %>
-        <%= link_to(t('g.Back'), request.referrer ? :back : contacts_path, class: "btn") %>
-      </div>
-
-    <% end %>
-  </div>
-</div>
+<%= render 'form', contact: @contact %>
 
