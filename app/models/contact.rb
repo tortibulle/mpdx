@@ -99,9 +99,11 @@ class Contact < ActiveRecord::Base
   def merge(other)
     # Merge people that have the same name
     people.each do |person|
-      if other_person = other.people.detect { |p| p.first_name = person.first_name &&
+      if other_person = other.people.detect { |p| p.first_name == person.first_name &&
                                                   p.last_name == person.last_name }
         person.merge(other_person)
+        # don't check this person next time through the loop
+        other.people -= [other_person]
       end
     end
 
