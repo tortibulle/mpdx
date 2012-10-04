@@ -31,6 +31,10 @@ class ContactsController < ApplicationController
       @contacts = @contacts.where(likely_to_give: params[:likely])
     end
 
+    if params[:status].present? && params[:status].first != ''
+      @contacts = @contacts.where(status: params[:status])
+    end
+
     if params[:newsletter].present?
       case params[:newsletter]
       when 'address'
