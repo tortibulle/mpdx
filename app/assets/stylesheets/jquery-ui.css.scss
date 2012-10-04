@@ -445,7 +445,7 @@
   font-weight: normal;
 }
 
-.ui-widget-content .desired_action {
+.desired_action, .ui-dialog .ui-dialog-buttonset button:nth-child(1), .actions input:nth-child(1) {
   background-color: #eeeeee;
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #0077b1), color-stop(100%, #004a6e));
   background-image: -webkit-linear-gradient(top, #0077b1, #004a6e);
@@ -454,9 +454,10 @@
   background-image: -o-linear-gradient(top, #0077b1, #004a6e);
   background-image: linear-gradient(top, #0077b1, #004a6e);
   color: #fff;
+  text-shadow: none;
 }
 
-.ui-button.ui-state-hover.desired_action{
+.desired_action{
   text-shadow: 0 1px 0 #000; 
 }
 
@@ -522,7 +523,6 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { float: none; }
 .ui-dialog .ui-dialog-buttonpane button { margin: .5em .4em .5em 0; cursor: pointer; }
 .ui-dialog .ui-dialog-buttonset button:nth-child(2) { float: right }
-.ui-dialog .ui-dialog-buttonset button:nth-child(1) { background: green; color: white }
 .ui-dialog .ui-resizable-se { width: 14px; height: 14px; right: 3px; bottom: 3px; }
 .ui-draggable .ui-dialog-titlebar { cursor: move; }
 /*
