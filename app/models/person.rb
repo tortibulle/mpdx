@@ -109,7 +109,7 @@ class Person < ActiveRecord::Base
 
   def merge(other)
     Person.transaction do
-      %w[phone_numbers family_relationships company_positions twitter_accounts facebook_accounts linkedin_accounts
+      %w[phone_numbers company_positions twitter_accounts facebook_accounts linkedin_accounts
         google_accounts relay_accounts organization_accounts contact_people].each do |relationship|
         other.send(relationship.to_sym).update_all(person_id: id)
       end
@@ -123,6 +123,12 @@ class Person < ActiveRecord::Base
       FamilyRelationship.where(related_person_id: other.id).each do |fr|
         unless FamilyRelationship.where(person_id: fr.person_id, related_person_id: id).first
           fr.update_attributes(related_person_id: id)
+        end
+      end
+
+      FamilyRelationship.where(person_id: other.id).each do |fr|
+        unless FamilyRelationship.where(related_person_id: fr.person_id, person_id: id).first
+          fr.update_attributes(person_id: id)
         end
       end
 

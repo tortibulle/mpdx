@@ -389,7 +389,7 @@ GEM
       rack (>= 1.0.0)
     warden (1.2.1)
       rack (>= 1.0)
-    webmock (1.8.3)
+    webmock (1.8.11)
       addressable (>= 2.2.7)
       crack (>= 0.1.7)
     wicked (0.2.0)
@@ -465,6 +465,6 @@ DEPENDENCIES
   uglifier (>= 1.0.3)
   unicorn
   versionist!
-  webmock (= 1.8.3)
+  webmock (~> 1.8.3)
   wicked
   will_paginate (~> 3.0)

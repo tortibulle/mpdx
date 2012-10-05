@@ -90,7 +90,7 @@ group :development, :test do
   gem 'mailcatcher'
 end
 group :test do
-  gem 'webmock', '= 1.8.3'
+  gem 'webmock', '~> 1.8.3'
   gem 'spork-rails', '~> 3.2.0'
   gem 'rb-fsevent', :require => false
   gem 'guard-spork'
