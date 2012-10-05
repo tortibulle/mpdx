@@ -33,7 +33,7 @@ platforms :mri do
   gem 'pg'
 end
 gem 'resque-ensure-connected'
-gem 'devise', '~> 2.0.0'
+gem 'devise', '~> 2.1.0'
 gem 'dalli'
 gem 'twitter_cldr'
 gem "gettext_i18n_rails"
@@ -72,6 +72,7 @@ gem 'gibberish'
 gem 'active_model_serializers', git: 'git://github.com/josevalim/active_model_serializers.git'
 gem 'rails_autolink'
 gem 'display_case'
+gem 'gibbon'
 
 group :development do
   gem 'unicorn'

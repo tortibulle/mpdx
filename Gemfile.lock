@@ -94,11 +94,11 @@ GEM
     dalli (2.2.1)
     database_cleaner (0.8.0)
     deadlock_retry (1.2.0)
-    devise (2.0.4)
+    devise (2.1.2)
       bcrypt-ruby (~> 3.0)
-      orm_adapter (~> 0.0.3)
+      orm_adapter (~> 0.1)
       railties (~> 3.1)
-      warden (~> 1.1.1)
+      warden (~> 1.2.1)
     diff-lcs (1.1.3)
     display_case (0.0.4)
     erubis (2.7.0)
@@ -140,6 +140,12 @@ GEM
       gettext_i18n_rails (>= 0.7.1)
       rails (~> 3.2.0)
     gibberish (1.2.0)
+    gibbon (0.3.5)
+      httparty (> 0.6.0)
+      httparty (> 0.6.0)
+      json (> 1.4.0)
+      json (> 1.4.0)
+      rdoc
     girl_friday (0.10.0)
       connection_pool (~> 0.9.0)
     growl (1.0.3)
@@ -157,6 +163,9 @@ GEM
     haml (3.1.7)
     hashie (1.2.0)
     hike (1.2.1)
+    httparty (0.9.0)
+      multi_json (~> 1.0)
+      multi_xml
     httpauth (0.2.0)
     httpclient (2.2.7)
     i18n (0.6.1)
@@ -199,6 +208,7 @@ GEM
       thin (~> 1.5.0)
     mime-types (1.19)
     multi_json (1.3.6)
+    multi_xml (0.5.1)
     multipart-post (1.1.5)
     net-scp (1.0.4)
       net-ssh (>= 1.99.1)
@@ -236,7 +246,7 @@ GEM
     omniauth-twitter (0.0.13)
       multi_json (~> 1.3)
       omniauth-oauth (~> 1.0)
-    orm_adapter (0.0.7)
+    orm_adapter (0.4.0)
     pg (0.14.1)
     polyglot (0.3.3)
     rack (1.4.1)
@@ -377,7 +387,7 @@ GEM
       raindrops (~> 0.7)
     vegas (0.1.11)
       rack (>= 1.0.0)
-    warden (1.1.1)
+    warden (1.2.1)
       rack (>= 1.0)
     webmock (1.8.3)
       addressable (>= 2.2.7)
@@ -407,7 +417,7 @@ DEPENDENCIES
   dalli
   database_cleaner
   deadlock_retry
-  devise (~> 2.0.0)
+  devise (~> 2.1.0)
   display_case
   execjs
   factory_girl_rails
@@ -417,6 +427,7 @@ DEPENDENCIES
   gettext_i18n_rails
   gettext_i18n_rails_js
   gibberish
+  gibbon
   growl
   guard-rspec
   guard-spork
