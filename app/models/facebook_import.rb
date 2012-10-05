@@ -59,7 +59,6 @@ class FacebookImport
             end
 
             contact.tag_list.add(@import.tags, parse: true) if @import.tags.present?
-            contact.tag_list.add('facebook', parse: true) unless contact.tag_list.map(&:downcase).include?('facebook')
             contact.save
 
             contact.people.reload

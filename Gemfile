@@ -67,7 +67,7 @@ gem 'redis-objects'
 gem 'carrierwave', git: 'git://github.com/jnicklas/carrierwave.git' # tracking master because of fixes made since last gem version
 gem 'fb_graph'
 gem "acts-as-taggable-on", '~> 2.3.3'
-gem "fog", "~> 1.3.1"
+gem "fog", "~> 1.6.0"
 gem 'gibberish'
 gem 'active_model_serializers', git: 'git://github.com/josevalim/active_model_serializers.git'
 gem 'rails_autolink'
