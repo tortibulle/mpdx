@@ -1,8 +1,7 @@
 <aside id="leftmenu">
-<ul>
-  <li><%= link_to(_('Preferences'), preferences_path, class: 'menu_item ' + (request.path == preferences_path ? 'completed' : '')) %></li>
-  <li><%= link_to(_('Networks & Imports'), accounts_path, class: 'menu_item ' + (request.path == accounts_path ? 'completed' : '')) %></li>
-<!--  <li><%= link_to("Signature", "", class: "") %></li>
-  <li><%= link_to("Export", "", class: "") %></li> -->
-</ul>
+  <ul>
+    <li><%= link_to(_('Preferences'), preferences_path, class: 'menu_item ' + (request.path == preferences_path ? 'completed' : '')) %></li>
+    <li><%= link_to(_('Networks & Imports'), accounts_path, class: 'menu_item ' + (request.path == accounts_path ? 'completed' : '')) %></li>
+    <li><%= link_to(_('Integrations'), integrations_settings_path, class: 'menu_item ' + (request.path == integrations_settings_path ? 'completed' : '')) %></li>
+  </ul>
 </aside>

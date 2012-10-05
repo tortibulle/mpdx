@@ -25,6 +25,7 @@ class AccountList < ActiveRecord::Base
   has_many :tasks
   has_many :activities, dependent: :destroy
   has_many :imports, dependent: :destroy
+  has_one  :mail_chimp_account, dependent: :destroy
 
   belongs_to :designation_profile
 
@@ -68,7 +69,9 @@ class AccountList < ActiveRecord::Base
                                                        where al.id = #{id} order by c.church_name")
   end
 
-
+  def valid_mail_chimp_account
+    mail_chimp_account.try(:active?) && mail_chimp_account.primary_list
+  end
 
   def top_partners
     contacts.order('total_donations desc')
@@ -91,6 +94,12 @@ class AccountList < ActiveRecord::Base
         companies << company unless companies.include?(company)
       end
       other.activities.update_all(account_list_id: id)
+
+      unless mail_chimp_account
+        if other.mail_chimp_account
+          other.mail_chimp_account.update_attributes({account_list_id: id}, without_protection: true)
+        end
+      end
 
       save(validate: false)
       other.reload

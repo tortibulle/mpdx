@@ -159,25 +159,4 @@ $leftmenuwidth: 200px;
   }
 }
 
-/* ************************************************************** */
-.qtip {
-  background: image-url("qmark.png") no-repeat;
-  width: 16px;
-  height: 16px;
-  display: inline-block;
-	margin-right: 5px;
-	/*vertical-align: bottom;*/
-}
 
-.tip {
-  border-bottom:1px dotted;
-}
-
-.tooltipsy
-{
-    padding: 10px;
-    max-width: 200px;
-    color: #303030;
-    background-color: #f5f5b5;
-    border: 1px solid #deca7e;
-}

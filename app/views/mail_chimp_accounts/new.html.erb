@@ -1,0 +1,25 @@
+<%= render 'settings_sidebar' %>
+<div id="contentbody" class="withleft">
+  <div class="wpp">
+    <%= image_tag('logos/mailchimp_logo.png') %><br />
+
+    <% if @error_message  %>
+      <%#Invalid api key%>
+      <%= @error_message %><br /><br />
+    <% end %>
+
+    <%= form_for @mail_chimp_account do |f| %>
+      <div class="field">
+        <%= f.label :api_key, _('Api Key') %>
+        <%= f.text_field :api_key %><br />
+      </div>
+      <% if @mail_chimp_account.lists.present? %>
+        <%= render 'lists_field', f: f %>
+      <% end %>
+      <div class="actions">
+        <%= f.submit _('Save'), class: "btn desired_action" %>
+        <%= link_to(_('Cancel'), request.referrer ? :back : integrations_settings_path, class: "btn") %>
+      </div>
+    <% end %>
+  </div>
+</div>

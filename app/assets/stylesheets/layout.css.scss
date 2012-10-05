@@ -829,5 +829,53 @@ table.meta {
   li a.active {
     background: $gray_mid;
   }
+}
+/* ************************************************************** */
+.qtip {
+  background: image-url("qmark.png") no-repeat;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+	margin-right: 5px;
+	/*vertical-align: bottom;*/
+}
 
+.tip {
+  border-bottom:1px dotted;
+}
+
+.tooltipsy
+{
+    padding: 10px;
+    max-width: 200px;
+    color: #303030;
+    background-color: #f5f5b5;
+    border: 1px solid #deca7e;
+}
+
+.statusIcon {
+  float: left;
+  width: 23px;
+  height: 16px;
+  margin-top: 12px;
+  overflow: hidden;
+  background: image-url("status-icon.png") -0px -0px repeat;
+  background-repeat: no-repeat;
+}
+
+
+.statusIcon-enabled {
+  background-position: -6px -56px;
+}
+
+.statusIcon-disabled {
+  background-position: -6px -1px;
+}
+
+.statusIcon-error {
+  background-position: -6px -27px;
+}
+
+.mail_chimp_accounts_controller .wpp {
+  margin-top: 10px;
 }

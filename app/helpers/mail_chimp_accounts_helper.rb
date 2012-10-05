@@ -1,0 +1,2 @@
+module MailChimpAccountsHelper
+end

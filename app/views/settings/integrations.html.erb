@@ -1,0 +1,38 @@
+<%= render 'settings_sidebar' %>
+<div id="contentbody" class="withleft">
+  <div class="wpp">
+
+    <div class="network_connect">
+      <table>
+        <tr>
+          <td class="identify">
+            <% if current_account_list.mail_chimp_account %>
+              <% if current_account_list.valid_mail_chimp_account %>
+                <div class="statusIcon statusIcon-enabled">&nbsp;</div>
+              <% else %>
+                <div class="statusIcon statusIcon-error">&nbsp;</div>
+              <% end %>
+            <% else %>
+              <div class="statusIcon statusIcon-disabled">&nbsp;</div>
+            <% end %>
+            <div class="network_logo">
+              <%= image_tag("logos/mailchimp_logo.png", alt: 'MailChimp') %>
+            </div>
+
+          </td>
+          <td class="connections">
+            <div class="network_button">
+              <% if current_account_list.valid_mail_chimp_account %>
+                <%= link_to(_('Settings'), mail_chimp_accounts_path, :class => "btn") %>
+              <% else %>
+                <%= link_to(_('Enable'), new_mail_chimp_account_path, :class => "btn") %>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+

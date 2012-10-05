@@ -1,0 +1,19 @@
+<%= render 'settings_sidebar' %>
+<div id="contentbody" class="withleft">
+  <div class="wpp">
+    <%= image_tag('logos/mailchimp_logo.png') %><br />
+
+    <% if @mail_chimp_account.lists.present? %>
+      <%= form_for @mail_chimp_account do |f| %>
+        <%= render 'lists_field', f: f %>
+        <div class="actions">
+          <%= f.submit _('Save'), class: "btn desired_action" %>
+          <%= link_to(_('Cancel'), integrations_settings_path, class: "btn") %>
+        </div>
+      <% end %>
+    <% else %>
+      <%= _('You need to create a list on Mail Chimp that MPDX can use for your newsletter. Go to %(link} to create a list') %
+        { link: link_to('Mail Chimp', "https://#{@mail_chimp_account.datacenter}.admin.mailchimp.com/lists/") } %>
+    <% end %>
+  </div>
+</div>

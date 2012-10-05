@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121003213137) do
+ActiveRecord::Schema.define(:version => 20121005151834) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -318,6 +318,18 @@ ActiveRecord::Schema.define(:version => 20121003213137) do
 
   add_index "imports", ["account_list_id"], :name => "index_imports_on_account_list_id"
   add_index "imports", ["user_id"], :name => "index_imports_on_user_id"
+
+  create_table "mail_chimp_accounts", :force => true do |t|
+    t.string   "api_key"
+    t.boolean  "active",          :default => false
+    t.integer  "grouping_id"
+    t.string   "primary_list_id"
+    t.integer  "account_list_id"
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
+  end
+
+  add_index "mail_chimp_accounts", ["account_list_id"], :name => "index_mail_chimp_accounts_on_account_list_id"
 
   create_table "master_companies", :force => true do |t|
     t.string   "name"

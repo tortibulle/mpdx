@@ -1,0 +1,4 @@
+<div class="field">
+  <%= f.label :primary_list_id, _('Pick a list to use for your newsletter') %>
+  <%= f.select :primary_list_id, @mail_chimp_account.lists.collect { |l| [l.name, l.id] } %><br />
+</div>
