@@ -1,7 +1,11 @@
 require 'resque/server'
 Mpdx::Application.routes.draw do
 
-  resources :mail_chimp_accounts
+  resources :mail_chimp_accounts do
+    collection do
+      get :sync
+    end
+  end
 
   get "settings/integrations", as: :integrations_settings
 

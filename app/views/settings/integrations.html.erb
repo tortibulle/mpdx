@@ -24,9 +24,11 @@
             <div class="network_button">
               <% if current_account_list.valid_mail_chimp_account %>
                 <%= link_to(_('Settings'), mail_chimp_accounts_path, :class => "btn") %>
+                <%= link_to(_('Sync Now'), sync_mail_chimp_accounts_path, :class => "btn") %>
               <% else %>
                 <%= link_to(_('Enable'), new_mail_chimp_account_path, :class => "btn") %>
               <% end %>
+
             </div>
           </td>
         </tr>

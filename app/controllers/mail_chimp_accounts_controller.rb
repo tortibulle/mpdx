@@ -35,6 +35,12 @@ class MailChimpAccountsController < ApplicationController
     redirect_to integrations_settings_path
   end
 
+  def sync
+    flash[:notice] = _("MPDX is now uploading your newsletter recipients to MailChimp. We'll send you an email to let you know when we're done.")
+    @mail_chimp_account.queue_export_to_primary_list
+    redirect_to :back
+  end
+
 
   private
 
