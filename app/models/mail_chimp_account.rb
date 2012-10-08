@@ -96,7 +96,8 @@ class MailChimpAccount < ActiveRecord::Base
     if statuses.present?
       groupings = gb.list_interest_groupings(id: primary_list_id)
 
-      if groupings[0] && (grouping = groupings.detect { |g| g['id'] == grouping_id })
+      if groupings[0] && ((grouping = groupings.detect { |g| g['id'] == grouping_id }) ||
+                          (grouping = groupings.detect { |g| g['name'] == _('Partner Status') }))
         # make sure the grouping is hidden
         gb.list_interest_grouping_add(grouping_id: grouping_id, name: 'type', value: 'hidden')
 
