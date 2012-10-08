@@ -48,21 +48,52 @@ class MailChimpAccount < ActiveRecord::Base
   end
 
   def queue_export_to_primary_list
-    async(:export_to_primary_list)
+    async(:subscribe_contacts)
+  end
+
+
+  def queue_subscribe_contact(contact)
+    async(:subscribe_contacts, contact.id)
+  end
+
+  def queue_unsubscribe_contact(contact)
+    async(:unsubscribe_contact, contact.id)
   end
 
   private
 
-  def export_to_primary_list
-    export_to_list(primary_list_id)
+  def unsubscribe_email(email)
+    logger.debug(email)
+    if email.present?
+      gb.list_unsubscribe(id: primary_list_id, email_address: email,
+                            send_goodbye: false, delete_member: true)
+    end
   end
 
-  def export_to_list(list_id)
+  def unsubscribe_contact(contact_id)
+    contact = Contact.includes(people: :primary_email_address).where(id: contact_id).first
 
-    contacts = account_list.contacts.
+    contact.people.each do |person|
+      unsubscribe_email(person.primary_email_address.try(:email))
+    end
+  end
+
+  def subscribe_contacts(contact_ids = nil)
+    if contact_ids
+      contacts = Contact.where(id: contact_ids)
+    else
+      contacts = account_list.contacts
+    end
+    contacts = contacts.
                includes(people: :primary_email_address).
                where(send_newsletter: ['Email', 'Both']).
                where('email_addresses.email is not null')
+
+    export_to_list(primary_list_id, contacts)
+  end
+
+
+  def export_to_list(list_id, contacts)
     # Make sure we have an interest group for each status of partner set
     # to receive the newsletter
     statuses = contacts.collect(&:status).compact.uniq
@@ -111,12 +142,8 @@ class MailChimpAccount < ActiveRecord::Base
         # make sure the grouping is hidden
         gb.list_interest_grouping_add(grouping_id: grouping_id, name: 'type', value: 'hidden')
 
-        # Add any new groups, remove any no longer being used
+        # Add any new groups
         groups = grouping['groups'].collect { |g| g['name'] }
-
-        (groups - statuses).each do |group|
-          gb.list_interest_group_del(id: list_id, group_name: group, grouping_id: grouping_id)
-        end
 
         (statuses - groups).each do |group|
           gb.list_interest_group_add(id: list_id, group_name: group, grouping_id: grouping_id)

@@ -32,6 +32,7 @@ class Contact < ActiveRecord::Base
 
   before_destroy :delete_people
   before_save    :set_notes_saved_at
+  after_update   :sync_with_mail_chimp
 
   assignable_values_for :status, allow_blank: true do
     ['Never Contacted', 'Ask in Future', 'Call for Appointment', 'Appointment Scheduled', 'Call for Decision',
@@ -156,6 +157,18 @@ class Contact < ActiveRecord::Base
 
   def set_notes_saved_at
     self.notes_saved_at = DateTime.now if changed.include?('notes')
+  end
+
+  def sync_with_mail_chimp
+    if mail_chimp_account = account_list.mail_chimp_account
+      if changed.include?('send_newsletter')
+        if %w[Email Both].include?(send_newsletter)
+          mail_chimp_account.queue_subscribe_contact(self)
+        else
+          mail_chimp_account.queue_unsubscribe_contact(self)
+        end
+      end
+    end
   end
 end
 
