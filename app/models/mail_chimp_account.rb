@@ -56,14 +56,30 @@ class MailChimpAccount < ActiveRecord::Base
     async(:subscribe_contacts, contact.id)
   end
 
+  def queue_subscribe_person(person)
+    async(:subscribe_person, person.id)
+  end
+
+  def queue_unsubscribe_email(email)
+    async(:unsubscribe_email, email)
+  end
+
+  def queue_update_email(old_email, new_email)
+    async(:update_email, old_email, new_email)
+  end
+
+
   def queue_unsubscribe_contact(contact)
     async(:unsubscribe_contact, contact.id)
   end
 
   private
 
+  def update_email(old_email, new_email)
+    gb.list_update_member(id: primary_list_id, email_address: old_email, merge_vars: { EMAIL: new_email })
+  end
+
   def unsubscribe_email(email)
-    logger.debug(email)
     if email.present?
       gb.list_unsubscribe(id: primary_list_id, email_address: email,
                             send_goodbye: false, delete_member: true)
@@ -75,6 +91,17 @@ class MailChimpAccount < ActiveRecord::Base
 
     contact.people.each do |person|
       unsubscribe_email(person.primary_email_address.try(:email))
+    end
+  end
+
+  def subscribe_person(person_id)
+    person = Person.find(person_id)
+    if person.primary_email_address
+      vars = { :EMAIL => person.primary_email_address.email, :FNAME => person.first_name,
+               :LNAME => person.last_name}
+      gb.list_subscribe(id: list_id, email_address: vars[:EMAIL], update_existing: true,
+                        double_optin: false, merge_vars: vars, send_welcome: false, replace_interests: true)
+
     end
   end
 
@@ -118,14 +145,6 @@ class MailChimpAccount < ActiveRecord::Base
 
     gb.list_batch_subscribe(id: list_id, batch: batch, update_existing: true, double_optin: false,
                             send_welcome: false, replace_interests: true)
-
-    # Batch subscribe times out, so for now we'll add the people using a loop.
-    #responses = []
-    #batch.each do |person|
-      #responses << gb.list_subscribe(id: list_id, email_address: person[:EMAIL], update_existing: true,
-                        #double_optin: false, merge_vars: person, send_welcome: false, replace_interests: true)
-    #end
-    #responses
   end
 
   def add_status_groups(list_id, statuses)

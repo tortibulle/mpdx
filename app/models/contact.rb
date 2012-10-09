@@ -97,6 +97,10 @@ class Contact < ActiveRecord::Base
     pledge_amount.to_f / pledge_frequency
   end
 
+  def send_email_letter?
+    %w[Email Both].include?(send_newsletter)
+  end
+
   def merge(other)
     Contact.transaction do
       # Merge people that have the same name

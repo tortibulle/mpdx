@@ -2,7 +2,9 @@ class EmailAddress < ActiveRecord::Base
   belongs_to :person
   validates_presence_of :email
   before_save :strip_email
-  after_save :ensure_only_one_primary
+  after_update :sync_with_mail_chimp
+  after_commit :ensure_only_one_primary, :subscribe_to_mail_chimp
+  #after_destroy :delete_from_mailchimp
 
   attr_accessible :email, :primary
 
@@ -22,12 +24,67 @@ class EmailAddress < ActiveRecord::Base
   end
 
   private
-    def ensure_only_one_primary
-      primary_emails = self.person.email_addresses.where(primary: true)
-      primary_emails[0..-2].map {|e| e.update_column(:primary, false)} if primary_emails.length > 1
+
+  def ensure_only_one_primary
+    primary_emails = self.person.email_addresses.where(primary: true)
+    if primary_emails.blank?
+      person.email_addresses.first.update_column(:primary, true)
+    elsif primary_emails.length > 1
+      primary_emails[0..-2].map {|e| e.update_column(:primary, false)}
+    end
+  end
+
+  def strip_email
+    self.email = email.to_s.strip
+  end
+
+  def contact
+    @contact ||= person.contacts.first
+  end
+
+  def mail_chimp_account
+    @mail_chimp_account ||= contact.account_list.mail_chimp_account
+  end
+
+  def sync_with_mail_chimp
+
+    if contact.send_email_letter? && mail_chimp_account
+
+      # If the value of the email field changed, unsubscribe the old
+      if changed.include?('email') && email_was.present?
+        mail_chimp_account.queue_update_email(email_was, email)
+      end
+
+      if changed.include?('primary')
+        if primary?
+          # If this is the newly designated primary email, we need to
+          # change the old one to this one
+          if old_email = person.primary_email_address.try(:email)
+            mail_chimp_account.queue_update_email(old_email, email)
+          else
+            mail_chimp_account.queue_subscribe_person(person)
+          end
+        else
+          # If this used to be the primary, and now isn't, that means
+          # something else is now the primary and will take care of
+          # updating itself.
+        end
+      end
     end
 
-    def strip_email
-      self.email = email.to_s.strip
+  end
+
+  def subscribe_to_mail_chimp
+    if person
+      contact = person.contacts.first
+
+      if contact.send_email_letter? &&
+          mail_chimp_account &&
+          (primary? || person.email_addresses.length == 1)
+        mail_chimp_account.queue_subscribe_person(person)
+      end
     end
+
+  end
+
 end
