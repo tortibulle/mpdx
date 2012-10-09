@@ -70,7 +70,9 @@ class MailChimpAccount < ActiveRecord::Base
 
 
   def queue_unsubscribe_contact(contact)
-    async(:unsubscribe_contact, contact.id)
+    contact.people.each do |person|
+      async(:unsubscribe_email, person.primary_email_address.try(:email))
+    end
   end
 
   private
@@ -83,14 +85,6 @@ class MailChimpAccount < ActiveRecord::Base
     if email.present?
       gb.list_unsubscribe(id: primary_list_id, email_address: email,
                             send_goodbye: false, delete_member: true)
-    end
-  end
-
-  def unsubscribe_contact(contact_id)
-    contact = Contact.includes(people: :primary_email_address).where(id: contact_id).first
-
-    contact.people.each do |person|
-      unsubscribe_email(person.primary_email_address.try(:email))
     end
   end
 
