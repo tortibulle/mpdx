@@ -55,6 +55,9 @@ class Contact < ActiveRecord::Base
                   :church_name, :send_newsletter, :direct_deposit, :magazine, :last_activity, :last_appointment,
                   :last_letter, :last_phone_call, :last_pre_call, :last_thank, :tag_list
 
+  delegate :first_name, :last_name, :phone, :email, to: :primary_person
+  delegate :street, :city, :state, :postal_code, to: :mailing_address
+
   def to_s() name; end
 
   def add_person(person)
@@ -82,7 +85,11 @@ class Contact < ActiveRecord::Base
   end
 
   def primary_person
-    people.where('contact_people.primary' => true).first || people.first
+    people.where('contact_people.primary' => true).first || people.first || Person.new
+  end
+
+  def spouse_name
+    people.order('contact_people.primary desc')[1].try(:first_name)
   end
 
   def update_donation_totals(donation)

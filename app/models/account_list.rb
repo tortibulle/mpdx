@@ -29,7 +29,9 @@ class AccountList < ActiveRecord::Base
 
   belongs_to :designation_profile
 
-  attr_accessible :name, :creator_id
+  attr_accessible :name, :creator_id, :contacts_attributes
+
+  accepts_nested_attributes_for :contacts, reject_if: :all_blank, allow_destroy: true
 
   def self.find_with_designation_numbers(numbers)
     designation_account_ids = DesignationAccount.where(designation_number: numbers).pluck(:id).sort

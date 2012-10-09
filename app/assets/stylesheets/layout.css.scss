@@ -830,6 +830,11 @@ table.meta {
     background: $gray_mid;
   }
 }
+
+#referrals_modal input {
+  width: 88px;
+}
+
 /* ************************************************************** */
 .qtip {
   background: image-url("qmark.png") no-repeat;
@@ -879,3 +884,4 @@ table.meta {
 .mail_chimp_accounts_controller .wpp {
   margin-top: 10px;
 }
+

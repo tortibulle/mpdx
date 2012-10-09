@@ -192,6 +192,23 @@ $ ->
 
 
     if $('#contacts_show')[0]?
+      # Add referrals
+      $(document).on 'ajax:before', '#add_referrals', ->
+        $('#referrals_modal').dialog {
+          buttons: [
+            {
+              text: __('Save'),
+              click: ->
+                $(this).dialog('close')
+            },
+            {
+              text: __('Cancel'),
+              click: ->
+                $(this).dialog('close')
+            }
+          ]
+        }
+
       # Filter contact list
       $(document).on 'keyup', '#contact_name', ->
         name = $(this).val()

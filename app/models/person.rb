@@ -108,6 +108,10 @@ class Person < ActiveRecord::Base
     primary_phone_number
   end
 
+  def phone
+    primary_phone_number.try(:number)
+  end
+
   def merge(other)
     Person.transaction do
       %w[phone_numbers company_positions twitter_accounts facebook_accounts linkedin_accounts

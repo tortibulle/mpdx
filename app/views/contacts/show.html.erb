@@ -10,3 +10,7 @@
 </div>
 
 <%= render 'contact_body', contacts: @all_contacts, contact: @contact %>
+
+<div id="referrals_modal" style="display:none" title="<%= _('Add Referrals') %>">
+  <%= spinner(visible: true) %>
+</div>

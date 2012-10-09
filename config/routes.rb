@@ -1,6 +1,8 @@
 require 'resque/server'
 Mpdx::Application.routes.draw do
 
+  resources :account_lists, only: :update
+
   resources :mail_chimp_accounts do
     collection do
       get :sync
@@ -39,6 +41,7 @@ Mpdx::Application.routes.draw do
       get :social_search
       post :bulk_update
       post :merge
+      get :add_referrals
     end
     resources :people
   end

@@ -1,0 +1,21 @@
+<%= form_for current_account_list, remote: true do |f| %>
+  <table border="0">
+    <tr>
+      <th><%= _('First') %></th>
+      <th><%= _('Spouse') %></th>
+      <th><%= _('Last') %></th>
+      <th><%= _('Street Address') %></th>
+      <th><%= _('City') %></th>
+      <th><%= _('State') %></th>
+      <th><%= _('Postal Code') %></th>
+      <th><%= _('Phone') %></th>
+      <th><%= _('Email') %></th>
+    </tr>
+    <% 15.times do %>
+      <%= f.fields_for :contacts, Contact.new do |cf| %>
+        <%= render 'contacts/referral_fields', builder: cf %>
+      <% end %>
+    <% end %>
+  </table>
+<% end %>
+

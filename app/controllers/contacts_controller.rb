@@ -145,6 +145,10 @@ class ContactsController < ApplicationController
     render layout: false
   end
 
+  def add_referrals
+    
+  end
+
   protected
   def get_contact
     @contact = current_account_list.contacts.includes({people: [:email_addresses, :phone_numbers, :family_relationships]}).find(params[:id])

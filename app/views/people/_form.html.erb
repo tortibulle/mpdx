@@ -74,13 +74,13 @@
 
 
     <div class="fieldset">
-      <label class="fieldset_label"><%= t('g.email') %></label>
+      <label class="fieldset_label"><%= _('Email') %></label>
       <%# person.email_addresses.build if person.email_addresses.blank? %>
       <%= builder.fields_for :email_addresses do |builder| %>
         <%= render 'people/email_address_fields', builder: builder, object: person, no_remove: person.email_addresses.length <= 1 %>
       <% end %>
       <div class="sfield field_indent" data-behavior="add-wrapper">
-        <%= link_to_add_fields(t('.add_email_address'), builder, :email_addresses, partial: 'people/email_address_fields') %>
+        <%= link_to_add_fields(_('Add Email Address'), builder, :email_addresses, partial: 'people/email_address_fields') %>
       </div>
 
     </div>
@@ -88,13 +88,13 @@
     <div class="spacer"></div>
 
     <div class="fieldset">
-      <label class="fieldset_label"><%= t('g.phone') %></label>
+      <label class="fieldset_label"><%= _('Phone') %></label>
       <%# person.phone_numbers.build if person.phone_numbers.blank? %>
       <%= builder.fields_for :phone_numbers do |pf| %>
         <%= render 'people/phone_number_fields', builder: pf, object: person, no_remove: person.phone_numbers.length <= 1 %>
       <% end %>
       <div class="sfield field_indent" data-behavior="add-wrapper">
-        <%= link_to_add_fields(t('.add_phone_number'), builder, :phone_numbers, partial: 'people/phone_number_fields') %>
+        <%= link_to_add_fields(_('Add Phone Number'), builder, :phone_numbers, partial: 'people/phone_number_fields') %>
       </div>
 
     </div>
@@ -102,14 +102,14 @@
     <div class="spacer"></div>
 
     <div class="fieldset">
-      <label class="fieldset_label"><%= t('g.Social') %></label>
+      <label class="fieldset_label"><%= _('Social') %></label>
       <% %w[facebook twitter linkedin].each do |network| %>
         <% relationship = person.send(:"#{network}_accounts") %>
         <%= builder.fields_for :"#{network}_accounts" do |pf| %>
           <%= render "people/#{network}_account_fields", builder: pf, object: person, no_remove: false %>
         <% end %>
         <div class="sfield field_indent" data-behavior="add-wrapper">
-          <%= link_to_add_fields(t(".add_#{network}_account"), builder, :"#{network}_accounts", partial: "people/#{network}_account_fields") %>
+          <%= link_to_add_fields(_("Add %{network} Account") % { network: network }, builder, :"#{network}_accounts", partial: "people/#{network}_account_fields") %>
         </div>
         
         <hr class="thin"/>
