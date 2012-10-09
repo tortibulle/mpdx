@@ -4,7 +4,7 @@ class EmailAddress < ActiveRecord::Base
   before_save :strip_email
   after_update :sync_with_mail_chimp
   after_commit :ensure_only_one_primary, :subscribe_to_mail_chimp
-  #after_destroy :delete_from_mailchimp
+  after_destroy :delete_from_mailchimp
 
   attr_accessible :email, :primary
 
@@ -47,28 +47,31 @@ class EmailAddress < ActiveRecord::Base
   end
 
   def sync_with_mail_chimp
+    if mail_chimp_account
+      if contact.send_email_letter?
 
-    if contact.send_email_letter? && mail_chimp_account
-
-      # If the value of the email field changed, unsubscribe the old
-      if changed.include?('email') && email_was.present?
-        mail_chimp_account.queue_update_email(email_was, email)
-      end
-
-      if changed.include?('primary')
-        if primary?
-          # If this is the newly designated primary email, we need to
-          # change the old one to this one
-          if old_email = person.primary_email_address.try(:email)
-            mail_chimp_account.queue_update_email(old_email, email)
-          else
-            mail_chimp_account.queue_subscribe_person(person)
-          end
-        else
-          # If this used to be the primary, and now isn't, that means
-          # something else is now the primary and will take care of
-          # updating itself.
+        # If the value of the email field changed, unsubscribe the old
+        if changed.include?('email') && email_was.present?
+          mail_chimp_account.queue_update_email(email_was, email)
         end
+
+        if changed.include?('primary')
+          if primary?
+            # If this is the newly designated primary email, we need to
+            # change the old one to this one
+            if old_email = person.primary_email_address.try(:email)
+              mail_chimp_account.queue_update_email(old_email, email)
+            else
+              mail_chimp_account.queue_subscribe_person(person)
+            end
+          else
+            # If this used to be the primary, and now isn't, that means
+            # something else is now the primary and will take care of
+            # updating itself.
+          end
+        end
+      else
+        queue_unsubscribe_email(email)
       end
     end
 
@@ -85,6 +88,12 @@ class EmailAddress < ActiveRecord::Base
       end
     end
 
+  end
+
+  def delete_from_mailchimp
+    if mail_chimp_account
+      mail_chimp_account.queue_unsubscribe_email(email)
+    end
   end
 
 end

@@ -7,7 +7,7 @@ class Contact < ActiveRecord::Base
   has_many :contact_donor_accounts
   has_many :donor_accounts, through: :contact_donor_accounts
   belongs_to :account_list
-  has_many :contact_people
+  has_many :contact_people, dependent: :destroy
   has_many :people, through: :contact_people
   has_many :contact_referrals_to_me, foreign_key: :referred_to_id, class_name: 'ContactReferral'
   has_many :contact_referrals_by_me, foreign_key: :referred_by_id, class_name: 'ContactReferral'

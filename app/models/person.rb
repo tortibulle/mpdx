@@ -21,7 +21,7 @@ class Person < ActiveRecord::Base
   has_many :key_accounts, class_name: 'Person::KeyAccount', foreign_key: :person_id, dependent: :destroy
   has_many :companies, through: :company_positions
   has_many :donor_accounts, through: :master_person
-  has_many :contact_people, dependent: :destroy
+  has_many :contact_people
   has_many :contacts, through: :contact_people
   has_many :account_lists, through: :contacts
 
@@ -41,6 +41,7 @@ class Person < ActiveRecord::Base
 
   before_create :find_master_person
   after_destroy :clean_up_master_person
+  after_commit  :sync_with_mailchimp
 
   validates_presence_of :first_name
 
@@ -165,4 +166,20 @@ class Person < ActiveRecord::Base
   def clean_up_master_person
     self.master_person.destroy if (self.master_person.people - [self]).blank?
   end
+
+  def contact
+    @contact ||= person.contacts.first
+  end
+
+  def mail_chimp_account
+    @mail_chimp_account ||= contact.account_list.mail_chimp_account
+  end
+
+  def sync_with_mailchimp
+    if mail_chimp_account && contact.send_email_letter?
+      queue_subscribe_person(self)
+    end
+  end
+
+
 end

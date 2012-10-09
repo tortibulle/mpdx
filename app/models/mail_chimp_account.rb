@@ -99,7 +99,7 @@ class MailChimpAccount < ActiveRecord::Base
     if person.primary_email_address
       vars = { :EMAIL => person.primary_email_address.email, :FNAME => person.first_name,
                :LNAME => person.last_name}
-      gb.list_subscribe(id: list_id, email_address: vars[:EMAIL], update_existing: true,
+      gb.list_subscribe(id: primary_list_id, email_address: vars[:EMAIL], update_existing: true,
                         double_optin: false, merge_vars: vars, send_welcome: false, replace_interests: true)
 
     end
