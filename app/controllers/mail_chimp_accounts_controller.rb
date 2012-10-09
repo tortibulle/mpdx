@@ -36,7 +36,7 @@ class MailChimpAccountsController < ApplicationController
   end
 
   def sync
-    flash[:notice] = _("MPDX is now uploading your newsletter recipients to MailChimp. We'll send you an email to let you know when we're done.")
+    flash[:notice] = _("MPDX is now uploading your newsletter recipients to MailChimp.") # We'll send you an email to let you know when we're done.
     @mail_chimp_account.queue_export_to_primary_list
     redirect_to :back
   end
@@ -52,7 +52,7 @@ class MailChimpAccountsController < ApplicationController
     if @mail_chimp_account.save
       if @mail_chimp_account.primary_list
         if changed_primary
-          flash[:notice] = _("MPDX is now uploading your newsletter recipients to MailChimp. We'll send you an email to let you know when we're done.")
+          flash[:notice] = _("MPDX is now uploading your newsletter recipients to MailChimp.")
         end
         redirect_to mail_chimp_accounts_path
       else
