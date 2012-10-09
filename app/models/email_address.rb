@@ -43,7 +43,7 @@ class EmailAddress < ActiveRecord::Base
   end
 
   def mail_chimp_account
-    @mail_chimp_account ||= contact.account_list.mail_chimp_account
+    @mail_chimp_account ||= contact.try(:account_list).try(:mail_chimp_account)
   end
 
   def sync_with_mail_chimp
