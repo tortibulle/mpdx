@@ -48,7 +48,7 @@ class EmailAddress < ActiveRecord::Base
 
   def sync_with_mail_chimp
     if mail_chimp_account
-      if contact.send_email_letter?
+      if contact && contact.send_email_letter?
 
         # If the value of the email field changed, unsubscribe the old
         if changed.include?('email') && email_was.present?
