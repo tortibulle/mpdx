@@ -18,13 +18,13 @@
   <%= f.hidden_field :completed %>
   <div class="field">
     <%= f.label :start_at, _('Completed On') %>
-    <%= f.date_select :start_at, ampm: true, default: Date.today %>
+    <%= f.date_select :start_at, ampm: true, default: Date.today, order: [:month, :day, :year] %>
   </div>
 
 <% else %>
   <div class="field">
     <%= f.label :start_at, _('Due Date') %>
-    <%= f.datetime_select :start_at, ampm: true, default: 1.day.from_now %>
+    <%= f.datetime_select :start_at, ampm: true, default: 1.day.from_now, order: [:month, :day, :year] %>
   </div>
 <% end %>
 

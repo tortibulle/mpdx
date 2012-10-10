@@ -191,13 +191,13 @@ class ContactsController < ApplicationController
       end
 
       if @contacts.length > 0
-        flash[:notice] = "You have successfully added %{contacts_count:referrals}.".to_str.localize %
-          { contacts_count: @contacts.length, referrals: { one: '1 referral', other: '%{contacts_count} referrals' } }
+        flash[:notice] = _("You have successfully added %{contacts_count:referrals}.").to_str.localize %
+          { contacts_count: @contacts.length, referrals: { one: _('1 referral'), other: _('%{contacts_count} referrals') } }
       end
 
       if @bad_contacts_count > 0
-        flash[:alert] = "%{contacts_count:referrals} couldn't be added because they were missing the first and last name.".to_str.localize %
-          { contacts_count: @bad_contacts_count, referrals: { one: '1 referral', other: '%{contacts_count} referrals' } }
+        flash[:alert] = _("%{contacts_count:referrals} couldn't be added because they were missing the first and last name.").to_str.localize %
+          { contacts_count: @bad_contacts_count, referrals: { one: _('1 referral'), other: _('%{contacts_count} referrals') } }
 
       end
     end

@@ -44,9 +44,9 @@
         },
         subtitle: {
           text: '<%== if prior_average > average 
-                       _("Average donations down <span style=\"color:red\">#{number_to_current_currency(prior_average - average)}</span> from last year")
+                        _('Average donations down <span style="color:red">%{amount}</span> from last year') % { amount: number_to_current_currency(prior_average - average) }
                      elsif average > prior_average
-                       _("Average donations up <span style=\"color:green\">#{number_to_current_currency(average - prior_average)}</span> from last year")
+                       _('Average donations up <span style="color:green">%{amount}</span> from last year') % { amount: number_to_current_currency(average - prior_average) }
                      else
                        ''
                       end %>'
@@ -74,15 +74,15 @@
           }
         },
         series: [{
-          name: '<%= 'Donations' %>',
+          name: '<%= _('Donations') %>',
           data: [<%= @by_month_index.collect {|month| @by_month[month] || []}.collect {|v| v.sum(&:amount)}.join(',') %>],
           type: 'column'
         },{
-          name: '<%= 'Last Year' %>',
+          name: '<%= _('Last Year') %>',
           data: [<%= @prior_year_index.collect {|month| @prior_year[month] || []}.collect {|v| v.sum(&:amount)}.join(',') %>],
           type: 'column'
         },{
-  name: '<%= 'Average' %>',
+  name: '<%= _('Average') %>',
         data: [<%= 0.upto(12).collect {|i| average}.join(',') %>],
           type: 'line'
         }]

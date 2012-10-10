@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
   before_filter :ensure_login, :ensure_setup_finished
-  around_filter :do_with_current_user, :set_user_time_zone
+  around_filter :do_with_current_user, :set_user_time_zone, :set_locale
 
 
   private
@@ -79,6 +79,13 @@ class ApplicationController < ActionController::Base
     ensure
       Thread.current[:user] = nil
     end
+  end
+
+  def set_locale
+    old_locale = I18n.locale
+    FastGettext.locale = locale
+    yield
+    FastGettext.locale = old_locale
   end
 
   def render_csv(filename = nil)

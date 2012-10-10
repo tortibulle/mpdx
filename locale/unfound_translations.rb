@@ -25,8 +25,8 @@ _('Likely')
 _('Most Likely')
 
 # Send Newsletter
-_('physical')
-_('email')
-_('both')
+_('Physical')
+_('Email')
+_('Both')
 
 
