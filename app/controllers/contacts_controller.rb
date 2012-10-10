@@ -104,6 +104,14 @@ class ContactsController < ApplicationController
   def bulk_update
     contacts = current_account_list.contacts.where(id: params[:bulk_edit_contact_ids].split(','))
     contacts.update_all(params[:contact].select { |_, v| v.present? })
+    # Since update_all doesn't trigger callbacks, we need to manually sync with mail chimp
+    if params[:contact][:send_newsletter].present? && (mail_chimp_account = current_account_list.mail_chimp_account)
+      if params[:contact][:send_newsletter] == 'Physical'
+        contacts.map { |c| mail_chimp_account.queue_unsubscribe_contact(c) }
+      else
+        contacts.map { |c| mail_chimp_account.queue_subscribe_contact(c) }
+      end
+    end
   end
 
 
