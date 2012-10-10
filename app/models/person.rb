@@ -37,7 +37,7 @@ class Person < ActiveRecord::Base
                   :anniversary_year, :anniversary_day, :title, :suffix, :gender, :marital_status, :preferences, :addresses_attributes,
                   :phone_number, :email_address, :middle_name, :phone_numbers_attributes, :family_relationships_attributes, :email,
                   :email_addresses_attributes, :facebook_accounts_attributes, :twitter_accounts_attributes, :linkedin_accounts_attributes,
-                  :time_zone, :locale
+                  :time_zone, :locale, :phone
 
   before_create :find_master_person
   after_destroy :clean_up_master_person
@@ -110,6 +110,10 @@ class Person < ActiveRecord::Base
 
   def phone
     primary_phone_number.try(:number)
+  end
+
+  def phone=(number)
+    self.phone_number = {number: number}
   end
 
   def merge(other)

@@ -173,7 +173,7 @@ class Contact < ActiveRecord::Base
   def sync_with_mail_chimp
     if mail_chimp_account = account_list.mail_chimp_account
       if changed.include?('send_newsletter')
-        if %w[Email Both].include?(send_newsletter)
+        if send_email_letter?
           mail_chimp_account.queue_subscribe_contact(self)
         else
           mail_chimp_account.queue_unsubscribe_contact(self)

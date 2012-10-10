@@ -199,7 +199,9 @@ $ ->
             {
               text: __('Save'),
               click: ->
-                $(this).dialog('close')
+                $('form', this).submit()
+                $('.form_wrapper', this).html('<%= image_tag('spinner.gif') %>')
+                $(this).dialog( "option", "buttons", [])
             },
             {
               text: __('Cancel'),

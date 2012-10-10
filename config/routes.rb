@@ -41,7 +41,10 @@ Mpdx::Application.routes.draw do
       get :social_search
       post :bulk_update
       post :merge
+    end
+    member do
       get :add_referrals
+      post :save_referrals
     end
     resources :people
   end

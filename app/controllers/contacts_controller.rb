@@ -1,6 +1,6 @@
 class ContactsController < ApplicationController
   respond_to :html, :js
-  before_filter :get_contact, only: [:show, :edit, :update]
+  before_filter :get_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals]
 
   def index
     @contacts = current_account_list.contacts.order('contacts.name')
@@ -33,6 +33,10 @@ class ContactsController < ApplicationController
 
     if params[:status].present? && params[:status].first != ''
       @contacts = @contacts.where(status: params[:status])
+    end
+
+    if params[:referrer].present? && params[:referrer].first != ''
+      @contacts = @contacts.joins(:contact_referrals_to_me).where('contact_referrals.referred_by_id' => params[:referrer])
     end
 
     if params[:newsletter].present?
@@ -114,11 +118,10 @@ class ContactsController < ApplicationController
     end
   end
 
-
   def merge
     # When performing a merge we want to keep the contact with the most people
     contacts = current_account_list.contacts.includes(:people).
-               where(id: params[:merge_contact_ids].split(','))
+      where(id: params[:merge_contact_ids].split(','))
     if contacts.length > 1
       winner = contacts.max_by {|c| c.people.length}
       Contact.transaction do
@@ -146,7 +149,58 @@ class ContactsController < ApplicationController
   end
 
   def add_referrals
-    
+  end
+
+  def save_referrals
+    @contacts = []
+    @bad_contacts_count = 0
+    Contact.transaction do
+      params[:account_list][:contacts_attributes].each do |_, attributes|
+        next if attributes.all? { |_, v| v.blank? }
+        # create the new contact
+        if attributes[:first_name].present? || attributes[:last_name].present?
+          attributes[:first_name] = _('Unknown') if attributes[:first_name].blank?
+          attributes[:last_name] = _('Unknown') if attributes[:last_name].blank?
+          contact_name = "#{attributes[:last_name]}, #{attributes[:first_name]}"
+          contact_name += " & #{attributes[:spouse_name]}" if attributes[:spouse_name].present?
+          contact = current_account_list.contacts.create(name: contact_name)
+
+          # create primary
+          person = Person.create(attributes.slice(:first_name, :last_name, :email, :phone))
+          contact.people << person
+
+          # create spouse
+          if attributes[:spouse_name].present?
+            spouse = Person.create(first_name: attributes[:spouse_name], last_name: attributes[:last_name])
+            contact.people << spouse
+          end
+
+          # create address
+          contact.addresses_attributes = [attributes.slice(:street, :city, :state, :postal_code)]
+
+          contact.save
+
+          @contact.referrals_by_me << contact
+
+          @contacts << contact
+
+        else
+          @bad_contacts_count += 1
+        end
+
+      end
+
+      if @contacts.length > 0
+        flash[:notice] = "You have successfully added %{contacts_count:referrals}.".to_str.localize %
+          { contacts_count: @contacts.length, referrals: { one: '1 referral', other: '%{contacts_count} referrals' } }
+      end
+
+      if @bad_contacts_count > 0
+        flash[:alert] = "%{contacts_count:referrals} couldn't be added because they were missing the first and last name.".to_str.localize %
+          { contacts_count: @bad_contacts_count, referrals: { one: '1 referral', other: '%{contacts_count} referrals' } }
+
+      end
+    end
   end
 
   protected
