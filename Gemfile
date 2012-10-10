@@ -35,7 +35,7 @@ end
 gem 'resque-ensure-connected'
 gem 'devise', '~> 2.1.0'
 gem 'dalli'
-gem 'twitter_cldr'
+gem 'twitter_cldr', '~> 1.8.0'
 gem "gettext_i18n_rails"
 gem 'gettext_i18n_rails_js'#, path: '/Users/josh/htdocs/gettext_i18n_rails_js' #,git: 'git://github.com/twinge/gettext_i18n_rails_js.git'
 
