@@ -1,0 +1,21 @@
+<div class="contact_sets">
+  <% if @contact_sets.present? %>
+  <%= form_tag merge_contacts_path do %>
+    <%= link_to(_('Select all duplicates'), '#', class: 'select_all') %>
+    <% @contact_sets.each do |set| %>
+      <div class="contact_set">
+        <% set.each do |contact| %>
+          <div class="contact">
+            <%= contact %>
+          </div>
+        <% end %>
+        <%= check_box_tag 'merge_sets[]', set.collect(&:id).join(',') %>
+        <%= _('Merge these contacts') %>
+      </div>
+    <% end %>
+    <%= submit_tag _('Merge selected contacts'), class: 'btn desired_action' %>
+  <% end %>
+  <% else %>
+    <%= _("We weren't able to detect any duplicates on your account.") %>
+  <% end %>
+</div>

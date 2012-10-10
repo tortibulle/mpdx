@@ -41,6 +41,7 @@ Mpdx::Application.routes.draw do
       get :social_search
       post :bulk_update
       post :merge
+      get  :find_duplicates
     end
     member do
       get :add_referrals

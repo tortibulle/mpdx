@@ -63,6 +63,9 @@
         <!-- <div class="section"><%= link_to(_('Send Message'), "", :class => "btn") %></div> -->
         <div class="section"><%= link_to(_('Add Contact'), new_contact_path, class: 'btn') %></div>
         <div class="section"><%= link_to(_('Import Contacts'), accounts_path, class: 'btn') %></div>
+        <% if params[:controller] == 'contacts' %>
+          <div class="section"><%= link_to(_('Find Duplicates'), find_duplicates_contacts_path, class: 'btn') %></div>
+        <% end %>
       </div>
     </div>
     </hgroup>

@@ -1,6 +1,18 @@
 $ ->
   if $('.contacts_controller')[0]?
 
+    if $('#contacts_find_duplicates')[0]?
+      $.ajax {
+        url: '/contacts/find_duplicates',
+        dataType: 'script',
+        error: () ->
+          $('.wpp').html('<div class="mwrap"><div class="inside alert">' + __("There was an error searching for duplicates. We've been notified") + '</div></div>')
+      }
+
+      $(document).on 'click', '.select_all', ->
+        $('input[type=checkbox]').prop('checked', true)
+        false
+
     if $('#contacts_index')[0]?
       # quick search for contact
       $('#contact_name').autocomplete({

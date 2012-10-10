@@ -119,18 +119,26 @@ class ContactsController < ApplicationController
   end
 
   def merge
-    # When performing a merge we want to keep the contact with the most people
-    contacts = current_account_list.contacts.includes(:people).
-      where(id: params[:merge_contact_ids].split(','))
-    if contacts.length > 1
-      winner = contacts.max_by {|c| c.people.length}
-      Contact.transaction do
-        (contacts - [winner]).each do |loser|
-          winner.merge(loser)
+    if params[:merge_contact_ids]
+      params[:merge_sets] = [params[:merge_contact_ids]]
+    end
+
+    merged_contacts_count = 0
+
+    params[:merge_sets].each do |ids|
+      # When performing a merge we want to keep the contact with the most people
+      contacts = current_account_list.contacts.includes(:people).where(id: ids.split(','))
+      if contacts.length > 1
+        merged_contacts_count += contacts.length
+        winner = contacts.max_by {|c| c.people.length}
+        Contact.transaction do
+          (contacts - [winner]).each do |loser|
+            winner.merge(loser)
+          end
         end
       end
     end
-    redirect_to :back
+    redirect_to contacts_path, notice: _('You just merged %{count} contacts') % {count: merged_contacts_count}
   end
 
   def destroy
@@ -202,6 +210,30 @@ class ContactsController < ApplicationController
       end
     end
   end
+
+  def find_duplicates
+    respond_to do |wants|
+      wants.html {  }
+      wants.js do
+        # Find sets of people with the same name
+        people_with_duplicate_names = Person.connection.select_values("select array_to_string(array_agg(people.id), ',') from people INNER JOIN contact_people ON people.id = contact_people.person_id INNER JOIN contacts ON contact_people.contact_id = contacts.id WHERE contacts.account_list_id = #{current_account_list.id} group by first_name, last_name having count(*) > 1")
+        @contact_sets = []
+        contacts_checked = []
+        people_with_duplicate_names.each do |pair|
+          contacts = current_account_list.contacts.includes(:people).where('people.id' => pair.split(','))
+          if contacts.length > 1
+            already_included = false
+            contacts.each { |c| already_included = true if contacts_checked.include?(c) }
+            next if already_included
+            contacts_checked += contacts
+            @contact_sets << contacts
+          end
+        end
+        @contact_sets.sort_by! { |s| s.first.name }
+      end
+    end
+  end
+
 
   protected
   def get_contact
