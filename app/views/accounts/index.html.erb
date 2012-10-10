@@ -59,7 +59,7 @@
                 </h1>
               </div>
             </td>
-            <td class="connections" data-behavior="account">
+            <td class="connections" data-behavior="account" style="width:500px">
 
               <div class="importoptions formstyles" data-behavior="import_options" style="display:none">
                 <%= form_for Import.new(source: provider) do |f| %>
@@ -72,7 +72,7 @@
 
                   <div class="field radiocheck">
                     <%= f.radio_button :override, false %>
-                    <%= f.label 'override_false', _('Add CSV data to matched contact records when the current field is blank.') %>
+                    <%= f.label 'override_false', _('Only add CSV data to matched contact records when the current field is blank.') %>
                   </div>
                   <div class="field radiocheck">
                     <%= f.radio_button :override, true %>
