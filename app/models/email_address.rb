@@ -71,7 +71,7 @@ class EmailAddress < ActiveRecord::Base
           end
         end
       else
-        queue_unsubscribe_email(email)
+        mail_chimp_account.queue_unsubscribe_email(email)
       end
     end
 
