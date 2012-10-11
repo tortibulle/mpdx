@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: version 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-10 10:51-0400\n"
-"PO-Revision-Date: 2012-10-10 11:02-0500\n"
+"PO-Revision-Date: 2012-10-10 17:24-0500\n"
 "Last-Translator: Josh Starcher <josh.starcher@gmail.com>\n"
 "Language-Team: Spanish\n"
 "Language: es\n"
@@ -121,7 +121,7 @@ msgstr ""
 "behavior=\"clear_selection\">Borrar selección</a>"
 
 msgid "Api Key"
-msgstr ""
+msgstr "Api Key"
 
 msgid "Appointment Scheduled"
 msgstr ""
@@ -129,19 +129,19 @@ msgstr ""
 msgid ""
 "Are you sure you want to merge the selected contacts? This action cannot be "
 "undone!"
-msgstr ""
+msgstr "¿Estás seguro?"
 
 msgid "Are you sure you want to remove this connection?"
-msgstr ""
+msgstr "¿Está seguro que desea eliminar esta conexión?"
 
 msgid "Are you sure?"
-msgstr ""
+msgstr "¿Estás seguro?"
 
 msgid "Ask in Future"
-msgstr ""
+msgstr "Pregunte en el Futuro"
 
 msgid "Average"
-msgstr ""
+msgstr "Promedio"
 
 msgid ""
 "Average donations down <span style=\"color:red\">%{amount}</span> from last "
@@ -154,22 +154,22 @@ msgid ""
 msgstr ""
 
 msgid "Back"
-msgstr ""
+msgstr "Volver"
 
 msgid "Basic Information"
-msgstr ""
+msgstr "Información Básica"
 
 msgid "Both"
-msgstr ""
+msgstr "Los dos"
 
 msgid "Business"
-msgstr ""
+msgstr "Empresa"
 
 msgid "Call for Appointment"
-msgstr ""
+msgstr "Llame para cita"
 
 msgid "Call for Decision"
-msgstr ""
+msgstr "Convocatoria de la Decisión"
 
 msgid "Cancel"
 msgstr ""
