@@ -303,13 +303,9 @@ GEM
       activerecord (>= 2.3.5)
       resque (>= 1.10.0)
     resque-lock (1.0.0)
-    resque-retry (1.0.0)
-      resque (>= 1.10.0)
-      resque-scheduler (>= 1.9.9)
-    resque-scheduler (2.0.0)
-      redis (>= 2.0.1)
-      resque (>= 1.20.0)
-      rufus-scheduler
+    resque_spec (0.12.3)
+      resque (>= 1.19.0)
+      rspec (>= 2.5.0)
     rest-client (1.6.7)
       mime-types (>= 1.16)
     rspec (2.11.0)
@@ -327,8 +323,6 @@ GEM
       rspec (~> 2.11.0)
     ruby-hmac (0.4.0)
     rubyzip (0.9.9)
-    rufus-scheduler (2.0.17)
-      tzinfo (>= 0.3.23)
     sass (3.2.1)
     sass-rails (3.2.5)
       railties (~> 3.2.0)
@@ -453,7 +447,7 @@ DEPENDENCIES
   resque
   resque-ensure-connected
   resque-lock
-  resque-retry
+  resque_spec
   rest-client
   rspec-rails
   sass-rails (~> 3.2.3)

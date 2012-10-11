@@ -44,4 +44,19 @@ describe Person do
     end
   end
 
+
+  describe 'merging two people' do
+    it "shouldn't fail if the winner has the same facebook account as the loser" do
+      @winner = create(:person)
+      fb_account = create(:facebook_account, person: @winner)
+      @loser = create(:person)
+      create(:facebook_account, person: @loser, remote_id: fb_account.remote_id)
+
+      # this shouldn't blow up
+      -> {
+        @winner.merge(@loser)
+      }.should change(Person::FacebookAccount, :count)
+    end
+  end
+
 end

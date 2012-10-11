@@ -1,5 +1,5 @@
 require 'resque/plugins/lock'
-require 'resque/plugins/retry'
+# require 'resque/plugins/retry'
 module Async
   module ClassMethods
     #extend Resque::Plugins::Lock
@@ -33,7 +33,7 @@ module Async
   # We can pass this any Repository instance method that we want to
   # run later.
   def async(method, *args)
-    Resque.enqueue(self.class, id, method, *args) unless Rails.env.test?
+    Resque.enqueue(self.class, id, method, *args)
   end
 
   def self.included(base)
