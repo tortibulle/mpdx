@@ -28,7 +28,8 @@ class ContactExhibit < DisplayCase::Exhibit
   end
 
   def pledge_as_currency
-    @context.number_to_currency(pledge_amount, precision: 0)
+    pledge = @context.number_to_currency(pledge_amount, precision: 0)
+    pledge += " #{Contact.pledge_frequencies[pledge_frequency]}" if pledge_frequency.present?
   end
 
   def notes_saved_at

@@ -154,6 +154,18 @@ class Contact < ActiveRecord::Base
     end
   end
 
+  def self.pledge_frequencies
+    {
+      1 => _('Monthly'),
+      2 => _('Bi-Monthly'),
+      3 => _('Quarterly'),
+      4 => _('Quad-Monthly'),
+      6 => _('Semi-Annual'),
+      12 => _('Annual'),
+      24 => _('Biennial')
+    }
+  end
+
   private
   def delete_people
     people.each do |person|

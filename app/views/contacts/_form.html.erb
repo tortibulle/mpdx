@@ -29,6 +29,11 @@
           <%= f.text_field :pledge_amount %>
         </div>
 
+        <div class="field">
+          <%= f.label :pledge_frequency, _('Pledge Frequency') %>
+          <%= f.select :pledge_frequency, Contact.pledge_frequencies.invert.to_a, include_blank: true %>
+        </div>
+
         <%= render 'contacts/bulk_fields', f: f %>
 
         <div class="field">
