@@ -22,11 +22,15 @@ class DataServer
   end
 
   def import_profiles
-    check_credentials!
-
     designation_profiles = []
-    profiles.each do |profile|
-      designation_profiles << @org.designation_profiles.where(user_id: @org_account.person_id, name: profile[:name], code: profile[:code]).first_or_create
+    if @org.profiles_url.present?
+      check_credentials!
+
+      profiles.each do |profile|
+        designation_profiles << @org.designation_profiles.where(user_id: @org_account.person_id, name: profile[:name], code: profile[:code]).first_or_create
+      end
+    else
+      designation_profiles << @org.designation_profiles.where(user_id: @org_account.person_id, name: @org_account.person.to_s).first_or_create
     end
     designation_profiles
   end
