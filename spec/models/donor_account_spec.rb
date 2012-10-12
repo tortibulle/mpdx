@@ -32,14 +32,15 @@ describe DonorAccount do
       new_contact.donor_account_ids.should include(@donor_account.id)
     end
 
-    it 'should link a contact based on a matching address' do
-      contact = create(:contact, account_list: @account_list)
-      a1 = create(:address, addressable: @donor_account)
-      a2 = create(:address, addressable: contact)
-      new_contact = @donor_account.link_to_contact_for(@account_list)
-      new_contact.should == contact
-      new_contact.donor_account_ids.should include(@donor_account.id)
-    end
+    # This feature was removed
+    #it 'should link a contact based on a matching address' do
+      #contact = create(:contact, account_list: @account_list)
+      #a1 = create(:address, addressable: @donor_account)
+      #a2 = create(:address, addressable: contact)
+      #new_contact = @donor_account.link_to_contact_for(@account_list)
+      #new_contact.should == contact
+      #new_contact.donor_account_ids.should include(@donor_account.id)
+    #end
 
     it "should create a new contact if no match is found" do
       -> {
