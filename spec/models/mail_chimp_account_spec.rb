@@ -1,8 +1,11 @@
 require 'spec_helper'
 
 describe MailChimpAccount do
+
   before(:each) do
+    @account_list = create(:account_list)
     @account = MailChimpAccount.new(api_key: 'fake-us4')
+    @account.account_list = @account_list
   end
 
   it "should return an array of lists" do
@@ -49,7 +52,6 @@ describe MailChimpAccount do
 
     before do
       ResqueSpec.reset!
-      @account.account_list = create(:account_list)
       @account.save!
     end
 
@@ -75,6 +77,11 @@ describe MailChimpAccount do
       MailChimpAccount.should have_queued(@account.id, :unsubscribe_email, 'foo@example.com')
     end
 
+    it "should queue update_email" do
+      @account.queue_update_email('foo@example.com', 'foo1@example.com')
+      MailChimpAccount.should have_queued(@account.id, :update_email, 'foo@example.com', 'foo1@example.com')
+    end
+
     it "should queue unsubscribe_email for each of a contacts email addresses" do
       contact = create(:contact)
       contact.people << create(:person)
@@ -86,6 +93,14 @@ describe MailChimpAccount do
       MailChimpAccount.should have_queued(@account.id, :unsubscribe_email, 'foo1@example.com')
     end
 
+  end
+
+  describe "callbacks" do
+    it "should queue import if primary list changed" do
+      @account.should_receive(:queue_export_to_primary_list).and_return(true)
+      @account.primary_list_id = 'foo'
+      @account.save
+    end
   end
 
 end

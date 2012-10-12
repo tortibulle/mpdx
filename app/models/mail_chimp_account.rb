@@ -12,7 +12,7 @@ class MailChimpAccount < ActiveRecord::Base
   validates :account_list_id, :api_key, presence: true
 
   before_create :set_active
-  after_save :queue_import_if_list_chagned
+  after_save :queue_import_if_list_changed
 
   def self.queue() :general; end
 
@@ -174,7 +174,7 @@ class MailChimpAccount < ActiveRecord::Base
     end
   end
 
-  def queue_import_if_list_chagned
+  def queue_import_if_list_changed
     if changed.include?('primary_list_id')
       queue_export_to_primary_list
     end
