@@ -102,17 +102,18 @@ class MailChimpAccount < ActiveRecord::Base
   end
 
   def subscribe_contacts(contact_ids = nil)
+    contacts = account_list.contacts
+
     if contact_ids
-      contacts = Contact.where(id: contact_ids)
-    else
-      contacts = account_list.contacts
+      contacts = contacts.where(id: contact_ids)
     end
+
     contacts = contacts.
                includes(people: :primary_email_address).
                where(send_newsletter: ['Email', 'Both']).
                where('email_addresses.email is not null')
 
-    export_to_list(primary_list_id, contacts)
+    export_to_list(primary_list_id, contacts.to_set)
   end
 
 
@@ -155,7 +156,7 @@ class MailChimpAccount < ActiveRecord::Base
         self.grouping_id = grouping['id']
 
         # make sure the grouping is hidden
-        gb.list_interest_grouping_add(grouping_id: grouping_id, name: 'type', value: 'hidden')
+        gb.list_interest_grouping_update(grouping_id: grouping_id, name: 'type', value: 'hidden')
 
         # Add any new groups
         groups = grouping['groups'].collect { |g| g['name'] }

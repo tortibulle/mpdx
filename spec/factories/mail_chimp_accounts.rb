@@ -3,7 +3,7 @@
 FactoryGirl.define do
   factory :mail_chimp_account do
     api_key "MyString"
-    valid false
-    primary_list "MyString"
+    active false
+    primary_list_id "MyString"
   end
 end

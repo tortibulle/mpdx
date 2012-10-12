@@ -103,4 +103,100 @@ describe MailChimpAccount do
     end
   end
 
+  context "when updating mailchimp" do
+    it "should update an email" do
+      stub_request(:post, "https://us4.api.mailchimp.com/1.3/?method=listUpdateMember").
+        to_return(body: '{}')
+      @account.send(:update_email, 'foo@example.com', 'foo1@example.com')
+    end
+
+    it "should unsubscribe an email" do
+      stub_request(:post, "https://us4.api.mailchimp.com/1.3/?method=listUnsubscribe").
+        to_return(body: '{}')
+      @account.send(:unsubscribe_email, 'foo@example.com')
+    end
+
+
+    context "subscribing a person" do
+      it "should add a person's primary email address" do
+        stub_request(:post, "https://us4.api.mailchimp.com/1.3/?method=listSubscribe").
+          to_return(body: '{}')
+        person = create(:person, email: 'foo@example.com')
+        @account.send(:subscribe_person, person.id)
+      end
+    end
+
+    context "subscribing contacts" do
+      it "should subscribe a single contact" do
+        contact = create(:contact, send_newsletter: 'Email', account_list: @account_list)
+        contact.people << create(:person, email: 'foo@example.com')
+
+        @account.should_receive(:export_to_list).with(@account.primary_list_id, [contact].to_set).and_return(true)
+        @account.send(:subscribe_contacts, contact.id)
+      end
+
+      it "should subscribe multiple contacts" do
+        contact1 = create(:contact, send_newsletter: 'Email', account_list: @account_list)
+        contact1.people << create(:person, email: 'foo@example.com')
+
+        contact2 = create(:contact, send_newsletter: 'Email', account_list: @account_list)
+        contact2.people << create(:person, email: 'foo@example.com')
+
+        @account.should_receive(:export_to_list).with(@account.primary_list_id, [contact1, contact2].to_set).and_return(true)
+        @account.send(:subscribe_contacts, [contact1.id, contact2.id])
+      end
+
+      it "should subscribe all contacts" do
+        contact = create(:contact, send_newsletter: 'Email', account_list: @account_list)
+        contact.people << create(:person, email: 'foo@example.com')
+
+        @account.should_receive(:export_to_list).with(@account.primary_list_id, [contact].to_set).and_return(true)
+        @account.send(:subscribe_contacts)
+      end
+
+      it "should export to a list" do
+        stub_request(:post, "https://us4.api.mailchimp.com/1.3/?method=listBatchSubscribe").
+         with(:body => "%7B%22apikey%22%3A%22fake-us4%22%2C%22id%22%3Anull%2C%22batch%22%3A%5B%7B%22EMAIL%22%3A%22foo%40example.com%22%2C%22FNAME%22%3A%22John%22%2C%22LNAME%22%3Anull%2C%22GROUPINGS%22%3A%5B%7B%22id%22%3Anull%2C%22groups%22%3A%22Partner+-+Pray%22%7D%5D%7D%5D%2C%22update_existing%22%3Atrue%2C%22double_optin%22%3Afalse%2C%22send_welcome%22%3Afalse%2C%22replace_interests%22%3Atrue%7D").
+         to_return(:status => 200, :body => "{}", :headers => {})
+
+        contact = create(:contact, send_newsletter: 'Email', account_list: @account_list)
+        contact.people << create(:person, email: 'foo@example.com')
+
+        @account.send(:export_to_list, @account.primary_list_id, [contact])
+      end
+
+      context "adding status groups" do
+        before do
+          @gb = double
+          @account.stub(:gb).and_return(@gb)
+        end
+        it "should add groups to an existing grouping" do
+          @account.grouping_id = 1
+
+          list_id = 'foo'
+
+          @gb.should_receive(:list_interest_groupings).with(id: list_id).and_return([{'id' => 1, 'name' => 'Partner Status', 'groups' => []}])
+
+          @gb.should_receive(:list_interest_grouping_update).with(grouping_id: 1, name: 'type', value: 'hidden')
+
+          @gb.should_receive(:list_interest_group_add).with({id: 'foo', group_name: 'Partner - Pray', grouping_id: 1})
+
+          @account.send(:add_status_groups, list_id, ['Partner - Pray'])
+        end
+
+        it "should create a new grouping if none exists" do
+          list_id = 'foo'
+
+          @gb.should_receive(:list_interest_groupings).with(id: list_id).and_return([])
+
+          @gb.should_receive(:list_interest_grouping_add).with({:id=>"foo", :name=>"Partner Status", :type=>"hidden", :groups=>["Partner - Pray"]})
+
+          @account.send(:add_status_groups, list_id, ['Partner - Pray'])
+        end
+
+      end
+    end
+
+  end
+
 end
