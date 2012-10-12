@@ -56,6 +56,7 @@ gem 'iniparse'
 gem 'versionist', git: 'git://github.com/twinge/versionist.git', branch: 'multiple_versioning_strategies' # Switch back to gem once multiple_strategies are supported
 gem 'rest-client'
 gem 'airbrake'
+gem 'airbrake_user_attributes'
 gem 'wicked'
 gem 'will_paginate', '~> 3.0'
 gem 'resque'

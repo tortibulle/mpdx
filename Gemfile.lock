@@ -64,6 +64,8 @@ GEM
     airbrake (3.1.5)
       builder
       girl_friday
+    airbrake_user_attributes (0.1.1)
+      airbrake (>= 3.0.9)
     arel (3.0.2)
     assignable_values (0.5.0)
       activerecord
@@ -401,6 +403,7 @@ DEPENDENCIES
   active_model_serializers!
   acts-as-taggable-on (~> 2.3.3)
   airbrake
+  airbrake_user_attributes
   assignable_values
   awesome_print
   capybara
