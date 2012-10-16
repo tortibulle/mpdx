@@ -33,7 +33,7 @@ class TntImport
 
       lines = read_csv(@import.file.file.file)
 
-      unless lines.first['Organization Account IDs']
+      unless lines.first.headers.include?('Organization Account IDs')
         raise "export didn't include Organization Account IDs'"
       end
 
@@ -226,7 +226,7 @@ class TntImport
   def add_or_update_donor_accounts(line, account_list, designation_profile)
     contact = nil # create the contact variable outside the block scop
     if designation_profile
-      donor_accounts = line['Organization Account IDs'].split(',').collect do |account_number|
+      donor_accounts = line['Organization Account IDs'].to_s.split(',').collect do |account_number|
         donor_account = designation_profile.organization.donor_accounts.where(account_number: account_number).first_or_create(name: line['File As'])
         donor_account.name = line['File As'] # if the acccount already existed, update the name
 
@@ -239,7 +239,10 @@ class TntImport
 
     # If there was no donor account, we won't have a linked contact
     unless contact
-      contact = account_list.contacts.where(name: line['File As']).first_or_create
+      # try to find a contact with a person who has the same name already in the system
+      contact ||= account_list.contacts.includes(:people).where('people.first_name' => line['First/Given Name'], 'people.last_name' => line['Last/Family Name']).first
+      contact ||= account_list.contacts.includes(:people).where('people.first_name' => line['Spouse First/Given Name'], 'people.last_name' => line['Last/Family Name']).first
+      contact ||= account_list.contacts.where(name: line['File As']).first_or_create
     end
 
     [donor_accounts, contact]

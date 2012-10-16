@@ -187,7 +187,7 @@ class Person < ActiveRecord::Base
   end
 
   def contact
-    @contact ||= person.contacts.first
+    @contact ||= contacts.first
   end
 
   def mail_chimp_account
