@@ -60,14 +60,6 @@ describe Person::FacebookAccount do
       @account.remote_id.should == 1
     end
 
-    it "delete the account if the name is not found" do
-      #stub_request(:get, /https:\/\/graph.facebook.com\/.*/).
-         #with(:headers => {'Accept'=>'application/json'}).to_return(:status => 404)
-      @account.should_receive(:get_id_from_url).and_raise(RestClient::ResourceNotFound)
-      @account.url = 'https://www.facebook.com/john.doe'
-      @account.frozen?.should == true # deleted
-    end
-
   end
 
   describe 'get id from url' do

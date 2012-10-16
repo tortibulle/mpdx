@@ -45,7 +45,6 @@ class Person::FacebookAccount < ActiveRecord::Base
       self.remote_id = get_id_from_url(value)
     rescue RestClient::ResourceNotFound
     end
-    self.destroy unless remote_id
   end
 
   def get_id_from_url(url)

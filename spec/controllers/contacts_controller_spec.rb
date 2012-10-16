@@ -80,6 +80,7 @@ describe ContactsController do
         assigns(:contact).errors.full_messages.should == ["Name can't be blank"]
         response.should be_success
       end
+
     end
 
     describe "PUT 'update'" do

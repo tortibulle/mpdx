@@ -36,7 +36,7 @@ class Person < ActiveRecord::Base
   attr_accessible :first_name, :last_name, :legal_first_name, :birthday_month, :birthday_year, :birthday_day, :anniversary_month, 
                   :anniversary_year, :anniversary_day, :title, :suffix, :gender, :marital_status, :preferences, :addresses_attributes,
                   :phone_number, :email_address, :middle_name, :phone_numbers_attributes, :family_relationships_attributes, :email,
-                  :email_addresses_attributes, :facebook_accounts_attributes, :twitter_accounts_attributes, :linkedin_accounts_attributes,
+                  :email_addresses_attributes, :facebook_accounts_attributes, :twi5tter_accounts_attributes, :linkedin_accounts_attributes,
                   :time_zone, :locale, :phone
 
   before_create :find_master_person
