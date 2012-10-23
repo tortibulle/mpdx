@@ -76,6 +76,7 @@ gem 'display_case'
 gem 'gibbon'
 
 group :development do
+  gem 'railroady'
   gem 'unicorn'
   gem 'rails-footnotes'
 end

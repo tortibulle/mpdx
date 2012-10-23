@@ -25,12 +25,12 @@
         </div>
 
         <div class="field">
-          <%= f.label :pledge_amount, _('Pledge Amount') %>
+          <%= f.label :pledge_amount, _('Commitment Amount') %>
           <%= f.text_field :pledge_amount %>
         </div>
 
         <div class="field">
-          <%= f.label :pledge_frequency, _('Pledge Frequency') %>
+          <%= f.label :pledge_frequency, _('Commitment Frequency') %>
           <%= f.select :pledge_frequency, Contact.pledge_frequencies.invert.to_a, include_blank: true %>
         </div>
 
