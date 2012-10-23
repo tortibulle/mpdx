@@ -72,8 +72,21 @@ class Person::FacebookAccount < ActiveRecord::Base
     async(:import_contacts, import.id)
   end
 
-  def token_missing_or_expired?
-    token.blank? || !token_expires_at || token_expires_at < Time.now
+  def token_missing_or_expired?(tries = 0)
+    # If we have an expired token, try once to refresh it
+    if tries == 0 && token && (!token_expires_at || token_expires_at < Time.now)
+      refresh_token
+      token_missing_or_expired?(1)
+    else
+      token.blank? || !token_expires_at || token_expires_at < Time.now
+    end
+  end
+
+  def refresh_token
+    info = Koala::Facebook::OAuth.new(APP_CONFIG['facebook_key'], APP_CONFIG['facebook_secret']).exchange_access_token_info(a.token)
+    self.token = info['access_token']
+    self.token_expires_at = Time.at(info['expires'])
+    save
   end
 
   private
