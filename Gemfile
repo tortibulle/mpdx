@@ -89,6 +89,7 @@ group :development, :test do
   #only used for mo/po file generation in development, !do not load(:require=>false)! since it will eat 7mb ram
   gem "gettext", '~> 2.3.2', :require => false
   gem 'mailcatcher'
+  gem 'fuubar'
 end
 group :test do
   gem 'webmock', '~> 1.8.3'

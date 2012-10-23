@@ -189,22 +189,8 @@ class TntImport
 
       person ||= Person.new({master_person: master_person_from_source}, without_protection: true)
     end
-    person.attributes = {first_name: line[prefix + 'First/Given Name'], last_name: line[prefix + 'Last/Family Name'], middle_name: line[prefix + 'Middle Name'],
-                          title: line[prefix + 'Title'], suffix: line[prefix + 'Suffix'], gender: prefix.present? ? 'female' : 'male'}
-    # Phone numbers
-    {'Home Phone' => 'home', 'Home Phone 2' => 'home', 'Home Fax' => 'fax',
-     'Business Phone' => 'work', 'Business Phone 2' => 'work', 'Business Fax' => 'fax',
-     'Company Main Phone' => 'work', 'Assistant Phone' => 'work', 'Other Phone' => 'other',
-     'Car Phone' => 'mobile', 'Mobile Phone' => 'mobile', 'Pager Number' => 'other',
-     'Callback Phone' => 'other', 'ISDN Phone' => 'other', 'Primary Phone' => 'other',
-     'Radio Phone' => 'other', 'Telex Phone' => 'other'}.each_with_index do |key, location, i|
-       person.phone_number = {number: line[key], location: location, primary: line['Preferred Phone Type'].to_i == i} if line[key].present?
-     end
 
-    # email address
-    3.times do |i|
-      person.email_address = {email: line["Email #{i}"], primary: line['Preferred Email Types'] == i} if line["Email #{i}"].present?
-    end
+    update_person_attributes(person, line, prefix)
 
     # TODO: deal with other TNT fields
 
@@ -221,6 +207,27 @@ class TntImport
     end
 
     [person, contact_person]
+  end
+
+  def update_person_attributes(person, line, prefix)
+    person.attributes = {first_name: line[prefix + 'First/Given Name'], last_name: line[prefix + 'Last/Family Name'], middle_name: line[prefix + 'Middle Name'],
+                          title: line[prefix + 'Title'], suffix: line[prefix + 'Suffix'], gender: prefix.present? ? 'female' : 'male'}
+    # Phone numbers
+    {'Home Phone' => 'home', 'Home Phone 2' => 'home', 'Home Fax' => 'fax',
+     'Business Phone' => 'work', 'Business Phone 2' => 'work', 'Business Fax' => 'fax',
+     'Company Main Phone' => 'work', 'Assistant Phone' => 'work', 'Other Phone' => 'other',
+     'Car Phone' => 'mobile', 'Mobile Phone' => 'mobile', 'Pager Number' => 'other',
+     'Callback Phone' => 'other', 'ISDN Phone' => 'other', 'Primary Phone' => 'other',
+     'Radio Phone' => 'other', 'Telex Phone' => 'other'}.each_with_index do |key, i|
+       person.phone_number = {number: line[key[0]], location: key[1], primary: line['Preferred Phone Type'].to_i == i} if line[key[0]].present?
+     end
+
+    # email address
+    3.times do |i|
+      person.email_address = {email: line["Email #{i}"], primary: line['Preferred Email Types'] == i} if line["Email #{i}"].present?
+    end
+
+    person
   end
 
   def add_or_update_donor_accounts(line, account_list, designation_profile)
