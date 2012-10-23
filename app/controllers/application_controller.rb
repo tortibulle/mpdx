@@ -1,10 +1,18 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
+  before_filter :redirect_to_mobile
   before_filter :ensure_login, :ensure_setup_finished
   around_filter :do_with_current_user, :set_user_time_zone, :set_locale
 
 
   private
+
+  def redirect_to_mobile
+    if params[:mobile] == "1" ||
+       request.user_agent =~ /iPhone|Android/
+      redirect_to '/mobile/index.html' and return false
+    end
+  end
 
   def ensure_login
     unless user_signed_in?
