@@ -35,7 +35,7 @@ class Contact < ActiveRecord::Base
   after_update   :sync_with_mail_chimp
 
   assignable_values_for :status, allow_blank: true do
-    ['Never Contacted', 'Ask in Future', 'Call for Appointment', 'Appointment Scheduled', 'Call for Decision',
+    ['Never Contacted', 'Ask in Future', 'Contact for Appointment', 'Appointment Scheduled', 'Call for Decision',
     'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Not Interested', 'Unresponsive', 'Never Ask',
     'Research Abandoned','Expired Referral']
   end

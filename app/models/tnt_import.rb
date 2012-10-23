@@ -134,7 +134,7 @@ class TntImport
     case phase.to_i
     when 10 then 'Never Contacted'
     when 20 then 'Ask in Future'
-    when 30 then 'Call for Appointment'
+    when 30 then 'Contact for Appointment'
     when 40 then 'Appointment Scheduled'
     when 50 then 'Call for Decision'
     when 60 then 'Partner - Financial'
