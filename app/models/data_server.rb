@@ -45,10 +45,15 @@ class DataServer
 
     account_list = get_account_list(profile)
 
-    response = get_response(@org.addresses_url,
-                            get_params(@org.addresses_params, {profile: profile.code.to_s, 
-                                                               datefrom: (date_from || @org.minimum_gift_date).to_s,
-                                                               personid: @org_account.remote_id}))
+    begin
+      response = get_response(@org.addresses_url,
+                              get_params(@org.addresses_params, {profile: profile.code.to_s, 
+                                                                 datefrom: (date_from || @org.minimum_gift_date).to_s,
+                                                                 personid: @org_account.remote_id}))
+    rescue Errors::UrlChanged => e
+      @org.update_attributes(addresses_url: e.message)
+      retry
+    end
 
     CSV.new(response, headers: :first_row).each do |line|
       line['LAST_NAME'] = line['LAST_NAME_ORG']
@@ -99,11 +104,17 @@ class DataServer
     date_from = @org.minimum_gift_date || '1/1/2004' if date_from.blank?
     date_to = Time.now.strftime("%m/%d/%Y") if date_to.blank?
 
-    response = get_response(@org.donations_url,
-                            get_params(@org.donations_params, {profile: profile.code.to_s, 
-                                                               datefrom: date_from,
-                                                               dateto: date_to,
-                                                               personid: @org_account.remote_id}))
+    begin
+      response = get_response(@org.donations_url,
+                              get_params(@org.donations_params, {profile: profile.code.to_s, 
+                                                                 datefrom: date_from,
+                                                                 dateto: date_to,
+                                                                 personid: @org_account.remote_id}))
+    rescue Errors::UrlChanged => e
+      @org.update_attributes(donations_url: e.message)
+      retry
+    end
+
 
     CSV.new(response, headers: :first_row).each do |line|
       designation_account = find_or_create_designation_account(line['DESIGNATION'], profile)
@@ -134,9 +145,19 @@ class DataServer
   def validate_username_and_password
     begin
       if @org.profiles_url.present?
-        get_response(@org.profiles_url, get_params(@org.profiles_params))
+        begin
+          get_response(@org.profiles_url, get_params(@org.profiles_params))
+        rescue Errors::UrlChanged => e
+          @org.update_attributes(profiles_url: e.message)
+          retry
+        end
       else
-        get_response(@org.account_balance_url, get_params(@org.account_balance_params))
+        begin
+          get_response(@org.account_balance_url, get_params(@org.account_balance_params))
+        rescue Errors::UrlChanged => e
+          @org.update_attributes(account_balance_url: e.message)
+          retry
+        end
       end
     rescue DataServerError => e
       if e.message =~ /password/
@@ -158,8 +179,13 @@ class DataServer
   protected
   def profile_balance(profile_code)
     balance = {}
-    response = get_response(@org.account_balance_url,
-                            get_params(@org.account_balance_params, {profile: profile_code.to_s}))
+    begin
+      response = get_response(@org.account_balance_url,
+                              get_params(@org.account_balance_params, {profile: profile_code.to_s}))
+    rescue Errors::UrlChanged => e
+      @org.update_attributes(account_balance_url: e.message)
+      retry
+    end
 
     # This csv should always only have one line (besides the headers)
     CSV.new(response, headers: :first_row).each do |line|
@@ -186,7 +212,12 @@ class DataServer
     unless @profiles
       @profiles = []
       unless @org.profiles_url.blank?
-        response = get_response(@org.profiles_url, get_params(@org.profiles_params))
+        begin
+          response = get_response(@org.profiles_url, get_params(@org.profiles_params))
+        rescue Errors::UrlChanged => e
+          @org.update_attributes(profiles_url: e.message)
+          retry
+        end
         CSV.new(response, headers: :first_row).each do |line|
           name = line['PROFILE_DESCRIPTION'] || line['ROLE_DESCRIPTION']
           code = line['PROFILE_CODE'] || line['ROLE_CODE']
@@ -212,7 +243,8 @@ class DataServer
     RestClient::Request.execute(:method => :post, :url => url, :payload => params, :timeout => -1) { |response, request, result, &block|
       Rails.logger.ap request
       # check for error response
-      first_line = response.split("\n").first.upcase
+      lines = response.split("\n")
+      first_line = lines.first.upcase
       case
       when first_line.include?('BAD_PASSWORD')
         raise OrgAccountInvalidCredentialsError, I18n.t('data_server.invalid_username_password', org: @org)
@@ -222,6 +254,12 @@ class DataServer
       response = response.to_str.unpack("C*").pack("U*")
       # Strip annoying extra unicode at the beginning of the file
       response = response[3..-1] if response.first.localize.code_points.first == 239
+
+      # look for a redirect
+      if lines[1].include?('RedirectQueryIni')
+        raise Errors::UrlChanged, lines[1].split('=')[1]
+      end
+
       response
     }
   end
