@@ -45,6 +45,9 @@ class Person::FacebookAccount < ActiveRecord::Base
       self.remote_id = get_id_from_url(value)
     rescue RestClient::ResourceNotFound
     end
+    unless remote_id.present?
+      raise Errors::FacebookLink, _('We were unable to link this person to the facebook url you provided. Check the url you entered and try again. If you are currently running the "Import contacts from facebook" process, please wait until you get the email saying the import finished before trying again.')
+    end
   end
 
   def get_id_from_url(url)

@@ -95,10 +95,16 @@ class ContactsController < ApplicationController
 
   def update
     respond_to do |format|
-      if @contact.update_attributes(params[:contact])
-        format.html { redirect_to @contact }
-        format.js
-      else
+      begin
+        if @contact.update_attributes(params[:contact])
+          format.html { redirect_to @contact }
+          format.js
+        else
+          format.html { render action: "edit" }
+          format.js { render nothing: true }
+        end
+      rescue Errors::FacebookLink => e
+        flash.now[:alert] = e.message
         format.html { render action: "edit" }
         format.js { render nothing: true }
       end
