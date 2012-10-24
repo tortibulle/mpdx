@@ -118,15 +118,15 @@ class Person < ActiveRecord::Base
 
   def merge(other)
     Person.transaction(:requires_new => true) do
-      %w[phone_numbers company_positions contact_people].each do |relationship|
+      %w[phone_numbers company_positions].each do |relationship|
         other.send(relationship.to_sym).update_all(person_id: id)
       end
 
       # handle a few things separately to check for duplicates
       %w[twitter_accounts facebook_accounts linkedin_accounts
         google_accounts relay_accounts organization_accounts].each do |relationship|
-        other.send(relationship.to_sym).each do |record|
-          unless send(relationship.to_sym).where(person_id: id, remote_id: record.remote_id)
+        other.send(relationship).each do |record|
+          unless send(relationship).where(person_id: id, remote_id: record.remote_id)
             record.update_attributes(person_id: id)
           end
         end
