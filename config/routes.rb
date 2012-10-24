@@ -1,6 +1,8 @@
 require 'resque/server'
 Mpdx::Application.routes.draw do
 
+  resources :notifications
+
   resources :account_lists, only: :update
 
   resources :mail_chimp_accounts do
