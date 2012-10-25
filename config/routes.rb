@@ -39,7 +39,7 @@ Mpdx::Application.routes.draw do
   resources :contacts do
     collection do
       get :social_search
-      post :bulk_update
+      put :bulk_update
       post :merge
       get  :find_duplicates
     end

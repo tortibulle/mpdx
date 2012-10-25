@@ -106,6 +106,13 @@ describe ContactsController do
       end
     end
 
+    describe '#bulk_update' do
+      it "doesn't error out when all the attributes to update are blank" do
+        xhr :put, :bulk_update, bulk_edit_contact_ids: '1', contact: {send_newsletter: ''}
+        response.should be_success
+      end
+    end
+
 
   end
 end
