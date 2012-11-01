@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
   def redirect_to_mobile
     if params[:mobile] == "1" ||
        request.user_agent =~ /iPhone|Android/
-      redirect_to '/mobile/index.html' and return false
+      redirect_to '/mobile/' and return false
     end
   end
 
