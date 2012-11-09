@@ -75,6 +75,7 @@ gem 'rails_autolink'
 gem 'display_case'
 gem 'gibbon'
 gem 'whenever'
+gem 'virtus'
 
 group :development do
   gem 'railroady'

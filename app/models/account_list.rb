@@ -26,6 +26,7 @@ class AccountList < ActiveRecord::Base
   has_many :activities, dependent: :destroy
   has_many :imports, dependent: :destroy
   has_one  :mail_chimp_account, dependent: :destroy
+  has_many :notification_preferences, autosave: true
 
   belongs_to :designation_profile
 

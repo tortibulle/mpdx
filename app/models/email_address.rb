@@ -28,9 +28,13 @@ class EmailAddress < ActiveRecord::Base
   def ensure_only_one_primary
     primary_emails = self.person.email_addresses.where(primary: true)
     if primary_emails.blank?
-      person.email_addresses.first.update_column(:primary, true)
+      person.email_addresses.last.update_column(:primary, true)
     elsif primary_emails.length > 1
-      primary_emails[0..-2].map {|e| e.update_column(:primary, false)}
+      if primary_emails.include?(self)
+        (primary_emails - [self]).map {|e| e.update_column(:primary, false)}
+      else
+        primary_emails[0..-2].map {|e| e.update_column(:primary, false)}
+      end
     end
   end
 
@@ -81,7 +85,7 @@ class EmailAddress < ActiveRecord::Base
     if person
       contact = person.contacts.first
 
-      if contact.send_email_letter? &&
+      if contact && contact.send_email_letter? &&
           mail_chimp_account &&
           (primary? || person.email_addresses.length == 1)
         mail_chimp_account.queue_subscribe_person(person)

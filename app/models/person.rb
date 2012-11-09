@@ -1,7 +1,7 @@
 class Person < ActiveRecord::Base
 
   belongs_to :master_person
-  has_many :email_addresses, dependent: :destroy
+  has_many :email_addresses, dependent: :destroy, autosave: true
   has_one :primary_email_address, class_name: 'EmailAddress', foreign_key: :person_id, conditions: {'email_addresses.primary' => true}
   has_many :phone_numbers, dependent: :destroy
   has_one :primary_phone_number, class_name: 'PhoneNumber', foreign_key: :person_id, conditions: {'phone_numbers.primary' => true}
@@ -71,7 +71,7 @@ class Person < ActiveRecord::Base
   end
 
   def email=(val)
-    self.email_address = {email: val}
+    self.email_address = {email: val, primary: true}
   end
 
   def email
@@ -175,6 +175,11 @@ class Person < ActiveRecord::Base
     new_person
   end
 
+  def contact
+    @contact ||= contacts.first
+  end
+
+
   private
   def find_master_person
     unless master_person_id
@@ -186,16 +191,12 @@ class Person < ActiveRecord::Base
     self.master_person.destroy if (self.master_person.people - [self]).blank?
   end
 
-  def contact
-    @contact ||= contacts.first
-  end
-
   def mail_chimp_account
-    @mail_chimp_account ||= contact.account_list.mail_chimp_account
+    @mail_chimp_account ||= contact.account_list.mail_chimp_account if contact
   end
 
   def sync_with_mailchimp
-    if mail_chimp_account && contact.send_email_letter?
+    if mail_chimp_account && contact && contact.send_email_letter?
       queue_subscribe_person(self)
     end
   end

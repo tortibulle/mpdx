@@ -1,19 +1,49 @@
 <%= render 'settings_sidebar' %>
 <div id="contentbody" class="withleft">
   <div class="wpp">
-    <%= form_for current_user, url: preference_path(current_user), method: :put do |f| %>
+    <%= form_for @preference_set, url: preference_path(current_user), method: :put do |f| %>
+      <h3><%= _('About you') %></h3>
+
+      <div class="field">
+        <%= f.label :first_name, _('Your first name') %>
+        <%= f.text_field :first_name %>
+      </div>
+
+      <div class="field">
+        <%= f.label :email, _('Preferred Email Address') %>
+        <%= f.text_field :email %>
+      </div>
+
+      <div class="field">
+        <%= f.label :time_zone, _('Time zone') %>
+        <%= f.time_zone_select :time_zone %>
+      </div>
+
+      <div class="field">
+        <%= f.label :locale, _('Language') %>
+        <%= f.select :locale, TwitterCldr::Shared::Languages.all_for(locale).select { |k, _| TwitterCldr.supported_locales.include?(k) }.invert, selected: locale %>
+      </div>
+
+      <br />
+
+      <h3><%= _('Notifications / Alerts') %></h3>
+      <p><%= _("Based on an analysis of a partner's giving history, MPDX can notify you of events that you will probably want to follow up on. The detection logic
+                is based on a set of rules that are right most of the time, but you will still want to verify an event manually before contacting the partner.<br><br>
+               For each event MPDX can notify you via email and also create a task entry reminding you to do something about it. The options below allow you to control that behavior.") %>
+      </p>
+
+      <% NotificationType.all.each do |notification_type| %>
+        <% field_name = notification_type.class.to_s.split('::').last.to_s.underscore.to_sym %>
         <div class="field">
-          <%= f.label :first_name, _('Your first name') %>
-          <%= f.text_field :first_name %>
+          <strong><%= f.label field_name, _(notification_type.description) %></strong>
+          <%= check_box_tag "preference_set[stopped_giving][actions][]", 'email', f.object.send(field_name).include?('email') %>
+          <%= _('Email me') %> &nbsp;
+          <%= check_box_tag "preference_set[stopped_giving][actions][]", 'task', f.object.send(field_name).include?('task') %>
+          <%= _('Create a task') %>
+
         </div>
-        <div class="field">
-          <%= f.label :time_zone, _('Time zone') %>
-          <%= f.time_zone_select :time_zone %>
-        </div>
-        <div class="field">
-          <%= f.label :locale, _('Language') %>
-          <%= f.select :locale, TwitterCldr::Shared::Languages.all_for(locale).select { |k, _| TwitterCldr.supported_locales.include?(k) }.invert, selected: locale %>
-        </div>
+      <% end %>
+
       <%= f.submit _('Save Preferences') %>
     <% end %>
   </div>
