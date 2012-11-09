@@ -74,6 +74,7 @@ gem 'active_model_serializers', git: 'git://github.com/josevalim/active_model_se
 gem 'rails_autolink'
 gem 'display_case'
 gem 'gibbon'
+gem 'whenever'
 
 group :development do
   gem 'railroady'
