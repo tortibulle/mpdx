@@ -256,7 +256,7 @@ class DataServer
       response = response[3..-1] if response.first.localize.code_points.first == 239
 
       # look for a redirect
-      if lines[1].include?('RedirectQueryIni')
+      if lines[1] && lines[1].include?('RedirectQueryIni')
         raise Errors::UrlChanged, lines[1].split('=')[1]
       end
 
