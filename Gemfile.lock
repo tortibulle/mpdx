@@ -83,6 +83,7 @@ GEM
     charlock_holmes (0.6.9)
     childprocess (0.3.5)
       ffi (~> 1.0, >= 1.0.6)
+    chronic (0.8.0)
     coffee-rails (3.2.2)
       coffee-script (>= 2.2.0)
       railties (~> 3.2.0)
@@ -395,6 +396,9 @@ GEM
     webmock (1.8.11)
       addressable (>= 2.2.7)
       crack (>= 0.1.7)
+    whenever (0.8.0)
+      activesupport (>= 2.3.4)
+      chronic (>= 0.6.3)
     wicked (0.2.0)
       activesupport (>= 3.0.7)
       rails (>= 3.0.7)
@@ -472,5 +476,6 @@ DEPENDENCIES
   unicorn
   versionist!
   webmock (~> 1.8.3)
+  whenever
   wicked
   will_paginate (~> 3.0)
