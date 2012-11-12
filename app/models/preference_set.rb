@@ -31,8 +31,11 @@ class PreferenceSet
     false
   end
 
-  def stopped_giving=(val)
-    set_preference(NotificationType::StoppedGiving, val)
+  NotificationType.types.each do |type|
+    method_name = (type.split('::').last.underscore + '=').to_sym
+    define_method method_name do |val|
+      set_preference(type, val)
+    end
   end
 
   def save
@@ -64,7 +67,7 @@ class PreferenceSet
   private
 
   def set_preference(klass, val)
-    type = klass.first
+    type = klass.constantize.first
     preference = account_list.notification_preferences.detect { |p| p.notification_type_id == type.id } ||
                  account_list.notification_preferences.new(notification_type_id: type.id)
     preference.actions = val['actions']

@@ -36,9 +36,9 @@
         <% field_name = notification_type.class.to_s.split('::').last.to_s.underscore.to_sym %>
         <div class="field">
           <strong><%= f.label field_name, _(notification_type.description) %></strong>
-          <%= check_box_tag "preference_set[stopped_giving][actions][]", 'email', f.object.send(field_name).include?('email') %>
+          <%= check_box_tag "preference_set[#{field_name}][actions][]", 'email', f.object.send(field_name).include?('email') %>
           <%= _('Email me') %> &nbsp;
-          <%= check_box_tag "preference_set[stopped_giving][actions][]", 'task', f.object.send(field_name).include?('task') %>
+          <%= check_box_tag "preference_set[#{field_name}][actions][]", 'task', f.object.send(field_name).include?('task') %>
           <%= _('Create a task') %>
 
         </div>
