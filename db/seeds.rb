@@ -104,3 +104,4 @@ if Organization.all.blank?
 end
 (NotificationType::StoppedGiving.first || NotificationType::StoppedGiving.create).update_column(:description, _('Partner stopped giving'))
 (NotificationType::StartedGiving.first || NotificationType::StartedGiving.create).update_column(:description, _('Partner started giving'))
+(NotificationType::LargerGift.first || NotificationType::LargerGift.create).update_column(:description, _('Partner gave a larger gift than usual'))

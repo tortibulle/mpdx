@@ -1,8 +1,8 @@
 class SiebelTemp < DataServer
 
   def check_credentials!
-    raise OrgAccountMissingCredentialsError, I18n.t('data_server.missing_username_password') unless @org_account.token.present?
-    raise OrgAccountInvalidCredentialsError, I18n.t('data_server.invalid_username_password', org: @org) unless @org_account.valid_credentials?
+    raise OrgAccountMissingCredentialsError, _('Your username and password are missing for this account.') unless @org_account.token.present?
+    raise OrgAccountInvalidCredentialsError, _('Your username and password for %{org} are invalid.') % { org: @org } unless @org_account.valid_credentials?
   end
 
   def requires_username_and_password?
@@ -30,7 +30,7 @@ class SiebelTemp < DataServer
       first_line = response.split("\n").first.to_s.upcase
       case
       when first_line.include?('BAD_PASSWORD')
-        raise OrgAccountInvalidCredentialsError, I18n.t('data_server.invalid_username_password', org: @org)
+        raise OrgAccountInvalidCredentialsError, _("Your username and password for %{org} are invalid.") % { org: @org }
       when response.code.to_i == 500 || first_line.include?('ERROR') || first_line.include?('HTML')
         raise DataServerError, response.to_str
       end
