@@ -33,6 +33,7 @@ describe MailChimpAccount do
     @account.active = true
     @account.validate_key
     @account.active.should == false
+    @account.validation_error.should =~ /Invalid Mailchimp API Key: fake-us4/
   end
 
   it "should activate the account if the api key is valid" do

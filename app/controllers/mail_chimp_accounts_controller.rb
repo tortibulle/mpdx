@@ -2,9 +2,8 @@ class MailChimpAccountsController < ApplicationController
   before_filter :get_mail_chimp_account
 
   def index
-    if current_account_list.mail_chimp_account
-      @error_message = @mail_chimp_account.validate_key
-    end
+    
+    @mail_chimp_account.validate_key if current_account_list.mail_chimp_account
 
     unless @mail_chimp_account.active?
       redirect_to new_mail_chimp_account_path and return
@@ -28,6 +27,7 @@ class MailChimpAccountsController < ApplicationController
   end
 
   def edit
+    render :new unless @mail_chimp_account.active_and_valid?
   end
 
   def destroy
@@ -49,7 +49,7 @@ class MailChimpAccountsController < ApplicationController
 
     changed_primary = true if @mail_chimp_account.changed.include?('primary_list_id')
 
-    if @mail_chimp_account.save
+    if @mail_chimp_account.save && @mail_chimp_account.active?
       if @mail_chimp_account.primary_list
         if changed_primary
           flash[:notice] = _("MPDX is now uploading your newsletter recipients to MailChimp.")

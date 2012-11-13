@@ -3,9 +3,9 @@
   <div class="wpp">
     <%= image_tag('logos/mailchimp_logo.png') %><br />
 
-    <% if @error_message  %>
+    <% if !@mail_chimp_account.active? && !@mail_chimp_account.validate_key  %>
       <%#Invalid api key%>
-      <%= @error_message %><br /><br />
+      <%= @mail_chimp_account.validation_error %><br /><br />
     <% end %>
 
     <%= form_for @mail_chimp_account do |f| %>

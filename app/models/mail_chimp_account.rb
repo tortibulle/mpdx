@@ -8,6 +8,7 @@ class MailChimpAccount < ActiveRecord::Base
   belongs_to :account_list
 
   attr_accessible :api_key, :primary_list_id
+  attr :validation_error
 
   validates :account_list_id, :api_key, presence: true
 
@@ -17,10 +18,14 @@ class MailChimpAccount < ActiveRecord::Base
   def self.queue() :general; end
 
   def lists
-    return [] unless api_key.present?
-    @list_response ||= gb.lists
-    return [] unless @list_response['data']
-    @lists ||= @list_response['data'].collect { |l| List.new(l['id'], l['name']) }
+    begin
+      return [] unless api_key.present?
+      @list_response ||= gb.lists
+      return [] unless @list_response['data']
+      @lists ||= @list_response['data'].collect { |l| List.new(l['id'], l['name']) }
+    rescue Gibbon::MailChimpError
+      []
+    end
   end
 
   def list(list_id)
@@ -32,15 +37,19 @@ class MailChimpAccount < ActiveRecord::Base
   end
 
   def validate_key
-    @list_response ||= gb.lists
-    if @list_response['code'] == 104 # Invalid API key
-      self.active = false
-      return @list_response['error']
-    else
+    begin
+      @list_response ||= gb.lists
       self.active = true
+    rescue Gibbon::MailChimpError => e
+      self.active = false
+      @validation_error = e.message
     end
-    save
-    true
+    update_column(:active, active) unless new_record?
+    active
+  end
+
+  def active_and_valid?
+    active? && validate_key
   end
 
   def datacenter
