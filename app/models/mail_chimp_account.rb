@@ -176,7 +176,7 @@ class MailChimpAccount < ActiveRecord::Base
 
       else
         # create a new grouping
-        self.grouping_id = gb.list_interest_grouping_add(id: list_id, name: _('Partner Status'), type: 'hidden', 
+        self.grouping_id = gb.list_interest_grouping_add(id: list_id, name: _('Partner Status'), type: 'hidden',
                                                          groups: statuses.map { |s| _(s) })
       end
       save

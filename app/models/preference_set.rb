@@ -53,7 +53,7 @@ class PreferenceSet
     if NotificationType.types.include?(class_name)
       type = class_name.constantize.first
       account_list.notification_preferences.detect { |p| p.notification_type_id == type.id }.try(:actions) ||
-      ['email','task']
+        NotificationPreference.default_actions
     else
       super
     end

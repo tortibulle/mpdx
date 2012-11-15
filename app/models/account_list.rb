@@ -51,24 +51,24 @@ class AccountList < ActiveRecord::Base
   end
 
   def activity_tags
-      @contact_tags ||= ActiveRecord::Base.connection.select_values("select distinct(tags.name) from account_lists al inner join activities a on a.account_list_id = al.id inner join taggings t on t.taggable_id = a.id AND t.taggable_type = 'Activity'
+    @contact_tags ||= ActiveRecord::Base.connection.select_values("select distinct(tags.name) from account_lists al inner join activities a on a.account_list_id = al.id inner join taggings t on t.taggable_id = a.id AND t.taggable_type = 'Activity'
                                             inner join tags on t.tag_id = tags.id where al.id = #{id} order by tags.name")
   end
 
   def cities
-     @cities ||= ActiveRecord::Base.connection.select_values("select distinct(a.city) from account_lists al inner join contacts c on c.account_list_id = al.id
+    @cities ||= ActiveRecord::Base.connection.select_values("select distinct(a.city) from account_lists al inner join contacts c on c.account_list_id = al.id
                                                        inner join addresses a on a.addressable_id = c.id AND a.addressable_type = 'Contact' where al.id = #{id}
                                                        order by a.city")
   end
 
   def states
-     @states ||= ActiveRecord::Base.connection.select_values("select distinct(a.state) from account_lists al inner join contacts c on c.account_list_id = al.id
+    @states ||= ActiveRecord::Base.connection.select_values("select distinct(a.state) from account_lists al inner join contacts c on c.account_list_id = al.id
                                                        inner join addresses a on a.addressable_id = c.id AND a.addressable_type = 'Contact' where al.id = #{id}
                                                        order by a.state")
   end
 
   def churches
-     @churches ||= ActiveRecord::Base.connection.select_values("select distinct(c.church_name) from account_lists al inner join contacts c on c.account_list_id = al.id
+    @churches ||= ActiveRecord::Base.connection.select_values("select distinct(c.church_name) from account_lists al inner join contacts c on c.account_list_id = al.id
                                                        where al.id = #{id} order by c.church_name")
   end
 
@@ -78,8 +78,40 @@ class AccountList < ActiveRecord::Base
 
   def top_partners
     contacts.order('total_donations desc')
-            .where('total_donations > 0')
-            .limit(10)
+    .where('total_donations > 0')
+    .limit(10)
+  end
+
+  # Download latest transactions and trigger any necessary notifications
+  def send_account_notifications
+    designation_accounts.each do |da|
+      contacts = NotificationType.check_all
+
+      notifications_to_email = {}
+
+      # Check preferences for what to do with each notification type
+      NotificationType.types.each do |notification_type|
+        actions = notification_preferences.find_by_notification_type_id(notification_type.id).try(:actions) ||
+          NotificationPreference.default_actions
+
+        # Collect any emails that need sent
+        if actions.include?('email')
+          notifications_to_email[notification_type] = contacts[notification_type]
+        end
+
+        if actions.include?('task')
+          # Create a task for each notification
+          contacts[type].each do |_, contact|
+            notification_type.create_task(self, contact)
+          end
+        end
+      end
+
+      # Send email if necessary
+      if notifications_to_email.present?
+        NotificationMailer.notify(account_list, notifications_to_email)
+      end
+    end
   end
 
   def merge(other)
