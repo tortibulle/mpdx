@@ -17,6 +17,7 @@ class Contact < ActiveRecord::Base
   has_many :activity_contacts
   has_many :activities, through: :activity_contacts
   has_many :tasks, through: :activity_contacts, source: :activity
+  has_many :notifications, inverse_of: :contact
 
 
   scope :people, where('donor_accounts.master_company_id is null').includes(:donor_accounts)

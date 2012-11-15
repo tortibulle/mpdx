@@ -1,5 +1,4 @@
 class Task < Activity
-  attr_accessible :activity_type
 
   before_save :update_completed_at
 

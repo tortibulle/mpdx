@@ -4,23 +4,32 @@ class NotificationType::StoppedGiving < NotificationType
   # (the extra week is to allow for a delay in the donation system)
   # If a donor gives via check, notify when their gift is 30 days past due
   def check(designation_account)
-    contacts = []
+    notifications = []
     designation_account.contacts.financial_partners.each do |contact|
-      if contact.direct_deposit?
-        unless contact.donations.for(designation_account).since(38.days.ago).first
-          contacts << contact
+      date = contact.direct_deposit? ? 38.days.ago : (contact.pledge_frequency.to_i + 1).months.ago
+      prior_notification = Notification.active.where(contact_id: contact.id, notification_type_id: id).first
+
+      if contact.donations.for(designation_account).since(date).first
+        # Clear a prior notification if there was one
+        if prior_notification
+          prior_notification.update_attributes(cleared: true)
+          # Remove any tasks associated with this notification
+          prior_notification.tasks.destroy_all
         end
       else
-        unless contact.donations.for(designation_account).since((contact.pledge_frequency.to_i + 1).months.ago).first
-          contacts << contact
+        unless prior_notification
+          notification = contact.notifications.create!(notification_type_id: id, event_date: Date.today)
+          notifications << notification
         end
       end
     end
-    contacts
+    notifications
   end
 
-  def create_task(account_list, contact)
-    task = account_list.tasks.create(subject: task_description(contact), start_at: Time.now, activity_type: _('Call'))
+  def create_task(account_list, notification)
+    contact = notification.contact
+    task = account_list.tasks.create(subject: task_description(contact), start_at: Time.now,
+                                     activity_type: _('Call'), notification_id: notification.id)
     task.activity_contacts.create(contact_id: contact.id)
     task
   end

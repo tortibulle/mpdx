@@ -8,7 +8,11 @@
 # user. This concept should only be exposed to users who have more than
 # one designation account.
 
+require 'async'
+
 class AccountList < ActiveRecord::Base
+  include Async
+
   belongs_to :creator, class_name: 'User', foreign_key: 'creator_id'
   has_many :account_list_users, dependent: :destroy
   has_many :users, through: :account_list_users
@@ -33,6 +37,8 @@ class AccountList < ActiveRecord::Base
   attr_accessible :name, :creator_id, :contacts_attributes
 
   accepts_nested_attributes_for :contacts, reject_if: :all_blank, allow_destroy: true
+
+  def self.queue() :import; end
 
   def self.find_with_designation_numbers(numbers)
     designation_account_ids = DesignationAccount.where(designation_number: numbers).pluck(:id).sort
@@ -82,36 +88,15 @@ class AccountList < ActiveRecord::Base
     .limit(10)
   end
 
-  # Download latest transactions and trigger any necessary notifications
-  def send_account_notifications
-    designation_accounts.each do |da|
-      contacts = NotificationType.check_all
-
-      notifications_to_email = {}
-
-      # Check preferences for what to do with each notification type
-      NotificationType.types.each do |notification_type|
-        actions = notification_preferences.find_by_notification_type_id(notification_type.id).try(:actions) ||
-          NotificationPreference.default_actions
-
-        # Collect any emails that need sent
-        if actions.include?('email')
-          notifications_to_email[notification_type] = contacts[notification_type]
-        end
-
-        if actions.include?('task')
-          # Create a task for each notification
-          contacts[type].each do |_, contact|
-            notification_type.create_task(self, contact)
-          end
-        end
-      end
-
-      # Send email if necessary
-      if notifications_to_email.present?
-        NotificationMailer.notify(account_list, notifications_to_email)
-      end
+  # Download all donations / info for all accounts associated with this list
+  def self.update_linked_org_accounts
+    AccountList.find_each do |al|
+      al.users.collect(&:organization_accounts).flatten.uniq.collect(&:queue_import_data)
     end
+  end
+
+  def self.queue_send_account_notifications
+    AccountList.find_each { |al| al.async(:send_account_notifications) }
   end
 
   def merge(other)
@@ -141,4 +126,43 @@ class AccountList < ActiveRecord::Base
       other.destroy
     end
   end
+
+  private
+
+  # trigger any notifications for designation accounts in this account list
+  def send_account_notifications
+    designation_accounts.each do |da|
+      notifications = NotificationType.check_all(da)
+
+      notifications_to_email = {}
+
+      # Check preferences for what to do with each notification type
+      NotificationType.types.each do |notification_type_string|
+        notification_type = notification_type_string.constantize.first
+
+        if notifications[notification_type_string].present?
+          actions = notification_preferences.find_by_notification_type_id(notification_type.id).try(:actions) ||
+            NotificationPreference.default_actions
+
+          # Collect any emails that need sent
+          if actions.include?('email')
+            notifications_to_email[notification_type] = notifications[notification_type_string]
+          end
+
+          if actions.include?('task')
+            # Create a task for each notification
+            notifications[notification_type_string].each do |notification|
+              notification_type.create_task(self, notification)
+            end
+          end
+        end
+      end
+
+      # Send email if necessary
+      if notifications_to_email.present?
+        NotificationMailer.notify(self, notifications_to_email).deliver
+      end
+    end
+  end
+
 end

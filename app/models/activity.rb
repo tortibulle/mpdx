@@ -1,6 +1,7 @@
 class Activity < ActiveRecord::Base
   acts_as_taggable
   belongs_to :account_list
+  belongs_to :notification, inverse_of: :tasks
   has_many :activity_contacts, dependent: :destroy
   has_many :contacts, through: :activity_contacts
   has_many :activity_comments, dependent: :destroy
@@ -18,7 +19,8 @@ class Activity < ActiveRecord::Base
 
   attr_accessible :starred, :location, :subject, :start_at, :end_at, :completed,
                   :activity_contacts_attributes, :activity_comments_attributes,
-                  :contacts_attributes, :tag_list, :result
+                  :contacts_attributes, :tag_list, :result, :notification_id,
+                  :activity_type
 
   validates :subject, :start_at, presence: true
 

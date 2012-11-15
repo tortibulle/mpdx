@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121108200031) do
+ActiveRecord::Schema.define(:version => 20121115201514) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -59,10 +59,12 @@ ActiveRecord::Schema.define(:version => 20121108200031) do
     t.string   "activity_type"
     t.string   "result"
     t.datetime "completed_at"
+    t.integer  "notification_id"
   end
 
   add_index "activities", ["account_list_id"], :name => "index_activities_on_account_list_id"
   add_index "activities", ["activity_type"], :name => "index_activities_on_activity_type"
+  add_index "activities", ["notification_id"], :name => "index_activities_on_notification_id"
   add_index "activities", ["start_at"], :name => "index_activities_on_start_at"
 
   create_table "activity_comments", :force => true do |t|
@@ -387,8 +389,9 @@ ActiveRecord::Schema.define(:version => 20121108200031) do
     t.integer  "contact_id"
     t.integer  "notification_type_id"
     t.datetime "event_date"
-    t.datetime "created_at",           :null => false
-    t.datetime "updated_at",           :null => false
+    t.boolean  "cleared",              :default => false, :null => false
+    t.datetime "created_at",                              :null => false
+    t.datetime "updated_at",                              :null => false
   end
 
   add_index "notifications", ["contact_id"], :name => "index_notifications_on_contact_id"

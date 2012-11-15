@@ -1,3 +1,8 @@
-NotificationMailer#notify
+<% @notifications_by_type.each do |type, notifications|
+     contacts = notifications.collect(&:contact) %>
+<%= type.description %>:
+<% contacts.sort_by(&:name).each do |contact| %>
+* <%= type.task_description(contact) %>
+<% end %>
 
-<%= @greeting %>, find me in app/views/app/views/notification_mailer/notify.text.erb
+<% end %>

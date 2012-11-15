@@ -11,14 +11,14 @@ describe NotificationType::StoppedGiving do
 
       it 'adds a notification if late' do
         create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 38.days.ago)
-        contacts = stopped_giving.check(da)
-        contacts.length.should == 1
+        notifications = stopped_giving.check(da)
+        notifications.length.should == 1
       end
 
       it "doesn't add a notification if not late" do
         create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 37.days.ago)
-        contacts = stopped_giving.check(da)
-        contacts.length.should == 0
+        notifications = stopped_giving.check(da)
+        notifications.length.should == 0
       end
     end
 
@@ -27,14 +27,14 @@ describe NotificationType::StoppedGiving do
 
       it 'adds a notification if late' do
         create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 61.days.ago)
-        contacts = stopped_giving.check(da)
-        contacts.length.should == 1
+        notifications = stopped_giving.check(da)
+        notifications.length.should == 1
       end
 
       it "doesn't add a notification if not late" do
         create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 37.days.ago)
-        contacts = stopped_giving.check(da)
-        contacts.length.should == 0
+        notifications = stopped_giving.check(da)
+        notifications.length.should == 0
       end
     end
   end
@@ -44,12 +44,12 @@ describe NotificationType::StoppedGiving do
 
     it 'creates a task for the activity list' do
       expect {
-        stopped_giving.create_task(account_list, contact)
+        stopped_giving.create_task(account_list, contact.notifications.new)
       }.to change(Activity, :count).by(1)
     end
 
     it "associates the contact with the task created" do
-      task = stopped_giving.create_task(account_list, contact)
+      task = stopped_giving.create_task(account_list, contact.notifications.new)
       task.contacts.should include contact
     end
   end
