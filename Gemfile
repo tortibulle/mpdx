@@ -102,4 +102,5 @@ group :test do
   gem 'growl'
   gem 'capybara'
   gem 'resque_spec'
+  gem 'fuubar'
 end

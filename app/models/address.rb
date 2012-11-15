@@ -2,7 +2,7 @@ class Address < ActiveRecord::Base
   belongs_to :addressable, polymorphic: true
 
   assignable_values_for :location, :allow_blank => true do
-    ['Home', 'Business', 'Mailing', 'Other']
+    [_('Home'), _('Business'), _('Mailing'), _('Other')]
   end
 
   attr_accessible :street, :city, :state, :country, :postal_code, :location, :primary_mailing_address, :location, :start_date, :end_date

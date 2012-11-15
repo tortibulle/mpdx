@@ -2,7 +2,8 @@
 
 FactoryGirl.define do
   factory :contact do
-    association :account_list
+    account_list
     name 'John'
+    status 'Partner - Financial'
   end
 end

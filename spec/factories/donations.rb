@@ -12,6 +12,6 @@ FactoryGirl.define do
     currency "MyString"
     amount "9.99"
     memo "MyText"
-    donation_date "2012-03-14"
+    donation_date { Date.today }
   end
 end

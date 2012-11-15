@@ -6,6 +6,7 @@ class Contact < ActiveRecord::Base
 
   has_many :contact_donor_accounts
   has_many :donor_accounts, through: :contact_donor_accounts
+  has_many :donations, through: :donor_accounts
   belongs_to :account_list
   has_many :contact_people, dependent: :destroy
   has_many :people, through: :contact_people
@@ -22,6 +23,7 @@ class Contact < ActiveRecord::Base
   scope :companies, where('donor_accounts.master_company_id is not null').includes(:donor_accounts)
   scope :with_person, lambda { |person| includes(:people).where('people.id' => person.id) }
   scope :for_donor_account, lambda { |donor_account| where('donor_accounts.id' => donor_account.id).includes(:donor_accounts) }
+  scope :financial_partners, where(status: 'Partner - Financial')
 
 
   validates :name, presence: true
@@ -35,17 +37,18 @@ class Contact < ActiveRecord::Base
   after_update   :sync_with_mail_chimp
 
   assignable_values_for :status, allow_blank: true do
-    ['Never Contacted', 'Ask in Future', 'Contact for Appointment', 'Appointment Scheduled', 'Call for Decision',
-    'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Not Interested', 'Unresponsive', 'Never Ask',
-    'Research Abandoned','Expired Referral']
+    [_('Never Contacted'), _('Ask in Future'), _('Contact for Appointment'), _('Appointment Scheduled'),
+     _('Call for Decision'), _('Partner - Financial'), _('Partner - Special'), _('Partner - Pray'),
+     _('Not Interested'), _('Unresponsive'), _('Never Ask'),
+    _('Research Abandoned'), _('Expired Referral')]
   end
 
   assignable_values_for :likely_to_give, allow_blank: true do
-    ['Least Likely', 'Likely', 'Most Likely']
+    [_('Least Likely'), _('Likely'), _('Most Likely')]
   end
 
   assignable_values_for :send_newsletter, allow_blank: true do
-    ['Physical', 'Email', 'Both']
+    [_('Physical'), _('Email'), _('Both')]
   end
 
 

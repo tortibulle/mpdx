@@ -4,6 +4,9 @@ class Donation < ActiveRecord::Base
 
   validates :amount, :donation_date, presence: true
 
+  scope :for, lambda { |designation_account| where(designation_account_id: designation_account.id) }
+  scope :since, lambda { |date| where("donation_date > ?", date) }
+
   default_scope order("donation_date desc")
 
   after_create :update_totals
