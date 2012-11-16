@@ -5,7 +5,7 @@ class Task < Activity
   assignable_values_for :activity_type, :allow_blank => true do
     [_('Call'), _('Appointment'), _('Email'), _('Text Message'), _('Facebook Message'),
      _('Letter'), _('Newsletter'), _('Pre Call Letter'), _('Reminder Letter'),
-     _('Support Letter'),W _('Thank'), _('To Do')]
+     _('Support Letter'), _('Thank'), _('To Do')]
   end
 
   assignable_values_for :result, :allow_blank => true do
