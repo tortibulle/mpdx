@@ -3,12 +3,13 @@ class Task < Activity
   before_save :update_completed_at
 
   assignable_values_for :activity_type, :allow_blank => true do
-    ['Call', 'Appointment', 'Email', 'Text Message', 'Facebook Message', 'Letter', 'Newsletter',
-     'Pre Call Letter', 'Reminder Letter', 'Support Letter', 'Thank', 'To Do']
+    [_('Call'), _('Appointment'), _('Email'), _('Text Message'), _('Facebook Message'),
+     _('Letter'), _('Newsletter'), _('Pre Call Letter'), _('Reminder Letter'),
+     _('Support Letter'),W _('Thank'), _('To Do')]
   end
 
   assignable_values_for :result, :allow_blank => true do
-    ['Attempted', 'Done']
+    [_('Attempted'), _('Done')]
   end
 
   def attempted?
