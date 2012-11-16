@@ -37,6 +37,13 @@ describe NotificationType::StoppedGiving do
         notifications.length.should == 0
       end
     end
+
+    context 'has never given' do
+      it "doesn't add a notification" do
+        notifications = stopped_giving.check(da)
+        notifications.length.should == 0
+      end
+    end
   end
 
   describe '.create_task' do

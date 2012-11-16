@@ -18,8 +18,11 @@ class NotificationType::StoppedGiving < NotificationType
         end
       else
         unless prior_notification
-          notification = contact.notifications.create!(notification_type_id: id, event_date: Date.today)
-          notifications << notification
+          # If they've never given, they haven't missed a gift
+          if contact.donations.for(designation_account).first
+            notification = contact.notifications.create!(notification_type_id: id, event_date: Date.today)
+            notifications << notification
+          end
         end
       end
     end
