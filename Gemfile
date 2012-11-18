@@ -70,7 +70,7 @@ gem 'fb_graph'
 gem "acts-as-taggable-on", '~> 2.3.3'
 gem "fog", "~> 1.6.0"
 gem 'gibberish'
-gem 'active_model_serializers', git: 'git://github.com/josevalim/active_model_serializers.git'
+gem 'active_model_serializers'
 gem 'rails_autolink'
 gem 'display_case'
 gem 'gibbon'

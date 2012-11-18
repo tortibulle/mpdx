@@ -13,13 +13,6 @@ GIT
       activesupport (>= 3.2.0)
 
 GIT
-  remote: git://github.com/josevalim/active_model_serializers.git
-  revision: 9f5e1b1776b67e2a601b0205fbba705a0cde55e6
-  specs:
-    active_model_serializers (0.5.2)
-      activemodel (>= 3.0)
-
-GIT
   remote: git://github.com/twinge/versionist.git
   revision: 1c546e743871c0e8aba7262b3a2a25f4e90c7173
   branch: multiple_versioning_strategies
@@ -44,6 +37,8 @@ GEM
       rack-cache (~> 1.2)
       rack-test (~> 0.6.1)
       sprockets (~> 2.2.1)
+    active_model_serializers (0.6.0)
+      activemodel (>= 3.0)
     activemodel (3.2.9)
       activesupport (= 3.2.9)
       builder (~> 3.0.0)
@@ -426,7 +421,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  active_model_serializers!
+  active_model_serializers
   acts-as-taggable-on (~> 2.3.3)
   airbrake
   airbrake_user_attributes
