@@ -26,14 +26,16 @@ class EmailAddress < ActiveRecord::Base
   private
 
   def ensure_only_one_primary
-    primary_emails = self.person.email_addresses.where(primary: true)
-    if primary_emails.blank?
-      person.email_addresses.last.update_column(:primary, true)
-    elsif primary_emails.length > 1
-      if primary_emails.include?(self)
-        (primary_emails - [self]).map {|e| e.update_column(:primary, false)}
-      else
-        primary_emails[0..-2].map {|e| e.update_column(:primary, false)}
+    if person.email_addresses.present?
+      primary_emails = self.person.email_addresses.where(primary: true)
+      if primary_emails.blank?
+        person.email_addresses.last.update_column(:primary, true)
+      elsif primary_emails.length > 1
+        if primary_emails.include?(self)
+          (primary_emails - [self]).map {|e| e.update_column(:primary, false)}
+        else
+          primary_emails[0..-2].map {|e| e.update_column(:primary, false)}
+        end
       end
     end
   end
@@ -75,7 +77,11 @@ class EmailAddress < ActiveRecord::Base
           end
         end
       else
-        mail_chimp_account.queue_unsubscribe_email(email)
+        begin
+          mail_chimp_account.queue_unsubscribe_email(email)
+        rescue Gibbon::MailChimpError => e
+          logger.info(e)
+        end
       end
     end
 
