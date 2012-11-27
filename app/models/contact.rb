@@ -25,7 +25,7 @@ class Contact < ActiveRecord::Base
   scope :with_person, lambda { |person| includes(:people).where('people.id' => person.id) }
   scope :for_donor_account, lambda { |donor_account| where('donor_accounts.id' => donor_account.id).includes(:donor_accounts) }
   scope :financial_partners, where(status: 'Partner - Financial')
-  scope :active, where('status NOT IN(?)', ['Not Interested', 'Unresponsive', 'Never Ask',
+  scope :active, where('status NOT IN(?) or status is null', ['Not Interested', 'Unresponsive', 'Never Ask',
                                'Research Abandoned', 'Expired Referral'])
 
 

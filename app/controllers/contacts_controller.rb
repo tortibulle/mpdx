@@ -60,9 +60,10 @@ class ContactsController < ApplicationController
       wants.html do
         @all_contacts = @contacts.select(['contacts.id', 'contacts.name'])
 
-        unless params[:per_page] == 'All'
-          @per_page = params[:per_page].to_i > 0 ? params[:per_page] : 25
-          @contacts = @contacts.page(params[:page]).per_page(@per_page)
+        @per_page = params[:per_page]
+        unless @per_page == 'All'
+          @per_page = @per_page.to_i > 0 ? @per_page : 25
+          @contacts = @contacts.page(params[:page]).per_page(@per_page.to_i)
         end
       end
 
