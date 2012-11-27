@@ -11,7 +11,7 @@
     <span class="tags menu_item"><%= _('Tags') %></span>
     <ul class="left_taglist tags">
       <li>
-        <% current_account_list.contact_tags.each do |tag| 
+        <% current_account_list.contact_tags.each do |tag|
           # toggle tag on / off
           tag_params = params.except(:action, :controller)
           if @tags && @tags.include?(tag)
@@ -86,7 +86,7 @@
 <div id="contentbody" class="withleft">
   <div class="filters">
     <%= text_field_tag :contact_name, '', autocomplete: 'off', placeholder: _('Type to filter'), class: 'search_filter' %>
-    <div class="right" id="contacts_actions">
+    <div class="right" class="contacts_actions">
       <%= link_to(_('Actions'), "#", class: "btn smallbtn actionbtn", style: 'display:none') %>
       <%= link_to(_('Merge'), '#', class: 'btn smallbtn', style: 'display:none', data: {behavior: 'merge'}) %>
       <%= hidden_field_tag :selected_ids %>
@@ -115,10 +115,31 @@
             </span>
           </td>
         </tr>
+        <tr>
+          <td colspan="3">
+            <%= render 'pagination' %>
+          </td>
+        </tr>
         <%= render partial: 'contact', collection: @contacts %>
+        <tr>
+          <td colspan="3">
+            <%= render 'pagination' %>
+          </td>
+        </tr>
       </table>
-      <%= will_paginate @contacts %>
-
+      <div class="filters">
+        <div class="right" class="contacts_actions">
+          <%= link_to(_('Actions'), "#", class: "btn smallbtn actionbtn", style: 'display:none') %>
+          <%= link_to(_('Merge'), '#', class: 'btn smallbtn', style: 'display:none', data: {behavior: 'merge'}) %>
+          <ul style="display:none" class="action_list">
+            <li><%= link_to(_('Add Tag'), '#', class: 'none', data: {behavior: 'add_tag_to_list'}) %></li>
+            <li><%= link_to(_('Remove Tag'), '#', class: 'none', data: {behavior: 'remove_tag_from_list'}) %></li>
+            <li><%= link_to(_('Add Task'), '#', class: 'none', data: {behavior: 'add_task_to_list'}) %></li>
+            <li><%= link_to(_('Edit Fields'), '#', class: 'none', data: {behavior: 'bulk_edit'}) %></li>
+          </ul>
+          <span style="margin-right:3px;margin-left:5px"><input type="checkbox" class="checkall" /></span>
+        </div>
+      </div>
     </div>
   </div>
 </div>

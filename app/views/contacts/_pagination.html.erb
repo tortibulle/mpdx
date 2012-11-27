@@ -1,0 +1,2 @@
+<%= will_paginate @contacts if @per_page %>
+<%= _('Show:') %> <%= select_tag(:per_page, options_for_select(['25', '50', '100', [_('All'), 'All']], params[:per_page] || '25')) %>

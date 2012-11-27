@@ -14,6 +14,9 @@ $ ->
         false
 
     if $('#contacts_index')[0]?
+      $(document).on 'change', '#per_page', ->
+        document.location = document.location.pathname + '?' + $.set_param('per_page', $(this).val())
+
       # quick search for contact
       $('#contact_name').autocomplete({
         source: contacts_json,
@@ -194,7 +197,7 @@ $ ->
         false
 
 
-      $('#contacts_actions').hoverIntent {
+      $('.contacts_actions').hoverIntent {
         over: ->{},
         timeout: 500,
         out: ->

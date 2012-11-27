@@ -14,6 +14,7 @@ describe ContactsController do
         @contact2 = create(:contact, name: 'Z', account_list: @user.account_lists.first)
         @contact2.donor_accounts << donor_account
       end
+
       it "gets all" do
         get :index
         response.should be_success
