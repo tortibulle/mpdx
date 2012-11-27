@@ -64,7 +64,6 @@ class ContactsController < ApplicationController
           @per_page = params[:per_page].to_i || 25
           @contacts = @contacts.page(params[:page]).per_page(@per_page)
         end
-        raise @contacts.inspect
       end
 
       wants.csv do

@@ -19,6 +19,7 @@ class AccountList < ActiveRecord::Base
   has_many :account_list_entries, dependent: :destroy
   has_many :designation_accounts, through: :account_list_entries
   has_many :contacts, dependent: :destroy
+  has_many :notifications, through: :contacts
   has_many :addresses, through: :contacts
   has_many :people, through: :contacts
   has_many :master_people, through: :people
