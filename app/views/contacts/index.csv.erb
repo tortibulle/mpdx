@@ -2,7 +2,9 @@
 <%== CSV.generate do |csv|
   @contacts.each do |contact|
     row = []
-    row << contact.name
+    row << contact.first_name
+    row << contact.last_name
+    row << contact.spouse_name
     row << contact.greeting
     row << contact.mailing_address.street
     row << contact.mailing_address.city

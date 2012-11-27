@@ -33,6 +33,8 @@ class ContactsController < ApplicationController
 
     if params[:status].present? && params[:status].first != ''
       @contacts = @contacts.where(status: params[:status])
+    else
+      @contacts = @contacts.active
     end
 
     if params[:referrer].present? && params[:referrer].first != ''
@@ -54,16 +56,26 @@ class ContactsController < ApplicationController
     end
 
     respond_to do |wants|
+
       wants.html do
         @all_contacts = @contacts.select(['contacts.id', 'contacts.name'])
-        @contacts = @contacts.page(params[:page])
+
+        unless params[:per_page] == 'All'
+          @per_page = params[:per_page].to_i || 25
+          @contacts = @contacts.page(params[:page]).per_page(@per_page)
+        end
+        raise @contacts.inspect
       end
+
       wants.csv do
-        @headers = ['Full Name','Greeting','Mailing Street Address','Mailing City',
-                    'Mailing State','Mailing Postal Code', 'Mailing Country',
-                    'Email 1','Email 2','Email 3','Email 4']
+        @contacts = @contacts.includes(:primary_address, :addresses, {people: :email_addresses})
+        @headers = ['First Name', 'Last Name', 'Spouse First Name', 'Greeting',
+                    'Mailing Street Address','Mailing City', 'Mailing State','Mailing Postal Code',
+                    'Mailing Country', 'Email 1','Email 2','Email 3','Email 4']
+
         render_csv("contacts-#{Time.now.strftime("%Y%m%d")}")
       end
+
     end
   end
 

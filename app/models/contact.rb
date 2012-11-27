@@ -25,6 +25,8 @@ class Contact < ActiveRecord::Base
   scope :with_person, lambda { |person| includes(:people).where('people.id' => person.id) }
   scope :for_donor_account, lambda { |donor_account| where('donor_accounts.id' => donor_account.id).includes(:donor_accounts) }
   scope :financial_partners, where(status: 'Partner - Financial')
+  scope :active, where('status NOT IN(?)', ['Not Interested', 'Unresponsive', 'Never Ask',
+                               'Research Abandoned', 'Expired Referral'])
 
 
   validates :name, presence: true
@@ -77,7 +79,7 @@ class Contact < ActiveRecord::Base
   end
 
   def mailing_address
-    addresses.where(primary_mailing_address: true).first || addresses.first || Address.new
+    @mailing_address ||= primary_address || addresses.first || Address.new
   end
 
   def self.create_from_donor_account(donor_account, account_list)
