@@ -1,2 +1,2 @@
-<%= will_paginate(@contacts) if @per_page && @per_page != 'All' %>
-<%= _('Show:') %> <%= select_tag(:per_page, options_for_select(['25', '50', '100', [_('All'), 'All']], @per_page.to_s)) %>
+<div style="float:left"><%= will_paginate(@contacts) if @per_page && @per_page != 'All' %></div>
+<div style="float:right"><%= _('Show:') %> <%= select_tag(:per_page, options_for_select(['25', '50', '100', [_('All'), 'All']], @per_page.to_s)) %></div>
