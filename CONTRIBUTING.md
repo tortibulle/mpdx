@@ -55,9 +55,14 @@ Now you should be able to run the entire suite using:
     $> bundle exec rspec spec
 
 
-### 5. Implement your fix or feature
+### 5. Add an entry to /etc/hosts
+Several callback services (including facebook and CAS) like to have a real hostname
+to redirect to. To work with those we recommend that you create an entry in your `hosts`
+file for local.mpdx.org like this:
 
-At this point, you should be ready to implement your feature!
+`local.mpdx.org 127.0.0.1`
+
+You might have to reboot after editing /etc/hosts before your computer picks up on it.
 
 
 ### 6. View your changes in a Rails application
