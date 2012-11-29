@@ -51,6 +51,10 @@ class Person::FacebookAccount < ActiveRecord::Base
   end
 
   def get_id_from_url(url)
+    Person::FacebookAccount.get_id_from_url(url)
+  end
+
+  def self.get_id_from_url(url)
     tries ||= 6
     # e.g. https://graph.facebook.com/nmfdelacruz)
     if url.include?("id=")

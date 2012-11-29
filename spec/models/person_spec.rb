@@ -30,6 +30,28 @@ describe Person do
     end
   end
 
+  describe '.save' do
+    it "gracefully handles having the same FB account assigned twice" do
+      fb_account = create(:facebook_account, person: person)
+      person.update_attributes("facebook_accounts_attributes" => {
+          "0" => {
+            "_destroy" => "false",
+            "url" => "http://facebook.com/profile.php?id=500015648"
+          },
+          "1" => {
+            "_destroy" => "false",
+            "url" => "http://facebook.com/profile.php?id=500015648"
+          },
+          "1354203866590" => {
+            "_destroy" => "false",
+            "id" => fb_account.id,
+            "url" => fb_account.url
+          }
+        })
+      person.facebook_accounts.length.should == 2
+    end
+  end
+
   context 'assigning an email address' do
     let(:email) { 'test@example.com' }
 

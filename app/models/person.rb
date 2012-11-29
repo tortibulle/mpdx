@@ -33,7 +33,7 @@ class Person < ActiveRecord::Base
   accepts_nested_attributes_for :linkedin_accounts, :reject_if => lambda { |p| p[:url].blank? }, :allow_destroy => true
 
 
-  attr_accessible :first_name, :last_name, :legal_first_name, :birthday_month, :birthday_year, :birthday_day, :anniversary_month, 
+  attr_accessible :first_name, :last_name, :legal_first_name, :birthday_month, :birthday_year, :birthday_day, :anniversary_month,
                   :anniversary_year, :anniversary_day, :title, :suffix, :gender, :marital_status, :preferences, :addresses_attributes,
                   :phone_number, :email_address, :middle_name, :phone_numbers_attributes, :family_relationships_attributes, :email,
                   :email_addresses_attributes, :facebook_accounts_attributes, :twi5tter_accounts_attributes, :linkedin_accounts_attributes,
@@ -94,6 +94,35 @@ class Person < ActiveRecord::Base
     end
   end
 
+  # Augment the built-in rails method to prevent duplicate facebook accounts
+  def facebook_accounts_attributes=(hash)
+    facebook_ids = facebook_accounts.pluck(:remote_id)
+
+    hash.each do |key, attributes|
+      next if attributes['_destroy'] == '1'
+
+      remote_id = Person::FacebookAccount.get_id_from_url(attributes['url'])
+      if facebook_ids.include?(remote_id)
+        hash.delete(key)
+      else
+        facebook_ids << remote_id
+      end
+    end
+
+    hash.each do |_, attributes|
+      if attributes['id']
+        fa = facebook_accounts.find(attributes['id'])
+        if attributes['_destroy'] == '1'
+          fa.destroy
+        else
+          fa.update_attributes(attributes.except('id', '_destroy'))
+        end
+      else
+        facebook_accounts.create(attributes.except('_destroy')) unless attributes['_destroy'] == '1'
+      end
+    end
+  end
+
   def email_address=(hash)
     hash = hash.with_indifferent_access
     EmailAddress.add_for_person(self, hash) if hash['email'].present?
@@ -138,7 +167,7 @@ class Person < ActiveRecord::Base
         end
       end
 
-      # because we're in a transaction, we need to keep track of which relationships we've updated so 
+      # because we're in a transaction, we need to keep track of which relationships we've updated so
       # we don't create duplicates on the next part
       FamilyRelationship.where(related_person_id: other.id).each do |fr|
         unless FamilyRelationship.where(person_id: fr.person_id, related_person_id: id).first

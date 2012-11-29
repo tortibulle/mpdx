@@ -24,7 +24,6 @@ describe Contact do
 
     it 'should update an address' do
       address = create(:address, addressable: @contact)
-      #raise [address.attributes.merge!(street: address.street + 'boo').with_indifferent_access.except(:id, :addressable_id, :addressable_type, :updated_at, :created_at)].inspect
       @contact.addresses_attributes = [address.attributes.merge!(street: address.street + 'boo').with_indifferent_access.except(:addressable_id, :addressable_type, :updated_at, :created_at)]
       @contact.save!
       @contact.addresses.first.street.should == address.street + 'boo'
