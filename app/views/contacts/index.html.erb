@@ -27,7 +27,8 @@
     </ul>
   </li>
   <li>
-    <%= form_tag '/contacts', method: :get do %>
+    <%= form_tag contacts_path, method: :get do %>
+      <%= hidden_field_tag :tags, params[:tags] %>
       <span class="left_filters menu_item" onclick="return false;"><%= _('Filters') %></span>
       <ul class="left_filters">
         <li>
