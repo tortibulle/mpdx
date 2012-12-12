@@ -14,7 +14,7 @@ class User < Person
   devise :trackable
   store :preferences, accessors: [:time_zone, :locale, :setup]
 
-  attr_accessible :first_name, :last_name
+  # attr_accessible :first_name, :last_name
 
   after_create :set_setup_mode
 

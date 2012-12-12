@@ -1,7 +1,7 @@
 class Person::GoogleAccount < ActiveRecord::Base
   extend Person::Account
 
-  attr_accessible :email
+  # attr_accessible :email
 
   def self.find_or_create_from_auth(auth_hash, person)
     @rel = person.google_accounts

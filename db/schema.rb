@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121115201514) do
+ActiveRecord::Schema.define(:version => 20121224123025) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -102,9 +102,12 @@ ActiveRecord::Schema.define(:version => 20121115201514) do
     t.datetime "updated_at",                                 :null => false
     t.boolean  "primary_mailing_address", :default => false
     t.string   "addressable_type"
+    t.string   "remote_id"
+    t.boolean  "seasonal",                :default => false
   end
 
   add_index "addresses", ["addressable_id"], :name => "index_addresses_on_person_id"
+  add_index "addresses", ["remote_id"], :name => "index_addresses_on_remote_id"
 
   create_table "companies", :force => true do |t|
     t.string   "name"
@@ -177,35 +180,34 @@ ActiveRecord::Schema.define(:version => 20121115201514) do
   create_table "contacts", :force => true do |t|
     t.string   "name"
     t.integer  "account_list_id"
-    t.datetime "created_at",                                                                                      :null => false
-    t.datetime "updated_at",                                                                                      :null => false
-    t.decimal  "pledge_amount",                                 :precision => 8,  :scale => 2
+    t.datetime "created_at",                                                                            :null => false
+    t.datetime "updated_at",                                                                            :null => false
+    t.decimal  "pledge_amount",                       :precision => 8,  :scale => 2
     t.string   "status"
-    t.decimal  "total_donations",                               :precision => 10, :scale => 2
+    t.decimal  "total_donations",                     :precision => 10, :scale => 2
     t.date     "last_donation_date"
     t.date     "first_donation_date"
     t.text     "notes"
     t.datetime "notes_saved_at"
     t.string   "full_name"
     t.string   "greeting"
-    t.string   "website",                       :limit => 1000
+    t.string   "website",             :limit => 1000
     t.integer  "pledge_frequency"
     t.date     "pledge_start_date"
-    t.boolean  "deceased",                                                                     :default => false, :null => false
+    t.boolean  "deceased",                                                           :default => false, :null => false
     t.date     "next_ask"
-    t.boolean  "never_ask",                                                                    :default => false, :null => false
+    t.boolean  "never_ask",                                                          :default => false, :null => false
     t.string   "likely_to_give"
     t.string   "church_name"
     t.string   "send_newsletter"
-    t.boolean  "direct_deposit",                                                               :default => false, :null => false
-    t.boolean  "magazine",                                                                     :default => false, :null => false
+    t.boolean  "direct_deposit",                                                     :default => false, :null => false
+    t.boolean  "magazine",                                                           :default => false, :null => false
     t.date     "last_activity"
     t.date     "last_appointment"
     t.date     "last_letter"
     t.date     "last_phone_call"
     t.date     "last_pre_call"
     t.date     "last_thank"
-    t.datetime "last_checked_notifications_at"
   end
 
   add_index "contacts", ["account_list_id"], :name => "index_contacts_on_account_list_id"
@@ -220,9 +222,11 @@ ActiveRecord::Schema.define(:version => 20121115201514) do
     t.decimal  "balance",            :precision => 8, :scale => 2
     t.datetime "balance_updated_at"
     t.string   "name"
+    t.string   "staff_account_id"
+    t.string   "chartfield"
   end
 
-  add_index "designation_accounts", ["organization_id", "designation_number"], :name => "unique_designation_org", :unique => true
+  add_index "designation_accounts", ["organization_id"], :name => "index_designation_accounts_on_organization_id"
 
   create_table "designation_profile_accounts", :force => true do |t|
     t.integer  "designation_profile_id"
@@ -246,7 +250,7 @@ ActiveRecord::Schema.define(:version => 20121115201514) do
   end
 
   add_index "designation_profiles", ["organization_id"], :name => "index_designation_profiles_on_organization_id"
-  add_index "designation_profiles", ["user_id", "organization_id", "remote_id"], :name => "unique_remote_id", :unique => true
+  add_index "designation_profiles", ["user_id", "organization_id", "remote_id"], :name => "user_id", :unique => true
 
   create_table "donations", :force => true do |t|
     t.string   "remote_id"
@@ -267,19 +271,29 @@ ActiveRecord::Schema.define(:version => 20121115201514) do
   end
 
   add_index "donations", ["designation_account_id", "remote_id"], :name => "unique_donation_designation", :unique => true
-  add_index "donations", ["donation_date"], :name => "index_donations_on_donation_date"
   add_index "donations", ["donor_account_id"], :name => "index_donations_on_donor_account_id"
+
+  create_table "donor_account_people", :force => true do |t|
+    t.integer  "donor_account_id"
+    t.integer  "person_id"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+  end
+
+  add_index "donor_account_people", ["donor_account_id"], :name => "index_donor_account_people_on_donor_account_id"
+  add_index "donor_account_people", ["person_id"], :name => "index_donor_account_people_on_person_id"
 
   create_table "donor_accounts", :force => true do |t|
     t.integer  "organization_id"
     t.string   "account_number"
     t.string   "name"
-    t.datetime "created_at",                                         :null => false
-    t.datetime "updated_at",                                         :null => false
+    t.datetime "created_at",                                                       :null => false
+    t.datetime "updated_at",                                                       :null => false
     t.integer  "master_company_id"
-    t.decimal  "total_donations",     :precision => 10, :scale => 2
+    t.decimal  "total_donations",                   :precision => 10, :scale => 2
     t.date     "last_donation_date"
     t.date     "first_donation_date"
+    t.string   "donor_type",          :limit => 20
   end
 
   add_index "donor_accounts", ["last_donation_date"], :name => "index_donor_accounts_on_last_donation_date"
@@ -288,14 +302,17 @@ ActiveRecord::Schema.define(:version => 20121115201514) do
 
   create_table "email_addresses", :force => true do |t|
     t.integer  "person_id"
-    t.string   "email",                         :null => false
-    t.boolean  "primary",    :default => false
-    t.datetime "created_at",                    :null => false
-    t.datetime "updated_at",                    :null => false
+    t.string   "email",                                       :null => false
+    t.boolean  "primary",                  :default => false
+    t.datetime "created_at",                                  :null => false
+    t.datetime "updated_at",                                  :null => false
+    t.string   "remote_id"
+    t.string   "location",   :limit => 50
   end
 
   add_index "email_addresses", ["email", "person_id"], :name => "index_email_addresses_on_email_and_person_id", :unique => true
   add_index "email_addresses", ["person_id"], :name => "index_email_addresses_on_person_id"
+  add_index "email_addresses", ["remote_id"], :name => "index_email_addresses_on_remote_id"
 
   create_table "family_relationships", :force => true do |t|
     t.integer  "person_id"
@@ -401,7 +418,7 @@ ActiveRecord::Schema.define(:version => 20121115201514) do
     t.string   "name"
     t.string   "query_ini_url"
     t.string   "iso3166"
-    t.string   "minimum_gift_date"
+    t.string   "minimum_gift_date",             :limit => 24
     t.string   "logo"
     t.string   "code"
     t.boolean  "query_authentication"
@@ -426,8 +443,8 @@ ActiveRecord::Schema.define(:version => 20121115201514) do
     t.string   "profiles_url"
     t.string   "profiles_params"
     t.string   "redirect_query_ini"
-    t.datetime "created_at",                    :null => false
-    t.datetime "updated_at",                    :null => false
+    t.datetime "created_at",                                  :null => false
+    t.datetime "updated_at",                                  :null => false
     t.string   "api_class"
   end
 
@@ -603,9 +620,20 @@ ActiveRecord::Schema.define(:version => 20121115201514) do
     t.boolean  "primary",      :default => false
     t.datetime "created_at",                      :null => false
     t.datetime "updated_at",                      :null => false
+    t.string   "remote_id"
   end
 
   add_index "phone_numbers", ["person_id"], :name => "index_phone_numbers_on_person_id"
+  add_index "phone_numbers", ["remote_id"], :name => "index_phone_numbers_on_remote_id"
+
+  create_table "prod_people", :force => true do |t|
+    t.string "globallyUniqueId"
+    t.string "username"
+    t.string "firstName"
+    t.string "lastName"
+    t.string "middleName"
+    t.string "accountNo"
+  end
 
   create_table "taggings", :force => true do |t|
     t.integer  "tag_id"

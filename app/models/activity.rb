@@ -17,10 +17,10 @@ class Activity < ActiveRecord::Base
 
   accepts_nested_attributes_for :activity_contacts, :activity_comments, allow_destroy: true
 
-  attr_accessible :starred, :location, :subject, :start_at, :end_at, :completed,
-                  :activity_contacts_attributes, :activity_comments_attributes,
-                  :contacts_attributes, :tag_list, :result, :notification_id,
-                  :activity_type
+  # attr_accessible :starred, :location, :subject, :start_at, :end_at, :completed,
+  #                 :activity_contacts_attributes, :activity_comments_attributes,
+  #                 :contacts_attributes, :tag_list, :result, :notification_id,
+  #                 :activity_type
 
   validates :subject, :start_at, presence: true
 

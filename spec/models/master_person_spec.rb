@@ -41,6 +41,7 @@ describe MasterPerson do
     person = create(:person)
     donor_account = create(:donor_account)
     donor_account.master_people << person.master_person
+    donor_account.people << person
     new_person = Person.new(first_name: person.first_name, last_name: person.last_name, suffix: person.suffix)
     MasterPerson.find_for_person(new_person, donor_account: donor_account).should == person.master_person
   end

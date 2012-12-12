@@ -1,13 +1,13 @@
 class Person::KeyAccount < ActiveRecord::Base
   extend Person::Account
 
-  attr_accessible :email
+  #attr_accessible :email
 
   def self.find_or_create_from_auth(auth_hash, person)
     @rel = person.key_accounts
     @remote_id = auth_hash.extra.attributes.first.ssoGuid
     @attributes = {
-                    remote_id: @remote_id, 
+                    remote_id: @remote_id,
                     first_name: auth_hash.extra.attributes.first.firstName,
                     last_name: auth_hash.extra.attributes.first.lastName,
                     email: auth_hash.extra.attributes.first.email
@@ -34,6 +34,6 @@ class Person::KeyAccount < ActiveRecord::Base
   end
 
   def queue_import_data
-    
+
   end
 end

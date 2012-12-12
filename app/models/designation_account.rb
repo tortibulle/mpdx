@@ -10,7 +10,7 @@ class DesignationAccount < ActiveRecord::Base
 
   validates :organization_id, presence: true
 
-  attr_accessible :designation_number
+  #attr_accessible :designation_number, :staff_account_id, :balance, :balance_updated_at
 
   def to_s() designation_number; end
 

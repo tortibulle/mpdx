@@ -8,8 +8,6 @@ class Company < ActiveRecord::Base
   before_create :find_master_company
   after_destroy :clean_up_master_company
 
-  attr_accessible :name, :master_company_id
-
   def to_s() name; end
 
   private

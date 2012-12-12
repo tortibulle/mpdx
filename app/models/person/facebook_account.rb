@@ -7,7 +7,7 @@ class Person::FacebookAccount < ActiveRecord::Base
   def self.queue() :facebook; end
 
   set :friends
-  attr_accessible :remote_id, :token, :token_expires_at, :first_name, :last_name, :valid_token, :authenticated, :url
+  # attr_accessible :remote_id, :token, :token_expires_at, :first_name, :last_name, :valid_token, :authenticated, :url
 
   def self.find_or_create_from_auth(auth_hash, person)
     @rel = person.facebook_accounts

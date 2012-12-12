@@ -1,13 +1,13 @@
 class Person::RelayAccount < ActiveRecord::Base
   extend Person::Account
 
-  attr_accessible :username
+  #attr_accessible :username, :remote_id
 
   def self.find_or_create_from_auth(auth_hash, user)
     @rel = user.relay_accounts
     @remote_id = auth_hash.extra.attributes.first.ssoGuid
     @attributes = {
-      remote_id: @remote_id, 
+      remote_id: @remote_id,
       first_name: auth_hash.extra.attributes.first.firstName,
       last_name: auth_hash.extra.attributes.first.lastName,
       username: auth_hash.extra.attributes.first.username,

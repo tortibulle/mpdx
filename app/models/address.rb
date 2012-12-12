@@ -5,14 +5,12 @@ class Address < ActiveRecord::Base
     [_('Home'), _('Business'), _('Mailing'), _('Other')]
   end
 
-  attr_accessible :street, :city, :state, :country, :postal_code, :location, :primary_mailing_address, :location, :start_date, :end_date
-
   def ==(other)
     other.street == street &&
     other.city == city &&
     other.state == state &&
     other.country == country &&
-    other.postal_code == postal_code
+    other.postal_code.to_s[0..4] == postal_code.to_s[0..4]
   end
 
   def not_blank?

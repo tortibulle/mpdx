@@ -47,7 +47,7 @@ class DataServer
 
     begin
       response = get_response(@org.addresses_url,
-                              get_params(@org.addresses_params, {profile: profile.code.to_s, 
+                              get_params(@org.addresses_params, {profile: profile.code.to_s,
                                                                  datefrom: (date_from || @org.minimum_gift_date).to_s,
                                                                  personid: @org_account.remote_id}))
     rescue Errors::UrlChanged => e
@@ -106,7 +106,7 @@ class DataServer
 
     begin
       response = get_response(@org.donations_url,
-                              get_params(@org.donations_params, {profile: profile.code.to_s, 
+                              get_params(@org.donations_params, {profile: profile.code.to_s,
                                                                  datefrom: date_from,
                                                                  dateto: date_to,
                                                                  personid: @org_account.remote_id}))
@@ -291,6 +291,7 @@ class DataServer
     person.master_person_id ||= MasterPerson.find_or_create_for_person(person, donor_account: donor_account).try(:id)
     person.save!
 
+    donor_account.people << person unless donor_account.people.include?(person)
     donor_account.master_people << person.master_person unless donor_account.master_people.include?(person.master_person)
 
     contact = account_list.contacts.for_donor_account(donor_account).first
@@ -323,8 +324,9 @@ class DataServer
 
   def add_or_update_donor_account(line, profile, account_list = nil)
     account_list ||= get_account_list(profile)
-    donor_account = @org.donor_accounts.where(account_number: line['PEOPLE_ID']).first_or_create(name: line['ACCT_NAME'])
-    donor_account.name = line['ACCT_NAME'] # if the acccount already existed, update the name
+    donor_account = @org.donor_accounts.where(account_number: line['PEOPLE_ID']).first_or_initialize
+    donor_account.attributes = {name: line['ACCT_NAME'],
+                                donor_type: line['PERSON_TYPE'] == 'P' ? 'Household' : 'Organization'} # if the acccount already existed, update the name
     # physical address
     if [line['ADDR1'],line['ADDR2'],line['ADDR3'],line['ADDR4'],line['CITY'],line['STATE'],line['ZIP'],line['CNTRY_DESCR']].any?(&:present?)
       donor_account.addresses_attributes = [{

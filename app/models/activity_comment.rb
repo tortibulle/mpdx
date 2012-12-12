@@ -4,5 +4,5 @@ class ActivityComment < ActiveRecord::Base
 
   validates :body, presence: true
 
-  attr_accessible :body, :person_id
+  # attr_accessible :body, :person_id
 end

@@ -4,14 +4,13 @@ class DonorAccount < ActiveRecord::Base
 
   has_many :master_person_donor_accounts, dependent: :destroy
   has_many :master_people, through: :master_person_donor_accounts
-  has_many :people, through: :master_people
+  has_many :donor_account_people
+  has_many :people, through: :donor_account_people
   has_many :donations, dependent: :destroy
   has_many :contact_donor_accounts
   has_many :contacts, through: :contact_donor_accounts
   belongs_to :organization
   belongs_to :master_company
-
-  attr_accessible :name, :total_donations, :master_company_id
 
   def primary_master_person
     master_people.where('master_person_donor_accounts.primary' => true).first
@@ -22,17 +21,6 @@ class DonorAccount < ActiveRecord::Base
 
     # Try to find a contact for this user that matches based on name
     contact ||= account_list.contacts.detect { |c| c.name == name }
-
-    # unless contact
-    #   # Try to find a contact for this user that matches based on address
-    #   addresses.each do |a|
-    #     next unless a.not_blank? && a.city.present?
-    #     if address = account_list.addresses.where(a.attributes.with_indifferent_access.slice(:street, :city, :state, :country, :postal_code)).first
-    #       contact = address.addressable
-    #       break
-    #     end
-    #   end
-    # end
 
     contact ||= Contact.create_from_donor_account(self, account_list)
     contact.donor_accounts << self unless contact.donor_accounts.include?(self)

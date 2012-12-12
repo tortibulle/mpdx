@@ -10,14 +10,14 @@ module Person::Account
     @attributes.merge!(authenticated: true)
     @account = @rel.find_by_remote_id_and_authenticated(@remote_id, true)
     if @account
-      @account.update_attributes(@attributes, without_protection: true)
+      @account.update_attributes(@attributes)
     else
       # if creating this authentication record is a duplicate, we have a duplicate person to merge
       if other_account = find_by_remote_id_and_authenticated(@remote_id, true)
-        other_account.update_attributes({person_id: person.id}, without_protection: true)
+        other_account.update_attributes(person_id: person.id)
         @account = other_account
       else
-        @account = @rel.create!(@attributes, without_protection: true)
+        @account = @rel.create!(@attributes)
       end
     end
     person.update_attributes(@attributes.slice(:first_name, :last_name, :email))
@@ -30,7 +30,7 @@ module Person::Account
 
   def create_user_from_auth(auth_hash)
     @attributes ||= {}
-    User.create!(@attributes, without_protection: true)
+    User.create!(@attributes)
   end
 
   def find_authenticated_user(auth_hash)

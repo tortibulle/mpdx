@@ -55,11 +55,11 @@ class Contact < ActiveRecord::Base
   end
 
 
-  attr_accessible :name, :addresses_attributes, :pledge_amount, :status, :contact_referrals_to_me_attributes,
-                  :people_attributes, :notes, :contact_people_attributes, :full_name, :greeting, :website,
-                  :pledge_frequency, :pledge_start_date, :deceased, :next_ask, :never_ask, :likely_to_give,
-                  :church_name, :send_newsletter, :direct_deposit, :magazine, :last_activity, :last_appointment,
-                  :last_letter, :last_phone_call, :last_pre_call, :last_thank, :tag_list
+  # attr_accessible :name, :addresses_attributes, :pledge_amount, :status, :contact_referrals_to_me_attributes,
+  #                 :people_attributes, :notes, :contact_people_attributes, :full_name, :greeting, :website,
+  #                 :pledge_frequency, :pledge_start_date, :deceased, :next_ask, :never_ask, :likely_to_give,
+  #                 :church_name, :send_newsletter, :direct_deposit, :magazine, :last_activity, :last_appointment,
+  #                 :last_letter, :last_phone_call, :last_pre_call, :last_thank, :tag_list
 
   delegate :first_name, :last_name, :phone, :email, to: :primary_person
   delegate :street, :city, :state, :postal_code, to: :mailing_address

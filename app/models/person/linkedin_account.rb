@@ -3,7 +3,7 @@ class Person::LinkedinAccount < ActiveRecord::Base
 
   scope :valid_token, where('(token_expires_at is null || token_expires_at > ?) AND valid_token = 1', Time.now)
 
-  attr_accessible :first_name, :last_name, :url
+  # attr_accessible :first_name, :last_name, :url
 
   def self.find_or_create_from_auth(auth_hash, person)
     @rel = person.linkedin_accounts

@@ -7,7 +7,7 @@ class DesignationProfile < ActiveRecord::Base
   after_create :find_or_create_account_list, unless: Proc.new { |p| p.skip_account_list }
 
   attr_accessor :skip_account_list
-  attr_accessible :skip_account_list, :name, :code
+  # attr_accessible :skip_account_list, :name, :code, :balance, :balance_updated_at
 
   scope :for_org, lambda {|org_id| where(organization_id: org_id)}
 

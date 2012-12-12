@@ -35,8 +35,6 @@ class AccountList < ActiveRecord::Base
 
   belongs_to :designation_profile
 
-  attr_accessible :name, :creator_id, :contacts_attributes
-
   accepts_nested_attributes_for :contacts, reject_if: :all_blank, allow_destroy: true
 
   def self.queue() :import; end

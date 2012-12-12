@@ -174,6 +174,7 @@ describe DataServer do
         person = create(:person)
         @user.account_lists << @account_list
         @donor_account.master_people << person.master_person
+        @donor_account.people << person
         @donor_account.organization.master_person_sources.create({master_person_id: person.master_person_id, remote_id: 1}, without_protection: true)
         -> {
           new_contact, other = @data_server.send(:add_or_update_person, @account_list, @user, @line, @donor_account, 1)

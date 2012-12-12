@@ -11,4 +11,4 @@ test:
   s3_key: asdf
   s3_secret: asdf
   s3_bucket: asdf
-
+  itg_auth_key: asdf

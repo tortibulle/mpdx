@@ -7,7 +7,7 @@ class MailChimpAccount < ActiveRecord::Base
 
   belongs_to :account_list
 
-  attr_accessible :api_key, :primary_list_id
+  # attr_accessible :api_key, :primary_list_id
   attr :validation_error
 
   validates :account_list_id, :api_key, presence: true

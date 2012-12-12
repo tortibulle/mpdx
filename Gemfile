@@ -45,6 +45,7 @@ gem 'omniauth-linkedin'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-cas', '~> 0.0.6'
 gem 'newrelic_rpm', '>= 3.5.3.25'
+gem 'rake'
 gem 'assignable_values'
 gem 'charlock_holmes'
 gem 'awesome_print'
@@ -75,7 +76,8 @@ gem 'display_case'
 gem 'gibbon'
 gem 'whenever'
 gem 'virtus'
-gem 'rake'
+#gem 'siebel_donations', path: '/Users/josh/htdocs/siebel_donations'
+gem 'siebel_donations', git: 'git://github.com/twinge/siebel_donations.git'
 
 group :development do
   gem 'railroady'
@@ -95,7 +97,7 @@ group :development, :test do
   gem 'fuubar'
 end
 group :test do
-  gem 'webmock', '~> 1.8.3'
+  gem 'webmock', '~> 1.9.0'
   gem 'spork-rails', '~> 3.2.0'
   gem 'rb-fsevent', :require => false
   gem 'guard-spork'

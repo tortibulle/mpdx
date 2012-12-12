@@ -2,7 +2,7 @@ class FamilyRelationship < ActiveRecord::Base
   belongs_to :person
   belongs_to :related_person, class_name: 'Person'
 
-  attr_accessible :related_person_id, :relationship
+  # attr_accessible :related_person_id, :relationship
 
   def self.add_for_person(person, attributes)
     attributes = attributes.except(:_destroy)

@@ -4,7 +4,7 @@ class PhoneNumber < ActiveRecord::Base
   before_save :clean_up_number
   after_save :ensure_only_one_primary
 
-  attr_accessible :number, :primary, :country_code, :location
+  # attr_accessible :number, :primary, :country_code, :location, :remote_id
 
   def self.add_for_person(person, attributes)
     attributes = attributes.except(:_destroy)

@@ -1,306 +1,290 @@
 class Siebel < DataServer
 
-  def import_profile_balance(profile)
-    # update account balance for each account associated with this profile
-    profile.designation_accounts.each do |da|
-      data = get_response("accounts/#{da.designation_number}/balance", da.designation_number)
+  def requires_username_and_password?() false; end
 
-      da.update_attributes({balance_updated_at: data['effectiveDate'],
-                            balance: data['balance']})
+  def import_profiles
+    designation_profiles = []
+
+    profiles.each do |profile|
+      designation_profile = @org.designation_profiles.where(user_id: @org_account.person_id, name: profile.name, code: profile.id).first_or_create
+
+      # Add included designation accounts
+      profile.designations.each do |designation|
+        find_or_create_designation_account(designation.number, designation_profile, {name: designation.description,
+                                                                                     staff_account_id: designation.staff_account_id,
+                                                                                     chartfield: designation.chartfield})
+      end
+      # add any included designation numbers
+      designation_profiles << designation_profile
     end
-    true
+
+    designation_profiles
   end
 
-  def import_donors(date_from = nil)
-    user = @org_account.user
+  def import_profile_balance(profile)
+    total = 0
+    # the profile balance is the sum of the balances from each designation account in that profile
+    profile.designation_accounts.each do |da|
+      if da.staff_account_id.present?
+        balance = SiebelDonations::Balance.find(employee_ids: da.staff_account_id).first
+        da.update_attributes(balance: balance.primary, balance_updated_at: Time.now())
+        total += balance.primary
+      end
+    end
+    profile.update_attributes(balance: total, balance_updated_at: Time.now())
+    profile
+  end
 
-    account_list = get_account_list
+  def import_donors(profile, date_from = nil)
+    designation_numbers = profile.designation_accounts.pluck(:designation_number)
 
-    # Fetch JSON data
-    data = get_response("desigdata/#{@org_account.remote_id}/donors")
+    if designation_numbers.present?
+      account_list = get_account_list(profile)
 
-    if data.present?
-      data.each do |line|
-        Person.transaction do
-          donor_account = add_or_update_donor_account(line, profile)
+      SiebelDonations::Donor.find(having_given_to_designations: designation_numbers.join(',')).each do |siebel_donor|
+        donor_account = add_or_update_donor_account(account_list, siebel_donor, profile)
 
-          unless %w{Household Organization Church Company}.include?(line['type'])
-            Airbrake.notify(
-              error_class: "Unknown TYPE",
-              error_message: "Unknown TYPE: #{line['type']}",
-              parameters: {line: line, org: @org.inspect, user: @user.inspect, org_account: @org_account.inspect}
-            )
-            line['type'] = 'Company'
-          end
-
-          case line['type']
-          when 'Household'
-
-            # Create/Update primary contact
-            primary_contact = add_or_update_primary_contact(account_list, user, line['primary'], donor_account)
-
-            # Add Spouse if there is
-            if line['spouse'].present?
-              spouse = add_or_update_spouse(account_list, user, line['spouse'], donor_account)
-              # Wed the two peple
-              primary_contact.add_spouse(spouse)
-            end
-          when 'Church', 'Organization', 'Company'
-            add_or_update_company(account_list, user, line['primary'], donor_account)
-          end
+        if siebel_donor.type == 'Business'
+          add_or_update_company(account_list, siebel_donor, donor_account)
         end
       end
     end
-    true
   end
 
-  def import_donations(start_date, end_date, donor = nil)
-    parameters = "?start_date=#{start_date}&end_date=#{end_date}"
-    parameters += "&donor=#{donor}"
-    profile = @org_account
-    user = profile.person.to_user
+  def import_donations(profile, start_date = nil, end_date = nil)
+    # if no date_from was passed in, use min date from query_ini
+    if start_date.blank?
+      start_date = @org.minimum_gift_date ? @org.minimum_gift_date : '01/01/2004'
+    end
 
-    account_list = @org.designation_accounts.collect {|da| da.account_list(user)}.first
-    account_list ||= user.account_lists.first
+    start_date = Date.strptime(start_date, '%m/%d/%Y').strftime("%Y-%m-%d")
 
-    # Fetch JSON data
-    data = get_response("desigdata/#{@org_account.remote_id}/donations")
+    end_date = end_date ? Date.strptime(end_date, '%m/%d/%Y').strftime("%Y-%m-%d") : Time.now.strftime("%Y-%m-%d")
 
-    if data.present?
-      data.each do |line|
-        designation_account = find_or_create_designation_account(profile,line['designation'])
-        add_or_update_donation(line, designation_account, profile)
+    profile.designation_accounts.each do |da|
+      SiebelDonations::Donation.find(designations: da.designation_number, start_date: start_date,
+                                     end_date: end_date).each do |donation|
+        add_or_update_donation(donation, da, profile)
       end
     end
-    true
   end
 
-  def get_response(url, id = @org_account.remote_id, extra = {})
-    url = "#{API_URL}/#{url}"
-
-    RestClient::Request.execute(method: :get, url: url, payload: extra, timeout: -1, headers: {'Authorization' => "Bearer #{@org_account.token}"}) { |response, request, result, &block|
-      # check for error response
-      if response.code.to_i == 500
-        raise DataServerError, response.inspect
-      end
-      JSON.parse(response.to_str)
-    }
-  end
 
   protected
 
   def profiles
     unless @profiles
-      @profiles = []
-      data = get_response("profiles/#{@org_account.remote_id}/list")
-      data.each do |profile_data|
-        @profiles << {name: profile_data['name'], conde: profile_data['code']}
-      end
+      raise 'No guid for user' unless relay_account = @org_account.user.relay_accounts.first
+      @profiles = SiebelDonations::Profile.find(ssoGuid: relay_account.remote_id)
     end
     @profiles
   end
 
-  def find_or_create_designation_profile(profile, hash) 
-    profile = @org.designation_profiles.where(user_id: profile.person_id,
-                                              name: hash['name'],
-                                              remote_id: hash['id']).first_or_create 
-    profile
-  end
-
-  def link_profile_to_account(designation_profile,designation_account)
-    DesignationProfileAccount.where(designation_profile_id: designation_profile.id,
-                                    designation_account_id: designation_account.id).first_or_create
-  end
-
-  def find_or_create_designation_account(profile, number, extra_attributes = {})
+  def find_or_create_designation_account(number, profile, extra_attributes = {})
     @designation_accounts ||= {}
     unless @designation_accounts.has_key?(number)
       da = @org.designation_accounts.where(designation_number: number).first_or_create
-      @org.designation_accounts << da unless @org.designation_accounts.include?(da)
+      profile.designation_accounts << da unless profile.designation_accounts.include?(da)
       da.update_attributes(extra_attributes) if extra_attributes.present?
       @designation_accounts[number] = da
     end
     @designation_accounts[number]
   end
 
-  def add_or_update_donation(line, designation_account, profile)
+  def add_or_update_donation(siebel_donation, designation_account, profile)
     default_currency = @org.default_currency_code || 'USD'
-    donor_account = add_or_update_donor_account(line, profile)
-    donation = designation_account.donations.where(remote_id: line['id']).first_or_initialize
-    Rails.logger.info "Resultssss: #{donation.to_json}"
-    date = line['donationDate'] ? Date.strptime(line['donationDate'], '%Y-%m-%d') : nil
+    donor_account = @org.donor_accounts.find_by_account_number(siebel_donation.donor_id)
+    unless donor_account
+      Rails.logger.info "Can't find donor account for #{siebel_donation.inspect}"
+      return
+    end
+
+    donation = designation_account.donations.where(remote_id: siebel_donation.id).first_or_initialize
+    date = Date.strptime(siebel_donation.donation_date, '%Y-%m-%d')
     donation.attributes = {
       donor_account_id: donor_account.id,
-      motivation: line['campaignCode'],
-      payment_method: line['paymentMethod'],
+      motivation: siebel_donation.campaign_code,
+      payment_method: siebel_donation.payment_method,
       tendered_currency: default_currency,
       donation_date: date,
-      amount: line['amount'],
-      tendered_amount: line['amount'],
+      amount: siebel_donation.amount,
+      tendered_amount: siebel_donation.amount,
       currency: default_currency,
-      channel: line['channel'],
-      payment_type: line['paymentType']
+      channel: siebel_donation.channel,
+      payment_type: siebel_donation.payment_type
     }
     donation.save!
     donation
   end
 
-  def add_or_update_primary_contact(account_list, user, line, donor_account)
-    remote_ids = ["#{donor_account.account_number}-1", line['id']]
-    add_or_update_person(account_list, user, line, donor_account, remote_ids)
-  end
+  def add_or_update_company(account_list, siebel_donor, donor_account)
+    master_company = MasterCompany.find_by_name(siebel_donor.account_name)
 
-  def add_or_update_spouse(account_list, user, line, donor_account)
-    remote_ids = ["#{donor_account.account_number}-2", line['id']]
-    add_or_update_person(account_list, user, line, donor_account, remote_ids)
-  end
+    company = @org_account.user.partner_companies.where(master_company_id: master_company.id).first if master_company
+    company ||= account_list.companies.new(master_company: master_company)
 
-  def add_or_update_company(account_list, user, line, donor_account)
-    master_company = MasterCompany.find_by_name(line['accountName'])
-    company = user.partner_companies.where(master_company_id: master_company.id).first if master_company
-    company ||= account_list.companies.new({master_company: master_company}, without_protection: true)
+    contact = siebel_donor.primary_contact || SiebelDonations::Contact.new
+    address = siebel_donor.primary_address || SiebelDonations::Address.new
+    street = [address.address1, address.address2, address.address3, address.address4].select {|a| a.to_s.strip.present?}.join("\n")
 
-    # contacts
-    phone_numbers = line['primary']['phoneNumbers']
-    phone_number = nil
-    if phone_numbers
-      phone_numbers.each do |p|
-        phone_number = p['phone'] if p['primary']
-      end
-    end
-
-    # addresses
-    addresses = line['addresses']
-    street = nil
-    city = nil
-    state = nil
-    postal_code = nil
-    if addresses
-      addresses.each do |a|
-        if a['primary']
-          street = [a['address1'], a['address2'], a['address3'], a['address4']].select {|a| a.present?}.join("\n")
-          city = a['city']
-          state = a['state']
-          postal_code = a['zip']
-        end
-      end
-    end
     company.attributes = {
-      name: line['accountName'],
-      phone_number: phone_number,
+      name: siebel_donor.account_name,
+      phone_number: contact.primary_phone_number.try(:phone),
       street: street,
-      city: city,
-      state: state,
-      postal_code: postal_code
+      city: address.city,
+      state: address.state,
+      postal_code: address.zip
     }
     company.save!
+
     donor_account.update_attribute(:master_company_id, company.master_company_id) unless donor_account.master_company_id == company.master_company.id
     company
   end
 
-  def add_or_update_donor_account(line, profile)
-    account_list = @org_account.user.account_lists.where(designation_profile_id: profile.id).first
-    donor_account = @org.donor_accounts.where(account_number: line['id']).first_or_create(name: line['accountName'])
-    donor_account.name = line['accountName']
+  def add_or_update_donor_account(account_list, donor, profile)
+    donor_account = @org.donor_accounts.where(account_number: donor.id).first_or_initialize
+    donor_account.attributes = {name: donor.account_name,
+                                donor_type: donor.type}
+    donor_account.save!
 
-    # Save Primary Address
-    if line['addresses']
-      addresses = line['addresses']
-      street = nil
-      city = nil
-      state = nil
-      postal_code = nil
+    contact = donor_account.link_to_contact_for(account_list)
+    raise 'Failed to link to contact' unless contact
 
-      addresses.each do |a|
-        if a['primary']
-          street = [a['address1'], a['address2'], a['address3'], a['address4']].select {|a| a.present?}.join("\n")
-          city = a['city']
-          state = a['state']
-          postal_code = a['zip']
-        end
-      end
+    # Save addresses
+    if donor.addresses
+      donor.addresses.each { |address| add_or_update_address(address, donor_account) }
 
-      donor_account.addresses_attributes = {'0' => 
-                                            {
-                                              street: street,
-                                              city: city,
-                                              state: state,
-                                              postal_code: postal_code
-                                            }
-      }
-
-      donor_account.save!
-      contact = donor_account.link_to_contact_for(account_list)
-      raise 'Failed to link to contact' unless contact
+      # Make sure the contact has the primary address
+      donor.addresses.each { |address| add_or_update_address(address, contact) if address.primary == true }
     end
+
+    # Save people (siebel calls them contacts)
+    if donor.contacts
+      donor.contacts.each { |person| add_or_update_person(person, donor_account, contact) }
+    end
+
     donor_account
   end
 
-  def add_or_update_person(account_list, user, line, donor_account, remote_id)
-    organization = donor_account.organization
-    master_person_from_source = organization.master_people.where('master_person_sources.remote_id' => remote_id).first
+  def add_or_update_person(siebel_person, donor_account, contact)
+    master_person_from_source = @org.master_people.where('master_person_sources.remote_id' => siebel_person.id).first
+
+    # If we didn't find someone using the real remote_id, try the "old style"
+    unless master_person_from_source
+      remote_id = siebel_person.primary ? "#{donor_account.account_number}-1" : "#{donor_account.account_number}-2"
+      if master_person_from_source = @org.master_people.where('master_person_sources.remote_id' => remote_id).first
+        MasterPersonSource.where(organization_id: @org.id, remote_id: remote_id).update_all(remote_id: siebel_person.id)
+      end
+    end
+
     person = donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
 
-    person ||= Person.new({master_person: master_person_from_source}, without_protection: true)
+    person ||= Person.new(master_person: master_person_from_source)
+
+    gender = case siebel_person.sex
+             when 'F' then 'female'
+             when 'M' then 'male'
+             else
+               nil
+             end
 
     person.attributes = {
-      first_name: line['firstName'],
-      last_name: line['lastName'],
-      middle_name: line['middleName'],
-      title: line['title'],
-      suffix: line['suffix']
+      legal_first_name: siebel_person.first_name,
+      first_name: siebel_person.preferred_name || siebel_person.first_name,
+      last_name: siebel_person.last_name,
+      middle_name: siebel_person.middle_name,
+      title: siebel_person.title,
+      suffix: siebel_person.suffix,
+      gender: gender
     }
-
-    # Phone Numbers
-    if line['phoneNumbers'].present?
-      line['phoneNumbers'].each do |line_phone_number|
-        if line_phone_number['phone'].present?
-          person.phone_number = {
-                                  number: line_phone_number['phone'],
-                                  location: line_phone_number['type'].downcase,
-                                  primary: line_phone_number['primary'] ? 1 : 0
-                                }
-        end
-      end
-    end
-
-    # Email Address
-    if line['emailAddresses'].present?
-      line['emailAddresses'].each do |line_email|
-        if line_email['email'].present? # && line_email['type'].present?
-          # person.email = line_email['email']
-          person.email_address = {
-            email: line_email['email'],
-            primary: line_email['primary'] ? 1 : 0
-          }
-        end
-      end
-    end
 
     person.master_person_id ||= MasterPerson.find_or_create_for_person(person, donor_account: donor_account).try(:id)
     person.save!
 
+    donor_account.people << person unless donor_account.people.include?(person)
     donor_account.master_people << person.master_person unless donor_account.master_people.include?(person.master_person)
 
-    contact = account_list.contacts.where(donor_account_id: donor_account.id).first
     contact_person = contact.add_person(person)
 
     # create the master_person_source if needed
     unless master_person_from_source
-      organization.master_person_sources.where(remote_id: remote_id).first_or_create(master_person_id: person.master_person.id)
+      @org.master_person_sources.where(remote_id: siebel_person.id).first_or_create(master_person_id: person.master_person.id)
+    end
+
+    # Phone Numbers
+    if siebel_person.phone_numbers
+      siebel_person.phone_numbers.each { |pn| add_or_update_phone_number(pn, person) }
+
+      # Make sure the contact person has the primary phone number
+      siebel_person.phone_numbers.each { |pn| add_or_update_phone_number(pn, contact_person) if pn.primary == true }
+    end
+
+    # Email Addresses
+    if siebel_person.email_addresses
+      siebel_person.email_addresses.each { |email| add_or_update_email_address(email, person) }
+
+      # Make sure the contact person has the primary phone number
+      siebel_person.email_addresses.each { |email| add_or_update_email_address(email, contact_person) if email.primary == true }
     end
 
     [person, contact_person]
   end
 
+  def add_or_update_address(address, object)
+    new_address = Address.new(street: [address.address1, address.address2, address.address3, address.address4].select {|a| a.to_s.strip.present?}.join("\n"),
+                              city: address.city,
+                              state: address.state,
+                              postal_code: address.zip,
+                              primary_mailing_address: address.primary,
+                              seasonal: address.seasonal,
+                              location: address.type,
+                              remote_id: address.id)
+
+    # If we can match it to an existing address, update that address
+    object.addresses.each do |a|
+      if a.remote_id == new_address.remote_id || a == new_address
+        a.update_attributes(new_address.attributes.select {|k,v| v.present?})
+        return a
+      end
+    end
+
+    # We didn't find a match. save it as a new address
+    object.addresses << new_address
+    object.save!
+  end
+
+  def add_or_update_phone_number(phone_number, person)
+    attributes = {
+                    number: phone_number.phone,
+                    location: phone_number.type.downcase,
+                    primary: phone_number.primary,
+                    remote_id: phone_number.id
+                 }
+    if existing_phone = person.phone_numbers.detect { |pn| pn.remote_id == phone_number.id }
+      existing_phone.update_attributes(attributes)
+    else
+      PhoneNumber.add_for_person(person, attributes)
+    end
+  end
+
+  def add_or_update_email_address(email, person)
+    attributes = {
+                   email: email.email,
+                   primary: email.primary,
+                   location: email.type,
+                   remote_id: email.id
+                 }
+    if existing_email = person.email_addresses.detect { |e| e.remote_id == email.id }
+      existing_email.update_attributes(attributes)
+    else
+      EmailAddress.add_for_person(person, attributes)
+    end
+  end
+
+
   def check_credentials!() end
 
 end
 
-
-class OrgAccountMissingCredentialsError < StandardError
-end
-class OrgAccountInvalidCredentialsError < StandardError
-end
 class SiebelError < StandardError
 end

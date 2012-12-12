@@ -18,7 +18,7 @@ class Person::OrganizationAccount < ActiveRecord::Base
   validates_with CredentialValidator
   after_validation :set_valid_credentials
 
-  attr_accessible :username, :password, :organization, :organization_id
+  # attr_accessible :username, :password, :organization, :organization_id
 
   belongs_to :organization
 

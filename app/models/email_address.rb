@@ -6,9 +6,6 @@ class EmailAddress < ActiveRecord::Base
   after_commit :ensure_only_one_primary, :subscribe_to_mail_chimp
   after_destroy :delete_from_mailchimp
 
-  attr_accessible :email, :primary
-
-
   def to_s() email; end
 
   def self.add_for_person(person, attributes)
