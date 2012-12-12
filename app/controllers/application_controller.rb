@@ -8,7 +8,7 @@ class ApplicationController < ActionController::Base
   private
 
   def redirect_to_mobile
-    if params[:mobile] != "0" && mobile_agent
+    if params[:mobile] != "false" && mobile_agent
       redirect_to '/mobile/' and return false
     end
   end
