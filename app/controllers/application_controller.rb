@@ -8,7 +8,10 @@ class ApplicationController < ActionController::Base
   private
 
   def redirect_to_mobile
-    if params[:mobile] != "false" && mobile_agent
+    session[:fullsite] = true if params[:fullsite] == "true"
+    session[:fullsite] = false if params[:fullsite] == "false"
+
+    if !session[:fullsite] && mobile_agent
       redirect_to '/mobile/' and return false
     end
   end
