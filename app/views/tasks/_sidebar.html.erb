@@ -8,7 +8,7 @@
       <span class="tags menu_item"><%= _('Tags') %></span>
       <ul class="left_taglist tags">
         <li>
-          <% current_account_list.activity_tags.each do |tag| 
+          <% current_account_list.activity_tags.each do |tag|
             # toggle tag on / off
             tag_params = params.except(:action, :controller)
             if params[:tags] && params[:tags].include?(tag)
@@ -45,6 +45,10 @@
         <li>
           <label><%= _('Action') %></label>
           <%= select_tag :activity_type, options_for_select([[_('-- Any --'), '']] + (Task.new.assignable_activity_types & current_account_list.tasks.select(:activity_type).uniq.collect(&:activity_type)).collect { |a| [_(a), a] }, params[:activity_type]), multiple: true, size: 5 %>
+        </li>
+        <li>
+          <label><%= _('Contact') %></label>
+          <%= select_tag :contact_ids, options_for_select([[_('-- Any --'), '']] + all_contacts.collect { |c| [c.name, c.id] }, params[:contact_ids].split(',')), multiple: true, size: 5 %>
         </li>
         <li>
           <%= submit_tag _('Filter') %><br />

@@ -29,7 +29,7 @@ $userheight: 60px;
   	color-stop(0, #00556D),
   	color-stop(0.22, #0077AE)
   );
-  
+
   .links {
     position: relative;
     float: right;
@@ -61,7 +61,7 @@ $userheight: 60px;
       padding-left: 8px;
       margin-left: 8px;
     }
-    
+
     .lists {
       a {
         padding: 0 5px;
@@ -114,7 +114,7 @@ $userheight: 60px;
   .right {
     float: right;
   }
-  
+
   .account_balances {
     padding-top: 0px;
     line-height: 35px;
@@ -140,8 +140,8 @@ $userheight: 60px;
   }
 
   .item {
-    float: left; 
-    border-right: 1px solid #231F20; 
+    float: left;
+    border-right: 1px solid #231F20;
     border-left: 1px solid #808184;
     a {
       line-height: $mainmenuheight;
@@ -162,7 +162,7 @@ $userheight: 60px;
     border: none;
   }
   .item.active a {
-    background: image-url("menuselected.png") repeat-x 0 0; 
+    background: image-url("menuselected.png") repeat-x 0 0;
     text-shadow: 1px 1px 1px #999 !important;
   }
   .item:first-child {
@@ -224,7 +224,7 @@ $userheight: 60px;
   border-right: none;
   width: 140px;
   -moz-box-shadow: 0 0 10px #000;
-  -webkit-box-shadow: 0 0 10px #000; 
+  -webkit-box-shadow: 0 0 10px #000;
   box-shadow: 0 0 10px #000;
   cursor: default;
 }
@@ -359,7 +359,7 @@ h2.section {
 }
 
 .set {
-  
+
 }
 
 .set.phone {margin-bottom:2px;}
@@ -393,7 +393,7 @@ div.name {font-size: 14px; margin-bottom: 4px;}
     li.selected {background: $white; a, span{border-left: 1px solid $borders;}}
     li a.menu_item, li span.menu_item {display: block; line-height: 3em; padding: 0 15px 0 35px;}
   }
-  
+
   ul li {
     a.menu_item, span.menu_item {background: image-url("sprite.png") no-repeat 0 50%; color: #000; font-weight: bold; font-size: 13px; font-family: 'FreightSansProMedium';}
     a.inbox {background-position: 5px 10px;}
@@ -404,7 +404,7 @@ div.name {font-size: 14px; margin-bottom: 4px;}
     a.companies {background-position: 5px -749px;}
     span.tags {background-position: 5px -995px;}
   }
-  
+
   ul.tags li, ul.left_filters li {
     border: none;
     padding-left: 35px;
@@ -428,7 +428,7 @@ div.name {font-size: 14px; margin-bottom: 4px;}
 /* ************************************************************** */
 
 .socstatus {
-  > li { 
+  > li {
     border-bottom: 1px solid $gray_light;
     padding-bottom: 10px;
     margin-bottom: 10px;
@@ -445,7 +445,7 @@ div.name {font-size: 14px; margin-bottom: 4px;}
       font-weight: normal;
     }
   }
-  
+
   .network_tags {
     margin-top: 5px;
     li {display: inline-block;}
@@ -472,31 +472,35 @@ div.name {font-size: 14px; margin-bottom: 4px;}
 .tablelist {
   border-collapse: collapse;
   width: 100%;
-  
+
   tr:nth-child(odd) {
     background-color: #f0f0f0;
   }
-  
+
   th {
-    background: $gray_light; 
+    background: $gray_light;
     text-align: left;
     padding: 5px 8px;
   }
-  
+
   .checks {width: 10px; line-height: 22px;}
-  
+
   td {
     padding: 8px 8px;
     vertical-align: top;
   }
+
+  td.avatar {
+    width: 50px;
+  }
   td.profile {
-    width: 90%;
+    width: 45%;
     span {display: block; }
     ul {
-      @include listclear; 
+      @include listclear;
     }
-    .key, .status, .avatar {
-      display: inline-block; 
+    .key, .status {
+      display: inline-block;
       vertical-align: top;
     }
     .key {
@@ -504,7 +508,11 @@ div.name {font-size: 14px; margin-bottom: 4px;}
       padding-right: 10px;
       width: auto;
     }
-    .avatar {margin-right: 10px;}
+  }
+
+  td.contact-tasks {
+    border-left: 2px solid black;
+    width: 40%;
   }
 }
 
@@ -527,7 +535,7 @@ div.name {font-size: 14px; margin-bottom: 4px;}
 }
 
 .taskgroup {
-  background: #EC1C24;  
+  background: #EC1C24;
   width: 150px;
   position: relative;
   margin-left: -18px;
@@ -551,16 +559,16 @@ div.name {font-size: 14px; margin-bottom: 4px;}
 .donations {
   th, td {padding-top: 4px; padding-bottom: 4px;}
   td {}
-  
+
   tr:hover {
     background-color: $gray_light;
   }
-  
+
   .right {text-align: right;}
   .date {width: 90px;}
   .appeal {width: 50%}
-  
-  
+
+
   thead {
     border-bottom: 1px solid $blue;
     th {background: $blue_light; }
@@ -584,7 +592,7 @@ div.name {font-size: 14px; margin-bottom: 4px;}
   background: $white;
   box-shadow: 0 0 6px #bbb;
   position: absolute;
-  
+
   a {background: image-url("sprite.png") no-repeat 0 50%; line-height: 25px; height: 25px; padding-left: 25px; padding-right: 10px; display: block;}
   a.text {background-position: 0 -192px;}
   a.email {background-position: 0 -259px;}
@@ -603,7 +611,7 @@ div.name {font-size: 14px; margin-bottom: 4px;}
  font-size: 11px;
  margin-bottom: 0px;
  border-radius: 5px;
- 
+
  header {background: image-url("comment_head.png") no-repeat $white -1px 0; height: 7px;}
  .comment {padding: 5px 10px; border-bottom: 1px dotted $white; position: relative;}
  .comment:hover .corner_close {display: block;}
@@ -616,7 +624,7 @@ div.name {font-size: 14px; margin-bottom: 4px;}
 
  .comment_form.focus .buttons {display:block;}
  .comment_form.focus textarea {height: 3em;}
- 
+
  .ico {float: left;}
  .body, .time {margin-left: 40px;}
  .body {min-height: 16px;}
@@ -642,7 +650,7 @@ div.name {font-size: 14px; margin-bottom: 4px;}
   }
   .item:hover {
     box-shadow: 0 0 10px #999;
-    position: relative; 
+    position: relative;
     z-index: 100;
     border-bottom: 1px solid #FFFCF5;
   }
@@ -706,10 +714,10 @@ table.meta {
 /* ************************************************************** */
 
 .network_connect {
-  
+
   border-bottom: 1px solid $gray_light;
   padding: 15px 0;
-  
+
   .identify {
     width: 170px;
     border-right: 1px solid silver;
@@ -717,16 +725,16 @@ table.meta {
   .connections {
     padding-left: 25px;
   }
-  
+
   .network_logo {
     img {
       max-height: 100px;
     }
   }
   .network_button {
-    
+
   }
-  
+
   .network_connections {
     .account_single {
       background: $gray_light;
@@ -741,7 +749,7 @@ table.meta {
       }
     }
     .account_name {
-      font-size: 14px; 
+      font-size: 14px;
       margin-bottom: .5em;
       display: block;
       margin-right: 30px;
@@ -777,7 +785,7 @@ table.meta {
   border-bottom: 1px solid $gray_mid;
   padding: 5px 16px;
   line-height: 23px;
-  
+
   .actions {float: right;}
   .contact_paging {padding: 0 5px;}
 }

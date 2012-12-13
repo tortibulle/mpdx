@@ -15,11 +15,15 @@ class ContactExhibit < DisplayCase::Exhibit
   end
 
   def contact_info
-    people.collect {|p| 
+    people.collect {|p|
       person_exhibit = exhibit(p, @context)
       email = p.primary_email_address || p.email_addresses.first
       [@context.link_to(p, @context.contact_person_path(to_model, p)), [person_exhibit.phone_number, person_exhibit.email].compact.map {|e| exhibit(e, @context)}.join(', ')].select(&:present?).join(': ')
     }.join('<br />').html_safe
+  end
+
+  def pledge_frequency
+    Contact.pledge_frequencies[to_model.pledge_frequency]
   end
 
   def avatar(size = :square)
@@ -30,7 +34,7 @@ class ContactExhibit < DisplayCase::Exhibit
   def pledge_as_currency
     if pledge_amount.present?
       pledge = @context.number_to_currency(pledge_amount, precision: 0)
-      pledge += " #{Contact.pledge_frequencies[pledge_frequency || 1]}"
+      pledge += " #{Contact.pledge_frequencies[to_model.pledge_frequency || 1]}"
       pledge
     end
   end

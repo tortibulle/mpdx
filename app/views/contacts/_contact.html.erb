@@ -1,21 +1,33 @@
 <% exhibit(contact, self).tap do |contact_exhibit| %>
   <tr id="<%= dom_id(contact) %>" data-hook="contact">
-    
+    <td class="avatar">
+      <%= link_to(image_tag(contact_exhibit.avatar, class: "avatar small"), contact_path(contact))%>
+    </td>
     <td class="profile">
-      <div class="avatar">
-        <%= link_to(image_tag(contact_exhibit.avatar, class: "avatar small"), contact_path(contact))%>
-      </div>
       <div class="key">
         <span class="name"><%= link_to(contact_exhibit, contact_path(contact), data: {name: contact_exhibit.to_s}) %></span>
         <div class="people">
           <%== contact.people.collect do |person|
-            link_to(exhibit(person, self), person_path(person))
+            link_to(exhibit(person, self), person_path(person)) +
+              (person.primary_phone_number ? " - #{exhibit(person.primary_phone_number, self)}" : '')
           end.join(', ') %>
         </div>
+        <span class="address"><%= exhibit(contact.primary_address, self).to_html if contact.primary_address %></span>
         <div class="tags">
           <%= contact_exhibit.tag_links %>
         </div>
       </div>
+    </td>
+    <td class="contact-tasks" nowrap="nowrap">
+      <% if contact.status %>
+        <%= contact_exhibit.status %><br />
+      <% end %>
+      <% if contact.pledge_amount %>
+        <%= _('Commitment') %>: <%= contact_exhibit.pledge_as_currency %><br />
+      <% end %>
+      <%= link_to(tasks_path(contact_ids: contact.id)) do %>
+        <%= _('Tasks') %>: <%= contact.tasks.count %><br />
+      <% end %>
     </td>
     <td class="qaction" id="<%= dom_id(contact) %>_quick" data-id="<%= contact.id %>">
       <a href="#" class="btn smallbtn quick"><%= _('Quick') %></a>

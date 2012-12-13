@@ -3,13 +3,13 @@
     <%= text_field_tag :contact_name, '', autocomplete: 'off', placeholder: _('Type to filter'), class: "search_filter" %>
   </div>
   <ul class="contact_list">
-    <% @all_contacts.each do |contact| %>
+    <% all_contacts.each do |contact| %>
       <li data-hook="contact"><%= link_to(truncate(contact.to_s, :length => 30), contact, data: {name: contact.to_s, id: contact.id}, class: contact.id == @contact.id ? 'active' : '', remote: true) %></li>
     <% end %>
   </ul>
 </div>
 
-<%= render 'contact_body', contacts: @all_contacts, contact: @contact %>
+<%= render 'contact_body', contacts: all_contacts, contact: @contact %>
 
 <div id="referrals_modal" style="display:none" title="<%= _('Add Referrals') %>">
   <%= spinner(visible: true) %>

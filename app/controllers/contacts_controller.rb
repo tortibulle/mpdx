@@ -58,12 +58,10 @@ class ContactsController < ApplicationController
     respond_to do |wants|
 
       wants.html do
-        @all_contacts = @contacts.select(['contacts.id', 'contacts.name'])
-
         @per_page = params[:per_page]
         unless @per_page == 'All'
           @per_page = @per_page.to_i > 0 ? @per_page : 25
-          @contacts = @contacts.page(params[:page]).per_page(@per_page.to_i)
+          @contacts = @contacts.includes([:primary_address, {people: :primary_phone_number}]).page(params[:page]).per_page(@per_page.to_i)
         end
       end
 
@@ -80,7 +78,6 @@ class ContactsController < ApplicationController
   end
 
   def show
-    @all_contacts = current_account_list.contacts.order('contacts.name').select([:id, :name])
     respond_with(@contact)
   end
 

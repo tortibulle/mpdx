@@ -2,7 +2,11 @@ class TasksController < ApplicationController
   respond_to :html, :js
 
   def index
-    base_scope = current_account_list.tasks.uncompleted
+    base_scope = current_account_list.tasks.uncompleted.includes(:contacts)
+
+    if params[:contact_id].present?
+      base_scope = base_scope.includes(:contacts).where('contacts.id' => params[:contact_ids])
+    end
 
     if params[:tags].present?
       base_scope = base_scope.tagged_with(params[:tags])

@@ -19,4 +19,4 @@ class AddressExhibit < DisplayCase::Exhibit
     [street, city, state, postal_code, country].select(&:present?).join(', ')
   end
 end
- 
+
