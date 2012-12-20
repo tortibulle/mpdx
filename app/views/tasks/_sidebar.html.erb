@@ -48,7 +48,7 @@
         </li>
         <li>
           <label><%= _('Contact') %></label>
-          <%= select_tag :contact_ids, options_for_select([[_('-- Any --'), '']] + all_contacts.collect { |c| [c.name, c.id] }, params[:contact_ids].split(',')), multiple: true, size: 5 %>
+          <%= select_tag :contact_ids, options_for_select([[_('-- Any --'), '']] + all_contacts.collect { |c| [c.name, c.id] }, params[:contact_ids]), multiple: true, size: 5 %>
         </li>
         <li>
           <%= submit_tag _('Filter') %><br />
