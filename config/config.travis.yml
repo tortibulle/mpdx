@@ -1,0 +1,14 @@
+test:
+  twitter_key: asdf
+  twitter_secret: asdf
+  facebook_key: asdf
+  facebook_secret: asdf
+  linkedin_key: asdf
+  linkedin_secret: asdf
+  google_key: asdf
+  google_secret: asdf
+  encryption_key: asdf
+  s3_key: asdf
+  s3_secret: asdf
+  s3_bucket: asdf
+
