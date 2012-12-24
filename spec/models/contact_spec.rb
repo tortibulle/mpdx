@@ -49,7 +49,7 @@ describe Contact do
   it "should have a primary person" do
     person = create(:person)
     @contact.people << person
-    @contact.primary_person.should == person
+    @contact.primary_or_first_person.should == person
   end
 
   describe 'when being deleted' do

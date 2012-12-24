@@ -6,14 +6,14 @@ describe PhoneNumber do
       @person = FactoryGirl.create(:person)
       @attributes = {'number' => '123-345-2313'}
     end
-    it "should create a phone number if it's new" do
+    it "creates a phone number if it's new" do
       ->{
         PhoneNumber.add_for_person(@person, @attributes)
         @person.phone_numbers.first.number.should == PhoneNumber.strip_number(@attributes['number'])
       }.should change(PhoneNumber, :count).from(0).to(1)
     end
 
-    it "should not create a phone number if it exists" do
+    it "doesn't create a phone number if it exists" do
       PhoneNumber.add_for_person(@person, @attributes)
       ->{
         PhoneNumber.add_for_person(@person, @attributes)
@@ -21,11 +21,21 @@ describe PhoneNumber do
       }.should_not change(PhoneNumber, :count)
     end
 
-    it "should set only the first phone number to primary" do
+    it "sets only the first phone number to primary" do
       PhoneNumber.add_for_person(@person, @attributes)
       @person.phone_numbers.first.primary?.should == true
       PhoneNumber.add_for_person(@person, @attributes.merge('number' => '313-313-3142'))
       @person.phone_numbers.last.primary?.should == false
+    end
+
+    it "sets a prior phone number to not-primary if the new one is primary" do
+      phone1 = PhoneNumber.add_for_person(@person, @attributes)
+      phone1.primary?.should == true
+
+      phone2 = PhoneNumber.add_for_person(@person, {number: '313-313-3142', primary: true})
+      phone2.primary?.should == true
+      phone2.send(:ensure_only_one_primary)
+      phone1.reload.primary?.should == false
     end
 
   end

@@ -5,7 +5,6 @@ class ContactsController < ApplicationController
   def index
     @contacts = current_account_list.contacts.order('contacts.name')
 
-    @contacts = @contacts.includes({people: :facebook_account}, :tags)
     if params[:filter] == 'people'
       @contacts = @contacts.people
     end
@@ -58,15 +57,16 @@ class ContactsController < ApplicationController
     respond_to do |wants|
 
       wants.html do
+        @contacts = @contacts.includes([{primary_person: :facebook_account}, :tags, :primary_address, {people: :primary_phone_number}])
         @per_page = params[:per_page]
         unless @per_page == 'All'
           @per_page = @per_page.to_i > 0 ? @per_page : 25
-          @contacts = @contacts.includes([:primary_address, {people: :primary_phone_number}]).page(params[:page]).per_page(@per_page.to_i)
+          @contacts = @contacts.page(params[:page]).per_page(@per_page.to_i)
         end
       end
 
       wants.csv do
-        @contacts = @contacts.includes(:primary_address, :addresses, {people: :email_addresses})
+        @contacts = @contacts.includes(:primary_person, :primary_address, :addresses, {people: :email_addresses})
         @headers = ['First Name', 'Last Name', 'Spouse First Name', 'Greeting',
                     'Mailing Street Address','Mailing City', 'Mailing State','Mailing Postal Code',
                     'Mailing Country', 'Email 1','Email 2','Email 3','Email 4']

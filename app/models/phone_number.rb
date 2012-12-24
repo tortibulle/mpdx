@@ -1,8 +1,10 @@
 class PhoneNumber < ActiveRecord::Base
+  include HasPrimary
+  @@primary_scope = :person
+
   belongs_to :person
 
   before_save :clean_up_number
-  after_save :ensure_only_one_primary
 
   # attr_accessible :number, :primary, :country_code, :location, :remote_id
 
@@ -11,9 +13,9 @@ class PhoneNumber < ActiveRecord::Base
     if number = person.phone_numbers.find_by_number(strip_number(attributes['number']))
       number.update_attributes(attributes)
     else
-      primary = person.phone_numbers.present? ? false : true
+      attributes['primary'] = (person.phone_numbers.present? ? false : true) if attributes['primary'].nil?
       new_or_create = person.new_record? ? :new : :create
-      number = person.phone_numbers.send(new_or_create, attributes.merge(primary: primary))
+      number = person.phone_numbers.send(new_or_create, attributes)
     end
     number
   end
@@ -28,20 +30,14 @@ class PhoneNumber < ActiveRecord::Base
     true
   end
 
-  private 
+  private
 
-
-
-    def strip_number!
-      if number.first == '+' && (match = number.match(/\+(\d+) /))
-        self.number = number.sub(match[0], '')
-        self.country_code = match[1]
-      end
-      self.number = PhoneNumber.strip_number(number)
+  def strip_number!
+    if number.first == '+' && (match = number.match(/\+(\d+) /))
+      self.number = number.sub(match[0], '')
+      self.country_code = match[1]
     end
+    self.number = PhoneNumber.strip_number(number)
+  end
 
-    def ensure_only_one_primary
-      primary_numbers = self.person.phone_numbers.where(primary: true)
-      primary_numbers[0..-2].map {|e| e.update_column(:primary, false)} if primary_numbers.length > 1
-    end
 end

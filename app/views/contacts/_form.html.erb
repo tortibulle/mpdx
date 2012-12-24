@@ -78,6 +78,11 @@
           <label class="fieldset_label">People</label>
           <% contact.people.build if contact.people.blank? %>
           <%= f.fields_for :people do |builder| %>
+            <div class="field radiocheck">
+              <%= f.radio_button :primary_person_id, builder.object.id %>
+              <%= f.label :primary_person_id, _('Primary Contact') %>
+            </div>
+
             <div class="inside_person">
               <%= render 'people/form', builder: builder, object: contact, no_remove: false %>
             </div>

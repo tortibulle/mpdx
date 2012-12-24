@@ -125,7 +125,7 @@ class Siebel < DataServer
 
     contact = siebel_donor.primary_contact || SiebelDonations::Contact.new
     address = siebel_donor.primary_address || SiebelDonations::Address.new
-    street = [address.address1, address.address2, address.address3, address.address4].select {|a| a.to_s.strip.present?}.join("\n")
+    street = [address.address1, address.address2, address.address3, address.address4].compact.join("\n")
 
     company.attributes = {
       name: siebel_donor.account_name,
@@ -231,7 +231,7 @@ class Siebel < DataServer
   end
 
   def add_or_update_address(address, object)
-    new_address = Address.new(street: [address.address1, address.address2, address.address3, address.address4].select {|a| a.to_s.strip.present?}.join("\n"),
+    new_address = Address.new(street: [address.address1, address.address2, address.address3, address.address4].compact.join("\n"),
                               city: address.city,
                               state: address.state,
                               postal_code: address.zip,

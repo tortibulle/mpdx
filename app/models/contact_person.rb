@@ -1,4 +1,7 @@
 class ContactPerson < ActiveRecord::Base
+  include HasPrimary
+  @@primary_scope = :contact
+
   belongs_to :contact
   belongs_to :person
 

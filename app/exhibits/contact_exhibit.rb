@@ -27,8 +27,13 @@ class ContactExhibit < DisplayCase::Exhibit
   end
 
   def avatar(size = :square)
-    fb = people.collect(&:facebook_account).flatten.first
-    fb ? "https://graph.facebook.com/#{fb.remote_id}/picture?type=#{size}" : 'https://mpdx.org/assets/avatar.png'
+    fb = primary_or_first_person.facebook_account
+    return "https://graph.facebook.com/#{fb.remote_id}/picture?type=#{size}" if fb
+    'https://mpdx.org/assets/' + if primary_or_first_person.gender == 'female'
+      'avatar_f.png'
+    else
+      'avatar.png'
+    end
   end
 
   def pledge_as_currency

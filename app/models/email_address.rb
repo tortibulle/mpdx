@@ -1,9 +1,12 @@
 class EmailAddress < ActiveRecord::Base
+  include HasPrimary
+  @@primary_scope = :person
+
   belongs_to :person
   validates_presence_of :email
   before_save :strip_email
   after_update :sync_with_mail_chimp
-  after_commit :ensure_only_one_primary, :subscribe_to_mail_chimp
+  after_commit :subscribe_to_mail_chimp
   after_destroy :delete_from_mailchimp
 
   def to_s() email; end
@@ -21,21 +24,6 @@ class EmailAddress < ActiveRecord::Base
   end
 
   private
-
-  def ensure_only_one_primary
-    if person.email_addresses.present?
-      primary_emails = self.person.email_addresses.where(primary: true)
-      if primary_emails.blank?
-        person.email_addresses.last.update_column(:primary, true)
-      elsif primary_emails.length > 1
-        if primary_emails.include?(self)
-          (primary_emails - [self]).map {|e| e.update_column(:primary, false)}
-        else
-          primary_emails[0..-2].map {|e| e.update_column(:primary, false)}
-        end
-      end
-    end
-  end
 
   def strip_email
     self.email = email.to_s.strip

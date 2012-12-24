@@ -1,5 +1,3 @@
-require_dependency 'address_methods'
-
 class Contact < ActiveRecord::Base
   include AddressMethods
   acts_as_taggable
@@ -10,6 +8,8 @@ class Contact < ActiveRecord::Base
   belongs_to :account_list
   has_many :contact_people, dependent: :destroy
   has_many :people, through: :contact_people
+  has_one  :primary_contact_person, class_name: 'ContactPerson', conditions: {primary: true}
+  has_one  :primary_person, through: :primary_contact_person, source: :person
   has_many :contact_referrals_to_me, foreign_key: :referred_to_id, class_name: 'ContactReferral'
   has_many :contact_referrals_by_me, foreign_key: :referred_by_id, class_name: 'ContactReferral'
   has_many :referrals_to_me, through: :contact_referrals_to_me, source: :referred_by
@@ -61,7 +61,7 @@ class Contact < ActiveRecord::Base
   #                 :church_name, :send_newsletter, :direct_deposit, :magazine, :last_activity, :last_appointment,
   #                 :last_letter, :last_phone_call, :last_pre_call, :last_thank, :tag_list
 
-  delegate :first_name, :last_name, :phone, :email, to: :primary_person
+  delegate :first_name, :last_name, :phone, :email, to: :primary_or_first_person
   delegate :street, :city, :state, :postal_code, to: :mailing_address
 
   def to_s() name; end
@@ -90,12 +90,22 @@ class Contact < ActiveRecord::Base
     contact
   end
 
-  def primary_person
-    people.where('contact_people.primary' => true).first || people.first || Person.new
+  def primary_or_first_person
+    @primary_or_first_person ||= primary_person || people.first || Person.new
+  end
+
+  def primary_person_id
+    primary_or_first_person.id
+  end
+
+  def primary_person_id=(person_id)
+    cp = contact_people.where(person_id: person_id).first
+    cp.update_attributes(primary: true)
+    person_id
   end
 
   def spouse_name
-    people.order('contact_people.primary desc')[1].try(:first_name)
+    people.where('contact_people.primary' => false).first.try(:first_name)
   end
 
   def update_donation_totals(donation)
