@@ -100,7 +100,7 @@ class Contact < ActiveRecord::Base
 
   def primary_person_id=(person_id)
     cp = contact_people.where(person_id: person_id).first
-    cp.update_attributes(primary: true)
+    cp.update_attributes(primary: true) if cp
     person_id
   end
 
