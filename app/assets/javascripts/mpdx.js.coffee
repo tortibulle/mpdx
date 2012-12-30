@@ -168,6 +168,7 @@ $.deparam = (coerce) ->
   obj
 
 $.set_param = (key, value) ->
-  params = $.deparam
+  params = $.deparam()
   params[key] = value
+  console.log(params)
   $.param(params)
