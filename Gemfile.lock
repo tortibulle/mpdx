@@ -212,7 +212,7 @@ GEM
       hashie (~> 1.2)
       multi_json (~> 1.0)
       oauth (~> 0.4)
-    listen (0.6.0)
+    listen (0.7.0)
     locale (2.0.8)
     lumberjack (1.0.2)
     mail (2.4.4)
