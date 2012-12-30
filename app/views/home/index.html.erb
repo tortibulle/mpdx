@@ -16,17 +16,15 @@
         <% if current_account_list.tasks.uncompleted.present? %>
           <ul class="list tasklist">
             <% current_account_list.tasks.uncompleted.limit(5).each do |task|
-              task = exhibit(task, self) %>
-              <li class="<%= task.css_class %>" id="<%= dom_id(task) %>">
-                <%= form_for task, remote: true, namespace: dom_id(task) do |f| %>
-                  <input type="checkbox" data-behavior="complete_task" data-id="<%= task.id %>" />
-                  <%= f.hidden_field :completed %>
-                  <%= link_to(tasks_path(anchor: dom_id(task))) do %>
-                    <span class="date"><%= l(task.start_at) %></span> - <span><%= task %></span>
-                  <% end %> 
-                  <%== "(#{task.contact_links})" if task.contact_links.present? %>
-                  <%= link_to('Destroy', task, confirm: _('Are you sure?'), method: :delete, :class=> "ico ico_trash", remote: true) %>
-                <% end %>
+              task_exhibit = exhibit(task, self) %>
+              <li class="<%= task_exhibit.css_class %>" id="<%= dom_id(task) %>">
+                <%= render 'tasks/results_modal', task: task, task_exhibit: task_exhibit %>
+                <input type="checkbox" data-behavior="complete_task" data-id="<%= task.id %>" />
+                <%= link_to(tasks_path(anchor: dom_id(task))) do %>
+                  <span class="date"><%= l(task_exhibit.start_at) %></span> - <span><%= task_exhibit %></span>
+                <% end %> 
+                <%== "(#{task_exhibit.contact_links})" if task_exhibit.contact_links.present? %>
+                <%= link_to('Destroy', task, confirm: _('Are you sure?'), method: :delete, :class=> "ico ico_trash", remote: true) %>
               </li>
             <% end %>
           </ul>

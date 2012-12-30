@@ -13,12 +13,12 @@ $ ->
   # When someone marks off a task, we need to open a modal to ask the result
   $(document).on 'click', '[data-behavior=complete_task]', ->
     id = $(this).attr('data-id')
-    form = $('#task_' + id + '_edit_task_' + id)
     if $(this).prop('checked') == false && $('#tasks_history')[0]?
       # Uncomplete a task
+      form = $('#task_' + id + '_edit_task_' + id)
       form.submit()
       $('#task_' + id).fadeOut()
-    else 
+    else
       if $(this).prop('checked') == true && !$('#tasks_completed')[0]?
         # Marking a task off, open the result modal
         $('#result_modal_' + id).dialog
@@ -38,5 +38,4 @@ $ ->
                 $(this).dialog("close")
             }
           ]
-        false
 

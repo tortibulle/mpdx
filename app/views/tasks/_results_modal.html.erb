@@ -1,0 +1,8 @@
+<div id="result_modal_<%= task.id %>" title="<%= task_exhibit %>" style="display:none">
+  <%= form_for task, remote: true, namespace: dom_id(task) do |f| %>
+    <%= _('Result') %>
+    <%= f.select :result, f.object.assignable_results.collect { |s| [_(s), s] } %>
+    <%= f.hidden_field :starred %>
+    <%= f.hidden_field :completed, value: true%>
+  <% end %>
+</div>
