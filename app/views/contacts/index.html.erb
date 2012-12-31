@@ -1,6 +1,6 @@
 <%= contact_instance = Contact.new %>
 <script type="text/javascript" charset="utf-8">
-  var contacts_json = <%= all_contacts.collect { |c| {value: c.id, label: c.name} }.to_json.html_safe %>
+  var contacts_json = <%= contacts_for_filter.collect { |c| {value: c.id, label: c.name} }.to_json.html_safe %>
 </script>
 <aside id="leftmenu">
 <ul>
@@ -107,16 +107,20 @@
   <div class="">
     <div class="padded">
       <table class="tablelist">
-        <tr id="select_more" style="display:none">
-          <td colspan="3">
-            <span id="select_all_prompt">
-              <%= _('All <strong>%{this_page}</strong> conversations on this page are selected. <a data-behavior="select_all">Select all <strong>%{total}</strong> contacts</a>') % {this_page: @contacts.length, total: all_contacts.length} %>
-            </span>
-            <span id="clear_selection_prompt" style="display:none">
-              <%= _('All <strong>%{total}</strong> contacts are selected. <a data-behavior="clear_selection">Clear selection</a>') % {total: all_contacts.length} %>
-            </span>
-          </td>
-        </tr>
+        <% unless @contacts.length == all_contacts.length %>
+          <tr id="select_more" style="display:none">
+            <td colspan="3">
+              <span id="select_all_prompt">
+                <%= _('All <strong>%{this_page}</strong> conversations on this page are selected. <a data-behavior="select_all">Select all <strong>%{total}</strong> contacts</a>') %
+                  {this_page: @contacts.length, total: all_contacts.length} %>
+              </span>
+              <span id="clear_selection_prompt" style="display:none">
+                <%= _('All <strong>%{total}</strong> contacts are selected. <a data-behavior="clear_selection">Clear selection</a>') %
+                  {total: all_contacts.length} %>
+              </span>
+            </td>
+          </tr>
+        <% end %>
         <tr>
           <td colspan="10">
             <%= render 'pagination' %>
