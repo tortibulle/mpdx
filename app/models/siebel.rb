@@ -250,7 +250,11 @@ class Siebel < DataServer
 
     # We didn't find a match. save it as a new address
     object.addresses << new_address
-    object.save!
+    begin
+      object.save!
+    rescue ActiveRecord::RecordInvalid => e
+      raise e.message + " - #{address.inspect}"
+    end
   end
 
   def add_or_update_phone_number(phone_number, person)
