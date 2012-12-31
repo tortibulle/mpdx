@@ -1,6 +1,5 @@
 class Api::V1::BaseController < ApplicationController
   skip_before_filter :redirect_to_mobile
-  skip_before_filter :ensure_setup_finished
 
   rescue_from ActiveRecord::RecordNotFound, with: :render_404
 
@@ -20,6 +19,13 @@ class Api::V1::BaseController < ApplicationController
         end
       rescue RestClient::Unauthorized
         render json: {errors: ['Invalid access token']}, status: :unauthorized, callback: params[:callback]
+        return false
+      end
+    end
+
+    def ensure_setup_finished
+      unless current_account_list
+        render json: {errors: _('You need to go to http://mpdx.org and set up your account before using the mobile app.')}, callback: params[:callback]
         return false
       end
     end
