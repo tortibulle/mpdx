@@ -64,7 +64,7 @@ class Person::FacebookAccount < ActiveRecord::Base
         else
           name = url.split('/').last
           name = name.split('?').first
-          response = RestClient.get("https://graph.facebook.com/#{name}", { accept: :json})
+          response = RestClient.get("https://graph.facebook.com/#{name}", { accept: :json })
           json = JSON.parse(response)
           raise RestClient::ResourceNotFound unless json['id'].to_i > 0
           json['id']

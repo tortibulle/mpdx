@@ -35,7 +35,7 @@ describe ContactsController do
 
       it "filters by tag" do
         @contact.update_attributes(tag_list: 'asdf')
-        get :index, tags: 'asdf'
+        get :index, filters: {tags: 'asdf'}
         response.should be_success
         assigns(:contacts).should == [@contact]
       end

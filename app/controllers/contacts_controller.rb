@@ -13,46 +13,7 @@ class ContactsController < ApplicationController
       @contacts = @contacts.companies
     end
 
-    if params[:tags].present?
-      @tags = params[:tags].split(',')
-      @contacts = @contacts.tagged_with(@tags)
-    end
-
-    if params[:city].present? && params[:city].first != ''
-      @contacts = @contacts.includes(:addresses).where('addresses.city' => params[:city])
-    end
-
-    if params[:state].present? && params[:state].first != ''
-      @contacts = @contacts.includes(:addresses).where('addresses.state' => params[:state])
-    end
-
-    if params[:likely].present? && params[:likely].first != ''
-      @contacts = @contacts.where(likely_to_give: params[:likely])
-    end
-
-    if params[:status].present? && params[:status].first != ''
-      @contacts = @contacts.where(status: params[:status])
-    else
-      @contacts = @contacts.active
-    end
-
-    if params[:referrer].present? && params[:referrer].first != ''
-      @contacts = @contacts.joins(:contact_referrals_to_me).where('contact_referrals.referred_by_id' => params[:referrer])
-    end
-
-    if params[:newsletter].present?
-      case params[:newsletter]
-      when 'address'
-        @contacts = @contacts.where(send_newsletter: 'Physical')
-        @contacts = @contacts.joins(:addresses).where('street is not null')
-      when 'email'
-        @contacts = @contacts.where(send_newsletter: 'Email')
-        @contacts = @contacts.joins(people: :email_addresses)
-        @contacts = @contacts.uniq unless @contacts.to_sql.include?('INNER JOIN')
-      else
-        @contacts = @contacts.where('send_newsletter is not null')
-      end
-    end
+    @contacts = ContactFilter.new(filters_params).filter(@contacts) if filters_params.present?
 
     respond_to do |wants|
 
@@ -257,5 +218,15 @@ class ContactsController < ApplicationController
   def get_contact
     @contact = current_account_list.contacts.includes({people: [:email_addresses, :phone_numbers, :family_relationships]}).find(params[:id])
   end
+
+  def filters_params
+    params[:filters] || {}
+  end
+  helper_method :filters_params
+
+  def tag_params
+    filters_params[:tags]
+  end
+  helper_method :tag_params
 
 end
