@@ -10,9 +10,6 @@ before_script:
   - cp config/database.travis.yml config/database.yml
   - cp config/config.travis.yml config/config.yml
   - bundle exec rake db:migrate RAILS_ENV=test
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq libicu-dev
 branches:
   only:
     - master

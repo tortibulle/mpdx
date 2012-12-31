@@ -72,11 +72,11 @@
 
                   <div class="field radiocheck">
                     <%= f.radio_button :override, false %>
-                    <%= f.label 'override_false', _('Only add CSV data to matched contact records when the current field is blank.') %>
+                    <%= f.label 'override_false', _('Only add data to matched contact records when the current field is blank.') %>
                   </div>
                   <div class="field radiocheck">
                     <%= f.radio_button :override, true %>
-                    <%= f.label 'override_true', _('Override existing contact fields with data in the CSV.') %>
+                    <%= f.label 'override_true', _('Override existing contact fields with data in the uploaded file.') %>
                   </div>
                   <div class="field">
                     <div class="importtags">

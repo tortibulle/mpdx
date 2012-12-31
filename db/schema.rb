@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121224123025) do
+ActiveRecord::Schema.define(:version => 20130107135513) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -60,12 +60,14 @@ ActiveRecord::Schema.define(:version => 20121224123025) do
     t.string   "result"
     t.datetime "completed_at"
     t.integer  "notification_id"
+    t.string   "tnt_id"
   end
 
   add_index "activities", ["account_list_id"], :name => "index_activities_on_account_list_id"
   add_index "activities", ["activity_type"], :name => "index_activities_on_activity_type"
   add_index "activities", ["notification_id"], :name => "index_activities_on_notification_id"
   add_index "activities", ["start_at"], :name => "index_activities_on_start_at"
+  add_index "activities", ["tnt_id"], :name => "index_activities_on_tnt_id"
 
   create_table "activity_comments", :force => true do |t|
     t.integer  "activity_id"
@@ -226,7 +228,7 @@ ActiveRecord::Schema.define(:version => 20121224123025) do
     t.string   "chartfield"
   end
 
-  add_index "designation_accounts", ["organization_id"], :name => "index_designation_accounts_on_organization_id"
+  add_index "designation_accounts", ["organization_id", "designation_number"], :name => "unique_designation_org", :unique => true
 
   create_table "designation_profile_accounts", :force => true do |t|
     t.integer  "designation_profile_id"
@@ -250,7 +252,7 @@ ActiveRecord::Schema.define(:version => 20121224123025) do
   end
 
   add_index "designation_profiles", ["organization_id"], :name => "index_designation_profiles_on_organization_id"
-  add_index "designation_profiles", ["user_id", "organization_id", "remote_id"], :name => "user_id", :unique => true
+  add_index "designation_profiles", ["user_id", "organization_id", "remote_id"], :name => "unique_remote_id", :unique => true
 
   create_table "donations", :force => true do |t|
     t.string   "remote_id"
@@ -271,6 +273,7 @@ ActiveRecord::Schema.define(:version => 20121224123025) do
   end
 
   add_index "donations", ["designation_account_id", "remote_id"], :name => "unique_donation_designation", :unique => true
+  add_index "donations", ["donation_date"], :name => "index_donations_on_donation_date"
   add_index "donations", ["donor_account_id"], :name => "index_donations_on_donor_account_id"
 
   create_table "donor_account_people", :force => true do |t|
@@ -418,7 +421,7 @@ ActiveRecord::Schema.define(:version => 20121224123025) do
     t.string   "name"
     t.string   "query_ini_url"
     t.string   "iso3166"
-    t.string   "minimum_gift_date",             :limit => 24
+    t.string   "minimum_gift_date"
     t.string   "logo"
     t.string   "code"
     t.boolean  "query_authentication"
@@ -443,8 +446,8 @@ ActiveRecord::Schema.define(:version => 20121224123025) do
     t.string   "profiles_url"
     t.string   "profiles_params"
     t.string   "redirect_query_ini"
-    t.datetime "created_at",                                  :null => false
-    t.datetime "updated_at",                                  :null => false
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
     t.string   "api_class"
   end
 
@@ -625,15 +628,6 @@ ActiveRecord::Schema.define(:version => 20121224123025) do
 
   add_index "phone_numbers", ["person_id"], :name => "index_phone_numbers_on_person_id"
   add_index "phone_numbers", ["remote_id"], :name => "index_phone_numbers_on_remote_id"
-
-  create_table "prod_people", :force => true do |t|
-    t.string "globallyUniqueId"
-    t.string "username"
-    t.string "firstName"
-    t.string "lastName"
-    t.string "middleName"
-    t.string "accountNo"
-  end
 
   create_table "taggings", :force => true do |t|
     t.integer  "tag_id"

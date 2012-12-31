@@ -3,7 +3,7 @@ require Rails.root.join('config','initializers','load_config').to_s
 if Rails.env.test? or Rails.env.cucumber?
   CarrierWave.configure do |config|
     config.storage = :file
-    config.enable_processing = false
+    #config.enable_processing = false
   end
 else
   CarrierWave.configure do |config|

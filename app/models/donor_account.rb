@@ -4,10 +4,10 @@ class DonorAccount < ActiveRecord::Base
 
   has_many :master_person_donor_accounts, dependent: :destroy
   has_many :master_people, through: :master_person_donor_accounts
-  has_many :donor_account_people
+  has_many :donor_account_people, dependent: :destroy
   has_many :people, through: :donor_account_people
   has_many :donations, dependent: :destroy
-  has_many :contact_donor_accounts
+  has_many :contact_donor_accounts, dependent: :destroy
   has_many :contacts, through: :contact_donor_accounts
   belongs_to :organization
   belongs_to :master_company

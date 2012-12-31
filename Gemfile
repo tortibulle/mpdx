@@ -24,7 +24,6 @@ gem 'airbrake', '~> 3.1.6'
 gem 'airbrake_user_attributes', '~> 0.1.6'
 gem 'assignable_values', '~> 0.5.3'
 gem 'carrierwave', git: 'git://github.com/jnicklas/carrierwave.git' # tracking master because of fixes made since last gem version
-gem 'charlock_holmes', '~> 0.6.9'
 gem 'country_select', git: 'git://github.com/26am/country_select.git' # My fork has the meta data for the fancy select
 gem 'dalli'
 gem 'deadlock_retry', '~> 1.2.0'

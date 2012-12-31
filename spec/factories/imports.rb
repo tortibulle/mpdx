@@ -9,7 +9,7 @@ FactoryGirl.define do
   end
 
   factory :tnt_import, parent: :import do
-    file { File.new(Rails.root.join('spec/fixtures/tnt_export.csv')) }
+    file { File.new(Rails.root.join('spec/fixtures/tnt_export.xml')) }
     source "tnt"
   end
 end

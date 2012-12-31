@@ -13,7 +13,7 @@ class ContactPerson < ActiveRecord::Base
     # See if there is any other contact_person with the same person id
     unless ContactPerson.where(person_id: person_id).where('id <> ?', id).first
       # if there isn't, delete the associated person
-      person.destroy
+      person.destroy if person
     end
   end
 

@@ -1,0 +1,550 @@
+<Database>
+  <Application>TntMPD</Application>
+  <Version>2.1</Version>
+  <Name>Z:\Users\josh\Desktop\starcher.mpddb</Name>
+  <Tables>
+    <Appeal>
+      <row id="-723622290">
+        <LastEdit>2005-07-26 21:04:39</LastEdit>
+        <Description>CSU</Description>
+        <Active>true</Active>
+      </row>
+    </Appeal>
+    <Contact>
+      <row id="-1620699916">
+        <LastEdit>2011-12-16 15:29:33</LastEdit>
+        <CreatedDate>2004-07-30</CreatedDate>
+        <FileAs>Elliott, Bob and Kathie</FileAs>
+        <FullName>Bob and Kathie Elliott</FullName>
+        <Greeting>Bob and Kathie</Greeting>
+        <ShortName>Bob and Kathie Elliott</ShortName>
+        <MailingAddressBlock>Bob and Kathie Elliott
+1107 L St.
+Davis, CA  95616</MailingAddressBlock>
+        <MailingAddressIsDeliverable>true</MailingAddressIsDeliverable>
+        <Phone>(530) 753-5816</Phone>
+        <PhoneIsOperational>true</PhoneIsOperational>
+        <EmailIsOperational>false</EmailIsOperational>
+        <IsOrganization>false</IsOrganization>
+        <FirstName>Bob</FirstName>
+        <LastName>Elliott</LastName>
+        <SpouseFirstName>Kathie</SpouseFirstName>
+        <PreferredAddressType>1</PreferredAddressType>
+        <MailingStreetAddress>1107 L St.</MailingStreetAddress>
+        <MailingCity>Davis</MailingCity>
+        <MailingState>CA</MailingState>
+        <MailingPostalCode>95616</MailingPostalCode>
+        <HomeStreetAddress>1107 L St.</HomeStreetAddress>
+        <HomeCity>Davis</HomeCity>
+        <HomeState>CA</HomeState>
+        <HomePostalCode>95616</HomePostalCode>
+        <HomeCountryID>840</HomeCountryID>
+        <HomeCountry>United States of America</HomeCountry>
+        <HomeAddressIsDeliverable>true</HomeAddressIsDeliverable>
+        <HomeAddressBlock>Bob and Kathie Elliott
+1107 L St.
+Davis, CA  95616</HomeAddressBlock>
+        <BusinessCountryID>840</BusinessCountryID>
+        <BusinessCountry>United States of America</BusinessCountry>
+        <BusinessAddressIsDeliverable>false</BusinessAddressIsDeliverable>
+        <OtherCountryID>840</OtherCountryID>
+        <OtherCountry>United States of America</OtherCountry>
+        <OtherAddressIsDeliverable>false</OtherAddressIsDeliverable>
+        <PreferredPhoneType>0</PreferredPhoneType>
+        <HomePhone>(530) 753-5816</HomePhone>
+        <PreferredEmailTypes>0</PreferredEmailTypes>
+        <Email1IsOperational>false</Email1IsOperational>
+        <Email2IsOperational>false</Email2IsOperational>
+        <Email3IsOperational>false</Email3IsOperational>
+        <FamilyLevelID>0</FamilyLevelID>
+        <FamilySideID>0</FamilySideID>
+        <PledgeAmount>0</PledgeAmount>
+        <PledgeFrequencyID>0</PledgeFrequencyID>
+        <PledgeReceived>false</PledgeReceived>
+        <PledgeStartDate>2004-08-26</PledgeStartDate>
+        <Deceased>false</Deceased>
+        <MPDPhaseID>80</MPDPhaseID>
+        <NextAsk>1899-12-30</NextAsk>
+        <NeverAsk>false</NeverAsk>
+        <LikelyToGiveID>0</LikelyToGiveID>
+        <ChurchName>PLRBC</ChurchName>
+        <SendNewsletter>false</SendNewsletter>
+        <DirectDeposit>false</DirectDeposit>
+        <Magazine>false</Magazine>
+        <MonthlyPledge>0</MonthlyPledge>
+        <FirstGiftDate>2004-09-01</FirstGiftDate>
+        <LastGiftDate>2005-06-06</LastGiftDate>
+        <LastGiftAmount>100</LastGiftAmount>
+        <PrevYearTotal>0</PrevYearTotal>
+        <YearTotal>0</YearTotal>
+        <LifetimeTotal>260</LifetimeTotal>
+        <LargestGift>100</LargestGift>
+        <GoodUntil>1899-12-30</GoodUntil>
+        <AveMonthlyGift>0</AveMonthlyGift>
+        <LastDateInAve>1899-12-30</LastDateInAve>
+        <TwelveMonthTotal>0</TwelveMonthTotal>
+        <LastActivity>2006-09-18</LastActivity>
+        <LastAppointment>2004-08-26</LastAppointment>
+        <LastLetter>2006-08-31</LastLetter>
+        <LastPhoneCall>2006-09-18</LastPhoneCall>
+        <LastPreCall>2004-07-30</LastPreCall>
+        <LastThank>2004-08-30</LastThank>
+        <AppealsSinceLastGift>0</AppealsSinceLastGift>
+        <OrgDonorCodes>413518908</OrgDonorCodes>
+        <FileAsIsCustom>false</FileAsIsCustom>
+        <ShortNameIsCustom>false</ShortNameIsCustom>
+        <GreetingIsCustom>false</GreetingIsCustom>
+        <FullNameIsCustom>false</FullNameIsCustom>
+        <HomeAddressBlockIsCustom>false</HomeAddressBlockIsCustom>
+        <BusinessAddressBlockIsCustom>false</BusinessAddressBlockIsCustom>
+        <OtherAddressBlockIsCustom>false</OtherAddressBlockIsCustom>
+        <PhoneIsOperationalMask>1</PhoneIsOperationalMask>
+        <PhoneCountryIDs>0=840</PhoneCountryIDs>
+        <ReferredBy>Don and Linda Stumbo</ReferredBy>
+      </row>
+      <row id="-861693757">
+        <LastEdit>2012-11-16 11:10:09</LastEdit>
+        <CreatedDate>2005-09-14</CreatedDate>
+        <FileAs>Stumbo, Don and Linda</FileAs>
+        <FullName>Don and Linda Stumbo</FullName>
+        <Greeting>Don and Linda</Greeting>
+        <ShortName>Don and Linda Stumbo</ShortName>
+        <MailingAddressBlock>Don and Linda Stumbo
+40739 Capa Dr.
+Fremont, CA  94539</MailingAddressBlock>
+        <MailingAddressIsDeliverable>true</MailingAddressIsDeliverable>
+        <Phone>(510) 623-0921</Phone>
+        <PhoneIsOperational>true</PhoneIsOperational>
+        <EmailIsOperational>false</EmailIsOperational>
+        <IsOrganization>true</IsOrganization>
+        <FirstName>Don</FirstName>
+        <LastName>Stumbo</LastName>
+        <SpouseFirstName>Linda</SpouseFirstName>
+        <PreferredAddressType>1</PreferredAddressType>
+        <MailingStreetAddress>40739 Capa Dr.</MailingStreetAddress>
+        <MailingCity>Fremont</MailingCity>
+        <MailingState>CA</MailingState>
+        <MailingPostalCode>94539</MailingPostalCode>
+        <HomeStreetAddress>40739 Capa Dr.</HomeStreetAddress>
+        <HomeCity>Fremont</HomeCity>
+        <HomeState>CA</HomeState>
+        <HomePostalCode>94539</HomePostalCode>
+        <HomeCountryID>840</HomeCountryID>
+        <HomeCountry>United States of America</HomeCountry>
+        <HomeAddressIsDeliverable>true</HomeAddressIsDeliverable>
+        <HomeAddressBlock>Don and Linda Stumbo
+40739 Capa Dr.
+Fremont, CA  94539</HomeAddressBlock>
+        <BusinessCountryID>840</BusinessCountryID>
+        <BusinessCountry>United States of America</BusinessCountry>
+        <BusinessAddressIsDeliverable>false</BusinessAddressIsDeliverable>
+        <OtherCountryID>840</OtherCountryID>
+        <OtherCountry>United States of America</OtherCountry>
+        <OtherAddressIsDeliverable>false</OtherAddressIsDeliverable>
+        <PreferredPhoneType>0</PreferredPhoneType>
+        <HomePhone>(510) 623-0921</HomePhone>
+        <PreferredEmailTypes>0</PreferredEmailTypes>
+        <Email1IsOperational>false</Email1IsOperational>
+        <Email2IsOperational>false</Email2IsOperational>
+        <Email3IsOperational>false</Email3IsOperational>
+        <ReferredByList>Steve and Lisa Ray</ReferredByList>
+        <ReferredBy>Steve and Lisa Ray</ReferredBy>
+        <Notes>{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}{\f1\fnil Tahoma;}}
+{\*\generator Msftedit 5.41.15.1507;}\viewkind4\uc1\pard\lang1033\f0\fs16 call for amount\f1\par
+}</Notes>
+        <FamilyLevelID>0</FamilyLevelID>
+        <FamilySideID>0</FamilySideID>
+        <PledgeAmount>50</PledgeAmount>
+        <PledgeFrequencyID>1</PledgeFrequencyID>
+        <PledgeReceived>true</PledgeReceived>
+        <PledgeStartDate>2005-10-14</PledgeStartDate>
+        <Deceased>false</Deceased>
+        <MPDPhaseID>60</MPDPhaseID>
+        <NextAsk>1899-12-30</NextAsk>
+        <NeverAsk>false</NeverAsk>
+        <LikelyToGiveID>0</LikelyToGiveID>
+        <SendNewsletter>true</SendNewsletter>
+        <DirectDeposit>false</DirectDeposit>
+        <Magazine>false</Magazine>
+        <MonthlyPledge>50</MonthlyPledge>
+        <FirstGiftDate>2005-10-18</FirstGiftDate>
+        <LastGiftDate>2012-10-20</LastGiftDate>
+        <LastGiftAmount>50</LastGiftAmount>
+        <PrevYearTotal>600</PrevYearTotal>
+        <YearTotal>500</YearTotal>
+        <LifetimeTotal>4250</LifetimeTotal>
+        <LargestGift>50</LargestGift>
+        <GoodUntil>2012-11-19</GoodUntil>
+        <AveMonthlyGift>50</AveMonthlyGift>
+        <LastDateInAve>2012-11-30</LastDateInAve>
+        <TwelveMonthTotal>600</TwelveMonthTotal>
+        <LastActivity>2006-08-31</LastActivity>
+        <LastAppointment>2005-10-06</LastAppointment>
+        <LastLetter>2006-08-31</LastLetter>
+        <LastPhoneCall>2005-10-10</LastPhoneCall>
+        <LastPreCall>2005-09-20</LastPreCall>
+        <LastThank>1899-12-30</LastThank>
+        <AppealsSinceLastGift>0</AppealsSinceLastGift>
+        <OrgDonorCodes>441189512</OrgDonorCodes>
+        <FileAsIsCustom>false</FileAsIsCustom>
+        <ShortNameIsCustom>false</ShortNameIsCustom>
+        <GreetingIsCustom>false</GreetingIsCustom>
+        <FullNameIsCustom>false</FullNameIsCustom>
+        <HomeAddressBlockIsCustom>false</HomeAddressBlockIsCustom>
+        <BusinessAddressBlockIsCustom>false</BusinessAddressBlockIsCustom>
+        <OtherAddressBlockIsCustom>false</OtherAddressBlockIsCustom>
+        <PhoneIsOperationalMask>1</PhoneIsOperationalMask>
+        <PhoneCountryIDs>0=840</PhoneCountryIDs>
+      </row>
+
+    </Contact>
+    <Designation>
+      <row id="1248631139">
+        <LastEdit>2004-05-19 09:41:13</LastEdit>
+        <OrganizationID>-276331507</OrganizationID>
+        <OrgDesignationCode>559826</OrgDesignationCode>
+        <OrgDesignationName>Starcher, Joshua L</OrgDesignationName>
+      </row>
+    </Designation>
+    <Group>
+    </Group>
+    <GroupContact>
+    </GroupContact>
+    <History>
+      <row id="620575700">
+        <LastEdit>2004-08-26 20:28:17</LastEdit>
+        <TaskTypeID>1</TaskTypeID>
+        <HistoryDate>2004-08-26 19:00:00</HistoryDate>
+        <HistoryResultID>1</HistoryResultID>
+      </row>
+    </History>
+    <HistoryContact>
+      <row id="21">
+        <LastEdit>2006-12-19 20:55:50</LastEdit>
+        <HistoryID>620575700</HistoryID>
+        <ContactID>-861693757</ContactID>
+      </row>
+    </HistoryContact>
+    <HistoryResult>
+      <row id="1">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Done</Description>
+      </row>
+      <row id="2">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Received</Description>
+      </row>
+      <row id="3">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Attempted</Description>
+      </row>
+    </HistoryResult>
+    <HistoryType>
+      <row id="1">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Appointment</Description>
+      </row>
+      <row id="2">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Phone</Description>
+      </row>
+      <row id="3">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Mail</Description>
+      </row>
+      <row id="4">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Thank</Description>
+      </row>
+      <row id="5">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>PreCall</Description>
+      </row>
+      <row id="6">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Ignore (To Do)</Description>
+      </row>
+      <row id="7">
+        <LastEdit>2006-12-19 20:56:03</LastEdit>
+        <Description>Email</Description>
+      </row>
+    </HistoryType>
+    <LikelyToGive>
+      <row id="0">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Unassigned</Description>
+      </row>
+      <row id="1">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Least Likely</Description>
+      </row>
+      <row id="2">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Likely</Description>
+      </row>
+      <row id="3">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Most Likely</Description>
+      </row>
+    </LikelyToGive>
+    <Login>
+      <row id="506252359">
+        <LastEdit>2011-12-16 15:26:34</LastEdit>
+        <OrganizationID>-276331507</OrganizationID>
+        <Login>josh.starcher@cojourners.com</Login>
+        <Password>04E96D44F4828E527D47953C56C1D2896958</Password>
+      </row>
+    </Login>
+    <LoginProfile>
+      <row id="506252358">
+        <LastEdit>2012-11-18 14:02:38</LastEdit>
+        <LoginID>506252359</LoginID>
+        <OrgRoleDescription>Staff Account (0559826)</OrgRoleDescription>
+        <GiftLastSyncDate>2012-11-12</GiftLastSyncDate>
+        <AddressLastSyncDate>2011-12-16</AddressLastSyncDate>
+      </row>
+    </LoginProfile>
+    <LoginProfileDesignation>
+      <row id="1582730996">
+        <LastEdit>2004-05-19 09:41:13</LastEdit>
+        <LoginProfileID>506252358</LoginProfileID>
+        <DesignationID>1248631139</DesignationID>
+      </row>
+    </LoginProfileDesignation>
+    <PendingAction>
+    </PendingAction>
+    <Picture>
+    </Picture>
+    <Property>
+      <row id="-1783235008">
+        <LastEdit>2005-12-10 09:32:38</LastEdit>
+        <PropName>MonthlySupportGoal</PropName>
+        <PropValue>6300</PropValue>
+      </row>
+      <row id="-1727062327">
+        <LastEdit>2004-05-19 09:41:13</LastEdit>
+        <PropName>OrgName</PropName>
+        <PropValue>Campus Crusade for Christ</PropValue>
+      </row>
+      <row id="-1206643896">
+        <LastEdit>2004-05-02 18:16:21</LastEdit>
+        <PropName>DefaultCountryID</PropName>
+        <PropValue>840</PropValue>
+      </row>
+      <row id="-989588033">
+        <LastEdit>2004-05-19 09:41:13</LastEdit>
+        <PropName>LastLoginProfileID</PropName>
+        <PropValue>506252358</PropValue>
+      </row>
+      <row id="-798231460">
+        <LastEdit>2004-08-21 18:30:16</LastEdit>
+        <PropName>ThankFirstGift</PropName>
+        <PropValue>0</PropValue>
+      </row>
+      <row id="-785601838">
+        <LastEdit>2005-08-08 09:41:57</LastEdit>
+        <PropName>FirstDayOfMPDWeek</PropName>
+        <PropValue>7</PropValue>
+      </row>
+      <row id="-727841683">
+        <LastEdit>2004-05-02 18:16:21</LastEdit>
+        <PropName>MailingFromCountryID</PropName>
+        <PropValue>840</PropValue>
+      </row>
+      <row id="-615484335">
+        <LastEdit>2004-08-19 12:08:28</LastEdit>
+        <PropName>DbPropLink.DBID</PropName>
+        <PropValue>104772388</PropValue>
+      </row>
+      <row id="-613978564">
+        <LastEdit>2006-12-19 20:55:50</LastEdit>
+        <PropName>DefaultExportFields</PropName>
+        <PropValue>FullName,Greeting,MailingStreetAddress,MailingCity,MailingState,MailingPostalCode</PropValue>
+      </row>
+      <row id="-610326034">
+        <LastEdit>2004-08-21 18:30:16</LastEdit>
+        <PropName>ThankExtraGift</PropName>
+        <PropValue>0</PropValue>
+      </row>
+      <row id="42092228">
+        <LastEdit>2012-11-14 11:20:23</LastEdit>
+        <PropName>LastCompactDate</PropName>
+        <PropValue>41227</PropValue>
+      </row>
+      <row id="210510367">
+        <LastEdit>2005-08-08 09:41:58</LastEdit>
+        <PropName>TntMPD_Pro</PropName>
+        <PropValue>1</PropValue>
+      </row>
+      <row id="259768818">
+        <LastEdit>2004-05-19 09:41:13</LastEdit>
+        <PropName>OrgAbbrev</PropName>
+        <PropValue>CCC</PropValue>
+      </row>
+      <row id="269116797">
+        <LastEdit>2011-12-16 15:25:09</LastEdit>
+        <PropName>InitialLookupType</PropName>
+        <PropValue>EVERYONE</PropValue>
+      </row>
+      <row id="567524820">
+        <LastEdit>2004-05-02 18:16:31</LastEdit>
+        <PropName>WelcomeScreen</PropName>
+        <PropValue>1</PropValue>
+      </row>
+      <row id="576841793">
+        <LastEdit>2012-08-16 11:44:00</LastEdit>
+        <PropName>MailChimpLastSyncDate</PropName>
+        <PropValue>41137</PropValue>
+      </row>
+      <row id="590548395">
+        <LastEdit>2004-08-21 18:30:16</LastEdit>
+        <PropName>ThankLongTermPledgeMonths</PropName>
+        <PropValue>24</PropValue>
+      </row>
+      <row id="910724045">
+        <LastEdit>2012-08-16 11:42:22</LastEdit>
+        <PropName>MailChimpListId</PropName>
+        <PropValue>c2d7fef6f4</PropValue>
+      </row>
+      <row id="1173418757">
+        <LastEdit>2012-08-16 11:42:22</LastEdit>
+        <PropName>MailChimpListName</PropName>
+        <PropValue>Financial Partners</PropValue>
+      </row>
+      <row id="1774276494">
+        <LastEdit>2012-08-16 11:42:22</LastEdit>
+        <PropName>MailChimpAPIKey</PropName>
+        <PropValue>642db646ac58a4bc4ace3a3dba5897df-us4</PropValue>
+      </row>
+      <row id="1840023849">
+        <LastEdit>2012-11-21 08:41:51</LastEdit>
+        <PropName>CountryUpdateVersion</PropName>
+        <PropValue>562954254156390</PropValue>
+      </row>
+      <row id="2003064828">
+        <LastEdit>2011-12-16 15:20:00</LastEdit>
+        <PropName>DbPropLink.GUID</PropName>
+        <PropValue>{FE512D6C-C1E1-43D9-8442-9C1D6903A58E}</PropValue>
+      </row>
+      <row id="2067745523">
+        <LastEdit>2011-12-16 15:19:43</LastEdit>
+        <PropName>Version</PropName>
+        <PropValue>131073</PropValue>
+      </row>
+    </Property>
+    <Region>
+    </Region>
+    <RegionLocation>
+    </RegionLocation>
+    <Task>
+      <row id="-1918558789">
+        <LastEdit>2006-09-09 13:09:52</LastEdit>
+        <TaskTypeID>20</TaskTypeID>
+        <Description>for appointment</Description>
+        <TaskDate>2006-09-09</TaskDate>
+        <TaskTime>1899-12-30</TaskTime>
+        <ApptLength>30</ApptLength>
+        <AllDayEvent>false</AllDayEvent>
+        <IsRecurring>false</IsRecurring>
+        <RecurrenceType>0</RecurrenceType>
+        <Interval>1</Interval>
+        <DayOfWeekMask>0</DayOfWeekMask>
+        <Instance>1</Instance>
+        <DayOfMonth>1</DayOfMonth>
+        <MonthOfYear>1</MonthOfYear>
+        <Regenerate>false</Regenerate>
+        <NoEndDate>true</NoEndDate>
+        <Occurrences>10</Occurrences>
+        <StartDate>1899-12-30</StartDate>
+        <Status>0</Status>
+        <Importance>1</Importance>
+        <PercentComplete>0</PercentComplete>
+        <Sensitivity>0</Sensitivity>
+        <TotalWork>0</TotalWork>
+        <ActualWork>0</ActualWork>
+        <BusyStatus>0</BusyStatus>
+      </row>
+    </Task>
+    <TaskContact>
+      <row id="1">
+        <LastEdit>2006-12-19 20:55:53</LastEdit>
+        <TaskID>-1918558789</TaskID>
+        <ContactID>-1620699916</ContactID>
+      </row>
+    </TaskContact>
+    <TaskReason>
+      <row id="-2094607405">
+        <LastEdit>2004-07-02 17:43:31</LastEdit>
+        <Description>Call for Appointment</Description>
+      </row>
+      <row id="-2039871973">
+        <LastEdit>2004-07-06 12:14:27</LastEdit>
+        <Description>Support Letter</Description>
+      </row>
+      <row id="-481977580">
+        <LastEdit>2004-07-06 15:15:32</LastEdit>
+        <Description>Pre-Appointment</Description>
+      </row>
+      <row id="-266459752">
+        <LastEdit>2004-07-06 12:14:45</LastEdit>
+        <Description>Call for Decision</Description>
+      </row>
+      <row id="1861289788">
+        <LastEdit>2004-08-30 15:52:20</LastEdit>
+        <Description>Dan call</Description>
+      </row>
+    </TaskReason>
+    <TaskType>
+      <row id="1">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Appointment</Description>
+        <HistoryTypeID>1</HistoryTypeID>
+      </row>
+      <row id="2">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Thank</Description>
+        <HistoryTypeID>4</HistoryTypeID>
+      </row>
+      <row id="3">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>To Do</Description>
+        <HistoryTypeID>6</HistoryTypeID>
+      </row>
+      <row id="20">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Call</Description>
+        <HistoryTypeID>2</HistoryTypeID>
+      </row>
+      <row id="30">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Reminder Letter</Description>
+        <HistoryTypeID>3</HistoryTypeID>
+      </row>
+      <row id="40">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Support Letter</Description>
+        <HistoryTypeID>3</HistoryTypeID>
+      </row>
+      <row id="50">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Letter</Description>
+        <HistoryTypeID>3</HistoryTypeID>
+      </row>
+      <row id="60">
+        <LastEdit>2011-12-16 15:19:59</LastEdit>
+        <Description>Newsletter</Description>
+        <HistoryTypeID>3</HistoryTypeID>
+      </row>
+      <row id="70">
+        <LastEdit>2004-05-02 18:14:59</LastEdit>
+        <Description>Pre Call Letter</Description>
+        <HistoryTypeID>5</HistoryTypeID>
+      </row>
+      <row id="100">
+        <LastEdit>2006-12-19 20:56:03</LastEdit>
+        <Description>Email</Description>
+        <HistoryTypeID>7</HistoryTypeID>
+      </row>
+    </TaskType>
+  </Tables>
+</Database>
