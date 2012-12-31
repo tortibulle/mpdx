@@ -79,8 +79,8 @@ describe Person::FacebookAccount do
 
     it "should raise an exception if the url is bad" do
       stub_request(:get, /https:\/\/graph.facebook.com\/.*/).
-         with(:headers => {'Accept'=>'application/json'}).to_return(:status => 404)
-      lambda {@account.get_id_from_url('https://www.facebook.com/john.doe')}.should raise_error(RestClient::ResourceNotFound)
+         with(:headers => {'Accept'=>'application/json'}).to_return(:status => 400)
+      lambda {@account.get_id_from_url('https://www.facebook.com/john.doe')}.should raise_error(Errors::FacebookLink)
     end
 
   end

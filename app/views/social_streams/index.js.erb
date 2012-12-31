@@ -1,7 +1,10 @@
 $('#spinner_social').hide();
-<% if params[:page] %>
-  $('#stream_table').append('<%= j(render('items', items: @items)) %>');
+<% if current_user.facebook_account.token_missing_or_expired? %>
+    $('#social').html('<%= j(link_to(_('The link to your facebook account needs to be refreshed. Click here to re-connect to facebook</a>.'), new_account_path(provider: :facebook, redirect: contact_path(@contact, anchor: 'stream-tab')))) %>');
 <% else %>
-  $('#social').html('<%= j(render('items', items: @items)) %>');
+  <% if params[:page] %>
+    $('#stream_table').append('<%= j(render('items', items: @items)) %>');
+  <% else %>
+    $('#social').html('<%= j(render('items', items: @items)) %>');
+  <% end %>
 <% end %>
-

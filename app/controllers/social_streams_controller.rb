@@ -4,7 +4,7 @@ class SocialStreamsController < ApplicationController
       @contact = current_account_list.contacts.where(id: params[:contact_id]).first
       @items = []
 
-      if current_user.facebook_account.try(:token) && 
+      if current_user.facebook_account.try(:token) &&
          !current_user.facebook_account.token_missing_or_expired?
         @graph = Koala::Facebook::API.new(current_user.facebook_account.token)
         @contact.people.each do |person|

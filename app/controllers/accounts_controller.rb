@@ -5,6 +5,13 @@ class AccountsController < ApplicationController
   def index
   end
 
+  def new
+    if params[:redirect]
+      session[:user_return_to] = params[:redirect]
+    end
+    redirect_to "/auth/#{params[:provider]}"
+  end
+
   def create
     User.transaction do
       logger.ap request.env['omniauth.auth']
@@ -42,7 +49,7 @@ class AccountsController < ApplicationController
 
   private
     def redirect_path
-      case 
+      case
       when current_user.setup_mode?
         if current_user.organization_accounts.present?
           setup_path(:social_accounts)

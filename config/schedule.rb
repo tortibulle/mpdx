@@ -27,6 +27,10 @@ every :day, at: '12am' do
   runner "AccountList.update_linked_org_accounts"
 end
 
+every :day, at: '11pm' do
+  runner "Person::FacebookAccount.refresh_tokens"
+end
+
 every :day, at: '12pm' do
   runner "AccountList.queue_send_account_notifications"
 end

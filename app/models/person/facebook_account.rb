@@ -1,4 +1,5 @@
 require 'async'
+require 'retryable'
 class Person::FacebookAccount < ActiveRecord::Base
   include Redis::Objects
   include Async
@@ -41,10 +42,7 @@ class Person::FacebookAccount < ActiveRecord::Base
   end
 
   def url=(value)
-    begin
-      self.remote_id = get_id_from_url(value)
-    rescue RestClient::ResourceNotFound
-    end
+    self.remote_id = get_id_from_url(value)
     unless remote_id.present?
       raise Errors::FacebookLink, _('We were unable to link this person to the facebook url you provided. Check the url you entered and try again. If you are currently running the "Import contacts from facebook" process, please wait until you get the email saying the import finished before trying again.')
     end
@@ -57,23 +55,24 @@ class Person::FacebookAccount < ActiveRecord::Base
   def self.get_id_from_url(url)
     return nil unless url.present?
 
-    tries ||= 6
-    # e.g. https://graph.facebook.com/nmfdelacruz)
-    if url.include?("id=")
-      id = url.split('id=').last
-      id = id.split('&').first
-    else
-      name = url.split('/').last
-      name = name.split('?').first
-      response = RestClient.get("https://graph.facebook.com/#{name}", { accept: :json})
-      json = JSON.parse(response)
-      raise RestClient::ResourceNotFound unless json['id'].to_i > 0
-      json['id']
-    end.to_i
-  rescue RestClient::Forbidden
-    if (tries -= 1) > 0
-      sleep(0.5)
-      retry
+    begin
+      Retryable.retryable :on => [RestClient::Forbidden, Timeout::Error, Errno::ECONNRESET], :times => 6, :sleep => 0.5 do
+        # e.g. https://graph.facebook.com/nmfdelacruz)
+        if url.include?("id=")
+          id = url.split('id=').last
+          id = id.split('&').first
+        else
+          name = url.split('/').last
+          name = name.split('?').first
+          response = RestClient.get("https://graph.facebook.com/#{name}", { accept: :json})
+          json = JSON.parse(response)
+          raise RestClient::ResourceNotFound unless json['id'].to_i > 0
+          json['id']
+        end.to_i
+      end
+    rescue RestClient::ResourceNotFound
+    rescue RestClient::BadRequest
+      raise Errors::FacebookLink, _('We were unable to link this person to the facebook url you provided. This is likely due to facebook privacy settings this person has set. If they are your friend on facebook, try using the "Import contacts from facebook" feature instead of manually pasting the link in.')
     end
   end
 
@@ -83,8 +82,10 @@ class Person::FacebookAccount < ActiveRecord::Base
 
   def token_missing_or_expired?(tries = 0)
     # If we have an expired token, try once to refresh it
-    if tries == 0 && token && (!token_expires_at || token_expires_at < Time.now)
-      refresh_token
+    if tries == 0 && token && (!token_expires_at || token_expires_at > Time.now)
+      begin
+        refresh_token
+      rescue; end
       token_missing_or_expired?(1)
     else
       token.blank? || !token_expires_at || token_expires_at < Time.now
@@ -96,6 +97,13 @@ class Person::FacebookAccount < ActiveRecord::Base
     self.token = info['access_token']
     self.token_expires_at = Time.at(info['expires'])
     save
+  end
+
+  # Refresh any tokens that will be expiring soon
+  def refresh_tokens
+    Person::FacebookAccount.where("token_expires_at < ? AND token_expires_at > ?", 2.days.from_now, Time.now).each do |fa|
+      fa.refresh_token
+    end
   end
 
   private

@@ -78,6 +78,7 @@ gem 'whenever'
 gem 'virtus'
 #gem 'siebel_donations', path: '/Users/josh/htdocs/siebel_donations'
 gem 'siebel_donations', git: 'git://github.com/twinge/siebel_donations.git'
+gem 'retryable-rb'
 
 group :development do
   gem 'railroady'

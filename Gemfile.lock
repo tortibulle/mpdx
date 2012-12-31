@@ -497,6 +497,7 @@ DEPENDENCIES
   resque-lock
   resque_spec
   rest-client
+  retryable-rb
   rspec-rails
   sass-rails (~> 3.2.3)
   siebel_donations!
