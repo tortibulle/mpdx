@@ -10,6 +10,8 @@ class Contact < ActiveRecord::Base
   has_many :people, through: :contact_people
   has_one  :primary_contact_person, class_name: 'ContactPerson', conditions: {primary: true}
   has_one  :primary_person, through: :primary_contact_person, source: :person
+  has_one  :spouse_contact_person, class_name: 'ContactPerson', conditions: {primary: false}
+  has_one  :spouse, through: :spouse_contact_person, source: :person
   has_many :contact_referrals_to_me, foreign_key: :referred_to_id, class_name: 'ContactReferral'
   has_many :contact_referrals_by_me, foreign_key: :referred_by_id, class_name: 'ContactReferral'
   has_many :referrals_to_me, through: :contact_referrals_to_me, source: :referred_by
@@ -105,7 +107,7 @@ class Contact < ActiveRecord::Base
   end
 
   def spouse_name
-    people.where('contact_people.primary' => false).first.try(:first_name)
+    spouse.try(:first_name)
   end
 
   def update_donation_totals(donation)
