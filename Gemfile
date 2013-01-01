@@ -8,77 +8,60 @@ group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
 
-  gem 'execjs'
+  gem 'execjs', '~> 1.4.0'
   #gem 'therubyracer', :platforms => :ruby
-  gem 'therubyrhino'
+  gem 'therubyrhino', '~> 2.0.2'
 
-  gem 'uglifier', '>= 1.0.3'
-  gem 'jquery-ui-rails'
+  gem 'uglifier', '~> 1.3.0'
+  gem 'jquery-ui-rails', '~> 3.0.0'
 end
 
-gem 'jquery-rails'
-
-# To use Jbuilder templates for JSON
-# gem 'jbuilder'
-
-# the javascript engine for execjs gem
-#platforms :jruby do
-  #gem 'activerecord-jdbcmysql-adapter'
-
-  #gem 'jruby-openssl'
-#end
-
-platforms :mri do
-  #gem 'mysql2'
-  gem 'pg'
-end
-gem 'resque-ensure-connected'
-gem 'devise', '~> 2.1.0'
-gem 'dalli'
-gem 'twitter_cldr', '~> 1.8.0'
-gem "gettext_i18n_rails"
-gem 'gettext_i18n_rails_js'#, path: '/Users/josh/htdocs/gettext_i18n_rails_js' #,git: 'git://github.com/twinge/gettext_i18n_rails_js.git'
-
-gem 'omniauth-twitter'
-gem 'omniauth-facebook'
-gem 'omniauth-linkedin'
-gem 'omniauth-google-oauth2'
-gem 'omniauth-cas', '~> 0.0.6'
-gem 'newrelic_rpm', '>= 3.5.3.25'
-gem 'rake'
-gem 'assignable_values'
-gem 'charlock_holmes'
-gem 'awesome_print'
-gem 'koala'
-gem 'typhoeus'
-gem 'country_select', git: 'git://github.com/26am/country_select.git' # My fork has the meta data for the fancy select
-gem 'iniparse'
-gem 'versionist', git: 'git://github.com/twinge/versionist.git', branch: 'multiple_versioning_strategies' # Switch back to gem once multiple_strategies are supported
-gem 'rest-client'
-gem 'airbrake'
-gem 'airbrake_user_attributes'
-gem 'wicked'
-gem 'will_paginate', '~> 3.0'
-gem 'resque'
 #gem 'resque-retry'
-gem 'resque-lock'
-gem 'deadlock_retry'
-gem 'linkedin'
-gem 'redis-objects'
+gem 'pg', '~> 0.14.1'
+gem 'jquery-rails', '~> 2.1.4'
+gem 'active_model_serializers', '~> 0.6.0'
+gem 'acts-as-taggable-on', '~> 2.3.3'
+gem 'airbrake', '~> 3.1.6'
+gem 'airbrake_user_attributes', '~> 0.1.6'
+gem 'assignable_values', '~> 0.5.3'
 gem 'carrierwave', git: 'git://github.com/jnicklas/carrierwave.git' # tracking master because of fixes made since last gem version
-gem 'fb_graph'
-gem "acts-as-taggable-on", '~> 2.3.3'
-gem "fog", "~> 1.6.0"
-gem 'gibberish'
-gem 'active_model_serializers'
-gem 'rails_autolink'
-gem 'display_case'
-gem 'gibbon'
-gem 'whenever'
-gem 'virtus'
-#gem 'siebel_donations', path: '/Users/josh/htdocs/siebel_donations'
+gem 'charlock_holmes', '~> 0.6.9'
+gem 'country_select', git: 'git://github.com/26am/country_select.git' # My fork has the meta data for the fancy select
+gem 'dalli'
+gem 'deadlock_retry', '~> 1.2.0'
+gem 'devise', '~> 2.1.0'
+gem 'display_case', '~> 0.0.5'
+gem 'fb_graph', '~> 2.6.0'
+gem 'fog', '~> 1.6.0'
+gem 'gettext_i18n_rails', '~> 0.8.0'
+gem 'gettext_i18n_rails_js', '~> 0.0.3'
+gem 'gibberish', '~> 1.2.0'
+gem 'gibbon', '~> 0.4.2'
+gem 'iniparse', '~> 1.1.6'
+gem 'koala', '~> 1.6.0'
+gem 'linkedin', '~> 0.3.7'
+gem 'newrelic_rpm', '~> 3.5.4'
+gem 'omniauth-cas', '~> 1.0.0'
+gem 'omniauth-facebook', '~> 1.4.1'
+gem 'omniauth-google-oauth2', '~> 0.1.13'
+gem 'omniauth-linkedin', '~> 0.0.8'
+gem 'omniauth-twitter', '~> 0.0.14'
+gem 'rails_autolink', '~> 1.0.9'
+gem 'rake'
+gem 'redis-objects', '~> 0.6.1'
+gem 'resque', '~> 1.23.0'
+gem 'resque-ensure-connected', '~> 0.2.0'
+gem 'resque-lock', '~> 1.1.0'
+gem 'rest-client', '~> 1.6.7'
+gem 'retryable-rb', '~> 1.1.0'
 gem 'siebel_donations', git: 'git://github.com/twinge/siebel_donations.git'
-gem 'retryable-rb'
+gem 'twitter_cldr', '~> 2.0.0'
+gem 'typhoeus', '~> 0.5.3'
+gem 'versionist', git: 'git://github.com/twinge/versionist.git', branch: 'multiple_versioning_strategies' # Switch back to gem once multiple_strategies are supported
+gem 'virtus', '~> 0.5.4'
+gem 'whenever', '~> 0.8.1'
+gem 'wicked', '~> 0.3.4'
+gem 'will_paginate', '~> 3.0.3'
 
 group :development do
   gem 'railroady'
@@ -87,6 +70,7 @@ group :development do
 end
 
 group :development, :test do
+  gem 'awesome_print'
   gem 'database_cleaner'
   gem 'rspec-rails'
   gem 'factory_girl_rails'

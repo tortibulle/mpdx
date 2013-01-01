@@ -14,13 +14,13 @@ GIT
 
 GIT
   remote: git://github.com/twinge/siebel_donations.git
-  revision: 48e900957255a05e6374a80bcae2d38023795ea0
+  revision: c388c486f5e788d7077ae27aef4bb41b6a3810b3
   specs:
     siebel_donations (1.0.3)
       activesupport
-      oj (~> 1.4.5)
+      oj (~> 2.0.0)
       rest-client (~> 1.6.7)
-      retryable-rb
+      retryable-rb (~> 1.1.0)
 
 GIT
   remote: git://github.com/twinge/versionist.git
@@ -79,7 +79,7 @@ GEM
     backports (2.6.5)
     bcrypt-ruby (3.0.1)
     builder (3.0.4)
-    capybara (2.0.1)
+    capybara (2.0.2)
       mime-types (>= 1.16)
       nokogiri (>= 1.3.3)
       rack (>= 1.0.0)
@@ -186,7 +186,7 @@ GEM
       multi_json (~> 1.0)
       multi_xml
     httpauth (0.2.0)
-    httpclient (2.3.0.1)
+    httpclient (2.3.1)
     i18n (0.6.1)
     iniparse (1.1.6)
     journey (1.0.4)
@@ -196,7 +196,7 @@ GEM
     jquery-ui-rails (3.0.0)
       jquery-rails
       railties (>= 3.1.0)
-    json (1.7.5)
+    json (1.7.6)
     jwt (0.1.5)
       multi_json (>= 1.0)
     kgio (2.7.4)
@@ -245,12 +245,12 @@ GEM
       jwt (~> 0.1.4)
       multi_json (~> 1.0)
       rack (~> 1.2)
-    oj (1.4.7)
+    oj (2.0.0)
     omniauth (1.1.1)
       hashie (~> 1.2)
       rack
-    omniauth-cas (0.0.7)
-      addressable (~> 2.2)
+    omniauth-cas (1.0.1)
+      addressable (~> 2.3)
       nokogiri (~> 1.5)
       omniauth (~> 1.1.0)
     omniauth-facebook (1.4.1)
@@ -316,7 +316,7 @@ GEM
       thor (>= 0.14.6, < 2.0)
     raindrops (0.10.0)
     rake (10.0.3)
-    rb-fsevent (0.9.2)
+    rb-fsevent (0.9.3)
     rdoc (3.12)
       json (~> 1.4)
     redis (3.0.2)
@@ -405,7 +405,7 @@ GEM
     treetop (1.4.12)
       polyglot
       polyglot (>= 0.3.1)
-    twitter_cldr (1.8.1)
+    twitter_cldr (2.0.2)
       json (>= 1.1.9)
     typhoeus (0.5.3)
       ethon (~> 0.5.3)
@@ -443,74 +443,74 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  active_model_serializers
+  active_model_serializers (~> 0.6.0)
   acts-as-taggable-on (~> 2.3.3)
-  airbrake
-  airbrake_user_attributes
-  assignable_values
+  airbrake (~> 3.1.6)
+  airbrake_user_attributes (~> 0.1.6)
+  assignable_values (~> 0.5.3)
   awesome_print
   capybara
   carrierwave!
-  charlock_holmes
+  charlock_holmes (~> 0.6.9)
   coffee-rails (~> 3.2.1)
   country_select!
   dalli
   database_cleaner
-  deadlock_retry
+  deadlock_retry (~> 1.2.0)
   devise (~> 2.1.0)
-  display_case
-  execjs
+  display_case (~> 0.0.5)
+  execjs (~> 1.4.0)
   factory_girl_rails
-  fb_graph
+  fb_graph (~> 2.6.0)
   fog (~> 1.6.0)
   fuubar
   gettext (~> 2.3.2)
-  gettext_i18n_rails
-  gettext_i18n_rails_js
-  gibberish
-  gibbon
+  gettext_i18n_rails (~> 0.8.0)
+  gettext_i18n_rails_js (~> 0.0.3)
+  gibberish (~> 1.2.0)
+  gibbon (~> 0.4.2)
   growl
   guard-rspec
   guard-spork
-  iniparse
-  jquery-rails
-  jquery-ui-rails
-  koala
-  linkedin
+  iniparse (~> 1.1.6)
+  jquery-rails (~> 2.1.4)
+  jquery-ui-rails (~> 3.0.0)
+  koala (~> 1.6.0)
+  linkedin (~> 0.3.7)
   mailcatcher
-  newrelic_rpm (>= 3.5.3.25)
-  omniauth-cas (~> 0.0.6)
-  omniauth-facebook
-  omniauth-google-oauth2
-  omniauth-linkedin
-  omniauth-twitter
-  pg
+  newrelic_rpm (~> 3.5.4)
+  omniauth-cas (~> 1.0.0)
+  omniauth-facebook (~> 1.4.1)
+  omniauth-google-oauth2 (~> 0.1.13)
+  omniauth-linkedin (~> 0.0.8)
+  omniauth-twitter (~> 0.0.14)
+  pg (~> 0.14.1)
   railroady
   rails (~> 3.2.3)
   rails-footnotes
-  rails_autolink
+  rails_autolink (~> 1.0.9)
   rake
   rb-fsevent
-  redis-objects
-  resque
-  resque-ensure-connected
-  resque-lock
+  redis-objects (~> 0.6.1)
+  resque (~> 1.23.0)
+  resque-ensure-connected (~> 0.2.0)
+  resque-lock (~> 1.1.0)
   resque_spec
-  rest-client
-  retryable-rb
+  rest-client (~> 1.6.7)
+  retryable-rb (~> 1.1.0)
   rspec-rails
   sass-rails (~> 3.2.3)
   siebel_donations!
   simplecov
   spork-rails (~> 3.2.0)
-  therubyrhino
-  twitter_cldr (~> 1.8.0)
-  typhoeus
-  uglifier (>= 1.0.3)
+  therubyrhino (~> 2.0.2)
+  twitter_cldr (~> 2.0.0)
+  typhoeus (~> 0.5.3)
+  uglifier (~> 1.3.0)
   unicorn
   versionist!
-  virtus
+  virtus (~> 0.5.4)
   webmock (~> 1.9.0)
-  whenever
-  wicked
-  will_paginate (~> 3.0)
+  whenever (~> 0.8.1)
+  wicked (~> 0.3.4)
+  will_paginate (~> 3.0.3)
