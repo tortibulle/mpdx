@@ -92,6 +92,8 @@ group :test do
 end
 
 # RAILS 4 -- should be able to remove these after upgrading
+gem 'cache_digests'
+
 group :development do
   gem 'quiet_assets'
 end
