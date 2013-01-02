@@ -80,11 +80,13 @@ class ApplicationController < ActionController::Base
   helper_method :locale
 
   def current_account_list
-    account_list = current_user.account_lists.find_by_id(session[:current_account_list_id]) if session[:current_account_list_id].present?
-    account_list ||= current_user.account_lists.first
-    account_list ||= current_user.organization_accounts.first.create_default_profile if current_user.organization_accounts.first
-    session[:current_account_list_id] = account_list.id if account_list
-    account_list
+    unless @current_account_list
+      @current_account_list = current_user.account_lists.find_by_id(session[:current_account_list_id]) if session[:current_account_list_id].present?
+      @current_account_list ||= current_user.account_lists.first
+      @current_account_list ||= current_user.organization_accounts.first.create_default_profile if current_user.organization_accounts.first
+      session[:current_account_list_id] = @current_account_list.id if @current_account_list
+    end
+    @current_account_list
   end
   helper_method :current_account_list
 
