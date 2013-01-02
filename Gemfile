@@ -16,7 +16,6 @@ group :assets do
   gem 'jquery-ui-rails', '~> 3.0.0'
 end
 
-#gem 'resque-retry'
 gem 'pg', '~> 0.14.1'
 gem 'jquery-rails', '~> 2.1.4'
 gem 'active_model_serializers', '~> 0.6.0'
@@ -90,4 +89,9 @@ group :test do
   gem 'capybara'
   gem 'resque_spec'
   gem 'fuubar'
+end
+
+# RAILS 4 -- should be able to remove these after upgrading
+group :development do
+  gem 'quiet_assets'
 end
