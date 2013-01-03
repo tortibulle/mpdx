@@ -241,7 +241,6 @@ class DataServer
 
   def get_response(url, params)
     RestClient::Request.execute(:method => :post, :url => url, :payload => params, :timeout => -1) { |response, request, result, &block|
-      Rails.logger.ap request
       # check for error response
       lines = response.split("\n")
       first_line = lines.first.upcase

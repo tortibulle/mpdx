@@ -23,8 +23,6 @@ class SiebelTemp < DataServer
 
   def get_response(url, params)
     RestClient::Request.execute(:method => :post, :url => url, :payload => params, :timeout => -1) { |response, request, result, &block|
-      Rails.logger.ap request
-      Rails.logger.ap response
       # check for error response
       raise DataServerError, "No data for #{params}" if response.blank?
       first_line = response.split("\n").first.to_s.upcase
