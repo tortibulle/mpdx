@@ -10,7 +10,7 @@ namespace :organizations do
 
       next unless line[1].present?
 
-      unless org = Organization.where(query_ini_url: line[1]).first
+      unless org = Organization.where(name: line[0]).first
         org = Organization.create(name: line[0], query_ini_url: line[1], iso3166: line[2], api_class: 'DataServer')
       end
       # Grab latest query.ini file for this org
