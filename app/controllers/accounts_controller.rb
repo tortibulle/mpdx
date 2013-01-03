@@ -14,8 +14,6 @@ class AccountsController < ApplicationController
 
   def create
     User.transaction do
-      logger.ap request.env['omniauth.auth']
-
       provider = "Person::#{params[:provider].titleize}Account".constantize
 
       # If we don't have a current user, login with this method
