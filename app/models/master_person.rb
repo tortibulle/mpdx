@@ -62,7 +62,7 @@ class MasterPerson < ActiveRecord::Base
   end
 
   def merge(other)
-    People.where(master_person_id: other.id).update_all(master_person_id: id)
+    Person.where(master_person_id: other.id).update_all(master_person_id: id)
     MasterPersonSource.where(master_person_id: other.id).update_all(master_person_id: id)
     MasterPersonDonorAccount.where(master_person_id: other.id).update_all(master_person_id: id)
     other.reload
