@@ -70,6 +70,17 @@ class Siebel < DataServer
   end
 
 
+  def profiles_with_designation_numbers
+    unless @profiles_with_designation_numbers
+      @profiles_with_designation_numbers = profiles.collect do |profile|
+        {designation_numbers: profile.designations.collect(&:number),
+         name: profile.name,
+         code: profile.id}
+      end
+    end
+    @profiles_with_designation_numbers
+  end
+
   protected
 
   def profiles

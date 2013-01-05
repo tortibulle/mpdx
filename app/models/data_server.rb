@@ -171,7 +171,10 @@ class DataServer
 
   def profiles_with_designation_numbers
     unless @profiles_with_designation_numbers
-      @profiles_with_designation_numbers = profiles.collect { |profile| profile[:designation_numbers] = designation_numbers(profile[:code]); profile }
+      @profiles_with_designation_numbers = profiles.collect do |profile|
+        {designation_numbers: designation_numbers(profile[:code])}
+         .merge(profile.slice(:name, :code, :balance, :balance_udated_at))
+      end
     end
     @profiles_with_designation_numbers
   end
