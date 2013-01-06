@@ -186,16 +186,13 @@ class DataServer
       response = get_response(@org.account_balance_url,
                               get_params(@org.account_balance_params, {profile: profile_code.to_s}))
     rescue Errors::UrlChanged => e
-      @org.update_attributes(account_balance_url: e.message)
+      @org.update_attributes!(account_balance_url: e.message)
       retry
     end
 
     # This csv should always only have one line (besides the headers)
     CSV.new(response, headers: :first_row).each do |line|
       balance[:designation_numbers] = line['EMPLID'].split(',').collect {|e| e.gsub('"','')}
-      if balance[:designation_numbers].any? { |n| n.length > 7 }
-         balance[:designation_numbers].map!{|e| e.gsub('"','')[-7..-1]}
-      end
       balance[:account_names] = line['ACCT_NAME'].split('\n')
       balance_match = line['BALANCE'].match(/([-]?\d+\.?\d*)/)
       balance[:balance] = balance_match[0] if balance_match

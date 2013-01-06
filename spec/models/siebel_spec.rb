@@ -96,7 +96,6 @@ describe Siebel do
 
     before do
       da1.save
-      org.donor_accounts << donor_account
     end
 
     it 'creates a new donation' do
@@ -107,6 +106,14 @@ describe Siebel do
 
     it "updates an existing donation" do
       donation = create(:donation, remote_id: "1-IGQAM", amount: 5, designation_account: da1)
+
+      expect {
+        siebel.send(:add_or_update_donation, siebel_donation, da1, designation_profile)
+      }.not_to change { Donation.count }.by(1)
+    end
+
+    it "doesn't save the donation if the donor can't be found" do
+      donor_account.destroy
 
       expect {
         siebel.send(:add_or_update_donation, siebel_donation, da1, designation_profile)
@@ -225,6 +232,13 @@ describe Siebel do
 
       address.reload.postal_code.should == siebel_address.zip
     end
+
+    it 'raises an error if the address is invalid' do
+      siebel_address = SiebelDonations::Address.new(Oj.load('{"id":"1-IQ5-1006","type":"BAD_TYPE"}'))
+      expect {
+        siebel.send(:add_or_update_address, siebel_address, contact)
+      }.to raise_exception
+    end
   end
 
   context '#add_or_update_phone_number' do
@@ -284,6 +298,13 @@ describe Siebel do
       }.not_to change { Company.count }
 
       company.reload.name.should == siebel_donor.account_name
+    end
+  end
+
+  context '#profiles_with_designation_numbers' do
+    it 'returns a hash of attributes' do
+      siebel.should_receive(:profiles).and_return([SiebelDonations::Profile.new({"id"=>"","name"=>"Profile 1","designations"=>[{"number"=>"1234"}]})])
+      siebel.profiles_with_designation_numbers.should == [{name: 'Profile 1', code: '', designation_numbers: ['1234']}]
     end
   end
 end
