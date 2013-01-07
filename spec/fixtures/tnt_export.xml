@@ -14,44 +14,44 @@
       <row id="-1620699916">
         <LastEdit>2011-12-16 15:29:33</LastEdit>
         <CreatedDate>2004-07-30</CreatedDate>
-        <FileAs>Elliott, Bob and Kathie</FileAs>
-        <FullName>Bob and Kathie Elliott</FullName>
-        <Greeting>Bob and Kathie</Greeting>
-        <ShortName>Bob and Kathie Elliott</ShortName>
-        <MailingAddressBlock>Bob and Kathie Elliott
-1107 L St.
-Davis, CA  95616</MailingAddressBlock>
+        <FileAs>Smith, John and Jane</FileAs>
+        <FullName>John and Jane Smith</FullName>
+        <Greeting>John and Jane</Greeting>
+        <ShortName>John and Jane Smith</ShortName>
+        <MailingAddressBlock>John and Jane Smith
+1234 N St.
+Nowhere, CA  12345</MailingAddressBlock>
         <MailingAddressIsDeliverable>true</MailingAddressIsDeliverable>
-        <Phone>(530) 753-5816</Phone>
+        <Phone>(555) 555-1234</Phone>
         <PhoneIsOperational>true</PhoneIsOperational>
         <EmailIsOperational>false</EmailIsOperational>
         <IsOrganization>false</IsOrganization>
-        <FirstName>Bob</FirstName>
-        <LastName>Elliott</LastName>
-        <SpouseFirstName>Kathie</SpouseFirstName>
+        <FirstName>John</FirstName>
+        <LastName>Smith</LastName>
+        <SpouseFirstName>Jane</SpouseFirstName>
         <PreferredAddressType>1</PreferredAddressType>
-        <MailingStreetAddress>1107 L St.</MailingStreetAddress>
-        <MailingCity>Davis</MailingCity>
+        <MailingStreetAddress>1234 N St.</MailingStreetAddress>
+        <MailingCity>Nowhere</MailingCity>
         <MailingState>CA</MailingState>
-        <MailingPostalCode>95616</MailingPostalCode>
-        <HomeStreetAddress>1107 L St.</HomeStreetAddress>
-        <HomeCity>Davis</HomeCity>
+        <MailingPostalCode>12345</MailingPostalCode>
+        <HomeStreetAddress>1234 N St.</HomeStreetAddress>
+        <HomeCity>Nowhere</HomeCity>
         <HomeState>CA</HomeState>
-        <HomePostalCode>95616</HomePostalCode>
+        <HomePostalCode>12345</HomePostalCode>
         <HomeCountryID>840</HomeCountryID>
         <HomeCountry>United States of America</HomeCountry>
         <HomeAddressIsDeliverable>true</HomeAddressIsDeliverable>
-        <HomeAddressBlock>Bob and Kathie Elliott
-1107 L St.
-Davis, CA  95616</HomeAddressBlock>
+        <HomeAddressBlock>John and Jane Smith
+1234 N St.
+Nowhere, CA  12345</HomeAddressBlock>
         <BusinessCountryID>840</BusinessCountryID>
         <BusinessCountry>United States of America</BusinessCountry>
         <BusinessAddressIsDeliverable>false</BusinessAddressIsDeliverable>
-        <OtherCountryID>840</OtherCountryID>
+        <OtherCountryID>555</OtherCountryID>
         <OtherCountry>United States of America</OtherCountry>
         <OtherAddressIsDeliverable>false</OtherAddressIsDeliverable>
         <PreferredPhoneType>0</PreferredPhoneType>
-        <HomePhone>(530) 753-5816</HomePhone>
+        <HomePhone>(555) 555-1234</HomePhone>
         <PreferredEmailTypes>0</PreferredEmailTypes>
         <Email1IsOperational>false</Email1IsOperational>
         <Email2IsOperational>false</Email2IsOperational>
@@ -100,41 +100,41 @@ Davis, CA  95616</HomeAddressBlock>
         <OtherAddressBlockIsCustom>false</OtherAddressBlockIsCustom>
         <PhoneIsOperationalMask>1</PhoneIsOperationalMask>
         <PhoneCountryIDs>0=840</PhoneCountryIDs>
-        <ReferredBy>Don and Linda Stumbo</ReferredBy>
+        <ReferredBy>Bob and Dawn Doe</ReferredBy>
       </row>
       <row id="-861693757">
         <LastEdit>2012-11-16 11:10:09</LastEdit>
         <CreatedDate>2005-09-14</CreatedDate>
-        <FileAs>Stumbo, Don and Linda</FileAs>
-        <FullName>Don and Linda Stumbo</FullName>
-        <Greeting>Don and Linda</Greeting>
-        <ShortName>Don and Linda Stumbo</ShortName>
-        <MailingAddressBlock>Don and Linda Stumbo
-40739 Capa Dr.
-Fremont, CA  94539</MailingAddressBlock>
+        <FileAs>Doe, Bob and Dawn</FileAs>
+        <FullName>Bob and Dawn Doe</FullName>
+        <Greeting>Bob and Dawn</Greeting>
+        <ShortName>Bob and Dawn Doe</ShortName>
+        <MailingAddressBlock>Bob and Dawn Doe
+2345 Capa Dr.
+State, CA  12345</MailingAddressBlock>
         <MailingAddressIsDeliverable>true</MailingAddressIsDeliverable>
-        <Phone>(510) 623-0921</Phone>
+        <Phone>(555) 234-2345</Phone>
         <PhoneIsOperational>true</PhoneIsOperational>
         <EmailIsOperational>false</EmailIsOperational>
         <IsOrganization>true</IsOrganization>
-        <FirstName>Don</FirstName>
-        <LastName>Stumbo</LastName>
-        <SpouseFirstName>Linda</SpouseFirstName>
+        <FirstName>Bob</FirstName>
+        <LastName>Doe</LastName>
+        <SpouseFirstName>Dawn</SpouseFirstName>
         <PreferredAddressType>1</PreferredAddressType>
-        <MailingStreetAddress>40739 Capa Dr.</MailingStreetAddress>
-        <MailingCity>Fremont</MailingCity>
+        <MailingStreetAddress>2345 Capa Dr.</MailingStreetAddress>
+        <MailingCity>State</MailingCity>
         <MailingState>CA</MailingState>
-        <MailingPostalCode>94539</MailingPostalCode>
-        <HomeStreetAddress>40739 Capa Dr.</HomeStreetAddress>
-        <HomeCity>Fremont</HomeCity>
+        <MailingPostalCode>12345</MailingPostalCode>
+        <HomeStreetAddress>2345 Capa Dr.</HomeStreetAddress>
+        <HomeCity>State</HomeCity>
         <HomeState>CA</HomeState>
-        <HomePostalCode>94539</HomePostalCode>
+        <HomePostalCode>12345</HomePostalCode>
         <HomeCountryID>840</HomeCountryID>
         <HomeCountry>United States of America</HomeCountry>
         <HomeAddressIsDeliverable>true</HomeAddressIsDeliverable>
-        <HomeAddressBlock>Don and Linda Stumbo
-40739 Capa Dr.
-Fremont, CA  94539</HomeAddressBlock>
+        <HomeAddressBlock>Bob and Dawn Doe
+2345 Capa Dr.
+State, CA  12345</HomeAddressBlock>
         <BusinessCountryID>840</BusinessCountryID>
         <BusinessCountry>United States of America</BusinessCountry>
         <BusinessAddressIsDeliverable>false</BusinessAddressIsDeliverable>
@@ -142,13 +142,13 @@ Fremont, CA  94539</HomeAddressBlock>
         <OtherCountry>United States of America</OtherCountry>
         <OtherAddressIsDeliverable>false</OtherAddressIsDeliverable>
         <PreferredPhoneType>0</PreferredPhoneType>
-        <HomePhone>(510) 623-0921</HomePhone>
+        <HomePhone>(555) 234-2345</HomePhone>
         <PreferredEmailTypes>0</PreferredEmailTypes>
         <Email1IsOperational>false</Email1IsOperational>
         <Email2IsOperational>false</Email2IsOperational>
         <Email3IsOperational>false</Email3IsOperational>
-        <ReferredByList>Steve and Lisa Ray</ReferredByList>
-        <ReferredBy>Steve and Lisa Ray</ReferredBy>
+        <ReferredByList>Steve and Lisa Moss</ReferredByList>
+        <ReferredBy>Steve and Lisa Moss</ReferredBy>
         <Notes>{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}{\f1\fnil Tahoma;}}
 {\*\generator Msftedit 5.41.15.1507;}\viewkind4\uc1\pard\lang1033\f0\fs16 call for amount\f1\par
 }</Notes>
@@ -201,8 +201,8 @@ Fremont, CA  94539</HomeAddressBlock>
     <Designation>
       <row id="1248631139">
         <LastEdit>2004-05-19 09:41:13</LastEdit>
-        <OrganizationID>-276331507</OrganizationID>
-        <OrgDesignationCode>559826</OrgDesignationCode>
+        <OrganizationID>-27655555</OrganizationID>
+        <OrgDesignationCode>555555</OrgDesignationCode>
         <OrgDesignationName>Starcher, Joshua L</OrgDesignationName>
       </row>
     </Designation>
@@ -290,16 +290,16 @@ Fremont, CA  94539</HomeAddressBlock>
     <Login>
       <row id="506252359">
         <LastEdit>2011-12-16 15:26:34</LastEdit>
-        <OrganizationID>-276331507</OrganizationID>
-        <Login>josh.starcher@cojourners.com</Login>
-        <Password>04E96D44F4828E527D47953C56C1D2896958</Password>
+        <OrganizationID>-276555555</OrganizationID>
+        <Login>josh.leaves.his.data@email.com</Login>
+        <Password>PASSWORDHASH12341234</Password>
       </row>
     </Login>
     <LoginProfile>
       <row id="506252358">
         <LastEdit>2012-11-18 14:02:38</LastEdit>
-        <LoginID>506252359</LoginID>
-        <OrgRoleDescription>Staff Account (0559826)</OrgRoleDescription>
+        <LoginID>506255555</LoginID>
+        <OrgRoleDescription>Staff Account (0559555)</OrgRoleDescription>
         <GiftLastSyncDate>2012-11-12</GiftLastSyncDate>
         <AddressLastSyncDate>2011-12-16</AddressLastSyncDate>
       </row>
@@ -307,8 +307,8 @@ Fremont, CA  94539</HomeAddressBlock>
     <LoginProfileDesignation>
       <row id="1582730996">
         <LastEdit>2004-05-19 09:41:13</LastEdit>
-        <LoginProfileID>506252358</LoginProfileID>
-        <DesignationID>1248631139</DesignationID>
+        <LoginProfileID>506255555</LoginProfileID>
+        <DesignationID>124865555</DesignationID>
       </row>
     </LoginProfileDesignation>
     <PendingAction>
@@ -334,7 +334,7 @@ Fremont, CA  94539</HomeAddressBlock>
       <row id="-989588033">
         <LastEdit>2004-05-19 09:41:13</LastEdit>
         <PropName>LastLoginProfileID</PropName>
-        <PropValue>506252358</PropValue>
+        <PropValue>506255555</PropValue>
       </row>
       <row id="-798231460">
         <LastEdit>2004-08-21 18:30:16</LastEdit>
@@ -354,7 +354,7 @@ Fremont, CA  94539</HomeAddressBlock>
       <row id="-615484335">
         <LastEdit>2004-08-19 12:08:28</LastEdit>
         <PropName>DbPropLink.DBID</PropName>
-        <PropValue>104772388</PropValue>
+        <PropValue>104765555</PropValue>
       </row>
       <row id="-613978564">
         <LastEdit>2006-12-19 20:55:50</LastEdit>
@@ -404,7 +404,7 @@ Fremont, CA  94539</HomeAddressBlock>
       <row id="910724045">
         <LastEdit>2012-08-16 11:42:22</LastEdit>
         <PropName>MailChimpListId</PropName>
-        <PropValue>c2d7fef6f4</PropValue>
+        <PropValue>c2d7f555554</PropValue>
       </row>
       <row id="1173418757">
         <LastEdit>2012-08-16 11:42:22</LastEdit>
@@ -414,7 +414,7 @@ Fremont, CA  94539</HomeAddressBlock>
       <row id="1774276494">
         <LastEdit>2012-08-16 11:42:22</LastEdit>
         <PropName>MailChimpAPIKey</PropName>
-        <PropValue>642db646ac58a4bc4ace3a3dba5897df-us4</PropValue>
+        <PropValue>jk234lkwjntlkj3n5lk3j3kj-us4</PropValue>
       </row>
       <row id="1840023849">
         <LastEdit>2012-11-21 08:41:51</LastEdit>
@@ -424,7 +424,7 @@ Fremont, CA  94539</HomeAddressBlock>
       <row id="2003064828">
         <LastEdit>2011-12-16 15:20:00</LastEdit>
         <PropName>DbPropLink.GUID</PropName>
-        <PropValue>{FE512D6C-C1E1-43D9-8442-9C1D6903A58E}</PropValue>
+        <PropValue>{FE512D6C-C1E1-43D9-8442-55555456456}</PropValue>
       </row>
       <row id="2067745523">
         <LastEdit>2011-12-16 15:19:43</LastEdit>
