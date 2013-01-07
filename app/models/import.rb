@@ -16,16 +16,18 @@ class Import < ActiveRecord::Base
   validates_with TntImportValidator, if: lambda {|import| 'tnt' == import.source }
   validates_with FacebookImportValidator, if: lambda {|import| 'facebook' == import.source }
 
-  after_create :queue_import_contacts
+  after_commit :queue_import
 
-  def queue_import_contacts
-    async(:import_contacts)
+  def queue_import
+    async(:import)
   end
 
-  def import_contacts
+  private
+
+  def import
     update_column(:importing, true)
     begin
-      "#{source.titleize}Import".constantize.new(self).import_contacts
+      "#{source.titleize}Import".constantize.new(self).import
       ImportMailer.complete(self).deliver
       true
     rescue => e

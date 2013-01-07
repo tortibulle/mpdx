@@ -1,7 +1,7 @@
 class Company < ActiveRecord::Base
-  has_many :company_positions
+  has_many :company_positions, dependent: :destroy
   has_many :people, through: :company_positions
-  has_many :company_partnerships
+  has_many :company_partnerships, dependent: :destroy
   has_many :account_lists, through: :company_partnerships
   belongs_to :master_company
 

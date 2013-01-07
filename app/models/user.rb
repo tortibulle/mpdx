@@ -1,15 +1,15 @@
 class User < Person
 
-  has_many :account_list_users
+  has_many :account_list_users, dependent: :destroy
   has_many :account_lists, through: :account_list_users
   has_many :contacts, through: :account_lists
   has_many :contact_people, through: :contacts
   has_many :people, through: :contact_people
   has_many :account_list_entries, through: :account_lists
   has_many :designation_accounts, through: :account_list_entries
-  has_many :designation_profiles
+  has_many :designation_profiles, dependent: :destroy
   has_many :partner_companies, through: :account_lists, source: :companies
-  has_many :imports
+  has_many :imports, dependent: :destroy
 
   devise :trackable
   store :preferences, accessors: [:time_zone, :locale, :setup]

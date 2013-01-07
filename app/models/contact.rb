@@ -2,7 +2,7 @@ class Contact < ActiveRecord::Base
   include AddressMethods
   acts_as_taggable
 
-  has_many :contact_donor_accounts
+  has_many :contact_donor_accounts, dependent: :destroy
   has_many :donor_accounts, through: :contact_donor_accounts
   has_many :donations, through: :donor_accounts
   belongs_to :account_list
@@ -12,14 +12,14 @@ class Contact < ActiveRecord::Base
   has_one  :primary_person, through: :primary_contact_person, source: :person
   has_one  :spouse_contact_person, class_name: 'ContactPerson', conditions: {primary: false}
   has_one  :spouse, through: :spouse_contact_person, source: :person
-  has_many :contact_referrals_to_me, foreign_key: :referred_to_id, class_name: 'ContactReferral'
-  has_many :contact_referrals_by_me, foreign_key: :referred_by_id, class_name: 'ContactReferral'
+  has_many :contact_referrals_to_me, foreign_key: :referred_to_id, class_name: 'ContactReferral', dependent: :destroy
+  has_many :contact_referrals_by_me, foreign_key: :referred_by_id, class_name: 'ContactReferral', dependent: :destroy
   has_many :referrals_to_me, through: :contact_referrals_to_me, source: :referred_by
   has_many :referrals_by_me, through: :contact_referrals_by_me, source: :referred_to
-  has_many :activity_contacts
+  has_many :activity_contacts, dependent: :destroy
   has_many :activities, through: :activity_contacts
   has_many :tasks, through: :activity_contacts, source: :activity
-  has_many :notifications, inverse_of: :contact
+  has_many :notifications, inverse_of: :contact, dependent: :destroy
 
 
   scope :people, where('donor_accounts.master_company_id is null').includes(:donor_accounts)

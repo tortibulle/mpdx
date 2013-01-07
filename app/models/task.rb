@@ -9,7 +9,7 @@ class Task < Activity
   end
 
   assignable_values_for :result, :allow_blank => true do
-    [_('Attempted'), _('Done')]
+    [_('Attempted'), _('Received'), _('Done')]
   end
 
   def attempted?
