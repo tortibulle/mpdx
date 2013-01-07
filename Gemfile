@@ -56,7 +56,7 @@ gem 'retryable-rb', '~> 1.1.0'
 gem 'siebel_donations', git: 'git://github.com/twinge/siebel_donations.git'
 gem 'twitter_cldr', '~> 2.0.0'
 gem 'typhoeus', '~> 0.5.3'
-gem 'versionist', git: 'git://github.com/twinge/versionist.git', branch: 'multiple_versioning_strategies' # Switch back to gem once multiple_strategies are supported
+gem 'versionist', :git => 'git://github.com/bploetz/versionist.git', :branch => 'release-1.0'
 gem 'virtus', '~> 0.5.4'
 gem 'whenever', '~> 0.8.1'
 gem 'wicked', '~> 0.3.4'

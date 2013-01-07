@@ -5,6 +5,15 @@ GIT
     country_select (1.0.1)
 
 GIT
+  remote: git://github.com/bploetz/versionist.git
+  revision: 7d20b33a516a4447cfa012d0a78f74d934957927
+  branch: release-1.0
+  specs:
+    versionist (1.0.0)
+      rails (~> 3.0)
+      yard (~> 0.7)
+
+GIT
   remote: git://github.com/jnicklas/carrierwave.git
   revision: 82075f0817b0d958620e68b79b4de1d4219349ae
   specs:
@@ -21,15 +30,6 @@ GIT
       oj (~> 2.0.0)
       rest-client (~> 1.6.7)
       retryable-rb (~> 1.1.0)
-
-GIT
-  remote: git://github.com/twinge/versionist.git
-  revision: 1c546e743871c0e8aba7262b3a2a25f4e90c7173
-  branch: multiple_versioning_strategies
-  specs:
-    versionist (0.3.1)
-      rails (~> 3.0)
-      yard (~> 0.7)
 
 GEM
   remote: http://rubygems.org/

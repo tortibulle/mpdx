@@ -18,7 +18,7 @@ Mpdx::Application.routes.draw do
   resources :social_streams, only: :index
 
   namespace :api do
-    api_version(module: "V1", header: "API-VERSION", value: "v1", parameter: "version", path: 'v1') do
+    api_version(module: 'V1', header: {name: 'API-VERSION', value: 'v1'}, parameter: {name: "version", value: 'v1'}, path: {value: 'v1'}) do
       resources :contacts
       resources :people
       resources :addresses
@@ -59,7 +59,7 @@ Mpdx::Application.routes.draw do
       get :history
     end
   end
-  resources :people 
+  resources :people
   resources :setup
 
   namespace :person do
