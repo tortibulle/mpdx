@@ -29,7 +29,10 @@
         </div>
         <div class="quickprofile">
           <h1><%= contact_exhibit %></h1>
-          <div class="metaset"><%= contact_exhibit.location %></div>
+          <div class="metaset">
+            <%= _('Donor ID: %{donor_id}') % {donor_id: contact_exhibit.donor_ids } %><br />
+            <%= contact_exhibit.location %>
+          </div>
         </div>
 
         <div class="cols col_30">

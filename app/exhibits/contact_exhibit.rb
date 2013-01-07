@@ -56,6 +56,10 @@ class ContactExhibit < DisplayCase::Exhibit
     end.join(' ').html_safe
   end
 
+  def donor_ids
+    donor_accounts.collect(&:account_number).join(', ')
+  end
+
   def to_s
     name
   end
