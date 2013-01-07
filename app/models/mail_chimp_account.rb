@@ -94,8 +94,12 @@ class MailChimpAccount < ActiveRecord::Base
 
   def unsubscribe_email(email)
     if email.present?
-      gb.list_unsubscribe(id: primary_list_id, email_address: email,
-                            send_goodbye: false, delete_member: true)
+      begin
+        gb.list_unsubscribe(id: primary_list_id, email_address: email,
+                              send_goodbye: false, delete_member: true)
+      rescue Gibbon::MailChimpError => e
+        raise e unless e.message.include?('code 232')
+      end
     end
   end
 

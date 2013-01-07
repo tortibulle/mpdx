@@ -104,14 +104,14 @@ class TntImport
                          subject: row['Description'],
                          start_at: DateTime.parse(row['TaskDate'] + ' ' + DateTime.parse(row['TaskTime']).strftime("%I:%M%p"))
                         }
-      task.save!
-
-      tnt_tasks[row['id']] = task
+      if task.save
+        tnt_tasks[row['id']] = task
+      end
     end
 
     # Add contacts to tasks
     Array.wrap(xml['TaskContact']['row']).each do |row|
-      if tnt_contacts[row['ContactID']]
+      if tnt_contacts[row['ContactID']] && tnt_tasks[row['TaskID']]
         tnt_tasks[row['TaskID']].contacts << tnt_contacts[row['ContactID']] unless tnt_tasks[row['TaskID']].contacts.include? tnt_contacts[row['ContactID']]
       end
     end
@@ -133,14 +133,14 @@ class TntImport
                          completed: true,
                          result: lookup_history_result(row['HistoryResultID'])
                         }
-      task.save!
-
-      tnt_history[row['id']] = task
+      if task.save
+        tnt_history[row['id']] = task
+      end
     end
 
     # Add contacts to tasks
     Array.wrap(xml['HistoryContact']['row']).each do |row|
-      if tnt_contacts[row['ContactID']]
+      if tnt_contacts[row['ContactID']] && tnt_history[row['HistoryID']]
         tnt_history[row['HistoryID']].contacts << tnt_contacts[row['ContactID']] unless tnt_history[row['HistoryID']].contacts.include? tnt_contacts[row['ContactID']]
       end
     end

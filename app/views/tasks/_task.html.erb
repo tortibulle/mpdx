@@ -22,7 +22,7 @@
           <%= link_to(_('Delete'), task, confirm: _("Are you sure you want to delete this task instead of marking it as completed?"), method: :delete, :class=> "ico ico_trash") %>
         </div>
       </div>
-      <div class="comments">
+      <div class="comments" style="<%= 'display:none' unless task.activity_comments.present? %>">
         <header></header>
 
         <div id="comment_list_<%= task.id %>">

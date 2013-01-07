@@ -1,4 +1,8 @@
 $ ->
+  $(document).on 'click', '.comment_status', ->
+    $('.comments', $(this).closest('tr')).toggle()
+    false
+
   $(document).on 'click', 'tr.task .fav', ->
     form = $(this).closest('form')
     field = $('input[name="task[starred]"]', form)
