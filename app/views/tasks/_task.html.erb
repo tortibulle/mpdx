@@ -8,7 +8,7 @@
       <%= render 'tasks/results_modal', task: task, task_exhibit: task_exhibit %>
       <div class="primary">
         <span class="ico <%= task.starred? ? 'ico_fav' : 'ico_fav_off' %> fav">Fav</span>
-        <%= l(task.start_at) %> -
+        <%= l(task.start_at.to_datetime) %> -
         <strong><span class="tasktitle"><%= task_exhibit %></span></strong> -
         <span class="taskaction"><%= _(task.activity_type) %></span>
         <div style="display:inline" class="tags"><%= task_exhibit.tag_links %></div>
@@ -18,7 +18,7 @@
 
         <a class="comment_status" href=""><span id="comment_count_<%= task.id %>"><%= task.activity_comments.length  %></span></a>
         <div class="actions">
-          <%= link_to _('Edit'), edit_task_path(task), :class=> "ico ico_edit" %>
+          <%= link_to(_('Edit'), edit_task_path(task), :class=> "ico ico_edit") %>
           <%= link_to(_('Delete'), task, confirm: _("Are you sure you want to delete this task instead of marking it as completed?"), method: :delete, :class=> "ico ico_trash") %>
         </div>
       </div>

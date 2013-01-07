@@ -4,7 +4,7 @@ class TasksController < ApplicationController
   def index
     base_scope = current_account_list.tasks.uncompleted.includes(:contacts)
 
-    if params[:contact_id].present?
+    if params[:contact_ids].present?
       base_scope = base_scope.includes(:contacts).where('contacts.id' => params[:contact_ids])
     end
 
