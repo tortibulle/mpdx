@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130107135513) do
+ActiveRecord::Schema.define(:version => 20130107193956) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -88,6 +88,7 @@ ActiveRecord::Schema.define(:version => 20130107135513) do
   end
 
   add_index "activity_contacts", ["activity_id", "contact_id"], :name => "index_activity_contacts_on_activity_id_and_contact_id"
+  add_index "activity_contacts", ["contact_id", "activity_id"], :name => "index_activity_contacts_on_contact_id_and_activity_id", :unique => true
   add_index "activity_contacts", ["contact_id"], :name => "index_activity_contacts_on_contact_id"
 
   create_table "addresses", :force => true do |t|

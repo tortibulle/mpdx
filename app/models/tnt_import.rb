@@ -112,7 +112,7 @@ class TntImport
     # Add contacts to tasks
     Array.wrap(xml['TaskContact']['row']).each do |row|
       if tnt_contacts[row['ContactID']]
-        tnt_tasks[row['TaskID']].contacts << tnt_contacts[row['ContactID']]
+        tnt_tasks[row['TaskID']].contacts << tnt_contacts[row['ContactID']] unless tnt_tasks[row['TaskID']].contacts.include? tnt_contacts[row['ContactID']]
       end
     end
 
@@ -141,7 +141,7 @@ class TntImport
     # Add contacts to tasks
     Array.wrap(xml['HistoryContact']['row']).each do |row|
       if tnt_contacts[row['ContactID']]
-        tnt_history[row['HistoryID']].contacts << tnt_contacts[row['ContactID']]
+        tnt_history[row['HistoryID']].contacts << tnt_contacts[row['ContactID']] unless tnt_history[row['HistoryID']].contacts.include? tnt_contacts[row['ContactID']]
       end
     end
 
