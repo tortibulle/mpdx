@@ -89,6 +89,12 @@
           <li><a href="#notes-tab"><%= _('Notes') %></a></li>
           <li><a href="#stream-tab"><%= _('Social') %></a></li>
         </ul>
+
+        <div id="donations-tab">
+          <%= spinner(extra: 'donations', visible: true) %>
+          <div id="donations"></div>
+        </div>
+
         <div id="contact-details">
           <div class="cols col_50">
             <table class="meta">
@@ -165,18 +171,9 @@
           <% end %>
         </div>
 
-        <div id="donations-tab">
-          <%= spinner(extra: 'donations', visible: true) %>
-          <div id="donations"></div>
-        </div>
-
         <div id="stream-tab">
-          <% if current_user.facebook_account.try(:token) %>
-            <%= spinner(extra: 'social', visible: true) %>
-            <div id="social"></div>
-          <% else %>
-            <%= link_to(_('Click here to link your facebook account.'), '/auth/facebook') %>
-          <% end %>
+          <%= spinner(extra: 'social', visible: true) %>
+          <div id="social"></div>
         </div>
       </div>
 
