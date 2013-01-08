@@ -1,5 +1,12 @@
 $ ->
 
+  #$('select[multiple=multiple]').MultiSelect()
+
+  $(document).on 'click', '#leftmenu ul.left_filters li label', ->
+    $(this).next(".collapse").slideToggle('fast')
+    $(this).toggleClass("opened")
+    $(this).parent("li").toggleClass("opened")
+
   $('.tip, .qtip').tooltipsy()
 
   $(document).on 'mouseleave', 'div[data-behavior=account_selector]', ->

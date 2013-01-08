@@ -7,28 +7,7 @@
   <li class="<%= 'selected' if params[:filter].blank? %>"><%= link_to(_('All'), contacts_path, class: "all menu_item") %></li>
   <li class="<%= 'selected' if params[:filter] == 'people' %>"><%= link_to(_('People'), contacts_path(filter: 'people'), class: "people menu_item") %></li>
   <li class="<%= 'selected' if params[:filter] == 'companies' %>"><%= link_to(_('Companies'), contacts_path(filter: 'companies'), class: "companies menu_item") %></li>
-  <li class="<%= 'selected' if tag_params.present? %>">
-    <span class="tags menu_item"><%= _('Tags') %></span>
-    <ul class="left_taglist tags">
-      <li>
-        <% current_account_list.contact_tags.each do |tag|
-          # toggle tag on / off
-          url_params = {}.merge(params.except(:action, :controller))
-          url_params[:filters] ||= {}
-          tag_params.to_s.split(',').tap do |tags|
-            if tags.include?(tag)
-              url_params[:filters][:tags] = (tags - [tag]).join(',')
-            else
-              url_params[:filters][:tags] = (tags + [tag]).join(',')
-            end
-            url_params[:filters].delete(:tags) if url_params[:filters][:tags].blank? %>
-
-            <%= link_to(tag, url_params, class: "tag #{'selected' if tags.include?(tag)}") %>
-          <% end %>
-        <% end %>
-      </li>
-    </ul>
-  </li>
+  <%= render 'sidebar_tags', tags: current_account_list.contact_tags %>
   <li>
 		<span class="left_filters menu_item"><%= _('Filters') %></span>
     <%= form_tag contacts_path, method: :get do %>
@@ -38,18 +17,22 @@
       <ul class="left_filters">
         <li>
           <label><%= _('City') %></label>
-          <div class="collapse"><%= select_tag 'filters[city]', options_for_select([[_('-- Any --'), '']] + current_account_list.cities.select(&:present?), filters_params[:city]), multiple: true, size: 5 %></div>
+          <div class="collapse" style="<%= 'display:none' unless filters_params[:city] %>">
+            <%= select_tag 'filters[city]', options_for_select([[_('-- Any --'), '']] + current_account_list.cities.select(&:present?), filters_params[:city]), multiple: true, size: 5 %>
+          </div>
         </li>
 
         <li>
           <label><%= _('State') %></label>
-          <div class="collapse"><%= select_tag 'filters[state]', options_for_select([[_('-- Any --'), '']] + current_account_list.states.select(&:present?), filters_params[:state]), multiple: true, size: 5 %></div>
+          <div class="collapse" style="<%= 'display:none' unless filters_params[:state] %>">
+            <%= select_tag 'filters[state]', options_for_select([[_('-- Any --'), '']] + current_account_list.states.select(&:present?), filters_params[:state]), multiple: true, size: 5 %>
+          </div>
         </li>
 
         <li>
           <label><%= _('Newsletter Recipients') %></label>
-          <div class="collapse">
-						<%= radio_button_tag 'filters[newsletter]', '', filters_params[:newsletter].blank? %> <%= _('-- Any --') %><br />
+          <div class="collapse" style="<%= 'display:none' unless filters_params[:newsletter] %>">
+						<%= radio_button_tag 'filters[newsletter]', '', filters_params[:newsletter] == '' %> <%= _('-- Any --') %><br />
 	          <%= radio_button_tag 'filters[newsletter]', 'all', filters_params[:newsletter] == 'all' %> <%= _('All') %><br />
 	          <div>
 	            <%= radio_button_tag 'filters[newsletter]', 'address', filters_params[:newsletter] == 'address' %> <%= _('With Mailing Address') %>
@@ -64,26 +47,34 @@
 
         <li>
           <label><%= _('Status') %></label>
-          <div class="collapse"><%= select_tag 'filters[status]', options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_statuses.collect { |s| [_(s), s] }, filters_params[:status]), multiple: true, size: 5 %></div>
+          <div class="collapse" style="<%= 'display:none' unless filters_params[:status] %>">
+            <%= select_tag 'filters[status]', options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_statuses.collect { |s| [_(s), s] }, filters_params[:status]), multiple: true, size: 5 %>
+          </div>
         </li>
 
         <li>
           <label><%= _('Likely To Give') %></label>
-          <div class="collapse"><%= select_tag 'filters[likely]', options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_likely_to_gives, filters_params[:likely]), multiple: true, size: 4 %></div>
+          <div class="collapse" style="<%= 'display:none' unless filters_params[:likely] %>">
+            <%= select_tag 'filters[likely]', options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_likely_to_gives, filters_params[:likely]), multiple: true, size: 4 %>
+          </div>
         </li>
 
         <li>
           <label><%= _('Church') %></label>
-          <div class="collapse"><%= select_tag 'filters[church]', options_for_select([[_('-- Any --'), '']] + current_account_list.churches.select(&:present?), filters_params[:church]), multiple: true, size: 5 %></div>
+          <div class="collapse" style="<%= 'display:none' unless filters_params[:church] %>">
+            <%= select_tag 'filters[church]', options_for_select([[_('-- Any --'), '']] + current_account_list.churches.select(&:present?), filters_params[:church]), multiple: true, size: 5 %>
+          </div>
         </li>
 
         <li>
           <label><%= _('Referrer') %></label>
-          <div class="collapse"><%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), '']] + all_contacts.collect { |c| [c.name, c.id] }, filters_params[:referrer]), multiple: true, size: 5 %></div>
+          <div class="collapse" style="<%= 'display:none' unless filters_params[:referrer] %>">
+            <%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), '']] + all_contacts.collect { |c| [c.name, c.id] }, filters_params[:referrer]), multiple: true, size: 5 %>
+          </div>
         </li>
         <li class="controls">
-        <%= submit_tag _('Apply Filters') %>
-        <%= link_to(_('Reset Filters'), contacts_path, style: 'font-size: 11px;') if params[:filters] %>
+          <%= submit_tag _('Apply Filters') %>
+          <%= link_to(_('Reset Filters'), contacts_path, style: 'font-size: 11px;') if params[:filters] %>
         </li>
       </ul>
     <% end %>

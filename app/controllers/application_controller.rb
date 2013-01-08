@@ -124,4 +124,14 @@ class ApplicationController < ActionController::Base
     render :layout => false
   end
 
+  def filters_params
+    params[:filters] || {}
+  end
+  helper_method :filters_params
+
+  def tag_params
+    filters_params[:tags]
+  end
+  helper_method :tag_params
+
 end

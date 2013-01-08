@@ -2,23 +2,12 @@ class TasksController < ApplicationController
   respond_to :html, :js
 
   def index
-    base_scope = current_account_list.tasks.uncompleted.includes(:contacts, :activity_comments, :tags)
+    tasks = current_account_list.tasks.uncompleted.includes(:contacts, :activity_comments, :tags)
+    tasks = TaskFilter.new(filters_params).filter(tasks)
 
-    if params[:contact_ids].present?
-      base_scope = base_scope.where('contacts.id' => params[:contact_ids])
-    end
-
-    if params[:tags].present?
-      base_scope = base_scope.tagged_with(params[:tags])
-    end
-
-    if params[:activity_type].present? && params[:activity_type].first != ''
-      base_scope = base_scope.where(activity_type: params[:activity_type])
-    end
-
-    @overdue = base_scope.overdue
-    @tomorrow = base_scope.tomorrow
-    @upcoming = base_scope.upcoming
+    @overdue = tasks.overdue
+    @tomorrow = tasks.tomorrow
+    @upcoming = tasks.upcoming
   end
 
   def starred
@@ -123,4 +112,5 @@ class TasksController < ApplicationController
       format.html { redirect_to :back }
     end
   end
+
 end

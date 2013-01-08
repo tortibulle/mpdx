@@ -214,19 +214,10 @@ class ContactsController < ApplicationController
   end
 
 
-  protected
+  private
+
   def get_contact
     @contact = current_account_list.contacts.includes({people: [:email_addresses, :phone_numbers, :family_relationships]}).find(params[:id])
   end
-
-  def filters_params
-    params[:filters] || {}
-  end
-  helper_method :filters_params
-
-  def tag_params
-    filters_params[:tags]
-  end
-  helper_method :tag_params
 
 end
