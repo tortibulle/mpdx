@@ -23,7 +23,7 @@ GIT
 
 GIT
   remote: git://github.com/twinge/siebel_donations.git
-  revision: 0c6824fec7ef7697d2390eb9af497a4aa85cd79d
+  revision: 5fa6c72218b49a5a5c23b501978fef89388850ef
   specs:
     siebel_donations (1.0.3)
       activesupport
