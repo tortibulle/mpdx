@@ -1,6 +1,7 @@
 class ContactsController < ApplicationController
   respond_to :html, :js
   before_filter :get_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals]
+  before_filter :setup_filters, only: :index
 
   def index
     @contacts = current_account_list.contacts.order('contacts.name')
@@ -218,6 +219,18 @@ class ContactsController < ApplicationController
 
   def get_contact
     @contact = current_account_list.contacts.includes({people: [:email_addresses, :phone_numbers, :family_relationships]}).find(params[:id])
+  end
+
+  def setup_filters
+    if filters_params.present?
+      current_user.update_attributes(contacts_filter: filters_params)
+    elsif params[:clear_filter] == 'true'
+      current_user.update_attributes(contacts_filter: nil)
+    end
+
+    if current_user.contacts_filter.present?
+      @filters_params = current_user.contacts_filter
+    end
   end
 
 end

@@ -40,7 +40,7 @@
         </li>
         <li class="controls">
           <%= submit_tag _('Apply Filters') %>
-          <%= link_to(_('Reset Filters'), tasks_path, style: 'font-size: 11px') %>
+          <%= link_to(_('Reset Filters'), tasks_path(clear_filter: true), style: 'font-size: 11px') %>
         </li>
       </ul>
     <% end %>

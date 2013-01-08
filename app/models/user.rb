@@ -12,7 +12,8 @@ class User < Person
   has_many :imports, dependent: :destroy
 
   devise :trackable
-  store :preferences, accessors: [:time_zone, :locale, :setup]
+  store :preferences, accessors: [:time_zone, :locale, :setup, :contacts_filter,
+                                  :tasks_filter]
 
   # attr_accessible :first_name, :last_name
 

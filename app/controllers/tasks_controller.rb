@@ -1,9 +1,12 @@
 class TasksController < ApplicationController
+  before_filter :setup_filters, only: :index
+
   respond_to :html, :js
 
   def index
     tasks = current_account_list.tasks.uncompleted.includes(:contacts, :activity_comments, :tags)
-    tasks = TaskFilter.new(filters_params).filter(tasks)
+
+    tasks = TaskFilter.new(filters_params).filter(tasks) if filters_params.present?
 
     @overdue = tasks.overdue
     @tomorrow = tasks.tomorrow
@@ -110,6 +113,20 @@ class TasksController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to :back }
+    end
+  end
+
+  private
+
+  def setup_filters
+    if filters_params.present?
+      current_user.update_attributes(tasks_filter: filters_params)
+    elsif params[:clear_filter] == 'true'
+      current_user.update_attributes(tasks_filter: nil)
+    end
+
+    if current_user.tasks_filter.present?
+      @filters_params = current_user.tasks_filter
     end
   end
 

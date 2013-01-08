@@ -125,7 +125,7 @@ class ApplicationController < ActionController::Base
   end
 
   def filters_params
-    params[:filters] || {}
+    @filters_params ||= params[:filters] || {}
   end
   helper_method :filters_params
 
