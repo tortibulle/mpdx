@@ -30,60 +30,72 @@
     </ul>
   </li>
   <li>
+		<span class="left_filters menu_item" onclick="return false;"><%= _('Filters') %></span>
     <%= form_tag contacts_path, method: :get do %>
       <%= hidden_field_tag 'filters[tags]', tag_params %>
       <%= hidden_field_tag :per_page, params[:per_page] %>
-      <span class="left_filters menu_item" onclick="return false;"><%= _('Filters') %></span>
+      
       <ul class="left_filters">
         <li>
           <label><%= _('City') %></label>
-          <%= select_tag 'filters[city]', options_for_select([[_('-- Any --'), '']] + current_account_list.cities.select(&:present?), filters_params[:city]), multiple: true, size: 5 %>
+          <div class="collapse"><%= select_tag 'filters[city]', options_for_select([[_('-- Any --'), '']] + current_account_list.cities.select(&:present?), filters_params[:city]), multiple: true, size: 5 %></div>
         </li>
 
         <li>
           <label><%= _('State') %></label>
-          <%= select_tag 'filters[state]', options_for_select([[_('-- Any --'), '']] + current_account_list.states.select(&:present?), filters_params[:state]), multiple: true, size: 5 %>
+          <div class="collapse"><%= select_tag 'filters[state]', options_for_select([[_('-- Any --'), '']] + current_account_list.states.select(&:present?), filters_params[:state]), multiple: true, size: 5 %></div>
         </li>
 
         <li>
           <label><%= _('Newsletter Recipients') %></label>
-          <%= radio_button_tag 'filters[newsletter]', '', filters_params[:newsletter].blank? %> <%= _('-- Any --') %><br />
-          <%= radio_button_tag 'filters[newsletter]', 'all', filters_params[:newsletter] == 'all' %> <%= _('All') %><br />
-          <div>
-            <%= radio_button_tag 'filters[newsletter]', 'address', filters_params[:newsletter] == 'address' %> <%= _('With Mailing Address') %>
-            <%= tip(_('This filter will search for people who are set to receive your physical newsletter and have a mailing address'), style: 'float:right;margin-right:15px') %>
-          </div>
-          <div>
-            <%= radio_button_tag 'filters[newsletter]', 'email', filters_params[:newsletter] == 'email' %> <%= _('With Email Address') %>
-            <%= tip(_('This filter will search for people who are set to receive your email newsletter and have a valid email address'), style: 'float:right;margin-right:15px') %>
-          </div>
+          <div class="collapse">
+						<%= radio_button_tag 'filters[newsletter]', '', filters_params[:newsletter].blank? %> <%= _('-- Any --') %><br />
+	          <%= radio_button_tag 'filters[newsletter]', 'all', filters_params[:newsletter] == 'all' %> <%= _('All') %><br />
+	          <div>
+	            <%= radio_button_tag 'filters[newsletter]', 'address', filters_params[:newsletter] == 'address' %> <%= _('With Mailing Address') %>
+	            <%= tip(_('This filter will search for people who are set to receive your physical newsletter and have a mailing address'), style: 'float:right;margin-right:15px') %>
+	          </div>
+	          <div>
+	            <%= radio_button_tag 'filters[newsletter]', 'email', filters_params[:newsletter] == 'email' %> <%= _('With Email Address') %>
+	            <%= tip(_('This filter will search for people who are set to receive your email newsletter and have a valid email address'), style: 'float:right;margin-right:15px') %>
+	          </div>
+					</div>
         </li>
 
         <li>
           <label><%= _('Status') %></label>
-          <%= select_tag 'filters[status]', options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_statuses.collect { |s| [_(s), s] }, filters_params[:status]), multiple: true, size: 5 %>
+          <div class="collapse"><%= select_tag 'filters[status]', options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_statuses.collect { |s| [_(s), s] }, filters_params[:status]), multiple: true, size: 5 %></div>
         </li>
 
         <li>
           <label><%= _('Likely To Give') %></label>
-          <%= select_tag 'filters[likely]', options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_likely_to_gives, filters_params[:likely]), multiple: true, size: 4 %>
+          <div class="collapse"><%= select_tag 'filters[likely]', options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_likely_to_gives, filters_params[:likely]), multiple: true, size: 4 %></div>
         </li>
 
         <li>
           <label><%= _('Church') %></label>
-          <%= select_tag 'filters[church]', options_for_select([[_('-- Any --'), '']] + current_account_list.churches.select(&:present?), filters_params[:church]), multiple: true, size: 5 %>
+          <div class="collapse"><%= select_tag 'filters[church]', options_for_select([[_('-- Any --'), '']] + current_account_list.churches.select(&:present?), filters_params[:church]), multiple: true, size: 5 %></div>
         </li>
 
         <li>
           <label><%= _('Referrer') %></label>
-          <%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), '']] + all_contacts.collect { |c| [c.name, c.id] }, filters_params[:referrer]), multiple: true, size: 5 %>
+          <div class="collapse"><%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), '']] + all_contacts.collect { |c| [c.name, c.id] }, filters_params[:referrer]), multiple: true, size: 5 %></div>
         </li>
-        <li>
-        <%= submit_tag _('Filter') %><br />
-        <%= link_to(_('Clear Filters'), contacts_path, style: 'font-size: 11px;color:red') %>
+        <li class="controls">
+        <%= submit_tag _('Apply Filter') %> <%= link_to(_('Reset Filters'), contacts_path, style: 'font-size: 11px;') %>
         </li>
       </ul>
     <% end %>
+
+
+		<script>
+			$('#leftmenu ul.left_filters li label').click(function(){
+				$(this).next(".collapse").slideToggle('fast');
+				$(this).toggleClass("opened");
+				$(this).parent("li").toggleClass("opened");
+			});
+		</script>
+
   </li>
 </ul>
 </aside>
@@ -136,6 +148,9 @@
           </td>
         </tr>
       </table>
+
+
+
       <div class="filters">
         <div class="right" class="contacts_actions">
           <%= link_to(_('Actions'), "#", class: "btn smallbtn actionbtn", style: 'display:none') %>
@@ -146,7 +161,10 @@
             <li><%= link_to(_('Add Task'), '#', class: 'none', data: {behavior: 'add_task_to_list'}) %></li>
             <li><%= link_to(_('Edit Fields'), '#', class: 'none', data: {behavior: 'bulk_edit'}) %></li>
           </ul>
-          <span style="margin-right:3px;margin-left:5px"><input type="checkbox" class="checkall" /></span>
+          <span style="margin-right:3px;margin-left:5px">
+							<label for="checkall">Select All Rows</label>
+							<input name="checkall" type="checkbox" class="checkall" />
+					</span>
         </div>
       </div>
     </div>

@@ -283,8 +283,19 @@ $userheight: 60px;
     background-repeat: no-repeat;
     background-position: 98% 50%;
   }
-  height: 20px;
+  height: 29px;
 }
+
+
+/* ************************************************************** */
+.pagination {
+  line-height: 24px;
+  .current {}
+  .next_page {}
+  .gap {}
+  a, .current {padding: 0 3px;}
+}
+
 
 /* ************************************************************** */
 
@@ -390,6 +401,7 @@ div.name {font-size: 14px; margin-bottom: 4px;}
   ul {
     @include listclear;
     li {border-bottom: 1px solid $borders;}
+    li:last-child {border-bottom: 0px;}
     li.selected {background: $white; a, span{border-left: 1px solid $borders;}}
     li a.menu_item, li span.menu_item {display: block; line-height: 3em; padding: 0 15px 0 35px;}
   }
@@ -403,6 +415,7 @@ div.name {font-size: 14px; margin-bottom: 4px;}
     a.people {background-position: 5px -834px;}
     a.companies {background-position: 5px -749px;}
     span.tags {background-position: 5px -995px;}
+    span.left_filters {background: image-url("filter.png") no-repeat 10px 12px;}
   }
 
   ul.tags li, ul.left_filters li {
@@ -417,11 +430,42 @@ div.name {font-size: 14px; margin-bottom: 4px;}
     border-left: 1px solid $borders;
   }
 
-  ul.left_filters li {
-    label {
-      font-weight: bold;
+  ul.left_filters {
+    background: white;
+    width: 93%;
+    margin: 0 auto;
+    li:last-child {border-bottom: 0px;}
+    li {
+      padding-left: 0px;
+      font-size: 11px;
+      background: $blue_comments;
+      padding-bottom: 0px;
+      border-bottom:  2px solid #F7F7F7;
+      label {
+        font-weight: bold;
+        padding: 6px 12px 6px 27px;
+        background: image-url("btn_expand.gif")  no-repeat 2% 37%;
+        cursor: pointer;
+      }
+      label.opened {
+        background-image: image-url("btn_contract.gif");
+      }
+      .collapse {
+        display: none;
+        padding: 10px;
+        background: #fff;
+        width: 85%;
+        margin: 0 auto 5px;
+        border-radius: 2px;
+      }
     }
-    font-size: 11px;
+    li.opened {
+      background: #eee;
+    }
+    li.controls {
+      background: #f7f7f7;
+      padding-left: 12px;
+    }
   }
 }
 
@@ -495,6 +539,7 @@ div.name {font-size: 14px; margin-bottom: 4px;}
   }
   td.profile {
     width: 45%;
+    border-right: 2px solid $gray_light;
     span {display: block; }
     ul {
       @include listclear;
@@ -511,7 +556,6 @@ div.name {font-size: 14px; margin-bottom: 4px;}
   }
 
   td.contact-tasks {
-    border-left: 2px solid black;
     width: 40%;
   }
 }
