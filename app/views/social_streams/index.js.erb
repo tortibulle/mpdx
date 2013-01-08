@@ -1,5 +1,5 @@
 $('#spinner_social').hide();
-<% if current_user.facebook_account.token_missing_or_expired? %>
+<% if @bad_facebook_token %>
     $('#social').html('<%= j(link_to(_('The link to your facebook account needs to be refreshed. Click here to re-connect to facebook</a>.'), new_account_path(provider: :facebook, redirect: contact_path(@contact, anchor: 'stream-tab')))) %>');
 <% else %>
   <% if params[:page] %>
