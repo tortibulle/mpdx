@@ -93,7 +93,7 @@ class MailChimpAccount < ActiveRecord::Base
   end
 
   def unsubscribe_email(email)
-    if email.present?
+    if email.present? && primary_list_id.present?
       begin
         gb.list_unsubscribe(id: primary_list_id, email_address: email,
                               send_goodbye: false, delete_member: true)
