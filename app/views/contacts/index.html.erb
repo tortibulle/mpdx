@@ -30,11 +30,11 @@
     </ul>
   </li>
   <li>
-		<span class="left_filters menu_item" onclick="return false;"><%= _('Filters') %></span>
+		<span class="left_filters menu_item"><%= _('Filters') %></span>
     <%= form_tag contacts_path, method: :get do %>
       <%= hidden_field_tag 'filters[tags]', tag_params %>
       <%= hidden_field_tag :per_page, params[:per_page] %>
-      
+
       <ul class="left_filters">
         <li>
           <label><%= _('City') %></label>
@@ -82,19 +82,11 @@
           <div class="collapse"><%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), '']] + all_contacts.collect { |c| [c.name, c.id] }, filters_params[:referrer]), multiple: true, size: 5 %></div>
         </li>
         <li class="controls">
-        <%= submit_tag _('Apply Filter') %> <%= link_to(_('Reset Filters'), contacts_path, style: 'font-size: 11px;') %>
+        <%= submit_tag _('Apply Filters') %>
+        <%= link_to(_('Reset Filters'), contacts_path, style: 'font-size: 11px;') if params[:filters] %>
         </li>
       </ul>
     <% end %>
-
-
-		<script>
-			$('#leftmenu ul.left_filters li label').click(function(){
-				$(this).next(".collapse").slideToggle('fast');
-				$(this).toggleClass("opened");
-				$(this).parent("li").toggleClass("opened");
-			});
-		</script>
 
   </li>
 </ul>

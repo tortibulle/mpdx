@@ -25,34 +25,42 @@
     </li>
   <% end %>
   <li>
+    <span class="left_filters menu_item"><%= _('Filters') %></span>
     <%= form_tag params.slice(:controller, :action), method: :get do %>
-      <span class="left_filters menu_item"><%= _('Filters') %></span>
       <ul class="left_filters">
         <% if params[:action] == 'history' %>
           <li>
             <label><%= _('Date Range') %></label>
-            <%= radio_button_tag :date_range, 'last_week', params[:date_range].blank? || params[:date_range] == 'last_week' %> <%= _('Last Week') %><br />
-            <%= radio_button_tag :date_range, 'last_month', params[:date_range] == 'last_month'  %> <%= _('Last 31 Days') %><br />
-            <%= radio_button_tag :date_range, 'last_year', params[:date_range] == 'last_year'  %> <%= _('Last 12 Months') %><br />
-            <%= radio_button_tag :date_range, 'last_two_years', params[:date_range] == 'last_two_years'  %> <%= _('Last Two Years') %><br />
-            <%= radio_button_tag :date_range, 'all', params[:date_range] == 'all'  %> <%= _('All') %><br />
+            <div class="collapse">
+              <%= radio_button_tag :date_range, 'last_week', params[:date_range].blank? || params[:date_range] == 'last_week' %> <%= _('Last Week') %><br />
+              <%= radio_button_tag :date_range, 'last_month', params[:date_range] == 'last_month'  %> <%= _('Last 31 Days') %><br />
+              <%= radio_button_tag :date_range, 'last_year', params[:date_range] == 'last_year'  %> <%= _('Last 12 Months') %><br />
+              <%= radio_button_tag :date_range, 'last_two_years', params[:date_range] == 'last_two_years'  %> <%= _('Last Two Years') %><br />
+              <%= radio_button_tag :date_range, 'all', params[:date_range] == 'all'  %> <%= _('All') %><br />
+            </div>
           </li>
         <% end %>
         <li>
           <label><%= _('Tags') %></label>
-          <%= select_tag :tags, options_for_select([[_('-- Any --'), '']] + current_account_list.activity_tags, params[:tags]), multiple: true, size: 5 %>
+          <div class="collapse">
+            <%= select_tag :tags, options_for_select([[_('-- Any --'), '']] + current_account_list.activity_tags, params[:tags]), multiple: true, size: 5 %>
+          </div>
         </li>
         <li>
-          <label><%= _('Action') %></label>
-          <%= select_tag :activity_type, options_for_select([[_('-- Any --'), '']] + (Task.new.assignable_activity_types & current_account_list.tasks.select(:activity_type).uniq.collect(&:activity_type)).collect { |a| [_(a), a] }, params[:activity_type]), multiple: true, size: 5 %>
+        <label><%= _('Action') %></label>
+          <div class="collapse">
+            <%= select_tag :activity_type, options_for_select([[_('-- Any --'), '']] + (Task.new.assignable_activity_types & current_account_list.tasks.select(:activity_type).uniq.collect(&:activity_type)).collect { |a| [_(a), a] }, params[:activity_type]), multiple: true, size: 5 %>
+          </div>
         </li>
         <li>
           <label><%= _('Contact') %></label>
-          <%= select_tag :contact_ids, options_for_select([[_('-- Any --'), '']] + all_contacts.collect { |c| [c.name, c.id] }, params[:contact_ids]), multiple: true, size: 5 %>
+          <div class="collapse">
+            <%= select_tag :contact_ids, options_for_select([[_('-- Any --'), '']] + all_contacts.collect { |c| [c.name, c.id] }, params[:contact_ids]), multiple: true, size: 5 %>
+          </div>
         </li>
-        <li>
-          <%= submit_tag _('Filter') %><br />
-          <%= link_to(_('Clear Filters'), tasks_path, style: 'font-size: 11px;color:red') %>
+        <li class="controls">
+          <%= submit_tag _('Apply Filters') %>
+          <%= link_to(_('Reset Filters'), tasks_path, style: 'font-size: 11px') %>
         </li>
       </ul>
     <% end %>
