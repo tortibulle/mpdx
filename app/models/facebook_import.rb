@@ -6,6 +6,10 @@ class FacebookImport
     @account_list = import.account_list
   end
 
+  def import
+    import_contacts
+  end
+
   def import_contacts
     @user.facebook_accounts.each do |facebook_account|
       begin
@@ -101,7 +105,7 @@ class FacebookImport
 
     # If we can't find a contact with this fb account, see if we have a contact with the same name and no fb account
     unless fb_person
-      fb_person = account_list.people.includes(:facebook_account).where('person_facebook_accounts.remote_id' => nil, 
+      fb_person = account_list.people.includes(:facebook_account).where('person_facebook_accounts.remote_id' => nil,
                                                                         'people.first_name' => friend.first_name,
                                                                         'people.last_name' => friend.last_name).first
 
