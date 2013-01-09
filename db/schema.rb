@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130107193956) do
+ActiveRecord::Schema.define(:version => 20130109160332) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -211,6 +211,7 @@ ActiveRecord::Schema.define(:version => 20130107193956) do
     t.date     "last_phone_call"
     t.date     "last_pre_call"
     t.date     "last_thank"
+    t.boolean  "pledge_received",                                                    :default => false, :null => false
   end
 
   add_index "contacts", ["account_list_id"], :name => "index_contacts_on_account_list_id"
@@ -479,6 +480,7 @@ ActiveRecord::Schema.define(:version => 20130107193956) do
     t.integer  "master_person_id",                                :null => false
     t.string   "middle_name"
     t.string   "access_token",       :limit => 32
+    t.string   "profession"
   end
 
   add_index "people", ["access_token"], :name => "index_people_on_access_token", :unique => true

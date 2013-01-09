@@ -153,10 +153,13 @@ class TntImport
     contact.full_name = row['FullName'] if @import.override? || contact.full_name.blank?
     contact.greeting = row['Greeting'] if @import.override? || contact.greeting.blank?
     contact.website = row['WebPage'] if @import.override? || contact.website.blank?
-    contact.notes = Nokogiri::HTML(row['Notes'].to_s.gsub(/{.*}/,'').gsub(/\\\w*/, '').gsub(/[{}]*/,'').strip).text if @import.override? || contact.notes.blank?
+    contact.updated_at = parse_date(row['LastEdit']) if @import.override?
+    contact.created_at = parse_date(row['CreatedDate']) if @import.override?
+    contact.notes = Nokogiri::HTML(row['Notes'].to_s.gsub(/{.*}/,'').gsub(/\\\w*/, '').gsub(/[{}]*/,'').gsub('-240-1','').strip).text if @import.override? || contact.notes.blank?
     contact.pledge_amount = row['PledgeAmount'] if @import.override? || contact.pledge_amount.blank?
     contact.pledge_frequency = row['PledgeFrequencyID'] if (@import.override? || contact.pledge_frequency.blank?) && row['PledgeFrequencyID'].to_i != 0
     contact.pledge_start_date = parse_date(row['PledgeStartDate']) if (@import.override? || contact.pledge_start_date.blank?) && row['PledgeStartDate'].present?
+    contact.pledge_received = is_true?(row['PledgeReceived']) if @import.override? || contact.pledge_received.blank?
     contact.status = lookup_mpd_phase(row['MPDPhaseID']) if (@import.override? || contact.status.blank?) && lookup_mpd_phase(row['MPDPhaseID']).present?
     contact.next_ask = parse_date(row['NextAsk']) if (@import.override? || contact.next_ask.blank?) && row['NextAsk'].present?
     contact.likely_to_give = contact.assignable_likely_to_gives[row['LikelyToGiveID'].to_i - 1] if (@import.override? || contact.likely_to_give.blank?) && row['LikelyToGiveID'].to_i != 0
@@ -291,7 +294,8 @@ class TntImport
 
   def update_person_attributes(person, row, prefix = '')
     person.attributes = {first_name: row[prefix + 'FirstName'], last_name: row[prefix + 'LastName'], middle_name: row[prefix + 'Middle Name'],
-                          title: row[prefix + 'Title'], suffix: row[prefix + 'Suffix'], gender: prefix.present? ? 'female' : 'male'}
+                          title: row[prefix + 'Title'], suffix: row[prefix + 'Suffix'], gender: prefix.present? ? 'female' : 'male',
+                          profession: prefix.present? ? nil : row['Profession']}
     # Phone numbers
     {'HomePhone' => 'home', 'HomePhone2' => 'home', 'HomeFax' => 'fax',
      'BusinessPhone' => 'work', 'BusinessPhone2' => 'work', 'BusinessFax' => 'fax',
