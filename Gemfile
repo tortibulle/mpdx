@@ -50,6 +50,7 @@ gem 'redis-objects', '~> 0.6.1'
 gem 'rest-client', '~> 1.6.7'
 gem 'retryable-rb', '~> 1.1.0'
 gem 'sidekiq'
+gem 'sidekiq-failures'
 gem 'siebel_donations', git: 'git://github.com/twinge/siebel_donations.git'
 gem 'sinatra', :require => nil
 gem 'slim'
