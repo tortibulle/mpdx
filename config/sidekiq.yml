@@ -1,0 +1,7 @@
+---
+:verbose: false
+:concurrency:  25
+:queues:
+  - [import, 1]
+  - [facebook, 1]
+  - [general, 2]
