@@ -57,30 +57,35 @@ describe MailChimpAccount do
     end
 
     it "should queue subscribe_contacts" do
-      @account.queue_export_to_primary_list
-      MailChimpAccount.should have_queued(@account.id, :subscribe_contacts)
+      expect {
+        @account.queue_export_to_primary_list
+      }.to change(MailChimpAccount.jobs, :size).by(1)
     end
 
     it "should queue subscribe_contacts for one contact" do
       contact = create(:contact)
-      @account.queue_subscribe_contact(contact)
-      MailChimpAccount.should have_queued(@account.id, :subscribe_contacts, contact.id)
+      expect {
+        @account.queue_subscribe_contact(contact)
+      }.to change(MailChimpAccount.jobs, :size).by(1)
     end
 
     it "should queue subscribe_person" do
       person = create(:person)
-      @account.queue_subscribe_person(person)
-      MailChimpAccount.should have_queued(@account.id, :subscribe_person, person.id)
+      expect {
+        @account.queue_subscribe_person(person)
+      }.to change(MailChimpAccount.jobs, :size).by(1)
     end
 
     it "should queue unsubscribe_email" do
-      @account.queue_unsubscribe_email('foo@example.com')
-      MailChimpAccount.should have_queued(@account.id, :unsubscribe_email, 'foo@example.com')
+      expect {
+        @account.queue_unsubscribe_email('foo@example.com')
+      }.to change(MailChimpAccount.jobs, :size).by(1)
     end
 
     it "should queue update_email" do
-      @account.queue_update_email('foo@example.com', 'foo1@example.com')
-      MailChimpAccount.should have_queued(@account.id, :update_email, 'foo@example.com', 'foo1@example.com')
+      expect {
+        @account.queue_update_email('foo@example.com', 'foo1@example.com')
+      }.to change(MailChimpAccount.jobs, :size).by(1)
     end
 
     it "should queue unsubscribe_email for each of a contacts email addresses" do
@@ -89,9 +94,9 @@ describe MailChimpAccount do
 
       2.times { |i| contact.people.first.email_addresses << EmailAddress.new(email: "foo#{i}@example.com") }
 
-      @account.queue_unsubscribe_contact(contact)
-      MailChimpAccount.should have_queued(@account.id, :unsubscribe_email, 'foo0@example.com')
-      MailChimpAccount.should have_queued(@account.id, :unsubscribe_email, 'foo1@example.com')
+      expect {
+        @account.queue_unsubscribe_contact(contact)
+      }.to change(MailChimpAccount.jobs, :size).by(2)
     end
 
   end

@@ -4,10 +4,10 @@ require 'tnt_import_validator'
 
 class Import < ActiveRecord::Base
   include Async
+  include Sidekiq::Worker
+  sidekiq_options queue: :import
 
   belongs_to :user
-
-  def self.queue() :import; end
 
   mount_uploader :file, ImportUploader
   belongs_to :account_list

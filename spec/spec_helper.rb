@@ -13,14 +13,13 @@ Spork.prefork do
   require 'rspec/autorun'
   require 'webmock/rspec'
   require 'capybara/rspec'
+  require 'sidekiq/testing'
 
   require 'simplecov'
   SimpleCov.start 'rails' do
     add_filter "vendor"
     add_group "Roles", "app/roles"
   end
-
-  Resque.inline = true
 
   # Requires supporting ruby files with custom matchers and macros, etc,
   # in spec/support/ and its subdirectories.

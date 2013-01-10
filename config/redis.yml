@@ -1,4 +1,4 @@
 development: localhost:6379
 test: localhost:6379
-staging: redis:6379
-production: redis:6379
+staging: 10.178.202.203:6379
+production: 10.178.202.203:6379

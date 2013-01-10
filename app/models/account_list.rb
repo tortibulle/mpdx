@@ -12,6 +12,8 @@ require 'async'
 
 class AccountList < ActiveRecord::Base
   include Async
+  include Sidekiq::Worker
+  sidekiq_options queue: :import
 
   belongs_to :creator, class_name: 'User', foreign_key: 'creator_id'
   has_many :account_list_users, dependent: :destroy
@@ -36,8 +38,6 @@ class AccountList < ActiveRecord::Base
   belongs_to :designation_profile
 
   accepts_nested_attributes_for :contacts, reject_if: :all_blank, allow_destroy: true
-
-  def self.queue() :import; end
 
   def self.find_with_designation_numbers(numbers)
     designation_account_ids = DesignationAccount.where(designation_number: numbers).pluck(:id).sort

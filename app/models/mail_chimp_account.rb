@@ -2,7 +2,9 @@ require 'async'
 
 class MailChimpAccount < ActiveRecord::Base
   include Async
-
+  include Sidekiq::Worker
+  sidekiq_options queue: :general
+  
   List = Struct.new(:id, :name)
 
   belongs_to :account_list
@@ -14,8 +16,6 @@ class MailChimpAccount < ActiveRecord::Base
 
   before_create :set_active
   after_save :queue_import_if_list_changed
-
-  def self.queue() :general; end
 
   def lists
     begin

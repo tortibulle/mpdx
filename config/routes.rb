@@ -1,4 +1,4 @@
-require 'resque/server'
+require 'sidekiq/web'
 Mpdx::Application.routes.draw do
 
   resources :notifications
@@ -99,7 +99,10 @@ Mpdx::Application.routes.draw do
   match '/auth/:provider/callback', to: 'accounts#create'
   match '/auth/failure', to: 'accounts#failure'
 
-  mount Resque::Server.new, :at => "/resque"
+constraint = lambda { |request| request.env["warden"].authenticate? and ['Starcher'].include?(request.env['warden'].user.last_name) }
+constraints constraint do
+  mount Sidekiq::Web => '/sidekiq'
+end
 
   root :to => 'home#index'
 

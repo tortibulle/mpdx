@@ -3,9 +3,10 @@ require 'retryable'
 class Person::FacebookAccount < ActiveRecord::Base
   include Redis::Objects
   include Async
+  include Sidekiq::Worker
+  sidekiq_options queue: :facebook
+  
   extend Person::Account
-
-  def self.queue() :facebook; end
 
   set :friends
   # attr_accessible :remote_id, :token, :token_expires_at, :first_name, :last_name, :valid_token, :authenticated, :url
