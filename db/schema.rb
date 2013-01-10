@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130109160332) do
+ActiveRecord::Schema.define(:version => 20130110204055) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -414,8 +414,10 @@ ActiveRecord::Schema.define(:version => 20130109160332) do
     t.boolean  "cleared",              :default => false, :null => false
     t.datetime "created_at",                              :null => false
     t.datetime "updated_at",                              :null => false
+    t.integer  "donation_id"
   end
 
+  add_index "notifications", ["contact_id", "notification_type_id", "donation_id"], :name => "notification_index"
   add_index "notifications", ["contact_id"], :name => "index_notifications_on_contact_id"
   add_index "notifications", ["notification_type_id"], :name => "index_notifications_on_notification_type_id"
 

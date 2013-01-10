@@ -6,7 +6,8 @@ class NotificationType::StartedGiving < NotificationType
       prior_notification = Notification.active.where(contact_id: contact.id, notification_type_id: id).first
       unless prior_notification
         # If they just gave their first gift, note it as such
-        if (donation = contact.donations.for(designation_account).where("donation_date > ?", 2.weeks.ago).last) &&
+        if !contact.pledge_received? &&
+           (donation = contact.donations.for(designation_account).where("donation_date > ?", 2.weeks.ago).last) &&
            contact.donations.for(designation_account).where("donation_date < ?", 2.weeks.ago).count == 0
 
           # update pledge amount/received
