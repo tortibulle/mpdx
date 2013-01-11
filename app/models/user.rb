@@ -21,7 +21,9 @@ class User < Person
 
   # Queue data imports
   def queue_imports
-    organization_accounts.map(&:queue_import_data)
+    organization_accounts.each do |oa|
+      oa.queue_import_data unless oa.last_download
+    end
   end
 
   def setup_mode?
