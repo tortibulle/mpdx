@@ -11,7 +11,7 @@ class CreateVersions < ActiveRecord::Migration
       t.datetime :created_at
     end
     add_index :versions, [:item_type, :item_id]
-    add_index :versions, [:item_type, :item_id, :related_object_type, :related_object_id, :created_at], name: 'related_object_index'
+    add_index :versions, [:item_type, :related_object_type, :related_object_id, :created_at], name: 'related_object_index'
   end
 
   def self.down
