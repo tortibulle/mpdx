@@ -1,6 +1,6 @@
 ---
 :verbose: false
-:concurrency:  25
+:concurrency:  15
 :queues:
   - [import, 1]
   - [facebook, 1]
