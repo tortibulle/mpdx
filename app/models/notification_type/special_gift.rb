@@ -23,8 +23,10 @@ class NotificationType::SpecialGift < NotificationType
   end
 
   def task_description(notification)
-    _("%{contact_name} gave a Special Gift on %{date}. Send them a Thank You.") %
-      { contact_name: notification.contact.name, date: notification.donation.donation_date.localize.to_s }
+    _("%{contact_name} gave a Special Gift of %{amount} on %{date}. Send them a Thank You.") %
+      { contact_name: notification.contact.name,
+        amount: notification.donation.amount.to_f.localize.to_currency.to_s(currency: notification.donation.currency),
+        date: notification.donation.donation_date.localize.to_s }
   end
 
 end
