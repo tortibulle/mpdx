@@ -58,4 +58,26 @@ class Api::V1::BaseController < ApplicationController
     def render_404
       render nothing: true, status: 404
     end
+
+    def add_includes_and_order(resource, options = {})
+      # eager loading is a waste of time if the 'since' parameter is passed
+      unless params[:since]
+        resource = resource.includes(available_includes) if available_includes.present?
+      end
+      resource = resource.where("#{resource.table.name}.updated_at > ?", Time.at(params[:since].to_i)) if params[:since].to_i > 0
+      resource = resource.limit(params[:limit]) if params[:limit]
+      resource = resource.offset(params[:offset]) if params[:offset]
+      resource = resource.order(options[:order]) if options[:order]
+      resource
+    end
+
+    # let the api use add additional relationships to this call
+    def includes
+      @includes ||= params[:include].to_s.split(',')
+    end
+
+    # Each controller should override this method
+    def available_includes
+      []
+    end
 end

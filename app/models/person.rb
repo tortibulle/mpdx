@@ -1,4 +1,7 @@
 class Person < ActiveRecord::Base
+  has_paper_trail :on => [:destroy],
+                  :meta => { related_object_type: 'Contact',
+                             related_object_id: :contact_id }
 
   belongs_to :master_person
   has_many :email_addresses, dependent: :destroy, autosave: true
@@ -207,6 +210,10 @@ class Person < ActiveRecord::Base
 
   def contact
     @contact ||= contacts.first
+  end
+
+  def contact_id
+    contact.try(:id)
   end
 
 

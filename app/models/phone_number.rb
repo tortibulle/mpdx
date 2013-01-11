@@ -2,6 +2,11 @@ class PhoneNumber < ActiveRecord::Base
   include HasPrimary
   @@primary_scope = :person
 
+  has_paper_trail :on => [:destroy],
+                  :meta => { related_object_type: 'Person',
+                             related_object_id: :person_id }
+
+
   belongs_to :person
 
   before_save :clean_up_number

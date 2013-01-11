@@ -1,4 +1,9 @@
 class Address < ActiveRecord::Base
+
+  has_paper_trail :on => [:destroy],
+                  :meta => { related_object_type: :addressable_type,
+                             related_object_id: :addressable_id }
+
   belongs_to :addressable, polymorphic: true
 
   assignable_values_for :location, :allow_blank => true do
@@ -6,11 +11,15 @@ class Address < ActiveRecord::Base
   end
 
   def ==(other)
-    other.street == street &&
-    other.city == city &&
-    other.state == state &&
-    other.country == country &&
-    other.postal_code.to_s[0..4] == postal_code.to_s[0..4]
+    if other
+      other.street == street &&
+      other.city == city &&
+      other.state == state &&
+      other.country == country &&
+      other.postal_code.to_s[0..4] == postal_code.to_s[0..4]
+    else
+      false
+    end
   end
 
   def not_blank?

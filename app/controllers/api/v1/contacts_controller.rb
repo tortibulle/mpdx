@@ -3,15 +3,20 @@ class Api::V1::ContactsController < Api::V1::BaseController
   def index
     order = params[:order] || 'name'
 
-    filtered_contacts = params[:filters] ? ContactFilter.new(params[:filters]).filter(contacts) : contacts
+    filtered_contacts = ContactFilter.new(params[:filters]).filter(contacts)
 
-    render json: filtered_contacts.order(order)
-                                  .includes({:people => [:email_addresses, :phone_numbers]}, :addresses),
+    render json: add_includes_and_order(filtered_contacts, order: order),
+           scope: {since: params[:since]},
+           meta:  params[:since] ?
+                    {deleted: Version.where(item_type: 'Contact', event: 'destroy', related_object_type: 'AccountList', related_object_id: current_account_list.id).where("created_at > ?", Time.at(params[:since].to_i)).pluck(:item_id)} :
+                    {},
            callback: params[:callback]
   end
 
   def show
-    render json: contacts.find(params[:id]), callback: params[:callback]
+    render json: contacts.find(params[:id]),
+           scope: {since: params[:since]},
+           callback: params[:callback]
   end
 
   def update
@@ -42,6 +47,10 @@ class Api::V1::ContactsController < Api::V1::BaseController
 
   def contacts
     current_account_list.contacts
+  end
+
+  def available_includes
+    [{:people => [:email_addresses, :phone_numbers, :facebook_account]}, :addresses, {primary_person: :facebook_account}]
   end
 
 end

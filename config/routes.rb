@@ -20,10 +20,6 @@ Mpdx::Application.routes.draw do
   namespace :api do
     api_version(module: 'V1', header: {name: 'API-VERSION', value: 'v1'}, parameter: {name: "version", value: 'v1'}, path: {value: 'v1'}) do
       resources :contacts
-      resources :people
-      resources :addresses
-      resources :email_addresses
-      resources :phone_numbers
       resources :tasks
       resources :preferences
       resources :users

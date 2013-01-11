@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130110204055) do
+ActiveRecord::Schema.define(:version => 20130111164215) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -650,5 +650,19 @@ ActiveRecord::Schema.define(:version => 20130110204055) do
   create_table "tags", :force => true do |t|
     t.string "name"
   end
+
+  create_table "versions", :force => true do |t|
+    t.string   "item_type",           :null => false
+    t.integer  "item_id",             :null => false
+    t.string   "event",               :null => false
+    t.string   "whodunnit"
+    t.text     "object"
+    t.string   "related_object_type"
+    t.integer  "related_object_id"
+    t.datetime "created_at"
+  end
+
+  add_index "versions", ["item_type", "item_id", "related_object_type", "related_object_id", "created_at"], :name => "related_object_index"
+  add_index "versions", ["item_type", "item_id"], :name => "index_versions_on_item_type_and_item_id"
 
 end

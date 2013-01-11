@@ -2,6 +2,10 @@ class Contact < ActiveRecord::Base
   include AddressMethods
   acts_as_taggable
 
+  has_paper_trail :on => [:destroy],
+                  :meta => { related_object_type: 'AccountList',
+                             related_object_id: :account_list_id }
+
   has_many :contact_donor_accounts, dependent: :destroy
   has_many :donor_accounts, through: :contact_donor_accounts
   has_many :donations, through: :donor_accounts

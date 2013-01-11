@@ -1,7 +1,12 @@
 class Api::V1::TasksController < Api::V1::BaseController
 
   def index
-    render json: tasks, callback: params[:callback]
+    render json: tasks,
+           scope: {since: params[:since]},
+           meta:  params[:since] ?
+                    {deleted: Version.where(item_type: 'Activity', event: 'destroy', related_object_type: 'AccountList', related_object_id: current_account_list.id).where("created_at > ?", Time.at(params[:since].to_i)).pluck(:item_id)} :
+                    {},
+           callback: params[:callback]
   end
 
   def show
@@ -35,7 +40,7 @@ class Api::V1::TasksController < Api::V1::BaseController
   protected
 
   def tasks
-    current_account_list.tasks.includes(:contacts, :activity_comments)
+    add_includes_and_order(current_account_list.tasks.includes(:contacts, :activity_comments, :people), order: params[:order])
   end
 
 end

@@ -2,6 +2,11 @@ class EmailAddress < ActiveRecord::Base
   include HasPrimary
   @@primary_scope = :person
 
+  has_paper_trail :on => [:destroy],
+                  :meta => { related_object_type: 'Person',
+                             related_object_id: :person_id }
+
+
   belongs_to :person
   validates_presence_of :email
   before_save :strip_email
