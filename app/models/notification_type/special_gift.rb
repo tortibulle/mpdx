@@ -16,15 +16,15 @@ class NotificationType::SpecialGift < NotificationType
 
   def create_task(account_list, notification)
     contact = notification.contact
-    task = account_list.tasks.create(subject: task_description(contact), start_at: Time.now,
+    task = account_list.tasks.create(subject: task_description(notification), start_at: Time.now,
                                      activity_type: _('Thank'), notification_id: notification.id)
     task.activity_contacts.create(contact_id: contact.id)
     task
   end
 
-  def task_description(contact)
-    _("%{contact_name} just gave a Special Gift. Send them a Thank You.") %
-      { contact_name: contact.name }
+  def task_description(notification)
+    _("%{contact_name} gave a Special Gift on %{date}. Send them a Thank You.") %
+      { contact_name: notification.contact.name, date: notification.donation.donation_date.localize.to_s }
   end
 
 end
