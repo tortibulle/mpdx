@@ -31,15 +31,15 @@ class NotificationType::StoppedGiving < NotificationType
 
   def create_task(account_list, notification)
     contact = notification.contact
-    task = account_list.tasks.create(subject: task_description(contact), start_at: Time.now,
+    task = account_list.tasks.create(subject: task_description(notification), start_at: Time.now,
                                      activity_type: _('Call'), notification_id: notification.id)
     task.activity_contacts.create(contact_id: contact.id)
     task
   end
 
-  def task_description(contact)
+  def task_description(notification)
     _("%{contact_name} seems to have missed a gift. Call to follow up.") %
-      { contact_name: contact.name }
+      { contact_name: notification.contact.name }
   end
 
 end
