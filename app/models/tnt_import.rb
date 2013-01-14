@@ -24,7 +24,11 @@ class TntImport
   def xml
     unless @xml
       @xml = read_xml(@import.file.file.file)
-      @xml = @xml['Database']['Tables'] if @xml.present?
+       if @xml.present? && @xml['Database']
+         @xml = @xml['Database']['Tables']
+       else
+         @xml = nil
+       end
     end
     @xml
   end

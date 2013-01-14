@@ -2,16 +2,15 @@ class TntImportValidator < ActiveModel::Validator
   include ActionView::Helpers::UrlHelper
   def validate(import)
     if import.file.file
-      #tnt_import = TntImport.new(import)
+      tnt_import = TntImport.new(import)
 
-      #lines = tnt_import.read_xml(import.file.file.file)
+      xml = tnt_import.xml
 
-      ## Make sure required columns are present
-      #unless (lines.headers & TntImport.required_columns).length == TntImport.required_columns.length
-        #import.errors[:base] << _('You need to export all the available fields from TNT. Also make sure you export as a .csv, not the Excel option. If you continue to have issues, make sure you have watched %{link}, then send us an email to %{email} with a copy of your .csv file') %
-          #{ link: link_to('http://youtu.be/hyixke_5Qew', 'http://youtu.be/hyixke_5Qew', target: '_blank'),
-            #email: mail_to('support@mpdx.org','support@mpdx.org') }
-      #end
+      # Make sure required columns are present
+      unless xml
+        import.errors[:base] << _('The file you uploaded is not a valid Tnt export. %{link}') %
+          { link: link_to(_('Please watch this video to see how to properly export from TntMPD.'), 'http://screencast.com/t/CU4y51KbRMkr', target: '_blank')}
+      end
     else
       import.errors[:base] << _('Please choose a file that ends with .xml')
     end
