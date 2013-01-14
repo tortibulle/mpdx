@@ -4,7 +4,7 @@ class MailChimpAccount < ActiveRecord::Base
   include Async
   include Sidekiq::Worker
   sidekiq_options queue: :general
-  
+
   List = Struct.new(:id, :name)
 
   belongs_to :account_list
@@ -57,36 +57,48 @@ class MailChimpAccount < ActiveRecord::Base
   end
 
   def queue_export_to_primary_list
-    async(:subscribe_contacts)
+    async(:call_mailchimp, :subscribe_contacts)
   end
 
 
   def queue_subscribe_contact(contact)
-    async(:subscribe_contacts, contact.id)
+    async(:call_mailchimp, :subscribe_contacts, contact.id)
   end
 
   def queue_subscribe_person(person)
-    async(:subscribe_person, person.id)
+    async(:call_mailchimp, :subscribe_person, person.id)
   end
 
   def queue_unsubscribe_email(email)
-    async(:unsubscribe_email, email)
+    async(:call_mailchimp, :unsubscribe_email, email)
   end
 
   def queue_update_email(old_email, new_email)
-    async(:update_email, old_email, new_email)
+    async(:call_mailchimp, :update_email, old_email, new_email)
   end
 
 
   def queue_unsubscribe_contact(contact)
     contact.people.each do |person|
       person.email_addresses.each do |email_address|
-        async(:unsubscribe_email, email_address.email)
+        async(:call_mailchimp, :unsubscribe_email, email_address.email)
       end
     end
   end
 
   private
+
+  def call_mailchimp(method, *args)
+    if active?
+      begin
+        send(method, *args)
+      rescue Gibbon::MailChimpError => e
+        raise e unless e.message.include?('API Key Disabled')
+        update_column(:active, false)
+        AccountMailer.invalid_mailchimp_key(account_list).deliver
+      end
+    end
+  end
 
   def update_email(old_email, new_email)
     gb.list_update_member(id: primary_list_id, email_address: old_email, merge_vars: { EMAIL: new_email })
