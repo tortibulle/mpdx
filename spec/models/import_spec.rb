@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Import do
   before(:each) do
-    @tnt_import = double('tnt_import', import: true, read_xml: {})
+    @tnt_import = double('tnt_import', import: true, xml: {'Database' => {'Tables' => []}})
     TntImport.stub(:new).and_return(@tnt_import)
   end
 
