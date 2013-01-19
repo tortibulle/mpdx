@@ -15,6 +15,8 @@ class AccountList < ActiveRecord::Base
   include Sidekiq::Worker
   sidekiq_options queue: :import
 
+  store :settings, accessors: [:monthly_goal]
+
   belongs_to :creator, class_name: 'User', foreign_key: 'creator_id'
   has_many :account_list_users, dependent: :destroy
   has_many :users, through: :account_list_users
@@ -181,9 +183,10 @@ class AccountList < ActiveRecord::Base
       pledge_frequency = contact.pledge_frequency
       pledge_amount = contact.pledge_amount
 
-      if latest_donation.channel == 'Recurring' ||
-         gifts[1..2].all? { |d| d.amount == latest_donation.amount &&
-                                  d.donation_date > latest_donation.donation_date - 4.months }
+      if latest_donation.donation_date.to_time > 2.months.ago &&
+         (latest_donation.channel == 'Recurring' ||
+          gifts[1..2].all? { |d| d.amount == latest_donation.amount &&
+                                 d.donation_date > latest_donation.donation_date - 4.months })
         status = 'Partner - Financial'
         pledge_frequency = 1 unless contact.pledge_frequency
         pledge_amount = latest_donation.amount unless contact.pledge_amount.to_i > 0

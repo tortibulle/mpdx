@@ -26,6 +26,15 @@
 
       <br />
 
+      <h3><%= _('Account Settings') %></h3>
+
+      <div class="field">
+        <%= f.label :monthly_goal, _('Monthly goal') %>
+        <%= f.text_field :monthly_goal %>
+      </div>
+
+      <br />
+
       <h3><%= _('Notifications / Alerts') %></h3>
       <p><%= _("Based on an analysis of a partner's giving history, MPDX can notify you of events that you will probably want to follow up on. The detection logic
                 is based on a set of rules that are right most of the time, but you will still want to verify an event manually before contacting the partner.<br><br>
