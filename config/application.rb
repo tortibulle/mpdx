@@ -56,7 +56,8 @@ module Mpdx
     #config.log_tags = [ :uuid, :remote_ip ]
 
     # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
-    config.assets.precompile += [/(?:\/|\\|\A).*\.css/]
+    #config.assets.precompile += [/(?:\/|\\|\A).*\.css/]
+    config.assets.precompile += [/^[a-z0-9]\w+.(css|js)$/]
   end
 end
 
