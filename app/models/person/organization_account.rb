@@ -65,7 +65,12 @@ class Person::OrganizationAccount < ActiveRecord::Base
 
       ending_donation_count = user.designation_profiles.where(organization_id: organization_id).collect(&:designation_accounts).flatten.sum { |da| da.donations.count }
 
-      update_column(:last_download, Time.now) if ending_donation_count - starting_donation_count > 0
+      if ending_donation_count - starting_donation_count > 0
+        # If this is the first time downloading, update the financial status of partners
+        account_list.update_partner_statuses if last_download.nil?
+
+        update_column(:last_download, Time.now)
+      end
     ensure
       update_attributes({downloading: false, locked_at: nil}, without_protection: true)
     end
