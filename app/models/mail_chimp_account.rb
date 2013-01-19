@@ -37,6 +37,7 @@ class MailChimpAccount < ActiveRecord::Base
   end
 
   def validate_key
+    return false unless api_key.present?
     begin
       @list_response ||= gb.lists
       self.active = true

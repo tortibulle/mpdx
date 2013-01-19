@@ -3,7 +3,7 @@
   <div class="wpp">
     <%= image_tag('logos/mailchimp_logo.png') %><br />
 
-    <% if !@mail_chimp_account.active? && !@mail_chimp_account.validate_key  %>
+    <% if @mail_chimp_account.api_key && !@mail_chimp_account.active? && !@mail_chimp_account.validate_key  %>
       <%#Invalid api key%>
       <%= @mail_chimp_account.validation_error %><br /><br />
     <% end %>

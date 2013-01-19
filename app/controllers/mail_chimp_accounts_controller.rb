@@ -2,7 +2,7 @@ class MailChimpAccountsController < ApplicationController
   before_filter :get_mail_chimp_account
 
   def index
-    
+
     @mail_chimp_account.validate_key if current_account_list.mail_chimp_account
 
     unless @mail_chimp_account.active?
@@ -65,7 +65,7 @@ class MailChimpAccountsController < ApplicationController
 
 
   def get_mail_chimp_account
-    @mail_chimp_account = current_account_list.mail_chimp_account || 
+    @mail_chimp_account = current_account_list.mail_chimp_account ||
                           current_account_list.build_mail_chimp_account
 
   end

@@ -20,7 +20,7 @@ class AccountsController < ApplicationController
       unless user_signed_in?
         session[:signed_in_with] = params[:provider]
         sign_in(User.from_omniauth(provider, request.env['omniauth.auth']))
-        session[:user_return_to] = '/'
+        session[:user_return_to] ||= '/'
 
         # queue up data imports
         current_user.queue_imports
