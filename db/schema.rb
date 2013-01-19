@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130111164215) do
+ActiveRecord::Schema.define(:version => 20130119193907) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -403,8 +403,9 @@ ActiveRecord::Schema.define(:version => 20130111164215) do
   create_table "notification_types", :force => true do |t|
     t.string   "type"
     t.text     "description"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",            :null => false
+    t.datetime "updated_at",            :null => false
+    t.text     "description_for_email"
   end
 
   create_table "notifications", :force => true do |t|

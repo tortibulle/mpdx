@@ -1,7 +1,0 @@
-<% @notifications_by_type.each do |type, notifications| %>
-<%= type.description %>:
-<% notifications.sort_by { |n| n.contact.name  }.each do |notification| %>
-* <%= type.task_description(notification) %>
-<% end %>
-
-<% end %>

@@ -1,0 +1,9 @@
+<% @notifications_by_type.each do |type, notifications| %>
+  <p><%= type.description_for_email %></p>
+  <ul>
+  <% notifications.sort_by { |n| n.contact.name  }.each do |notification| %>
+    <li><%= type.task_description(notification) %></li>
+  <% end %>
+  </ul>
+  <br/><br/>
+<% end %>

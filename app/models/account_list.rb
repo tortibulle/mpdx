@@ -178,18 +178,22 @@ class AccountList < ActiveRecord::Base
 
       next unless latest_donation
 
+      pledge_frequency = contact.pledge_frequency
+      pledge_amount = contact.pledge_amount
+
       if latest_donation.channel == 'Recurring' ||
          gifts[1..2].all? { |d| d.amount == latest_donation.amount &&
                                   d.donation_date > latest_donation.donation_date - 4.months }
         status = 'Partner - Financial'
-        pledge_frequency = 1
+        pledge_frequency = 1 unless contact.pledge_frequency
+        pledge_amount = latest_donation.amount unless contact.pledge_amount.to_i > 0
       else
         status = 'Partner - Special'
-        pledge_frequency = nil
       end
 
       # Re-query the contact to make it not read-only from the join
-      Contact.find(contact.id).update_attributes(status: status, pledge_frequency: pledge_frequency)
+      # (there are other ways to handle that, but this one was easy)
+      Contact.find(contact.id).update_attributes(status: status, pledge_frequency: pledge_frequency, pledge_amount: pledge_amount)
     end
   end
 
