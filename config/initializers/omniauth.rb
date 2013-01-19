@@ -1,4 +1,4 @@
-OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE 
+OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 OmniAuth.config.full_host = 'http://' + ActionMailer::Base.default_url_options[:host]
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :twitter, APP_CONFIG['twitter_key'], APP_CONFIG['twitter_secret']
@@ -7,4 +7,5 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   provider :google_oauth2, APP_CONFIG['google_key'], APP_CONFIG['google_secret'], :name => 'google', :scope => 'userinfo.email,userinfo.profile,https://mail.google.com/mail/feed/atom/,https://www.google.com/m8/feeds/'
   provider :cas, name: 'relay', host: 'signin.relaysso.org/cas'
   provider :cas, name: 'key', host: 'thekey.me/cas'
+  provider :cas, name: 'admin', host: 'signin.relaysso.org/cas'
 end

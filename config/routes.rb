@@ -1,6 +1,19 @@
 require 'sidekiq/web'
 Mpdx::Application.routes.draw do
 
+  ActiveAdmin.routes(self)
+
+  devise_for :admin_users, ActiveAdmin::Devise.config
+
+  namespace :admin do
+    resources :sessions do
+      collection do
+        get "failure"
+        get "no_access"
+      end
+    end
+  end
+
   resources :notifications
 
   resources :account_lists, only: :update
@@ -76,29 +89,14 @@ Mpdx::Application.routes.draw do
 
   match 'monitors/lb' => 'monitors#lb'
 
-  # The priority is based upon order of creation:
-  # first created -> highest priority.
-
-
-  # Sample of named route:
-  #   match 'products/:id/purchase' => 'catalog#purchase', :as => :purchase
-  # This route can be invoked with purchase_url(:id => product.id)
-
-  # Sample resource route within a namespace:
-  #   namespace :admin do
-  #     # Directs /admin/products/* to Admin::ProductsController
-  #     # (app/controllers/admin/products_controller.rb)
-  #     resources :products
-  #   end
-
-  # You can have the root of your site routed with "root"
+  match '/auth/admin/callback', to: 'admin::sessions#create'
   match '/auth/:provider/callback', to: 'accounts#create'
   match '/auth/failure', to: 'accounts#failure'
 
-constraint = lambda { |request| request.env["warden"].authenticate? and ['Starcher'].include?(request.env['warden'].user.last_name) }
-constraints constraint do
-  mount Sidekiq::Web => '/sidekiq'
-end
+  constraint = lambda { |request| request.env["warden"].authenticate? and ['Starcher'].include?(request.env['warden'].user.last_name) }
+  constraints constraint do
+    mount Sidekiq::Web => '/sidekiq'
+  end
 
   root :to => 'home#index'
 

@@ -16,6 +16,7 @@ group :assets do
   gem 'jquery-ui-rails', '~> 3.0.0'
 end
 
+gem 'activeadmin'
 gem 'active_model_serializers', git: 'git://github.com/rails-api/active_model_serializers.git'
 gem 'acts-as-taggable-on', '~> 2.3.3'
 gem 'airbrake', '~> 3.1.6'

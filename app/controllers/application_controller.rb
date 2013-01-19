@@ -134,4 +134,15 @@ class ApplicationController < ActionController::Base
   end
   helper_method :tag_params
 
+  def authenticate_admin_user!
+    unless admin_user_signed_in?
+      session[:user_return_to] = request.fullpath
+      redirect_to '/auth/admin'
+      return false
+    end
+  end
+
+  def auth_hash
+    request.env['omniauth.auth']
+  end
 end
