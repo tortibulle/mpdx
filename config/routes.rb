@@ -93,7 +93,11 @@ Mpdx::Application.routes.draw do
   match '/auth/:provider/callback', to: 'accounts#create'
   match '/auth/failure', to: 'accounts#failure'
 
-  constraint = lambda { |request| request.env["warden"].authenticate? and ['Starcher'].include?(request.env['warden'].user.last_name) }
+  constraint = lambda { |request| request.env["rack.session"] and
+                                  request.env["rack.session"]["warden.user.user.key"] and
+                                  request.env["rack.session"]["warden.user.user.key"][0] and
+                                  request.env["rack.session"]["warden.user.user.key"][1] and
+                                  ['Starcher'].include?(request.env["rack.session"]["warden.user.user.key"][0].constantize.find(request.env["rack.session"]["warden.user.user.key"][1].first).last_name) }
   constraints constraint do
     mount Sidekiq::Web => '/sidekiq'
   end
