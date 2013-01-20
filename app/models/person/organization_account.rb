@@ -7,7 +7,7 @@ class Person::OrganizationAccount < ActiveRecord::Base
   include Async
   include Sidekiq::Worker
   sidekiq_options queue: :import
-  
+
   serialize :password, Encryptor.new
 
   has_many :designation_profiles
@@ -78,6 +78,10 @@ class Person::OrganizationAccount < ActiveRecord::Base
 
   def set_valid_credentials
     self.valid_credentials = true
+  end
+
+  def account_list
+    AccountList.where(designation_profile_id: designation_profile.id).first
   end
 
   # The purpose of this method is to transparently share one account list between two spouses.

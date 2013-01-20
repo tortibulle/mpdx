@@ -191,13 +191,17 @@ class DataServer
     end
 
     # This csv should always only have one line (besides the headers)
-    CSV.new(response, headers: :first_row).each do |line|
-      balance[:designation_numbers] = line['EMPLID'].split(',').collect {|e| e.gsub('"','')}
-      balance[:account_names] = line['ACCT_NAME'].split('\n')
-      balance_match = line['BALANCE'].match(/([-]?\d+\.?\d*)/)
-      balance[:balance] = balance_match[0] if balance_match
-      balance[:date] = line['EFFDT'] ? DateTime.strptime(line['EFFDT'], "%Y-%m-%d %H:%M:%S") : Time.now
-      break
+    begin
+      CSV.new(response, headers: :first_row).each do |line|
+        balance[:designation_numbers] = line['EMPLID'].split(',').collect {|e| e.gsub('"','')}
+        balance[:account_names] = line['ACCT_NAME'].split('\n')
+        balance_match = line['BALANCE'].match(/([-]?\d+\.?\d*)/)
+        balance[:balance] = balance_match[0] if balance_match
+        balance[:date] = line['EFFDT'] ? DateTime.strptime(line['EFFDT'], "%Y-%m-%d %H:%M:%S") : Time.now
+        break
+      end
+    rescue NoMethodError
+      raise response.inspect
     end
     balance
   end
