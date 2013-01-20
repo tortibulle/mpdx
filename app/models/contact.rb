@@ -123,8 +123,7 @@ class Contact < ActiveRecord::Base
   end
 
   def monthly_pledge
-    return 0 unless pledge_frequency.to_i > 0
-    pledge_amount.to_f / pledge_frequency
+    pledge_amount.to_f / (pledge_frequency || 1)
   end
 
   def send_email_letter?

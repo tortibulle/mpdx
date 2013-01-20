@@ -2,7 +2,7 @@
    @by_month_index = 12.downto(0).collect {|i| i.months.ago.to_date.beginning_of_month}
 
    monthly_goal =  13.times.collect { current_account_list.monthly_goal }
-   pledges = current_account_list.contacts.financial_partners.sum(:pledge_amount) %>
+   pledges = current_account_list.contacts.financial_partners.sum(&:monthly_pledge).to_i %>
 
 <script type="text/javascript" charset="utf-8">
   var chart;
@@ -24,7 +24,7 @@
         '#B5CA92'
       ],
       title: {
-        text: '<%= _('Donation History') %>'
+        text: ''
       },
       xAxis: {
         categories: [
