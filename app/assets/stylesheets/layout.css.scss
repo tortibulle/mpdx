@@ -715,10 +715,24 @@ div.name {font-size: 14px; margin-bottom: 4px;}
     padding: 10px;
     background: $white;
   }
+  .nohide {
+    border: 2px solid gray;
+    border-top: none;
+    padding: 10px;
+    background: $white;
+  }
+  .floating {
+    border-top:2px solid;
+  }
   .notice {
     border-color: green;
     color: green;
     background: #def8cf;
+  }
+  .info {
+    border-color: $blue;
+    color: $blue;
+    background: $blue_light;
   }
   .alert {
     border-color: red;
