@@ -2,7 +2,8 @@
    @by_month_index = 12.downto(0).collect {|i| i.months.ago.to_date.beginning_of_month}
 
    monthly_goal =  13.times.collect { current_account_list.monthly_goal }
-   pledges = current_account_list.contacts.financial_partners.sum(&:monthly_pledge).to_i %>
+   pledges = current_account_list.contacts.financial_partners.sum(&:monthly_pledge).to_i 
+   monthly_average = (current_account_list.donations.where("donation_date >= ?", 12.months.ago.beginning_of_month).sum(:amount) / 13).to_i%>
 
 <script type="text/javascript" charset="utf-8">
   var chart;
@@ -59,6 +60,10 @@
       },{
         name: '<%= _('Monthly Goal') %>',
         data: [<%= 0.upto(12).collect { current_account_list.monthly_goal }.join(',') %>],
+        type: 'line'
+      },{
+        name: '<%= _('Monthly Average') %>',
+        data: [<%= 0.upto(12).collect { monthly_average }.join(',') %>],
         type: 'line'
       }]
     });
