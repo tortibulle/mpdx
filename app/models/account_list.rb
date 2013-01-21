@@ -28,7 +28,6 @@ class AccountList < ActiveRecord::Base
   has_many :people, through: :contacts
   has_many :master_people, through: :people
   has_many :donor_accounts, through: :contacts
-  has_many :donations, through: :donor_accounts, :select => 'distinct donations.*'
   has_many :company_partnerships, dependent: :destroy
   has_many :companies, through: :company_partnerships
   has_many :tasks
@@ -87,6 +86,10 @@ class AccountList < ActiveRecord::Base
     contacts.order('total_donations desc')
     .where('total_donations > 0')
     .limit(10)
+  end
+
+  def donations
+    Donation.where(donor_account_id: donor_account_ids, designation_account_id: designation_account_ids)
   end
 
   # Download all donations / info for all accounts associated with this list
