@@ -10,7 +10,7 @@
         <%= render 'donations_summary_chart' %>
       <% end %>
     <% else %>
-      <%= link_to(preferences_path(:anchor => "preference_set_monthly_goal")) do %>
+      <%= link_to(preferences_path(:focus => "preference_set_monthly_goal")) do %>
         <div class="mwrap">
           <div class="nohide floating info">
             <%= _('Click here to set your monthly goal, after which we will show you a pretty graph of your donations') %>

@@ -179,3 +179,7 @@ $.set_param = (key, value) ->
   params[key] = value
   console.log(params)
   $.param(params)
+
+$(document).ready ->
+  element = $.deparam(location.search).focus
+  $('#' + element).focus() if element
