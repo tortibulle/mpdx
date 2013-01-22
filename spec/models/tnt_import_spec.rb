@@ -9,6 +9,7 @@ describe TntImport do
   let(:task_contact_rows) { Array.wrap(import.read_xml(tnt_import.file.file.file)['Database']['Tables']['TaskContact']['row']) }
   let(:history_rows) { Array.wrap(import.read_xml(tnt_import.file.file.file)['Database']['Tables']['History']['row']) }
   let(:history_contact_rows) { Array.wrap(import.read_xml(tnt_import.file.file.file)['Database']['Tables']['HistoryContact']['row']) }
+  let(:property_rows) { Array.wrap(import.read_xml(tnt_import.file.file.file)['Database']['Tables']['Property']['row']) }
 
   context '#import_contacts' do
     it 'associates referrals' do
@@ -112,6 +113,33 @@ describe TntImport do
 
   end
 
+  context '#import_settings' do
+    it "updates monthly goal" do
+      import.should_receive(:create_or_update_mailchimp).and_return
+
+      expect {
+        import.send(:import_settings)
+      }.to change(tnt_import.account_list, :monthly_goal).from(nil).to('6300')
+    end
+  end
+
+  context '#create_or_update_mailchimp' do
+
+    it 'creates a mailchimp account' do
+      expect {
+        import.send(:create_or_update_mailchimp, '1', '2')
+      }.to change(MailChimpAccount, :count).by(1)
+    end
+
+    it 'updates a mailchimp account' do
+      tnt_import.account_list.create_mail_chimp_account(api_key: '5', primary_list_id: '6')
+
+      expect {
+        import.send(:create_or_update_mailchimp, '1', '2')
+      }.to change(tnt_import.account_list.mail_chimp_account, :api_key).from('5').to('2')
+    end
+
+  end
 
   context '#import' do
     it 'performs an import' do
@@ -119,6 +147,7 @@ describe TntImport do
       import.should_receive(:import_contacts).and_return
       import.should_receive(:import_tasks).and_return
       import.should_receive(:import_history).and_return
+      import.should_receive(:import_settings).and_return
       import.import
     end
   end

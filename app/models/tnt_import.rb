@@ -40,6 +40,7 @@ class TntImport
       tnt_contacts = import_contacts
       import_tasks(tnt_contacts)
       import_history(tnt_contacts)
+      import_settings
     end
 
   ensure
@@ -150,6 +151,34 @@ class TntImport
     end
 
     tnt_history
+  end
+
+  def import_settings
+    Array.wrap(xml['Property']['row']).each do |row|
+      case row['PropName']
+      when 'MonthlySupportGoal'
+        @account_list.monthly_goal = row['PropValue'] if @import.override? || @account_list.monthly_goal.blank?
+      when 'MailChimpListId'
+        @mail_chimp_list_id = row['PropValue']
+      when 'MailChimpAPIKey'
+        @mail_chimp_key = row['PropValue']
+      end
+
+      create_or_update_mailchimp(@mail_chimp_list_id, @mail_chimp_key) if @mail_chimp_list_id && @mail_chimp_key
+    end
+    @account_list.save
+  end
+
+  def create_or_update_mailchimp(mail_chimp_list_id, mail_chimp_key)
+    if @account_list.mail_chimp_account
+      if @import.override?
+        @account_list.mail_chimp_account.update_attributes(api_key: mail_chimp_key,
+                                                           primary_list_id: mail_chimp_list_id)
+      end
+    else
+      @account_list.create_mail_chimp_account(api_key: mail_chimp_key,
+                                              primary_list_id: mail_chimp_list_id)
+    end
   end
 
   def update_contact(contact, row)

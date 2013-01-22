@@ -321,115 +321,15 @@ State, CA  12345</HomeAddressBlock>
         <PropName>MonthlySupportGoal</PropName>
         <PropValue>6300</PropValue>
       </row>
-      <row id="-1727062327">
-        <LastEdit>2004-05-19 09:41:13</LastEdit>
-        <PropName>OrgName</PropName>
-        <PropValue>Campus Crusade for Christ</PropValue>
-      </row>
-      <row id="-1206643896">
-        <LastEdit>2004-05-02 18:16:21</LastEdit>
-        <PropName>DefaultCountryID</PropName>
-        <PropValue>840</PropValue>
-      </row>
-      <row id="-989588033">
-        <LastEdit>2004-05-19 09:41:13</LastEdit>
-        <PropName>LastLoginProfileID</PropName>
-        <PropValue>506255555</PropValue>
-      </row>
-      <row id="-798231460">
-        <LastEdit>2004-08-21 18:30:16</LastEdit>
-        <PropName>ThankFirstGift</PropName>
-        <PropValue>0</PropValue>
-      </row>
-      <row id="-785601838">
-        <LastEdit>2005-08-08 09:41:57</LastEdit>
-        <PropName>FirstDayOfMPDWeek</PropName>
-        <PropValue>7</PropValue>
-      </row>
-      <row id="-727841683">
-        <LastEdit>2004-05-02 18:16:21</LastEdit>
-        <PropName>MailingFromCountryID</PropName>
-        <PropValue>840</PropValue>
-      </row>
-      <row id="-615484335">
-        <LastEdit>2004-08-19 12:08:28</LastEdit>
-        <PropName>DbPropLink.DBID</PropName>
-        <PropValue>104765555</PropValue>
-      </row>
-      <row id="-613978564">
-        <LastEdit>2006-12-19 20:55:50</LastEdit>
-        <PropName>DefaultExportFields</PropName>
-        <PropValue>FullName,Greeting,MailingStreetAddress,MailingCity,MailingState,MailingPostalCode</PropValue>
-      </row>
-      <row id="-610326034">
-        <LastEdit>2004-08-21 18:30:16</LastEdit>
-        <PropName>ThankExtraGift</PropName>
-        <PropValue>0</PropValue>
-      </row>
-      <row id="42092228">
-        <LastEdit>2012-11-14 11:20:23</LastEdit>
-        <PropName>LastCompactDate</PropName>
-        <PropValue>41227</PropValue>
-      </row>
-      <row id="210510367">
-        <LastEdit>2005-08-08 09:41:58</LastEdit>
-        <PropName>TntMPD_Pro</PropName>
-        <PropValue>1</PropValue>
-      </row>
-      <row id="259768818">
-        <LastEdit>2004-05-19 09:41:13</LastEdit>
-        <PropName>OrgAbbrev</PropName>
-        <PropValue>CCC</PropValue>
-      </row>
-      <row id="269116797">
-        <LastEdit>2011-12-16 15:25:09</LastEdit>
-        <PropName>InitialLookupType</PropName>
-        <PropValue>EVERYONE</PropValue>
-      </row>
-      <row id="567524820">
-        <LastEdit>2004-05-02 18:16:31</LastEdit>
-        <PropName>WelcomeScreen</PropName>
-        <PropValue>1</PropValue>
-      </row>
-      <row id="576841793">
-        <LastEdit>2012-08-16 11:44:00</LastEdit>
-        <PropName>MailChimpLastSyncDate</PropName>
-        <PropValue>41137</PropValue>
-      </row>
-      <row id="590548395">
-        <LastEdit>2004-08-21 18:30:16</LastEdit>
-        <PropName>ThankLongTermPledgeMonths</PropName>
-        <PropValue>24</PropValue>
-      </row>
       <row id="910724045">
         <LastEdit>2012-08-16 11:42:22</LastEdit>
         <PropName>MailChimpListId</PropName>
         <PropValue>c2d7f555554</PropValue>
       </row>
-      <row id="1173418757">
-        <LastEdit>2012-08-16 11:42:22</LastEdit>
-        <PropName>MailChimpListName</PropName>
-        <PropValue>Financial Partners</PropValue>
-      </row>
       <row id="1774276494">
         <LastEdit>2012-08-16 11:42:22</LastEdit>
         <PropName>MailChimpAPIKey</PropName>
         <PropValue>jk234lkwjntlkj3n5lk3j3kj-us4</PropValue>
-      </row>
-      <row id="1840023849">
-        <LastEdit>2012-11-21 08:41:51</LastEdit>
-        <PropName>CountryUpdateVersion</PropName>
-        <PropValue>562954254156390</PropValue>
-      </row>
-      <row id="2003064828">
-        <LastEdit>2011-12-16 15:20:00</LastEdit>
-        <PropName>DbPropLink.GUID</PropName>
-        <PropValue>{FE512D6C-C1E1-43D9-8442-55555456456}</PropValue>
-      </row>
-      <row id="2067745523">
-        <LastEdit>2011-12-16 15:19:43</LastEdit>
-        <PropName>Version</PropName>
-        <PropValue>131073</PropValue>
       </row>
     </Property>
     <Region>
