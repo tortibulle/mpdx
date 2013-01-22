@@ -5,7 +5,7 @@ require 'tnt_import_validator'
 class Import < ActiveRecord::Base
   include Async
   include Sidekiq::Worker
-  sidekiq_options queue: :import
+  sidekiq_options queue: :import, retry: false, backtrace: true
 
   belongs_to :user
 
