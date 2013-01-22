@@ -85,6 +85,11 @@
         <%= render 'notices' %>
         <%= yield %>
       </div>
+      <div id="footer">
+        <% if session[:fullsite] == true %>
+        <%= link_to(_('Visit Mobile Version'), '/mobile/') %>
+        <% end %>
+      </div>
     </div>
     <div id="feedback">
       <h2><%= _('Give us feedback!') %></h2>
