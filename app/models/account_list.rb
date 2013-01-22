@@ -131,6 +131,40 @@ class AccountList < ActiveRecord::Base
     end
   end
 
+  # This method checks all of your donors and tries to intelligently determin which partners are regular givers
+  # based on thier giving history.
+  def update_partner_statuses
+    contacts.where(status: nil).joins(:donor_accounts).each do |contact|
+      # If they have a donor account id, they are at least a special donor
+      # If they have given the same amount for the past 3 months, we'll assume they are
+      # a monthly donor.
+      gifts = donations.where(donor_account_id: contact.donor_account_ids,
+                              designation_account_id: designation_account_ids).
+                        order('donation_date desc')
+      latest_donation = gifts[0]
+
+      next unless latest_donation
+
+      pledge_frequency = contact.pledge_frequency
+      pledge_amount = contact.pledge_amount
+
+      if latest_donation.donation_date.to_time > 2.months.ago &&
+         (latest_donation.channel == 'Recurring' ||
+          gifts[1..2].all? { |d| d.amount == latest_donation.amount &&
+                                 d.donation_date > latest_donation.donation_date - 4.months })
+        status = 'Partner - Financial'
+        pledge_frequency = 1 unless contact.pledge_frequency
+        pledge_amount = latest_donation.amount unless contact.pledge_amount.to_i > 0
+      else
+        status = 'Partner - Special'
+      end
+
+      # Re-query the contact to make it not read-only from the join
+      # (there are other ways to handle that, but this one was easy)
+      Contact.find(contact.id).update_attributes(status: status, pledge_frequency: pledge_frequency, pledge_amount: pledge_amount)
+    end
+  end
+
   private
 
   # trigger any notifications for designation accounts in this account list
@@ -168,40 +202,5 @@ class AccountList < ActiveRecord::Base
       end
     end
   end
-
-  # This method checks all of your donors and tries to intelligently determin which partners are regular givers
-  # based on thier giving history.
-  def update_partner_statuses
-    contacts.where(status: nil).joins(:donor_accounts).each do |contact|
-      # If they have a donor account id, they are at least a special donor
-      # If they have given the same amount for the past 3 months, we'll assume they are
-      # a monthly donor.
-      gifts = donations.where(donor_account_id: contact.donor_account_ids,
-                              designation_account_id: designation_account_ids).
-                        order('donation_date desc')
-      latest_donation = gifts[0]
-
-      next unless latest_donation
-
-      pledge_frequency = contact.pledge_frequency
-      pledge_amount = contact.pledge_amount
-
-      if latest_donation.donation_date.to_time > 2.months.ago &&
-         (latest_donation.channel == 'Recurring' ||
-          gifts[1..2].all? { |d| d.amount == latest_donation.amount &&
-                                 d.donation_date > latest_donation.donation_date - 4.months })
-        status = 'Partner - Financial'
-        pledge_frequency = 1 unless contact.pledge_frequency
-        pledge_amount = latest_donation.amount unless contact.pledge_amount.to_i > 0
-      else
-        status = 'Partner - Special'
-      end
-
-      # Re-query the contact to make it not read-only from the join
-      # (there are other ways to handle that, but this one was easy)
-      Contact.find(contact.id).update_attributes(status: status, pledge_frequency: pledge_frequency, pledge_amount: pledge_amount)
-    end
-  end
-
 
 end
