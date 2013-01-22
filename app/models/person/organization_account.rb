@@ -51,6 +51,10 @@ class Person::OrganizationAccount < ActiveRecord::Base
     account_list
   end
 
+  def account_list
+    AccountList.where(designation_profile_id: user.designation_profile_ids).first
+  end
+
   private
   def import_all_data
     return if locked_at
@@ -78,10 +82,6 @@ class Person::OrganizationAccount < ActiveRecord::Base
 
   def set_valid_credentials
     self.valid_credentials = true
-  end
-
-  def account_list
-    AccountList.where(designation_profile_id: designation_profile.id).first
   end
 
   # The purpose of this method is to transparently share one account list between two spouses.
