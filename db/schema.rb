@@ -696,7 +696,7 @@ ActiveRecord::Schema.define(:version => 20130119202905) do
     t.datetime "created_at"
   end
 
+  add_index "versions", ["item_type", "item_id", "related_object_type", "related_object_id", "created_at"], :name => "related_object_index"
   add_index "versions", ["item_type", "item_id"], :name => "index_versions_on_item_type_and_item_id"
-  add_index "versions", ["item_type", "related_object_type", "related_object_id", "created_at"], :name => "related_object_index"
 
 end
