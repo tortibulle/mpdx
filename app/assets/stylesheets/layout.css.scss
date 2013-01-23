@@ -383,6 +383,12 @@ h2.section {
 
 div.name {font-size: 14px; margin-bottom: 4px;}
 
+#tasks_index {
+  table {
+    width: 100%;
+  }
+}
+
 .tasklist {
   .high {
     a.ico_trash {
@@ -529,7 +535,7 @@ div.name {font-size: 14px; margin-bottom: 4px;}
   .checks {width: 10px; line-height: 22px;}
 
   td {
-    padding: 8px 8px;
+    padding: 8px 4px 8px 4px;
     vertical-align: top;
   }
 
@@ -561,13 +567,12 @@ div.name {font-size: 14px; margin-bottom: 4px;}
 
 /* ************************************************************** */
 
-.tasks {
-  td {padding: 0;}
+tbody.tasks {
   td {min-height: 1.5em;}
-  td.check {padding-right: 8px; padding-top: 12px;}
+  td.check {padding-left: 8px; padding-right: 4px; padding-top: 12px; width: 12px}
   td.data {padding-top: 10px; padding-bottom: 10px;}
 
-  tr, tr:nth-child(odd) {background: none; min-height: 2em; display: block; border-top: 1px dotted $gray_mid;}
+  tr, tr:nth-child(odd) {background: none; min-height: 2em; border-top: 1px dotted $gray_mid;}
   tr:first-child {border-top: none;}
   tr .actions {
     /*a {padding-left: 2px}*/
@@ -577,16 +582,16 @@ div.name {font-size: 14px; margin-bottom: 4px;}
   .primary {height: auto; line-height: 1.5em;}
 }
 
-.taskgroup {
+tr.taskgroup {
   background: #EC1C24;
   width: 150px;
   position: relative;
-  margin-left: -18px;
-  padding-left: 25px;
   border: 1px solid #AF1524;
   border-width: 1px 1px 1px 0;
   box-shadow: inset 0 1px 1px rgba(255,255,255,.75);
-  margin-bottom: 1em;
+  td {
+    padding: 8px;
+  }
 }
 
 .taskgroup.orange {background: #F6921E; border-color: #A55E00;}

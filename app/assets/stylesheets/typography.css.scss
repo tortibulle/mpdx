@@ -150,11 +150,11 @@ p:last-child {margin-bottom: 0;}
 .tags,
 #leftmenu ul li .tags {
   a {
-    background: $blue; 
-    color: $white; 
-    display: inline-block; 
+    background: $blue;
+    color: $white;
+    display: inline-block;
     font-weight: normal;
-    height: 18px; 
+    height: 18px;
     font-size: 11px;
     border-radius: 5px;
     line-height: 18px;
@@ -181,17 +181,17 @@ p:last-child {margin-bottom: 0;}
 
 .comment_status {
   background: image-url("comments.png") no-repeat 0 -2px;
-  padding-left: 17px;
+  padding-left: 18px;
   font-size: 10px;
   line-height: 1.5em;
   height: 1.5em;
-  margin-left: 8px;
+  margin-left: 4px;
 }
 
 .translation_missing {
-  color: red; 
-  font-weight: bold; 
-  font-size: 16px; 
+  color: red;
+  font-weight: bold;
+  font-size: 16px;
   text-decoration: blink;
 }
 
@@ -200,14 +200,14 @@ p:last-child {margin-bottom: 0;}
   tr:last-child {border-bottom: 0px;}
   tr td {padding-bottom: 10px; padding-top: 10px;}
   tr:last-child td {padding-bottom: 0px;}
-  
+
   .profilepic {padding-right: 10px;}
   .data {color: $gray;}
   .messagebody {margin-bottom: 5px;}
   .actions a {margin-right: 6px;}
-  
+
   header {margin-bottom: 3px;}
-  
+
 }
 
 .socstatus {

@@ -4,25 +4,55 @@
 
     <h1></h1>
 
-    <table class="tablelist tasks">
+    <% if @overdue.present? %>
+      <table>
+        <thead>
+          <tr class="taskgroup red">
+            <td><input type="checkbox" class="select_all" /></td>
+            <td>
+              <%= render 'actions' %>
+              <%= _('Overdue') %>
+            </td>
+          </tr>
+        </thead>
 
-      <tr class="clear">
-        <td colspan="4"><div class="taskgroup red">Overdue</div></td>
-      </tr>
+        <tbody class="tablelist tasks">
+          <%= render partial: 'task', collection: @overdue %>
+        </tbody>
+      </table>
+    <% end %>
 
-      <%= render partial: 'task', collection: @overdue %>
+    <% if @tomorrow.present? %>
+      <br /><br />
+      <table>
+        <thead>
+          <tr class="taskgroup orange">
+            <td><input type="checkbox" class="select_all" /></td>
+            <td><%= _('Tomorrow') %></td>
+          </tr>
+        </thead>
 
-      <tr class="clear">
-        <td colspan="4"><div class="taskgroup orange">Tomorrow</div></td>
-      </tr>
+        <tbody class="tablelist tasks">
+          <%= render partial: 'task', collection: @tomorrow %>
+        </tbody>
+      </table>
+    <% end %>
 
-      <%= render partial: 'task', collection: @tomorrow %>
+    <% if @upcoming.present? %>
+      <br /><br />
+      <table>
+        <thead>
+          <tr class="taskgroup gray">
+            <td><input type="checkbox" class="select_all" /></td>
+            <td><%= _('Upcoming') %></td>
+          </tr>
+        </thead>
 
-      <tr class="clear">
-        <td colspan="4"><div class="taskgroup gray">Upcoming</div></td>
-      </tr>
-
-      <%= render partial: 'task', collection: @upcoming %>
-    </table>
+        <tbody class="tablelist tasks">
+          <%= render partial: 'task', collection: @upcoming %>
+        </tbody>
+      </table>
+    <% end %>
   </div>
 </div>
+<%= render 'tasks/results_modal' %>

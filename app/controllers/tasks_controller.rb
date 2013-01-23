@@ -8,7 +8,7 @@ class TasksController < ApplicationController
 
     tasks = TaskFilter.new(filters_params).filter(tasks) if filters_params.present?
 
-    @overdue = tasks.overdue
+    @overdue = tasks.overdue.limit(20)
     @tomorrow = tasks.tomorrow
     @upcoming = tasks.upcoming
   end
@@ -113,6 +113,7 @@ class TasksController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to :back }
+      format.js
     end
   end
 

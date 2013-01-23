@@ -3,8 +3,8 @@
 
 .ico_fav {background-position: 50% -610px;}
 .ico_fav_off {background-position: 50% -679px;}
-.ico_edit {background-position: 50% -543px;}
-.ico_trash {background-position: 0 0; background-image: image-url("trash-gray.png") }
+.ico_edit {margin-left: 4px; background-position: 50% -543px;}
+.ico_trash {margin-left: 4px; background-position: 0 0; background-image: image-url("trash-gray.png") }
 .ico_trash:hover {background-position: 0 0; background-image: image-url("trash-blue.png") }
 
 .ico_individual {background-position: 50% -467px;}

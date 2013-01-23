@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  MAX_INT = 9223372036854775807
+
   protect_from_forgery
   before_filter :redirect_to_mobile
   before_filter :ensure_login, :ensure_setup_finished
@@ -144,5 +146,16 @@ class ApplicationController < ActionController::Base
 
   def auth_hash
     request.env['omniauth.auth']
+  end
+
+  def per_page
+    @per_page = params[:per_page]
+    if @per_page == 'All'
+      @per_page =  MAX_INT
+    else
+      @per_page = @per_page.to_i > 0 ? @per_page : 25
+    end
+
+    @per_page.to_i if @per_page
   end
 end

@@ -20,11 +20,8 @@ class ContactsController < ApplicationController
 
       wants.html do
         @contacts = @contacts.includes([{primary_person: :facebook_account}, :tags, :primary_address, {people: :primary_phone_number}])
-        @per_page = params[:per_page]
-        unless @per_page == 'All'
-          @per_page = @per_page.to_i > 0 ? @per_page : 25
-          @contacts = @contacts.page(params[:page]).per_page(@per_page.to_i)
-        end
+
+        @contacts = @contacts.page(params[:page]).per_page(per_page)
       end
 
       wants.csv do

@@ -1,9 +1,11 @@
-<% @by_month = current_account_list.donations.where("donation_date >= ?", 12.months.ago.beginning_of_month).group_by {|r| r.donation_date.beginning_of_month}
+<% @by_month = current_account_list.donations.where("donation_date >= ?", 12.months.ago.utc.beginning_of_month).group_by {|r| r.donation_date.beginning_of_month}
    @by_month_index = 12.downto(0).collect {|i| i.months.ago.to_date.beginning_of_month}
 
    monthly_goal =  13.times.collect { current_account_list.monthly_goal }
    pledges = current_account_list.contacts.financial_partners.sum(&:monthly_pledge).to_i
-   monthly_average = (current_account_list.donations.where("donation_date >= ? AND donation_date < ?", 12.months.ago.beginning_of_month, Date.today.beginning_of_month).sum(:amount) / 12).to_i%>
+   total = 0
+   @by_month.each { |month| month[1].each { |d| total += d.amount if d.donation_date < Date.today.beginning_of_month } }
+   monthly_average = (total / 12).to_i %>
 
 <script type="text/javascript" charset="utf-8">
   var chart;
