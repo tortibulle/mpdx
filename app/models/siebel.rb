@@ -290,7 +290,12 @@ class Siebel < DataServer
                    remote_id: email.id
                  }
     if existing_email = person.email_addresses.detect { |e| e.remote_id == email.id }
-      existing_email.update_attributes(attributes)
+      begin
+        existing_email.update_attributes(attributes)
+      rescue ActiveRecord::RecordNotUnique
+        # If they already have the email address we're trying to update
+        # to, don't do anything
+      end
     else
       EmailAddress.add_for_person(person, attributes)
     end
