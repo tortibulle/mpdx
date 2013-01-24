@@ -4,14 +4,17 @@
 
     <h1></h1>
 
-    <table class="tablelist tasks">
-
-      <tr class="clear">
-        <td colspan="4"><div class="taskgroup orange">Starred</div></td>
-      </tr>
-
-      <%= render partial: 'task', collection: @tasks %>
-
+    <table width="100%">
+      <thead>
+        <tr class="taskgroup orange">
+          <td colspan="100">
+            <%= _('Starred') %>
+          </td>
+        </tr>
+      </thead>
+      <tbody class="tablelist tasks">
+        <%= render partial: 'task', collection: @tasks %>
+      </tbody>
     </table>
   </div>
 </div>

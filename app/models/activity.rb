@@ -16,7 +16,7 @@ class Activity < ActiveRecord::Base
   scope :tomorrow, where("start_at BETWEEN ? AND ?", Time.now, 1.day.from_now).order('start_at')
   scope :upcoming, where("start_at > ?", 1.day.from_now).order('start_at')
   scope :completed, where(completed: true).order('start_at desc')
-  scope :uncompleted, where(completed: false).order('start_at')
+  scope :uncompleted, where(completed: false).order('completed_at desc')
   scope :starred, where(starred: true).order('start_at')
 
 

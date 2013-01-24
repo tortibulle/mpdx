@@ -1,10 +1,37 @@
 $ ->
   if $('#tasks_index')[0]?
+    $(document).on 'click', '[data-behavior=bulk_complete]', ->
+      title = __('Complete Tasks')
+      form = $('#task_result_modal form')
+      form.attr('action', '/tasks/bulk_update')
+      $('#bulk_update_ids').val($.mpdx.updateSelectedTaskIds($(this).closest('table')).join(','))
+
+      # Marking a task off, open the result modal
+      $('#task_result_modal').dialog
+        title: title,
+        resizable: false,
+        modal:'true'
+        buttons: [
+          {
+            text: __('Complete'),
+            click: (e) ->
+              $('#task_result_task_completed').val(true)
+              $('form', this).submit()
+              $(this).dialog("close")
+              $('#page_spinner').dialog(modal: true)
+          },
+          {
+            text: __('Cancel'),
+            click: () ->
+              $(this).dialog("close")
+          }
+        ]
+      false
+
     $(document).on 'click', '[data-behavior=bulk_delete]', ->
       $('#page_spinner').dialog(modal: true)
 
-      table = $(this).closest('table')
-      ids = $.mpdx.updateSelectedTaskIds(table)
+      ids = $.mpdx.updateSelectedTaskIds($(this).closest('table'))
       $.ajax {
         url: '/tasks/bulk_destroy',
         data: {ids: ids},
@@ -32,12 +59,16 @@ $ ->
     false
 
   $(document).on 'click', 'tr.task .fav', ->
-    form = $(this).closest('form')
+    id = $(this).closest('tr').attr('data-id')
+    form = $('#task_result_modal form')
+    form.attr('action', '/tasks/' + id)
+
     field = $('input[name="task[starred]"]', form)
     if $(this).hasClass('ico_fav')
       field.val(false)
     else
       field.val(true)
+    $('select[name="task[result]"]', form).val('')
     form.submit()
     $(this).toggleClass('ico_fav')
     $(this).toggleClass('ico_fav_off')
@@ -47,7 +78,6 @@ $ ->
     id = $(this).attr('data-id')
     form = $('#task_result_modal form')
     form.attr('action', '/tasks/' + id)
-    $('[name=_method]', form).val('put')
 
     if $(this).prop('checked') == false && $('#tasks_history')[0]?
       # Uncomplete a task

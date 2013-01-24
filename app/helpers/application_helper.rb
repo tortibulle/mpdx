@@ -62,5 +62,30 @@ module ApplicationHelper
     current_account_list.contacts.order('contacts.name').select(['contacts.id', 'contacts.name'])
   end
 
+  # Renders a message containing number of displayed vs. total entries.
+  #
+  #   <%= page_entries_info @posts %>
+  #   #-> Displaying posts 6 - 12 of 26 in total
+  #
+  # The default output contains HTML. Use ":html => false" for plain text.
+  def page_entries_info(collection, options = {})
+    if options.fetch(:html, true)
+      b, eb = '<b>', '</b>'
+      sp = '&nbsp;'
+      html_key = '_html'
+    else
+      b = eb = html_key = ''
+      sp = ' '
+    end
+
+    case collection.total_entries
+    when 0, 1; ''
+    else
+       _("Displaying #{b}%{from}#{sp}-#{sp}%{to}#{eb} of #{b}%{count}#{eb}") % {
+        :count => collection.total_entries,
+        :from => collection.offset + 1, :to => collection.offset + collection.length
+      }
+    end
+  end
 
 end

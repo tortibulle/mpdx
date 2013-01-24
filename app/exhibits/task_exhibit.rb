@@ -26,13 +26,4 @@ class TaskExhibit < DisplayCase::Exhibit
     end.join(' ').html_safe
   end
 
-  def date
-    @context.l(start_at.to_date)
-  end
-
-  def time
-   @context.l(start_at.to_time)
-  end
-
-
 end

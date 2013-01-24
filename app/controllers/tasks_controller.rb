@@ -23,6 +23,8 @@ class TasksController < ApplicationController
 
   def history
     @tasks = current_account_list.tasks.completed
+                                       .includes(:contacts, :activity_comments, :tags)
+                                       .page(params[:page]).per_page(per_page)
     case params[:date_range]
     when 'last_month'
       @tasks = @tasks.where('completed_at > ?', 1.month.ago)
@@ -108,13 +110,14 @@ class TasksController < ApplicationController
   end
 
   def bulk_update
-    tasks = current_account_list.tasks.where(id: params[:ids].split(','))
+    tasks = current_account_list.tasks.where(id: params[:bulk_update_ids].split(','))
     attributes_to_update = params[:task].select { |_, v| v.present? }
 
     tasks.update_all(attributes_to_update) if attributes_to_update.present?
 
     respond_to do |format|
       format.html { redirect_to :back }
+      format.js { render text: "document.location = '/tasks'" }
     end
   end
 

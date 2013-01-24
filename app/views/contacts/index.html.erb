@@ -121,13 +121,13 @@
         <% end %>
         <tr>
           <td colspan="10">
-            <%= render 'pagination' %>
+            <%= render 'pagination', objects: @contacts %>
           </td>
         </tr>
         <%= render partial: 'contact', collection: @contacts %>
         <tr>
           <td colspan="10">
-            <%= render 'pagination' %>
+            <%= render 'pagination', objects: @contacts %>
           </td>
         </tr>
       </table>

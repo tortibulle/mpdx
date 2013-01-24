@@ -3,14 +3,14 @@
   <div class="wpp">
 
     <h1></h1>
-
+    <%= render 'pagination', objects: @tasks %>
     <table class="tablelist">
       <thead>
         <tr>
           <th>&nbsp;</th>
           <th><%= _('Contact') %></th>
-          <th><%= _('Date') %></th>
-          <th><%= _('Time') %></th>
+          <th width="60"><%= _('Planned') %></th>
+          <th><%= _('Completed') %></th>
           <th><%= _('Type') %></th>
           <th><%= _('Result') %></th>
           <th><%= _('Description') %></th>
@@ -19,7 +19,7 @@
       </thead>
 
       <tbody>
-        <% @tasks.each do |task| 
+        <% @tasks.each do |task|
           task_exhibit = exhibit(task) %>
           <tr id="<%= dom_id(task) %>">
             <td>
@@ -29,8 +29,8 @@
               <% end %>
             </td>
             <td><%= task_exhibit.contact_links %></td>
-            <td><%= task_exhibit.date %></td>
-            <td><%= task_exhibit.time %></td>
+            <td><%= l(task_exhibit.start_at.to_datetime) %></td>
+            <td><%= l(task_exhibit.completed_at.to_datetime) %></td>
             <td><%= _(task_exhibit.activity_type) %></td>
             <td>
               <% if task.attempted? %>
@@ -49,6 +49,13 @@
           </tr>
         <% end %>
       </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="100">
+            <%= render 'pagination', objects: @tasks %>
+          </td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 </div>

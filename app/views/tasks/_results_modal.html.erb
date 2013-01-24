@@ -1,7 +1,8 @@
 <div id="task_result_modal" style="display:none">
-  <%= form_for Task.new, remote: true, namespace: 'task_result' do |f| %>
+  <%= form_for Task.new, method: :put, remote: true, namespace: 'task_result' do |f| %>
+    <%= hidden_field_tag :bulk_update_ids %>
     <%= _('Result') %>
-    <%= f.select :result, f.object.assignable_results.collect { |s| [_(s), s] } %>
+    <%= f.select :result, f.object.assignable_results.collect { |s| [_(s), s] }.append('') %>
     <%= f.hidden_field :starred %>
     <%= f.hidden_field :completed, value: false%>
   <% end %>
