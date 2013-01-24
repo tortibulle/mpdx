@@ -8,7 +8,7 @@
       <%= render 'activities/activity_contact', builder: builder, object: task, no_remove: task.activity_contacts.length <= 1 %>
     <% end %>
     <div class="sfield field_indent">
-      <div class="rs"><%= link_to_add_fields(t('.add_contact'), f, :activity_contacts, partial: 'activities/activity_contact') %></div>
+      <div class="rs"><%= link_to_add_fields(_('Add Contact'), f, :activity_contacts, partial: 'activities/activity_contact') %></div>
     </div>
   </div>
 

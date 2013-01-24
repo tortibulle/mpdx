@@ -110,7 +110,7 @@ class TasksController < ApplicationController
   end
 
   def bulk_update
-    tasks = current_account_list.tasks.where(id: params[:bulk_update_ids].split(','))
+    tasks = current_account_list.tasks.where(id: params[:bulk_task_update_ids].split(','))
     attributes_to_update = params[:task].select { |_, v| v.present? }
 
     tasks.update_all(attributes_to_update) if attributes_to_update.present?

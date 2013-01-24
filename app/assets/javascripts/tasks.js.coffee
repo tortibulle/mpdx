@@ -4,13 +4,13 @@ $ ->
       title = __('Complete Tasks')
       form = $('#task_result_modal form')
       form.attr('action', '/tasks/bulk_update')
-      $('#bulk_update_ids').val($.mpdx.updateSelectedTaskIds($(this).closest('table')).join(','))
+      $('#bulk_task_update_ids', form).val($.mpdx.getSelectedTaskIds($(this).closest('table')).join(','))
 
       # Marking a task off, open the result modal
       $('#task_result_modal').dialog
         title: title,
         resizable: false,
-        modal:'true'
+        modal:'true',
         buttons: [
           {
             text: __('Complete'),
@@ -22,7 +22,35 @@ $ ->
           },
           {
             text: __('Cancel'),
-            click: () ->
+            click: ->
+              $(this).dialog("close")
+          }
+        ]
+      false
+
+    $(document).on 'click', '[data-behavior=bulk_edit]', ->
+      form = $('#edit_task_modal form')
+      form.attr('action', '/tasks/bulk_update')
+      form.append('<input type="hidden" name="_method" value="put" />')
+      $('select', form).prepend('<option></option>')
+      $('select', form).val('')
+      $('#bulk_task_update_ids', form).val($.mpdx.getSelectedTaskIds($(this).closest('table')).join(','))
+
+      $('#edit_task_modal').dialog
+        resizable: true,
+        modal:'true',
+        width: '400px',
+        buttons: [
+          {
+            text: __('Save'),
+            click: (e) ->
+              $('form', this).submit()
+              $(this).dialog("close")
+              $('#page_spinner').dialog(modal: true)
+          },
+          {
+            text: __('Cancel'),
+            click: ->
               $(this).dialog("close")
           }
         ]
@@ -31,7 +59,7 @@ $ ->
     $(document).on 'click', '[data-behavior=bulk_delete]', ->
       $('#page_spinner').dialog(modal: true)
 
-      ids = $.mpdx.updateSelectedTaskIds($(this).closest('table'))
+      ids = $.mpdx.getSelectedTaskIds($(this).closest('table'))
       $.ajax {
         url: '/tasks/bulk_destroy',
         data: {ids: ids},
@@ -82,6 +110,7 @@ $ ->
     if $(this).prop('checked') == false && $('#tasks_history')[0]?
       # Uncomplete a task
       $('#task_result_task_completed').val(false)
+      $('select[name="task[result]"]', form).val('')
       form.submit()
       $('#task_' + id).fadeOut()
     else
@@ -112,7 +141,7 @@ $ ->
             }
           ]
 
-$.mpdx.updateSelectedTaskIds = (scope) ->
+$.mpdx.getSelectedTaskIds = (scope) ->
   scope ||= $(body)
   ids = []
   $('[name="task_ids[]"]:checked', scope).each ->
