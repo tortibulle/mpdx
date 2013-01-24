@@ -5,15 +5,6 @@ GIT
     country_select (1.0.1)
 
 GIT
-  remote: git://github.com/bploetz/versionist.git
-  revision: 3be9bdb3f67dbe47bad808ade4f0084df1157ac7
-  branch: release-1.0
-  specs:
-    versionist (1.0.0)
-      rails (~> 3.0)
-      yard (~> 0.7)
-
-GIT
   remote: git://github.com/jnicklas/carrierwave.git
   revision: e629c13fa39aaa187d3abf992fdea71cd5059cb4
   specs:
@@ -479,6 +470,9 @@ GEM
       raindrops (~> 0.7)
     vegas (0.1.11)
       rack (>= 1.0.0)
+    versionist (1.0.0)
+      rails (~> 3.0)
+      yard (~> 0.7)
     virtus (0.5.4)
       backports (~> 2.6.1)
       descendants_tracker (~> 0.0.1)
@@ -573,7 +567,7 @@ DEPENDENCIES
   typhoeus (~> 0.5.3)
   uglifier (~> 1.3.0)
   unicorn
-  versionist!
+  versionist
   virtus (~> 0.5.4)
   webmock (~> 1.9.0)
   whenever (~> 0.8.1)

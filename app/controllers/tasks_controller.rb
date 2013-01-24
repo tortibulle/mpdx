@@ -8,7 +8,7 @@ class TasksController < ApplicationController
 
     tasks = TaskFilter.new(filters_params).filter(tasks) if filters_params.present?
 
-    @overdue = tasks.overdue.limit(20)
+    @overdue = tasks.overdue
     @tomorrow = tasks.tomorrow
     @upcoming = tasks.upcoming
   end
@@ -104,6 +104,24 @@ class TasksController < ApplicationController
         format.html { render action: 'edit' }
         format.js { render action: 'edit' }
       end
+    end
+  end
+
+  def bulk_update
+    tasks = current_account_list.tasks.where(id: params[:ids].split(','))
+    attributes_to_update = params[:task].select { |_, v| v.present? }
+
+    tasks.update_all(attributes_to_update) if attributes_to_update.present?
+
+    respond_to do |format|
+      format.html { redirect_to :back }
+    end
+  end
+
+  def bulk_destroy
+    current_account_list.tasks.where(id: params[:ids]).destroy_all
+    respond_to do |format|
+      format.js { render nothing: true }
     end
   end
 

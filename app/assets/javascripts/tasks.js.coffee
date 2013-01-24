@@ -1,11 +1,31 @@
 $ ->
+  if $('#tasks_index')[0]?
+    $(document).on 'click', '[data-behavior=bulk_delete]', ->
+      $('#page_spinner').dialog(modal: true)
+
+      table = $(this).closest('table')
+      ids = $.mpdx.updateSelectedTaskIds(table)
+      $.ajax {
+        url: '/tasks/bulk_destroy',
+        data: {ids: ids},
+        dataType: 'script',
+        type: 'DELETE',
+        success: ->
+          document.location = '/tasks'
+        error: ->
+          $('#page_spinner').dialog('close')
+          alert(__('There was an error deleting your tasks'))
+      }
+      false
+
   $(document).on 'click', '#tasks_index .select_all', ->
     table = $(this).closest('table')
+
     $('input[type=checkbox]', table).prop('checked', $(this).prop('checked'))
     if $(this).prop('checked') == true
-      $('.actions', table).show()
+      $('.taskgroup .actions', table).show()
     else
-      $('.actions', table).hide()
+      $('.taskgroup .actions', table).hide()
 
   $(document).on 'click', '.comment_status', ->
     $('.comments', $(this).closest('tr')).toggle()
@@ -62,3 +82,9 @@ $ ->
             }
           ]
 
+$.mpdx.updateSelectedTaskIds = (scope) ->
+  scope ||= $(body)
+  ids = []
+  $('[name="task_ids[]"]:checked', scope).each ->
+    ids.push($(this).val())
+  ids

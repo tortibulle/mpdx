@@ -59,7 +59,7 @@ gem 'sinatra', :require => nil
 gem 'slim'
 gem 'twitter_cldr', '~> 2.0.0'
 gem 'typhoeus', '~> 0.5.3'
-gem 'versionist', :git => 'git://github.com/bploetz/versionist.git', :branch => 'release-1.0'
+gem 'versionist'
 gem 'virtus', '~> 0.5.4'
 gem 'whenever', '~> 0.8.1'
 gem 'wicked', '~> 0.3.4'

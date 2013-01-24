@@ -66,6 +66,8 @@ Mpdx::Application.routes.draw do
       get :starred
       get :completed
       get :history
+      delete :bulk_destroy
+      put :bulk_update
     end
   end
   resources :people

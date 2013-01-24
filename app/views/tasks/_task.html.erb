@@ -2,7 +2,7 @@
   <tr id="<%= dom_id(task) %>" class="task">
     <td class="check">
       <a name="<%= dom_id(task) %>" />
-      <input type="checkbox" data-behavior="complete_task" data-id="<%= task.id %>" <%= 'disabled="disabled"' if task.attempted? %> <%= 'checked="checked"' if task.completed? %> />
+      <input type="checkbox" name="task_ids[]" value="<%= task.id %>" data-behavior="complete_task" data-id="<%= task.id %>" <%= 'disabled="disabled"' if task.attempted? %> <%= 'checked="checked"' if task.completed? %> />
     </td>
     <td class="data">
       <div class="primary">

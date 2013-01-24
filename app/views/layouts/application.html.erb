@@ -37,7 +37,7 @@
     <div id="mainmenu">
       <div class="outer">
         <div class="item <%= request.path == '/' ? 'active' : '' %>"><%= link_to(_('Dashboard'), "/") %></div>
-        <div class="item <%= request.path =~ /\/contacts/ ? 'active' : '' %>"><%= link_to(_('Contacts'), "/contacts") %></div> 
+        <div class="item <%= request.path =~ /\/contacts/ ? 'active' : '' %>"><%= link_to(_('Contacts'), "/contacts") %></div>
         <!-- <div class="item <%= request.path =~ /\/messages/ ? 'active' : '' %>"><%= link_to((_('Messages') + ' ' + content_tag(:span, 3, class: 'indicator')).html_safe, '') %></div> -->
         <div class="item last <%= request.path =~ /\/tasks/ ? 'active' : '' %>"><%= link_to(_('Tasks'), "/tasks") %></div>
         <!-- <div class="item last <%= request.path =~ /\/social/ ? 'active' : '' %>"><%= link_to(_('Social'), "") %></div> -->
@@ -81,7 +81,7 @@
       <%#</section>%>
       <%#</aside>%>
 
-      <div id="content"> 
+      <div id="content">
         <%= render 'notices' %>
         <%= yield %>
       </div>
@@ -97,6 +97,7 @@
     </div>
 
     <div id="confirmation_modal" title="<%= _('Are you sure?') %>"></div>
+    <div id="page_spinner" title="<%= _('Please Wait') %>" style="display:none"><%= spinner(visible: true) %></div>
   </body>
 
 </html>
