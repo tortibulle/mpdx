@@ -51,6 +51,10 @@ class AccountList < ActiveRecord::Base
     nil
   end
 
+  def monthly_goal=(val)
+    settings[:monthly_goal] = val.gsub(/[^\d\.]/, '').to_i
+  end
+
   def contact_tags
     @contact_tags ||= ActiveRecord::Base.connection.select_values("select distinct(tags.name) from account_lists al inner join contacts c on c.account_list_id = al.id inner join taggings t on t.taggable_id = c.id AND t.taggable_type = 'Contact'
                                             inner join tags on t.tag_id = tags.id where al.id = #{id} order by tags.name")
