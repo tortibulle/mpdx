@@ -21,7 +21,7 @@ class ContactsController < ApplicationController
       wants.html do
         @contacts = @contacts.includes([{primary_person: :facebook_account}, :tags, :primary_address, {people: :primary_phone_number}])
 
-        @contacts = @contacts.page(params[:page]).per_page(per_page)
+        @contacts = @contacts.page(page).per_page(per_page)
       end
 
       wants.csv do

@@ -24,7 +24,7 @@ class TasksController < ApplicationController
   def history
     @tasks = current_account_list.tasks.completed
                                        .includes(:contacts, :activity_comments, :tags)
-                                       .page(params[:page]).per_page(per_page)
+                                       .page(page).per_page(per_page)
     case params[:date_range]
     when 'last_month'
       @tasks = @tasks.where('completed_at > ?', 1.month.ago)

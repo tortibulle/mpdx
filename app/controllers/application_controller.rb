@@ -158,4 +158,12 @@ class ApplicationController < ActionController::Base
 
     @per_page.to_i if @per_page
   end
+
+  def page
+    if params[:per_page] == 'All'
+      1
+    else
+      params[:page]
+    end
+  end
 end
