@@ -107,7 +107,7 @@ $ ->
     form = $('#task_result_modal form')
     form.attr('action', '/tasks/' + id)
 
-    if $(this).prop('checked') == false && $('#tasks_history')[0]?
+    if $(this).prop('checked') == false && ($('#tasks_history')[0]? || $('#history-tab')[0]?)
       # Uncomplete a task
       $('#task_result_task_completed').val(false)
       $('select[name="task[result]"]', form).val('')
