@@ -132,14 +132,10 @@ $.rails.confirmed = (element) ->
   element.removeData('confirm')
   element.trigger('click.rails')
 
-$.deparam = (coerce) ->
-  s = document.location.search
+$.deparam = (param_string) ->
+  s = param_string || document.location.search
   querystring = s.replace( /(?:^[^?#]*\?([^#]*).*$)?.*/, '$1' )
   obj = {}
-  coerce_types =
-    true: not 0
-    false: not 1
-    null: null
 
   $.each querystring.replace(/\+/g, " ").split("&"), (j, v) ->
     param = v.split("=")
@@ -157,7 +153,6 @@ $.deparam = (coerce) ->
       keys_last = 0
     if param.length is 2
       val = decodeURIComponent(param[1])
-      val = (if val and not isNaN(val) then +val else (if val is "undefined" then `undefined` else (if coerce_types[val] isnt `undefined` then coerce_types[val] else val)))  if coerce
       if keys_last
         while i <= keys_last
           key = (if keys[i] is "" then cur.length else keys[i])
@@ -170,14 +165,14 @@ $.deparam = (coerce) ->
           obj[key] = [ obj[key], val ]
         else
           obj[key] = val
-    else obj[key] = (if coerce then `undefined` else "")  if key
+    else obj[key] = "" if key
 
   obj
 
-$.set_param = (key, value) ->
-  params = $.deparam()
+$.set_param = (key, value, params) ->
+  params = '?' + params if params
+  params = $.deparam(params)
   params[key] = value
-  console.log(params)
   $.param(params)
 
 $(document).ready ->

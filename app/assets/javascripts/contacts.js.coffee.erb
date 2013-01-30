@@ -15,7 +15,9 @@ $ ->
 
     if $('#contacts_index')[0]?
       $(document).on 'change', '#per_page', ->
-        document.location = document.location.pathname + '?' + $.set_param('per_page', $(this).val())
+        params = $.set_param('per_page', $(this).val())
+        params = $.set_param('page', 1, params)
+        document.location = document.location.pathname + '?' + params
 
       # quick search for contact
       $('#contact_name').autocomplete({

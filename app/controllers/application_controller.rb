@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  MAX_INT = 9223372036854775807
+  MAX_PER_PAGE = 4294967296
 
   protect_from_forgery
   before_filter :redirect_to_mobile
@@ -151,7 +151,7 @@ class ApplicationController < ActionController::Base
   def per_page
     @per_page = params[:per_page]
     if @per_page == 'All'
-      @per_page =  MAX_INT
+      @per_page =  MAX_PER_PAGE
     else
       @per_page = @per_page.to_i > 0 ? @per_page : 25
     end
