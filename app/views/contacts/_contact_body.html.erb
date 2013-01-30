@@ -61,14 +61,16 @@
                 <td class="meta_data"><%= contact_exhibit.referrer_links %></td>
               </tr>
             <% end %>
-            <tr>
-              <td class="meta_name"><%= _('Tags') %> </td>
-              <td class="meta_data">
-                <div class="tags">
-                  <%= contact_exhibit.tag_links %>
-                </div>
-              </td>
-            </tr>
+            <% if contact.tags.present? %>
+              <tr>
+                <td class="meta_name"><%= _('Tags') %> </td>
+                <td class="meta_data">
+                  <div class="tags">
+                    <%= contact_exhibit.tag_links %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
           </table>
         </div>
         <div class="cols col_30">
@@ -82,83 +84,31 @@
 
       <div id="contact" class="tabgroup">
         <ul>
-          <li><a href="#donations-tab"><%= _('Donations') %></a></li>
           <li><a href="#contact-details"><%= _('Contact Details') %></a></li>
+          <li><a href="#donations-tab"><%= _('Donations') %></a></li>
           <li><a href="#tasks-tab"><%= _('Tasks') %></a></li>
           <li><a href="#history-tab"><%= _('History') %></a></li>
           <li><a href="#notes-tab"><%= _('Notes') %></a></li>
           <li><a href="#stream-tab"><%= _('Social') %></a></li>
         </ul>
 
+        <div id="contact-details">
+          <%= spinner(extra: 'details', visible: true) %>
+          <div id="details"></div>
+        </div>
+
         <div id="donations-tab">
           <%= spinner(extra: 'donations', visible: true) %>
           <div id="donations"></div>
         </div>
 
-        <div id="contact-details">
-          <div class="cols col_50">
-            <table class="meta">
-              <tr>
-                <th colspan="2"><%= _('Address') %></th>
-              </tr>
-              <% contact_exhibit.addresses.each do |address| %>
-                <% exhibit(address, self).tap do |address_exhibit| %>
-                  <tr>
-                    <td class="meta_name"><%= _(address.location) %></td>
-                    <td class="meta_data">
-                      <%= address_exhibit.to_html %>
-                      <br />
-                      <%= link_to(_('Map It'), "http://maps.google.com?q=#{address_exhibit.to_google}", target: '_blank', class: 'mapit') %>
-                    </td>
-                  </tr>
-                <% end %>
-              <% end %>
-            </table>
-          </div>
-
-          <div class="cols col_50">
-            <table class="meta">
-              <tr>
-                <th><%= _('People') %></th>
-              </tr>
-              <tr>
-                <td>
-                  <% contact_exhibit.people.each do |person| %>
-                    <div class="smallperson">
-                      <div class="name"><%= link_to(person, contact_person_path(contact, person)) %></div>
-                      <%= render 'people/contact_details_compact', person: person %>
-                    </div>
-                  <% end %>
-                </td>
-              </tr>
-            </table>
-          </div>
-          <div class="clr"></div>
-
-        </div>
         <div id="tasks-tab">
-          <% contact_exhibit.tasks.uncompleted.tap do |tasks| %>
-            <% if tasks.present? %>
-              <table class="tablelist tasks">
-                <%= render partial: 'tasks/task', collection: tasks %>
-              </table>
-            <% else %>
-              <%= _("You don't have any outstanding tasks for this contact.") %>
-              <%= link_to(_('Create one now.'), new_task_path(contact_id: contact.id)) %>
-            <% end %>
-          <% end %>
+          <%= spinner(extra: 'tasks', visible: true) %>
+          <div id="tasks"></div>
         </div>
         <div id="history-tab">
-          <% contact_exhibit.tasks.completed.tap do |tasks| %>
-            <% if tasks.present? %>
-              <table class="tablelist tasks">
-                <%= render partial: 'tasks/task', collection: tasks %>
-              </table>
-            <% else %>
-              <%= _("You don't have any tasks logged for this contact.") %>
-              <%= link_to(_('Log one now.'), new_task_path(contact_id: contact.id, completed: true)) %>
-            <% end %>
-          <% end %>
+          <%= spinner(extra: 'history', visible: true) %>
+          <div id="history"></div>
         </div>
         <div id="notes-tab">
           <%= form_for contact, remote: true do |f| %>

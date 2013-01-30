@@ -256,17 +256,9 @@ $ ->
           document.location = State.url
 
       $(document).on 'tabsshow', '#contact', (event, ui)->
-        switch ui.tab.hash
-          when '#donations-tab'
-            $.mpdx.loadDonations()
-          when '#stream-tab'
-            $.mpdx.loadSocialStream()
+        $.mpdx.loadTabData(ui.tab.hash)
 
-      switch window.location.hash
-        when '#donations-tab', ''
-          $.mpdx.loadDonations()
-        when '#stream-tab'
-          $.mpdx.loadSocialStream()
+      $.mpdx.loadTabData(window.location.hash)
 
       $(document).on 'click', '.next_page', ->
         $(this).replaceWith('<%= image_tag('spinner.gif', class: 'spinner') %>')
@@ -321,9 +313,62 @@ $ ->
 
     <%#$(document).on 'blur', '[data-behavior*=social-field]', ->%>
       <%#$('[data-behavior=suggestions]', this).hide()%>
+
 $.mpdx.updateSelectedContactIds = ->
   ids = []
   $('[name="contact_ids[]"]:checked').each ->
     ids.push($(this).val())
   $('#selected_ids').val(ids.join(','))
+
+$.mpdx.loadTabData = (hash) ->
+  switch hash
+    when '#contact-details', ''
+      $.mpdx.loadContactDetails()
+    when '#donations-tab'
+      $.mpdx.loadDonations()
+    when '#tasks-tab'
+      $.mpdx.loadContactTasks()
+    when '#history-tab'
+      $.mpdx.loadContactHistory()
+    when '#stream-tab'
+      $.mpdx.loadSocialStream()
+
+$.mpdx.loadContactDetails = ->
+  if $('#details').html() == ''
+    $.ajax {
+      url: '/contacts/' + $('#contentbody').attr('data-contact-id') + '/details',
+      dataType: 'script'
+    }
+
+$.mpdx.loadDonations = ->
+  if $('#donations').html() == ''
+    $.ajax {
+      url: '/donations',
+      data: {contact_id: $('#contentbody').attr('data-contact-id')},
+      dataType: 'script'
+    }
+
+$.mpdx.loadContactTasks = ->
+  if $('#tasks').html() == ''
+    $.ajax {
+      url: '/tasks',
+      data: {filters: {contact_ids: $('#contentbody').attr('data-contact-id')}},
+      dataType: 'script'
+    }
+
+$.mpdx.loadContactHistory = ->
+  if $('#history').html() == ''
+    $.ajax {
+      url: '/tasks/history',
+      data: {date_range: 'all', filters: {contact_ids: $('#contentbody').attr('data-contact-id')}},
+      dataType: 'script'
+    }
+
+$.mpdx.loadSocialStream = ->
+  if $('#social').html() == ''
+    $.ajax {
+      url: '/social_streams',
+      data: {contact_id: $('#contentbody').attr('data-contact-id')},
+      dataType: 'script'
+    }
 

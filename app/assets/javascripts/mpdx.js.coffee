@@ -82,22 +82,6 @@ $.mpdx.activateTabs = ->
       window.location.hash = ui.tab.hash
   })
 
-$.mpdx.loadDonations = ->
-  if $('#donations').html() == ''
-    $.ajax {
-      url: '/donations',
-      data: {contact_id: $('#contentbody').attr('data-contact-id')},
-      dataType: 'script'
-    }
-
-$.mpdx.loadSocialStream = ->
-  if $('#social').html() == ''
-    $.ajax {
-      url: '/social_streams',
-      data: {contact_id: $('#contentbody').attr('data-contact-id')},
-      dataType: 'script'
-    }
-
 # Stub method for translation
 window.__ = (val) ->
   val

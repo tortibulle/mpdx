@@ -57,6 +57,7 @@ Mpdx::Application.routes.draw do
     member do
       get :add_referrals
       post :save_referrals
+      get :details
     end
     resources :people
   end

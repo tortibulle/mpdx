@@ -1,0 +1,40 @@
+<% exhibit(contact, self).tap do |contact_exhibit| %>
+  <div class="cols col_50">
+    <table class="meta">
+      <tr>
+        <th colspan="2"><%= _('Address') %></th>
+      </tr>
+      <% contact_exhibit.addresses.each do |address| %>
+        <% exhibit(address, self).tap do |address_exhibit| %>
+          <tr>
+            <td class="meta_name"><%= _(address.location) %></td>
+            <td class="meta_data">
+              <%= address_exhibit.to_html %>
+              <br />
+              <%= link_to(_('Map It'), "http://maps.google.com?q=#{address_exhibit.to_google}", target: '_blank', class: 'mapit') %>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    </table>
+  </div>
+
+  <div class="cols col_50">
+    <table class="meta">
+      <tr>
+        <th><%= _('People') %></th>
+      </tr>
+      <tr>
+        <td>
+          <% contact_exhibit.people.each do |person| %>
+            <div class="smallperson">
+              <div class="name"><%= link_to(person, contact_person_path(contact, person)) %></div>
+              <%= render 'people/contact_details_compact', person: person %>
+            </div>
+          <% end %>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="clr"></div>
+<% end %>

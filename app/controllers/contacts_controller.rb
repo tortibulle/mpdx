@@ -1,6 +1,6 @@
 class ContactsController < ApplicationController
   respond_to :html, :js
-  before_filter :get_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals]
+  before_filter :get_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals, :details]
   before_filter :setup_filters, only: :index
 
   def index
@@ -37,6 +37,10 @@ class ContactsController < ApplicationController
   end
 
   def show
+    respond_with(@contact)
+  end
+
+  def details
     respond_with(@contact)
   end
 
@@ -215,7 +219,7 @@ class ContactsController < ApplicationController
   private
 
   def get_contact
-    @contact = current_account_list.contacts.includes({people: [:email_addresses, :phone_numbers, :family_relationships]}).find(params[:id])
+    @contact = current_account_list.contacts.includes({people: [:primary_email_address, :primary_phone_number, :email_addresses, :phone_numbers, :family_relationships]}).find(params[:id])
   end
 
   def setup_filters

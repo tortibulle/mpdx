@@ -1,0 +1,12 @@
+$('#spinner_tasks').hide();
+<% if @tasks.blank? %>
+    <% contact = current_account_list.contacts.find(filters_params[:contact_ids]) %>
+    $('#tasks').html('<%= j(_("You don't have any outstanding tasks for this contact. ") + link_to(_('Create one now.'), new_task_path(contact_id: contact.id))) %>');
+<% else %>
+  <% if params[:page] %>
+    $('#tasks_table').append('<%= j(render('tasks/task', collection: @tasks)) %>');
+  <% else %>
+    $('#tasks').html('<%= j(render('tasks/tasks', tasks: @tasks)) %>');
+  <% end %>
+<% end %>
+

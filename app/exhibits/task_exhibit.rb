@@ -17,7 +17,7 @@ class TaskExhibit < DisplayCase::Exhibit
   end
 
   def contact_links
-    contacts.collect { |c| @context.link_to(c.to_s, c) }.join(', ').html_safe
+    contacts.collect { |c| @context.link_to(c.to_s, c) }.join('; ').html_safe
   end
 
   def tag_links

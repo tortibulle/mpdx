@@ -4,13 +4,13 @@ class TasksController < ApplicationController
   respond_to :html, :js
 
   def index
-    tasks = current_account_list.tasks.uncompleted.includes(:contacts, :activity_comments, :tags)
+    @tasks = current_account_list.tasks.uncompleted.includes(:contacts, :activity_comments, :tags)
 
-    tasks = TaskFilter.new(filters_params).filter(tasks) if filters_params.present?
+    @tasks = TaskFilter.new(filters_params).filter(@tasks) if filters_params.present?
 
-    @overdue = tasks.overdue
-    @tomorrow = tasks.tomorrow
-    @upcoming = tasks.upcoming
+    @overdue = @tasks.overdue
+    @tomorrow = @tasks.tomorrow
+    @upcoming = @tasks.upcoming
   end
 
   def starred
@@ -25,6 +25,9 @@ class TasksController < ApplicationController
     @tasks = current_account_list.tasks.completed
                                        .includes(:contacts, :activity_comments, :tags)
                                        .page(page).per_page(per_page)
+
+    @tasks = TaskFilter.new(filters_params).filter(@tasks) if filters_params.present?
+
     case params[:date_range]
     when 'last_month'
       @tasks = @tasks.where('completed_at > ?', 1.month.ago)
