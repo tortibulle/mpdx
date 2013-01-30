@@ -119,7 +119,7 @@ describe TntImport do
 
       expect {
         import.send(:import_settings)
-      }.to change(tnt_import.account_list, :monthly_goal).from(nil).to('6300')
+      }.to change(tnt_import.account_list, :monthly_goal).from(nil).to(6300)
     end
   end
 
