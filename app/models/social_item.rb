@@ -1,23 +1,24 @@
 class SocialItem
   From = Struct.new(:id, :name)
+  To = Struct.new(:id, :name)
   Comment = Struct.new(:id, :from, :message, :created_time)
   Like = Struct.new(:id, :name)
   Action = Struct.new(:name, :link)
   StoryTag = Struct.new(:id, :name, :offset, :length, :type)
   FbApplication = Struct.new(:id, :name, :namespace)
 
-  attr_accessor :id, :from, :message, :picture, :link, :name, :caption, :description, :icon, :story, :story_tags, :type,
+  attr_accessor :id, :from, :to, :message, :picture, :link, :name, :caption, :description, :icon, :story, :story_tags, :type,
                 :status_type, :created_time, :updated_time, :likes, :likes_count, :comments, :comments_count, :application,
                 :object_id
 
-  def initialize(json)
+  def initialize(json, names)
     %w[id message picture object_id type status_type link name caption description icon story].each do |field|
-      send("#{field}=".to_sym, json[field]) if json[field]
+      send("#{field}=".to_sym, json[field]) if json[field].present?
     end
-    @created_time = DateTime.parse(json['created_time'] || json['updated_time'])
-    @updated_time = DateTime.parse(json['updated_time']) if json['updated_time']
+    @created_time = Time.at(json['created_time'])
 
-    @from = From.new(json['from']['id'], json['from']['name'])
+    @from = From.new(json['actor_id'], names[json['actor_id']])
+    @to = To.new(json['target_id'], names[json['target_id']]) if json['target_id'].present?
 
     if json['actions']
       @actions = []
@@ -62,7 +63,7 @@ class SocialItem
   end
 
   def body
-    message || story
+    message || story || description
   end
 
   def <=>(other)
