@@ -973,3 +973,93 @@ table.meta {
   padding: 5px 10px;
   text-align: center;
 }
+
+/* ************************************************************** */
+
+.socialicons {
+	list-style-type: none;
+	margin: 10px 0 0 -40px;
+	}
+	.socialicons li {
+		display: inline;
+		margin-right: 10px;
+		}
+/* ************************************************************** */
+
+.social_from {
+	color: #ff5400;
+	margin-left: 5px;
+	}
+
+.socialcommentbox {
+	position: relative;
+	width: 83%;
+	padding: 12px 12px 6px 12px;
+	margin:24px 17% 24px 0;
+	background: #dedede;
+	list-style-type: none;
+	li {
+		margin-bottom: 12px;
+		p:nth-child(3) {
+			margin-left: 22px;
+			}
+		}
+	img {
+		float:left;
+		padding-right: 3px;
+		margin-top: -2px;
+		}
+	form {
+		textarea {
+			width: 100%;
+			height: 75px;
+			border: 1px solid #cccccc;
+			padding: 0;
+			}
+		input[type=button] {
+			font-size: 10px;
+			color: #424242;
+			margin-top: 12px;
+			padding: 5px 10px;
+			background: -moz-linear-gradient(
+				top,
+				#ffffff 0%,
+				#d0d2d3);
+			background: -webkit-gradient(
+				linear, left top, left bottom, 
+				from(#ffffff),
+				to(#d0d2d3));
+			-moz-border-radius: 3px;
+			-webkit-border-radius: 3px;
+			border-radius: 3px;
+			border: 1px solid #adadad;
+			-moz-box-shadow:
+				0px 1px 2px rgba(255,255,255,0.5),
+				inset 0px 0px 1px rgba(255,255,255,1);
+			-webkit-box-shadow:
+				0px 1px 2px rgba(255,255,255,0.5),
+				inset 0px 0px 1px rgba(255,255,255,1);
+			box-shadow:
+				0px 1px 2px rgba(255,255,255,0.5),
+				inset 0px 0px 1px rgba(255,255,255,1);
+			text-shadow:
+				0px -1px 0px rgba(000,000,000,0.2),
+				0px 1px 0px rgba(255,255,255,0.3);
+			}
+		}	
+	}
+	
+
+.socialcommentbox:after {
+	content: "";
+	position: absolute;
+	top: -8px;
+	left: 23px;	
+	border-style: solid;
+	border-width: 0 8px 8px;
+	border-color: #dedede transparent;
+	display: block;
+	width: 0;
+	z-index: 1;
+	}
+

@@ -7,12 +7,50 @@
         <tr>
           <td class="image"><%= link_to(image_tag("https://graph.facebook.com/#{item.from.id}/picture?type=square"), "http://facebook.com/profile.php?id=#{item.from.id}", target: '_blank') %></td>
           <td>
-            <%= auto_link(item.body, target: '_blank') %>
+          	<p><%= image_tag('soc_facebook.gif', width: 16, height: 16) %><b class="social_from">Josh Starcher</b> to <b>Grover Cleveland</b> on <%= l(item.created_time) %></p>
+            <p>It was good we went to Roscoe's House of Chicken and Waffles. Are we planning to do anything else while we are down in Southern California? Hey Josh hows it going? I haven'ted tweeted in a while. It was good we went to Roscoe's House of Chicken and Waffles. Are we planning to do anything else while we are down in Southern California? Hey Josh hows it going? I haven'ted tweeted in a while.</p>
+            
             <% if item.picture %>
               <br /><%= link_to(image_tag(item.picture), item.link, html: {target: '_blank'}) %>
             <% end %>
-            <br />
-            <%= l(item.created_time) %>
+            
+            <ul class="socialicons">
+            	<li>
+            		<a href="#"><%= image_tag('like.png', width: 16, height:16) %></a>
+            	</li>
+            	<li>
+            		<a href="#"><%= image_tag('avatar_16x16.png', width: 16, height:16) %></a>
+            	</li>
+            	<li>
+            		<a href="#"><%= image_tag('check.png', width: 16, height:16) %></a>
+            	</li>
+            	<li>
+            		<a href="#"><%= image_tag('refresh.png', width: 16, height:16) %></a>
+            	</li>
+            </ul>
+            
+            <ul class="socialcommentbox">
+            	<li>
+            		<%= image_tag('comments.png', width: 16, height: 16) %>
+            		<p><b class="social_from">Josh Starcher</b> on <%= l(item.created_time) %></p>
+            		<p>Hey Joshy boo-boo-bear!</p>
+            	</li>
+            	<li>
+            		<%= image_tag('comments.png', width: 16, height: 16) %>
+            		<p><b class="social_from">Josh Starcher</b> on <%= l(item.created_time) %></p>
+            		<p>Hey Joshy boo-boo-bear!</p>
+            	</li>
+            	<li>
+            		<form>
+            			<textarea></textarea>
+            			<input type="button" id="" value="Post Comment"/>
+            		</form>
+            		
+            	</li>
+            	
+            </ul>
+           
+            
           </td>
         </tr>
       <% end %>
