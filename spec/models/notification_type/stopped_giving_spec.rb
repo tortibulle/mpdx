@@ -26,7 +26,7 @@ describe NotificationType::StoppedGiving do
       before { contact.update_column(:pledge_frequency, 1) }
 
       it 'adds a notification if late' do
-        create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 61.days.ago)
+        create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 65.days.ago)
         notifications = stopped_giving.check(da)
         notifications.length.should == 1
       end
