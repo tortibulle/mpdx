@@ -12,4 +12,11 @@ class PersonSerializer < ActiveModel::Serializer
     person_exhibit = exhibit(object)
     person_exhibit.avatar(:large)
   end
+
+  def attributes
+    hash = super
+    hash[:email_addresses] = object.email_address_ids
+    hash[:phone_numbers] = object.phone_number_ids
+    hash
+  end
 end
