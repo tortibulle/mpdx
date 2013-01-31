@@ -38,10 +38,10 @@ class ContactExhibit < DisplayCase::Exhibit
 
   def pledge_as_currency
     if pledge_amount.present?
-      if pledge_amount % 1 == 0
-        pledge = @context.number_to_currency(pledge_amount, precision: 0)
+      pledge = if pledge_amount % 1 > 0
+        @context.number_to_currency(pledge_amount, precision: 2)
       else
-        pledge = @context.number_to_currency(pledge_amount, precision: 2)
+        @context.number_to_currency(pledge_amount, precision: 0)
       end
 
       pledge += " #{Contact.pledge_frequencies[to_model.pledge_frequency || 1]}"
