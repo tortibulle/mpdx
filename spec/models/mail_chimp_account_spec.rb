@@ -3,7 +3,7 @@ require 'spec_helper'
 describe MailChimpAccount do
   it 'validates the format of an api key' do
     MailChimpAccount.new(account_list_id: 1, api_key: 'DEFAULT__{8D2385FE-5B3A-4770-A399-1AF1A6436A00}').should_not be_valid
-    MailChimpAccount.new(account_list_id: 1, api_key: 'fake-us4').should be_valid
+    MailChimpAccount.new(account_list_id: 1, api_key: 'jk234lkwjntlkj3n5lk3j3kj-us4').should be_valid
   end
 
   before(:each) do

@@ -133,6 +133,7 @@ class MailChimpAccount < ActiveRecord::Base
         if e.message.include?('code 250') # MMERGE3 must be provided - Please enter a value (code 250)
           # Notify user and nulify primary_list_id until they fix the problem
           update_column(:primary_list_id, nil)
+          AccountMailer.mailchimp_required_merge_field(account_list).deliver
         else
           raise e
         end

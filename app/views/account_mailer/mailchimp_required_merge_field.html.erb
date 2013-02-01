@@ -1,0 +1,30 @@
+<p>
+  The MailChimp mailing list that you have linked to your MPDX account has an extra merge field that you
+  created and marked as required. MPDX doesn't know how to populate your customer merge field, and is therefore
+  unable to sync your contacts to MailChimp.
+</p>
+
+<p>
+  For the MailChimp integration we recommend that you set up a new list on MailChimp to use
+  (not a new account, just a new list), and leave all the MailChimp defaults in place for that list.
+  If you set it up with a fresh list, everyone set to receive your newsletter will get copied over
+  automatically, and from then on you can manage all the updates from MPDX (i.e. when you change an email
+  address on MPDX it will update on mailchimp).
+</p>
+
+<p>
+  If you do want to stick with your existing list, you will need to make that extra merge field not a
+  required field.
+  </p>
+
+<p>
+  We have temporarily disassociated your MailChimp list from MPDX to prevent further errors. Once you have
+  chosen one of the options above, please go back to <%= link_to(mail_chimp_accounts_url, mail_chimp_accounts_url) %>
+  and update your MailChimp settings.
+</p>
+
+
+<p>
+  Thanks!<br />
+  MPDX Support Team
+</p>

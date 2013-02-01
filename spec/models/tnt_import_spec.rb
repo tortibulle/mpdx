@@ -127,7 +127,7 @@ describe TntImport do
 
     it 'creates a mailchimp account' do
       expect {
-        import.send(:create_or_update_mailchimp, '1', '2')
+        import.send(:create_or_update_mailchimp, 'asdf', 'asasdfdf-us4')
       }.to change(MailChimpAccount, :count).by(1)
     end
 
