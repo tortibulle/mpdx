@@ -93,7 +93,6 @@ group :test do
   gem 'capybara'
   gem 'resque_spec'
   gem 'fuubar'
-  gem 'mutant'
 end
 
 # RAILS 4 -- should be able to remove these after upgrading
