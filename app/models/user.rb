@@ -71,6 +71,10 @@ class User < Person
     end
   end
 
+  def to_person
+    Person.find(self.id)
+  end
+
   private
     def set_setup_mode
       if preferences[:setup].nil?

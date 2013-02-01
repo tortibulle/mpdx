@@ -247,7 +247,7 @@ class DataServer
     RestClient::Request.execute(:method => :post, :url => url, :payload => params, :timeout => -1) { |response, request, result, &block|
       # check for error response
       lines = response.split("\n")
-      first_line = lines.first.upcase
+      first_line = lines.first.to_s.upcase
       case
       when first_line.include?('BAD_PASSWORD')
         raise OrgAccountInvalidCredentialsError, I18n.t('data_server.invalid_username_password', org: @org)

@@ -4,7 +4,7 @@
 
     <h1></h1>
 
-    <% if @overdue.present? %>
+    <% if @overdue.length > 0 %>
       <table>
         <thead>
           <tr class="taskgroup red">
@@ -22,7 +22,7 @@
       </table>
     <% end %>
 
-    <% if @tomorrow.present? %>
+    <% if @tomorrow.length > 0 %>
       <br /><br />
       <table>
         <thead>
@@ -38,7 +38,7 @@
       </table>
     <% end %>
 
-    <% if @upcoming.present? %>
+    <% if @upcoming.length > 0 %>
       <br /><br />
       <table>
         <thead>

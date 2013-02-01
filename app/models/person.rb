@@ -216,6 +216,10 @@ class Person < ActiveRecord::Base
     contact.try(:id)
   end
 
+  def to_person
+    self
+  end
+
 
   private
   def find_master_person
@@ -239,7 +243,7 @@ class Person < ActiveRecord::Base
   end
 
   def touch_contacts
-    contacts.map(&:touch)
+    to_person.contacts.update_all(updated_at: Time.now.utc)
   end
 
 
