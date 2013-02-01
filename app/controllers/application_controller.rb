@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  ensure_security_headers
   MAX_PER_PAGE = 4294967296
 
   protect_from_forgery

@@ -6,5 +6,9 @@ class AccountMailer < ActionMailer::Base
          subject: _('Mailchimp API Key no longer valid')
   end
 
+  def mailchimp_required_merge_field
+
+  end
+
 end
 

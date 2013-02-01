@@ -13,6 +13,7 @@ class MailChimpAccount < ActiveRecord::Base
   attr :validation_error
 
   validates :account_list_id, :api_key, presence: true
+  validates :api_key, format: /\w+-us\d/
 
   before_create :set_active
   after_save :queue_import_if_list_changed
@@ -102,7 +103,11 @@ class MailChimpAccount < ActiveRecord::Base
   end
 
   def update_email(old_email, new_email)
-    gb.list_update_member(id: primary_list_id, email_address: old_email, merge_vars: { EMAIL: new_email })
+    begin
+      gb.list_update_member(id: primary_list_id, email_address: old_email, merge_vars: { EMAIL: new_email })
+    rescue Gibbon::MailChimpError => e
+      raise e unless e.message.include?('code 214') # The new email address "xxxxx@example.com" is already subscribed to this list and must be unsubscribed first. (code 214)
+    end
   end
 
   def unsubscribe_email(email)
@@ -121,9 +126,17 @@ class MailChimpAccount < ActiveRecord::Base
     if person.primary_email_address
       vars = { :EMAIL => person.primary_email_address.email, :FNAME => person.first_name,
                :LNAME => person.last_name}
-      gb.list_subscribe(id: primary_list_id, email_address: vars[:EMAIL], update_existing: true,
-                        double_optin: false, merge_vars: vars, send_welcome: false, replace_interests: true)
-
+      begin
+        gb.list_subscribe(id: primary_list_id, email_address: vars[:EMAIL], update_existing: true,
+                          double_optin: false, merge_vars: vars, send_welcome: false, replace_interests: true)
+      rescue Gibbon::MailChimpError => e
+        if e.message.include?('code 250') # MMERGE3 must be provided - Please enter a value (code 250)
+          # Notify user and nulify primary_list_id until they fix the problem
+          update_column(:primary_list_id, nil)
+        else
+          raise e
+        end
+      end
     end
   end
 
@@ -174,30 +187,33 @@ class MailChimpAccount < ActiveRecord::Base
     statuses = statuses.select(&:present?)
 
     if statuses.present?
-      groupings = gb.list_interest_groupings(id: list_id)
+      begin
+        groupings = gb.list_interest_groupings(id: list_id)
 
-      if groupings[0] && ((grouping = groupings.detect { |g| g['id'] == grouping_id }) ||
-                          (grouping = groupings.detect { |g| g['name'] == _('Partner Status') }))
+        if groupings[0] && ((grouping = groupings.detect { |g| g['id'] == grouping_id }) ||
+                            (grouping = groupings.detect { |g| g['name'] == _('Partner Status') }))
 
-        self.grouping_id = grouping['id']
+          self.grouping_id = grouping['id']
 
-        # make sure the grouping is hidden
-        gb.list_interest_grouping_update(grouping_id: grouping_id, name: 'type', value: 'hidden')
+          # make sure the grouping is hidden
+          gb.list_interest_grouping_update(grouping_id: grouping_id, name: 'type', value: 'hidden')
 
-        # Add any new groups
-        groups = grouping['groups'].collect { |g| g['name'] }
+          # Add any new groups
+          groups = grouping['groups'].collect { |g| g['name'] }
 
-        (statuses - groups).each do |group|
-          gb.list_interest_group_add(id: list_id, group_name: group, grouping_id: grouping_id)
+          (statuses - groups).each do |group|
+            gb.list_interest_group_add(id: list_id, group_name: group, grouping_id: grouping_id)
+          end
+
+        else
+          # create a new grouping
+          self.grouping_id = gb.list_interest_grouping_add(id: list_id, name: _('Partner Status'), type: 'hidden',
+                                                           groups: statuses.map { |s| _(s) })
         end
-
-      else
-        # create a new grouping
-        self.grouping_id = gb.list_interest_grouping_add(id: list_id, name: _('Partner Status'), type: 'hidden',
-                                                         groups: statuses.map { |s| _(s) })
+        save
+      rescue Gibbon::MailChimpError => e
+        raise e unless e.message.include?('code 211') # This list does not have interest groups enabled (code 211)
       end
-      save
-
     end
   end
 

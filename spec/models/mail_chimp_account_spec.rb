@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe MailChimpAccount do
+  it 'validates the format of an api key' do
+    MailChimpAccount.new(account_list_id: 1, api_key: 'DEFAULT__{8D2385FE-5B3A-4770-A399-1AF1A6436A00}').should_not be_valid
+    MailChimpAccount.new(account_list_id: 1, api_key: 'fake-us4').should be_valid
+  end
 
   before(:each) do
     @account_list = create(:account_list)
@@ -8,25 +12,25 @@ describe MailChimpAccount do
     @account.account_list = @account_list
   end
 
-  it "should return an array of lists" do
+  it "returns an array of lists" do
     stub_request(:post, "https://us4.api.mailchimp.com/1.3/?method=lists").
          with(:body => "%7B%22apikey%22%3A%22fake-us4%22%7D").
          to_return(:body => '{"total":2,"data":[{"id":"1e72b58b72","web_id":97593,"name":"MPDX","date_created":"2012-10-09 13:50:12","email_type_option":false,"use_awesomebar":true,"default_from_name":"MPDX","default_from_email":"support@mpdx.org","default_subject":"","default_language":"en","list_rating":3,"subscribe_url_short":"http:\/\/eepurl.com\/qnY35","subscribe_url_long":"http:\/\/26am.us4.list-manage1.com\/subscribe?u=720971c5830c5228bdf461524&id=1e72b58b72","beamer_address":"NzIwOTcxYzU4MzBjNTIyOGJkZjQ2MTUyNC1iYmNlYzBkNS05ZDhlLTQ5NDctYTg1OC00ZjQzYTAzOGI3ZGM=@campaigns.mailchimp.com","visibility":"pub","stats":{"member_count":159,"unsubscribe_count":0,"cleaned_count":0,"member_count_since_send":159,"unsubscribe_count_since_send":0,"cleaned_count_since_send":0,"campaign_count":0,"grouping_count":1,"group_count":4,"merge_var_count":2,"avg_sub_rate":null,"avg_unsub_rate":null,"target_sub_rate":null,"open_rate":null,"click_rate":null},"modules":[]},{"id":"29a77ba541","web_id":97493,"name":"Newsletter","date_created":"2012-10-09 00:32:44","email_type_option":true,"use_awesomebar":true,"default_from_name":"Josh Starcher","default_from_email":"josh.starcher@cru.org","default_subject":"","default_language":"en","list_rating":0,"subscribe_url_short":"http:\/\/eepurl.com\/qmAWn","subscribe_url_long":"http:\/\/26am.us4.list-manage.com\/subscribe?u=720971c5830c5228bdf461524&id=29a77ba541","beamer_address":"NzIwOTcxYzU4MzBjNTIyOGJkZjQ2MTUyNC02ZmZiZDJhOS0zNWFmLTQ1YzQtOWE0ZC1iOTZhMmRlMTQ0ZDc=@campaigns.mailchimp.com","visibility":"pub","stats":{"member_count":75,"unsubscribe_count":0,"cleaned_count":0,"member_count_since_send":75,"unsubscribe_count_since_send":0,"cleaned_count_since_send":0,"campaign_count":0,"grouping_count":1,"group_count":3,"merge_var_count":2,"avg_sub_rate":null,"avg_unsub_rate":null,"target_sub_rate":null,"open_rate":null,"click_rate":null},"modules":[]}]}')
     @account.lists.length.should == 2
   end
 
-  it "should find a list by list_id" do
+  it "finds a list by list_id" do
     @account.stub(:lists).and_return([OpenStruct.new(id: 1, name: 'foo')])
     @account.list(1).name.should == 'foo'
   end
 
-  it "should find the primary list" do
+  it "finds the primary list" do
     @account.stub(:lists).and_return([OpenStruct.new(id: 1, name: 'foo')])
     @account.primary_list_id = 1
     @account.primary_list.name.should == 'foo'
   end
 
-  it "should deactivate the account if the api key is invalid" do
+  it "deactivates the account if the api key is invalid" do
     stub_request(:post, "https://us4.api.mailchimp.com/1.3/?method=lists").
          with(:body => "%7B%22apikey%22%3A%22fake-us4%22%7D").
          to_return(:body => '{"error":"Invalid Mailchimp API Key: fake-us4","code":104}')
@@ -36,7 +40,7 @@ describe MailChimpAccount do
     @account.validation_error.should =~ /Invalid Mailchimp API Key: fake-us4/
   end
 
-  it "should activate the account if the api key is valid" do
+  it "activates the account if the api key is valid" do
     stub_request(:post, "https://us4.api.mailchimp.com/1.3/?method=lists").
          with(:body => "%7B%22apikey%22%3A%22fake-us4%22%7D").
          to_return(:body => '{"total":2,"data":[{"id":"1e72b58b72","web_id":97593,"name":"MPDX","date_created":"2012-10-09 13:50:12","email_type_option":false,"use_awesomebar":true,"default_from_name":"MPDX","default_from_email":"support@mpdx.org","default_subject":"","default_language":"en","list_rating":3,"subscribe_url_short":"http:\/\/eepurl.com\/qnY35","subscribe_url_long":"http:\/\/26am.us4.list-manage1.com\/subscribe?u=720971c5830c5228bdf461524&id=1e72b58b72","beamer_address":"NzIwOTcxYzU4MzBjNTIyOGJkZjQ2MTUyNC1iYmNlYzBkNS05ZDhlLTQ5NDctYTg1OC00ZjQzYTAzOGI3ZGM=@campaigns.mailchimp.com","visibility":"pub","stats":{"member_count":159,"unsubscribe_count":0,"cleaned_count":0,"member_count_since_send":159,"unsubscribe_count_since_send":0,"cleaned_count_since_send":0,"campaign_count":0,"grouping_count":1,"group_count":4,"merge_var_count":2,"avg_sub_rate":null,"avg_unsub_rate":null,"target_sub_rate":null,"open_rate":null,"click_rate":null},"modules":[]},{"id":"29a77ba541","web_id":97493,"name":"Newsletter","date_created":"2012-10-09 00:32:44","email_type_option":true,"use_awesomebar":true,"default_from_name":"Josh Starcher","default_from_email":"josh.starcher@cru.org","default_subject":"","default_language":"en","list_rating":0,"subscribe_url_short":"http:\/\/eepurl.com\/qmAWn","subscribe_url_long":"http:\/\/26am.us4.list-manage.com\/subscribe?u=720971c5830c5228bdf461524&id=29a77ba541","beamer_address":"NzIwOTcxYzU4MzBjNTIyOGJkZjQ2MTUyNC02ZmZiZDJhOS0zNWFmLTQ1YzQtOWE0ZC1iOTZhMmRlMTQ0ZDc=@campaigns.mailchimp.com","visibility":"pub","stats":{"member_count":75,"unsubscribe_count":0,"cleaned_count":0,"member_count_since_send":75,"unsubscribe_count_since_send":0,"cleaned_count_since_send":0,"campaign_count":0,"grouping_count":1,"group_count":3,"merge_var_count":2,"avg_sub_rate":null,"avg_unsub_rate":null,"target_sub_rate":null,"open_rate":null,"click_rate":null},"modules":[]}]}')
@@ -45,7 +49,7 @@ describe MailChimpAccount do
     @account.active.should == true
   end
 
-  it "should return the datacenter for an api key" do
+  it "returns the datacenter for an api key" do
     @account.datacenter.should == 'us4'
   end
 
@@ -130,6 +134,17 @@ describe MailChimpAccount do
         person = create(:person, email: 'foo@example.com')
         @account.send(:subscribe_person, person.id)
       end
+
+      it 'nilifies the primary_list_id if an extra merge field is required' do
+        stub_request(:post, "https://us4.api.mailchimp.com/1.3/?method=listSubscribe").
+          to_return(body: '{"error":"MMERGE3 must be provided - Please enter a value","code":250}', status: 500)
+        person = create(:person, email: 'foo@example.com')
+        @account.primary_list_id = 5
+        @account.save
+        @account.send(:subscribe_person, person.id)
+        @account.primary_list_id.should be_nil
+      end
+
     end
 
     context "subscribing contacts" do
