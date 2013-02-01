@@ -3,9 +3,5 @@
   config.x_frame_options = 'DENY'
   config.x_content_type_options = "nosniff"
   config.x_xss_protection = {:value => 1, :mode => false}
-  config.csp = {
-    :default_src => "https://*",
-    # ALWAYS supply a full URL for report URIs
-    :report_uri => "https://mpdx.org#{SecureHeaders::ContentSecurityPolicy::FF_CSP_ENDPOINT}"
-  }
+  config.csp = false
 end
