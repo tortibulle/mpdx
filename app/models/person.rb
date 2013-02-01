@@ -44,7 +44,7 @@ class Person < ActiveRecord::Base
 
   before_create :find_master_person
   after_destroy :clean_up_master_person
-  after_commit  :sync_with_mailchimp
+  after_commit  :sync_with_mailchimp, :touch_contacts
 
   validates_presence_of :first_name
 
@@ -236,6 +236,10 @@ class Person < ActiveRecord::Base
     if mail_chimp_account && contact && contact.send_email_letter?
       queue_subscribe_person(self)
     end
+  end
+
+  def touch_contacts
+    contacts.map(&:touch)
   end
 
 
