@@ -20,44 +20,44 @@ class SocialItem
     @from = From.new(json['actor_id'], names[json['actor_id']])
     @to = To.new(json['target_id'], names[json['target_id']]) if json['target_id'].present?
 
-    if json['actions']
-      @actions = []
-      json['actions'].each do |action|
-        @actions << Action.new(action['name'], action['link'])
-      end
-    end
+    #if json['actions']
+      #@actions = []
+      #json['actions'].each do |action|
+        #@actions << Action.new(action['name'], action['link'])
+      #end
+    #end
 
-    if json['application']
-      @application = FbApplication.new(json['application']['id'], json['application']['name'], json['application']['namespace'])
-    end
+    #if json['application']
+      #@application = FbApplication.new(json['application']['id'], json['application']['name'], json['application']['namespace'])
+    #end
 
-    if json['comments']
-      @comments_count = json['comments']['count']
-      if json['comments']['data']
-        @comments = []
-        json['comments']['data'].each do |comment|
-          @comments << Comment.new(comment['id'], From.new(comment['from']['id'], comment['from']['name']),
-                                   comment['message'], DateTime.parse(comment['created_time']))
-        end
-      end
-    end
+    #if json['comments']
+      #@comments_count = json['comments']['count']
+      #if json['comments']['data']
+        #@comments = []
+        #json['comments']['data'].each do |comment|
+          #@comments << Comment.new(comment['id'], From.new(comment['from']['id'], comment['from']['name']),
+                                   #comment['message'], DateTime.parse(comment['created_time']))
+        #end
+      #end
+    #end
 
-    if json['likes']
-      @likes_count = json['likes']['count']
-      if json['likes']['data']
-        @likes = []
-        json['likes']['data'].each do |like|
-          @likes << Like.new(like['id'], like['name'])
-        end
-      end
-    end
+    #if json['likes']
+      #@likes_count = json['likes']['count']
+      #if json['likes']['data']
+        #@likes = []
+        #json['likes']['data'].each do |like|
+          #@likes << Like.new(like['id'], like['name'])
+        #end
+      #end
+    #end
 
-    if json['story_tags']
-      @story_tags = []
-      json['story_tags'].values.flatten.each do |tag|
-        @story_tags << StoryTag.new(tag['id'], tag['name'], tag['offset'], tag['length'], tag['type'])
-      end
-    end
+    #if json['story_tags']
+      #@story_tags = []
+      #json['story_tags'].values.flatten.each do |tag|
+        #@story_tags << StoryTag.new(tag['id'], tag['name'], tag['offset'], tag['length'], tag['type'])
+      #end
+    #end
 
 
   end

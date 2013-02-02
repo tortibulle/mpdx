@@ -54,10 +54,6 @@ class MailChimpAccount < ActiveRecord::Base
     active? && validate_key
   end
 
-  def datacenter
-    api_key.to_s.split('-').last
-  end
-
   def queue_export_to_primary_list
     async(:call_mailchimp, :subscribe_contacts)
   end

@@ -49,10 +49,6 @@ describe MailChimpAccount do
     @account.active.should == true
   end
 
-  it "returns the datacenter for an api key" do
-    @account.datacenter.should == 'us4'
-  end
-
   describe "queueing methods" do
 
     before do
