@@ -91,7 +91,7 @@ class MailChimpAccount < ActiveRecord::Base
   private
 
   def call_mailchimp(method, *args)
-    if active?
+    if active? && primary_list_id
       begin
         send(method, *args)
       rescue Gibbon::MailChimpError => e
