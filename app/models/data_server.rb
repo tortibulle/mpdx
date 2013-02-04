@@ -27,10 +27,14 @@ class DataServer
       check_credentials!
 
       profiles.each do |profile|
-        designation_profiles << @org.designation_profiles.where(user_id: @org_account.person_id, name: profile[:name], code: profile[:code]).first_or_create
+        designation_profiles << Retryable.retryable do
+          @org.designation_profiles.where(user_id: @org_account.person_id, name: profile[:name], code: profile[:code]).first_or_create
+        end
       end
     else
-      designation_profiles << @org.designation_profiles.where(user_id: @org_account.person_id, name: @org_account.person.to_s).first_or_create
+      designation_profiles << Retryable.retryable do
+        @org.designation_profiles.where(user_id: @org_account.person_id, name: @org_account.person.to_s).first_or_create
+      end
     end
     designation_profiles
   end
@@ -302,7 +306,9 @@ class DataServer
 
     # create the master_person_source if needed
     unless master_person_from_source
-      organization.master_person_sources.where(remote_id: remote_id.to_s).first_or_create({master_person_id: person.master_person.id}, without_protection: true)
+      Retryable.retryable do
+        organization.master_person_sources.where(remote_id: remote_id.to_s).first_or_create({master_person_id: person.master_person.id}, without_protection: true)
+      end
     end
 
     [person, contact_person]
@@ -327,20 +333,23 @@ class DataServer
 
   def add_or_update_donor_account(line, profile, account_list = nil)
     account_list ||= get_account_list(profile)
-    donor_account = @org.donor_accounts.where(account_number: line['PEOPLE_ID']).first_or_initialize
-    donor_account.attributes = {name: line['ACCT_NAME'],
-                                donor_type: line['PERSON_TYPE'] == 'P' ? 'Household' : 'Organization'} # if the acccount already existed, update the name
-    # physical address
-    if [line['ADDR1'],line['ADDR2'],line['ADDR3'],line['ADDR4'],line['CITY'],line['STATE'],line['ZIP'],line['CNTRY_DESCR']].any?(&:present?)
-      donor_account.addresses_attributes = [{
-                                              street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select {|a| a.present?}.join("\n"),
-                                              city: line['CITY'],
-                                              state: line['STATE'],
-                                              postal_code: line['ZIP'],
-                                              country: line['CNTRY_DESCR']
-                                            }]
+    donor_account = Retryable.retryable do
+      donor_account = @org.donor_accounts.where(account_number: line['PEOPLE_ID']).first_or_initialize
+      donor_account.attributes = {name: line['ACCT_NAME'],
+                                  donor_type: line['PERSON_TYPE'] == 'P' ? 'Household' : 'Organization'} # if the acccount already existed, update the name
+      # physical address
+      if [line['ADDR1'],line['ADDR2'],line['ADDR3'],line['ADDR4'],line['CITY'],line['STATE'],line['ZIP'],line['CNTRY_DESCR']].any?(&:present?)
+        donor_account.addresses_attributes = [{
+                                                street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select {|a| a.present?}.join("\n"),
+                                                city: line['CITY'],
+                                                state: line['STATE'],
+                                                postal_code: line['ZIP'],
+                                                country: line['CNTRY_DESCR']
+                                              }]
+      end
+      donor_account.save!
+      donor_account
     end
-    donor_account.save!
     contact = donor_account.link_to_contact_for(account_list)
     raise 'Failed to link to contact' unless contact
     donor_account
@@ -349,7 +358,9 @@ class DataServer
   def find_or_create_designation_account(number, profile, extra_attributes = {})
     @designation_accounts ||= {}
     unless @designation_accounts.has_key?(number)
-      da = @org.designation_accounts.where(designation_number: number).first_or_create
+      da = Retryable.retryable do
+        @org.designation_accounts.where(designation_number: number).first_or_create
+      end
       profile.designation_accounts << da unless profile.designation_accounts.include?(da)
       da.update_attributes(extra_attributes, without_protection: true) if extra_attributes.present?
       @designation_accounts[number] = da
@@ -361,21 +372,23 @@ class DataServer
     default_currency = @org.default_currency_code || 'USD'
     donor_account = add_or_update_donor_account(line, profile)
 
-    donation = designation_account.donations.where(remote_id: line['DONATION_ID']).first_or_initialize
-    date = line['DISPLAY_DATE'] ? Date.strptime(line['DISPLAY_DATE'], '%m/%d/%Y') : nil
-    donation.assign_attributes( {
-      donor_account_id: donor_account.id,
-      motivation: line['MOTIVATION'],
-      payment_method: line['PAYMENT_METHOD'],
-      tendered_currency: line['TENDERED_CURRENCY'] || default_currency,
-      memo: line['MEMO'],
-      donation_date: date,
-      amount: line['AMOUNT'],
-      tendered_amount: line['TENDERED_AMOUNT'] || line['AMOUNT'],
-      currency: default_currency
-    }, without_protection: true )
-    donation.save!
-    donation
+    Retryable.retryable do
+      donation = designation_account.donations.where(remote_id: line['DONATION_ID']).first_or_initialize
+      date = line['DISPLAY_DATE'] ? Date.strptime(line['DISPLAY_DATE'], '%m/%d/%Y') : nil
+      donation.assign_attributes( {
+        donor_account_id: donor_account.id,
+        motivation: line['MOTIVATION'],
+        payment_method: line['PAYMENT_METHOD'],
+        tendered_currency: line['TENDERED_CURRENCY'] || default_currency,
+        memo: line['MEMO'],
+        donation_date: date,
+        amount: line['AMOUNT'],
+        tendered_amount: line['TENDERED_AMOUNT'] || line['AMOUNT'],
+        currency: default_currency
+      }, without_protection: true )
+      donation.save!
+      donation
+    end
   end
 end
 

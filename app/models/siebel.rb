@@ -6,7 +6,9 @@ class Siebel < DataServer
     designation_profiles = []
 
     profiles.each do |profile|
-      designation_profile = @org.designation_profiles.where(user_id: @org_account.person_id, name: profile.name, code: profile.id).first_or_create
+      designation_profile = Retryable.retryable do
+        @org.designation_profiles.where(user_id: @org_account.person_id, name: profile.name, code: profile.id).first_or_create
+      end
 
       # Add included designation accounts
       profile.designations.each do |designation|
@@ -94,7 +96,9 @@ class Siebel < DataServer
   def find_or_create_designation_account(number, profile, extra_attributes = {})
     @designation_accounts ||= {}
     unless @designation_accounts.has_key?(number)
-      da = @org.designation_accounts.where(designation_number: number).first_or_create
+      da = Retryable.retryable do
+        @org.designation_accounts.where(designation_number: number).first_or_create
+      end
       profile.designation_accounts << da unless profile.designation_accounts.include?(da)
       da.update_attributes(extra_attributes) if extra_attributes.present?
       @designation_accounts[number] = da
@@ -110,22 +114,24 @@ class Siebel < DataServer
       return
     end
 
-    donation = designation_account.donations.where(remote_id: siebel_donation.id).first_or_initialize
-    date = Date.strptime(siebel_donation.donation_date, '%Y-%m-%d')
-    donation.attributes = {
-      donor_account_id: donor_account.id,
-      motivation: siebel_donation.campaign_code,
-      payment_method: siebel_donation.payment_method,
-      tendered_currency: default_currency,
-      donation_date: date,
-      amount: siebel_donation.amount,
-      tendered_amount: siebel_donation.amount,
-      currency: default_currency,
-      channel: siebel_donation.channel,
-      payment_type: siebel_donation.payment_type
-    }
-    donation.save!
-    donation
+    Retryable.retryable do
+      donation = designation_account.donations.where(remote_id: siebel_donation.id).first_or_initialize
+      date = Date.strptime(siebel_donation.donation_date, '%Y-%m-%d')
+      donation.attributes = {
+        donor_account_id: donor_account.id,
+        motivation: siebel_donation.campaign_code,
+        payment_method: siebel_donation.payment_method,
+        tendered_currency: default_currency,
+        donation_date: date,
+        amount: siebel_donation.amount,
+        tendered_amount: siebel_donation.amount,
+        currency: default_currency,
+        channel: siebel_donation.channel,
+        payment_type: siebel_donation.payment_type
+      }
+      donation.save!
+      donation
+    end
   end
 
   def add_or_update_company(account_list, siebel_donor, donor_account)
@@ -219,7 +225,9 @@ class Siebel < DataServer
 
     # create the master_person_source if needed
     unless master_person_from_source
-      @org.master_person_sources.where(remote_id: siebel_person.id).first_or_create(master_person_id: person.master_person.id)
+      Retryable.retryable do
+        @org.master_person_sources.where(remote_id: siebel_person.id).first_or_create(master_person_id: person.master_person.id)
+      end
     end
 
     # Phone Numbers
@@ -289,15 +297,17 @@ class Siebel < DataServer
                    location: email.type,
                    remote_id: email.id
                  }
-    if existing_email = person.email_addresses.detect { |e| e.remote_id == email.id }
-      begin
-        existing_email.update_attributes(attributes)
-      rescue ActiveRecord::RecordNotUnique
-        # If they already have the email address we're trying to update
-        # to, don't do anything
+    Retryable.retryable do
+      if existing_email = person.email_addresses.detect { |e| e.remote_id == email.id }
+        begin
+          existing_email.update_attributes(attributes)
+        rescue ActiveRecord::RecordNotUnique
+          # If they already have the email address we're trying to update
+          # to, don't do anything
+        end
+      else
+        EmailAddress.add_for_person(person, attributes)
       end
-    else
-      EmailAddress.add_for_person(person, attributes)
     end
   end
 

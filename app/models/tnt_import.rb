@@ -102,7 +102,9 @@ class TntImport
     tnt_tasks = {}
 
     Array.wrap(xml['Task']['row']).each do |row|
-      task = @account_list.tasks.where(tnt_id: row['id']).first_or_initialize
+      task = Retryable.retryable do
+        @account_list.tasks.where(tnt_id: row['id']).first_or_initialize
+      end
 
       task.attributes = {
                          activity_type: lookup_task_type(row['TaskTypeID']),
@@ -128,7 +130,9 @@ class TntImport
     tnt_history = {}
 
     Array.wrap(xml['History']['row']).each do |row|
-      task = @account_list.tasks.where(tnt_id: row['id']).first_or_initialize
+      task = Retryable.retryable do
+        @account_list.tasks.where(tnt_id: row['id']).first_or_initialize
+      end
 
       task.attributes = {
                          activity_type: lookup_task_type(row['TaskTypeID']),
@@ -319,7 +323,9 @@ class TntImport
 
     # create the master_person_source if needed
     unless master_person_from_source
-      organization.master_person_sources.where(remote_id: remote_id).first_or_create(master_person_id: person.master_person.id)
+      Retryable.retryable do
+        organization.master_person_sources.where(remote_id: remote_id).first_or_create(master_person_id: person.master_person.id)
+      end
     end
 
     [person, contact_person]
@@ -366,7 +372,9 @@ class TntImport
     end
 
     # If there was no donor account, we won't have a linked contact
-    contact ||= @account_list.contacts.where(name: row['FileAs']).first_or_create
+    contact ||= Retryable.retryable do
+      @account_list.contacts.where(name: row['FileAs']).first_or_create
+    end
 
     [donor_accounts, contact]
   end
