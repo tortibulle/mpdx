@@ -71,7 +71,7 @@ class Person::OrganizationAccount < ActiveRecord::Base
 
       if ending_donation_count - starting_donation_count > 0
         # If this is the first time downloading, update the financial status of partners
-        account_list.update_partner_statuses if last_download.nil?
+        account_list.update_partner_statuses if last_download.nil? && account_list
 
         update_column(:last_download, Time.now)
       end
