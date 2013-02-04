@@ -7,7 +7,7 @@ class EmailAddress < ActiveRecord::Base
                              related_object_id: :person_id }
 
 
-  belongs_to :person
+  belongs_to :person, touch: true
   validates_presence_of :email
   before_save :strip_email
   after_update :sync_with_mail_chimp

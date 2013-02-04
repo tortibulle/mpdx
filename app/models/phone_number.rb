@@ -7,7 +7,7 @@ class PhoneNumber < ActiveRecord::Base
                              related_object_id: :person_id }
 
 
-  belongs_to :person
+  belongs_to :person, touch: true
 
   before_save :clean_up_number
 

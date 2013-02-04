@@ -4,7 +4,7 @@ class Address < ActiveRecord::Base
                   :meta => { related_object_type: :addressable_type,
                              related_object_id: :addressable_id }
 
-  belongs_to :addressable, polymorphic: true
+  belongs_to :addressable, polymorphic: true, touch: true
 
   assignable_values_for :location, :allow_blank => true do
     [_('Home'), _('Business'), _('Mailing'), _('Other')]
