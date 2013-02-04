@@ -1,7 +1,7 @@
 class ContactFilter
   attr_accessor :contacts, :filters
 
-  def initialize(filters)
+  def initialize(filters = nil)
     @filters = filters || {}
 
     # strip extra spaces from filters
@@ -56,7 +56,7 @@ class ContactFilter
         case @filters[:newsletter]
         when 'address'
           filtered_contacts = filtered_contacts.where(send_newsletter: 'Physical')
-          filtered_contacts = filtered_contacts.joins(:addresses).where('street is not null')
+          filtered_contacts = filtered_contacts.joins(:addresses).where('addresses.street is not null')
         when 'email'
           filtered_contacts = filtered_contacts.where(send_newsletter: 'Email')
           filtered_contacts = filtered_contacts.joins(people: :email_addresses)

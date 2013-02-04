@@ -69,7 +69,7 @@
         <li>
           <label><%= _('Referrer') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:referrer] %>">
-            <%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), '']] + all_contacts.collect { |c| [c.name, c.id] }, filters_params[:referrer]), multiple: true, size: 5 %>
+            <%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), '']] + contacts_for_filter.collect { |c| [c.name, c.id] }, filters_params[:referrer]), multiple: true, size: 5 %>
           </div>
         </li>
         <li class="controls">
@@ -105,16 +105,16 @@
   <div class="">
     <div class="padded">
       <table class="tablelist">
-        <% unless @contacts.length == all_contacts.length %>
+        <% unless @contacts.length == @contacts.total_entries %>
           <tr id="select_more" style="display:none">
             <td colspan="3">
               <span id="select_all_prompt">
                 <%= _('All <strong>%{this_page}</strong> conversations on this page are selected. <a data-behavior="select_all">Select all <strong>%{total}</strong> contacts</a>') %
-                  {this_page: @contacts.length, total: all_contacts.length} %>
+                  {this_page: @contacts.length, total: @contacts.total_entries} %>
               </span>
               <span id="clear_selection_prompt" style="display:none">
                 <%= _('All <strong>%{total}</strong> contacts are selected. <a data-behavior="clear_selection">Clear selection</a>') %
-                  {total: all_contacts.length} %>
+                  {total: @contacts.total_entries} %>
               </span>
             </td>
           </tr>

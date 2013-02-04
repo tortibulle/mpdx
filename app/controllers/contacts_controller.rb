@@ -15,7 +15,6 @@ class ContactsController < ApplicationController
     end
 
     @contacts = ContactFilter.new(filters_params).filter(@contacts) if filters_params.present?
-
     respond_to do |wants|
 
       wants.html do
