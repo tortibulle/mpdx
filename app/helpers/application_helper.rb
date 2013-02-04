@@ -53,10 +53,10 @@ module ApplicationHelper
     end
   end
 
-  #def all_contacts
-    #@contacts ||= current_account_list.contacts.order('contacts.name')
-    #@all_contacts ||= @contacts.select(['contacts.id', 'contacts.name'])
-  #end
+  def all_contacts
+    @contacts ||= current_account_list.contacts.order('contacts.name')
+    @all_contacts ||= @contacts.select(['contacts.id', 'contacts.name'])
+  end
 
   def contacts_for_filter
     current_account_list.contacts.order('contacts.name').select(['contacts.id', 'contacts.name'])
