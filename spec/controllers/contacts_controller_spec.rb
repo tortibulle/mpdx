@@ -2,59 +2,82 @@ require 'spec_helper'
 
 describe ContactsController do
   describe 'when signed in' do
+    let(:user) { create(:user_with_account) }
+    let(:contact) { create(:contact, account_list: user.account_lists.first) }
+
     before(:each) do
-      @user = create(:user_with_account)
-      sign_in(:user, @user)
-      @contact = create(:contact, account_list: @user.account_lists.first)
+      sign_in(:user, user)
     end
 
     describe '#index' do
+      let(:contact2) { create(:contact, name: 'Z', account_list: user.account_lists.first) }
+
       before do
         donor_account = create(:donor_account, master_company: create(:master_company))
-        @contact2 = create(:contact, name: 'Z', account_list: @user.account_lists.first)
-        @contact2.donor_accounts << donor_account
+        contact2.donor_accounts << donor_account
       end
 
       it "gets all" do
         get :index
         response.should be_success
-        assigns(:contacts).should == [@contact, @contact2]
+        assigns(:contacts).should == [contact, contact2]
       end
 
       it "gets people" do
         get :index, filter: 'people'
         response.should be_success
-        assigns(:contacts).should == [@contact]
+        assigns(:contacts).should == [contact]
       end
 
       it "gets companies" do
         get :index, filter: 'companies'
         response.should be_success
-        assigns(:contacts).should == [@contact2]
+        assigns(:contacts).should == [contact2]
       end
 
       it "filters by tag" do
-        @contact.update_attributes(tag_list: 'asdf')
+        contact.update_attributes(tag_list: 'asdf')
         get :index, filters: {tags: 'asdf'}
         response.should be_success
-        assigns(:contacts).should == [@contact]
+        assigns(:contacts).should == [contact]
       end
 
+      it "doesn't display duplicate rows when filtering by Newsletter Recipients With Mailing Address" do
+        contact.update_attributes(send_newsletter: 'Physical')
+        2.times do
+          contact.addresses << create(:address, addressable: contact)
+        end
+
+        get :index, filters: {newsletter: 'address'}
+        assigns(:contacts).length.should == 1
+      end
+
+      it "doesn't display duplicate rows when filtering by Newsletter Recipients With Email Address" do
+        contact.update_attributes(send_newsletter: 'Email')
+        p = create(:person)
+        contact.people << p
+        2.times do
+          create(:email_address, person: p)
+        end
+
+        get :index, filters: {newsletter: 'email'}
+        assigns(:contacts).length.should == 1
+      end
     end
 
     describe '#show' do
       it "should find a contact in the current account list" do
-        get :show, id: @contact.id
+        get :show, id: contact.id
         response.should be_success
-        @contact.should == assigns(:contact)
+        contact.should == assigns(:contact)
       end
     end
 
     describe '#edit' do
       it "should edit a contact in the current account list" do
-        get :edit, id: @contact.id
+        get :edit, id: contact.id
         response.should be_success
-        @contact.should == assigns(:contact)
+        contact.should == assigns(:contact)
       end
     end
 
@@ -86,14 +109,14 @@ describe ContactsController do
 
     describe "#update" do
       it "updates a contact when passed valid attributes" do
-        put :update, id: @contact.id, contact: {name: 'Bob'}
+        put :update, id: contact.id, contact: {name: 'Bob'}
         contact = assigns(:contact)
         contact.name.should == 'Bob'
         response.should redirect_to(contact)
       end
 
       it "doesn't update a contact when passed invalid attributes" do
-        put :update, id: @contact.id, contact: {name: ''}
+        put :update, id: contact.id, contact: {name: ''}
         assigns(:contact).errors.full_messages.should == ["Name can't be blank"]
         response.should be_success
       end
@@ -101,8 +124,9 @@ describe ContactsController do
 
     describe "#destroy" do
       it "should destroy a contact" do
+        contact # instantiate object
         -> {
-          delete :destroy, id: @contact.id
+          delete :destroy, id: contact.id
         }.should change(Contact, :count).by(-1)
       end
     end

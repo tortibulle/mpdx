@@ -60,10 +60,10 @@ class ContactFilter
         when 'email'
           filtered_contacts = filtered_contacts.where(send_newsletter: 'Email')
           filtered_contacts = filtered_contacts.joins(people: :email_addresses)
-          filtered_contacts = filtered_contacts.uniq unless filtered_contacts.to_sql.include?('INNER JOIN')
         else
           filtered_contacts = filtered_contacts.where('send_newsletter is not null')
         end
+        filtered_contacts = filtered_contacts.uniq unless filtered_contacts.to_sql.include?('DISTINCT')
       end
     end
 
