@@ -24,7 +24,7 @@ class Person < ActiveRecord::Base
   has_many :key_accounts, class_name: 'Person::KeyAccount', foreign_key: :person_id, dependent: :destroy
   has_many :companies, through: :company_positions
   has_many :donor_accounts, through: :master_person
-  has_many :contact_people
+  has_many :contact_people, dependent: :destroy
   has_many :contacts, through: :contact_people
   has_many :account_lists, through: :contacts
 
@@ -44,7 +44,7 @@ class Person < ActiveRecord::Base
 
   before_create :find_master_person
   after_destroy :clean_up_master_person
-  after_commit  :sync_with_mailchimp, :touch_contacts
+  after_commit  :sync_with_mailchimp
 
   validates_presence_of :first_name
 
@@ -241,10 +241,5 @@ class Person < ActiveRecord::Base
       queue_subscribe_person(self)
     end
   end
-
-  def touch_contacts
-    to_person.contacts.update_all(updated_at: Time.now.utc)
-  end
-
 
 end

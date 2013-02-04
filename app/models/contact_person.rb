@@ -2,10 +2,10 @@ class ContactPerson < ActiveRecord::Base
   include HasPrimary
   @@primary_scope = :contact
 
-  belongs_to :contact
+  belongs_to :contact, touch: true
   belongs_to :person
 
-  before_destroy :delete_orphaned_person
+  after_commit :delete_orphaned_person, on: :destroy
 
   private
 
