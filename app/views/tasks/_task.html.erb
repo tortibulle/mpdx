@@ -13,7 +13,8 @@
           <%= link_to(_('Delete'), task, confirm: _("Are you sure you want to delete this task instead of marking it as completed?"), method: :delete, remote: true, :class=> "ico ico_trash") %>
         </div>
         <% if task.completed? %>
-          <%= _("Completed - %{time}; Planned -") % {time: l(task.completed_at.to_datetime)} %>
+          <%= _("%{action} - %{time}; Planned -") % {action: _(task.result),
+                                                     time: l(task.completed_at.to_datetime)} %>
         <% end %>
         <%= l(task.start_at.to_datetime) %> -
         <span class="taskaction"><%= _(task.activity_type) %></span> -
