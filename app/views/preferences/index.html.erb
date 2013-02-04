@@ -49,7 +49,7 @@
           <%= _('Email me') %> &nbsp;
           <%= check_box_tag "preference_set[#{field_name}][actions][]", 'task', f.object.send(field_name).include?('task') %>
           <%= _('Create a task') %>
-
+          <%= hidden_field_tag "preference_set[#{field_name}][actions][]", '' %>
         </div>
       <% end %>
 
