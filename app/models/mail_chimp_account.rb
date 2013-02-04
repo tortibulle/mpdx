@@ -170,10 +170,16 @@ class MailChimpAccount < ActiveRecord::Base
       contact.people.each do |person|
         if person.primary_email_address
           batch << { :EMAIL => person.primary_email_address.email, :FNAME => person.first_name,
-                     :LNAME => person.last_name, :GROUPINGS => [{id: grouping_id,
-                                                                groups: _(contact.status)}] }
+                     :LNAME => person.last_name }
         end
       end
+
+      # if we have a grouping_id, add them to that group
+      if grouping_id.present?
+        batch.each { |p| p[:GROUPING] ||= [{id: grouping_id, groups: _(contact.status)}] }
+      end
+
+
     end
 
     gb.list_batch_subscribe(id: list_id, batch: batch, update_existing: true, double_optin: false,
