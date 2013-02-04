@@ -1,5 +1,5 @@
 # REMOVE THIS IN RAILS 4
-#
+
  module ActiveRecord
   module FinderMethods
     def construct_limited_ids_condition(relation)
