@@ -35,6 +35,15 @@ class AccountsController < ApplicationController
   end
 
   def destroy
+    # if they're trying to delete a key or relay account, make sure they have at least
+    # one way to log in
+    if %w[key relay].include?(params[:provider])
+      unless current_user.key_accounts.length + 
+             current_user.relay_accounts.length > 1
+        redirect_to redirect_path, alert: _("If we let you delete that account you won't be able to log in anymore")
+        return
+      end
+    end
     base = current_user.send("#{params[:provider]}_accounts".to_sym)
     base.find(params[:id]).destroy
     redirect_to redirect_path

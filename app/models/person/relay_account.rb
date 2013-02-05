@@ -1,6 +1,8 @@
 class Person::RelayAccount < ActiveRecord::Base
   extend Person::Account
 
+  after_commit :delete_corresponding_org_account, on: :destroy
+
   #attr_accessible :username, :remote_id
 
   def self.find_or_create_from_auth(auth_hash, user)
@@ -51,6 +53,14 @@ class Person::RelayAccount < ActiveRecord::Base
       account.save(validate: false)
     end
 
+  end
+
+  private
+
+  def delete_corresponding_org_account
+    if employee_id.present?
+      person.organization_accounts.where(remote_id: employee_id).destroy_all
+    end
   end
 
 end
