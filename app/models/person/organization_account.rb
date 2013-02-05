@@ -6,7 +6,6 @@ class Person::OrganizationAccount < ActiveRecord::Base
   extend Person::Account
   include Async
   include Sidekiq::Worker
-  sidekiq_options queue: :import
 
   serialize :password, Encryptor.new
 

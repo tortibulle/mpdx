@@ -218,8 +218,10 @@ class Siebel < DataServer
     person.master_person_id ||= MasterPerson.find_or_create_for_person(person, donor_account: donor_account).try(:id)
     person.save!
 
-    donor_account.people << person unless donor_account.people.include?(person)
-    donor_account.master_people << person.master_person unless donor_account.master_people.include?(person.master_person)
+    Retryable.retryable do
+      donor_account.people << person unless donor_account.people.include?(person)
+      donor_account.master_people << person.master_person unless donor_account.master_people.include?(person.master_person)
+    end
 
     contact_person = contact.add_person(person)
 
