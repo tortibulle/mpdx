@@ -3,5 +3,6 @@
 :concurrency:  15
 :queues:
   - [import, 1]
+  - [default, 1]
   - [facebook, 1]
   - [general, 5]
