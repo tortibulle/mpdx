@@ -1,7 +1,7 @@
 ---
 :verbose: false
-:concurrency:  10
+:concurrency:  15
 :queues:
   - [import, 1]
   - [facebook, 1]
-  - [general, 2]
+  - [general, 5]
