@@ -11,7 +11,7 @@ Mpdx::Application.configure do
   # Disable Rails's static asset server (Apache or nginx will already do this)
   # config.serve_static_assets = false
   config.serve_static_assets = true
-  
+
 
   # Compress JavaScripts and CSS
   config.assets.compress = true
@@ -44,7 +44,9 @@ Mpdx::Application.configure do
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
 
   # Use a different cache store in production
-  # config.cache_store = :mem_cache_store
+  cache_servers = ['10.181.146.139', '10.181.139.83']
+
+  config.cache_store = :dalli_store, cache_servers,  { :namespace => 'MPDXCache', :expire_after => 1.day, :compress => true }
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server
   # config.action_controller.asset_host = "http://assets.example.com"
