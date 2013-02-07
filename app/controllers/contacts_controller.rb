@@ -229,8 +229,8 @@ class ContactsController < ApplicationController
       current_user.contacts_filter[current_account_list.id] = nil
     end
 
-    if current_user.contacts_filter.present?
-      @filters_params = current_user.contacts_filter
+    if current_user.contacts_filter.present? && current_user.contacts_filter[current_account_list.id].present?
+      @filters_params = current_user.contacts_filter[current_account_list.id]
     end
   end
 
