@@ -23,7 +23,7 @@ job_type :rake,    "cd :path && RAILS_ENV=:environment /usr/local/bin/bundle exe
 job_type :rails,    "cd :path && RAILS_ENV=:environment /usr/local/bin/bundle exec /usr/local/bin/rails :task --silent :output"
 job_type :runner,    "cd :path && RAILS_ENV=:environment /usr/local/bin/bundle exec /usr/local/bin/rails runner :task --silent :output"
 
-every :day, at: '12am' do
+every 2.days, at: '12am' do
   runner "AccountList.update_linked_org_accounts"
 end
 
@@ -35,7 +35,7 @@ every :day, at: '11pm' do
   runner "Person::FacebookAccount.refresh_tokens"
 end
 
-every :day, at: '12pm' do
+every 2.days, at: '12pm' do
   runner "AccountList.queue_send_account_notifications"
 end
 
