@@ -110,7 +110,7 @@ class MailChimpAccount < ActiveRecord::Base
     if email.present? && primary_list_id.present?
       begin
         gb.list_unsubscribe(id: primary_list_id, email_address: email,
-                              send_goodbye: false, delete_member: true)
+                            send_goodbye: false, delete_member: true)
       rescue Gibbon::MailChimpError => e
         raise e unless e.message.include?('code 232')
       end
@@ -145,9 +145,9 @@ class MailChimpAccount < ActiveRecord::Base
     end
 
     contacts = contacts.
-               includes(people: :primary_email_address).
-               where(send_newsletter: ['Email', 'Both']).
-               where('email_addresses.email is not null')
+      includes(people: :primary_email_address).
+      where(send_newsletter: ['Email', 'Both']).
+      where('email_addresses.email is not null')
 
     export_to_list(primary_list_id, contacts.to_set)
   end
@@ -192,31 +192,28 @@ class MailChimpAccount < ActiveRecord::Base
     if statuses.present?
       begin
         groupings = gb.list_interest_groupings(id: list_id)
-
-        if groupings[0] && ((grouping = groupings.detect { |g| g['id'] == grouping_id }) ||
-                            (grouping = groupings.detect { |g| g['name'] == _('Partner Status') }))
-
-          self.grouping_id = grouping['id']
-
-          # make sure the grouping is hidden
-          gb.list_interest_grouping_update(grouping_id: grouping_id, name: 'type', value: 'hidden')
-
-          # Add any new groups
-          groups = grouping['groups'].collect { |g| g['name'] }
-
-          (statuses - groups).each do |group|
-            gb.list_interest_group_add(id: list_id, group_name: group, grouping_id: grouping_id)
-          end
-
-        else
-          # create a new grouping
-          self.grouping_id = gb.list_interest_grouping_add(id: list_id, name: _('Partner Status'), type: 'hidden',
-                                                           groups: statuses.map { |s| _(s) })
-        end
-        save
+        ((grouping = groupings.detect { |g| g['id'] == grouping_id }) ||
+        (grouping = groupings.detect { |g| g['name'] == _('Partner Status') }))
+        self.grouping_id = grouping['id'] if grouping
       rescue Gibbon::MailChimpError => e
         raise e unless e.message.include?('code 211') # This list does not have interest groups enabled (code 211)
       end
+      # create a new grouping
+      self.grouping_id ||= gb.list_interest_grouping_add(id: list_id, name: _('Partner Status'), type: 'hidden',
+                                                         groups: statuses.map { |s| _(s) })
+
+      # make sure the grouping is hidden
+      gb.list_interest_grouping_update(grouping_id: grouping_id, name: 'type', value: 'hidden')
+
+      # Add any new groups
+      groups = grouping['groups'].collect { |g| g['name'] }
+
+      (statuses - groups).each do |group|
+        gb.list_interest_group_add(id: list_id, group_name: group, grouping_id: grouping_id)
+      end
+
+      save
+
     end
   end
 
