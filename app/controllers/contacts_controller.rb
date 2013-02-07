@@ -228,9 +228,10 @@ class ContactsController < ApplicationController
       current_user.update_attributes(contacts_filter: nil)
     end
 
-    if current_user.contacts_filter.present?
-      @filters_params = current_user.contacts_filter
-    end
+    #if current_user.contacts_filter.present?
+      #@filters_params = current_user.contacts_filter
+    #end
+    @filters_params = filters_params
   end
 
 end
