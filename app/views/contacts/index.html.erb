@@ -74,7 +74,7 @@
         </li>
         <li class="controls">
           <%= submit_tag _('Apply Filters') %>
-          <%= link_to(_('Reset Filters'), contacts_path, style: 'font-size: 11px;') if params[:filters] %>
+          <%= link_to(_('Reset Filters'), contacts_path(clear_filter: true), style: 'font-size: 11px;') if filters_params.present? %>
         </li>
       </ul>
     <% end %>
@@ -145,8 +145,8 @@
             <li><%= link_to(_('Edit Fields'), '#', class: 'none', data: {behavior: 'bulk_edit'}) %></li>
           </ul>
           <span style="margin-right:3px;margin-left:5px">
-							<label for="checkall">Select All Rows</label>
-							<input name="checkall" type="checkbox" class="checkall" />
+            <label for="checkall"><%= _('Select All Rows') %></label>
+            <input name="checkall" type="checkbox" class="checkall" />
 					</span>
         </div>
       </div>

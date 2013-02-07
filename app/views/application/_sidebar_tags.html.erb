@@ -5,14 +5,13 @@
       <% tags.each do |tag|
         # toggle tag on / off
         url_params = {}.merge(params.except(:action, :controller))
-        url_params[:filters] ||= {}
+        url_params['filters'] ||= filters_params.dup
         tag_params.to_s.split(',').tap do |tags|
           if tags.include?(tag)
-            url_params[:filters][:tags] = (tags - [tag]).join(',')
+            url_params['filters']['tags'] = (tags - [tag]).join(',')
           else
-            url_params[:filters][:tags] = (tags + [tag]).join(',')
-          end
-          url_params[:filters].delete(:tags) if url_params[:filters][:tags].blank? %>
+            url_params['filters']['tags'] = (tags + [tag]).join(',')
+          end %>
 
           <%= link_to(tag, url_params, class: "tag #{'selected' if tags.include?(tag)}") %>
         <% end %>

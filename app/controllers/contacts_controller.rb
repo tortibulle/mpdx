@@ -222,16 +222,16 @@ class ContactsController < ApplicationController
   end
 
   def setup_filters
+    current_user.contacts_filter ||= {}
     if filters_params.present?
-      current_user.update_attributes(contacts_filter: filters_params)
+      current_user.contacts_filter[current_account_list.id] = filters_params
     elsif params[:clear_filter] == 'true'
-      current_user.update_attributes(contacts_filter: nil)
+      current_user.contacts_filter[current_account_list.id] = nil
     end
 
-    #if current_user.contacts_filter.present?
-      #@filters_params = current_user.contacts_filter
-    #end
-    @filters_params = filters_params
+    if current_user.contacts_filter.present?
+      @filters_params = current_user.contacts_filter
+    end
   end
 
 end

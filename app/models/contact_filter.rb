@@ -55,10 +55,10 @@ class ContactFilter
       if @filters[:newsletter].present?
         case @filters[:newsletter]
         when 'address'
-          filtered_contacts = filtered_contacts.where(send_newsletter: 'Physical')
+          filtered_contacts = filtered_contacts.where(send_newsletter: ['Physical', 'Both'])
           filtered_contacts = filtered_contacts.joins(:addresses).where('addresses.street is not null')
         when 'email'
-          filtered_contacts = filtered_contacts.where(send_newsletter: 'Email')
+          filtered_contacts = filtered_contacts.where(send_newsletter: ['Email', 'Both'])
           filtered_contacts = filtered_contacts.joins(people: :email_addresses)
         else
           filtered_contacts = filtered_contacts.where('send_newsletter is not null')
