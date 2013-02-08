@@ -190,20 +190,25 @@ class MailChimpAccount < ActiveRecord::Base
     statuses = statuses.select(&:present?)
 
     if statuses.present?
+      grouping = nil # define grouping variable outside of block
       begin
-        groupings = gb.list_interest_groupings(id: list_id)
-        ((grouping = groupings.detect { |g| g['id'] == grouping_id }) ||
-        (grouping = groupings.detect { |g| g['name'] == _('Partner Status') }))
-        self.grouping_id = grouping['id'] if grouping
+        grouping = find_grouping(list_id)
+        if grouping
+          self.grouping_id = grouping['id'] 
+          # make sure the grouping is hidden
+          gb.list_interest_grouping_update(grouping_id: grouping_id, name: 'type', value: 'hidden')
+        end
       rescue Gibbon::MailChimpError => e
         raise e unless e.message.include?('code 211') # This list does not have interest groups enabled (code 211)
       end
       # create a new grouping
-      self.grouping_id ||= gb.list_interest_grouping_add(id: list_id, name: _('Partner Status'), type: 'hidden',
-                                                         groups: statuses.map { |s| _(s) })
+      unless grouping
+        gb.list_interest_grouping_add(id: list_id, name: _('Partner Status'), type: 'hidden',
+                                                           groups: statuses.map { |s| _(s) })
+        grouping = find_grouping(list_id)
+        self.grouping_id = grouping['id']
+      end
 
-      # make sure the grouping is hidden
-      gb.list_interest_grouping_update(grouping_id: grouping_id, name: 'type', value: 'hidden')
 
       # Add any new groups
       groups = grouping['groups'].collect { |g| g['name'] }
@@ -215,6 +220,12 @@ class MailChimpAccount < ActiveRecord::Base
       save
 
     end
+  end
+
+  def find_grouping(list_id)
+    groupings = gb.list_interest_groupings(id: list_id)
+    groupings.detect { |g| g['id'] == grouping_id } ||
+                        grouping = groupings.detect { |g| g['name'] == _('Partner Status') }
   end
 
   def queue_import_if_list_changed

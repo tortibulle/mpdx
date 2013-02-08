@@ -214,6 +214,10 @@ describe MailChimpAccount do
 
           @gb.should_receive(:list_interest_grouping_add).with({:id=>"foo", :name=>"Partner Status", :type=>"hidden", :groups=>["Partner - Pray"]})
 
+          @gb.should_receive(:list_interest_groupings).with(id: list_id).and_return([{'id' => 1, 'name' => 'Partner Status', 'groups' => []}])
+
+          @gb.should_receive(:list_interest_group_add).with({id: 'foo', group_name: 'Partner - Pray', grouping_id: 1})
+
           account.send(:add_status_groups, list_id, ['Partner - Pray'])
         end
 
