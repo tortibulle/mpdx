@@ -60,6 +60,14 @@ describe DataServer do
   end
 
   describe "import donors" do
+    it "should update the addresses_url on the org if the url changed" do
+      stub_request(:post, @org.addresses_url).to_return(body: "whatever\nRedirectQueryIni=foo")
+      stub_request(:post, "http://foo/")
+      -> {
+        @data_server.import_donors(@profile)
+      }.should change(@org, :addresses_url).to('foo')
+    end
+
     it "should import a company" do
       stub_request(:post, @org.addresses_url).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"19238\",\"ACorporation\",\"123 mi casa blvd.\",\"Colima\",\"COL\",\"456788\",\"(52) 45 456-5678\",\"MEX\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"8/15/2003\",\"8/15/2003\",\"\",\"O\",\"ACorporation\",\"\"\r\n")
       @data_server.should_receive(:add_or_update_donor_account)

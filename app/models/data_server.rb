@@ -49,14 +49,11 @@ class DataServer
 
     account_list = get_account_list(profile)
 
-    begin
-      response = get_response(@org.addresses_url,
-                              get_params(@org.addresses_params, {profile: profile.code.to_s,
-                                                                 datefrom: (date_from || @org.minimum_gift_date).to_s,
-                                                                 personid: @org_account.remote_id}))
-    rescue Errors::UrlChanged => e
-      @org.update_attributes(addresses_url: e.message)
-      retry
+    response = Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:addresses_url) do
+      get_response(@org.addresses_url,
+                   get_params(@org.addresses_params, {profile: profile.code.to_s,
+                                                      datefrom: (date_from || @org.minimum_gift_date).to_s,
+                                                      personid: @org_account.remote_id}))
     end
 
     CSV.new(response, headers: :first_row).each do |line|
@@ -108,15 +105,12 @@ class DataServer
     date_from = @org.minimum_gift_date || '1/1/2004' if date_from.blank?
     date_to = Time.now.strftime("%m/%d/%Y") if date_to.blank?
 
-    begin
-      response = get_response(@org.donations_url,
-                              get_params(@org.donations_params, {profile: profile.code.to_s,
-                                                                 datefrom: date_from,
-                                                                 dateto: date_to,
-                                                                 personid: @org_account.remote_id}))
-    rescue Errors::UrlChanged => e
-      @org.update_attributes(donations_url: e.message)
-      retry
+    response = Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:donations_url) do
+      get_response(@org.donations_url,
+                    get_params(@org.donations_params, {profile: profile.code.to_s,
+                                                       datefrom: date_from,
+                                                       dateto: date_to,
+                                                       personid: @org_account.remote_id}))
     end
 
 
@@ -149,18 +143,12 @@ class DataServer
   def validate_username_and_password
     begin
       if @org.profiles_url.present?
-        begin
+        response = Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:profiles_url) do
           get_response(@org.profiles_url, get_params(@org.profiles_params))
-        rescue Errors::UrlChanged => e
-          @org.update_attributes(profiles_url: e.message)
-          retry
         end
       else
-        begin
+        response = Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:account_balances_url) do
           get_response(@org.account_balance_url, get_params(@org.account_balance_params))
-        rescue Errors::UrlChanged => e
-          @org.update_attributes(account_balance_url: e.message)
-          retry
         end
       end
     rescue DataServerError => e
@@ -186,12 +174,9 @@ class DataServer
   protected
   def profile_balance(profile_code)
     balance = {}
-    begin
-      response = get_response(@org.account_balance_url,
-                              get_params(@org.account_balance_params, {profile: profile_code.to_s}))
-    rescue Errors::UrlChanged => e
-      @org.update_attributes!(account_balance_url: e.message)
-      retry
+    response = Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:account_balance_url) do
+      get_response(@org.account_balance_url,
+                   get_params(@org.account_balance_params, {profile: profile_code.to_s}))
     end
 
     # This csv should always only have one line (besides the headers)
@@ -220,12 +205,10 @@ class DataServer
     unless @profiles
       @profiles = []
       unless @org.profiles_url.blank?
-        begin
-          response = get_response(@org.profiles_url, get_params(@org.profiles_params))
-        rescue Errors::UrlChanged => e
-          @org.update_attributes(profiles_url: e.message)
-          retry
+        response = Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:profiles_url) do
+          get_response(@org.profiles_url, get_params(@org.profiles_params))
         end
+
         CSV.new(response, headers: :first_row).each do |line|
           name = line['PROFILE_DESCRIPTION'] || line['ROLE_DESCRIPTION']
           code = line['PROFILE_CODE'] || line['ROLE_CODE']
@@ -389,6 +372,12 @@ class DataServer
       donation.save!
       donation
     end
+  end
+
+  def update_url(url)
+    Proc.new { |exception, handler, attempts, retries, times|
+      @org.update_attributes(url => exception.message)
+    }
   end
 end
 
