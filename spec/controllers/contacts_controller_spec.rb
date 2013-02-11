@@ -3,7 +3,7 @@ require 'spec_helper'
 describe ContactsController do
   describe 'when signed in' do
     let(:user) { create(:user_with_account) }
-    let(:contact) { create(:contact, account_list: user.account_lists.first) }
+    let!(:contact) { create(:contact, account_list: user.account_lists.first) }
 
     before(:each) do
       sign_in(:user, user)
@@ -20,8 +20,16 @@ describe ContactsController do
       it "gets all" do
         get :index
         response.should be_success
-        assigns(:contacts).should == [contact, contact2]
+        assigns(:contacts).length.should.should == 2
       end
+
+      it "filters out people you don't want to contact even when no filter is set" do
+        contact.update_attributes(status: 'Not Interested')
+        get :index
+        response.should be_success
+        assigns(:contacts).length.should == 1
+      end
+
 
       it "gets people" do
         get :index, filter: 'people'

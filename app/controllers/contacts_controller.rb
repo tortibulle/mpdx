@@ -14,7 +14,11 @@ class ContactsController < ApplicationController
       @contacts = @contacts.companies
     end
 
-    @contacts = ContactFilter.new(filters_params).filter(@contacts) if filters_params.present?
+    @contacts = if filters_params.present?
+                  ContactFilter.new(filters_params).filter(@contacts)
+                else
+                  @contacts.active
+                end
     respond_to do |wants|
 
       wants.html do
