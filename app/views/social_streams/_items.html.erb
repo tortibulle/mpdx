@@ -9,7 +9,7 @@
           <td>
             <p>
               <%= link_to(image_tag('soc_facebook.gif', width: 16, height: 16), "http://facebook.com/profile.php?id=#{item.from.id}", target: '_blank') %><b class="social_from"><%= item.from.name %></b> 
-              <%= _('to') + " <b>#(item.to.name}</b>" if item.to %> <%= _('on') %> <%= l(item.created_time) %>
+              <%= _('to') + " <b>#(item.to.name}</b>" if item.to %> <%= _('on') %> <%= l(item.created_time.to_datetime) %>
             </p>
             <p><%= auto_link(item.body, target: '_blank') %></p>
 
