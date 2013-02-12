@@ -1,4 +1,8 @@
 $ ->
+  $(document).on 'click', '.task_show_more', ->
+    $(this).closest('.people').html($(this).next('.task_all_contacts').html())
+    false
+
   if $('#tasks_index')[0]?
     $(document).on 'click', '[data-behavior=bulk_complete]', ->
       title = __('Complete Tasks')

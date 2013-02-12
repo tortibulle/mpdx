@@ -17,7 +17,13 @@ class TaskExhibit < DisplayCase::Exhibit
   end
 
   def contact_links
-    contacts.collect { |c| @context.link_to(c.to_s, c) }.join('; ').html_safe
+    if contacts.length > 3
+      (contacts[0..1].collect { |c| @context.link_to(c.to_s, c) }.join('; ') +
+       @context.link_to(_('... Show More'), '#', class: 'task_show_more') +
+       '<span class="task_all_contacts" style="display:none">' + contacts.collect { |c| @context.link_to(c.to_s, c) }.join('; ') + '</span>').html_safe
+    else
+      contacts.collect { |c| @context.link_to(c.to_s, c) }.join('; ').html_safe
+    end
   end
 
   def tag_links
