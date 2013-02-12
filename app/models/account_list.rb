@@ -68,18 +68,22 @@ class AccountList < ActiveRecord::Base
   def cities
     @cities ||= ActiveRecord::Base.connection.select_values("select distinct(a.city) from account_lists al inner join contacts c on c.account_list_id = al.id
                                                        inner join addresses a on a.addressable_id = c.id AND a.addressable_type = 'Contact' where al.id = #{id}
+                                                       AND (#{Contact.active_conditions})
                                                        order by a.city")
   end
 
   def states
     @states ||= ActiveRecord::Base.connection.select_values("select distinct(a.state) from account_lists al inner join contacts c on c.account_list_id = al.id
                                                        inner join addresses a on a.addressable_id = c.id AND a.addressable_type = 'Contact' where al.id = #{id}
+                                                       AND (#{Contact.active_conditions})
                                                        order by a.state")
   end
 
   def churches
     @churches ||= ActiveRecord::Base.connection.select_values("select distinct(c.church_name) from account_lists al inner join contacts c on c.account_list_id = al.id
-                                                       where al.id = #{id} order by c.church_name")
+                                                       where al.id = #{id}
+                                                       AND (#{Contact.active_conditions})
+                                                       order by c.church_name")
   end
 
   def valid_mail_chimp_account

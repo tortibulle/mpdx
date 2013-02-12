@@ -232,6 +232,7 @@ class ContactsController < ApplicationController
     elsif params[:clear_filter] == 'true'
       current_user.contacts_filter[current_account_list.id] = nil
     end
+    current_user.save
 
     if current_user.contacts_filter.present? && current_user.contacts_filter[current_account_list.id].present?
       @filters_params = current_user.contacts_filter[current_account_list.id]
