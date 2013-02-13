@@ -20,6 +20,7 @@ class AccountList < ActiveRecord::Base
   belongs_to :creator, class_name: 'User', foreign_key: 'creator_id'
   has_many :account_list_users, dependent: :destroy
   has_many :users, through: :account_list_users
+  has_many :organization_accounts, through: :users
   has_many :account_list_entries, dependent: :destroy
   has_many :designation_accounts, through: :account_list_entries
   has_many :contacts, dependent: :destroy
@@ -102,8 +103,9 @@ class AccountList < ActiveRecord::Base
 
   # Download all donations / info for all accounts associated with this list
   def self.update_linked_org_accounts
-    AccountList.find_each do |al|
+    AccountList.joins(:organization_accounts).order('last_download asc').limit((AccountList.count / 48.0).ceil).each do |al|
       al.users.collect(&:organization_accounts).flatten.uniq.collect(&:queue_import_data)
+      al.async(:send_account_notifications)
     end
   end
 

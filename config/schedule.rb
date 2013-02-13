@@ -23,7 +23,7 @@ job_type :rake,    "cd :path && RAILS_ENV=:environment /usr/local/bin/bundle exe
 job_type :rails,    "cd :path && RAILS_ENV=:environment /usr/local/bin/bundle exec /usr/local/bin/rails :task --silent :output"
 job_type :runner,    "cd :path && RAILS_ENV=:environment /usr/local/bin/bundle exec /usr/local/bin/rails runner :task --silent :output"
 
-every 2.days, at: '12am' do
+every 30.minutes do
   runner "AccountList.update_linked_org_accounts"
 end
 
