@@ -35,9 +35,9 @@ every :day, at: '11pm' do
   runner "Person::FacebookAccount.refresh_tokens"
 end
 
-every 2.days, at: '12pm' do
-  runner "AccountList.queue_send_account_notifications"
-end
+#every 2.days, at: '12pm' do
+  #runner "AccountList.queue_send_account_notifications"
+#end
 
 
 # Learn more: http://github.com/javan/whenever
