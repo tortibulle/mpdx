@@ -27,7 +27,7 @@ gem 'country_select', git: 'git://github.com/26am/country_select.git' # My fork 
 gem 'dalli'
 gem 'deadlock_retry', '~> 1.2.0'
 gem 'devise', '~> 2.1.0'
-gem 'display_case', '~> 0.0.5'
+gem 'display_case', '= 0.0.5'
 gem 'fb_graph', '~> 2.6.0'
 gem 'fog', '~> 1.6.0'
 gem 'gettext_i18n_rails', '~> 0.8.0'
