@@ -103,7 +103,7 @@ class AccountList < ActiveRecord::Base
 
   # Download all donations / info for all accounts associated with this list
   def self.update_linked_org_accounts
-    AccountList.joins(:organization_accounts).order('last_download asc').limit((AccountList.count / 48.0).ceil).each do |al|
+    AccountList.joins(:organization_accounts).where("locked_at is null").order('last_download asc').limit((AccountList.count / 48.0).ceil).each do |al|
       al.users.collect(&:organization_accounts).flatten.uniq.collect(&:queue_import_data)
       al.async(:send_account_notifications)
     end

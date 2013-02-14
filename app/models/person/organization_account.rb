@@ -6,7 +6,7 @@ class Person::OrganizationAccount < ActiveRecord::Base
   extend Person::Account
   include Async
   include Sidekiq::Worker
-  sidekiq_options :retry => false
+  sidekiq_options retry: false
 
   serialize :password, Encryptor.new
 
