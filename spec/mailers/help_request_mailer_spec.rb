@@ -6,7 +6,7 @@ describe HelpRequestMailer do
     let(:mail) { HelpRequestMailer.email(help_request) }
 
     it "renders the headers" do
-      mail.subject.should eq("Email")
+      mail.subject.should eq("Problem")
       mail.to.should eq(["support@mpdx.org"])
       mail.from.should eq([help_request.email])
     end
