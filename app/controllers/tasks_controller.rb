@@ -144,15 +144,15 @@ class TasksController < ApplicationController
   private
 
   def setup_filters
+    current_user.tasks_filter ||= {}
     if filters_params.present?
-      current_user.update_attributes(tasks_filter: filters_params)
+      current_user.tasks_filter[current_account_list.id] = filters_params
     elsif params[:clear_filter] == 'true'
-      current_user.update_attributes(tasks_filter: nil)
+      current_user.tasks_filter[current_account_list.id] = nil
     end
 
-    if current_user.tasks_filter.present?
-      @filters_params = current_user.tasks_filter
+    if current_user.tasks_filter.present? && current_user.tasks_filter[current_account_list.id].present?
+      @filters_params = current_user.tasks_filter[current_account_list.id]
     end
   end
-
 end

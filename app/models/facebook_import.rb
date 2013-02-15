@@ -125,10 +125,13 @@ class FacebookImport
 
     unless fb_person.facebook_accounts.pluck(:remote_id).include?(friend.identifier.to_i)
       # Create a facebook account
-      fb_person.facebook_accounts.create!(remote_id: friend.identifier,
-                                          authenticated: true,
-                                          first_name: friend.first_name,
-                                          last_name: friend.last_name)
+      begin
+        fb_person.facebook_accounts.create!(remote_id: friend.identifier,
+                                            authenticated: true,
+                                            first_name: friend.first_name,
+                                            last_name: friend.last_name)
+      rescue ActiveRecord::RecordNotUnique
+      end
     end
 
     # add phone number and email if available

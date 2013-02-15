@@ -29,8 +29,8 @@
               <% end %>
             </td>
             <td><%= task_exhibit.contact_links %></td>
-            <td><%= l(task_exhibit.start_at.to_datetime) %></td>
-            <td><%= l(task_exhibit.completed_at.to_datetime) %></td>
+            <td><%= task_exhibit.start_at %></td>
+            <td><%= task_exhibit.completed_at %></td>
             <td><%= _(task_exhibit.activity_type) %></td>
             <td>
               <% if task.attempted? %>

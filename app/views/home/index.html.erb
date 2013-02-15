@@ -40,7 +40,7 @@
               <li class="<%= task_exhibit.css_class %>" id="<%= dom_id(task) %>">
                 <input type="checkbox" data-behavior="complete_task" data-id="<%= task.id %>" />
                 <%= link_to(tasks_path(anchor: dom_id(task))) do %>
-                  <span class="date"><%= l(task_exhibit.start_at) %></span> - <span><%= task_exhibit %></span>
+                  <span class="date"><%= task_exhibit.start_at %></span> - <span><%= task_exhibit %></span>
                 <% end %>
                 <%== "(#{task_exhibit.contact_links})" if task_exhibit.contact_links.present? %>
                 <%= link_to('Destroy', task, confirm: _("Are you sure you want to delete this task instead of marking it as completed?"), method: :delete, :class=> "ico ico_trash", remote: true) %>

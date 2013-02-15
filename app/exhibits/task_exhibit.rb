@@ -32,4 +32,12 @@ class TaskExhibit < DisplayCase::Exhibit
     end.join(' ').html_safe
   end
 
+  def completed_at
+    to_model.completed_at ? @context.l(to_model.completed_at.to_datetime) : ''
+  end
+
+  def start_at
+    to_model.start_at ? @context.l(to_model.start_at.to_datetime) : ''
+  end
+
 end

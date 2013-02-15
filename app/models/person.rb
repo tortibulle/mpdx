@@ -62,7 +62,10 @@ class Person < ActiveRecord::Base
                      'Wife' # Default to wife
                    end
 
-    family_relationships.where(related_person_id: spouse.id).first_or_create(relationship: relationship)
+    begin
+      family_relationships.where(related_person_id: spouse.id).first_or_create(relationship: relationship)
+    rescue ActiveRecord::RecordNotUnique
+    end
   end
 
   def spouse

@@ -12,7 +12,7 @@ class TaskFilter
   def filter(tasks)
     filtered_tasks = tasks
 
-    if @filters[:contact_ids].present?
+    if @filters[:contact_ids].present? && @filters[:contact_ids].first != ''
       filtered_tasks = filtered_tasks.where('contacts.id' => @filters[:contact_ids])
     end
 
