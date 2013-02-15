@@ -84,6 +84,10 @@ class MailChimpAccount < ActiveRecord::Base
     end
   end
 
+  def datacenter
+    api_key.to_s.split('-').last
+  end
+
   private
 
   def call_mailchimp(method, *args)
@@ -194,7 +198,7 @@ class MailChimpAccount < ActiveRecord::Base
       begin
         grouping = find_grouping(list_id)
         if grouping
-          self.grouping_id = grouping['id'] 
+          self.grouping_id = grouping['id']
           # make sure the grouping is hidden
           gb.list_interest_grouping_update(grouping_id: grouping_id, name: 'type', value: 'hidden')
         end
