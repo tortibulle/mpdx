@@ -93,7 +93,7 @@
     </div>
     <div id="feedback">
       <h2><%= _('Give us feedback!') %></h2>
-      <p><%= _('Have some feedback on how we can improve MPDX? Send us an email: %{address}') % {address: mail_to('support@mpdx.org')} %>
+      <p><%= _('Have some feedback on how we can improve MPDX? %{link}') % {link: link_to(_('Click here to let us know'), new_help_request_path)} %>
     </div>
 
     <div id="confirmation_modal" title="<%= _('Are you sure?') %>"></div>

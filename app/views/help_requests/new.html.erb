@@ -1,0 +1,50 @@
+<h2>
+  <%= _('Have a suggestion or a problem? Please fill out the form below.') %>
+  <br>
+  <%= _('The more detail you are able to give us, the easier it will be for us to help you. Thanks!') %>
+</h2>
+
+<%= form_for @help_request do |f| %>
+  <% if @help_request.errors.any? %>
+    <div id="error_explanation">
+      <ul>
+        <% @help_request.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </div>
+
+  <div class="field">
+    <%= f.label :email %>
+    <%= f.text_field :email %>
+  </div>
+
+  <div class="field">
+    <%= f.label :request_type %>
+    <%= f.select :request_type, [[_('Problem'), 'Problem'], [_('Suggestion'), 'Suggestion']] %>
+  </div>
+
+  <div class="field">
+    <%= f.label :problem, _('Problem or Suggestion') %>
+    <%= f.text_area :problem, rows: 10, style: 'width:500px' %>
+  </div>
+
+  <div class="field">
+    <%= f.label :file, _('If your problem is related to importing, please attach the file you are trying to upload.') %>
+    <%= f.file_field :file %>
+    <%= f.hidden_field :file_cache %>
+    <%= @help_request.file.filename if @help_request.file? %>
+  </div>
+
+  <div class="field">
+    <%= f.submit _('Submit') %>
+  </div>
+
+
+<% end %>

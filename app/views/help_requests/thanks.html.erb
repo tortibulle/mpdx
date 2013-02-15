@@ -1,0 +1,10 @@
+<h2><%= _('Thanks!') %></h2>
+<p>
+  <% if @help_request.request_type == 'Problem' %>
+    <%= _("Thank you for helping us find problems with MPDX. Your issue has been emailed to the support team
+    and we'll do our best to get back to you within 24 hours (we're not always perfect about that, but we try") %>
+  <% else %>
+    <%= _("Thank you for suggesting ways we can make MPDX a better tool. We will take your suggestion into consideration
+    and add it to MPDX's project tool: %{link}") % {link: link_to('http://jira.uscm.org/browse/MPDX', 'http://jira.uscm.org/browse/MPDX') } %>
+  <% end %>
+</p>

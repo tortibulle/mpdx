@@ -1,0 +1,53 @@
+<h2><%= @help_request.request_type %></h2>
+
+<table border="1" cellspacing="0" cellpadding="5">
+  <tr>
+    <th>Name:</th>
+    <td><%= @help_request.name %></td>
+  </tr>
+  <tr>
+    <th>Email:</th>
+    <td><%= @help_request.email %></td>
+  </tr>
+  <tr>
+    <th><%= @help_request.request_type.titleize %>:</th>
+    <td><%= @help_request.problem %></td>
+  </tr>
+
+  <% if @help_request.file? %>
+    <tr>
+      <th>Import File:</th>
+      <td><%= link_to('Click here to download the file', @help_request.file_url) %></td>
+    </tr>
+  <% end %>
+</table>
+<br /><br />
+<h2>User Info</h2>
+<table border="1" cellspacing="0" cellpadding="5">
+  <tr>
+    <th>Browser:</th>
+    <td><%= @help_request.browser %></td>
+  </tr>
+
+  <tr>
+    <th>User ID:</th>
+    <td><%= @help_request.user_id %></td>
+  </tr>
+
+  <tr>
+    <th>Account List ID:</th>
+    <td><%= @help_request.account_list_id %></td>
+  </tr>
+
+  <tr>
+    <th>User Preferences:</th>
+    <td><%= @help_request.user_preferences %></td>
+  </tr>
+
+  <tr>
+    <th>Account List Settings:</th>
+    <td><%= @help_request.account_list_settings %></td>
+  </tr>
+
+
+</table>

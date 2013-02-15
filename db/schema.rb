@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130119202905) do
+ActiveRecord::Schema.define(:version => 20130213173322) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -362,6 +362,22 @@ ActiveRecord::Schema.define(:version => 20130119202905) do
 
   add_index "family_relationships", ["person_id", "related_person_id"], :name => "index_family_relationships_on_person_id_and_related_person_id", :unique => true
   add_index "family_relationships", ["related_person_id"], :name => "index_family_relationships_on_related_person_id"
+
+  create_table "help_requests", :force => true do |t|
+    t.string   "name"
+    t.text     "browser"
+    t.text     "problem"
+    t.string   "email"
+    t.string   "file"
+    t.integer  "user_id"
+    t.integer  "account_list_id"
+    t.text     "session"
+    t.text     "user_preferences"
+    t.text     "account_list_settings"
+    t.string   "request_type"
+    t.datetime "created_at",            :null => false
+    t.datetime "updated_at",            :null => false
+  end
 
   create_table "imports", :force => true do |t|
     t.integer  "account_list_id"
