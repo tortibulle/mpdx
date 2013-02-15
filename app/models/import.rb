@@ -1,6 +1,4 @@
 require 'async'
-require 'csv'
-require 'tnt_import_validator'
 
 class Import < ActiveRecord::Base
   include Async
