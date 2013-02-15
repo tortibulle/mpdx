@@ -10,7 +10,7 @@ class HelpRequest < ActiveRecord::Base
   serialize :user_preferences, JSON
   serialize :account_list_preferences, JSON
 
-  validates :name, :email, :problem, presence: true
+  validates :name, :email, :problem, :request_type, presence: true
   validates :email, email: true
 
   def send_email

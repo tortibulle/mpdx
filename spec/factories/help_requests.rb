@@ -11,5 +11,6 @@ FactoryGirl.define do
     session "MyText"
     user_preferences "MyText"
     account_list_settings "MyText"
+    request_type 'Problem'
   end
 end
