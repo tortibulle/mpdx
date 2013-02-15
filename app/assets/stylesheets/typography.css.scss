@@ -65,6 +65,8 @@ p:last-child {margin-bottom: 0;}
 
 #global {
   font-family: $font_highlight;
+  z-index: 10;
+  position: relative;
   #mainmenu {font-size: 14px; a {color: $white; text-shadow: 1px 1px 1px #111;} a:hover {color: $gray_mid;} .active a {color: $black;;}}
   #submenu {font-size: 12px;}
   .bal {
