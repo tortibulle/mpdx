@@ -317,7 +317,10 @@ class TntImport
     person.master_person_id ||= MasterPerson.find_or_create_for_person(person, donor_account: donor_account, remote_id: remote_id).try(:id)
     person.save!
 
-    donor_account.master_people << person.master_person unless donor_account.master_people.include?(person.master_person)
+    begin
+      donor_account.master_people << person.master_person unless donor_account.master_people.include?(person.master_person)
+    rescue ActiveRecord::RecordNotUnique
+    end
 
     contact_person ||= contact.add_person(person)
 

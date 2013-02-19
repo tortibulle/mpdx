@@ -232,7 +232,7 @@ class Person < ActiveRecord::Base
   end
 
   def clean_up_master_person
-    self.master_person.destroy if (self.master_person.people - [self]).blank?
+    self.master_person.destroy if self.master_person && (self.master_person.people - [self]).blank?
   end
 
   def mail_chimp_account

@@ -3,14 +3,6 @@ class PeopleController < ApplicationController
   before_filter :get_contact
   before_filter :get_person, only: [:show, :edit, :update, :social_search]
 
-  #def index
-    #@people = current_account_list.people.includes(:people).order(:name).page(params[:page])
-
-    #respond_to do |format|
-      #format.html { render :stream => true }
-    #end
-  #end
-
   def show
     @person = current_account_list.people.find(params[:id])
 
