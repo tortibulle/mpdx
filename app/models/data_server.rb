@@ -236,7 +236,8 @@ class DataServer
       lines = response.split("\n")
       first_line = lines.first.to_s.upcase
       case
-      when first_line.include?('BAD_PASSWORD')
+      when first_line.include?('BAD_PASSWORD') || first_line.include?('username or password were incorrect')
+        @org_account.update_column(:valid_credentials, false) if @org_account.valid_credentials? && !@org_account.new_record?
         raise OrgAccountInvalidCredentialsError, I18n.t('data_server.invalid_username_password', org: @org)
       when response.code.to_i == 500 || first_line.include?('ERROR') || first_line.include?('HTML')
         raise DataServerError, response
