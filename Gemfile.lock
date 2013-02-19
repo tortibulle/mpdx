@@ -6,22 +6,23 @@ GIT
 
 GIT
   remote: git://github.com/jnicklas/carrierwave.git
-  revision: 26fefeaad836ef419c745da0788d04b52fec02f4
+  revision: 9566044fe1b97367a0adc0eb6fd7bb59b5409a4c
   specs:
     carrierwave (0.8.0)
       activemodel (>= 3.2.0)
       activesupport (>= 3.2.0)
+      multi_json (~> 1)
 
 GIT
   remote: git://github.com/rails-api/active_model_serializers.git
-  revision: 3e9b366a4531e6795b73b41e732f9db849874903
+  revision: 0114e492388ff84defcd1afbbb315e547849cb96
   specs:
     active_model_serializers (0.5.2)
       activemodel (>= 3.0)
 
 GIT
   remote: git://github.com/twinge/siebel_donations.git
-  revision: 77f7b23c07ab1492bb6aa46ba22e5164a64eb77e
+  revision: 833428f4ba9807fc8fa2df8a5377f829ea5ab65e
   specs:
     siebel_donations (1.0.3)
       activesupport
@@ -136,7 +137,7 @@ GEM
       ffi (~> 1.2.0)
       mime-types (~> 1.18)
     eventmachine (1.0.0)
-    excon (0.16.10)
+    excon (0.17.0)
     execjs (1.4.0)
       multi_json (~> 1.0)
     facter (1.6.17)
@@ -193,7 +194,7 @@ GEM
       pry (>= 0.9.10)
       terminal-table (>= 1.4.3)
       thor (>= 0.14.6)
-    guard-rspec (2.4.0)
+    guard-rspec (2.4.1)
       guard (>= 1.1)
       rspec (~> 2.11)
     guard-spork (1.4.2)
@@ -260,13 +261,13 @@ GEM
       polyamorous (~> 0.5.0)
     method_source (0.8.1)
     mime-types (1.21)
-    multi_json (1.6.0)
+    multi_json (1.6.1)
     multi_xml (0.5.3)
     multipart-post (1.1.5)
     net-scp (1.0.6)
       net-ssh (>= 2.6.5)
     net-ssh (2.6.5)
-    newrelic_rpm (3.5.6.46)
+    newrelic_rpm (3.5.6.55)
     nokogiri (1.5.6)
     oauth (0.4.7)
     oauth2 (0.8.0)
@@ -275,8 +276,8 @@ GEM
       jwt (~> 0.1.4)
       multi_json (~> 1.0)
       rack (~> 1.2)
-    oj (2.0.4)
-    omniauth (1.1.2)
+    oj (2.0.7)
+    omniauth (1.1.3)
       hashie (~> 1.2)
       rack
     omniauth-cas (1.0.1)
@@ -300,7 +301,7 @@ GEM
       multi_json (~> 1.3)
       omniauth-oauth (~> 1.0)
     orm_adapter (0.4.0)
-    paper_trail (2.7.0)
+    paper_trail (2.7.1)
       activerecord (~> 3.0)
       railties (~> 3.0)
     pg (0.14.1)
@@ -318,7 +319,7 @@ GEM
     rack (1.4.5)
     rack-cache (1.2)
       rack (>= 0.4)
-    rack-oauth2 (1.0.1)
+    rack-oauth2 (1.0.3)
       activesupport (>= 2.3)
       attr_required (>= 0.0.5)
       httpclient (>= 2.2.0.2)
@@ -478,9 +479,9 @@ GEM
       descendants_tracker (~> 0.0.1)
     warden (1.2.1)
       rack (>= 1.0)
-    webmock (1.9.0)
+    webmock (1.9.2)
       addressable (>= 2.2.7)
-      crack (>= 0.1.7)
+      crack (>= 0.3.2)
     websocket (1.0.7)
     whenever (0.8.2)
       activesupport (>= 2.3.4)
