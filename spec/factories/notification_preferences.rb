@@ -2,7 +2,8 @@
 
 FactoryGirl.define do
   factory :notification_preference do
-    notification_type_id 1
-    actions "MyText"
+    association :notification_type
+    association :account_list
+    actions ['email']
   end
 end

@@ -180,7 +180,7 @@ class AccountList < ActiveRecord::Base
   # trigger any notifications for designation accounts in this account list
   def send_account_notifications
     designation_accounts.each do |da|
-      notifications = NotificationType.check_all(da)
+      notifications = NotificationType.check_all(da, self)
 
       notifications_to_email = {}
 

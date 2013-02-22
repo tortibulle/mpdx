@@ -1,5 +1,6 @@
 class NotificationPreference < ActiveRecord::Base
   belongs_to :account_list
+  belongs_to :notification_type
 
   serialize :actions
   # attr_accessible :actions, :notification_type_id

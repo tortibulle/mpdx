@@ -9,10 +9,14 @@ class NotificationType < ActiveRecord::Base
     @@types ||= connection.select_values("select distinct(type) from #{table_name}")
   end
 
-  def self.check_all(designation_account)
+  def self.check_all(designation_account, account_list)
     contacts = {}
     types.each do |type|
-      contacts[type] = type.constantize.first.check(designation_account)
+      type_instance = type.constantize.first
+      actions = account_list.notification_preferences.find_by_notification_type_id(type_instance.id).try(:actions)
+      if (Array.wrap(actions) & NotificationPreference.default_actions).present?
+        contacts[type] = type_instance.check(designation_account)
+      end
     end
     contacts
   end
