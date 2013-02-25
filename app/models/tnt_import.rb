@@ -204,7 +204,13 @@ class TntImport
     contact.website = row['WebPage'] if @import.override? || contact.website.blank?
     contact.updated_at = parse_date(row['LastEdit']) if @import.override?
     contact.created_at = parse_date(row['CreatedDate']) if @import.override?
-    contact.notes = Nokogiri::HTML(row['Notes'].to_s.gsub(/{.*}/,'').gsub(/\\\w*/, '').gsub(/[{}]*/,'').gsub('-240-1','').strip).text if @import.override? || contact.notes.blank?
+    if @import.override? || contact.notes.blank?
+      contact.notes = begin
+                        Nokogiri::HTML(RubyRTF::Parser.new.parse(row['Notes'].to_s).sections.collect {|s| s[:text]}.join("\n").gsub(/\n+/, "\n")).text
+                      rescue RubyRTF::InvalidDocument
+                        row['Notes']
+                      end
+    end
     contact.pledge_amount = row['PledgeAmount'] if @import.override? || contact.pledge_amount.blank?
     contact.pledge_frequency = row['PledgeFrequencyID'] if (@import.override? || contact.pledge_frequency.blank?) && row['PledgeFrequencyID'].to_i != 0
     contact.pledge_start_date = parse_date(row['PledgeStartDate']) if (@import.override? || contact.pledge_start_date.blank?) && row['PledgeStartDate'].present?
