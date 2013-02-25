@@ -13,11 +13,18 @@ describe TntImport do
 
   context '#import_contacts' do
     it 'associates referrals' do
-      import.should_receive(:add_or_update_donor_accounts).and_return([[create(:donor_account)], contact])
-      import.should_receive(:add_or_update_donor_accounts).and_return([[create(:donor_account)], create(:contact, name: 'Foo')])
+      import.should_receive(:add_or_update_donor_accounts).and_return([create(:donor_account)])
+      import.should_receive(:add_or_update_donor_accounts).and_return([create(:donor_account)])
       expect {
         import.send(:import_contacts)
       }.to change(ContactReferral, :count).by(1)
+    end
+
+    it 'imports a contact people details even if the contact is not a donor' do
+      import = TntImport.new(create(:tnt_import_non_donor))
+      expect {
+        import.send(:import_contacts)
+      }.to change(Person, :count).by(1)
     end
   end
 
@@ -60,9 +67,26 @@ describe TntImport do
 
     it 'creates a new contact' do
       expect {
-        import.send(:add_or_update_donor_accounts, contact_rows.first, designation_profile)
+        import.send(:import_contacts)
+      }.to change(Contact, :count).by(2)
+    end
+
+    it 'creates a new contact from a non-donor' do
+      import = TntImport.new(create(:tnt_import_non_donor))
+      expect {
+        import.send(:import_contacts)
       }.to change(Contact, :count).by(1)
     end
+
+    it "doesn't create duplicate people when importing the same list twice" do
+      import = TntImport.new(create(:tnt_import_non_donor))
+      import.send(:import_contacts)
+
+      expect {
+        import.send(:import_contacts)
+      }.not_to change(Person, :count)
+    end
+
 
   end
 

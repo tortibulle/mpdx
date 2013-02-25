@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130213173322) do
+ActiveRecord::Schema.define(:version => 20130222192624) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -245,10 +245,12 @@ ActiveRecord::Schema.define(:version => 20130213173322) do
     t.date     "last_pre_call"
     t.date     "last_thank"
     t.boolean  "pledge_received",                                                    :default => false, :null => false
+    t.integer  "tnt_id"
   end
 
   add_index "contacts", ["account_list_id"], :name => "index_contacts_on_account_list_id"
   add_index "contacts", ["last_donation_date"], :name => "index_contacts_on_last_donation_date"
+  add_index "contacts", ["tnt_id"], :name => "index_contacts_on_tnt_id"
   add_index "contacts", ["total_donations"], :name => "index_contacts_on_total_donations"
 
   create_table "designation_accounts", :force => true do |t|

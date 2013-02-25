@@ -15,6 +15,7 @@ else
     config.fog_directory  = APP_CONFIG['s3_bucket']                     # required
     config.fog_public     = false                                   # optional, defaults to true
     config.fog_attributes = { 'x-amz-storage-class' => 'REDUCED_REDUNDANCY' }
+    config.fog_authenticated_url_expiration = 1.month
     config.storage :fog
   end
 end

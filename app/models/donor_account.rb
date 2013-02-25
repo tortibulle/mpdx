@@ -16,8 +16,8 @@ class DonorAccount < ActiveRecord::Base
     master_people.where('master_person_donor_accounts.primary' => true).first
   end
 
-  def link_to_contact_for(account_list)
-    contact = account_list.contacts.where('donor_accounts.id' => id).includes(:donor_accounts).first # already linked
+  def link_to_contact_for(account_list, contact = nil)
+    contact ||= account_list.contacts.where('donor_accounts.id' => id).includes(:donor_accounts).first # already linked
 
     # Try to find a contact for this user that matches based on name
     contact ||= account_list.contacts.detect { |c| c.name == name }

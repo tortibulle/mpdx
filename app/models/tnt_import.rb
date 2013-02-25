@@ -56,25 +56,37 @@ class TntImport
     rows = Array.wrap(xml['Contact']['row'])
 
     rows.each_with_index do |row, i|
-      donor_accounts, contact = add_or_update_donor_accounts(row, @designation_profile)
-      @tnt_contacts[row['id']] = contact
+
+      contact = Retryable.retryable do
+        @account_list.contacts.where(tnt_id: row['id']).first
+      end
+
+      donor_accounts = add_or_update_donor_accounts(row, @designation_profile)
+
+      donor_accounts.each do |donor_account|
+        contact = donor_account.link_to_contact_for(@account_list, contact)
+      end
+
+      # Look for more ways to link a contact
+      contact ||= Retryable.retryable do
+        @account_list.contacts.where(name: row['FileAs']).first_or_create
+      end
 
       # add additional data to contact
       update_contact(contact, row)
 
-      donor_accounts.each do |donor_account|
-        primary_person, primary_contact_person = add_or_update_primary_contact(row, donor_account, contact)
+      primary_contact_person = add_or_update_primary_person(row, contact)
 
-        # Now the secondary person (persumably spouse)
-        if row['SpouseFirstName'].present?
-          row['SpouseLastName'] = row['LastName'] if row['SpouseLastName'].blank?
-          spouse, contact_spouse = add_or_update_spouse(row, donor_account, contact)
+      # Now the secondary person (persumably spouse)
+      if row['SpouseFirstName'].present?
+        row['SpouseLastName'] = row['LastName'] if row['SpouseLastName'].blank?
+        contact_spouse = add_or_update_spouse(row, contact)
 
-          # Wed the two peple
-          primary_person.add_spouse(spouse)
-          primary_contact_person.add_spouse(contact_spouse)
-        end
+        # Wed the two peple
+        primary_contact_person.add_spouse(contact_spouse)
       end
+
+      @tnt_contacts[row['id']] = contact
 
       if is_true?(row['IsOrganization'])
         # organization
@@ -212,6 +224,7 @@ class TntImport
     contact.last_pre_call = parse_date(row['LastPreCall']) if (@import.override? || contact.last_pre_call.blank?) && row['LastPreCall'].present?
     contact.last_thank = parse_date(row['LastThank']) if (@import.override? || contact.last_thank.blank?) && row['LastThank'].present?
     contact.tag_list.add(@import.tags, parse: true) if @import.tags.present?
+    contact.tnt_id = row['id']
     contact.addresses_attributes = build_address_array(row)
     contact.save
   end
@@ -284,58 +297,35 @@ class TntImport
     company
   end
 
-
-  def add_or_update_primary_contact(row, donor_account, contact)
-    remote_id = "#{donor_account.account_number}-1"
-    add_or_update_person(row, donor_account, remote_id, contact)
+  def add_or_update_primary_person(row, contact)
+    add_or_update_person(row, contact)
   end
 
-  def add_or_update_spouse(row, donor_account, contact)
-    remote_id = "#{donor_account.account_number}-2"
-    add_or_update_person(row, donor_account, remote_id, contact, 'Spouse')
+  def add_or_update_spouse(row, contact)
+    add_or_update_person(row, contact, 'Spouse')
   end
 
-  def add_or_update_person(row, donor_account, remote_id, contact, prefix = '')
+  def add_or_update_person(row, contact, prefix = '')
     row[prefix + 'FirstName'] = 'Unknown' if row[prefix + 'FirstName'].blank?
-    organization = donor_account.organization
+
     # See if there's already a person by this name on this contact (This is a contact with multiple donation accounts)
-    contact_person = contact.people.where(first_name: row[prefix + 'FirstName'], last_name: row[prefix + 'LastName'], middle_name: row[prefix + 'MiddleName']).first
-
-    if contact_person
-      person = Person.new(master_person: contact_person.master_person)
-    else
-      master_person_from_source = organization.master_people.where('master_person_sources.remote_id' => remote_id).first
-      person = donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
-
-      person ||= Person.new(master_person: master_person_from_source)
-    end
+    person = contact.people.where(first_name: row[prefix + 'FirstName'], last_name: row[prefix + 'LastName'], middle_name: row[prefix + 'MiddleName']).first
+    person ||= Person.new
 
     update_person_attributes(person, row, prefix)
 
-    # TODO: deal with other TNT fields
+    person.master_person_id ||= MasterPerson.find_or_create_for_person(person).id
 
-    person.master_person_id ||= MasterPerson.find_or_create_for_person(person, donor_account: donor_account, remote_id: remote_id).try(:id)
     person.save!
 
-    begin
-      donor_account.master_people << person.master_person unless donor_account.master_people.include?(person.master_person)
-    rescue ActiveRecord::RecordNotUnique
-    end
+    contact.people << person unless contact.people.include?(person)
 
-    contact_person ||= contact.add_person(person)
-
-    # create the master_person_source if needed
-    unless master_person_from_source
-      Retryable.retryable do
-        organization.master_person_sources.where(remote_id: remote_id).first_or_create(master_person_id: person.master_person.id)
-      end
-    end
-
-    [person, contact_person]
+    person
   end
 
+
   def update_person_attributes(person, row, prefix = '')
-    person.attributes = {first_name: row[prefix + 'FirstName'], last_name: row[prefix + 'LastName'], middle_name: row[prefix + 'Middle Name'],
+    person.attributes = {first_name: row[prefix + 'FirstName'], last_name: row[prefix + 'LastName'], middle_name: row[prefix + 'MiddleName'],
                           title: row[prefix + 'Title'], suffix: row[prefix + 'Suffix'], gender: prefix.present? ? 'female' : 'male',
                           profession: prefix.present? ? nil : row['Profession']}
     # Phone numbers
@@ -358,7 +348,6 @@ class TntImport
 
   def add_or_update_donor_accounts(row, designation_profile)
     # create variables outside the block scope
-    contact = nil
     donor_accounts = []
 
     if designation_profile
@@ -369,17 +358,11 @@ class TntImport
           donor_account.addresses_attributes = build_address_array(row)
           donor_account.save!
         end
-        contact = donor_account.link_to_contact_for(@account_list)
         donor_account
       end
     end
 
-    # If there was no donor account, we won't have a linked contact
-    contact ||= Retryable.retryable do
-      @account_list.contacts.where(name: row['FileAs']).first_or_create
-    end
-
-    [donor_accounts, contact]
+    donor_accounts
   end
 
   def build_address_array(row)

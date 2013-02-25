@@ -15,7 +15,10 @@ class PhoneNumber < ActiveRecord::Base
 
   def self.add_for_person(person, attributes)
     attributes = attributes.except(:_destroy)
-    if number = person.phone_numbers.find_by_number(strip_number(attributes['number']))
+    normalized_number = PhoneNumber.new(attributes)
+    normalized_number.clean_up_number
+
+    if number = person.phone_numbers.find_by_number(normalized_number.number)
       number.update_attributes(attributes)
     else
       attributes['primary'] = (person.phone_numbers.present? ? false : true) if attributes['primary'].nil?

@@ -1,0 +1,98 @@
+<Database>
+  <Tables>
+    <Contact>
+      <row id="1885155404">
+        <LastEdit>2013-02-09 03:18:02</LastEdit>
+        <CreatedDate>2011-11-09</CreatedDate>
+        <FileAs>Fisher, Naomi</FileAs>
+        <FullName>Naomi M Fisher</FullName>
+        <Greeting>Naomi</Greeting>
+        <ShortName>Naomi Fisher</ShortName>
+        <MailingAddressBlock>Naomi M Fisher
+P.O. Box 303
+East Petersburg, PA  17520</MailingAddressBlock>
+        <MailingAddressIsDeliverable>true</MailingAddressIsDeliverable>
+        <Phone>(717) 629-8581</Phone>
+        <PhoneIsOperational>true</PhoneIsOperational>
+        <Email>butterflytwist01@gmail.com</Email>
+        <EmailIsOperational>true</EmailIsOperational>
+        <IsOrganization>false</IsOrganization>
+        <FirstName>Naomi</FirstName>
+        <MiddleName>M</MiddleName>
+        <LastName>Fisher</LastName>
+        <PreferredAddressType>1</PreferredAddressType>
+        <MailingStreetAddress>P.O. Box 303</MailingStreetAddress>
+        <MailingCity>East Petersburg</MailingCity>
+        <MailingState>PA</MailingState>
+        <MailingPostalCode>17520</MailingPostalCode>
+        <HomeStreetAddress>P.O. Box 303</HomeStreetAddress>
+        <HomeCity>East Petersburg</HomeCity>
+        <HomeState>PA</HomeState>
+        <HomePostalCode>17520</HomePostalCode>
+        <HomeCountryID>840</HomeCountryID>
+        <HomeCountry>United States of America</HomeCountry>
+        <HomeAddressIsDeliverable>true</HomeAddressIsDeliverable>
+        <HomeAddressBlock>Naomi M Fisher
+P.O. Box 303
+East Petersburg, PA  17520</HomeAddressBlock>
+        <BusinessCountryID>840</BusinessCountryID>
+        <BusinessCountry>United States of America</BusinessCountry>
+        <BusinessAddressIsDeliverable>false</BusinessAddressIsDeliverable>
+        <OtherCountryID>840</OtherCountryID>
+        <OtherCountry>United States of America</OtherCountry>
+        <OtherAddressIsDeliverable>false</OtherAddressIsDeliverable>
+        <PreferredPhoneType>0</PreferredPhoneType>
+        <HomePhone>(717) 629-8581</HomePhone>
+        <PreferredEmailTypes>2</PreferredEmailTypes>
+        <Email1>butterflytwist01@gmail.com</Email1>
+        <Email1IsOperational>true</Email1IsOperational>
+        <Email2IsOperational>false</Email2IsOperational>
+        <Email3IsOperational>false</Email3IsOperational>
+        <Notes>{\rtf1\ansi\ansicpg1252\uc1\deff0\deflang1033\deflangfe1033{\fonttbl{\f0\fcharset0 Tahoma;}}
+{\*\generator Wine Riched20 2.0.????;}\pard\sl-240\slmult1\li0\fi0\ri0\sa0\sb0\s-1\cfpat0\cbpat0{\fs16\ul0 strictly prayer partner }}</Notes>
+        <FamilyLevelID>0</FamilyLevelID>
+        <FamilySideID>0</FamilySideID>
+        <PledgeAmount>0</PledgeAmount>
+        <PledgeFrequencyID>0</PledgeFrequencyID>
+        <PledgeReceived>false</PledgeReceived>
+        <PledgeStartDate>1899-12-30</PledgeStartDate>
+        <Deceased>false</Deceased>
+        <MPDPhaseID>0</MPDPhaseID>
+        <NextAsk>1899-12-30</NextAsk>
+        <NeverAsk>false</NeverAsk>
+        <LikelyToGiveID>0</LikelyToGiveID>
+        <SendNewsletter>false</SendNewsletter>
+        <DirectDeposit>false</DirectDeposit>
+        <Magazine>false</Magazine>
+        <MonthlyPledge>0</MonthlyPledge>
+        <FirstGiftDate>1899-12-30</FirstGiftDate>
+        <LastGiftDate>1899-12-30</LastGiftDate>
+        <LastGiftAmount>0</LastGiftAmount>
+        <PrevYearTotal>0</PrevYearTotal>
+        <YearTotal>0</YearTotal>
+        <LifetimeTotal>0</LifetimeTotal>
+        <LargestGift>0</LargestGift>
+        <GoodUntil>1899-12-30</GoodUntil>
+        <AveMonthlyGift>0</AveMonthlyGift>
+        <LastDateInAve>1899-12-30</LastDateInAve>
+        <TwelveMonthTotal>0</TwelveMonthTotal>
+        <LastActivity>2013-02-06</LastActivity>
+        <LastAppointment>1899-12-30</LastAppointment>
+        <LastLetter>1899-12-30</LastLetter>
+        <LastPhoneCall>2013-02-06</LastPhoneCall>
+        <LastPreCall>1899-12-30</LastPreCall>
+        <LastThank>1899-12-30</LastThank>
+        <AppealsSinceLastGift>0</AppealsSinceLastGift>
+        <FileAsIsCustom>false</FileAsIsCustom>
+        <ShortNameIsCustom>false</ShortNameIsCustom>
+        <GreetingIsCustom>false</GreetingIsCustom>
+        <FullNameIsCustom>false</FullNameIsCustom>
+        <HomeAddressBlockIsCustom>false</HomeAddressBlockIsCustom>
+        <BusinessAddressBlockIsCustom>false</BusinessAddressBlockIsCustom>
+        <OtherAddressBlockIsCustom>false</OtherAddressBlockIsCustom>
+        <PhoneIsOperationalMask>1</PhoneIsOperationalMask>
+        <PhoneCountryIDs>0=840</PhoneCountryIDs>
+      </row>
+    </Contact>
+  </Tables>
+</Database>

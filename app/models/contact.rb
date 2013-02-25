@@ -3,8 +3,8 @@ class Contact < ActiveRecord::Base
   acts_as_taggable
 
   has_paper_trail :on => [:destroy],
-                  :meta => { related_object_type: 'AccountList',
-                             related_object_id: :account_list_id }
+    :meta => { related_object_type: 'AccountList',
+               related_object_id: :account_list_id }
 
   has_many :contact_donor_accounts, dependent: :destroy
   has_many :donor_accounts, through: :contact_donor_accounts
@@ -49,7 +49,7 @@ class Contact < ActiveRecord::Base
     [_('Never Contacted'), _('Ask in Future'), _('Contact for Appointment'), _('Appointment Scheduled'),
      _('Call for Decision'), _('Partner - Financial'), _('Partner - Special'), _('Partner - Pray'),
      _('Not Interested'), _('Unresponsive'), _('Never Ask'),
-    _('Research Abandoned'), _('Expired Referral')]
+     _('Research Abandoned'), _('Expired Referral')]
   end
 
   assignable_values_for :likely_to_give, allow_blank: true do
@@ -139,8 +139,8 @@ class Contact < ActiveRecord::Base
       # Merge people that have the same name
       people.each do |person|
         if other_person = other.people.detect { |p| p.first_name == person.first_name &&
-                                                    p.last_name == person.last_name &&
-                                                    p.id != person.id }
+                                                p.last_name == person.last_name &&
+                                                p.id != person.id }
           person.merge(other_person)
           # don't check this person next time through the loop
           other.people -= [other_person]
@@ -168,15 +168,15 @@ class Contact < ActiveRecord::Base
        :pledge_frequency, :pledge_start_date, :deceased, :next_ask, :never_ask, :likely_to_give,
        :church_name, :send_newsletter, :direct_deposit, :magazine, :last_activity, :last_appointment,
        :last_letter, :last_phone_call, :last_pre_call, :last_thank].each do |field|
-        if send(field).blank? && other.send(field).present?
-          send("#{field}=".to_sym, other.send(field))
-        end
-      end
-      self.tag_list += other.tag_list
+         if send(field).blank? && other.send(field).present?
+           send("#{field}=".to_sym, other.send(field))
+         end
+       end
+       self.tag_list += other.tag_list
 
-      save(validate: false)
-      other.reload
-      other.destroy
+       save(validate: false)
+       other.reload
+       other.destroy
     end
   end
 
