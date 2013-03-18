@@ -9,6 +9,7 @@ class TasksController < ApplicationController
     @tasks = TaskFilter.new(filters_params).filter(@tasks) if filters_params.present?
 
     @overdue = @tasks.overdue
+    @today = @tasks.today
     @tomorrow = @tasks.tomorrow
     @upcoming = @tasks.upcoming
   end

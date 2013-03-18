@@ -22,6 +22,22 @@
       </table>
     <% end %>
 
+    <% if @today.length > 0 %>
+      <br /><br />
+      <table>
+        <thead>
+          <tr class="taskgroup green">
+            <td><input type="checkbox" class="select_all" /></td>
+            <td><%= _('Today') %></td>
+          </tr>
+        </thead>
+
+        <tbody class="tablelist tasks">
+          <%= render partial: 'task', collection: @today %>
+        </tbody>
+      </table>
+    <% end %>
+
     <% if @tomorrow.length > 0 %>
       <br /><br />
       <table>
