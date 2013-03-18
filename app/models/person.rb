@@ -12,13 +12,13 @@ class Person < ActiveRecord::Base
   has_many :related_people, through: :family_relationships
   has_one :company_position, class_name: 'CompanyPosition', foreign_key: :person_id, conditions: "company_positions.end_date is null", order: "company_positions.start_date desc"
   has_many :company_positions, dependent: :destroy
-  has_many :twitter_accounts, class_name: 'Person::TwitterAccount', foreign_key: :person_id, dependent: :destroy
+  has_many :twitter_accounts, class_name: 'Person::TwitterAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
   has_one :twitter_account, class_name: 'Person::TwitterAccount', foreign_key: :person_id, conditions: {'person_twitter_accounts.primary' => true}
-  has_many :facebook_accounts, class_name: 'Person::FacebookAccount', foreign_key: :person_id, dependent: :destroy
+  has_many :facebook_accounts, class_name: 'Person::FacebookAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
   has_one  :facebook_account, class_name: 'Person::FacebookAccount', foreign_key: :person_id
-  has_many :linkedin_accounts, class_name: 'Person::LinkedinAccount', foreign_key: :person_id, dependent: :destroy
+  has_many :linkedin_accounts, class_name: 'Person::LinkedinAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
   has_one :linkedin_account, class_name: 'Person::LinkedinAccount', foreign_key: :person_id, conditions: {'person_linkedin_accounts.valid_token' => true}
-  has_many :google_accounts, class_name: 'Person::GoogleAccount', foreign_key: :person_id, dependent: :destroy
+  has_many :google_accounts, class_name: 'Person::GoogleAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
   has_many :relay_accounts, class_name: 'Person::RelayAccount', foreign_key: :person_id, dependent: :destroy
   has_many :organization_accounts, class_name: 'Person::OrganizationAccount', foreign_key: :person_id, dependent: :destroy
   has_many :key_accounts, class_name: 'Person::KeyAccount', foreign_key: :person_id, dependent: :destroy
