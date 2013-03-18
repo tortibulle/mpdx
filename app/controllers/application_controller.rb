@@ -26,10 +26,6 @@ class ApplicationController < ActionController::Base
   end
 
   def ensure_login
-    ###### !!!!!!!TODO offline code !!!!!!######
-      sign_in(:user, User.find(1960))
-    ###### !!!!!!!TODO!!!!!!######
-
     unless user_signed_in?
       if $request_test
         sign_in(:user, $user)

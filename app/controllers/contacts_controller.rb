@@ -22,8 +22,8 @@ class ContactsController < ApplicationController
     respond_to do |wants|
 
       wants.html do
-        @contacts = @filtered_contacts.includes([{primary_person: :facebook_account}, 
-                                                 :tags, :primary_address, 
+        @contacts = @filtered_contacts.includes([{primary_person: :facebook_account},
+                                                 :tags, :primary_address,
                                                  {people: :primary_phone_number}])
                                       .page(page)
                                       .per_page(per_page)
@@ -229,9 +229,10 @@ class ContactsController < ApplicationController
 
   def setup_filters
     current_user.contacts_filter ||= {}
+    clear_filters = params.delete(:clear_filter)
     if filters_params.present?
       current_user.contacts_filter[current_account_list.id] = filters_params
-    elsif params[:clear_filter] == 'true'
+    elsif clear_filters == 'true'
       current_user.contacts_filter[current_account_list.id] = nil
     end
     current_user.save

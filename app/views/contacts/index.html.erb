@@ -1,4 +1,4 @@
-<%= contact_instance = Contact.new %>
+<% contact_instance = Contact.new %>
 <script type="text/javascript" charset="utf-8">
   var account_contacts_json = <%= contacts_for_filter.collect { |c| {value: c.id, label: c.name} }.to_json.html_safe %>
   var filtered_contacts_json = <%= @filtered_contacts.collect { |c| {value: c.id, label: c.name} }.to_json.html_safe %>
