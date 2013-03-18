@@ -124,7 +124,10 @@ class Person < ActiveRecord::Base
           fa.update_attributes(attributes.except('id', '_destroy'))
         end
       else
-        facebook_accounts.create(attributes.except('_destroy')) unless attributes['_destroy'] == '1'
+        unless attributes['_destroy'] == '1'
+          fa = facebook_accounts.new(attributes.except('_destroy'))
+          fa.save unless new_record?
+        end
       end
     end
   end
