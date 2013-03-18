@@ -7,11 +7,11 @@ class ContactsController < ApplicationController
     @filtered_contacts = current_account_list.contacts.order('contacts.name')
 
     if params[:filter] == 'people'
-      @filtered_contacts = @contacts.people
+      @filtered_contacts = @filtered_contacts.people
     end
 
     if params[:filter] == 'companies'
-      @filtered_contacts = @contacts.companies
+      @filtered_contacts = @filtered_contacts.companies
     end
 
     @filtered_contacts = if filters_params.present?
@@ -124,7 +124,7 @@ class ContactsController < ApplicationController
         end
       end
     end
-    redirect_to contacts_path, notice: _('You just merged %{count} contacts') % {count: merged_contacts_count}
+    redirect_to :back, notice: _('You just merged %{count} contacts') % {count: merged_contacts_count}
   end
 
   def destroy
