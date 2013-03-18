@@ -95,9 +95,16 @@ class MailChimpAccount < ActiveRecord::Base
       begin
         send(method, *args)
       rescue Gibbon::MailChimpError => e
-        raise e unless e.message.include?('API Key Disabled')
-        update_column(:active, false)
-        AccountMailer.invalid_mailchimp_key(account_list).deliver
+        case
+        when e.message.include?('API Key Disabled')
+          update_column(:active, false)
+          AccountMailer.invalid_mailchimp_key(account_list).deliver
+        when e.message.include?('code -91') # A backend database error has occurred. Please try again later or report this issue. (code -91)
+          # raise the exception and the background queue will retry
+          raise e
+        else
+          raise e
+        end
       end
     end
   end
@@ -106,7 +113,13 @@ class MailChimpAccount < ActiveRecord::Base
     begin
       gb.list_update_member(id: primary_list_id, email_address: old_email, merge_vars: { EMAIL: new_email })
     rescue Gibbon::MailChimpError => e
-      raise e unless e.message.include?('code 214') # The new email address "xxxxx@example.com" is already subscribed to this list and must be unsubscribed first. (code 214)
+      # The email address "xxxxx@example.com" does not belong to this list (code 215)
+      # There is no record of "xxxxx@example.com" in the database (code 232)
+      if e.message.include?('code 215') || e.message.include?('code 232')
+        subscribe_email(new_email)
+      else
+        raise e unless e.message.include?('code 214') # The new email address "xxxxx@example.com" is already subscribed to this list and must be unsubscribed first. (code 214)
+      end
     end
   end
 
@@ -116,9 +129,19 @@ class MailChimpAccount < ActiveRecord::Base
         gb.list_unsubscribe(id: primary_list_id, email_address: email,
                             send_goodbye: false, delete_member: true)
       rescue Gibbon::MailChimpError => e
-        raise e unless e.message.include?('code 232')
+        raise e unless e.message.include?('code 232') || e.message.include?('code 215')
       end
     end
+  end
+
+  def subscribe_email(email)
+    begin
+      gb.list_subscribe(id: primary_list_id, email_address: email, update_existing: true,
+                        double_optin: false, send_welcome: false, replace_interests: true)
+    rescue Gibbon::MailChimpError => e
+      raise e unless e.message.include?('code 214') # The new email address "xxxxx@example.com" is already subscribed to this list and must be unsubscribed first. (code 214)
+    end
+
   end
 
   def subscribe_person(person_id)
