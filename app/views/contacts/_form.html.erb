@@ -1,7 +1,16 @@
 <div id="contentbody">
   <div class="wpp">
-    <h1><%= @contact.name.present? ? @contact.name : _('New contact') %></h1>
     <%= form_for(contact) do |f| %>
+      <div class="clr"></div>
+      <div class="spacer"></div>
+      
+      <div class="actions">
+        <%= f.submit _('Save Contact'), class: "btn desired_action" %>
+        <%= link_to(_('Back'), request.referrer ? :back : contacts_path, class: "btn") %>
+      </div>
+
+
+      <h1><%= @contact.name.present? ? @contact.name : _('New contact') %></h1>
       <% if contact.errors.any? %>
         <div id="error_explanation">
           <ul>
