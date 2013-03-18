@@ -21,7 +21,7 @@ $ ->
 
       # quick search for contact
       $('#contact_name').autocomplete({
-        source: contacts_json,
+        source: account_contacts_json,
         select: (event, ui) ->
           document.location = '/contacts/' + ui.item.value
           false
@@ -59,7 +59,7 @@ $ ->
         $('#select_all_prompt').hide()
         $('#clear_selection_prompt').show()
         ids = []
-        $.each(contacts_json, ->
+        $.each(filtered_contacts_json, ->
           ids.push(this.value)
         )
         $('#selected_ids').val(ids.join(','))

@@ -4,27 +4,29 @@ class ContactsController < ApplicationController
   before_filter :setup_filters, only: :index
 
   def index
-    @contacts = current_account_list.contacts.order('contacts.name')
+    @filtered_contacts = current_account_list.contacts.order('contacts.name')
 
     if params[:filter] == 'people'
-      @contacts = @contacts.people
+      @filtered_contacts = @contacts.people
     end
 
     if params[:filter] == 'companies'
-      @contacts = @contacts.companies
+      @filtered_contacts = @contacts.companies
     end
 
-    @contacts = if filters_params.present?
-                  ContactFilter.new(filters_params).filter(@contacts)
+    @filtered_contacts = if filters_params.present?
+                  ContactFilter.new(filters_params).filter(@filtered_contacts)
                 else
-                  @contacts.active
+                  @filtered_contacts.active
                 end
     respond_to do |wants|
 
       wants.html do
-        @contacts = @contacts.includes([{primary_person: :facebook_account}, :tags, :primary_address, {people: :primary_phone_number}])
-
-        @contacts = @contacts.page(page).per_page(per_page)
+        @contacts = @filtered_contacts.includes([{primary_person: :facebook_account}, 
+                                                 :tags, :primary_address, 
+                                                 {people: :primary_phone_number}])
+                                      .page(page)
+                                      .per_page(per_page)
       end
 
       wants.csv do

@@ -1,6 +1,7 @@
 <%= contact_instance = Contact.new %>
 <script type="text/javascript" charset="utf-8">
-  var contacts_json = <%= contacts_for_filter.collect { |c| {value: c.id, label: c.name} }.to_json.html_safe %>
+  var account_contacts_json = <%= contacts_for_filter.collect { |c| {value: c.id, label: c.name} }.to_json.html_safe %>
+  var filtered_contacts_json = <%= @filtered_contacts.collect { |c| {value: c.id, label: c.name} }.to_json.html_safe %>
 </script>
 <aside id="leftmenu">
 <ul>
@@ -107,7 +108,7 @@
       <table class="tablelist">
         <% unless @contacts.length == @contacts.total_entries %>
           <tr id="select_more" style="display:none">
-            <td colspan="3">
+            <td colspan="6">
               <span id="select_all_prompt">
                 <%= _('All <strong>%{this_page}</strong> conversations on this page are selected. <a data-behavior="select_all">Select all <strong>%{total}</strong> contacts</a>') %
                   {this_page: @contacts.length, total: @contacts.total_entries} %>
