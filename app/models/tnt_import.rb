@@ -207,7 +207,7 @@ class TntImport
     if @import.override? || contact.notes.blank?
       contact.notes = begin
                         Nokogiri::HTML(RubyRTF::Parser.new.parse(row['Notes'].to_s).sections.collect {|s| s[:text]}.join("\n").gsub(/\n+/, "\n")).text
-                      rescue RubyRTF::InvalidDocument
+                      rescue RubyRTF::InvalidDocument, NoMethodError
                         row['Notes']
                       end
     end
