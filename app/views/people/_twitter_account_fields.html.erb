@@ -2,8 +2,8 @@
   <div class="ls"><%= builder.label :url, 'Twitter' %></div>
   <div class="rs">
     <%= builder.text_field :screen_name, placeholder: '@' %>
-    <div class="field_action" style="<%= no_remove ? 'display:none' : '' %>">
-      <%= link_to_remove_fields(builder, no_remove) %>
+    <div class="field_action">
+      <%= link_to_remove_fields(builder) %>
     </div>
   </div>
 </div>

@@ -3,10 +3,10 @@
   <div class="rs">
     <%= builder.phone_field :number %>
     <%= builder.select :location, %w[mobile home work].collect {|l| [t("g.#{l}"), l]} %>
-    <div class="field_action" style="<%= no_remove ? 'display:none' : '' %>">
+    <div class="field_action">
       <%= builder.check_box :primary, class: 'primary' %>
       <%= builder.label :primary %>
-      <%= link_to_remove_fields(builder, no_remove) %>
+      <%= link_to_remove_fields(builder) %>
     </div>
   </div>
 </div>

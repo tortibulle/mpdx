@@ -10,7 +10,7 @@ module ApplicationHelper
     link_to(prompt, "/auth/#{provider}", :class => "btn") if prompt
   end
 
-  def link_to_remove_fields(f, hidden)
+  def link_to_remove_fields(f, hidden = false)
     f.hidden_field(:_destroy) + link_to(_('Remove'), 'javascript:void(0)', class: 'ico ico_trash', style: hidden ? 'display:none' : '', data: {behavior: 'remove_field'})
   end
 
