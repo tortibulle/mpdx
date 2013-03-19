@@ -24,6 +24,18 @@ class TaskFilter
       filtered_tasks = filtered_tasks.where(activity_type: @filters[:activity_type])
     end
 
+    case @filters[:date_range]
+    when 'last_month'
+      filtered_tasks = filtered_tasks.where('completed_at > ?', 1.month.ago)
+    when 'last_year'
+      filtered_tasks = filtered_tasks.where('completed_at > ?', 1.year.ago)
+    when 'last_two_years'
+      filtered_tasks = filtered_tasks.where('completed_at > ?', 2.years.ago)
+    when 'all'
+    else
+      filtered_tasks = filtered_tasks.where('completed_at > ?', 1.week.ago)
+    end
+
     filtered_tasks
   end
 end

@@ -13,6 +13,7 @@
           <th><%= _('Completed') %></th>
           <th><%= _('Type') %></th>
           <th><%= _('Result') %></th>
+          <th><%= _('Tags') %></th>
           <th><%= _('Description') %></th>
           <th>&nbsp;</th>
         </tr>
@@ -39,6 +40,7 @@
                 <%= _(task_exhibit.result) %>
               <% end %>
             </td>
+            <td><%= task_exhibit.tag_list %></td>
             <td><%= task_exhibit %></td>
             <td>
               <div class="actions">
