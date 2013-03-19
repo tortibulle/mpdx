@@ -14,11 +14,12 @@ class ContactsController < ApplicationController
       @filtered_contacts = @filtered_contacts.companies
     end
 
-    @filtered_contacts = if filters_params.present?
-                  ContactFilter.new(filters_params).filter(@filtered_contacts)
-                else
-                  @filtered_contacts.active
-                end
+    @filtered_contacts =  if filters_params.present?
+                            ContactFilter.new(filters_params).filter(@filtered_contacts)
+                          else
+                            @filtered_contacts.active
+                          end
+
     respond_to do |wants|
 
       wants.html do

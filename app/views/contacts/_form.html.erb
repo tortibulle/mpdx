@@ -3,7 +3,7 @@
     <%= form_for(contact) do |f| %>
       <div class="clr"></div>
       <div class="spacer"></div>
-      
+
       <div class="actions">
         <%= f.submit _('Save Contact'), class: "btn desired_action" %>
         <%= link_to(_('Back'), request.referrer ? :back : contacts_path, class: "btn") %>
@@ -43,11 +43,36 @@
           <%= f.select :pledge_frequency, Contact.pledge_frequencies.invert.to_a, include_blank: true %>
         </div>
 
+        <div class="field">
+          <%= f.label :pledge_start_date, _('Commitment Start Date') %>
+          <%= f.date_select :pledge_start_date, include_blank: true, order: [:month, :day, :year] %>
+        </div>
+
         <%= render 'contacts/bulk_fields', f: f %>
 
         <div class="field">
           <%= f.label :tag_list, _('Tags') %>
           <%= f.text_field :tag_list %>
+        </div>
+
+        <div class="field radiocheck">
+          <%= f.check_box :magazine %>
+          <%= f.label :magazine, _('Magazine') %>
+        </div>
+
+        <div class="field radiocheck">
+          <%= f.check_box :deceased %>
+          <%= f.label :deceased, _('Deceased') %>
+        </div>
+
+        <div class="field radiocheck">
+          <%= f.check_box :direct_deposit %>
+          <%= f.label :direct_deposit, _('Direct Deposit') %>
+        </div>
+
+        <div class="field radiocheck">
+          <%= f.check_box :pledge_received %>
+          <%= f.label :pledge_received, _('Pledge Received') %>
         </div>
 
 

@@ -4,6 +4,11 @@
 </div>
 
 <div class="field">
+  <%= f.label :next_ask, _('Next Ask') %>
+  <%= f.date_select :next_ask, include_blank: true, order: [:month, :day, :year] %>
+</div>
+
+<div class="field">
   <%= f.label :status, _('Status') %>
   <%= f.select :status, f.object.assignable_statuses.collect { |s| [_(s), s] }, include_blank: true %>
 </div>
@@ -17,4 +22,3 @@
   <%= f.label :church_name, _('Church') %>
   <%= f.text_field :church_name %>
 </div>
-
