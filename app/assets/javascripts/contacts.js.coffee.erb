@@ -360,7 +360,7 @@ $.mpdx.loadContactHistory = ->
   if $('#history').html() == ''
     $.ajax {
       url: '/tasks/history',
-      data: {date_range: 'all', filters: {contact_ids: $('#contentbody').attr('data-contact-id')}},
+      data: {filters: {date_range: 'all', contact_ids: $('#contentbody').attr('data-contact-id')}},
       dataType: 'script'
     }
 
