@@ -31,8 +31,7 @@ class TaskFilter
       filtered_tasks = filtered_tasks.where('completed_at > ?', 1.year.ago)
     when 'last_two_years'
       filtered_tasks = filtered_tasks.where('completed_at > ?', 2.years.ago)
-    when 'all'
-    else
+    when 'last_week'
       filtered_tasks = filtered_tasks.where('completed_at > ?', 1.week.ago)
     end
 

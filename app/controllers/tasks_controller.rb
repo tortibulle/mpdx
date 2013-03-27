@@ -26,9 +26,9 @@ class TasksController < ApplicationController
     @tasks = current_account_list.tasks.completed
                                        .includes(:contacts, :activity_comments, :tags)
                                        .page(page).per_page(per_page)
-
-    @tasks = TaskFilter.new(filters_params).filter(@tasks) if filters_params.present?
-
+    filters_params ||= {}
+    filters_params[:date_range] ||= 'last_week'
+    @tasks = TaskFilter.new(filters_params).filter(@tasks)
 
   end
 
