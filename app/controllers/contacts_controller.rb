@@ -31,7 +31,7 @@ class ContactsController < ApplicationController
       end
 
       wants.csv do
-        @contacts = @contacts.includes(:primary_person, :spouse, :primary_address, :addresses, {people: :email_addresses})
+        @contacts = @filtered_contacts.includes(:primary_person, :spouse, :primary_address, {people: :email_addresses})
         @headers = ['Contact Name', 'First Name', 'Last Name', 'Spouse First Name', 'Greeting',
                     'Mailing Street Address','Mailing City', 'Mailing State','Mailing Postal Code',
                     'Mailing Country', 'Email 1','Email 2','Email 3','Email 4']
