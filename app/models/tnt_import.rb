@@ -209,7 +209,7 @@ class TntImport
                         Nokogiri::HTML(RubyRTF::Parser.new.parse(row['Notes'].to_s).sections.collect {|s| s[:text]}.join("\n").gsub(/\n+/, "\n")).text
                       rescue RubyRTF::InvalidDocument, NoMethodError
                         row['Notes']
-                      end
+                      end.to_s.unpack("C*").pack("U*").force_encoding("UTF-8").encode!
     end
     contact.pledge_amount = row['PledgeAmount'] if @import.override? || contact.pledge_amount.blank?
     contact.pledge_frequency = row['PledgeFrequencyID'] if (@import.override? || contact.pledge_frequency.blank?) && row['PledgeFrequencyID'].to_i != 0
