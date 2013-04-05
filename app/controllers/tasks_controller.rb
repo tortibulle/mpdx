@@ -107,7 +107,7 @@ class TasksController < ApplicationController
     tasks = current_account_list.tasks.where(id: params[:bulk_task_update_ids].split(','))
     attributes_to_update = params[:task].select { |_, v| v.present? }
 
-    tasks.update_all(attributes_to_update) if attributes_to_update.present?
+    tasks.map {|t| t.update_attributes(attributes_to_update) } if attributes_to_update.present?
 
     respond_to do |format|
       format.html { redirect_to :back }

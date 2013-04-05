@@ -28,7 +28,10 @@
         <thead>
           <tr class="taskgroup green">
             <td><input type="checkbox" class="select_all" /></td>
-            <td><%= _('Today') %></td>
+            <td>
+              <%= render 'actions' %>
+              <%= _('Today') %>
+            </td>
           </tr>
         </thead>
 
@@ -44,7 +47,10 @@
         <thead>
           <tr class="taskgroup orange">
             <td><input type="checkbox" class="select_all" /></td>
-            <td><%= _('Tomorrow') %></td>
+            <td>
+              <%= render 'actions' %>
+              <%= _('Tomorrow') %>
+            </td>
           </tr>
         </thead>
 
@@ -60,7 +66,10 @@
         <thead>
           <tr class="taskgroup gray">
             <td><input type="checkbox" class="select_all" /></td>
-            <td><%= _('Upcoming') %></td>
+            <td>
+              <%= render 'actions' %>
+              <%= _('Upcoming') %>
+            </td>
           </tr>
         </thead>
 
