@@ -20,7 +20,10 @@ module Person::Account
         @account = @rel.create!(@attributes)
       end
     end
-    person.update_attributes(@attributes.slice(:first_name, :last_name, :email))
+
+    person.first_name = @attributes[:first_name] if person.first_name.blank?
+    person.last_name = @attributes[:last_name] if person.last_name.blank?
+    person.email = @attributes[:email] if person.email.blank?
 
     # start a data import in the background
     @account.queue_import_data if @account.respond_to?(:queue_import_data)
