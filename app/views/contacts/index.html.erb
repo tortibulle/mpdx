@@ -37,11 +37,11 @@
 	          <%= radio_button_tag 'filters[newsletter]', 'all', filters_params[:newsletter] == 'all' %> <%= _('All') %><br />
 	          <div>
 	            <%= radio_button_tag 'filters[newsletter]', 'address', filters_params[:newsletter] == 'address' %> <%= _('With Mailing Address') %>
-	            <%= tip(_('This filter will search for people who are set to receive your physical newsletter and have a mailing address'), style: 'float:right;margin-right:15px') %>
+	            <%= tip(_('This filter will search for people who are set to receive your physical newsletter and have a mailing address'), style: 'margin: 0 6px -2px') %>
 	          </div>
 	          <div>
 	            <%= radio_button_tag 'filters[newsletter]', 'email', filters_params[:newsletter] == 'email' %> <%= _('With Email Address') %>
-	            <%= tip(_('This filter will search for people who are set to receive your email newsletter and have a valid email address'), style: 'float:right;margin-right:15px') %>
+	            <%= tip(_('This filter will search for people who are set to receive your email newsletter and have a valid email address'), style: 'margin: 0 6px -2px') %>
 	          </div>
 					</div>
         </li>
