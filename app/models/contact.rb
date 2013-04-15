@@ -156,10 +156,13 @@ class Contact < ActiveRecord::Base
 
       %w[contact_donor_accounts activity_contacts].each do |relationship|
         other.send(relationship.to_sym).each do |r|
-          r.update_attributes({contact_id: id}, without_protection: true)
+          unless send(relationship.to_sym).where({contact_id: id}).first
+            r.update_attributes({contact_id: id}, without_protection: true)
+          end
         end
       end
       other.addresses.update_all(addressable_id: id)
+
       ContactReferral.where(referred_to_id: other.id).update_all(referred_to_id: id)
       ContactReferral.where(referred_by_id: other.id).update_all(referred_by_id: id)
 
