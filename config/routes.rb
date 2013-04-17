@@ -1,12 +1,13 @@
 require 'sidekiq/web'
 Mpdx::Application.routes.draw do
 
+  devise_for :admin_users, ActiveAdmin::Devise.config
+
   resources :help_requests
 
 
-  ActiveAdmin.routes(self)
+  #ActiveAdmin.routes(self)
 
-  devise_for :admin_users, ActiveAdmin::Devise.config
 
   namespace :admin do
     resources :sessions do
