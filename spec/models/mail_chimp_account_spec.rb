@@ -133,6 +133,8 @@ describe MailChimpAccount do
       end
 
       it 'nilifies the primary_list_id if an extra merge field is required' do
+        AccountMailer.stub!(:mailchimp_required_merge_field).and_return(double('mailer', deliver: true))
+
         stub_request(:post, "https://us4.api.mailchimp.com/1.3/?method=listSubscribe").
           to_return(body: '{"error":"MMERGE3 must be provided - Please enter a value","code":250}', status: 500)
         person = create(:person, email: 'foo@example.com')

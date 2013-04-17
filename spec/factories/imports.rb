@@ -6,6 +6,9 @@ FactoryGirl.define do
     association :user
     importing false
     source 'facebook'
+    after :create do |i|
+      i.user.email_addresses << create(:email_address)
+    end
   end
 
   factory :tnt_import, parent: :import do
