@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe DataServer do
+  let(:profile) { create(:designation_profile, organization: @org, user: @person.to_user) }
+
   before(:each) do
     stub_request(:post, "http://example.com/").
       with(:body => {"Action"=>"Profiles", "Password"=>"Test1234", "UserName"=>"test@test.com"}).
@@ -14,25 +16,22 @@ describe DataServer do
     @org = create(:organization)
     @person = create(:person)
     @org_account = build(:organization_account, person: @person, organization: @org)
-    @profile = create(:designation_profile, organization: @org, user: @person.to_user)
-    #@org_account.designation_profiles << @profile
-    #@org_account.save!
     @data_server = DataServer.new(@org_account)
   end
 
   it "should import all" do
     date_from = '01/01/1951'
-    @data_server.should_receive(:import_profiles).and_return([@profile])
-    @data_server.should_receive(:import_profile_balance).with(@profile)
-    @data_server.should_receive(:import_donors).with(@profile, date_from)
-    @data_server.should_receive(:import_donations).with(@profile, date_from)
+    @data_server.should_receive(:import_profiles).and_return([profile])
+    @data_server.should_receive(:import_profile_balance).with(profile)
+    @data_server.should_receive(:import_donors).with(profile, date_from)
+    @data_server.should_receive(:import_donations).with(profile, date_from)
     @data_server.import_all(date_from)
   end
 
   it "should return designation numbers for a profile code" do
     designation_numbers = ['031231']
     @data_server.should_receive(:profile_balance).and_return({designation_numbers: designation_numbers})
-    @data_server.send(:designation_numbers, @profile.code).should == designation_numbers
+    @data_server.send(:designation_numbers, profile.code).should == designation_numbers
   end
 
   it "should return a list of all profiles with their associated designation numbers" do
@@ -64,7 +63,7 @@ describe DataServer do
       stub_request(:post, @org.addresses_url).to_return(body: "whatever\nRedirectQueryIni=foo")
       stub_request(:post, "http://foo/")
       -> {
-        @data_server.import_donors(@profile)
+        @data_server.import_donors(profile)
       }.should change(@org, :addresses_url).to('foo')
     end
 
@@ -72,7 +71,7 @@ describe DataServer do
       stub_request(:post, @org.addresses_url).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"19238\",\"ACorporation\",\"123 mi casa blvd.\",\"Colima\",\"COL\",\"456788\",\"(52) 45 456-5678\",\"MEX\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"8/15/2003\",\"8/15/2003\",\"\",\"O\",\"ACorporation\",\"\"\r\n")
       @data_server.should_receive(:add_or_update_donor_account)
       @data_server.should_receive(:add_or_update_company)
-      @data_server.import_donors(@profile)
+      @data_server.import_donors(profile)
     end
 
     it "should import an individual" do
@@ -83,17 +82,17 @@ describe DataServer do
       @data_server.should_receive(:add_or_update_spouse)
       primary_contact.should_receive(:add_spouse)
       other_person.should_receive(:add_spouse)
-      @data_server.import_donors(@profile)
+      @data_server.import_donors(profile)
     end
 
     it 'should create a new contact in the right account list' do
       stub_request(:post, @org.addresses_url).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodriguez, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\",\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\",\"\",\"P\",\"Rodriguez\",\"\"\r\n")
-      @profile = create(:designation_profile, user: @org_account.user, skip_account_list: true)
+      profile = create(:designation_profile, user: @org_account.user, skip_account_list: true)
       @account_list1 = create(:account_list, designation_profile: nil)
-      @account_list2 = create(:account_list, designation_profile: @profile)
+      @account_list2 = create(:account_list, designation_profile: profile)
       @org_account.user.account_lists = [@account_list1, @account_list2]
       -> {
-        @data_server.import_donors(@profile)
+        @data_server.import_donors(profile)
       }.should change(Contact, :count)
       @account_list2.contacts.last.name.should == 'Rodriguez, Ramon y Celeste (Moreno)'
     end
@@ -101,7 +100,7 @@ describe DataServer do
     it "should notify Airbrake if PERSON_TYPE is not 'O' or 'P'" do
       stub_request(:post, @org.addresses_url).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodriguez, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\",\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\",\"\",\"BAD_PERSON_TYPE\",\"Rodriguez\",\"\"\r\n")
       Airbrake.should_receive(:notify)
-      @data_server.import_donors(@profile)
+      @data_server.import_donors(profile)
     end
     it "should add or update primary contact" do
       @data_server.should_receive(:add_or_update_person)
@@ -203,7 +202,7 @@ describe DataServer do
     end
     it "should create a new contact" do
       -> {
-        @data_server.send(:add_or_update_donor_account, @line, @profile)
+        @data_server.send(:add_or_update_donor_account, @line, profile)
       }.should change(Contact, :count)
     end
   end
@@ -212,14 +211,14 @@ describe DataServer do
     it "raise an error if credentials are missing" do
       no_user_account = @org_account.dup
       no_user_account.username = nil
-      ->{DataServer.new(no_user_account).import_donors(@profile)}.should raise_error(OrgAccountMissingCredentialsError, I18n.t('data_server.missing_username_password'))
+      ->{DataServer.new(no_user_account).import_donors(profile)}.should raise_error(OrgAccountMissingCredentialsError, I18n.t('data_server.missing_username_password'))
       no_pass_account = @org_account.dup
       no_pass_account.password = nil
-      ->{DataServer.new(no_pass_account).import_donors(@profile)}.should raise_error(OrgAccountMissingCredentialsError, I18n.t('data_server.missing_username_password'))
+      ->{DataServer.new(no_pass_account).import_donors(profile)}.should raise_error(OrgAccountMissingCredentialsError, I18n.t('data_server.missing_username_password'))
     end
     it "raise an error if credentials are invalid" do
       @org_account.valid_credentials = false
-      ->{DataServer.new(@org_account).import_donors(@profile)}.should raise_error(OrgAccountInvalidCredentialsError, I18n.t('data_server.invalid_username_password', org: @org))
+      ->{DataServer.new(@org_account).import_donors(profile)}.should raise_error(OrgAccountInvalidCredentialsError, I18n.t('data_server.invalid_username_password', org: @org))
     end
   end
 
@@ -269,13 +268,13 @@ describe DataServer do
       stub_request(:post, @org.donations_url).to_return(body: "\"EMPLID\",\"EFFDT\",\"BALANCE\",\"ACCT_NAME\"\n\"0000000\",\"2012-03-23 16:01:39.0\",\"123.45\",\"Test Account\"\n")
       @data_server.should_receive(:check_credentials!)
       -> {
-        @data_server.import_profile_balance(@profile)
-      }.should change(@profile, :balance).to(123.45)
+        @data_server.import_profile_balance(profile)
+      }.should change(profile, :balance).to(123.45)
     end
     it "should update a designation account balance" do
       stub_request(:post, @org.donations_url).to_return(body: "\"EMPLID\",\"EFFDT\",\"BALANCE\",\"ACCT_NAME\"\n\"0000000\",\"2012-03-23 16:01:39.0\",\"123.45\",\"Test Account\"\n")
       @designation_account = create(:designation_account, organization: @org, designation_number: '0000000')
-      @data_server.import_profile_balance(@profile)
+      @data_server.import_profile_balance(profile)
       @designation_account.reload.balance.should == 123.45
     end
 
@@ -290,17 +289,17 @@ describe DataServer do
       @data_server.should_receive(:check_credentials!)
       @data_server.should_receive(:find_or_create_designation_account)
       @data_server.should_receive(:add_or_update_donation)
-      @data_server.import_donations(@profile, '1/1/1951','2/2/2012')
+      @data_server.import_donations(profile, '1/1/1951','2/2/2012')
     end
 
     it "should find an existing designation account" do
       account = create(:designation_account, organization: @org, designation_number: @line['DESIGNATION'])
-      @data_server.send(:find_or_create_designation_account, @line['DESIGNATION'], @profile).should == account
+      @data_server.send(:find_or_create_designation_account, @line['DESIGNATION'], profile).should == account
     end
 
     it "should create a new designation account" do
       -> {
-        @data_server.send(:find_or_create_designation_account, @line['DESIGNATION'], @profile)
+        @data_server.send(:find_or_create_designation_account, @line['DESIGNATION'], profile)
       }.should change(DesignationAccount, :count)
     end
 
@@ -310,13 +309,13 @@ describe DataServer do
       end
       it "should add a new donation" do
         -> {
-          @data_server.send(:add_or_update_donation, @line, @designation_account, @profile)
+          @data_server.send(:add_or_update_donation, @line, @designation_account, profile)
         }.should change(Donation, :count)
       end
       it "should update an existing donation" do
-        @data_server.send(:add_or_update_donation, @line, @designation_account, @profile)
+        @data_server.send(:add_or_update_donation, @line, @designation_account, profile)
         -> {
-          donation = @data_server.send(:add_or_update_donation, @line.merge!('AMOUNT' => '5'), @designation_account, @profile)
+          donation = @data_server.send(:add_or_update_donation, @line.merge!('AMOUNT' => '5'), @designation_account, profile)
           donation.amount == '5'
         }.should_not change(Donation, :count)
       end

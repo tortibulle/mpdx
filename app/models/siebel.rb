@@ -3,7 +3,15 @@ class Siebel < DataServer
   def requires_username_and_password?() false; end
 
   def import_profiles
-    designation_profiles = []
+
+    designation_profiles = @org.designation_profiles.where(user_id: @org_account.person_id)
+
+    # Remove any profiles this user no longer has access to
+    designation_profiles.each do |designation_profile|
+      unless profiles.detect { |profile| profile.name == designation_profile.name && profile.id == designation_profile.code}
+        designation_profile.destroy
+      end
+    end
 
     profiles.each do |profile|
       designation_profile = Retryable.retryable do
@@ -16,11 +24,9 @@ class Siebel < DataServer
                                                                                      staff_account_id: designation.staff_account_id,
                                                                                      chartfield: designation.chartfield})
       end
-      # add any included designation numbers
-      designation_profiles << designation_profile
     end
 
-    designation_profiles
+    designation_profiles.reload
   end
 
   def import_profile_balance(profile)

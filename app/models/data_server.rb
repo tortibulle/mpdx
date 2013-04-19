@@ -22,21 +22,31 @@ class DataServer
   end
 
   def import_profiles
-    designation_profiles = []
+    designation_profiles = @org.designation_profiles.where(user_id: @org_account.person_id)
+
     if @org.profiles_url.present?
       check_credentials!
 
+      # Remove any profiles this user no longer has access to
+      designation_profiles.each do |designation_profile|
+        unless profiles.detect { |profile| profile[:name] == designation_profile.name && profile[:code] == designation_profile.code}
+          designation_profile.destroy
+        end
+      end
+
       profiles.each do |profile|
-        designation_profiles << Retryable.retryable do
+        Retryable.retryable do
           @org.designation_profiles.where(user_id: @org_account.person_id, name: profile[:name], code: profile[:code]).first_or_create
         end
       end
+
     else
-      designation_profiles << Retryable.retryable do
+      Retryable.retryable do
         @org.designation_profiles.where(user_id: @org_account.person_id, name: @org_account.person.to_s).first_or_create
       end
     end
-    designation_profiles
+
+    designation_profiles.reload
   end
 
   def get_account_list(profile)

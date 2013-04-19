@@ -14,8 +14,9 @@ describe Siebel do
   let(:siebel_donor) { SiebelDonations::Donor.new(Oj.load('{ "id": "602506447", "accountName": "Hillside Evangelical Free Church", "contacts": [ { "id": "1-2XH-663", "primary": true, "firstName": "Friend", "lastName": "of the Ministry", "sex": "Unspecified", "phoneNumbers": [ { "id": "1-CI7-4832", "type": "Work", "primary": true, "phone": "408/269-4782" } ] } ], "addresses": [ { "id": "1-HS7-779", "type": "Mailing", "primary": true, "seasonal": false, "address1": "545 Hillsdale Ave", "city": "San Jose", "state": "CA", "zip": "95136-1202" } ], "type": "Business" }')) }
 
   context '#import_profiles' do
+    let(:relay) { create(:relay_account, person: person) }
+
     it 'imports profiles for a relay guid' do
-      relay = create(:relay_account, person: person)
       stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/profiles?response_timeout=60000&ssoGuid=#{relay.remote_id}").
         to_return(:status => 200, :body => '[ { "name": "Staff Account (0559826)", "designations": [ { "number": "0559826", "description": "Joshua and Amanda Starcher (0559826)", "staffAccountId": "000559826" } ] }]')
 
@@ -24,6 +25,18 @@ describe Siebel do
       expect {
         siebel.import_profiles
       }.to change {DesignationProfile.count}.by(1)
+    end
+
+    it 'removes profiles that a user no longer has access to' do
+      stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/profiles?response_timeout=60000&ssoGuid=#{relay.remote_id}").
+        to_return(:status => 200, :body => '[ ]')
+
+      designation_profile = create(:designation_profile, user: person.to_user, organization: org)
+
+      expect {
+        siebel.import_profiles
+      }.to change {DesignationProfile.count}.by(-1)
+
     end
   end
 
