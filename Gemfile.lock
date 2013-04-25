@@ -236,6 +236,7 @@ GEM
       faraday (~> 0.8)
       multi_json (~> 1.3)
     levenshtein (0.2.2)
+    libv8 (3.11.8.17)
     linkedin (0.3.7)
       hashie (~> 1.2)
       multi_json (~> 1.0)
@@ -364,6 +365,7 @@ GEM
       redis (~> 3.0.0)
     redis-objects (0.6.1)
       redis (>= 3.0.2)
+    ref (1.0.4)
     responders (0.9.3)
       railties (~> 3.1)
     resque (1.24.1)
@@ -444,9 +446,9 @@ GEM
       tilt (~> 1.1, != 1.3.0)
     sqlite3 (1.3.7)
     temple (0.6.4)
-    therubyrhino (2.0.2)
-      therubyrhino_jar (>= 1.7.3)
-    therubyrhino_jar (1.7.4)
+    therubyracer (0.11.4)
+      libv8 (~> 3.11.8.12)
+      ref
     thin (1.5.1)
       daemons (>= 1.0.9)
       eventmachine (>= 0.12.6)
@@ -516,7 +518,6 @@ DEPENDENCIES
   deadlock_retry (~> 1.2.0)
   devise (~> 2.1.0)
   display_case (= 0.0.5)
-  execjs (~> 1.4.0)
   factory_girl_rails
   fb_graph (~> 2.6.0)
   fog (~> 1.6.0)
@@ -567,7 +568,7 @@ DEPENDENCIES
   sinatra
   slim
   spork-rails (~> 3.2.0)
-  therubyrhino (~> 2.0.2)
+  therubyracer
   twitter_cldr (~> 2.0.0)
   typhoeus (~> 0.5.3)
   uglifier (~> 1.3.0)
