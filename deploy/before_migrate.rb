@@ -2,7 +2,7 @@ Chef::Log.info("Running deploy/before_migrate.rb...")
 
 Chef::Log.info("Symlinking #{release_path}/public/assets to #{new_resource.deploy_to}/shared/assets")
 
-directory "#{release_path}/public/assets" do
+directory "#{new_resource.deploy_to}/shared/assets" do
   action :create
 end
 
