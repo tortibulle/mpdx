@@ -16,36 +16,34 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :request_type %>
-    <%= f.select :request_type, ['', [_("Something's Not Working"), 'Problem'], [_('How Do I?'), 'Question'], [_('Suggestion'), 'Suggestion'], [_('Other'), 'Other']] %>
+    <%= f.label :request_type, _("Short version of why you're emailing us") %>
+    <%= f.text_field :request_type %>
   </div>
 
-  <div id="request_fields" style="display:none">
-    <div class="field">
-      <%= f.label :name %>
-      <%= f.text_field :name %>
-    </div>
+  <div class="field">
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </div>
 
-    <div class="field">
-      <%= f.label :email %>
-      <%= f.text_field :email %>
-    </div>
+  <div class="field">
+    <%= f.label :email %>
+    <%= f.text_field :email %>
+  </div>
 
-    <div class="field">
-      <%= f.label :problem, _('Problem / Suggestion / Question') %>
-      <%= f.text_area :problem, rows: 10, style: 'width:500px' %>
-    </div>
+  <div class="field">
+    <%= f.label :problem, _('Problem / Suggestion / Question (Longer version)') %>
+    <%= f.text_area :problem, rows: 10, style: 'width:500px' %>
+  </div>
 
-    <div class="field">
-      <%= f.label :file, _('If your problem is related to importing, please attach the file you are trying to upload.') %>
-      <%= f.file_field :file %>
-      <%= f.hidden_field :file_cache %>
-      <%= @help_request.file.filename if @help_request.file? %>
-    </div>
+  <div class="field">
+    <%= f.label :file, _('If your problem is related to importing, please attach the file you are trying to upload.') %>
+    <%= f.file_field :file %>
+    <%= f.hidden_field :file_cache %>
+    <%= @help_request.file.filename if @help_request.file? %>
+  </div>
 
-    <div class="field">
-      <%= f.submit _('Submit') %>
-    </div>
+  <div class="field">
+    <%= f.submit _('Submit') %>
   </div>
 
 
