@@ -34,4 +34,3 @@
 //= require social_streams
 //= require tags
 //= require tasks
-//= require help_requests
