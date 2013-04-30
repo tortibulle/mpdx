@@ -123,10 +123,8 @@ class AccountList < ActiveRecord::Base
 
   def merge(other)
     AccountList.transaction do
-      if designation_profile
+      if designation_profile && other.designation_profile
         designation_profile.merge(other.designation_profile)
-      else
-        self.designation_profile_id = other.designation_profile_id
       end
 
       other.users.each do |user|
@@ -146,10 +144,14 @@ class AccountList < ActiveRecord::Base
           other.mail_chimp_account.update_attributes({account_list_id: id}, without_protection: true)
         end
       end
-
-      save(validate: false)
       other.reload
       other.destroy
+
+      unless designation_profile
+        self.designation_profile_id = other.designation_profile_id
+      end
+
+      save(validate: false)
     end
   end
 
