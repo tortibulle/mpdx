@@ -123,7 +123,11 @@ class AccountList < ActiveRecord::Base
 
   def merge(other)
     AccountList.transaction do
-      designation_profile.merge(other.designation_profile)
+      if designation_profile
+        designation_profile.merge(other.designation_profile)
+      else
+        self.designation_profile_id = other.designation_profile_id
+      end
 
       other.users.each do |user|
         users << user unless users.include?(user)

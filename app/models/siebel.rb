@@ -7,11 +7,11 @@ class Siebel < DataServer
     designation_profiles = @org.designation_profiles.where(user_id: @org_account.person_id)
 
     # Remove any profiles this user no longer has access to
-    designation_profiles.each do |designation_profile|
-      unless profiles.detect { |profile| profile.name == designation_profile.name && profile.id == designation_profile.code}
-        designation_profile.destroy
-      end
-    end
+    #designation_profiles.each do |designation_profile|
+      #unless profiles.detect { |profile| profile.name == designation_profile.name && profile.id == designation_profile.code}
+        #designation_profile.destroy
+      #end
+    #end
 
     profiles.each do |profile|
       designation_profile = Retryable.retryable do
