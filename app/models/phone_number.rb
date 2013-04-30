@@ -38,6 +38,11 @@ class PhoneNumber < ActiveRecord::Base
     true
   end
 
+  def ==(other)
+    return false unless other.is_a?(PhoneNumber)
+    PhoneNumber.strip_number(number.to_s) == PhoneNumber.strip_number(other.number.to_s)
+  end
+
   private
 
   def strip_number!

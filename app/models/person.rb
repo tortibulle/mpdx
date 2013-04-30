@@ -157,7 +157,11 @@ class Person < ActiveRecord::Base
   def merge(other)
     Person.transaction(:requires_new => true) do
       %w[phone_numbers company_positions].each do |relationship|
-        other.send(relationship.to_sym).update_all(person_id: id)
+        other.send(relationship.to_sym).each do |other_rel|
+          unless send(relationship.to_sym).detect { |rel| rel == other_rel }
+            other_rel.update_column(:person_id, id)
+          end
+        end
       end
 
       # handle a few things separately to check for duplicates

@@ -161,7 +161,12 @@ class Contact < ActiveRecord::Base
           end
         end
       end
-      other.addresses.update_all(addressable_id: id)
+
+      other.addresses.each do |other_address|
+        unless addresses.detect { |address| address == other_address }
+          other_address.update_column(:addressable_id, id)
+        end
+      end
 
       ContactReferral.where(referred_to_id: other.id).update_all(referred_to_id: id)
       ContactReferral.where(referred_by_id: other.id).update_all(referred_by_id: id)
