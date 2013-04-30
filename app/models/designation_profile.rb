@@ -28,12 +28,13 @@ class DesignationProfile < ActiveRecord::Base
   def merge(other)
     DesignationProfile.transaction do
       other.designation_profile_accounts.each do |da|
-        designation_profile_accounts << da unless designation_profile_accounts.include?(da)
+        designation_profile_accounts << da unless designation_profile_accounts.detect {|dpa| dpa.designation_account_id == da.designation_account_id }
       end
 
-      save(validate: false)
       other.reload
       other.destroy
+
+      save(validate: false)
     end
   end
 

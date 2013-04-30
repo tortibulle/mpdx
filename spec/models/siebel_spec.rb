@@ -27,17 +27,17 @@ describe Siebel do
       }.to change {DesignationProfile.count}.by(1)
     end
 
-    it 'removes profiles that a user no longer has access to' do
-      stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/profiles?response_timeout=60000&ssoGuid=#{relay.remote_id}").
-        to_return(:status => 200, :body => '[ ]')
+    #it 'removes profiles that a user no longer has access to' do
+      #stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/profiles?response_timeout=60000&ssoGuid=#{relay.remote_id}").
+        #to_return(:status => 200, :body => '[ ]')
 
-      designation_profile = create(:designation_profile, user: person.to_user, organization: org)
+      #designation_profile = create(:designation_profile, user: person.to_user, organization: org)
 
-      expect {
-        siebel.import_profiles
-      }.to change {DesignationProfile.count}.by(-1)
+      #expect {
+        #siebel.import_profiles
+      #}.to change {DesignationProfile.count}.by(-1)
 
-    end
+    #end
   end
 
   context '#import_profile_balance' do
