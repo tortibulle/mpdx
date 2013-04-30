@@ -72,6 +72,7 @@ group :development do
   gem 'railroady'
   gem 'unicorn'
   gem 'rails-footnotes'
+  gem 'bluepill'
 end
 
 group :development, :test do
