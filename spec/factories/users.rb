@@ -8,6 +8,7 @@ FactoryGirl.define do
   end
 
   factory :user_with_account, parent: :user do
+    access_token "243857230498572349898798"
     after :create do |u|
       FactoryGirl.create(:organization_account, person: u)
       account_list = FactoryGirl.create(:account_list)
