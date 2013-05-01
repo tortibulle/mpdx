@@ -3,7 +3,11 @@ class Api::V1::ContactsController < Api::V1::BaseController
   def index
     order = params[:order] || 'name'
 
-    filtered_contacts = ContactFilter.new(params[:filters]).filter(contacts)
+    if params[:filters].present?
+      filtered_contacts = ContactFilter.new(params[:filters]).filter(contacts)
+    else
+      filtered_contacts = contacts.active
+    end
 
     render json: add_includes_and_order(filtered_contacts, order: order),
            scope: {since: params[:since]},
