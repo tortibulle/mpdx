@@ -2,7 +2,7 @@ class Contact < ActiveRecord::Base
   include AddressMethods
   acts_as_taggable
 
-  has_paper_trail :on => [:destroy],
+  has_paper_trail :on => [:destroy, :update],
     :meta => { related_object_type: 'AccountList',
                related_object_id: :account_list_id }
 
@@ -33,6 +33,7 @@ class Contact < ActiveRecord::Base
   scope :financial_partners, where(status: 'Partner - Financial')
   scope :non_financial_partners, where("status <> 'Partner - Financial' OR status is NULL")
   scope :active, lambda { where(active_conditions) }
+  scope :inactive, lambda { where(inactive_conditions) }
 
 
   validates :name, presence: true
@@ -89,8 +90,16 @@ class Contact < ActiveRecord::Base
   end
 
   def self.active_conditions
-    "status NOT IN('Not Interested', 'Unresponsive', 'Never Ask',
-                               'Research Abandoned', 'Expired Referral') or status is null"
+    ["status NOT IN(?) or status is null", inactive_statuses]
+  end
+
+  def self.inactive_conditions
+    ["status IN(?)", inactive_statuses]
+
+  end
+
+  def self.inactive_statuses
+    ['Not Interested', 'Unresponsive', 'Never Ask', 'Research Abandoned', 'Expired Referral']
   end
 
   def self.create_from_donor_account(donor_account, account_list)
