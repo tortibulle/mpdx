@@ -153,10 +153,14 @@ class MailChimpAccount < ActiveRecord::Base
         gb.list_subscribe(id: primary_list_id, email_address: vars[:EMAIL], update_existing: true,
                           double_optin: false, merge_vars: vars, send_welcome: false, replace_interests: true)
       rescue Gibbon::MailChimpError => e
-        if e.message.include?('code 250') # MMERGE3 must be provided - Please enter a value (code 250)
+        case
+        when e.message.include?('code 250') # MMERGE3 must be provided - Please enter a value (code 250)
           # Notify user and nulify primary_list_id until they fix the problem
           update_column(:primary_list_id, nil)
           AccountMailer.mailchimp_required_merge_field(account_list).deliver
+        when e.message.include?('code 200') # Invalid MailChimp List ID (code 250)
+          # TODO: Notify user and nulify primary_list_id until they fix the problem
+          update_column(:primary_list_id, nil)
         else
           raise e
         end
