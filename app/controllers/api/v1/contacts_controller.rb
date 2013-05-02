@@ -8,7 +8,7 @@ class Api::V1::ContactsController < Api::V1::BaseController
     else
       filtered_contacts = contacts.active
     end
-    inactivated = Version.where(item_type: 'Contact', event: 'update', related_object_type: 'AccountList', related_object_id: current_account_list.id, item_id: contacts.inactive.pluck(:id)).where("created_at > ?", Time.at(params[:since].to_i)).pluck(:item_id)
+    inactivated = contacts.inactive.where("created_at > ?", Time.at(params[:since].to_i)).pluck(:id)
 
     render json: add_includes_and_order(filtered_contacts, order: order),
            scope: {since: params[:since]},
