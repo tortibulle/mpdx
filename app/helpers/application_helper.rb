@@ -49,7 +49,10 @@ module ApplicationHelper
     if [:full, :long, :medium, :short].include?(options[:format])
       date.localize(locale).send("to_#{options[:format]}_s".to_sym)
     else
-      super
+      case options[:format]
+      when :month_abbrv
+        date.localize(locale).to_s(format: 'MMM')
+      end
     end
   end
 
