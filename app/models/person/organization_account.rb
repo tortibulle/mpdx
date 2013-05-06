@@ -91,27 +91,25 @@ class Person::OrganizationAccount < ActiveRecord::Base
     begin
       profiles = organization.api(self).profiles_with_designation_numbers
       profiles.each do |profile|
-        #raise profiles.inspect unless profile[:designation_numbers]
         next  unless profile[:designation_numbers]
-        designation_profile = organization.designation_profiles.where(name: profile[:name], user_id: person.id)
-                                          .first_or_create!(profile.slice(:code, :balance, :balance_udated_at)
-                                          .merge(skip_account_list: true))
 
         # look for an existing account list with the same designation numbers in it
-        if account_list = AccountList.find_with_designation_numbers(profile[:designation_numbers])
-          account_list.update_attributes({designation_profile_id: designation_profile.id}, without_protection: true)
-        else
+        unless account_list = AccountList.find_with_designation_numbers(profile[:designation_numbers])
           # create a new list for this profile
+          designation_profile = organization.designation_profiles.where(name: profile[:name], user_id: person.id)
+                                  .first_or_create!(profile.slice(:code, :balance, :balance_udated_at)
+                                  .merge(skip_account_list: true))
+
           account_list = AccountList.where(designation_profile_id: designation_profile.id).first_or_create!(name: profile[:name], creator_id: person.id)
+
+          # add designation number(s) to profiles and lists
+          profile[:designation_numbers].each do |number|
+            da = organization.designation_accounts.where(designation_number: number).first_or_create
+            designation_profile.designation_accounts << da unless designation_profile.designation_accounts.include?(da)
+          end
         end
         account_list.users << user unless account_list.users.include?(user)
 
-        # add designation number(s) to profiles and lists
-        profile[:designation_numbers].each do |number|
-          da = organization.designation_accounts.where(designation_number: number).first_or_create
-          designation_profile.designation_accounts << da unless designation_profile.designation_accounts.include?(da)
-          #account_list.designation_accounts << da unless account_list.designation_accounts.include?(da)
-        end
       end
     rescue DataServerError => e
       Airbrake.notify(e)

@@ -34,6 +34,15 @@ describe Person::OrganizationAccount do
         org_account.send(:set_up_account_list)
       }.should_not change(AccountList, :count)
     end
+
+    it "doesn't create a new designation profile if linking to an account list that already has one" do
+      account_list.designation_accounts << create(:designation_account, designation_number: '1234')
+      account_list.designation_profile = create(:designation_profile, name: 'Profile 1')
+
+      -> {
+        org_account.send(:set_up_account_list)
+      }.should_not change(DesignationProfile, :count)
+    end
   end
 
   context '#to_s' do

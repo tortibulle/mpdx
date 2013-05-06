@@ -3,8 +3,9 @@ class Siebel < DataServer
   def requires_username_and_password?() false; end
 
   def import_profiles
+    designation_profiles = []
 
-    designation_profiles = @org.designation_profiles.where(user_id: @org_account.person_id)
+    #designation_profiles = @org.designation_profiles.where(user_id: @org_account.person_id)
 
     # Remove any profiles this user no longer has access to
     #designation_profiles.each do |designation_profile|
@@ -18,6 +19,8 @@ class Siebel < DataServer
         @org.designation_profiles.where(user_id: @org_account.person_id, name: profile.name, code: profile.id).first_or_create
       end
 
+      designation_profiles << designation_profile
+
       # Add included designation accounts
       profile.designations.each do |designation|
         find_or_create_designation_account(designation.number, designation_profile, {name: designation.description,
@@ -26,7 +29,7 @@ class Siebel < DataServer
       end
     end
 
-    designation_profiles.reload
+    designation_profiles
   end
 
   def import_profile_balance(profile)
