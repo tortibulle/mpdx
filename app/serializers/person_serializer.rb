@@ -6,17 +6,11 @@ class PersonSerializer < ActiveModel::Serializer
              :anniversary_month, :anniversary_year, :anniversary_day, :title, :suffix, :gender,
              :marital_status, :master_person_id, :birthday_day, :avatar
 
-  has_many :phone_numbers, :email_addresses
+  has_many :phone_numbers
+  has_many :email_addresses
 
   def avatar
     person_exhibit = exhibit(object)
     person_exhibit.avatar(:large)
-  end
-
-  def attributes
-    hash = super
-    hash[:email_addresses] = object.email_address_ids
-    hash[:phone_numbers] = object.phone_number_ids
-    hash
   end
 end
