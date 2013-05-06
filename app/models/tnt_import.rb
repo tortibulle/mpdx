@@ -11,7 +11,18 @@ class TntImport
     xml = {}
     begin
       File.open(import_file, "r:utf-8") do |file|
-        xml = Hash.from_xml(file.read)
+        @contents = file.read
+        begin
+          xml = Hash.from_xml(@contents)
+        rescue => e
+          # If the document contains characters that we don't know how to parse
+          # just strip them out.
+          # The eval is dirty, but it was all I could come up with at the time
+          # to unescape a unicode character.
+          bad_char = e.message.match(/"([^"]*)"/)[1]
+          subbed = @contents.gsub!(eval(%Q{"#{bad_char}"}), " ")
+          retry
+        end
       end
     rescue ArgumentError
       File.open(import_file, "r:windows-1251:utf-8") do |file|
