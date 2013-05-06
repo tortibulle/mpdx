@@ -5,5 +5,8 @@ FactoryGirl.define do
     account_list
     name 'John'
     status 'Partner - Financial'
+    pledge_amount 100
+    pledge_frequency 1
+    notes 'Test Note.'
   end
 end
