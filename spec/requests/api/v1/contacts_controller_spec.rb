@@ -7,6 +7,8 @@ describe Api::V1::ContactsController do
     let!(:contact) { create(:contact, account_list: user.account_lists.first) }
     let!(:person) { 
       p = create(:person)
+      p.email_addresses << create(:email_address)
+      p.phone_numbers << create(:phone_number)
       contact.people << p
       p
     }
@@ -36,7 +38,6 @@ describe Api::V1::ContactsController do
 
     context "people" do
       it "list exists" do
-        p person.contact
         body.should include 'people'
         body['people'].length.should > 0
       end
@@ -44,6 +45,14 @@ describe Api::V1::ContactsController do
         subject { body['people'][0] }
         it { should include 'id' }
       end
+    end
+
+    it "email_addresses list" do 
+      body.should include 'email_addresses'
+    end
+
+    it "phone_numbers list" do 
+      body.should include 'phone_numbers'
     end
   end
 end
