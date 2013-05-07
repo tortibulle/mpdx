@@ -4,7 +4,7 @@ class NotificationType::SpecialGift < NotificationType
     notifications = []
     designation_account.contacts.non_financial_partners.each do |contact|
       if donation = contact.donations.for(designation_account).where("donation_date > ?", 2.weeks.ago).order('donations.donation_date desc').last
-        prior_notification = Notification.active.where(contact_id: contact.id, notification_type_id: id, donation_id: donation.id).first
+        prior_notification = Notification.active.where(notification_type_id: id, donation_id: donation.id).first
         unless prior_notification
           notification = contact.notifications.create!(notification_type_id: id, donation_id: donation.id, event_date: Date.today)
           notifications << notification

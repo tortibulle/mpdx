@@ -14,7 +14,7 @@ namespace :mpdx do
     end
 
     def merge_account_lists
-      AccountList.all.each do |al|
+      AccountList.order('created_at').each do |al|
         other_list = AccountList.where(name: al.name).where("id <> #{al.id} AND name like 'Staff Account (%'").first
         if other_list# && other_contact.donor_accounts.first == contact.donor_accounts.first
           puts other_list.name
