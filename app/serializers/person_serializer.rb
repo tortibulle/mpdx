@@ -21,19 +21,20 @@ class PersonSerializer < ActiveModel::Serializer
   def attributes
     includes = scope[:include] if scope.is_a? Hash
     if includes.present?
-      hash = {}
-      includes.each do |rel|
-        if ATTRIBUTES.include?(rel.to_sym)
-          hash[rel.to_sym] = object.send(rel.to_sym)
-        end
-      end
+      attributes = includes.map(&:to_sym) & ATTRIBUTES
     else
-      hash = super
+      attributes = ATTRIBUTES
+    end
+
+    hash = {}
+    attributes.each do |rel|
+      value = send(rel.to_sym)
+      hash[rel.to_sym] = value if value
     end
 
     hash
   end
-  
+
   def include_associations!
     includes = scope[:include] if scope.is_a? Hash
     includes.each do |rel|
