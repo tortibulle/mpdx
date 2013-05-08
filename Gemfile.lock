@@ -15,9 +15,9 @@ GIT
 
 GIT
   remote: git://github.com/rails-api/active_model_serializers.git
-  revision: 3aa7773ebc80afd9d2af8ec3d476c81a0cf30ab4
+  revision: e6e1b3feaa5382d5e6bc82fe4a45d863bd78870c
   specs:
-    active_model_serializers (0.7.0)
+    active_model_serializers (0.8.1)
       activemodel (>= 3.0)
 
 GIT
@@ -270,7 +270,7 @@ GEM
     method_source (0.8.1)
     mime-types (1.22)
     mono_logger (1.0.1)
-    multi_json (1.7.2)
+    multi_json (1.7.3)
     multi_xml (0.5.3)
     multipart-post (1.2.0)
     net-scp (1.0.6)
