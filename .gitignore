@@ -30,3 +30,5 @@ public/docs
 public/uploads
 .project
 public/mobile
+*.sublime-project
+*.sublime-workspace

@@ -2,57 +2,17 @@ require 'spec_helper'
 require_relative 'api_spec_helper'
 
 describe Api::V1::ContactsController do
-  describe 'when signed in' do
+  describe 'api' do
     let(:user) { create(:user_with_account) }
     let!(:contact) { create(:contact, account_list: user.account_lists.first) }
-    let!(:person) { 
-      p = create(:person)
-      p.email_addresses << create(:email_address)
-      p.phone_numbers << create(:phone_number)
-      contact.people << p
-      p
-    }
 
     before do
       stub_auth
       get "/api/v1/contacts?access_token=" + user.access_token
     end
-    let(:body) { JSON.parse(response.body) }
 
     it "responds 200" do
       response.code.should == "200"
-    end
-
-    it "contacts list" do 
-      body.should include 'contacts'
-    end
-    describe "contact" do
-      subject { body['contacts'][0] }
-      it { should include 'id' }
-      it { should include 'name' }
-      it { should include 'pledge_amount' }
-      it { should include 'pledge_frequency' }
-      it { should include 'status' }
-      it { should include 'notes' }
-    end
-
-    context "people" do
-      it "list exists" do
-        body.should include 'people'
-        body['people'].length.should > 0
-      end
-      describe "person" do
-        subject { body['people'][0] }
-        it { should include 'id' }
-      end
-    end
-
-    it "email_addresses list" do 
-      body.should include 'email_addresses'
-    end
-
-    it "phone_numbers list" do 
-      body.should include 'phone_numbers'
     end
   end
 end
