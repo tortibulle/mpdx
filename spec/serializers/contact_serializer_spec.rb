@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe ContactSerializer do
   describe "contacts list" do
-    let(:contact) { build(:contact) }
+    let(:contact) { create(:contact) }
     subject{ ContactSerializer.new(contact).as_json[:contact] }
 
     describe "contact" do
