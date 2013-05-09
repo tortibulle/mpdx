@@ -93,7 +93,8 @@
     </div>
     <div id="feedback">
       <h2><%= _('Need Help?') %></h2>
-      <p><%= _('Are you having a problem? Do you have a question? Do you have some feedback on how we can improve MPDX? %{link}') % {link: link_to(_('Click here to let us know'), new_help_request_path)} %>
+      <p><%= _("Check out %{help_site} for training videos and FAQs. If you can't find the answer you need there or need to report a bug, %{link}") % {link: link_to(_('click here to let us know'), new_help_request_path),
+                                                                                                                                                                                  help_site: link_to('help.mpdx.org', 'http://help.mpdx.org', target: '_blank')} %>
     </div>
 
     <div id="confirmation_modal" title="<%= _('Are you sure?') %>"></div>
