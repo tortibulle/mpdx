@@ -15,11 +15,15 @@ class ContactSerializer < ActiveModel::Serializer
 
   def include_associations!
     includes = scope[:include] if scope.is_a? Hash
-    includes.each do |rel|
-      if INCLUDES.include?(rel.to_sym)
-        include!(rel.to_sym)
+    if includes.present?
+      includes.each do |rel|
+        if INCLUDES.include?(rel.to_sym)
+          include!(rel.to_sym)
+        end
       end
-    end if includes
+    else
+      super
+    end
   end
 
   def attributes
