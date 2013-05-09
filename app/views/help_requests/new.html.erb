@@ -1,7 +1,9 @@
-<h2>
+<h2 style="line-height:130%">
   <%= _('Have a suggestion or a problem? Please fill out the form below.') %>
   <br>
   <%= _('The more detail you are able to give us, the easier it will be for us to help you. Thanks!') %>
+  <br>
+  <%= _('Before emailing us, please have a look at %{link} to see if your question is already answered there.') % {link: link_to('help.mpdx.org', 'http://help.mpdx.org/', target: '_blank')} %>
 </h2>
 
 <%= form_for @help_request do |f| %>
