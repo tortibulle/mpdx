@@ -189,7 +189,7 @@ class Contact < ActiveRecord::Base
          end
        end
 
-       self.notes += "\n#{other.notes}"
+       self.notes = "#{notes}\n#{other.notes}"
        self.tag_list += other.tag_list
 
        save(validate: false)
