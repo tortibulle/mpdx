@@ -180,7 +180,7 @@ class Contact < ActiveRecord::Base
       ContactReferral.where(referred_by_id: other.id).update_all(referred_by_id: id)
 
       # Copy fields over updating any field that's blank on the winner
-      [:name, :pledge_amount, :status, :notes, :greeting, :website,
+      [:name, :pledge_amount, :status, :greeting, :website,
        :pledge_frequency, :pledge_start_date, :deceased, :next_ask, :never_ask, :likely_to_give,
        :church_name, :send_newsletter, :direct_deposit, :magazine, :last_activity, :last_appointment,
        :last_letter, :last_phone_call, :last_pre_call, :last_thank].each do |field|
@@ -188,6 +188,8 @@ class Contact < ActiveRecord::Base
            send("#{field}=".to_sym, other.send(field))
          end
        end
+
+       self.notes += "\n#{other.notes}"
        self.tag_list += other.tag_list
 
        save(validate: false)
