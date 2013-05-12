@@ -46,6 +46,11 @@ class ContactSerializer < ActiveModel::Serializer
       hash[:deleted_people] = Version.where(item_type: 'Person', event: 'destroy', related_object_type: 'Contact', related_object_id: id).where("created_at > ?", Time.at(scope[:since].to_i)).pluck(:item_id)
       hash[:deleted_addresses] = Version.where(item_type: 'Address', event: 'destroy', related_object_type: 'Contact', related_object_id: id).where("created_at > ?", Time.at(scope[:since].to_i)).pluck(:item_id)
     end
+
+    # added by Spencer Oberstadt to support old api access on 5/12/13
+    # remove in a few weeks
+    hash[:addresses] = object.address_ids if object.address_ids.count > 0
+
     hash
   end
 
