@@ -11,7 +11,9 @@ class ContactSerializer < ActiveModel::Serializer
   attributes *ATTRIBUTES
 
   INCLUDES = [:people, :addresses]
-  has_many *INCLUDES
+  INCLUDES.each do |i|
+    has_many i
+  end
 
   def include_associations!
     includes = scope[:include] if scope.is_a? Hash
