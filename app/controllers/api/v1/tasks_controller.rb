@@ -23,6 +23,12 @@ class Api::V1::TasksController < Api::V1::BaseController
   end
 
   def create
+
+    # temporary fix for bad api call
+    # added by Spencer on 5/15/13
+    # remove in a few weeks
+    params[:task].delete "contacts"
+    
     task = tasks.new(params[:task])
     if task.save
       render json: task, callback: params[:callback], status: :created
