@@ -33,6 +33,11 @@
         <%= f.text_field :monthly_goal %>
       </div>
 
+      <div class="field">
+        <%= f.label :default_account_list, _('Default Account List') %>
+        <%= f.select :default_account_list, current_user.account_lists.collect { |al| [al.name, al.id] } %>
+      </div>
+
       <br />
 
       <h3><%= _('Notifications / Alerts') %></h3>

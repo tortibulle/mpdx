@@ -19,6 +19,7 @@ class PreferenceSet
   attribute :time_zone, String, default: lambda { |preference_set, attribute| preference_set.user.time_zone }
   attribute :locale, String, default: lambda { |preference_set, attribute| preference_set.user.locale }
   attribute :monthly_goal, String, default: lambda { |preference_set, attribute| preference_set.account_list.monthly_goal }
+  attribute :default_account_list, Integer, default: lambda { |preference_set, attribute| preference_set.user.default_account_list }
 
   # AccountList preferences
   # - Notification Preferences
@@ -76,7 +77,7 @@ class PreferenceSet
   end
 
   def persist!
-    user.update_attributes(first_name: first_name, email: email, time_zone: time_zone, locale: locale)
+    user.update_attributes(first_name: first_name, email: email, time_zone: time_zone, locale: locale, default_account_list: default_account_list)
     account_list.update_attributes(monthly_goal: monthly_goal)
     account_list.save
   end

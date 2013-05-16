@@ -84,7 +84,8 @@ class ApplicationController < ActionController::Base
 
   def current_account_list
     unless @current_account_list
-      @current_account_list = current_user.account_lists.find_by_id(session[:current_account_list_id]) if session[:current_account_list_id].present?
+      @current_account_list = current_user.account_lists.find(session[:current_account_list_id]) if session[:current_account_list_id].present?
+      @current_account_list ||= current_user.account_lists.find(current_user.default_account_list) if current_user.default_account_list.present?
       @current_account_list ||= current_user.account_lists.first
       @current_account_list ||= current_user.organization_accounts.first.create_default_profile if current_user.organization_accounts.first
       session[:current_account_list_id] = @current_account_list.id if @current_account_list

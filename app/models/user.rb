@@ -13,7 +13,7 @@ class User < Person
 
   devise :trackable
   store :preferences, accessors: [:time_zone, :locale, :setup, :contacts_filter,
-                                  :tasks_filter]
+                                  :tasks_filter, :default_account_list]
 
   # attr_accessible :first_name, :last_name
 
