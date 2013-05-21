@@ -52,6 +52,8 @@ module ApplicationHelper
       case options[:format]
       when :month_abbrv
         date.localize(locale).to_s(format: 'MMM')
+      when :date_time
+        date.to_datetime.localize(locale).to_short_s
       end
     end
   end
