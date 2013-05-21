@@ -2,6 +2,9 @@
 
   <div class="wpp">
   <h1><%= t('.new_task') %></h1>
+  <% if !@task.activity_contacts.blank? %>
+    <h2>for <%= @task.activity_contacts.first.contact %></h2>
+  <% end %>
 
   <%= render 'form', task: @task %>
 

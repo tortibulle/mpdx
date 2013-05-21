@@ -46,7 +46,7 @@ class TasksController < ApplicationController
         @task.activity_contacts.build(contact_id: ac.contact_id)
       end
     end
-    if params[:contact_id]
+    if params[:contact_id] && current_user.contacts.exists?(params[:contact_id])
       @task.activity_contacts.build(contact_id: params[:contact_id])
       session[:contact_redirect_to] = contact_path(params[:contact_id], anchor: 'tasks-tab')
     end
