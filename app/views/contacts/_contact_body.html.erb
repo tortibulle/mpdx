@@ -88,10 +88,11 @@
           <li><a href="#donations-tab"><%= _('Donations') %></a></li>
           <li><a href="#tasks-tab"><%= _('Tasks') %></a></li>
           <li><a href="#history-tab"><%= _('History') %></a></li>
+          <li><a href="#referrals-tab"><%= _('Referrals') %></a></li>
           <li><a href="#notes-tab"><%= _('Notes') %></a></li>
           <li><a href="#stream-tab"><%= _('Social') %></a></li>
         </ul>
-
+        <div class="clr"></div>
         <div id="contact-details">
           <%= spinner(extra: 'details', visible: true) %>
           <div id="details"></div>
@@ -109,6 +110,14 @@
         <div id="history-tab">
           <%= spinner(extra: 'history', visible: true) %>
           <div id="history"></div>
+        </div>
+        <div id="referrals-tab">
+          <h2>Referrals from This Contact</h2>
+          <ul>
+            <% contact.contact_referrals_by_me.each do |r| %>
+              <li><%= link_to(r.referred_to) %> on <%= l r.created_at.to_date %></li>
+            <% end %>
+          </ul>
         </div>
         <div id="notes-tab">
           <%= form_for contact, remote: true do |f| %>
