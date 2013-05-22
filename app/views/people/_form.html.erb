@@ -65,7 +65,7 @@
       <%= builder.select :anniversary_year, Time.now.year.downto(1900).to_a, include_blank: true %>
     </div>
     <div class="spacer"></div>
-    <% if builder.parent_builder.object.is_a?(Contact) %>
+    <% if builder.parent_builder && builder.parent_builder.object.is_a?(Contact) %>
       <%= link_to_remove_fields(builder, no_remove) %>
     <% end %>
   </div>
