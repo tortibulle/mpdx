@@ -1,4 +1,4 @@
-$('#contentbody').replaceWith('<%= j(render('contact_body', contacts: all_contacts, contact: @contact)) %>')
+$('#contentbody').replaceWith('<%= j(render('contact_body', contacts: @filtered_contacts, contact: @contact)) %>')
 $('.contact_list a').removeClass('active')
 $('[data-id=<%= @contact.id %>]').addClass('active')
 $.mpdx.activateTabs()

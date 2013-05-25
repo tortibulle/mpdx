@@ -1,24 +1,10 @@
 class ContactsController < ApplicationController
   respond_to :html, :js
   before_filter :get_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals, :details]
-  before_filter :setup_filters, only: :index
+  before_filter :setup_filters, only: [:index, :show]
 
   def index
-    @filtered_contacts = current_account_list.contacts.order('contacts.name')
-
-    if params[:filter] == 'people'
-      @filtered_contacts = @filtered_contacts.people
-    end
-
-    if params[:filter] == 'companies'
-      @filtered_contacts = @filtered_contacts.companies
-    end
-
-    @filtered_contacts =  if filters_params.present?
-                            ContactFilter.new(filters_params).filter(@filtered_contacts)
-                          else
-                            @filtered_contacts.active
-                          end
+    @filtered_contacts = filtered_contacts
 
     respond_to do |wants|
 
@@ -43,6 +29,8 @@ class ContactsController < ApplicationController
   end
 
   def show
+    @filtered_contacts = filtered_contacts
+    
     respond_with(@contact)
   end
 
@@ -240,6 +228,24 @@ class ContactsController < ApplicationController
 
     if current_user.contacts_filter.present? && current_user.contacts_filter[current_account_list.id].present?
       @filters_params = current_user.contacts_filter[current_account_list.id]
+    end
+  end
+
+  def filtered_contacts
+    filtered_contacts = current_account_list.contacts.order('contacts.name')
+
+    if params[:filter] == 'people'
+      filtered_contacts = filtered_contacts.people
+    end
+
+    if params[:filter] == 'companies'
+      filtered_contacts = filtered_contacts.companies
+    end
+
+    if filters_params.present?
+      ContactFilter.new(filters_params).filter(filtered_contacts)
+    else
+      filtered_contacts.active
     end
   end
 
