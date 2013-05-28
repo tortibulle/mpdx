@@ -118,6 +118,10 @@
               <li><%= link_to(r.referred_to) %> on <%= l r.created_at.to_date %></li>
             <% end %>
           </ul>
+          <% if contact.contact_referrals_by_me.empty? %>
+            <%= _('There are no referrals by this contact, ') +
+                link_to(_('Add some now'), add_referrals_contact_path(contact), remote: true) + "." %>
+          <% end %>
         </div>
         <div id="notes-tab">
           <%= form_for contact, remote: true do |f| %>
