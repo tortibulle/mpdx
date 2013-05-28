@@ -221,10 +221,11 @@ class ContactsController < ApplicationController
     clear_filters = params.delete(:clear_filter)
     if filters_params.present?
       current_user.contacts_filter[current_account_list.id] = filters_params
+      current_user.save
     elsif clear_filters == 'true'
       current_user.contacts_filter[current_account_list.id] = nil
+      current_user.save
     end
-    current_user.save
 
     if current_user.contacts_filter.present? && current_user.contacts_filter[current_account_list.id].present?
       @filters_params = current_user.contacts_filter[current_account_list.id]
