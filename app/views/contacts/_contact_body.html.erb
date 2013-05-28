@@ -119,7 +119,7 @@
           <h2>Referrals from This Contact</h2>
           <ul>
             <% contact.contact_referrals_by_me.each do |r| %>
-              <li><%= link_to(r.referred_to) %> on <%= l r.created_at.to_date %></li>
+              <li><%= link_to(r.referred_to, contact_path(r.referred_to)) %> on <%= l r.created_at.to_date %></li>
             <% end %>
           </ul>
           <% if contact.contact_referrals_by_me.empty? %>
