@@ -23,6 +23,10 @@ module ApplicationHelper
     link_to_function(name, raw("addFields(this, \"#{association}\", \"#{escape_javascript(fields)}\")"), class: "add_field")
   end
 
+  def link_to_clear_contact_filters(f)
+    link_to(f, contacts_path(clear_filter: true))
+  end
+
   def tip(tip, options = {})
     tag('span', class: 'qtip', title: tip, style: options[:style])
   end

@@ -847,11 +847,22 @@ table.meta {
 .contact_controls {
   background: $gray_lightest;
   border-bottom: 1px solid $gray_mid;
-  padding: 5px 16px;
+  display: inline-block;
+  padding: 5px 0;
   line-height: 23px;
+  width: 100%;
 
-  .actions {float: right;}
-  .contact_paging {padding: 0 5px;}
+  .actions {
+    float: right;
+    padding-right: 16px;
+  }
+}
+
+#contact_paging {
+  display: inline-block;
+  padding-left: 16px;
+
+  span { padding: 0 5px; }
 }
 
 .flatbtn {
@@ -879,7 +890,13 @@ table.meta {
     display: inline-block;
   }
   .filters {
+    height: auto;
     .search_filter {width: 96%;}
+  }
+  .filtered_message {
+    display: block;
+    padding: 5px 0;
+    a { padding: 0 5px;}
   }
 }
 
