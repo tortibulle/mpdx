@@ -11,7 +11,7 @@
 
 <div class="field">
   <%= f.label :subject, _('Subject') %>
-  <%= f.text_field :subject %>
+  <%= f.text_field :subject, :autofocus => true %>
 </div>
 
 <% if task.completed? %>

@@ -895,7 +895,9 @@ table.meta {
   }
   .filtered_message {
     display: block;
-    padding: 5px 0;
+    font-weight: bold;
+    padding: 8px 0;
+    text-align: center;
     a { padding: 0 5px;}
   }
 }
