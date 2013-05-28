@@ -43,13 +43,21 @@ class ContactFilter
       end
 
       if @filters[:status].present? && @filters[:status].first != ''
-        filtered_contacts = filtered_contacts.where(status: @filters[:status])
+        if(@filters[:status].first == 'null')
+          filtered_contacts = filtered_contacts.where(status: "")
+        else
+          filtered_contacts = filtered_contacts.where(status: @filters[:status])
+        end
       else
         filtered_contacts = filtered_contacts.active
       end
 
       if @filters[:referrer].present? && @filters[:referrer].first != ''
-        filtered_contacts = filtered_contacts.joins(:contact_referrals_to_me).where('contact_referrals.referred_by_id' => @filters[:referrer])
+        if(@filters[:referrer].first == '*')
+          filtered_contacts = filtered_contacts.joins(:contact_referrals_to_me).where('contact_referrals.referred_by_id is not null')
+        else
+          filtered_contacts = filtered_contacts.joins(:contact_referrals_to_me).where('contact_referrals.referred_by_id' => @filters[:referrer])
+        end
       end
 
       if @filters[:newsletter].present?
