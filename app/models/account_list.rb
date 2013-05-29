@@ -189,6 +189,11 @@ class AccountList < ActiveRecord::Base
     end
   end
 
+  def all_contacts
+    contacts = self.contacts.order('contacts.name')
+    contacts.select(['contacts.id', 'contacts.name'])
+  end
+
   private
 
   # trigger any notifications for designation accounts in this account list
