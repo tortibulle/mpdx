@@ -4,6 +4,8 @@ class TasksController < ApplicationController
   respond_to :html, :js
 
   def index
+    @page_title = _('Tasks')
+
     @tasks = current_account_list.tasks.uncompleted.includes(:contacts, :activity_comments, :tags)
 
     @tasks = TaskFilter.new(filters_params).filter(@tasks) if filters_params.present?
@@ -15,6 +17,8 @@ class TasksController < ApplicationController
   end
 
   def starred
+    @page_title = _('Starred Tasks')
+
     @tasks = current_account_list.tasks.uncompleted.starred
   end
 
@@ -23,6 +27,8 @@ class TasksController < ApplicationController
   end
 
   def history
+    @page_title = _('Task History')
+
     @tasks = current_account_list.tasks.completed
                                        .includes(:contacts, :activity_comments, :tags)
                                        .page(page).per_page(per_page)
@@ -32,11 +38,13 @@ class TasksController < ApplicationController
 
   end
 
-  def show
-    @task = current_account_list.tasks.find(params[:id])
-  end
+  # def show
+  #   @task = current_account_list.tasks.find(params[:id])
+  # end
 
   def new
+    @page_title = _('New Task')
+
     @task = current_account_list.tasks.new
     @old_task = current_account_list.tasks.find_by_id(params[:from]) if params[:from]
     if @old_task
@@ -49,6 +57,8 @@ class TasksController < ApplicationController
     if params[:contact_id] && current_user.contacts.exists?(params[:contact_id])
       @task.activity_contacts.build(contact_id: params[:contact_id])
       session[:contact_redirect_to] = contact_path(params[:contact_id], anchor: 'tasks-tab')
+
+      @page_title += _(' For %{contact}') % {contact: @task.activity_contacts.first.contact.name} if @task.activity_contacts.length == 1 
     end
     if params[:completed]
       @task.completed = true
@@ -58,6 +68,8 @@ class TasksController < ApplicationController
 
   def edit
     @task = current_account_list.tasks.find(params[:id])
+
+    @page_title = _('Edit Task - %{task}') % {task: @task.subject}
   end
 
   def create

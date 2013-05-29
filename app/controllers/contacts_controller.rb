@@ -49,7 +49,7 @@ class ContactsController < ApplicationController
   end
 
   def edit
-    @page_title = _('Edit %{contact}') % {contact: @contact.name}
+    @page_title = _('Edit - %{contact}') % {contact: @contact.name}
   end
 
   def create
