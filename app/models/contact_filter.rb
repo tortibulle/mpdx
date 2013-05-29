@@ -44,7 +44,7 @@ class ContactFilter
 
       if @filters[:status].present? && @filters[:status].first != ''
         if(@filters[:status].first == 'null')
-          filtered_contacts = filtered_contacts.where(status: "")
+          filtered_contacts = filtered_contacts.where("status = '' or status is NULL")
         else
           filtered_contacts = filtered_contacts.where(status: @filters[:status])
         end

@@ -311,7 +311,7 @@ GEM
     paper_trail (2.7.2)
       activerecord (~> 3.0)
       railties (~> 3.0)
-    pg (0.15.1)
+    pg (0.14.1)
     po_to_json (0.0.7)
       json
     polyamorous (0.5.0)
@@ -551,7 +551,7 @@ DEPENDENCIES
   omniauth-linkedin (~> 0.0.8)
   omniauth-twitter (~> 0.0.14)
   paper_trail (~> 2.7.0)
-  pg
+  pg (~> 0.14.1)
   quiet_assets
   railroady
   rails (~> 3.2.3)
