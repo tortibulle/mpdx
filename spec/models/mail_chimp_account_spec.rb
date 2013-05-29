@@ -176,8 +176,8 @@ describe MailChimpAccount do
 
       it "should export to a list" do
         stub_request(:post, "https://us4.api.mailchimp.com/1.3/?method=listBatchSubscribe").
-         with(:body => "%7B%22apikey%22%3A%22fake-us4%22%2C%22id%22%3Anull%2C%22batch%22%3A%5B%7B%22EMAIL%22%3A%22foo%40example.com%22%2C%22FNAME%22%3A%22John%22%2C%22LNAME%22%3Anull%2C%22GROUPING%22%3A%5B%7B%22id%22%3A1%2C%22groups%22%3A%22Partner+-+Financial%22%7D%5D%7D%5D%2C%22update_existing%22%3Atrue%2C%22double_optin%22%3Afalse%2C%22send_welcome%22%3Afalse%2C%22replace_interests%22%3Atrue%7D").
-         to_return(:status => 200, :body => "{}", :headers => {})
+         with(:body => "%7B%22apikey%22%3A%22fake-us4%22%2C%22id%22%3Anull%2C%22batch%22%3A%5B%7B%22EMAIL%22%3A%22foo%40example.com%22%2C%22FNAME%22%3A%22John%22%2C%22LNAME%22%3Anull%2C%22GROUPINGS%22%3A%5B%7B%22id%22%3A1%2C%22groups%22%3A%22Partner+-+Financial%22%7D%5D%7D%5D%2C%22update_existing%22%3Atrue%2C%22double_optin%22%3Afalse%2C%22send_welcome%22%3Afalse%2C%22replace_interests%22%3Atrue%7D").
+         to_return(:status => 200, :body => "", :headers => {})
 
         account.grouping_id = 1
 
