@@ -207,7 +207,7 @@ class MailChimpAccount < ActiveRecord::Base
 
       # if we have a grouping_id, add them to that group
       if grouping_id.present?
-        batch.each { |p| p[:GROUPING] ||= [{id: grouping_id, groups: _(contact.status)}] }
+        batch.each { |p| p[:GROUPINGS] ||= [{id: grouping_id, groups: _(contact.status)}] }
       end
 
 
