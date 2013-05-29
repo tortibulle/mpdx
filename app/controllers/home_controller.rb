@@ -2,6 +2,8 @@ class HomeController < ApplicationController
   skip_before_filter :ensure_login, only: [:login, :privacy]
 
   def index
+    @page_title = _('Dashboard')
+
     @tasks = current_account_list.tasks.uncompleted.includes(:contacts).limit(6)
   end
 

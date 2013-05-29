@@ -4,6 +4,8 @@ class ContactsController < ApplicationController
   before_filter :setup_filters, only: [:index, :show]
 
   def index
+    @page_title = _('Contacts')
+
     @filtered_contacts = filtered_contacts
 
     respond_to do |wants|
@@ -29,8 +31,10 @@ class ContactsController < ApplicationController
   end
 
   def show
+    @page_title = @contact.name
+
     @filtered_contacts = filtered_contacts
-    
+
     respond_with(@contact)
   end
 
@@ -39,10 +43,13 @@ class ContactsController < ApplicationController
   end
 
   def new
+    @page_title = _('New Contact')
+
     @contact = current_account_list.contacts.new
   end
 
   def edit
+    @page_title = _('Edit %{contact}') % {contact: @contact.name}
   end
 
   def create
@@ -94,6 +101,8 @@ class ContactsController < ApplicationController
   end
 
   def merge
+    @page_title = _('Merge Contacts')
+
     if params[:merge_contact_ids]
       params[:merge_sets] = [params[:merge_contact_ids]]
     end
@@ -187,6 +196,8 @@ class ContactsController < ApplicationController
   end
 
   def find_duplicates
+    @page_title = _('Find Duplicates')
+
     respond_to do |wants|
       wants.html {  }
       wants.js do

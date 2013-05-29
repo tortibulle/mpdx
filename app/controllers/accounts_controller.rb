@@ -3,9 +3,11 @@ class AccountsController < ApplicationController
   skip_before_filter :ensure_setup_finished, only: :create
 
   def index
+    @page_title = _('Accounts')
   end
 
   def new
+    @page_title = _('New Account')
     if params[:redirect]
       session[:user_return_to] = params[:redirect]
     end
@@ -38,7 +40,7 @@ class AccountsController < ApplicationController
     # if they're trying to delete a key or relay account, make sure they have at least
     # one way to log in
     if %w[key relay].include?(params[:provider])
-      unless current_user.key_accounts.length + 
+      unless current_user.key_accounts.length +
              current_user.relay_accounts.length > 1
         redirect_to redirect_path, alert: _("If we let you delete that account you won't be able to log in anymore")
         return
