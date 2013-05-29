@@ -202,11 +202,11 @@ class ContactsController < ApplicationController
       wants.html {  }
       wants.js do
         # Find sets of people with the same name
-        people_with_duplicate_names = Person.connection.select_values("select array_to_string(array_agg(people.id), ',') from people INNER JOIN contact_people ON people.id = contact_people.person_id INNER JOIN contacts ON contact_people.contact_id = contacts.id WHERE contacts.account_list_id = #{current_account_list.id} group by first_name, last_name having count(*) > 1")
+        people_with_duplicate_names = Person.connection.select_values("select array_to_string(array_agg(people.id), ',') from people INNER JOIN contact_people ON people.id = contact_people.person_id INNER JOIN contacts ON contact_people.contact_id = contacts.id WHERE contacts.account_list_id = #{current_account_list.id} and name not like '%nonymous%' group by first_name, last_name having count(*) > 1")
         @contact_sets = []
         contacts_checked = []
         people_with_duplicate_names.each do |pair|
-          contacts = current_account_list.contacts.includes(:people).where('people.id' => pair.split(','))
+          contacts = current_account_list.contacts.people.includes(:people).where('people.id' => pair.split(','))
           if contacts.length > 1
             already_included = false
             contacts.each { |c| already_included = true if contacts_checked.include?(c) }
