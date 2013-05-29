@@ -6,7 +6,7 @@ class ContactExhibit < DisplayCase::Exhibit
   end
 
   def referrer_links
-    referrals_to_me.collect {|r| @context.link_to(exhibit(r, @context), r)}.join(', ').html_safe
+    referrals_to_me.collect {|r| @context.link_to(exhibit(r, @context), r, remote: true)}.join(', ').html_safe
   end
 
 

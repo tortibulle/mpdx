@@ -49,7 +49,7 @@
         <li>
           <label><%= _('Status') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:status] %>">
-            <%= select_tag 'filters[status]', options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_statuses.collect { |s| [_(s), s] }, filters_params[:status]), multiple: true, size: 5 %>
+            <%= select_tag 'filters[status]', options_for_select([[_('-- Any --'), ''], [_('-- None --'), 'null']] + contact_instance.assignable_statuses.collect { |s| [_(s), s] }, filters_params[:status]), multiple: true, size: 5 %>
           </div>
         </li>
 
@@ -70,7 +70,7 @@
         <li>
           <label><%= _('Referrer') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:referrer] %>">
-            <%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), '']] + contacts_for_filter.collect { |c| [c.name, c.id] }, filters_params[:referrer]), multiple: true, size: 5 %>
+            <%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), ''], [_('-- Someone --'), '*']] + contacts_for_filter.collect { |c| [c.name, c.id] }, filters_params[:referrer]), multiple: true, size: 5 %>
           </div>
         </li>
         <li class="controls">
