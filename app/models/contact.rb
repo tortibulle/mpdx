@@ -193,6 +193,8 @@ class Contact < ActiveRecord::Base
 
        self.tag_list += other.tag_list
 
+       ActivityContact.where(contact_id: other.id).update_all(contact_id: id)
+
        save(validate: false)
        other.reload
        other.destroy
