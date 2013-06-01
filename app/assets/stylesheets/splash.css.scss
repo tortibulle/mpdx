@@ -1,39 +1,51 @@
 @font-face {
-    font-family: 'NillandBlackRegular';
-    src: font-url('splash/nilland-black-webfont.eot');
-    src: font-url('splash/nilland-black-webfont.eot?#iefix') format('embedded-opentype'),
-         font-url('splash/nilland-black-webfont.woff') format('woff'),
-         font-url('splash/nilland-black-webfont.ttf') format('truetype'),
-         font-url('splash/nilland-black-webfont.svg#NillandBlackRegular') format('svg');
-    font-weight: normal;
-    font-style: normal;
-
+  font-family: 'NillandBlackRegular';
+  src: font-url('splash/nilland-black-webfont.eot');
+  src: font-url('splash/nilland-black-webfont.eot?#iefix') format('embedded-opentype'),
+       font-url('splash/nilland-black-webfont.woff') format('woff'),
+       font-url('splash/nilland-black-webfont.ttf') format('truetype'),
+       font-url('splash/nilland-black-webfont.svg#NillandBlackRegular') format('svg');
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'NillandRegular';
-    src: font-url('splash/nilland-webfont.eot');
-    src: font-url('splash/nilland-webfont.eot?#iefix') format('embedded-opentype'),
-         font-url('splash/nilland-webfont.woff') format('woff'),
-         font-url('splash/nilland-webfont.ttf') format('truetype'),
-         font-url('splash/nilland-webfont.svg#NillandRegular') format('svg');
-    font-weight: normal;
-    font-style: normal;
-
+  font-family: 'NillandRegular';
+  src: font-url('splash/nilland-webfont.eot');
+  src: font-url('splash/nilland-webfont.eot?#iefix') format('embedded-opentype'),
+       font-url('splash/nilland-webfont.woff') format('woff'),
+       font-url('splash/nilland-webfont.ttf') format('truetype'),
+       font-url('splash/nilland-webfont.svg#NillandRegular') format('svg');
+  font-weight: normal;
+  font-style: normal;
 }
 
 
 
-html {font-family: Arial; font-size: 12px; line-height: 1.25em;}
+html {font-family: Arial; line-height: 1.25em;}
 body {margin: 0; padding: 0; background: image-url("splash/bg_blue.jpg");}
 .margin {margin: 0 auto;}
 .pagewidth {width: 482px;}
 header {background: image-url("splash/bottomshadow.png") 0 100% repeat-x, image-url("splash/bg_gray.jpg"); border-bottom: 1px solid #c2c2c2;}
 .headercontent {text-align: center; height: 210px;}
 #logo {margin-top: 38px;}
-#main {font-family: 'NillandRegular', Arial; border: 1px solid #cfcfcf; box-shadow: 0 5px 12px rgba(0,0,0,.63), inset 0 0 21px rgba(0,0,0,.14); text-align: center; background: #fafafa; min-height: 90px; position: relative; margin-top: -65px; margin-bottom: 15px; font-size: 18px; line-height: 1.35em; padding-bottom: 35px;}
-#main h1 {font-weight: normal; font-family: 'NillandBlackRegular', Arial; color: #0073ab; font-size: 28.83px; margin-top: 55px;}
-#main p {margin: 1em 0;}
+#main {
+  font-family: 'NillandRegular', Arial; 
+  border: 1px solid #cfcfcf; 
+  box-shadow: 0 5px 12px rgba(0,0,0,.63), inset 0 0 21px rgba(0,0,0,.14); 
+  text-align: center; 
+  background: #fafafa; 
+  min-height: 90px; 
+  position: relative; 
+  margin-top: -65px; 
+  margin-bottom: 15px; 
+  font-size: 18px; 
+  line-height: 1.35em; 
+  padding-bottom: 17px;
+
+  h1 {font-weight: normal; font-family: 'NillandBlackRegular', Arial; color: #0073ab; font-size: 28.83px; margin-top: 55px;}
+  p {margin: 1em 0;}
+}
 .loginlink {
   border-radius: 30px;
   border: 1px solid #fff;
@@ -60,10 +72,22 @@ header {background: image-url("splash/bottomshadow.png") 0 100% repeat-x, image-
   padding: 0 20px;
   width: 140px;
   vertical-align: middle;
+  margin: 0 .4em 1em;
 }
 
 .loginlink img {vertical-align: middle;}
 .loginlink.relay img {margin-top: -5px;}
 
-footer {text-align: center; font-size: 11px; margin-bottom: 30px; min-height: 60px;}
+footer {text-align: center; font-size: .8em; margin-bottom: 30px; min-height: 60px;}
 footer, footer a {color: #76a2b7;}
+
+@media screen and (min-width: 0px) and (max-width: 480px) {
+  #logo { margin: 1em; }
+
+  .pagewidth {width: 100%;}
+
+  .headercontent { height: auto; }
+  #mainwrap { margin-top: 60px; }
+
+  #main h1 { margin-top: 1em; }
+}
