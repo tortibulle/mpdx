@@ -78,4 +78,34 @@ describe Contact do
     end
   end
 
+  describe 'when merging' do
+    let(:loser_contact) { create(:contact) }
+
+    it "should move all people" do
+      contact.people << create(:person)
+      contact.people << create(:person, first_name: "Jill")
+
+      loser_contact.people << create(:person, first_name: "Bob")
+
+      contact.merge(loser_contact)
+      contact.contact_people.size.should == 3
+    end
+
+    it "should move loser's tasks" do
+      task = create(:task, account_list: contact.account_list, subject: "Loser task")
+      loser_contact.tasks << task
+
+      contact.tasks << create(:task, account_list: contact.account_list, subject: "Winner task")
+
+      shared_task = create(:task, account_list: contact.account_list, subject: "Shared Task")
+      contact.tasks << shared_task
+      loser_contact.tasks << shared_task
+
+      contact.merge(loser_contact)
+
+      contact.tasks.reload.should include(task, shared_task)
+      shared_task.contacts.should match_array [contact]
+    end
+  end
+
 end

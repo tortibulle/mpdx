@@ -162,11 +162,15 @@ class Contact < ActiveRecord::Base
         end
       end
 
-      %w[contact_donor_accounts activity_contacts].each do |relationship|
-        other.send(relationship.to_sym).each do |r|
-          unless send(relationship.to_sym).where({contact_id: id}).first
-            r.update_attributes({contact_id: id}, without_protection: true)
-          end
+      other.contact_donor_accounts.each do |other_contact_donor_account|
+        unless donor_accounts.include?(other_contact_donor_account.donor_account)
+          other_contact_donor_account.update_column(:contact_id, id)
+        end
+      end
+
+      other.activity_contacts.each do |other_activity_contact|
+        unless activities.include?(other_activity_contact.activity)
+          other_activity_contact.update_column(:contact_id, id)
         end
       end
 
@@ -192,8 +196,6 @@ class Contact < ActiveRecord::Base
        self.notes = [notes, other.notes].compact.join("\n") if other.notes.present?
 
        self.tag_list += other.tag_list
-
-       ActivityContact.where(contact_id: other.id).update_all(contact_id: id)
 
        save(validate: false)
        other.reload
