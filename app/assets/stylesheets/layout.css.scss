@@ -16,7 +16,6 @@ hr.thin {margin: .5em 0; border: none; border-top: 1px solid $gray_mid;}
 $userheight: 60px;
 
 #user {
-  height: $userheight;
   background-image: linear-gradient(bottom, #00556D 0%, #0077AE 22%);
   background-image: -o-linear-gradient(bottom, #00556D 0%, #0077AE 22%);
   background-image: -moz-linear-gradient(bottom, #00556D 0%, #0077AE 22%);
@@ -101,7 +100,7 @@ $userheight: 60px;
   display: inline-block;
   .logo {
     width: 200px;
-    height: 53px;
+    height: 56px;
     text-indent: -1000px;
     display: block;
   }
@@ -303,9 +302,8 @@ $userheight: 60px;
 #submenu {
   $submenuheight: 50px;
   background: rgba(230,231,232,1);
-  height: $submenuheight;
   .section {
-    float: left;
+    display: inline-block;
     height: $submenuheight;
     line-height: $submenuheight;
     margin-right: 12px;
@@ -410,11 +408,19 @@ div.name {font-size: 14px; margin-bottom: 4px;}
     li {border-bottom: 1px solid $borders;}
     li:last-child {border-bottom: 0px;}
     li.selected {background: $white; a, span{border-left: 1px solid $borders;}}
-    li a.menu_item, li span.menu_item {display: block; line-height: 3em; padding: 0 15px 0 35px;}
+    li .menu_item {
+      background: image-url("sprite.png") no-repeat 0 50%;
+      color: #000;
+      display: block;
+      font-weight: bold;
+      font-size: 13px;
+      font-family: 'FreightSansProMedium';
+      line-height: 3em;
+      padding: 0 15px 0 35px;
+    }
   }
 
   ul li {
-    a.menu_item, span.menu_item {background: image-url("sprite.png") no-repeat 0 50%; color: #000; font-weight: bold; font-size: 13px; font-family: 'FreightSansProMedium';}
     a.inbox {background-position: 5px 10px;}
     a.starred {background-position: 5px -55px;}
     a.completed {background-position: 5px -119px;}

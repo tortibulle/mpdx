@@ -47,6 +47,7 @@ class Contact < ActiveRecord::Base
   after_update   :sync_with_mail_chimp
 
   assignable_values_for :status, allow_blank: true do
+    # Don't change these willy-nilly, they break the mobile app
     [_('Never Contacted'), _('Ask in Future'), _('Contact for Appointment'), _('Appointment Scheduled'),
      _('Call for Decision'), _('Partner - Financial'), _('Partner - Special'), _('Partner - Pray'),
      _('Not Interested'), _('Unresponsive'), _('Never Ask'),
