@@ -1,4 +1,5 @@
 <div class="sfield address_field" data-behavior="field-wrapper">
+  <%= builder.hidden_field :remote_id, value: '' %>
   <div class="ls">
     <%= builder.label :location %>
     <%= builder.select :location, builder.object.assignable_locations.collect { |l| [_(l), l] }, include_blank: true %>

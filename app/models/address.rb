@@ -26,5 +26,4 @@ class Address < ActiveRecord::Base
     attributes.with_indifferent_access.slice(:street, :city, :state, :country, :postal_code).any? { |_, v| v.present? && v.strip != '(UNDELIVERABLE)' }
   end
 
-
 end
