@@ -4,7 +4,7 @@
     <%= builder.select :location, builder.object.assignable_locations.collect { |l| [_(l), l] }, include_blank: true %>
   </div>
   <div class="rs">
-    
+
     <%= builder.label :street %>
     <%= builder.text_area :street, rows: 3, placeholder: "Street address" %>
     <%= builder.label :city %>
@@ -15,10 +15,10 @@
     <%= builder.text_field :postal_code, placeholder: "Postal Code" %>
     <%= builder.label :country %>
     <%= builder.country_select :country, nil, {include_blank: true}, {class: 'country_select'} %><br/>
-    <div class="field_action" style="<%= no_remove ? 'display:none' : '' %>">
+    <div class="field_action">
       <%= builder.check_box :primary_mailing_address, class: 'primary' %>
       <%= builder.label :primary_mailing_address %>
-      <%= link_to_remove_fields(builder, no_remove) %>
+      <%= link_to_remove_fields(builder) %>
     </div>
 
   </div>

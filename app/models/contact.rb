@@ -39,6 +39,7 @@ class Contact < ActiveRecord::Base
   validates :name, presence: true
 
   accepts_nested_attributes_for :people, reject_if: :all_blank, allow_destroy: true
+  accepts_nested_attributes_for :donor_accounts, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :contact_people, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :contact_referrals_to_me, reject_if: :all_blank, allow_destroy: true
 

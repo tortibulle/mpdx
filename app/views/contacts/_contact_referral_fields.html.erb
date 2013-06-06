@@ -1,7 +1,10 @@
-<div class="sfield referral_field">
+<div class="sfield referral_field" data-behavior="field-wrapper">
   <div class="ls">
     <%= builder.label :referred_by_id %>
     <%= builder.select :referred_by_id, current_account_list.contacts.order('name').collect { |c| [c.name, c.id] }, include_blank: true %>
+    <div class="field_action">
+      <%= link_to_remove_fields(builder) %>
+    </div>
   </div>
 </div>
 

@@ -18,7 +18,7 @@ module ApplicationHelper
     partial = options[:partial] || "#{association.to_s.singularize}_fields"
     new_object = f.object.class.reflect_on_association(association).klass.new
     fields = f.fields_for(association, new_object, :child_index => "new_#{association}") do |builder|
-      render(partial, :builder => builder, no_remove: false, object: f.object)
+      render(partial, :builder => builder, object: f.object)
     end
     link_to_function(name, raw("addFields(this, \"#{association}\", \"#{escape_javascript(fields)}\")"), class: "add_field")
   end
