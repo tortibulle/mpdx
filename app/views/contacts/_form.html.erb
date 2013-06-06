@@ -45,7 +45,7 @@
 
         <div class="field">
           <%= f.label :pledge_start_date, _('Commitment Start Date') %>
-          <%= f.date_select :pledge_start_date, include_blank: true, order: [:month, :day, :year], start_year: 1951 %>
+          <%= f.date_select :pledge_start_date, include_blank: true, order: [:month, :day, :year], start_year: 1951, end_year: Time.now.year + 5 %>
         </div>
 
         <%= render 'contacts/bulk_fields', f: f %>
