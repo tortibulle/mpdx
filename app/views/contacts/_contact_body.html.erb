@@ -16,7 +16,7 @@
       <% end %>
 
       <div class="actions">
-        <%= link_to(_('Add Referrals'), add_referrals_contact_path(contact), remote: true, id: 'add_referrals', :class=> "btn smallbtn") %>
+        <%= link_to(_('Add Referrals'), add_referrals_contact_path(contact), remote: true, :class=> "btn smallbtn add_referrals") %>
         <%= link_to(_('Log Task'), new_task_path(contact_id: contact.id, completed: true), class: "btn smallbtn") %>
         <%= link_to(_('Add Task'), new_task_path(contact_id: contact.id), class: "btn smallbtn") %>
         <%= link_to(_('Edit'), edit_contact_path(contact), :class=> "btn smallbtn") %>
@@ -124,7 +124,7 @@
           </ul>
           <% if contact.contact_referrals_by_me.empty? %>
             <%= _('There are no referrals by this contact, ') +
-                link_to(_('Add some now'), add_referrals_contact_path(contact), remote: true) + "." %>
+                link_to(_('Add some now'), add_referrals_contact_path(contact), remote: true, :class => "add_referrals") + "." %>
           <% end %>
         </div>
         <div id="notes-tab">
