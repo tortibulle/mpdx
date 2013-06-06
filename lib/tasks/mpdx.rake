@@ -26,8 +26,27 @@ namespace :mpdx do
       end
     end
     merge_account_lists
+  end
 
+  task address_cleanup: :environment do
+    def merge_addresses(contact)
+      addresses = contact.addresses.order('addresses.created_at')
+      if addresses.length > 1
+        addresses.reload
+        addresses.each do |address|
+          other_address = addresses.detect {|a| a == address && a.id != address.id}
+          if other_address
+            address.merge(other_address)
+            merge_addresses(contact)
+            return
+          end
+        end
+      end
+    end
 
+    Contact.includes(:addresses).where("addresses.id is not null AND (addresses.country is null or addresses.country = 'United States' or addresses.country = '' or addresses.country = 'United States of America')").find_each do |c|
+      merge_addresses(c)
+    end
   end
 end
 
