@@ -64,17 +64,22 @@ $ ->
       $('#page_spinner').dialog(modal: true)
 
       ids = $.mpdx.getSelectedTaskIds($(this).closest('table'))
+
+      # remove items
+      $(ids).each ->
+        $('#task_' + this).fadeOut()
+
       $.ajax {
         url: '/tasks/bulk_destroy',
         data: {ids: ids},
         dataType: 'script',
-        type: 'DELETE',
-        success: ->
-          document.location = '/tasks'
+        type: 'DELETE'
         error: ->
           $('#page_spinner').dialog('close')
           alert(__('There was an error deleting your tasks'))
       }
+
+      $('#page_spinner').dialog('close')
       false
 
   $(document).on 'click', '#tasks_index .select_all', ->
