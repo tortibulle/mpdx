@@ -18,8 +18,8 @@ class EmailAddress < ActiveRecord::Base
 
   def self.add_for_person(person, attributes)
     attributes = attributes.with_indifferent_access.except(:_destroy)
-    if email = person.email_addresses.find_by_email(attributes['email'].to_s.strip)
-      email.update_attributes(attributes)
+    if email = person.email_addresses.detect {|e| e.email == attributes['email'].to_s.strip}
+      email.attributes = attributes
     else
       attributes['primary'] = (person.email_addresses.present? ? false : true) if attributes['primary'].nil?
       new_or_create = person.new_record? ? :new : :create

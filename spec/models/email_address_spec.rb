@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe EmailAddress do
-  describe 'adding an email address to a person' do
-    let(:person) { FactoryGirl.create(:person) }
+  context '.add_for_person' do
+    let(:person) { create(:person) }
     let(:address) { 'test@example.com' }
 
     it "should create an email address if it's new" do
@@ -36,6 +36,18 @@ describe EmailAddress do
       email2.send(:ensure_only_one_primary)
       email1.reload.primary?.should == false
     end
+
+    it 'gracefully handles duplicate emails on an unsaved person' do
+      person = build(:person)
+      email = 'test@example.com'
+
+      person.email_address = {email: email}
+      EmailAddress.add_for_person(person, {email: email})
+      person.save
+      person.email_addresses.first.email.should == email
+      person.email_addresses.length.should == 1
+    end
+
 
   end
 end

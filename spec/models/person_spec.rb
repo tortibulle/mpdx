@@ -52,7 +52,7 @@ describe Person do
     end
   end
 
-  context 'assigning an email address' do
+  context '#email=' do
     let(:email) { 'test@example.com' }
 
     it 'creates an email' do
@@ -62,7 +62,6 @@ describe Person do
       }.should change(EmailAddress, :count).from(0).to(1)
     end
   end
-
 
   describe 'merging two people' do
     it "shouldn't fail if the winner has the same facebook account as the loser" do

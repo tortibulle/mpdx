@@ -115,7 +115,8 @@ State, CA  12345</MailingAddressBlock>
         <MailingAddressIsDeliverable>true</MailingAddressIsDeliverable>
         <Phone>(555) 234-2345</Phone>
         <PhoneIsOperational>true</PhoneIsOperational>
-        <EmailIsOperational>false</EmailIsOperational>
+        <Email>fake@example.com</Email>
+        <EmailIsOperational>true</EmailIsOperational>
         <IsOrganization>true</IsOrganization>
         <FirstName>Bob</FirstName>
         <LastName>Doe</LastName>
@@ -144,8 +145,10 @@ State, CA  12345</HomeAddressBlock>
         <PreferredPhoneType>0</PreferredPhoneType>
         <HomePhone>(555) 234-2345</HomePhone>
         <PreferredEmailTypes>0</PreferredEmailTypes>
-        <Email1IsOperational>false</Email1IsOperational>
-        <Email2IsOperational>false</Email2IsOperational>
+        <Email1>fake@example.com</Email1>
+        <Email2>fake@example.com</Email2>
+        <Email1IsOperational>true</Email1IsOperational>
+        <Email2IsOperational>true</Email2IsOperational>
         <Email3IsOperational>false</Email3IsOperational>
         <ReferredByList>Steve and Lisa Moss</ReferredByList>
         <ReferredBy>Steve and Lisa Moss</ReferredBy>
