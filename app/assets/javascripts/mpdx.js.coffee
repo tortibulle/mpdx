@@ -1,6 +1,8 @@
 $ ->
-
-  #$('select[multiple=multiple]').MultiSelect()
+  $(document).on 'change', '#per_page', ->
+    params = $.set_param('per_page', $(this).val())
+    params = $.set_param('page', 1, params)
+    document.location = document.location.pathname + '?' + params
 
   $(document).on 'click', '#leftmenu ul.left_filters li label', ->
     $(this).next(".collapse").slideToggle('fast')
