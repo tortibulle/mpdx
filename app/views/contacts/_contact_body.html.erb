@@ -116,7 +116,7 @@
           <div id="history"></div>
         </div>
         <div id="referrals-tab">
-          <h2>Referrals from This Contact</h2>
+          <h2><%= _('Referrals by this contact') %></h2>
           <ul>
             <% contact.contact_referrals_by_me.each do |r| %>
               <li><%= link_to(r.referred_to, r.referred_to, remote: true) %> on <%= l r.created_at.to_date %></li>
