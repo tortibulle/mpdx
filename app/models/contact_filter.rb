@@ -73,6 +73,10 @@ class ContactFilter
         end
         filtered_contacts = filtered_contacts.uniq unless filtered_contacts.to_sql.include?('DISTINCT')
       end
+
+      if @filters[:name].present?
+        filtered_contacts = filtered_contacts.where("name like ?", "%#{@filters[:name]}%")
+      end
     end
 
     filtered_contacts

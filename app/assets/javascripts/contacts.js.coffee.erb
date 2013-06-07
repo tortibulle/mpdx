@@ -19,9 +19,13 @@ $ ->
       $('#contact_name').autocomplete({
         source: account_contacts_json,
         select: (event, ui) ->
-          document.location = '/contacts/' + ui.item.value
+          $('#filters_name').val(ui.item.value)
+          $('#filters_form').submit()
           false
-      })
+      }).keyup (event)->
+        if event.which == 13 && $(this).val() != ''
+          $('#filters_name').val($(this).val())
+          $('#filters_form').submit()
 
       # check all feature
       $(document).on 'click', '.checkall', ->
@@ -43,6 +47,13 @@ $ ->
           $('#select_more').hide()
           $('.checkall').prop('checked', false)
 
+        if $(this).is(':checked')
+          if $('.checks input:checked').length == $('.checks input').length
+            $('#select_all_prompt').show()
+        else
+          $('#select_all_prompt').hide()
+          $('#clear_selection_prompt').hide()
+
         # Only show merge button if 2 checkboxes are checked
         if $('.checks input:checked').length >= 2
           $('[data-behavior=merge]').show()
@@ -54,11 +65,7 @@ $ ->
       $(document).on 'click', '[data-behavior=select_all]', ->
         $('#select_all_prompt').hide()
         $('#clear_selection_prompt').show()
-        ids = []
-        $.each(filtered_contacts_json, ->
-          ids.push(this.value)
-        )
-        $('#selected_ids').val(ids.join(','))
+        $('#selected_ids').val(filtered_contacts_ids.join(','))
 
       $(document).on 'click', '[data-behavior=clear_selection]', ->
         $('#select_more').hide()
