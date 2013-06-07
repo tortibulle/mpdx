@@ -11,7 +11,7 @@ class Contact < ActiveRecord::Base
   has_many :donations, through: :donor_accounts
   belongs_to :account_list, touch: true
   has_many :contact_people, dependent: :destroy
-  has_many :people, through: :contact_people
+  has_many :people, through: :contact_people, order: 'contact_people.primary::int'
   has_one  :primary_contact_person, class_name: 'ContactPerson', conditions: {primary: true}
   has_one  :primary_person, through: :primary_contact_person, source: :person
   has_one  :spouse_contact_person, class_name: 'ContactPerson', conditions: {primary: false}
@@ -112,7 +112,7 @@ class Contact < ActiveRecord::Base
   end
 
   def primary_or_first_person
-    @primary_or_first_person ||= primary_person || people.first || Person.new
+    @primary_or_first_person ||= primary_person || people.where(gender: 'male').first || people.order('created_at').first || Person.new
   end
 
   def primary_person_id
@@ -120,8 +120,10 @@ class Contact < ActiveRecord::Base
   end
 
   def primary_person_id=(person_id)
-    cp = contact_people.where(person_id: person_id).first
-    cp.update_attributes(primary: true) if cp
+    if person_id
+      cp = contact_people.where(person_id: person_id).first
+      cp.update_attributes(primary: true) if cp
+    end
     person_id
   end
 
@@ -244,5 +246,6 @@ class Contact < ActiveRecord::Base
       end
     end
   end
+
 end
 

@@ -6,6 +6,7 @@ class ContactPerson < ActiveRecord::Base
   belongs_to :person
 
   after_commit :delete_orphaned_person, on: :destroy
+  before_create :set_primary_contact
 
   private
 
@@ -14,6 +15,12 @@ class ContactPerson < ActiveRecord::Base
     unless ContactPerson.where(person_id: person_id).where('id <> ?', id).first
       # if there isn't, delete the associated person
       person.destroy if person
+    end
+  end
+
+  def set_primary_contact
+    unless contact.primary_person
+      self.primary = true
     end
   end
 
