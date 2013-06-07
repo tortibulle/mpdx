@@ -1,1 +1,1 @@
-document.location = '<%= contacts_path(referrer: [@contact.id]) %>'
+document.location = '<%= contacts_path(filters: {referrer: [@contact.id]}) %>'

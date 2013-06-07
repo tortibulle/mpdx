@@ -58,7 +58,7 @@ class TasksController < ApplicationController
       @task.activity_contacts.build(contact_id: params[:contact_id])
       session[:contact_redirect_to] = contact_path(params[:contact_id], anchor: 'tasks-tab')
 
-      @page_title += _(' For %{contact}') % {contact: @task.activity_contacts.first.contact.name} if @task.activity_contacts.length == 1 
+      @page_title += _(' For %{contact}') % {contact: @task.activity_contacts.first.contact.name} if @task.activity_contacts.length == 1
     end
     if params[:completed]
       @task.completed = true

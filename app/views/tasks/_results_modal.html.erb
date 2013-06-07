@@ -3,6 +3,11 @@
     <%= hidden_field_tag :bulk_task_update_ids %>
     <%= _('Result') %>
     <%= f.select :result, f.object.assignable_results.collect { |s| [_(s), s] }.append('') %>
+    <div class="comment_form">
+      <%= f.fields_for f.object.activity_comments.new do |cf| %>
+        <%= cf.text_area :body, placeholder: _('Add Note'), rows: 4 %>
+      <% end %>
+    </div>
     <%= f.hidden_field :starred %>
     <%= f.hidden_field :completed, value: false%>
   <% end %>

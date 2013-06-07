@@ -21,7 +21,8 @@ class Activity < ActiveRecord::Base
   scope :starred, where(starred: true).order('start_at')
 
 
-  accepts_nested_attributes_for :activity_contacts, :activity_comments, allow_destroy: true
+  accepts_nested_attributes_for :activity_contacts, allow_destroy: true
+  accepts_nested_attributes_for :activity_comments, reject_if: :all_blank
 
   # attr_accessible :starred, :location, :subject, :start_at, :end_at, :completed,
   #                 :activity_contacts_attributes, :activity_comments_attributes,
@@ -42,6 +43,10 @@ class Activity < ActiveRecord::Base
         contacts << contact unless contacts.include?(contact)
       end
     end
+  end
+
+  def activity_comment=(hash)
+    activity_comments.new(hash) if hash.values.any?(&:present?)
   end
 
 end

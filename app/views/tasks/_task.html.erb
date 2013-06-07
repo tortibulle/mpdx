@@ -37,9 +37,9 @@
         <div class="comment_form">
           <%= form_for task.activity_comments.new, namespace: "activity_#{task.id}", remote: true do |f| %>
             <%= hidden_field_tag :activity_id, task.id %>
-            <%= f.text_area :body, placeholder: t('.add_comments') %>
+            <%= f.text_area :body %>
             <div class="buttons">
-              <button class="btn smallbtn"><%= t('.add_comment') %></button>
+              <button class="btn smallbtn"><%= _('Add Comment') %></button>
             </div>
           <% end %>
         </div>
