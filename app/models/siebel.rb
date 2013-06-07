@@ -16,8 +16,10 @@ class Siebel < DataServer
 
     profiles.each do |profile|
       designation_profile = Retryable.retryable do
-        @org.designation_profiles.where(user_id: @org_account.person_id, name: profile.name, code: profile.id).first_or_create
+        @org.designation_profiles.where(user_id: @org_account.person_id, name: profile.name, code: profile.id)
+                                 .first_or_create
       end
+
 
       designation_profiles << designation_profile
 
@@ -26,6 +28,10 @@ class Siebel < DataServer
         find_or_create_designation_account(designation.number, designation_profile, {name: designation.description,
                                                                                      staff_account_id: designation.staff_account_id,
                                                                                      chartfield: designation.chartfield})
+      end
+
+      unless designation_profile.account_list
+        AccountList.find_or_create_from_profile(designation_profile, @org_account)
       end
     end
 
@@ -50,7 +56,7 @@ class Siebel < DataServer
     designation_numbers = profile.designation_accounts.pluck(:designation_number)
 
     if designation_numbers.present?
-      account_list = get_account_list(profile)
+      account_list = profile.account_list
 
       SiebelDonations::Donor.find(having_given_to_designations: designation_numbers.join(',')).each do |siebel_donor|
         donor_account = add_or_update_donor_account(account_list, siebel_donor, profile)

@@ -37,12 +37,12 @@ class AccountList < ActiveRecord::Base
   has_one  :mail_chimp_account, dependent: :destroy
   has_many :notification_preferences, dependent: :destroy, autosave: true
 
-  belongs_to :designation_profile
+  has_many :designation_profiles
 
   accepts_nested_attributes_for :contacts, reject_if: :all_blank, allow_destroy: true
 
-  def self.find_with_designation_numbers(numbers)
-    designation_account_ids = DesignationAccount.where(designation_number: numbers).pluck(:id).sort
+  def self.find_with_designation_numbers(numbers, organization)
+    designation_account_ids = DesignationAccount.where(designation_number: numbers, organization_id: organization.id).pluck(:id).sort
     results = AccountList.connection.select_all("select account_list_id,array_to_string(array_agg(designation_account_id), ',') as designation_account_ids from account_list_entries group by account_list_id")
     results.each do |hash|
       if hash['designation_account_ids'].split(',').map(&:to_i).sort == designation_account_ids
@@ -101,14 +101,12 @@ class AccountList < ActiveRecord::Base
     Donation.where(donor_account_id: donor_account_ids, designation_account_id: designation_account_ids)
   end
 
+  def designation_profile(user)
+    designation_profiles.where(user_id: user.id).first
+  end
+
   # Download all donations / info for all accounts associated with this list
   def self.update_linked_org_accounts
-    #limit = (AccountList.count / 48.0).ceil
-    #offset = (Time.now.strftime("%H").to_i + (Time.now.strftime("%M").to_f * 2 / 60).round / 2.0) * limit
-    #AccountList.joins(:organization_accounts)
-               #.where("locked_at is null").order('last_download asc')
-               #.offset(offset)
-               #.limit(limit).each do |al|
     AccountList.joins(:organization_accounts)
                .where("locked_at is null").order('last_download asc')
                .each do |al|
@@ -121,11 +119,31 @@ class AccountList < ActiveRecord::Base
     AccountList.find_each { |al| al.async(:send_account_notifications) }
   end
 
+  def self.find_or_create_from_profile(profile, org_account)
+    user = org_account.user
+    organization = org_account.organization
+    designation_numbers = profile.designation_accounts.collect(&:designation_number)
+    # look for an existing account list with the same designation numbers in it
+    unless account_list = AccountList.find_with_designation_numbers(designation_numbers, organization)
+      # create a new list for this profile
+      account_list = AccountList.where(name: profile.name, creator_id: user.id).first_or_create!
+    end
+
+    # Add designation accounts to account_list
+    profile.designation_accounts.each do |da|
+      account_list.designation_accounts << da unless account_list.designation_accounts.include?(da)
+    end
+
+    # Add user to account list
+    account_list.users << user unless account_list.users.include?(user)
+    profile.update_attributes(account_list_id: account_list.id)
+
+    account_list
+  end
+
   def merge(other)
     AccountList.transaction do
-      if designation_profile && other.designation_profile
-        designation_profile.merge(other.designation_profile)
-      end
+      other.designation_profiles.update_all(account_list_id: id)
 
       other.users.each do |user|
         users << user unless users.include?(user)
@@ -146,10 +164,6 @@ class AccountList < ActiveRecord::Base
       end
       other.reload
       other.destroy
-
-      unless designation_profile
-        self.designation_profile_id = other.designation_profile_id
-      end
 
       save(validate: false)
     end
@@ -190,8 +204,11 @@ class AccountList < ActiveRecord::Base
   end
 
   def all_contacts
-    contacts = self.contacts.order('contacts.name')
-    contacts.select(['contacts.id', 'contacts.name'])
+    unless @all_contacts
+      @all_contacts = contacts.order('contacts.name')
+      @all_contacts.select(['contacts.id', 'contacts.name'])
+    end
+    @all_contacts
   end
 
   private

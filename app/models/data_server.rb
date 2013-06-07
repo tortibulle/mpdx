@@ -12,8 +12,6 @@ class DataServer
     Rails.logger.debug 'Importing Profiles'
     designation_profiles = import_profiles
     designation_profiles.each do |p|
-      Rails.logger.debug 'Importing balances'
-      import_profile_balance(p)
       Rails.logger.debug 'Importing Donors'
       import_donors(p, date_from)
       Rails.logger.debug 'Importing Donations'
@@ -29,35 +27,29 @@ class DataServer
 
       # Remove any profiles this user no longer has access to
       designation_profiles.each do |designation_profile|
-        unless profiles.detect { |profile| profile[:name] == designation_profile.name && profile[:code] == designation_profile.code}
-          designation_profile.destroy
-        end
+        #unless profiles.detect { |profile| profile[:name] == designation_profile.name && profile[:code] == designation_profile.code}
+          #designation_profile.destroy
+        #end
       end
 
       profiles.each do |profile|
         Retryable.retryable do
-          @org.designation_profiles.where(user_id: @org_account.person_id, name: profile[:name], code: profile[:code]).first_or_create
+          designation_profile = @org.designation_profiles.where(user_id: @org_account.person_id, name: profile[:name], code: profile[:code]).first_or_create
+          import_profile_balance(designation_profile)
+          AccountList.find_or_create_from_profile(designation_profile, @org_account)
         end
       end
 
-    else
-      Retryable.retryable do
-        @org.designation_profiles.where(user_id: @org_account.person_id, name: @org_account.person.to_s).first_or_create
-      end
     end
 
     designation_profiles.reload
-  end
-
-  def get_account_list(profile)
-    profile.find_or_create_account_list
   end
 
   def import_donors(profile, date_from = nil)
     check_credentials!
     user = @org_account.user
 
-    account_list = get_account_list(profile)
+    account_list = profile.account_list
 
     response = Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:addresses_url) do
       get_response(@org.addresses_url,
@@ -140,7 +132,7 @@ class DataServer
     if balance[:designation_numbers]
       attributes.merge!(:name => balance[:account_names].first) if balance[:designation_numbers].length == 1
       balance[:designation_numbers].each_with_index do |number, i|
-        da = find_or_create_designation_account(number, profile, attributes)
+        find_or_create_designation_account(number, profile, attributes)
       end
     end
   end
@@ -326,7 +318,7 @@ class DataServer
   end
 
   def add_or_update_donor_account(line, profile, account_list = nil)
-    account_list ||= get_account_list(profile)
+    account_list ||= profile.account_list
     donor_account = Retryable.retryable do
       donor_account = @org.donor_accounts.where(account_number: line['PEOPLE_ID']).first_or_initialize
       donor_account.attributes = {name: line['ACCT_NAME'],

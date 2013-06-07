@@ -21,12 +21,6 @@ describe Person::OrganizationAccount do
       api.stub!(:profiles_with_designation_numbers).and_return([{name: 'Profile 1', code: '', designation_numbers: ['1234']}])
     end
 
-    it 'creates a new account list if none is found' do
-      -> {
-        org_account.send(:set_up_account_list)
-      }.should change(AccountList, :count)
-    end
-
     it "doesn't create a new list if an existing list contains only the designation number for a profile" do
       account_list.designation_accounts << create(:designation_account, designation_number: '1234')
 
@@ -37,7 +31,7 @@ describe Person::OrganizationAccount do
 
     it "doesn't create a new designation profile if linking to an account list that already has one" do
       account_list.designation_accounts << create(:designation_account, designation_number: '1234')
-      account_list.designation_profile = create(:designation_profile, name: 'Profile 1')
+      create(:designation_profile, name: 'Profile 1', account_list: account_list)
 
       -> {
         org_account.send(:set_up_account_list)

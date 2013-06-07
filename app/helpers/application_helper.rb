@@ -39,7 +39,7 @@ module ApplicationHelper
 
   def number_to_current_currency(value, options={})
     options[:precision] ||= 0
-    options[:currency] ||= current_account_list.designation_profile.organization.default_currency_code if current_account_list.designation_profile
+    options[:currency] ||= current_account_list.designation_profile(current_user).organization.default_currency_code if current_account_list.designation_profile(current_user)
     begin
       value.to_f.localize(locale).to_currency.to_s(options)
     rescue Errno::ENOENT

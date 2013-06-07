@@ -7,8 +7,8 @@ class DesignationProfileAccount < ActiveRecord::Base
   private
 
   def create_account_list_entry
-    account_list = designation_profile.find_or_create_account_list
-    unless account_list.designation_accounts.include?(designation_account)
+    account_list = designation_profile.account_list
+    if account_list && !account_list.designation_accounts.include?(designation_account)
       account_list.designation_accounts << designation_account
     end
   end

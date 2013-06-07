@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130222192624) do
+ActiveRecord::Schema.define(:version => 20130607153639) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -286,8 +286,10 @@ ActiveRecord::Schema.define(:version => 20130222192624) do
     t.string   "code"
     t.decimal  "balance",            :precision => 8, :scale => 2
     t.datetime "balance_updated_at"
+    t.integer  "account_list_id"
   end
 
+  add_index "designation_profiles", ["account_list_id"], :name => "index_designation_profiles_on_account_list_id"
   add_index "designation_profiles", ["organization_id"], :name => "index_designation_profiles_on_organization_id"
   add_index "designation_profiles", ["user_id", "organization_id", "remote_id"], :name => "unique_remote_id", :unique => true
 

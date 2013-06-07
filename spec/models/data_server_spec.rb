@@ -1,18 +1,10 @@
 require 'spec_helper'
 
 describe DataServer do
-  let(:profile) { create(:designation_profile, organization: @org, user: @person.to_user) }
+  let(:account_list) { create(:account_list) }
+  let(:profile) { create(:designation_profile, organization: @org, user: @person.to_user, account_list: account_list) }
 
   before(:each) do
-    stub_request(:post, "http://example.com/").
-      with(:body => {"Action"=>"Profiles", "Password"=>"Test1234", "UserName"=>"test@test.com"}).
-      to_return(:status => 200, body: "\"PROFILE_CODE\",\"PROFILE_DESCRIPTION\"\n\"93830923\",\"Ministry Account\"\n\"\",\"Staff Account\"")
-    stub_request(:post, "http://example.com/").
-      with(:body => {"Action"=>"AccountBalance", "Password"=>"bar", "Profile"=>"93830923", "UserName"=>"foo"}).
-      to_return(:status => 200, :body => "\"EMPLID\",\"ACCT_NAME\",\"BALANCE\"\n\"\"\"112235\"\",\"\"112234\"\",\"\"112233\"\"\",\"Dell SM / Holding\nDell SM / Project\nDell, Stefan and Marie\",\"(multiple accounts): 95649.14 (ZAR)\"")
-    stub_request(:post, "http://example.com/").
-      with(:body => {"Action"=>"AccountBalance", "Password"=>"bar", "Profile"=>"", "UserName"=>"foo"}).
-      to_return(:status => 200, :body => "\"EMPLID\",\"ACCT_NAME\",\"BALANCE\"\n\"\",\"\",\"(multiple accounts): 5112.03 (ZAR)\"")
     @org = create(:organization)
     @person = create(:person)
     @org_account = build(:organization_account, person: @person, organization: @org)
@@ -22,7 +14,6 @@ describe DataServer do
   it "should import all" do
     date_from = '01/01/1951'
     @data_server.should_receive(:import_profiles).and_return([profile])
-    @data_server.should_receive(:import_profile_balance).with(profile)
     @data_server.should_receive(:import_donors).with(profile, date_from)
     @data_server.should_receive(:import_donations).with(profile, date_from)
     @data_server.import_all(date_from)
@@ -43,17 +34,23 @@ describe DataServer do
     @data_server.profiles_with_designation_numbers.first[:designation_numbers].should == designation_numbers
   end
 
-  describe "import profiles" do
+  context ".import_profiles" do
+    let(:data_server) { DataServer.new(@org_account) }
+
     it "in US format" do
       stub_request(:post, @org.profiles_url).to_return(body: "ROLE_CODE,ROLE_DESCRIPTION\n,\"Staff Account (0559826)\"\n")
+      stub_request(:post, @org.account_balance_url).to_return(body: "\"EMPLID\",\"EFFDT\",\"BALANCE\",\"ACCT_NAME\"\n\"0000000\",\"2012-03-23 16:01:39.0\",\"123.45\",\"Test Account\"\n")
+      data_server.should_receive(:import_profile_balance)
+
       -> {
-        DataServer.new(@org_account).import_profiles
+        data_server.import_profiles
       }.should change(DesignationProfile, :count).by(1)
     end
     it "in DataServer format" do
       stub_request(:post, @org.profiles_url).to_return(body: "\xEF\xBB\xBF\"PROFILE_CODE\",\"PROFILE_DESCRIPTION\"\r\n\"1769360689\",\"MPD Coach (All Staff Donations)\"\r\n\"1769360688\",\"My Campus Accounts\"\r\n\"\",\"My Staff Account\"\r\n")
+      stub_request(:post, @org.account_balance_url).to_return(body: "\"EMPLID\",\"EFFDT\",\"BALANCE\",\"ACCT_NAME\"\n\"0000000\",\"2012-03-23 16:01:39.0\",\"123.45\",\"Test Account\"\n")
       -> {
-        DataServer.new(@org_account).import_profiles
+        data_server.import_profiles
       }.should change(DesignationProfile, :count).by(3)
     end
   end
@@ -87,9 +84,9 @@ describe DataServer do
 
     it 'should create a new contact in the right account list' do
       stub_request(:post, @org.addresses_url).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodriguez, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\",\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\",\"\",\"P\",\"Rodriguez\",\"\"\r\n")
-      profile = create(:designation_profile, user: @org_account.user, skip_account_list: true)
-      @account_list1 = create(:account_list, designation_profile: nil)
-      @account_list2 = create(:account_list, designation_profile: profile)
+      @account_list1 = create(:account_list)
+      @account_list2 = create(:account_list)
+      profile = create(:designation_profile, user: @org_account.user, account_list: @account_list2)
       @org_account.user.account_lists = [@account_list1, @account_list2]
       -> {
         @data_server.import_donors(profile)
@@ -112,21 +109,22 @@ describe DataServer do
     end
 
     describe "add or update a company" do
+      let(:line) { {"PEOPLE_ID" => "19238", "ACCT_NAME" => "ACorporation", "ADDR1" => "123 mi casa blvd.", "CITY" => "Colima", "STATE" => "COL", "ZIP" => "456788", "PHONE" => "(52) 45 456-5678", "COUNTRY" => "MEX", "FIRST_NAME" => "", "MIDDLE_NAME" => "", "TITLE" => "", "SUFFIX" => "", "SP_LAST_NAME" => "", "SP_FIRST_NAME" => "", "SP_MIDDLE_NAME" => "", "SP_TITLE" => "", "ADDR2" => "", "ADDR3" => "", "ADDR4" => "", "ADDR_CHANGED" => "8/15/2003", "PHONE_CHANGED" => "8/15/2003", "CNTRY_DESCR" => "", "PERSON_TYPE" => "O", "LAST_NAME_ORG" => "ACorporation", "SP_SUFFIX" => ""} }
+
       before(:each) do
         @account_list = create(:account_list)
         @user = User.find(@person.id)
-        @line = {"PEOPLE_ID" => "19238", "ACCT_NAME" => "ACorporation", "ADDR1" => "123 mi casa blvd.", "CITY" => "Colima", "STATE" => "COL", "ZIP" => "456788", "PHONE" => "(52) 45 456-5678", "COUNTRY" => "MEX", "FIRST_NAME" => "", "MIDDLE_NAME" => "", "TITLE" => "", "SUFFIX" => "", "SP_LAST_NAME" => "", "SP_FIRST_NAME" => "", "SP_MIDDLE_NAME" => "", "SP_TITLE" => "", "ADDR2" => "", "ADDR3" => "", "ADDR4" => "", "ADDR_CHANGED" => "8/15/2003", "PHONE_CHANGED" => "8/15/2003", "CNTRY_DESCR" => "", "PERSON_TYPE" => "O", "LAST_NAME_ORG" => "ACorporation", "SP_SUFFIX" => ""}
         @donor_account = create(:donor_account)
       end
       it "should add a company with an existing master company" do
         create(:company, name: 'ACorporation')
         -> {
-          @data_server.send(:add_or_update_company, @account_list, @user, @line, @donor_account)
+          @data_server.send(:add_or_update_company, @account_list, @user, line, @donor_account)
         }.should_not change(MasterCompany, :count)
       end
       it "should add a company without an existing master company and create a master company" do
         -> {
-          @data_server.send(:add_or_update_company, @account_list, @user, @line, @donor_account)
+          @data_server.send(:add_or_update_company, @account_list, @user, line, @donor_account)
         }.should change(MasterCompany, :count).by(1)
       end
       it "should update an existing company" do
@@ -134,21 +132,22 @@ describe DataServer do
         @user.account_lists << @account_list
         @account_list.companies << company
         -> {
-          new_company = @data_server.send(:add_or_update_company, @account_list, @user, @line, @donor_account)
+          new_company = @data_server.send(:add_or_update_company, @account_list, @user, line, @donor_account)
           new_company.should == company
         }.should_not change(Company, :count)
       end
       it "should associate new company with the donor account" do
-        @data_server.send(:add_or_update_company, @account_list, @user, @line, @donor_account)
+        @data_server.send(:add_or_update_company, @account_list, @user, line, @donor_account)
         @donor_account.master_company_id.should_not be_nil
       end
     end
 
     describe "add or update contact" do
+      let(:line) { {"PEOPLE_ID" => "17083", "ACCT_NAME" => "Rodrigue", "ADDR1" => "Ramon y Celeste (Moreno)", "CITY" => "Bahia Acapulco 379", "STATE" => "Chihuahua", "ZIP" => "CHH", "PHONE" => "24555", "COUNTRY" => "(376) 706-670", "FIRST_NAME" => "MEX", "MIDDLE_NAME" => "Ramon", "TITLE" => "", "SUFFIX" => "Sr.", "SP_LAST_NAME" => "", "SP_FIRST_NAME" => "Moreno", "SP_MIDDLE_NAME" => "Celeste", "SP_TITLE" => "Gonzalez", "ADDR2" => "Sra.", "ADDR3" => "", "ADDR4" => "", "ADDR_CHANGED" => "", "PHONE_CHANGED" => "4/4/2003", "CNTRY_DESCR" => "4/4/2003", "PERSON_TYPE" => "", "LAST_NAME_ORG" => "P", "SP_SUFFIX" => "Rodriguez"} }
+
       before(:each) do
         @account_list = create(:account_list)
         @user = User.find(@person.id)
-        @line = {"PEOPLE_ID" => "17083", "ACCT_NAME" => "Rodrigue", "ADDR1" => "Ramon y Celeste (Moreno)", "CITY" => "Bahia Acapulco 379", "STATE" => "Chihuahua", "ZIP" => "CHH", "PHONE" => "24555", "COUNTRY" => "(376) 706-670", "FIRST_NAME" => "MEX", "MIDDLE_NAME" => "Ramon", "TITLE" => "", "SUFFIX" => "Sr.", "SP_LAST_NAME" => "", "SP_FIRST_NAME" => "Moreno", "SP_MIDDLE_NAME" => "Celeste", "SP_TITLE" => "Gonzalez", "ADDR2" => "Sra.", "ADDR3" => "", "ADDR4" => "", "ADDR_CHANGED" => "", "PHONE_CHANGED" => "4/4/2003", "CNTRY_DESCR" => "4/4/2003", "PERSON_TYPE" => "", "LAST_NAME_ORG" => "P", "SP_SUFFIX" => "Rodriguez"}
         @donor_account = create(:donor_account)
         @donor_account.link_to_contact_for(@account_list)
       end
@@ -156,25 +155,25 @@ describe DataServer do
         mp = create(:master_person)
         @donor_account.organization.master_person_sources.create({master_person_id: mp.id, remote_id: 1}, without_protection: true)
         -> {
-          @data_server.send(:add_or_update_person, @account_list, @user, @line, @donor_account, 1)
+          @data_server.send(:add_or_update_person, @account_list, @user, line, @donor_account, 1)
         }.should_not change(MasterPerson, :count)
       end
       it "should add a contact without an existing master person and create a master person" do
         -> {
           -> {
-            @data_server.send(:add_or_update_person, @account_list, @user, @line, @donor_account, 1)
+            @data_server.send(:add_or_update_person, @account_list, @user, line, @donor_account, 1)
           }.should change(MasterPerson, :count).by(1)
         }.should change(Person, :count).by(2)
       end
 
       it "should add a new contact with no spouse prefix" do
         -> {
-          @data_server.send(:add_or_update_person, @account_list, @user, @line, @donor_account, 1)
+          @data_server.send(:add_or_update_person, @account_list, @user, line, @donor_account, 1)
         }.should change(MasterPerson, :count).by(1)
       end
       it "should add a new contact with a spouse prefix" do
         -> {
-          @data_server.send(:add_or_update_person, @account_list, @user, @line, @donor_account, 1, 'SP_')
+          @data_server.send(:add_or_update_person, @account_list, @user, line, @donor_account, 1, 'SP_')
         }.should change(MasterPerson, :count).by(1)
       end
       it "should update an existing person" do
@@ -184,25 +183,24 @@ describe DataServer do
         @donor_account.people << person
         @donor_account.organization.master_person_sources.create({master_person_id: person.master_person_id, remote_id: 1}, without_protection: true)
         -> {
-          new_contact, other = @data_server.send(:add_or_update_person, @account_list, @user, @line, @donor_account, 1)
+          new_contact, other = @data_server.send(:add_or_update_person, @account_list, @user, line, @donor_account, 1)
           new_contact.should == person
         }.should_not change(MasterPerson, :count)
       end
       it "should associate new contacts with the donor account" do
         -> {
-          @data_server.send(:add_or_update_person, @account_list, @user, @line, @donor_account, 1)
+          @data_server.send(:add_or_update_person, @account_list, @user, line, @donor_account, 1)
         }.should change(MasterPersonDonorAccount, :count).by(1)
       end
     end
   end
 
   describe 'add or update donor account' do
-    before do
-      @line = {"PEOPLE_ID" => "17083", "ACCT_NAME" => "Rodrigue", "ADDR1" => "Ramon y Celeste (Moreno)", "CITY" => "Bahia Acapulco 379", "STATE" => "Chihuahua", "ZIP" => "CHH", "PHONE" => "24555", "COUNTRY" => "(376) 706-670", "FIRST_NAME" => "MEX", "MIDDLE_NAME" => "Ramon", "TITLE" => "", "SUFFIX" => "Sr.", "SP_LAST_NAME" => "", "SP_FIRST_NAME" => "Moreno", "SP_MIDDLE_NAME" => "Celeste", "SP_TITLE" => "Gonzalez", "ADDR2" => "Sra.", "ADDR3" => "", "ADDR4" => "", "ADDR_CHANGED" => "", "PHONE_CHANGED" => "4/4/2003", "CNTRY_DESCR" => "4/4/2003", "PERSON_TYPE" => "", "LAST_NAME_ORG" => "P", "SP_SUFFIX" => "Rodriguez"}
-    end
+    let(:line) { {"PEOPLE_ID" => "17083", "ACCT_NAME" => "Rodrigue", "ADDR1" => "Ramon y Celeste (Moreno)", "CITY" => "Bahia Acapulco 379", "STATE" => "Chihuahua", "ZIP" => "CHH", "PHONE" => "24555", "COUNTRY" => "(376) 706-670", "FIRST_NAME" => "MEX", "MIDDLE_NAME" => "Ramon", "TITLE" => "", "SUFFIX" => "Sr.", "SP_LAST_NAME" => "", "SP_FIRST_NAME" => "Moreno", "SP_MIDDLE_NAME" => "Celeste", "SP_TITLE" => "Gonzalez", "ADDR2" => "Sra.", "ADDR3" => "", "ADDR4" => "", "ADDR_CHANGED" => "", "PHONE_CHANGED" => "4/4/2003", "CNTRY_DESCR" => "4/4/2003", "PERSON_TYPE" => "", "LAST_NAME_ORG" => "P", "SP_SUFFIX" => "Rodriguez"} }
+
     it "should create a new contact" do
       -> {
-        @data_server.send(:add_or_update_donor_account, @line, profile)
+        @data_server.send(:add_or_update_donor_account, line, profile)
       }.should change(Contact, :count)
     end
   end
@@ -265,14 +263,14 @@ describe DataServer do
 
   describe "import account balances" do
     it "should update a profile balance" do
-      stub_request(:post, @org.donations_url).to_return(body: "\"EMPLID\",\"EFFDT\",\"BALANCE\",\"ACCT_NAME\"\n\"0000000\",\"2012-03-23 16:01:39.0\",\"123.45\",\"Test Account\"\n")
+      stub_request(:post, @org.account_balance_url).to_return(body: "\"EMPLID\",\"EFFDT\",\"BALANCE\",\"ACCT_NAME\"\n\"0000000\",\"2012-03-23 16:01:39.0\",\"123.45\",\"Test Account\"\n")
       @data_server.should_receive(:check_credentials!)
       -> {
         @data_server.import_profile_balance(profile)
       }.should change(profile, :balance).to(123.45)
     end
     it "should update a designation account balance" do
-      stub_request(:post, @org.donations_url).to_return(body: "\"EMPLID\",\"EFFDT\",\"BALANCE\",\"ACCT_NAME\"\n\"0000000\",\"2012-03-23 16:01:39.0\",\"123.45\",\"Test Account\"\n")
+      stub_request(:post, @org.account_balance_url).to_return(body: "\"EMPLID\",\"EFFDT\",\"BALANCE\",\"ACCT_NAME\"\n\"0000000\",\"2012-03-23 16:01:39.0\",\"123.45\",\"Test Account\"\n")
       @designation_account = create(:designation_account, organization: @org, designation_number: '0000000')
       @data_server.import_profile_balance(profile)
       @designation_account.reload.balance.should == 123.45
@@ -281,9 +279,8 @@ describe DataServer do
   end
 
   describe "import donations" do
-    before(:each) do
-      @line = {"DONATION_ID" => "1062", "PEOPLE_ID" => "12271", "ACCT_NAME" => "Garci, Reynaldo", "DESIGNATION" => "10640", "MOTIVATION" => "", "PAYMENT_METHOD" => "EFECTIVO", "TENDERED_CURRENCY" => "MXN", "MEMO" => "", "DISPLAY_DATE" => "4/23/2003", "AMOUNT" => "1000.0000", "TENDERED_AMOUNT" => "1000.0000"}
-    end
+    let(:line) { {"DONATION_ID" => "1062", "PEOPLE_ID" => "12271", "ACCT_NAME" => "Garci, Reynaldo", "DESIGNATION" => "10640", "MOTIVATION" => "", "PAYMENT_METHOD" => "EFECTIVO", "TENDERED_CURRENCY" => "MXN", "MEMO" => "", "DISPLAY_DATE" => "4/23/2003", "AMOUNT" => "1000.0000", "TENDERED_AMOUNT" => "1000.0000"} }
+
     it "should create a donation" do
       stub_request(:post, @org.donations_url).to_return(body: "\xEF\xBB\xBF\"DONATION_ID\",\"PEOPLE_ID\",\"ACCT_NAME\",\"DESIGNATION\",\"MOTIVATION\",\"PAYMENT_METHOD\",\"TENDERED_CURRENCY\",\"MEMO\",\"DISPLAY_DATE\",\"AMOUNT\",\"TENDERED_AMOUNT\"\r\n\"1062\",\"12271\",\"Garcia, Reynaldo\",\"10640\",\"\",\"EFECTIVO\",\"MXN\",\"\",\"4/23/2003\",\"1000.0000\",\"1000.0000\"\r\n")
       @data_server.should_receive(:check_credentials!)
@@ -293,29 +290,28 @@ describe DataServer do
     end
 
     it "should find an existing designation account" do
-      account = create(:designation_account, organization: @org, designation_number: @line['DESIGNATION'])
-      @data_server.send(:find_or_create_designation_account, @line['DESIGNATION'], profile).should == account
+      account = create(:designation_account, organization: @org, designation_number: line['DESIGNATION'])
+      @data_server.send(:find_or_create_designation_account, line['DESIGNATION'], profile).should == account
     end
 
     it "should create a new designation account" do
       -> {
-        @data_server.send(:find_or_create_designation_account, @line['DESIGNATION'], profile)
+        @data_server.send(:find_or_create_designation_account, line['DESIGNATION'], profile)
       }.should change(DesignationAccount, :count)
     end
 
     describe "add or update donation" do
-      before(:each) do
-        @designation_account = create(:designation_account)
-      end
+      let(:designation_account) { create(:designation_account) }
+
       it "should add a new donation" do
         -> {
-          @data_server.send(:add_or_update_donation, @line, @designation_account, profile)
+          @data_server.send(:add_or_update_donation, line, designation_account, profile)
         }.should change(Donation, :count)
       end
       it "should update an existing donation" do
-        @data_server.send(:add_or_update_donation, @line, @designation_account, profile)
+        @data_server.send(:add_or_update_donation, line, designation_account, profile)
         -> {
-          donation = @data_server.send(:add_or_update_donation, @line.merge!('AMOUNT' => '5'), @designation_account, profile)
+          donation = @data_server.send(:add_or_update_donation, line.merge!('AMOUNT' => '5'), designation_account, profile)
           donation.amount == '5'
         }.should_not change(Donation, :count)
       end

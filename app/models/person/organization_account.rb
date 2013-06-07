@@ -42,17 +42,8 @@ class Person::OrganizationAccount < ActiveRecord::Base
     async(:import_all_data)
   end
 
-  def create_default_profile
-    account_list =  if user.designation_profiles.empty?
-                      organization.designation_profiles.create({name: user.to_s, user_id: user.id}, without_protection: true).account_list
-                    else
-                      user.designation_profiles.first.find_or_create_account_list
-                    end
-    account_list
-  end
-
   def account_list
-    AccountList.where(designation_profile_id: user.designation_profile_ids).first
+    user.designation_profiles.first.try(:account_list)
   end
 
   private
@@ -89,34 +80,14 @@ class Person::OrganizationAccount < ActiveRecord::Base
   # designation account, the second person will be given access to the first person's account list
   def set_up_account_list
     begin
-      profiles = organization.api(self).profiles_with_designation_numbers
-      profiles.each do |profile|
-        next  unless profile[:designation_numbers]
-
-        # look for an existing account list with the same designation numbers in it
-        unless account_list = AccountList.find_with_designation_numbers(profile[:designation_numbers])
-          # create a new list for this profile
-          designation_profile = organization.designation_profiles.where(name: profile[:name], user_id: person.id)
-                                  .first_or_create!(profile.slice(:code, :balance, :balance_udated_at)
-                                  .merge(skip_account_list: true))
-
-          account_list = AccountList.where(designation_profile_id: designation_profile.id).first_or_create!(name: profile[:name], creator_id: person.id)
-
-          # add designation number(s) to profiles and lists
-          profile[:designation_numbers].each do |number|
-            da = organization.designation_accounts.where(designation_number: number).first_or_create
-            designation_profile.designation_accounts << da unless designation_profile.designation_accounts.include?(da)
-          end
-        end
-        account_list.users << user unless account_list.users.include?(user)
-
-      end
+      organization.api(self).import_profiles
     rescue DataServerError => e
       Airbrake.notify(e)
     end
-    # If this org account doesn't have any profiles, create a default account list for them
-    if user.account_lists.empty?
-      create_default_profile
+    # If this org account doesn't have any profiles, create a default account list and profile for them
+    if user.account_lists.reload.empty?
+      account_list = user.account_lists.create({name: user.to_s, creator_id: user.id}, without_protection: true)
+      organization.designation_profiles.create({name: user.to_s, user_id: user.id, account_list_id: account_list.id}, without_protection: true)
     end
   end
 end

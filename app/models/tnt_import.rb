@@ -4,7 +4,7 @@ class TntImport
     @import = import
     @account_list = @import.account_list
     @user = @import.user
-    @designation_profile = @account_list.designation_profile || @user.designation_profiles.first
+    @designation_profile = @account_list.designation_profiles.first || @user.designation_profiles.first
   end
 
   def read_xml(import_file)

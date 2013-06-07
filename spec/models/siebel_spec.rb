@@ -4,14 +4,18 @@ describe Siebel do
   let(:org) { create(:organization) }
   let(:person) { create(:person) }
   let(:org_account) { build(:organization_account, person: person, organization: org) }
-  let(:designation_profile) { create(:designation_profile, user: person.to_user, organization: org) }
-  let(:account_list) { designation_profile.find_or_create_account_list}
+  let(:account_list) { create(:account_list) }
+  let(:designation_profile) { create(:designation_profile, user: person.to_user, organization: org, account_list: account_list) }
   let!(:siebel) { Siebel.new(org_account) }
   let(:da1) { build(:designation_account, staff_account_id: 1, organization: org) }
   let(:da2) { build(:designation_account, staff_account_id: 2, organization: org) }
   let(:donor_account) { create(:donor_account, organization: org) }
   let(:contact) { create(:contact) }
   let(:siebel_donor) { SiebelDonations::Donor.new(Oj.load('{ "id": "602506447", "accountName": "Hillside Evangelical Free Church", "contacts": [ { "id": "1-2XH-663", "primary": true, "firstName": "Friend", "lastName": "of the Ministry", "sex": "Unspecified", "phoneNumbers": [ { "id": "1-CI7-4832", "type": "Work", "primary": true, "phone": "408/269-4782" } ] } ], "addresses": [ { "id": "1-HS7-779", "type": "Mailing", "primary": true, "seasonal": false, "address1": "545 Hillsdale Ave", "city": "San Jose", "state": "CA", "zip": "95136-1202" } ], "type": "Business" }')) }
+
+  before do
+    account_list.users << person.to_user
+  end
 
   context '#import_profiles' do
     let(:relay) { create(:relay_account, person: person) }
