@@ -47,7 +47,7 @@ Mpdx::Application.configure do
   if File.exist?(Rails.root.join('config','memcached.yml'))
     cache_servers = YAML.load_file(Rails.root.join('config','memcached.yml'))[Rails.env]['host']
   else
-    cache_servers = ['10.181.146.139', '10.181.139.83']
+    cache_servers = ['10.181.146.139', '10.181.25.99']
   end
 
   config.cache_store = :dalli_store, cache_servers,  { :namespace => 'MPDXCache', :expire_after => 1.day, :compress => true }
