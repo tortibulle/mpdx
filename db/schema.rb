@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130607153639) do
+ActiveRecord::Schema.define(:version => 20130607202118) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -36,14 +36,12 @@ ActiveRecord::Schema.define(:version => 20130607153639) do
   create_table "account_lists", :force => true do |t|
     t.string   "name"
     t.integer  "creator_id"
-    t.datetime "created_at",             :null => false
-    t.datetime "updated_at",             :null => false
-    t.integer  "designation_profile_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
     t.text     "settings"
   end
 
   add_index "account_lists", ["creator_id"], :name => "index_account_lists_on_creator_id"
-  add_index "account_lists", ["designation_profile_id"], :name => "index_account_lists_on_designation_profile_id", :unique => true
 
   create_table "active_admin_comments", :force => true do |t|
     t.string   "resource_id",   :null => false
@@ -275,6 +273,16 @@ ActiveRecord::Schema.define(:version => 20130607153639) do
   end
 
   add_index "designation_profile_accounts", ["designation_profile_id", "designation_account_id"], :name => "designation_p_to_a", :unique => true
+
+  create_table "designation_profile_users", :force => true do |t|
+    t.integer  "designation_profile_id"
+    t.integer  "user_id"
+    t.datetime "created_at",             :null => false
+    t.datetime "updated_at",             :null => false
+  end
+
+  add_index "designation_profile_users", ["designation_profile_id", "user_id"], :name => "profile_user"
+  add_index "designation_profile_users", ["user_id"], :name => "index_designation_profile_users_on_user_id"
 
   create_table "designation_profiles", :force => true do |t|
     t.string   "remote_id"
