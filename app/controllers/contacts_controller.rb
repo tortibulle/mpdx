@@ -7,6 +7,8 @@ class ContactsController < ApplicationController
     if params[:filters] && params[:filters][:name].present?
       contacts_with_name = ContactFilter.new({name: filters_params[:name], status: ['*']}).filter(current_account_list.contacts)
       if contacts_with_name.count == 1
+        current_user.contacts_filter[current_account_list.id].delete("name")
+        current_user.save
         redirect_to contacts_with_name.first
         return
       end
