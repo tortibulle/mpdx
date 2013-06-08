@@ -1,6 +1,6 @@
 <% contact_instance = Contact.new %>
 <script type="text/javascript" charset="utf-8">
-  var account_contacts_json = <%= contacts_for_filter.collect { |c| {value: c.name} }.to_json.html_safe %>
+  var account_contacts_json = <%= contacts_for_filter.collect { |c| {value: c.name, id: c.id} }.to_json.html_safe %>
   var filtered_contacts_ids = <%= @filtered_contacts.collect { |c| c.id }.to_json.html_safe %>
 </script>
 <aside id="leftmenu">

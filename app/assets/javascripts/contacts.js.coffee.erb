@@ -19,8 +19,7 @@ $ ->
       $('#contact_name').autocomplete({
         source: account_contacts_json,
         select: (event, ui) ->
-          $('#filters_name').val(ui.item.value)
-          $('#filters_form').submit()
+          document.location = '/contacts/' + ui.item.id
           false
       }).keyup (event)->
         if event.which == 13 && $(this).val() != ''

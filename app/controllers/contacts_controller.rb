@@ -4,6 +4,14 @@ class ContactsController < ApplicationController
   before_filter :setup_filters, only: [:index, :show]
 
   def index
+    if params[:filters] && params[:filters][:name].present?
+      contacts_with_name = ContactFilter.new({name: filters_params[:name], status: ['*']}).filter(current_account_list.contacts)
+      if contacts_with_name.count == 1
+        redirect_to contacts_with_name.first
+        return
+      end
+    end
+
     @page_title = _('Contacts')
 
     @filtered_contacts = filtered_contacts

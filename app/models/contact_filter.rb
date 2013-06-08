@@ -43,8 +43,11 @@ class ContactFilter
       end
 
       if @filters[:status].present? && @filters[:status].first != ''
-        if(@filters[:status].first == 'null')
+        case @filters[:status].first
+        when 'null'
           filtered_contacts = filtered_contacts.where("status = '' or status is NULL")
+        when '*'
+          # allow any status
         else
           filtered_contacts = filtered_contacts.where(status: @filters[:status])
         end
@@ -75,7 +78,7 @@ class ContactFilter
       end
 
       if @filters[:name].present?
-        filtered_contacts = filtered_contacts.where("name like ?", "%#{@filters[:name]}%")
+        filtered_contacts = filtered_contacts.where("lower(name) like ?", "%#{@filters[:name].downcase}%")
       end
     end
 
