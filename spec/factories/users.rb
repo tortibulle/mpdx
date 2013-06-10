@@ -8,11 +8,11 @@ FactoryGirl.define do
   end
 
   factory :user_with_account, parent: :user do
-    access_token "243857230498572349898798"
+    sequence(:access_token) {|n| "243857230498572349898798#{n}" }
     after :create do |u|
-      FactoryGirl.create(:organization_account, person: u)
-      account_list = FactoryGirl.create(:account_list)
-      FactoryGirl.create(:account_list_user, {user: u, account_list: account_list})
+      create(:organization_account, person: u)
+      account_list = create(:account_list)
+      create(:account_list_user, {user: u, account_list: account_list})
     end
   end
 end
