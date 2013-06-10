@@ -6,7 +6,7 @@ GIT
 
 GIT
   remote: git://github.com/jnicklas/carrierwave.git
-  revision: 1e87bb54d545dafe0d26644d4c3c558938cc593a
+  revision: e0c1f199737042c1e158d42354edfc9b61aa76f0
   specs:
     carrierwave (0.8.0)
       activemodel (>= 3.2.0)
@@ -15,7 +15,7 @@ GIT
 
 GIT
   remote: git://github.com/rails-api/active_model_serializers.git
-  revision: 1d7cb2da75f9f89e88cf6860d20572aa0ae4648c
+  revision: 4f185efa90d91a8981498a5f875320ee580d554e
   specs:
     active_model_serializers (0.8.1)
       activemodel (>= 3.2)
@@ -79,8 +79,6 @@ GEM
       activesupport
       builder
       json
-    airbrake_user_attributes (0.1.6)
-      airbrake (~> 3.1.0)
     arbre (1.0.1)
       activesupport (>= 3.0.0)
     arel (3.0.2)
@@ -96,7 +94,7 @@ GEM
       daemons (~> 1.1.4)
       i18n (>= 0.5.0)
       state_machine (~> 1.1)
-    bourbon (3.1.6)
+    bourbon (3.1.7)
       sass (>= 3.2.0)
       thor
     brwsr (1.1.1)
@@ -123,8 +121,9 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.6.2)
-    connection_pool (1.0.0)
-    crack (0.3.2)
+    connection_pool (1.1.0)
+    crack (0.4.0)
+      safe_yaml (~> 0.9.0)
     daemons (1.1.9)
     dalli (2.6.4)
     database_cleaner (1.0.1)
@@ -159,7 +158,7 @@ GEM
       multi_json (>= 1.3)
       rack-oauth2 (>= 0.14.4)
       tzinfo
-    ffi (1.8.1)
+    ffi (1.9.0)
     fog (1.6.0)
       builder
       excon (~> 0.14)
@@ -173,10 +172,10 @@ GEM
     formatador (0.2.4)
     formtastic (2.2.1)
       actionpack (>= 3.0)
-    fuubar (1.1.0)
+    fuubar (1.1.1)
       rspec (~> 2.0)
       rspec-instafail (~> 0.2.0)
-      ruby-progressbar (~> 1.0.0)
+      ruby-progressbar (~> 1.0)
     gettext (2.3.9)
       locale
       text
@@ -208,7 +207,7 @@ GEM
       tilt
     has_scope (0.5.1)
     hashie (1.2.0)
-    hike (1.2.2)
+    hike (1.2.3)
     httparty (0.11.0)
       multi_json (~> 1.0)
       multi_xml (>= 0.5.2)
@@ -242,7 +241,7 @@ GEM
       hashie (~> 1.2)
       multi_json (~> 1.0)
       oauth (~> 0.4)
-    listen (1.1.4)
+    listen (1.1.6)
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
       rb-kqueue (>= 0.2)
@@ -268,14 +267,14 @@ GEM
     method_source (0.8.1)
     mime-types (1.23)
     mono_logger (1.1.0)
-    multi_json (1.7.4)
-    multi_xml (0.5.3)
+    multi_json (1.7.6)
+    multi_xml (0.5.4)
     multipart-post (1.2.0)
     net-scp (1.0.6)
       net-ssh (>= 2.6.5)
     net-ssh (2.6.7)
-    newrelic_rpm (3.5.8.72)
-    nokogiri (1.5.9)
+    newrelic_rpm (3.6.3.111)
+    nokogiri (1.5.10)
     oauth (0.4.7)
     oauth2 (0.8.1)
       faraday (~> 0.8)
@@ -404,8 +403,9 @@ GEM
       rspec-expectations (~> 2.13.0)
       rspec-mocks (~> 2.13.0)
     ruby-hmac (0.4.0)
-    ruby-progressbar (1.0.2)
+    ruby-progressbar (1.1.1)
     ruby-rtf (0.0.1)
+    safe_yaml (0.9.3)
     sass (3.2.9)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
@@ -428,10 +428,10 @@ GEM
       multi_json (~> 1.0)
       simplecov-html (~> 0.7.1)
     simplecov-html (0.7.1)
-    sinatra (1.3.6)
+    sinatra (1.4.3)
       rack (~> 1.4)
-      rack-protection (~> 1.3)
-      tilt (~> 1.3, >= 1.3.3)
+      rack-protection (~> 1.4)
+      tilt (~> 1.3, >= 1.3.4)
     skinny (0.2.3)
       eventmachine (~> 1.0.0)
       thin (~> 1.5.0)
@@ -464,7 +464,7 @@ GEM
       atomic
     tilt (1.4.1)
     timers (1.1.0)
-    treetop (1.4.12)
+    treetop (1.4.14)
       polyglot
       polyglot (>= 0.3.1)
     twitter_cldr (2.0.2)
@@ -510,8 +510,7 @@ DEPENDENCIES
   active_model_serializers!
   activeadmin
   acts-as-taggable-on (~> 2.3.3)
-  airbrake (~> 3.1.6)
-  airbrake_user_attributes (~> 0.1.6)
+  airbrake
   assignable_values (~> 0.5.3)
   awesome_print
   bluepill
@@ -543,7 +542,7 @@ DEPENDENCIES
   koala (~> 1.6.0)
   linkedin (~> 0.3.7)
   mailcatcher
-  newrelic_rpm (~> 3.5.4)
+  newrelic_rpm (~> 3.6.3)
   oj (~> 2.0.0)
   omniauth-cas (~> 1.0.0)
   omniauth-facebook (~> 1.4.1)

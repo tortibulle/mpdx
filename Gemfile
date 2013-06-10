@@ -19,8 +19,7 @@ end
 gem 'activeadmin'
 gem 'active_model_serializers', git: 'git://github.com/rails-api/active_model_serializers.git'
 gem 'acts-as-taggable-on', '~> 2.3.3'
-gem 'airbrake', '~> 3.1.6'
-gem 'airbrake_user_attributes', '~> 0.1.6'
+gem 'airbrake'#, '~> 3.1.6'
 gem 'assignable_values', '~> 0.5.3'
 gem 'carrierwave', git: 'git://github.com/jnicklas/carrierwave.git' # tracking master because of fixes made since last gem version
 gem 'country_select', git: 'git://github.com/26am/country_select.git' # My fork has the meta data for the fancy select
@@ -38,7 +37,7 @@ gem 'iniparse', '~> 1.1.6'
 gem 'jquery-rails', '~> 2.1.4'
 gem 'koala', '~> 1.6.0'
 gem 'linkedin', '~> 0.3.7'
-gem 'newrelic_rpm', '~> 3.5.4'
+gem 'newrelic_rpm', '~> 3.6.3'
 gem 'oj', '~> 2.0.0'
 gem 'omniauth-cas', '~> 1.0.0'
 gem 'omniauth-facebook', '~> 1.4.1'
