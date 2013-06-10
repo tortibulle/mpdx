@@ -469,8 +469,8 @@ GEM
       polyglot (>= 0.3.1)
     twitter_cldr (2.0.2)
       json (>= 1.1.9)
-    typhoeus (0.5.4)
-      ethon (~> 0.5.7)
+    typhoeus (0.6.3)
+      ethon (~> 0.5.11)
     tzinfo (0.3.37)
     uglifier (1.3.0)
       execjs (>= 0.3.0)
@@ -576,7 +576,7 @@ DEPENDENCIES
   spork-rails (~> 3.2.0)
   therubyracer
   twitter_cldr (~> 2.0.0)
-  typhoeus (~> 0.5.3)
+  typhoeus (~> 0.6.3)
   uglifier (~> 1.3.0)
   unicorn
   versionist

@@ -60,7 +60,7 @@ gem 'siebel_donations', git: 'git://github.com/twinge/siebel_donations.git'
 gem 'sinatra', :require => nil
 gem 'slim'
 gem 'twitter_cldr', '~> 2.0.0'
-gem 'typhoeus', '~> 0.5.3'
+gem 'typhoeus', '~> 0.6.3'
 gem 'versionist'
 gem 'virtus', '~> 0.5.4'
 gem 'whenever', '~> 0.8.1'

@@ -16,7 +16,7 @@ class SocialStreamsController < ApplicationController
           end
         end
         @items.sort!
-      rescue Koala::Facebook::AuthenticationError, Koala::Facebook::ClientError
+      rescue Koala::Facebook::AuthenticationError, Koala::Facebook::ClientError, Koala::Facebook::ServerError
         @bad_facebook_token = true
       end
     end
