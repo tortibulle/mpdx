@@ -45,11 +45,17 @@ class Person < ActiveRecord::Base
   before_create :find_master_person
   after_destroy :clean_up_master_person
   after_commit  :sync_with_mailchimp
+  after_save :touch_contacts
 
   validates_presence_of :first_name
 
   def to_s
     [first_name, last_name].join(' ')
+  end
+
+  def touch
+    super
+    touch_contacts
   end
 
   def add_spouse(spouse)
@@ -250,6 +256,10 @@ class Person < ActiveRecord::Base
     if mail_chimp_account && contact && contact.send_email_letter?
       queue_subscribe_person(self)
     end
+  end
+  
+  def touch_contacts
+    contacts.map(&:touch)
   end
 
 end

@@ -1,6 +1,9 @@
 class ContactSerializer < ActiveModel::Serializer
   include DisplayCase::ExhibitsHelper
 
+  cached
+  delegate :cache_key, to: :object
+  
   embed :ids, include: true
 
   ATTRIBUTES = [:id, :name, :pledge_amount, :pledge_frequency, :pledge_start_date, :status, :deceased,

@@ -11,14 +11,16 @@ class Api::V1::ContactsController < Api::V1::BaseController
     inactivated = contacts.inactive.where("updated_at > ?", Time.at(params[:since].to_i)).pluck(:id)
 
     render json: add_includes_and_order(filtered_contacts, order: order),
-           scope: {include: includes, since: params[:since]},
+           serializer: ContactArraySerializer,
+           scope: {include: includes, since: params[:since], user: current_user},
            meta:  params[:since] ?
                     {
                       deleted: Version.where(item_type: 'Contact', event: 'destroy', related_object_type: 'AccountList', related_object_id: current_account_list.id).where("created_at > ?", Time.at(params[:since].to_i)).pluck(:item_id),
                       inactivated: inactivated
                     } :
                     {},
-           callback: params[:callback]
+           callback: params[:callback],
+           root: :contacts
   end
 
   def show
