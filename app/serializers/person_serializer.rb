@@ -13,40 +13,9 @@ class PersonSerializer < ActiveModel::Serializer
     has_many i
   end
 
-  #has_many *INCLUDES
-
   def avatar
     person_exhibit = exhibit(object)
     person_exhibit.avatar(:large)
   end
 
-  def attributes
-    includes = scope[:include] if scope.is_a? Hash
-    if includes.present?
-      attributes = includes.map(&:to_sym) & ATTRIBUTES
-    else
-      attributes = ATTRIBUTES
-    end
-
-    hash = {}
-    attributes.each do |rel|
-      value = send(rel.to_sym)
-      hash[rel.to_sym] = value if value
-    end
-
-    hash
-  end
-
-  def include_associations!
-    includes = scope[:include] if scope.is_a? Hash
-    if includes.present?
-      includes.each do |rel|
-        if INCLUDES.include?(rel.to_sym)
-          include!(rel.to_sym)
-        end
-      end
-    else
-      super
-    end
-  end
 end

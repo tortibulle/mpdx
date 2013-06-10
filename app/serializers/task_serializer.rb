@@ -14,7 +14,7 @@ class TaskSerializer < ActiveModel::Serializer
 
   def attributes
     hash = super
-    #hash.merge!(contacts: contacts.collect(&:id))
+
     if scope.is_a?(Hash) && scope[:since]
       hash[:deleted_comments] = Version.where(item_type: 'ActivityComment', event: 'destroy', related_object_type: 'Activity', related_object_id: id).where("created_at > ?", Time.at(scope[:since].to_i)).pluck(:item_id)
     end

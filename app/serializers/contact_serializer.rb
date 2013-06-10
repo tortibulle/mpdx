@@ -15,32 +15,8 @@ class ContactSerializer < ActiveModel::Serializer
     has_many i
   end
 
-  def include_associations!
-    includes = scope[:include] if scope.is_a? Hash
-    if includes.present?
-      includes.each do |rel|
-        if INCLUDES.include?(rel.to_sym)
-          include!(rel.to_sym)
-        end
-      end
-    else
-      super
-    end
-  end
-
   def attributes
-    includes = scope[:include] if scope.is_a? Hash
-    if includes.present?
-      attributes = includes.map(&:to_sym) & ATTRIBUTES
-    else
-      attributes = ATTRIBUTES
-    end
-
-    hash = {}
-    attributes.each do |rel|
-      value = send(rel.to_sym)
-      hash[rel.to_sym] = value if value
-    end
+    hash = super
 
     if scope.is_a?(Hash) && scope[:since]
       hash[:deleted_people] = Version.where(item_type: 'Person', event: 'destroy', related_object_type: 'Contact', related_object_id: id).where("created_at > ?", Time.at(scope[:since].to_i)).pluck(:item_id)
