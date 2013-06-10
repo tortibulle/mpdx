@@ -112,11 +112,11 @@ class Contact < ActiveRecord::Base
   end
 
   def primary_or_first_person
-    unless @primary_or_first_person 
+    unless @primary_or_first_person
       @primary_or_first_person = primary_person
       if !@primary_or_first_person && people.present?
         @primary_or_first_person = people.where(gender: 'male').first || people.order('created_at').first
-        if @primary_or_first_person.new_record? && !self.new_record?
+        if @primary_or_first_person && @primary_or_first_person.new_record? && !self.new_record?
           self.primary_person_id = @primary_or_first_person.id
         end
       end
