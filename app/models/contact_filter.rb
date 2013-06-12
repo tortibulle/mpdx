@@ -70,7 +70,7 @@ class ContactFilter
           filtered_contacts = filtered_contacts.joins(:addresses).where('addresses.street is not null')
         when 'email'
           filtered_contacts = filtered_contacts.where(send_newsletter: ['Email', 'Both'])
-          filtered_contacts = filtered_contacts.joins(people: :email_addresses)
+          filtered_contacts = filtered_contacts.joins(people: :email_addresses).includes(people: :email_addresses)
         else
           filtered_contacts = filtered_contacts.where('send_newsletter is not null')
         end
