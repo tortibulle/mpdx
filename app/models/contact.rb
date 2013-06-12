@@ -9,7 +9,7 @@ class Contact < ActiveRecord::Base
   has_many :contact_donor_accounts, dependent: :destroy
   has_many :donor_accounts, through: :contact_donor_accounts
   has_many :donations, through: :donor_accounts
-  belongs_to :account_list, touch: true
+  belongs_to :account_list
   has_many :contact_people, dependent: :destroy
   has_many :people, through: :contact_people, order: 'contact_people.primary::int'
   has_one  :primary_contact_person, class_name: 'ContactPerson', conditions: {primary: true}
