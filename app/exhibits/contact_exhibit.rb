@@ -43,8 +43,7 @@ class ContactExhibit < DisplayCase::Exhibit
       else
         @context.number_to_currency(pledge_amount, precision: 0)
       end
-
-      pledge += " #{Contact.pledge_frequencies[to_model.pledge_frequency || 1]}"
+      pledge += " #{Contact.pledge_frequencies[to_model.pledge_frequency || 1.0]}"
       pledge
     end
   end
