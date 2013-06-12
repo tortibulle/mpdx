@@ -259,7 +259,7 @@ class Person < ActiveRecord::Base
   end
   
   def touch_contacts
-    contacts.map(&:touch)
+    contacts.map(&:touch) if sign_in_count == 0
   end
 
 end
