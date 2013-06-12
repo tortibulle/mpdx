@@ -218,8 +218,10 @@ class Contact < ActiveRecord::Base
 
   def self.pledge_frequencies
     {
-      1 => _('Monthly'),
-      2 => _('Bi-Monthly'),
+      0.23076923076923 => _('Weekly'),
+      0.46153846153846 => _('Fortnightly'),
+      1.0 => _('Monthly'),
+      2.0 => _('Bi-Monthly'),
       3 => _('Quarterly'),
       4 => _('Quad-Monthly'),
       6 => _('Semi-Annual'),

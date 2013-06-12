@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130607202118) do
+ActiveRecord::Schema.define(:version => 20130612033951) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -226,7 +226,7 @@ ActiveRecord::Schema.define(:version => 20130607202118) do
     t.string   "full_name"
     t.string   "greeting"
     t.string   "website",             :limit => 1000
-    t.integer  "pledge_frequency"
+    t.decimal  "pledge_frequency"
     t.date     "pledge_start_date"
     t.boolean  "deceased",                                                           :default => false, :null => false
     t.date     "next_ask"
@@ -273,16 +273,6 @@ ActiveRecord::Schema.define(:version => 20130607202118) do
   end
 
   add_index "designation_profile_accounts", ["designation_profile_id", "designation_account_id"], :name => "designation_p_to_a", :unique => true
-
-  create_table "designation_profile_users", :force => true do |t|
-    t.integer  "designation_profile_id"
-    t.integer  "user_id"
-    t.datetime "created_at",             :null => false
-    t.datetime "updated_at",             :null => false
-  end
-
-  add_index "designation_profile_users", ["designation_profile_id", "user_id"], :name => "profile_user"
-  add_index "designation_profile_users", ["user_id"], :name => "index_designation_profile_users_on_user_id"
 
   create_table "designation_profiles", :force => true do |t|
     t.string   "remote_id"
