@@ -1,4 +1,29 @@
 $ ->
+  $(document).on 'click', '.task .people a', ->
+    contact_info = $(this).closest('.people').next('.contact_info')
+    if contact_info[0]? && contact_info.html() != ''
+      $('#mini_contact_modal').html(contact_info.html())
+      $('#mini_contact_modal').dialog
+        modal:'true',
+        width: '400px',
+        title: contact_info.attr('data-title'),
+        buttons: [
+          {
+            text: __('Go to contact'),
+            click: (e) ->
+              document.location = '/contacts/' + contact_info.attr('data-id')
+          },
+          {
+            text: __('Close'),
+            click: ->
+              $(this).dialog("close")
+          }
+        ]
+    else
+      document.location = '/contacts/' + contact_info.attr('data-id')
+
+    false
+
   $(document).on 'click', '.task_show_more', ->
     $(this).closest('.people').html($(this).next('.task_all_contacts').html())
     false

@@ -14,17 +14,50 @@
         </div>
 
         <span class="taskaction"><%= _(task.activity_type) %></span> -
-        <strong><span class="tasktitle"><%= task_exhibit %></span></strong> - 
+        <strong><span class="tasktitle"><%= task_exhibit %></span></strong> -
         <% if task.completed? %>
           <%= _("%{action} - %{time}") % {action: _(task.result),
-                                                     time: task_exhibit.completed_at} %>
+                                          time: task_exhibit.completed_at} %>
         <% else %>
           <%= task_exhibit.start_at %>
         <% end %>
 
         <div style="display:inline" class="tags"><%= task_exhibit.tag_links %></div>
-        <% if task.contacts.present? %>
+        <% if !task.completed? && task.contacts.present? %>
           <span class="people">(<%= task_exhibit.contact_links %>)</span>
+          <% task.contacts.each do |contact| %>
+            <div class="contact_info" style="display:none" data-id="<%= contact.id %>" data-title="<%= "#{_(task.activity_type)} #{contact}" %>">
+              <% case task.activity_type
+                 when 'Call', 'Text Message'
+                   contact.people.each do |person| %>
+                     <strong><%= person.to_s %></strong>:
+                  <% if person.phone_numbers.present? %>
+                       <%= person.phone_numbers.collect {|pn| exhibit(pn).to_s }.join(', ') %><br />
+                  <% else %>
+                       <%= _('No phone number') %>
+                  <% end
+                   end
+                 when 'Email'
+                   contact.people.each do |person| %>
+                     <strong><%= person.to_s %></strong>:
+                     <% if person.email_addresses.present? %>
+                       <%== person.email_addresses.collect {|email| exhibit(email).to_s }.join(', ') %><br />
+                     <% else %>
+                       <%= _('No email address') %>
+                   <% end
+                   end
+                 when 'Thank', 'Reminder Letter', 'Pre Call Letter', 'Letter', 'Appointment', 'Support Letter', 'Newsletter' %>
+                   <table border="0">
+                   <% contact.addresses.each do |address| %>
+                     <tr>
+                       <td><%= _(address.location) %> | </td>
+                       <td><%== exhibit(address).to_html %></td>
+                     </tr>
+                   <% end %>
+                   </table>
+               <% end %>
+            </div>
+          <% end %>
         <% end %>
       </div>
       <div class="comments" style="<%= 'display:none' unless task.activity_comments.present? %>">
