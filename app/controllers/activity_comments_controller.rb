@@ -11,7 +11,6 @@ class ActivityCommentsController < ApplicationController
   def destroy
     @comment = @activity.activity_comments.find(params[:id])
     @comment.destroy
-    render nothing: true
   end
 
   protected
