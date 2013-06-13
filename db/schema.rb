@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130607202118) do
+ActiveRecord::Schema.define(:version => 20130613201210) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -244,6 +244,7 @@ ActiveRecord::Schema.define(:version => 20130607202118) do
     t.date     "last_thank"
     t.boolean  "pledge_received",                                                    :default => false, :null => false
     t.integer  "tnt_id"
+    t.string   "not_duplicated_with", :limit => 2000
   end
 
   add_index "contacts", ["account_list_id"], :name => "index_contacts_on_account_list_id"

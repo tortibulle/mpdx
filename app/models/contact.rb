@@ -155,6 +155,10 @@ class Contact < ActiveRecord::Base
     %w[Email Both].include?(send_newsletter)
   end
 
+  def not_same_as?(other)
+    not_duplicated_with.to_s.split(',').include?(other.id.to_s)
+  end
+
   def merge(other)
     Contact.transaction do
       # Merge people that have the same name

@@ -13,6 +13,11 @@ $ ->
         $('input[type=checkbox]').prop('checked', true)
         false
 
+      $(document).on 'click', '[data-behavior=not_duplicates]', ->
+        div = $(this).closest('.contact_set')
+        div.fadeOut('fast')
+        $('input', div).remove()
+
     if $('#contacts_index')[0]?
 
       # quick search for contact

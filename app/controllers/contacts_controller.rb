@@ -212,21 +212,45 @@ class ContactsController < ApplicationController
       wants.html {  }
       wants.js do
         # Find sets of people with the same name
-        people_with_duplicate_names = Person.connection.select_values("select array_to_string(array_agg(people.id), ',') from people INNER JOIN contact_people ON people.id = contact_people.person_id INNER JOIN contacts ON contact_people.contact_id = contacts.id WHERE contacts.account_list_id = #{current_account_list.id} and name not like '%nonymous%' group by first_name, last_name having count(*) > 1")
+        sql = "SELECT array_to_string(array_agg(people.id), ',') 
+               FROM people 
+               INNER JOIN contact_people ON people.id = contact_people.person_id 
+               INNER JOIN contacts ON contact_people.contact_id = contacts.id 
+               WHERE contacts.account_list_id = #{current_account_list.id} 
+               AND name not like '%nonymous%' 
+               AND first_name not like '%nknow%'
+               GROUP BY first_name, last_name 
+               HAVING count(*) > 1"
+        people_with_duplicate_names = Person.connection.select_values(sql)
         @contact_sets = []
         contacts_checked = []
         people_with_duplicate_names.each do |pair|
-          contacts = current_account_list.contacts.people.includes(:people).where('people.id' => pair.split(','))
+          contacts = current_account_list.contacts.people.includes(:people).where('people.id' => pair.split(','))[0..1]
           if contacts.length > 1
             already_included = false
             contacts.each { |c| already_included = true if contacts_checked.include?(c) }
             next if already_included
             contacts_checked += contacts
-            @contact_sets << contacts
+            unless contacts.first.not_same_as?(contacts.last)
+              @contact_sets << contacts
+            end
           end
         end
         @contact_sets.sort_by! { |s| s.first.name }
       end
+    end
+  end
+
+  def not_duplicates
+    contacts = current_account_list.contacts.where(id: params[:ids])
+    contacts.each do |contact|
+      not_duplicated_with = (contact.not_duplicated_with.to_s.split(',') + params[:ids].split(',') - [contact.id.to_s]).uniq.join(',')
+      contact.update_attributes(not_duplicated_with: not_duplicated_with)
+    end
+
+    respond_to do |wants|
+      wants.html { redirect_to :back }
+      wants.js { render nothing: true }
     end
   end
 

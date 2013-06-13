@@ -10,7 +10,8 @@
           </div>
         <% end %>
         <%= check_box_tag 'merge_sets[]', set.collect(&:id).join(',') %>
-        <%= _('Merge these contacts') %>
+        <%= _('Merge these contacts') %><br />
+        <%= link_to(_('These are not duplicates'), not_duplicates_contacts_path(ids: set.collect(&:id).join(',')), remote: true, method: :put, data: {behavior: 'not_duplicates'}) %>
       </div>
     <% end %>
     <%= submit_tag _('Merge selected contacts'), class: 'btn desired_action' %>
