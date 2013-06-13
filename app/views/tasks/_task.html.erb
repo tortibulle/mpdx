@@ -34,7 +34,7 @@
                   <% if person.phone_numbers.present? %>
                        <%= person.phone_numbers.collect {|pn| exhibit(pn).to_s }.join(', ') %><br />
                   <% else %>
-                       <%= _('No phone number') %>
+                       <%= _('No phone number') %><br />
                   <% end
                    end
                  when 'Email'
