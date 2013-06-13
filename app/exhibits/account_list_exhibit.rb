@@ -15,7 +15,8 @@ class AccountListExhibit < DisplayCase::Exhibit
     else
       balance = designation_accounts.first.balance.to_i
     end
-    "<div class=\"account_balances lots\">#{_('Balance: %{balance}') %{balance: @context.number_to_current_currency(balance)}}</div>".html_safe # <a href=\"#show\" class=\"plain\">Details</a></div>
+    "<div class=\"account_balances lots tip\" title=\"#{_('May take a few days to update')}\">#{_('Balance: %{balance}') %{balance: @context.number_to_current_currency(balance)}}</div>".html_safe
+    # <a href=\"#show\" class=\"plain\">Details</a></div>
   end
 
 
