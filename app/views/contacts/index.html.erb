@@ -95,8 +95,8 @@
   <div class="filters">
     <%= text_field_tag :contact_name, '', autocomplete: 'off', placeholder: _('Type to filter'), class: 'search_filter' %>
     <div class="right" class="contacts_actions">
-      <%= link_to(_('Actions'), "#", class: "btn smallbtn actionbtn", style: 'display:none') %>
-      <%= link_to(_('Merge'), '#', class: 'btn smallbtn', style: 'display:none', data: {behavior: 'merge'}) %>
+      <%= link_to(_('Actions'), "#", class: "btn smallbtn actionbtn") %>
+      <%= link_to(_('Merge'), '#', class: 'btn smallbtn', data: {behavior: 'merge'}) %>
       <%= hidden_field_tag :selected_ids %>
       <ul style="display:none" class="action_list">
         <li><%= link_to(_('Add Tag'), '#', class: 'none', data: {behavior: 'add_tag_to_list'}) %></li>
@@ -144,8 +144,8 @@
 
       <div class="filters">
         <div class="right" class="contacts_actions">
-          <%= link_to(_('Actions'), "#", class: "btn smallbtn actionbtn", style: 'display:none') %>
-          <%= link_to(_('Merge'), '#', class: 'btn smallbtn', style: 'display:none', data: {behavior: 'merge'}) %>
+          <%= link_to(_('Actions'), "#", class: "btn smallbtn actionbtn") %>
+          <%= link_to(_('Merge'), '#', class: 'btn smallbtn', data: {behavior: 'merge'}) %>
           <ul style="display:none" class="action_list">
             <li><%= link_to(_('Add Tag'), '#', class: 'none', data: {behavior: 'add_tag_to_list'}) %></li>
             <li><%= link_to(_('Remove Tag'), '#', class: 'none', data: {behavior: 'remove_tag_from_list'}) %></li>
