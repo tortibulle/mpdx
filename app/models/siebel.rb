@@ -20,6 +20,8 @@ class Siebel < DataServer
                                  .first_or_create
       end
 
+      import_profile_balance(designation_profile)
+
 
       designation_profiles << designation_profile
 
