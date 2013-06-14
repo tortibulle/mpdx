@@ -67,7 +67,7 @@
 
           $.each(this.points, function(i, point) {
             s += '<br/>'+ point.series.name +': '+
-                  '$' + point.y +
+                  point.y +
                   '<br/><%= _('Percentage of goal') %>: '+
                   Math.round(Number(point.y) / <%= current_account_list.monthly_goal %> * 100) + '%'+
                   '<br/><%= _('Percentage of average') %>: '+

@@ -10,7 +10,7 @@ class Person::OrganizationAccount < ActiveRecord::Base
 
   serialize :password, Encryptor.new
 
-  has_many :designation_profiles
+  has_many :designation_profiles, dependent: :destroy
 
   after_create :set_up_account_list, :queue_import_data
   validates :organization_id, :person_id, presence: true
