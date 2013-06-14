@@ -1,0 +1,75 @@
+<%
+   pledges = current_account_list.total_pledges.to_i
+   current_account_list.monthly_goal %>
+
+
+<script type="text/javascript" charset="utf-8">
+  var chart;
+  $(document).ready(function() {
+        chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'mpd_progress_bar',
+                type: 'bar',
+                margin: [0,0,0,0],
+                animation: false
+            },
+            credits: {
+              enabled: false
+            },
+            legend: {
+                enabled: false,
+            },
+            title: {
+                text: ''
+            },
+            xAxis: {
+
+                lineWidth: 0,
+
+                labels: {
+                    enabled: false
+                },
+                minorTickLength: 0,
+                tickLength: 0
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: ''
+                },
+                lineWidth: 0,
+                gridLineWidth:0,
+                lineColor: 'transparent',
+                labels: {
+                    enabled: false
+                },
+                minorTickLength: 0,
+                tickLength: 0
+            },
+            tooltip: {
+                enabled: false
+            },
+            plotOptions: {
+                bar: {
+                    stacking: 'percent'
+                },
+               series: {
+                pointPadding: 0,
+                groupPadding: 0,
+                animation: false
+              }
+            },
+
+            series: [{
+                name: 'max',
+                data: [<%= current_account_list.monthly_goal - current_account_list.total_pledges.to_i %>],
+                color: 'red'
+            }, {
+                name: 'current',
+                data: [<%= current_account_list.total_pledges.to_i %>],
+                color: 'green'
+            }]
+        });
+  });
+</script>
+

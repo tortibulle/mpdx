@@ -107,13 +107,14 @@ $userheight: 60px;
 }
 /* ************************************************************** */
 
+.right {
+  float: right;
+}
+
 #mainmenu {
   $mainmenuheight: 35px;
   height: $mainmenuheight;
   background: image-url("mainmenu_gradient.png") repeat-x #58595b 0 0;
-  .right {
-    float: right;
-  }
 
   .account_balances {
     padding-top: 0px;
@@ -308,6 +309,13 @@ $userheight: 60px;
     line-height: $submenuheight;
     margin-right: 12px;
   }
+}
+
+#mpd_progress_bar {
+  width: 200px;
+  height: 40px;
+  margin: 5px;
+  margin-right:-70px;
 }
 
 /* ************************************************************** */

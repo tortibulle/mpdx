@@ -68,6 +68,11 @@
         <% if params[:controller] == 'contacts' %>
           <div class="section"><%= link_to(_('Find Duplicates'), find_duplicates_contacts_path, class: 'btn') %></div>
         <% end %>
+        <div class="section right">
+          <div id="mpd_progress_bar">
+          </div>
+          <%= render 'progress_bar' %>
+        </div>
       </div>
     </div>
     </hgroup>

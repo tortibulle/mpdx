@@ -105,6 +105,10 @@ class AccountList < ActiveRecord::Base
     designation_profiles.where(user_id: user.id).first
   end
 
+  def total_pledges
+    @total_pledges ||= contacts.financial_partners.sum(&:monthly_pledge)
+  end
+
   # Download all donations / info for all accounts associated with this list
   def self.update_linked_org_accounts
     AccountList.joins(:organization_accounts)
