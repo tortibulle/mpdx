@@ -84,6 +84,7 @@ Mpdx::Application.routes.draw do
   end
 
   get "home/index"
+  get "home/care"
   get "privacy" => "home#privacy"
   get "home/change_account_list"
   get "home/download_data_check"

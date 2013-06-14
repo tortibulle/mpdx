@@ -109,6 +109,50 @@ class AccountList < ActiveRecord::Base
     @total_pledges ||= contacts.financial_partners.sum(&:monthly_pledge)
   end
 
+  def people_with_birthdays(start_date, end_date)
+    people.where("birthday_month BETWEEN ? AND ?", start_date.month, end_date.month)
+          .where("birthday_day BETWEEN ? AND ?", start_date.day, end_date.day)
+          .order('birthday_month, birthday_day')
+  end
+
+  def people_with_anniversaries(start_date, end_date)
+    people.where("anniversary_month BETWEEN ? AND ?", start_date.month, end_date.month)
+          .where("anniversary_day BETWEEN ? AND ?", start_date.day, end_date.day)
+          .order('anniversary_month, anniversary_day')
+  end
+
+  def top_50_percent
+    unless @top_50_percent
+      financial_partners_count = contacts.where("pledge_amount > 0").count
+      @top_50_percent = contacts.where("pledge_amount > 0")
+                                .order('(pledge_amount::numeric / (pledge_frequency::numeric)) desc')
+                                .limit(financial_partners_count / 2)
+    end
+    @top_50_percent
+  end
+
+  def bottom_50_percent
+    unless @bottom_50_percent
+      financial_partners_count = contacts.where("pledge_amount > 0").count
+      @bottom_50_percent = contacts.where("pledge_amount > 0")
+                                .order('(pledge_amount::numeric / (pledge_frequency::numeric))')
+                                .limit(financial_partners_count / 2)
+    end
+    @bottom_50_percent
+  end
+
+
+  def no_activity_since(date, contacts_scope = nil, activity_type = nil)
+    @no_activity_since = []
+    contacts_scope ||= contacts
+    contacts_scope.includes({people: [:primary_phone_number, :primary_email_address]}).each do |contact|
+      activities = contact.tasks.where("completed_at > ?", date)
+      activities = activities.where("activity_type = ?", activity_type) if activity_type.present?
+      @no_activity_since << contact if activities.blank?
+    end
+    @no_activity_since
+  end
+
   # Download all donations / info for all accounts associated with this list
   def self.update_linked_org_accounts
     AccountList.joins(:organization_accounts)

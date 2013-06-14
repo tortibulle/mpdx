@@ -68,6 +68,8 @@ module ApplicationHelper
         date.localize(locale).to_s(format: 'MMM')
       when :date_time
         date.to_datetime.localize(locale).to_short_s
+      else
+        date.localize(locale).to_s(format: options[:format])
       end
     end
   end

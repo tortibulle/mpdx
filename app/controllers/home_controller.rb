@@ -7,6 +7,9 @@ class HomeController < ApplicationController
     @tasks = current_account_list.tasks.uncompleted.includes(:contacts).limit(6)
   end
 
+  def care
+  end
+
   def login
     render layout: false
   end
