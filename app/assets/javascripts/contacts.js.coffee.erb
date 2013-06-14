@@ -322,9 +322,9 @@ $.mpdx.updateSelectedContactIds = ->
 
 $.mpdx.loadTabData = (hash) ->
   switch hash
-    when '#contact-details', ''
+    when '#contact-details'
       $.mpdx.loadContactDetails()
-    when '#donations-tab'
+    when '#donations-tab', ''
       $.mpdx.loadDonations()
     when '#tasks-tab'
       $.mpdx.loadContactTasks()
