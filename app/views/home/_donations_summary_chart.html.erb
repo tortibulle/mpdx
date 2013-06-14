@@ -28,10 +28,13 @@
         '#B5CA92'
       ],
       title: {
-          text: '<span style="color:red"><%= _('Pledges:') %> <%= number_to_current_currency(pledges) %></span> | ' +
-                '<span style="color:blue"><%= _('Monthly Goal:') %> <%= number_to_current_currency(current_account_list.monthly_goal) %></span> | ' +
-                '<span style="color:green"><%= _('Monthly Average:') %> <%= number_to_current_currency(monthly_average) %></span>',
-          useHTML: true
+          text: '<span style="color:#007398"><%= _('Pledges:') %> <%= number_to_current_currency(pledges) %></span> | ' +
+                '<span style="color:#3eb1c8"><%= _('Monthly Goal:') %> <%= number_to_current_currency(current_account_list.monthly_goal) %></span> | ' +
+                '<span style="color:#666062"><%= _('Monthly Average:') %> <%= number_to_current_currency(monthly_average) %></span>',
+          useHTML: true,
+          style: {
+            fontSize: '12px'
+          }
       },
       xAxis: {
         categories: [
@@ -47,15 +50,15 @@
         plotLines: [{
           value: <%= pledges %>,
           width: 2,
-          color: "red"
+          color: "#007398"
         },{
           value: <%= current_account_list.monthly_goal %>,
           width: 2,
-          color: "blue"
+          color: "#3eb1c8"
         },{
           value: <%= monthly_average %>,
           width: 2,
-          color: "green"
+          color: "#666062"
         }]
       },
       tooltip: {

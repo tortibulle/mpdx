@@ -68,11 +68,13 @@
         <% if params[:controller] == 'contacts' %>
           <div class="section"><%= link_to(_('Find Duplicates'), find_duplicates_contacts_path, class: 'btn') %></div>
         <% end %>
-        <div class="section right">
-          <div id="mpd_progress_bar">
+        <% if current_account_list.monthly_goal %>
+          <div class="section right">
+            <div id="mpd_progress_bar">
+            </div>
+            <%= render 'progress_bar' %>
           </div>
-          <%= render 'progress_bar' %>
-        </div>
+        <% end %>
       </div>
     </div>
     </hgroup>
