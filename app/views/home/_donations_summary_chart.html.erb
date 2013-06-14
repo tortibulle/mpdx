@@ -45,7 +45,7 @@
         min: 0,
         max: <%= plot_line_values.max * 1.1 %>,
         title: {
-          text: '<%= _('Amount (%{currency})') % {currency: current_account_list.designation_profile(current_user).organization.default_currency_code || 'USD'} %>'
+          text: '<%= _('Amount (%{currency})') % {currency: current_currency} %>'
         },
         plotLines: [{
           value: <%= pledges %>,

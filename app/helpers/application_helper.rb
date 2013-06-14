@@ -39,13 +39,23 @@ module ApplicationHelper
 
   def number_to_current_currency(value, options={})
     options[:precision] ||= 0
-    options[:currency] ||= current_account_list.designation_profile(current_user).organization.default_currency_code if current_account_list.designation_profile(current_user)
+    options[:currency] ||= current_currency
     begin
       value.to_f.localize(locale).to_currency.to_s(options)
     rescue Errno::ENOENT
       value.to_f.localize(:es).to_currency.to_s(options)
     end
     #number_to_currency(value, options)
+  end
+
+  def current_currency
+    unless @current_currency
+      @current_currency = if designation_profile = current_account_list.designation_profile(current_user)
+        designation_profile.organization.default_currency_code
+      end
+      @current_currency ||= 'USD'
+    end
+    @current_currency
   end
 
   def l(date, options = {})
