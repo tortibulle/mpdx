@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130613201210) do
+ActiveRecord::Schema.define(:version => 20130607202118) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -226,7 +226,7 @@ ActiveRecord::Schema.define(:version => 20130613201210) do
     t.string   "full_name"
     t.string   "greeting"
     t.string   "website",             :limit => 1000
-    t.integer  "pledge_frequency"
+    t.decimal  "pledge_frequency"
     t.date     "pledge_start_date"
     t.boolean  "deceased",                                                           :default => false, :null => false
     t.date     "next_ask"
