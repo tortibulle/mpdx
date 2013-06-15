@@ -55,7 +55,7 @@
 
             series: [{
                 name: 'max',
-                data: [<%= current_account_list.monthly_goal - current_account_list.total_pledges.to_i %>],
+                data: [<%= current_account_list.monthly_goal.to_i - current_account_list.total_pledges.to_i %>],
                 color: '#666062'
             }, {
                 name: 'current',
