@@ -30,7 +30,7 @@
 
 <% no_call = current_account_list.no_activity_since(6.months.ago, current_account_list.top_50_percent, 'Call') %>
 <% if no_call.present? %>
-  <h3><%= _('Partner financial, top 50%, last call more than 6 months ago') %></h3>
+  <h3><%= _(' It has been more than 6 months since you have called these important financial partners.') %></h3>
   <table class="list top_50_no_call">
     <% no_call.collect {|c| exhibit(c, self)}.sort_by(&:to_s).each do |contact| %>
       <tr>
@@ -51,7 +51,7 @@
 
 <% no_thank = current_account_list.no_activity_since(1.year.ago, current_account_list.bottom_50_percent, 'Thank') %>
 <% if no_thank.present? %>
-  <h3><%= _('Partner financial, bottom 50%, last thank more than 1 year ago') %></h3>
+  <h3><%= _('It has been more than a year since you have thanked these important financial partners.') %></h3>
   <table class="list top_50_no_call">
     <% no_thank.collect {|c| exhibit(c, self)}.sort_by(&:to_s).each do |contact| %>
       <tr>
