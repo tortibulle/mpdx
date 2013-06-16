@@ -55,6 +55,16 @@ class Contact < ActiveRecord::Base
      _('Research Abandoned'), _('Expired Referral')]
   end
 
+  def status=(val)
+    # handle deprecated values
+    case val 
+    when 'Call for Appointment'
+      self[:status] = 'Contact for Appointment'
+    else
+      self[:status] = val
+    end
+  end
+
   assignable_values_for :likely_to_give, allow_blank: true do
     [_('Least Likely'), _('Likely'), _('Most Likely')]
   end
