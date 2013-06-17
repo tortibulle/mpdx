@@ -10,8 +10,6 @@ class Person::OrganizationAccount < ActiveRecord::Base
 
   serialize :password, Encryptor.new
 
-  has_many :designation_profiles, dependent: :destroy
-
   after_create :set_up_account_list, :queue_import_data
   validates :organization_id, :person_id, presence: true
   validates :username, :password, :presence => {if: :requires_username_and_password?}
@@ -44,6 +42,10 @@ class Person::OrganizationAccount < ActiveRecord::Base
 
   def account_list
     user.designation_profiles.first.try(:account_list)
+  end
+
+  def designation_profiles
+    DesignationProfile.where(organization_id: organization_id, user_id: person_id)
   end
 
   private
