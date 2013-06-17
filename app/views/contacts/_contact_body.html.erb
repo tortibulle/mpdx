@@ -19,8 +19,6 @@
         <%= link_to(_('Add Referrals'), add_referrals_contact_path(contact), remote: true, :class=> "btn smallbtn add_referrals") %>
         <%= link_to(_('Log Task'), new_task_path(contact_id: contact.id, completed: true), class: "btn smallbtn add_task", remote: true, data: {completed: true}) %>
         <%= link_to(_('Add Task'), new_task_path(contact_id: contact.id), class: "btn smallbtn add_task", data: {contact_id: contact.id}, remote: true) %>
-        <%= link_to(_('Edit'), edit_contact_path(contact), :class=> "btn smallbtn") %>
-        <%#= link_to(_('Quick'), "", :class => "btn smallbtn quick")%>
         <%= link_to(_('Delete'), contact_path(contact), class: "btn smallbtn", method: :delete, data: { confirm: _("This contact will be set to 'Never Ask'. Is that what you want to do?") }) %>
       </div>
     </div>
@@ -28,58 +26,50 @@
 
       <div class="profiletop">
 
-
         <div class="avatar">
           <div class="avatar_wrapper"><%= image_tag(contact_exhibit.avatar(:large), class: "mid") %></div>
         </div>
         <div class="quickprofile">
-          <h1><%= contact_exhibit %></h1>
-          <div class="metaset">
-            <%= _('Donor ID: %{donor_id}').localize % {donor_id: contact_exhibit.donor_ids } %>
-            <% if contact_exhibit.location.present? %>
-              <br /><%= contact_exhibit.location %>
-            <% end %>
-          </div>
+          <h1><%= contact_exhibit %>
+          <% if contact_exhibit.location.present? %><span class="contact_location"><%= contact_exhibit.location %></span><% end %>
+          </h1>
+          <% if contact_exhibit.status.present? %>
+            <div class="contact_status">
+              <%= _('Status: %{status}').localize % {status: contact_exhibit.status } %>
+            </div>
+          <% end %>
         </div>
 
-        <div class="cols col_50">
+        <div class="cols col_30">
           <table class="meta">
-            <% if contact.status.present? %>
+            <% if contact_exhibit.donor_ids.present? %>
               <tr>
-                <td class="meta_name"><%= _('Status') %></td>
-                <td class="meta_data"><%= _(contact_exhibit.status) %></td>
+                <td class="meta_name"><%= _('Donor ID') %></td>
+                <td class="meta_data"><%= contact_exhibit.donor_ids %></td>
               </tr>
             <% end %>
-            <% if contact.send_newsletter.present? %>
-              <tr>
-                <td class="meta_name"><%= _('Newsletter') %></td>
-                <td class="meta_data"><%= _(contact_exhibit.send_newsletter) %></td>
-              </tr>
-            <% end %>
-            <% if contact.likely_to_give.present? %>
+            <% if contact_exhibit.likely_to_give.present? %>
               <tr>
                 <td class="meta_name"><%= _('Likelihood') %></td>
                 <td class="meta_data"><%= _(contact_exhibit.likely_to_give) %></td>
               </tr>
             <% end %>
-            <% if contact.people.present? %>
-              <tr>
-                <td class="meta_name"><%= _('People') %> </td>
-                <td class="meta_data"><%= contact_exhibit.contact_info %></td>
-              </tr>
-            <% end %>
-            <% if contact.pledge_amount.to_i > 0 %>
+            <% if contact_exhibit.pledge_as_currency.present? %>
               <tr>
                 <td class="meta_name"><%= _('Commitment') %> </td>
                 <td class="meta_data"><%= contact_exhibit.pledge_as_currency %></td>
               </tr>
             <% end %>
-            <% if contact.referrals_to_me.present? %>
+            <% if contact_exhibit.send_newsletter.present? %>
               <tr>
-                <td class="meta_name"><%= _('Referrer') %></td>
-                <td class="meta_data"><%= contact_exhibit.referrer_links %></td>
+                <td class="meta_name"><%= _('Newsletter') %> </td>
+                <td class="meta_data"><%= contact_exhibit.send_newsletter %></td>
               </tr>
             <% end %>
+          </table>
+        </div>
+        <div class="cols col_30">
+          <table class="meta">
             <% if contact.church_name.present? %>
               <tr>
                 <td class="meta_name"><%= _('Church') %></td>
@@ -90,6 +80,12 @@
               <tr>
                 <td class="meta_name"><%= _('Website') %></td>
                 <td class="meta_data"><%= contact_exhibit.website %></td>
+              </tr>
+            <% end %>
+            <% if contact_exhibit.referrals_to_me.present? %>
+              <tr>
+                <td class="meta_name"><%= _('Referrer') %></td>
+                <td class="meta_data"><%= contact_exhibit.referrer_links %></td>
               </tr>
             <% end %>
             <% if contact.tags.present? %>
@@ -104,13 +100,42 @@
             <% end %>
           </table>
         </div>
-        <%#<div class="cols col_30">%>
-          <%#<table class="meta">%>
-
-          <%#</table>%>
-        <%#</div>%>
         <div class="clr"></div>
+        <div class="edit_btn_container">
+          <%= link_to(_('Edit'), edit_contact_path(contact), :class=> "btn edit_contact_btn desired_action") %>
+        </div>
 
+      </div>
+
+      <div id="contact-people" class="js-people">
+        <h2><%= _('People') %>
+          <small>
+            <%= link_to(_('(Click here to merge duplicates)'), '#', class: 'js-merge_people') %>
+            <%= link_to(_('(Cancel merging)'), '#', class: 'js-cancel_merge_people js-merge_related', style: 'display:none') %>
+          </small>
+        </h2>
+        <% if contact_exhibit.people.any? %>
+          <% contact_exhibit.people.each do |person| %>
+            <%= render 'people/smallperson', person: person %>
+          <% end %>
+          <%= submit_tag(_('Merge checked people'), class: 'js-merge_related', style: 'display:none') %>
+          <div id="person_merge_winner" style="display:none" title="<%= _('Pick the winner of the merge') %>">
+            <%= _('Data from the "losers" will get copied to the "winner". No data will be lost by merging.') %>
+            <%= form_tag(merge_contact_people_path(contact), id: 'merge_people_form', remote: true) do %>
+              <%= hidden_field_tag :merge_people_ids %>
+              <ul>
+                <% contact.people.each do |person| %>
+                  <li style="display:none" id="<%= "merge_winner_#{person.id}_li"%>" class="radiocheck">
+                    <%= radio_button_tag('merge_winner', person.id) %>
+                    <%= label_tag('merge_winner_'+person.id.to_s, person) %>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+          </div>
+        <% else %>
+          <p><%= _('Currently No People') %></p>
+        <% end %>
       </div>
 
       <div id="contact" class="tabgroup">
@@ -124,11 +149,6 @@
         <div id="details-tab">
           <%= spinner(extra: 'details', visible: true) %>
           <div id="details"></div>
-        </div>
-
-        <div id="donations-tab">
-          <%= spinner(extra: 'donations', visible: true) %>
-          <div id="donations"></div>
         </div>
 
         <div id="tasks-tab">
@@ -149,6 +169,8 @@
           <% if contact.contact_referrals_by_me.empty? %>
             <%= _('There are no referrals by this contact, ') +
                 link_to(_('Add some now'), add_referrals_contact_path(contact), remote: true, :class => "add_referrals") + "." %>
+          <% else %>
+            <%= link_to(_('Add Referrals'), add_referrals_contact_path(contact), remote: true, :class => "add_referrals") %>
           <% end %>
         </div>
         <div id="notes-tab">
@@ -170,6 +192,12 @@
           <div id="social"></div>
         </div>
       </div>
+
+      <div class="clr"></div>
+
+      <h2><%= _('Donations') %></h2>
+      <%= spinner(extra: 'donations', visible: true) %>
+      <div id="donations"></div>
 
     </div>
   </div>

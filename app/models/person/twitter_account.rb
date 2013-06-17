@@ -40,6 +40,10 @@ class Person::TwitterAccount < ActiveRecord::Base
     
   end
 
+  def url
+    "http://twitter.com/#{screen_name}" if screen_name
+  end
+
   private
     def ensure_only_one_primary
       primaries = self.person.twitter_accounts.where(primary: true)

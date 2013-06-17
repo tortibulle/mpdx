@@ -4,5 +4,6 @@ $('[data-id=<%= @contact.id %>]').addClass('active')
 $.mpdx.activateTabs()
 $.mpdx.sortableTabs('contact')
 $.mpdx.loadTabData(window.location.hash)
+$.mpdx.loadDonations()
 document.title = '<%= @page_title %> - MPDX'
 History.pushState({contact_id: <%= @contact.id %>}, "<%== sanitize @contact.name %>", '<%= contact_path(@contact) %>' + document.location.hash)
