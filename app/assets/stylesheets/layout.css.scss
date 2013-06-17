@@ -309,13 +309,36 @@ div.right {
     line-height: $submenuheight;
     margin-right: 12px;
   }
+  .section.right {
+    margin-right: 0px;
+    margin-left: 12px;
+  }
 }
 
 #mpd_progress_bar {
+  background: #888;
+  border: 1px solid white;
+  color: $white;
+  height: 20px;
+  margin: 14px 0;
+  overflow: hidden;
   width: 200px;
-  height: 30px;
-  margin: 8px;
-  margin-right:-70px;
+  .bar {
+    background: #c5da6e;
+    border-right: 1px solid #5D7A29;
+    height: 20px;
+  }
+  .value {
+    float: right;
+    line-height: normal;
+    padding: 6px;
+    position: relative;
+    top: -22px;
+  }
+  .value.left {
+    float: left;
+    color: $gray_dark;
+  }
 }
 
 /* ************************************************************** */
