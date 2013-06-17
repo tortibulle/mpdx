@@ -1,3 +1,13 @@
+<div class="mwrap">
+  <div class="inside alert" style="border-top:2px solid red">
+    <h3>
+      <%= _('Please create a NEW list in MailChimp EXCLUSIVELY for use with MPDX. MPDX will automatically synchronize your mailchimp 
+             list with your MPDX data. If you pick an existing list, this process could have the effect of removing people
+             from your mailchimp list.') %>
+    </h3>
+  </div>
+</div>
+<br />
 <div class="field">
   <%= f.label :primary_list_id, _('Pick a list to use for your newsletter') %>
   <%= f.select :primary_list_id, @mail_chimp_account.lists.collect { |l| [l.name, l.id] } %><br />
