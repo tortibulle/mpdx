@@ -131,7 +131,7 @@ class ContactsController < ApplicationController
           end
         end
       end
-    end
+    end if params[:merge_sets].present?
     redirect_to :back, notice: _('You just merged %{count} contacts') % {count: merged_contacts_count}
   end
 
