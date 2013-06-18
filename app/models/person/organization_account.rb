@@ -15,6 +15,7 @@ class Person::OrganizationAccount < ActiveRecord::Base
   validates :username, :password, :presence => {if: :requires_username_and_password?}
   validates_with CredentialValidator
   after_validation :set_valid_credentials
+  after_destroy :destroy_designation_profiles
 
   # attr_accessible :username, :password, :organization, :organization_id
 
@@ -91,5 +92,9 @@ class Person::OrganizationAccount < ActiveRecord::Base
       account_list = user.account_lists.create({name: user.to_s, creator_id: user.id}, without_protection: true)
       organization.designation_profiles.create({name: user.to_s, user_id: user.id, account_list_id: account_list.id}, without_protection: true)
     end
+  end
+
+  def destroy_designation_profiles
+    designation_profiles.destroy_all
   end
 end
