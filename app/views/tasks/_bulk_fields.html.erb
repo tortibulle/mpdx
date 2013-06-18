@@ -18,7 +18,7 @@
   <%= f.hidden_field :completed %>
   <div class="field">
     <%= f.label :start_at, _('Completed On') %>
-    <%= f.date_select :completed_at, ampm: true, default: Date.today, order: [:month, :day, :year] %>
+    <%= f.datetime_select :completed_at, ampm: true, default: Time.zone.now, order: [:month, :day, :year] %>
   </div>
 
 <% else %>
