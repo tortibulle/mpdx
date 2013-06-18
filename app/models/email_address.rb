@@ -18,12 +18,20 @@ class EmailAddress < ActiveRecord::Base
 
   def self.add_for_person(person, attributes)
     attributes = attributes.with_indifferent_access.except(:_destroy)
-    if email = person.email_addresses.detect {|e| e.email == attributes['email'].to_s.strip}
-      email.attributes = attributes
-    else
-      attributes['primary'] = (person.email_addresses.present? ? false : true) if attributes['primary'].nil?
-      new_or_create = person.new_record? ? :new : :create
-      email = person.email_addresses.send(new_or_create, attributes)
+    then_cb = Proc.new do |exception, handler, attempts, retries, times|
+      person.email_addresses.reload
+    end
+
+    email = Retryable.retryable on: ActiveRecord::RecordNotUnique,
+                                then: then_cb do
+
+      if email = person.email_addresses.detect {|e| e.email == attributes['email'].to_s.strip}
+        email.attributes = attributes
+      else
+        attributes['primary'] = (person.email_addresses.present? ? false : true) if attributes['primary'].nil?
+        new_or_create = person.new_record? ? :new : :create
+        email = person.email_addresses.send(new_or_create, attributes)
+      end
     end
     email
   end
