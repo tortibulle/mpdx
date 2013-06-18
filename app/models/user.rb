@@ -60,7 +60,14 @@ class User < Person
   end
 
   def self.get_user_from_cas_oauth(token)
-    response = RestClient.get("http://oauth.ccci.us/users/#{token}")
+    return nil unless token.present?
+
+    begin
+      response = RestClient.get("http://oauth.ccci.us/users/#{token}")
+    rescue RestClient::Unauthorized
+      return nil
+    end
+
     json = JSON.parse(response.to_str)
     if account = Person::RelayAccount.find_by_remote_id(json['guid'])
       user = account.person.to_user
