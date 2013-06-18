@@ -167,25 +167,28 @@ class ContactsController < ApplicationController
           contact_name += " & #{attributes[:spouse_name]}" if attributes[:spouse_name].present?
           contact = current_account_list.contacts.create(name: contact_name)
 
-          # create primary
-          person = Person.create(attributes.slice(:first_name, :last_name, :email, :phone))
-          contact.people << person
+          begin
+            # create primary
+            person = Person.create(attributes.slice(:first_name, :last_name, :email, :phone))
+            contact.people << person
 
-          # create spouse
-          if attributes[:spouse_name].present?
-            spouse = Person.create(first_name: attributes[:spouse_name], last_name: attributes[:last_name])
-            contact.people << spouse
+            # create spouse
+            if attributes[:spouse_name].present?
+              spouse = Person.create(first_name: attributes[:spouse_name], last_name: attributes[:last_name])
+              contact.people << spouse
+            end
+
+            # create address
+            contact.addresses_attributes = [attributes.slice(:street, :city, :state, :postal_code)]
+
+            contact.save
+
+            @contact.referrals_by_me << contact
+
+            @contacts << contact
+          rescue ActiveRecord::RecordInvalid
+            @bad_contacts_count += 1
           end
-
-          # create address
-          contact.addresses_attributes = [attributes.slice(:street, :city, :state, :postal_code)]
-
-          contact.save
-
-          @contact.referrals_by_me << contact
-
-          @contacts << contact
-
         else
           @bad_contacts_count += 1
         end
@@ -198,7 +201,7 @@ class ContactsController < ApplicationController
       end
 
       if @bad_contacts_count > 0
-        flash[:alert] = _("%{contacts_count:referrals} couldn't be added because they were missing the first and last name.").to_str.localize %
+        flash[:alert] = _("%{contacts_count:referrals} couldn't be added because they were missing a first name or you put in a bad email address.").to_str.localize %
           { contacts_count: @bad_contacts_count, referrals: { one: _('1 referral'), other: _('%{contacts_count} referrals') } }
 
       end
@@ -212,14 +215,14 @@ class ContactsController < ApplicationController
       wants.html {  }
       wants.js do
         # Find sets of people with the same name
-        sql = "SELECT array_to_string(array_agg(people.id), ',') 
-               FROM people 
-               INNER JOIN contact_people ON people.id = contact_people.person_id 
-               INNER JOIN contacts ON contact_people.contact_id = contacts.id 
-               WHERE contacts.account_list_id = #{current_account_list.id} 
-               AND name not like '%nonymous%' 
+        sql = "SELECT array_to_string(array_agg(people.id), ',')
+               FROM people
+               INNER JOIN contact_people ON people.id = contact_people.person_id
+               INNER JOIN contacts ON contact_people.contact_id = contacts.id
+               WHERE contacts.account_list_id = #{current_account_list.id}
+               AND name not like '%nonymous%'
                AND first_name not like '%nknow%'
-               GROUP BY first_name, last_name 
+               GROUP BY first_name, last_name
                HAVING count(*) > 1"
         people_with_duplicate_names = Person.connection.select_values(sql)
         @contact_sets = []

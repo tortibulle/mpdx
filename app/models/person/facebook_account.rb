@@ -5,7 +5,7 @@ class Person::FacebookAccount < ActiveRecord::Base
   include Async
   include Sidekiq::Worker
   sidekiq_options queue: :facebook
-  
+
   extend Person::Account
 
   set :friends
@@ -72,7 +72,7 @@ class Person::FacebookAccount < ActiveRecord::Base
           json['id']
         end.to_i
       end
-    rescue RestClient::ResourceNotFound, URI::InvalidURIError
+    rescue RestClient::ResourceNotFound, URI::InvalidURIError, RestClient::Forbidden
     rescue RestClient::BadRequest
       raise Errors::FacebookLink, _('We were unable to link this person to the facebook url you provided. This is likely due to facebook privacy settings this person has set. If they are your friend on facebook, try using the "Import contacts from facebook" feature instead of manually pasting the link in.')
     end
