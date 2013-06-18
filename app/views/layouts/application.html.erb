@@ -68,9 +68,9 @@
         <% if params[:controller] == 'contacts' %>
           <div class="section"><%= link_to(_('Find Duplicates'), find_duplicates_contacts_path, class: 'btn') %></div>
         <% end %>
-        <% if current_account_list.monthly_goal.present? && current_account_list.monthly_goal.to_i > 0 %>
+        <% if current_account_list.monthly_goal.present? && current_account_list.monthly_goal > 0 %>
           <div class="section right tip" title="<%= _('%% of goal pledged (%{totals})') %
-                                                    {totals: "#{number_to_current_currency(current_account_list.total_pledges.to_i)} / #{number_to_current_currency(current_account_list.monthly_goal.to_i)}"} %>">
+                                                    {totals: "#{number_to_current_currency(current_account_list.total_pledges.to_i)} / #{number_to_current_currency(current_account_list.monthly_goal)}"} %>">
             <%= render 'progress_bar' %>
           </div>
         <% end %>
