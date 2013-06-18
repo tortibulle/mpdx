@@ -105,7 +105,9 @@ class Siebel < DataServer
   def profiles
     unless @profiles
       raise 'No guid for user' unless relay_account = @org_account.user.relay_accounts.first
-      @profiles = SiebelDonations::Profile.find(ssoGuid: relay_account.remote_id)
+      Retryable.retryable on: RestClient::InternalServerError, sleep: 10 do
+        @profiles = SiebelDonations::Profile.find(ssoGuid: relay_account.remote_id)
+      end
     end
     @profiles
   end
