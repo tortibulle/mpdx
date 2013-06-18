@@ -78,7 +78,7 @@ class ContactFilter
       end
 
       if @filters[:name].present?
-        filtered_contacts = filtered_contacts.where("lower(name) like ?", "%#{@filters[:name].downcase}%")
+        filtered_contacts = filtered_contacts.where("lower(contacts.name) like ?", "%#{@filters[:name].downcase}%")
       end
     end
 
