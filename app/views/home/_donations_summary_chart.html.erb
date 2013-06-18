@@ -5,7 +5,7 @@
    total = 0
    @by_month.each { |month| month[1].each { |d| total += d.amount if d.donation_date < Date.today.beginning_of_month } }
    monthly_average = (total / 12).to_i
-   plot_line_values = [pledges, current_account_list.monthly_goal, monthly_average] %>
+   plot_line_values = [pledges, current_account_list.monthly_goal.to_i, monthly_average] %>
 
 
 <script type="text/javascript" charset="utf-8">
