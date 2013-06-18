@@ -34,6 +34,10 @@ class ContactFilter
         filtered_contacts = filtered_contacts.includes(:addresses).where('addresses.city' => @filters[:city])
       end
 
+      if @filters[:church].present? && @filters[:church].first != ''
+        filtered_contacts = filtered_contacts.where('contacts.church_name' => @filters[:church])
+      end
+
       if @filters[:state].present? && @filters[:state].first != ''
         filtered_contacts = filtered_contacts.includes(:addresses).where('addresses.state' => @filters[:state])
       end
