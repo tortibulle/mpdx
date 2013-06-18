@@ -35,19 +35,11 @@
         <%#</div>%>
       <div id="dash-connect">
         <% if @tasks[0] %>
-          <ul class="list tasklist">
-            <% @tasks[0..4].each do |task|
-              task_exhibit = exhibit(task, self) %>
-              <li class="<%= task_exhibit.css_class %>" id="<%= dom_id(task) %>">
-                <input type="checkbox" data-behavior="complete_task" data-id="<%= task.id %>" />
-                <%= link_to(tasks_path(anchor: dom_id(task))) do %>
-                  <span class="date"><%= task_exhibit.start_at %></span> - <span><%= task_exhibit %></span>
-                <% end %>
-                <%== "(#{task_exhibit.contact_links})" if task_exhibit.contact_links.present? %>
-                <%= link_to('Destroy', task, confirm: _("Are you sure you want to delete this task instead of marking it as completed?"), method: :delete, :class=> "ico ico_trash", remote: true) %>
-              </li>
+          <table class="list tasklist">
+            <% @tasks[0..4].each do |task| %>
+              <%= render 'tasks/task', task: task %>
             <% end %>
-          </ul>
+          </table>
         <% else %>
           <%= _("Good news! You don't have any pending tasks.") %>
         <% end %>
@@ -96,3 +88,4 @@
 
   </div>
 </div>
+<%= render 'tasks/results_modal' %>
