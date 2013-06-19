@@ -77,7 +77,7 @@
         <li>
           <label><%= _('Referrer') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:referrer] %>">
-            <%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), ''], [_('-- Someone --'), '*']] + contacts_for_filter.collect { |c| [c.name, c.id] }, filters_params[:referrer]), multiple: true, size: 5 %>
+            <%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), ''], [_('-- Someone --'), '*']] + current_account_list.contacts.with_referrals.collect { |c| [c.name, c.id] }, filters_params[:referrer]), multiple: true, size: 5 %>
           </div>
         </li>
         <li class="controls">

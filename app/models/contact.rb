@@ -32,6 +32,7 @@ class Contact < ActiveRecord::Base
   scope :for_donor_account, lambda { |donor_account| where('donor_accounts.id' => donor_account.id).includes(:donor_accounts) }
   scope :financial_partners, where(status: 'Partner - Financial')
   scope :non_financial_partners, where("status <> 'Partner - Financial' OR status is NULL")
+  scope :with_referrals, joins(:contact_referrals_by_me).uniq
   scope :active, lambda { where(active_conditions) }
   scope :inactive, lambda { where(inactive_conditions) }
 
