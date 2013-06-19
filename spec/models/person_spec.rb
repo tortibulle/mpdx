@@ -75,6 +75,24 @@ describe Person do
         @winner.merge(@loser)
       }.should change(Person::FacebookAccount, :count)
     end
+
+    it "should move loser's facebook over" do
+      @winner = create(:person)
+      @loser = create(:person)
+      create(:facebook_account, person: @loser)
+
+      @winner.merge(@loser)
+      @winner.facebook_accounts.should_not be_empty 
+    end
+
+    it "should move loser's twitter over" do
+      @winner = create(:person)
+      @loser = create(:person)
+      create(:twitter_account, person: @loser)
+
+      @winner.merge(@loser)
+      @winner.twitter_accounts.should_not be_empty 
+    end
   end
 
 end

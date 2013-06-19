@@ -178,7 +178,7 @@ class Person < ActiveRecord::Base
       %w[twitter_accounts facebook_accounts linkedin_accounts
         google_accounts relay_accounts organization_accounts].each do |relationship|
         other.send(relationship).each do |record|
-          unless send(relationship).where(person_id: id, remote_id: record.remote_id)
+          unless send(relationship).where(person_id: id, remote_id: record.remote_id).any?
             record.update_attributes(person_id: id)
           end
         end
