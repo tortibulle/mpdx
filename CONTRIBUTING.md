@@ -49,11 +49,17 @@ Make sure you have a recent version of bundler:
 Then install the development the development dependencies:
 
     $> bundle install
+    $> bundle exec rake db:migrate
+    
+Make sure memcached and redis are running
 
 Now you should be able to run the entire suite using:
 
     $> bundle exec rspec spec
 
+MPDX also includes the `guard` gem, so if you like continous testing during development, run:
+
+    $> bundle exec guard
 
 ### 5. Add an entry to /etc/hosts
 Several callback services (including facebook and CAS) like to have a real hostname
