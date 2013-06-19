@@ -17,28 +17,28 @@
       <%= hidden_field_tag :per_page, params[:per_page] %>
 
       <ul class="left_filters">
-        <li>
-          <label><%= _('Name') %></label>
+        <li class="<%= 'opened' if filters_params[:name] %>">
+          <label class="<%= 'opened' if filters_params[:name] %>"><%= _('Name') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:name] %>">
             <%= text_field_tag 'filters[name]', filters_params[:name] %>
           </div>
         </li>
-        <li>
-          <label><%= _('City') %></label>
+        <li class="<%= 'opened' if filters_params[:city] %>">
+          <label class="<%= 'opened' if filters_params[:city] %>"><%= _('City') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:city] %>">
             <%= select_tag 'filters[city]', options_for_select([[_('-- Any --'), '']] + current_account_list.cities.select(&:present?), filters_params[:city]), multiple: true, size: 5 %>
           </div>
         </li>
 
-        <li>
-          <label><%= _('State') %></label>
+        <li class="<%= 'opened' if filters_params[:state] %>">
+          <label class="<%= 'opened' if filters_params[:state] %>"><%= _('State') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:state] %>">
             <%= select_tag 'filters[state]', options_for_select([[_('-- Any --'), '']] + current_account_list.states.select(&:present?), filters_params[:state]), multiple: true, size: 5 %>
           </div>
         </li>
 
-        <li>
-          <label><%= _('Newsletter Recipients') %></label>
+        <li class="<%= 'opened' if filters_params[:newsletter] %>">
+          <label class="<%= 'opened' if filters_params[:newsletter] %>"><%= _('Newsletter Recipients') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:newsletter] %>">
 						<%= radio_button_tag 'filters[newsletter]', '', filters_params[:newsletter] == '' %> <%= _('-- Any --') %><br />
 	          <%= radio_button_tag 'filters[newsletter]', 'all', filters_params[:newsletter] == 'all' %> <%= _('All') %><br />
@@ -53,29 +53,29 @@
 					</div>
         </li>
 
-        <li>
-          <label><%= _('Status') %></label>
+        <li class="<%= 'opened' if filters_params[:status] %>">
+          <label class="<%= 'opened' if filters_params[:status] %>"><%= _('Status') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:status] %>">
             <%= select_tag 'filters[status]', options_for_select([[_('-- Any --'), ''], [_('-- None --'), 'null']] + contact_instance.assignable_statuses.collect { |s| [_(s), s] }, filters_params[:status]), multiple: true, size: 5 %>
           </div>
         </li>
 
-        <li>
-          <label><%= _('Likely To Give') %></label>
+        <li class="<%= 'opened' if filters_params[:likely] %>">
+          <label class="<%= 'opened' if filters_params[:likely] %>"><%= _('Likely To Give') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:likely] %>">
             <%= select_tag 'filters[likely]', options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_likely_to_gives, filters_params[:likely]), multiple: true, size: 4 %>
           </div>
         </li>
 
-        <li>
-          <label><%= _('Church') %></label>
+        <li class="<%= 'opened' if filters_params[:church] %>">
+          <label class="<%= 'opened' if filters_params[:church] %>"><%= _('Church') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:church] %>">
             <%= select_tag 'filters[church]', options_for_select([[_('-- Any --'), '']] + current_account_list.churches.select(&:present?), filters_params[:church]), multiple: true, size: 5 %>
           </div>
         </li>
 
-        <li>
-          <label><%= _('Referrer') %></label>
+        <li class="<%= 'opened' if filters_params[:referrer] %>">
+          <label class="<%= 'opened' if filters_params[:referrer] %>"><%= _('Referrer') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:referrer] %>">
             <%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), ''], [_('-- Someone --'), '*']] + current_account_list.contacts.with_referrals.collect { |c| [c.name, c.id] }, filters_params[:referrer]), multiple: true, size: 5 %>
           </div>
