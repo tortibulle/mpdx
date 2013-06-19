@@ -26,7 +26,7 @@ class PreferenceSet
   attribute :notification_preferences, Array[NotificationPreference]
 
   validates :first_name, presence: true
-  validates :email, presence: true
+  validates :email, presence: true, email: true
 
 
   def persisted?

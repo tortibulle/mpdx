@@ -1,6 +1,6 @@
 ---
 :verbose: false
-:concurrency: 10
+:concurrency: 5
 :timeout: 600
 :queues:
   - [import, 1]

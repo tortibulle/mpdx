@@ -13,6 +13,11 @@ $ ->
         $('input[type=checkbox]').prop('checked', true)
         false
 
+      $(document).on 'click', '[data-behavior=not_duplicates]', ->
+        div = $(this).closest('.contact_set')
+        div.fadeOut('fast')
+        $('input', div).remove()
+
     if $('#contacts_index')[0]?
 
       # quick search for contact
@@ -29,20 +34,11 @@ $ ->
       # check all feature
       $(document).on 'click', '.checkall', ->
         $('.checks input[type=checkbox]').prop('checked', $(this).prop('checked'))
-        if $(this).prop('checked')
-          $('.actionbtn').show()
-          $('#select_more').show()
-        else
-          $('.actionbtn').hide()
-          $('#select_more').hide()
 
         $.mpdx.updateSelectedContactIds()
 
       $(document).on 'click', '.checks input[type=checkbox]', ->
-        if $('.checks input').is(':checked')
-          $('.actionbtn').show()
-        else
-          $('.actionbtn').hide()
+        unless $('.checks input').is(':checked')
           $('#select_more').hide()
           $('.checkall').prop('checked', false)
 
@@ -52,12 +48,6 @@ $ ->
         else
           $('#select_all_prompt').hide()
           $('#clear_selection_prompt').hide()
-
-        # Only show merge button if 2 checkboxes are checked
-        if $('.checks input:checked').length >= 2
-          $('[data-behavior=merge]').show()
-        else
-          $('[data-behavior=merge]').hide()
 
         $.mpdx.updateSelectedContactIds()
 
@@ -76,7 +66,11 @@ $ ->
 
       # Actions
       $(document).on 'click', '.actionbtn', ->
-        $('.action_list').toggle()
+        if $('.checks input:checked').length == 0
+          alert(__("You must select at least one contact you'd like to perform an action on."))
+          return false
+
+        $(this).nextAll('.action_list').toggle()
         $(this).toggleClass('on')
         false
 
@@ -141,10 +135,10 @@ $ ->
             {
               text: __('Add Task')
               click: (e) ->
-                return false if $.trim($('#task_subject').val()) == ''
-                $('form', this).submit()
+                form = $('form', this)
+                return false if $.trim($('#task_subject', form).val()) == ''
+                form.submit()
                 $('.form_wrapper', this).html('<%= image_tag('spinner.gif') %>')
-                $(this).dialog( "option", "buttons", [])
             },
             {
               text: __('Cancel')
@@ -178,9 +172,13 @@ $ ->
         false
 
       $(document).on 'click', '[data-behavior=merge]', ->
-        if $('.checks input:checked').length >= 5
-          alert(__('You can merge up to four contacts at a time. Please uncheck a contact and try again.'))
+        if $('.checks input:checked').length >= 9
+          alert(__('You can merge up to eight contacts at a time. Please uncheck a contact and try again.'))
           return false
+        if $('.checks input:checked').length < 2
+          alert(__('You must select at least 2 contacts to merge.'))
+          return false
+
         $('#merge_modal #merge_contact_ids').val($('#selected_ids').val())
         $('#merge_modal').dialog {
           buttons: [
@@ -324,9 +322,9 @@ $.mpdx.updateSelectedContactIds = ->
 
 $.mpdx.loadTabData = (hash) ->
   switch hash
-    when '#contact-details', ''
+    when '#contact-details'
       $.mpdx.loadContactDetails()
-    when '#donations-tab'
+    when '#donations-tab', ''
       $.mpdx.loadDonations()
     when '#tasks-tab'
       $.mpdx.loadContactTasks()

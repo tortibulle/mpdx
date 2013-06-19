@@ -2,17 +2,6 @@
 
   <%= render 'tasks/fields', task: task, f: f %>
 
-  <div style="<%= params[:contact_id] ? 'display:none' : '' %>">
-    <% task.activity_contacts.build if task.activity_contacts.blank? %>
-    <%= f.fields_for :activity_contacts do |builder| %>
-      <%= render 'activities/activity_contact', builder: builder, object: task %>
-    <% end %>
-    <div class="sfield field_indent">
-      <div class="rs"><%= link_to_add_fields(_('Add Contact'), f, :activity_contacts, partial: 'activities/activity_contact') %></div>
-    </div>
-  </div>
-
-
   <div class="spacer"></div>
 
   <div class="actions">

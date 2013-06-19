@@ -20,6 +20,8 @@ class Siebel < DataServer
                                  .first_or_create
       end
 
+      import_profile_balance(designation_profile)
+
 
       designation_profiles << designation_profile
 
@@ -102,8 +104,14 @@ class Siebel < DataServer
 
   def profiles
     unless @profiles
-      raise 'No guid for user' unless relay_account = @org_account.user.relay_accounts.first
-      @profiles = SiebelDonations::Profile.find(ssoGuid: relay_account.remote_id)
+      unless relay_account = @org_account.user.relay_accounts.first
+        # This org account is no longer useful
+        @org_account.destroy
+        raise 'No guid for user'
+      end
+      Retryable.retryable on: RestClient::InternalServerError, sleep: 10 do
+        @profiles = SiebelDonations::Profile.find(ssoGuid: relay_account.remote_id)
+      end
     end
     @profiles
   end
@@ -210,6 +218,10 @@ class Siebel < DataServer
     end
 
     person = donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
+
+    if !person
+      person = contact.people.where(first_name: siebel_person.first_name, last_name: siebel_person.last_name).first
+    end
 
     person ||= Person.new(master_person: master_person_from_source)
 

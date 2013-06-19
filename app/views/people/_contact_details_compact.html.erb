@@ -1,7 +1,7 @@
 <div class="set phone">
   <% if person.phone_numbers.present? %>
     <% person.phone_numbers.map {|pn| exhibit(pn, self)}.each do |phone_number| %>
-      <%= phone_number.to_s %> <%= t('g.' + (phone_number.location || 'mobile')) %><br/>
+      <%= phone_number %><br/>
     <% end %>
   <% else %>
     <%= link_to(t('people.contact_details.add_phone_number'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %>

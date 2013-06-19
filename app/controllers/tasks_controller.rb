@@ -70,6 +70,11 @@ class TasksController < ApplicationController
     @task = current_account_list.tasks.find(params[:id])
 
     @page_title = _('Edit Task - %{task}') % {task: @task.subject}
+
+    respond_to do |wants|
+      wants.html
+      wants.js
+    end
   end
 
   def create
@@ -85,7 +90,10 @@ class TasksController < ApplicationController
           ActivityContact.create(activity_id: @task.id, contact_id: c.id)
         end
       else
-        render action: "new"
+        respond_to do |format|
+          format.html { render action: "new" }
+          format.js { render action: "new" }
+        end
       end
     else
       respond_to do |format|
@@ -94,8 +102,10 @@ class TasksController < ApplicationController
             redirect_to (session[:contact_redirect_to] || tasks_path)
             session[:contact_redirect_to] = nil
           }
+          format.js
         else
           format.html { render action: "new" }
+          format.js { render action: "new" }
         end
       end
     end
@@ -107,7 +117,7 @@ class TasksController < ApplicationController
     respond_to do |format|
       if @task.update_attributes(params[:task])
         format.html { redirect_to tasks_path }
-        format.js   { render nothing: true }
+        format.js
       else
         format.html { render action: 'edit' }
         format.js { render action: 'edit' }

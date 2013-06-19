@@ -56,7 +56,7 @@ class ContactExhibit < DisplayCase::Exhibit
 
   def tag_links
     tags.collect do |tag|
-      @context.link_to(tag, @context.params.except(:action, :controller, :id).merge(action: :index, tags: tag.name), class: "tag")
+      @context.link_to(tag, @context.params.except(:action, :controller, :id).merge(action: :index, filters: {tags: tag.name}), class: "tag")
     end.join(' ').html_safe
   end
 

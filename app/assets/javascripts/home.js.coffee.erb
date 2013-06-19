@@ -1,0 +1,20 @@
+$ ->
+  if $('.home_controller')[0]?
+    $(document).on 'tabsshow', '#dash-tabs', (event, ui)->
+      $.mpdx.loadDashTabData(ui.tab.hash)
+
+    $.mpdx.loadDashTabData(window.location.hash)
+
+$.mpdx.loadDashTabData = (hash) ->
+  switch hash
+    when '#dash-care'
+      $.mpdx.loadDashbaordCare()
+
+$.mpdx.loadDashbaordCare = ->
+  if $('#dash-care').html() == ''
+    $('#dash-care').html('<%= image_tag('spinner.gif') %>')
+    $.ajax {
+      url: '/home/care',
+      dataType: 'script'
+    }
+

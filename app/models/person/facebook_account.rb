@@ -5,7 +5,7 @@ class Person::FacebookAccount < ActiveRecord::Base
   include Async
   include Sidekiq::Worker
   sidekiq_options queue: :facebook
-  
+
   extend Person::Account
 
   set :friends
@@ -43,8 +43,9 @@ class Person::FacebookAccount < ActiveRecord::Base
   end
 
   def url=(value)
+    return nil unless value.present?
     self.remote_id = get_id_from_url(value)
-    unless remote_id.present?
+    if remote_id.blank? && person_id.present?
       raise Errors::FacebookLink, _('We were unable to link this person to the facebook url you provided. Check the url you entered and try again. If you are currently running the "Import contacts from facebook" process, please wait until you get the email saying the import finished before trying again.')
     end
   end
@@ -58,7 +59,7 @@ class Person::FacebookAccount < ActiveRecord::Base
 
     begin
       Retryable.retryable :on => [RestClient::Forbidden, Timeout::Error, Errno::ECONNRESET], :times => 6, :sleep => 0.5 do
-        # e.g. https://graph.facebook.com/nmfdelacruz)
+        # e.g. https://www.facebook.com/username)
         if url.include?("id=")
           id = url.split('id=').last
           id = id.split('&').first
@@ -71,7 +72,7 @@ class Person::FacebookAccount < ActiveRecord::Base
           json['id']
         end.to_i
       end
-    rescue RestClient::ResourceNotFound, URI::InvalidURIError
+    rescue RestClient::ResourceNotFound, URI::InvalidURIError, RestClient::Forbidden
     rescue RestClient::BadRequest
       raise Errors::FacebookLink, _('We were unable to link this person to the facebook url you provided. This is likely due to facebook privacy settings this person has set. If they are your friend on facebook, try using the "Import contacts from facebook" feature instead of manually pasting the link in.')
     end

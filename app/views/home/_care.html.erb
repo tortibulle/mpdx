@@ -1,0 +1,72 @@
+<h2><%= _('Week of %{date1} to %{date2}') % {date1: l(Date.today.beginning_of_week), date2: l(Date.today.end_of_week)} %></h2>
+<% people_with_birthdays = current_account_list.people_with_birthdays(Time.now.beginning_of_week, Time.now.end_of_week) %>
+<% if people_with_birthdays.present? %>
+  <h3><%= _('Birthdays') %></h3>
+  <ul class="list birthdays">
+    <% people_with_birthdays.each do |person|
+      person_exhibit = exhibit(person, self) %>
+      <li>
+        <strong><%= link_to(person_exhibit, person) %></strong>: <%= l(Date.new(Time.now.year, person.birthday_month, person.birthday_day), format: 'MMM-d') %>
+        <% if person.primary_phone_number %> - <%= exhibit(person.primary_phone_number) %> <% end %>
+        <% if person.primary_email_address %> - <%= mail_to(person.primary_email_address) %> <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+<% people_with_anniversaries = current_account_list.people_with_anniversaries(Time.now.beginning_of_week, Time.now.end_of_week) %>
+<% if people_with_anniversaries.present? %>
+  <h3><%= _('Anniversaries') %></h3>
+  <ul class="list anniversaries">
+    <% people_with_anniversaries.each do |person|
+      person_exhibit = exhibit(person, self) %>
+      <li>
+        <strong><%= link_to(person_exhibit, person) %></strong>: <%= l(Date.new(Time.now.year, person.birthday_month, person.birthday_day), format: 'MMM-d') %>
+        <% if person.primary_phone_number %> - <%= exhibit(person.primary_phone_number) %> <% end %>
+        <% if person.primary_email_address %> - <%= mail_to(person.primary_email_address) %> <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
+<% no_call = current_account_list.no_activity_since(6.months.ago, current_account_list.top_50_percent, 'Call') %>
+<% if no_call.present? %>
+  <h3><%= _(' It has been more than 6 months since you have called these important financial partners.') %></h3>
+  <table class="list top_50_no_call">
+    <% no_call.collect {|c| exhibit(c, self)}.sort_by(&:to_s).each do |contact| %>
+      <tr>
+        <td>
+          <strong><%= link_to(contact, contact) %></strong>:
+        </td>
+        <% contact.people[0..1].each do |person| %>
+          <td>
+            <strong><%= person.first_name %></strong>:
+            <% if person.primary_phone_number %> - <%= exhibit(person.primary_phone_number) %> <% end %>
+            <% if person.primary_email_address %> - <%= mail_to(person.primary_email_address) %> <% end %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </table>
+<% end %>
+
+<% no_thank = current_account_list.no_activity_since(1.year.ago, current_account_list.bottom_50_percent, 'Thank') %>
+<% if no_thank.present? %>
+  <h3><%= _('It has been more than a year since you have thanked these important financial partners.') %></h3>
+  <table class="list top_50_no_call">
+    <% no_thank.collect {|c| exhibit(c, self)}.sort_by(&:to_s).each do |contact| %>
+      <tr>
+        <td nowrap="nowrap">
+          <strong><%= link_to(contact, contact) %></strong>
+        </td>
+        <% contact.people[0..1].each do |person| %>
+          <td>
+            <strong><%= person.first_name %></strong>:
+            <% if person.primary_phone_number %> - <%= exhibit(person.primary_phone_number) %> <% end %>
+            <% if person.primary_email_address %> - <%= mail_to(person.primary_email_address) %> <% end %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </table>
+<% end %>
+

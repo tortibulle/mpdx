@@ -1,0 +1,5 @@
+<% percent = ((current_account_list.total_pledges / current_account_list.monthly_goal)*100).round(1) %>
+<div id="mpd_progress_bar">
+    <div class="bar" style="width: <%= percent %>%"></div>
+    <span class="value <% if percent > 60 %>left<% end %>"><%= percent %>%</span>
+</div>

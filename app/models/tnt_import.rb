@@ -333,7 +333,7 @@ class TntImport
 
     person.master_person_id ||= MasterPerson.find_or_create_for_person(person).id
 
-    person.save!
+    person.save(validate: false)
 
     contact.people << person unless contact.people.include?(person)
 

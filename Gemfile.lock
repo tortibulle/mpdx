@@ -22,7 +22,7 @@ GIT
 
 GIT
   remote: git://github.com/twinge/siebel_donations.git
-  revision: 833428f4ba9807fc8fa2df8a5377f829ea5ab65e
+  revision: b5f2cfa5583a5b9bd6283706860035a82fd25ac4
   specs:
     siebel_donations (1.0.3)
       activesupport
@@ -279,7 +279,7 @@ GEM
     method_source (0.8.1)
     mime-types (1.23)
     mono_logger (1.1.0)
-    multi_json (1.7.6)
+    multi_json (1.7.7)
     multi_xml (0.5.4)
     multipart-post (1.2.0)
     net-scp (1.0.6)

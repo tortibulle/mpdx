@@ -2,13 +2,13 @@
   <div class="wpp">
     <h1><%= _('Hi') %> <%= current_user.first_name %>! <span class="smallhead"><%= _("Here's whats happening...") %></span></h1>
 
-    <% if current_account_list.monthly_goal.to_i > 0 %>
-      <% cache(['donations_summary_chart', current_account_list], expires_in: 24.hours) do %>
+    <% if current_account_list.monthly_goal.present? %>
+      <%# cache(['donations_summary_chart', current_account_list], expires_in: 24.hours) do %>
         <div id="donations_summary_chart">
 
         </div>
         <%= render 'donations_summary_chart' %>
-      <% end %>
+      <%# end %>
     <% else %>
       <%= link_to(preferences_path(:focus => "preference_set_monthly_goal")) do %>
         <div class="mwrap">
@@ -19,10 +19,11 @@
       <% end %>
     <% end %>
 
-    <div id="dash_tasks" class="tabgroup">
+    <div id="dash-tabs" class="tabgroup">
       <ul>
         <!-- <li class="killround"><a href="#dash_tasks-notifications"><%= _('Notifications') %></a></li> -->
-        <li class="killround"><a href="#dash_tasks-tasks"><%= _('Tasks') %></a></li>
+        <li class="killround"><a href="#dash-connect"><%= _('Connect') %></a></li>
+        <li class="killround"><a href="#dash-care"><%= _('Care') %></a></li>
         <!-- <li class="killround"><a href="#top5-soc"><%= _('Social Snapshot') %></a></li> -->
         <li class="killround"><a href="#top5-mp"><%= _('Top 10 Ministry Partners') %></a></li>
         <%#<li class="killround"><a href="#snapshot-fin">Snapshot</a></li>%>
@@ -32,21 +33,13 @@
         <%#<p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>%>
         <%#<p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>%>
         <%#</div>%>
-      <div id="dash_tasks-tasks">
+      <div id="dash-connect">
         <% if @tasks[0] %>
-          <ul class="list tasklist">
-            <% @tasks[0..4].each do |task|
-              task_exhibit = exhibit(task, self) %>
-              <li class="<%= task_exhibit.css_class %>" id="<%= dom_id(task) %>">
-                <input type="checkbox" data-behavior="complete_task" data-id="<%= task.id %>" />
-                <%= link_to(tasks_path(anchor: dom_id(task))) do %>
-                  <span class="date"><%= task_exhibit.start_at %></span> - <span><%= task_exhibit %></span>
-                <% end %>
-                <%== "(#{task_exhibit.contact_links})" if task_exhibit.contact_links.present? %>
-                <%= link_to('Destroy', task, confirm: _("Are you sure you want to delete this task instead of marking it as completed?"), method: :delete, :class=> "ico ico_trash", remote: true) %>
-              </li>
+          <table class="list tasklist">
+            <% @tasks[0..4].each do |task| %>
+              <%= render 'tasks/task', task: task %>
             <% end %>
-          </ul>
+          </table>
         <% else %>
           <%= _("Good news! You don't have any pending tasks.") %>
         <% end %>
@@ -56,6 +49,8 @@
           </div>
         <% end %>
       </div>
+
+      <div id="dash-care"></div>
 
       <div id="top5-mp">
         <ul class="list socstatus">
@@ -93,3 +88,4 @@
 
   </div>
 </div>
+<%= render 'tasks/results_modal' %>

@@ -9,7 +9,7 @@ class Contact < ActiveRecord::Base
   has_many :contact_donor_accounts, dependent: :destroy
   has_many :donor_accounts, through: :contact_donor_accounts
   has_many :donations, through: :donor_accounts
-  belongs_to :account_list, touch: true
+  belongs_to :account_list
   has_many :contact_people, dependent: :destroy
   has_many :people, through: :contact_people, order: 'contact_people.primary::int'
   has_one  :primary_contact_person, class_name: 'ContactPerson', conditions: {primary: true}
@@ -53,6 +53,16 @@ class Contact < ActiveRecord::Base
      _('Call for Decision'), _('Partner - Financial'), _('Partner - Special'), _('Partner - Pray'),
      _('Not Interested'), _('Unresponsive'), _('Never Ask'),
      _('Research Abandoned'), _('Expired Referral')]
+  end
+
+  def status=(val)
+    # handle deprecated values
+    case val 
+    when 'Call for Appointment'
+      self[:status] = 'Contact for Appointment'
+    else
+      self[:status] = val
+    end
   end
 
   assignable_values_for :likely_to_give, allow_blank: true do
@@ -153,6 +163,10 @@ class Contact < ActiveRecord::Base
 
   def send_email_letter?
     %w[Email Both].include?(send_newsletter)
+  end
+
+  def not_same_as?(other)
+    not_duplicated_with.to_s.split(',').include?(other.id.to_s)
   end
 
   def merge(other)

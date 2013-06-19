@@ -244,6 +244,7 @@ ActiveRecord::Schema.define(:version => 20130612033951) do
     t.date     "last_thank"
     t.boolean  "pledge_received",                                                    :default => false, :null => false
     t.integer  "tnt_id"
+    t.string   "not_duplicated_with", :limit => 2000
   end
 
   add_index "contacts", ["account_list_id"], :name => "index_contacts_on_account_list_id"

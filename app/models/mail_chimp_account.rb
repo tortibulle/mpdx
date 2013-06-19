@@ -213,8 +213,16 @@ class MailChimpAccount < ActiveRecord::Base
 
     end
 
+    begin
     gb.list_batch_subscribe(id: list_id, batch: batch, update_existing: true, double_optin: false,
                             send_welcome: false, replace_interests: true)
+    rescue Gibbon::MailChimpError => e
+      if e.message.include?('code 270') # Not a valid interest group
+        update_column(:primary_list_id, nil)
+      end
+      raise e
+    end
+
   end
 
   def add_status_groups(list_id, statuses)

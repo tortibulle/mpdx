@@ -60,13 +60,19 @@
     </div>
     <div id="submenu">
       <div class="outer">
-        <div class="section"><%= link_to(_('Add Task'), new_task_path, :class => "btn") %></div>
-        <!-- <div class="section"><%= link_to(_('Status Update'), "", :class => "btn") %></div> -->
-        <!-- <div class="section"><%= link_to(_('Send Message'), "", :class => "btn") %></div> -->
+        <div class="section"><%= link_to(_('Add Task'), new_task_path, id: 'add_task_button', class: 'btn add_task') %></div>
+        <!-- <div class="section"><%= link_to(_('Status Update'), "", class: 'btn') %></div> -->
+        <!-- <div class="section"><%= link_to(_('Send Message'), "", class: 'btn') %></div> -->
         <div class="section"><%= link_to(_('Add Contact'), new_contact_path, class: 'btn') %></div>
         <div class="section"><%= link_to(_('Import Contacts'), accounts_path, class: 'btn') %></div>
         <% if params[:controller] == 'contacts' %>
           <div class="section"><%= link_to(_('Find Duplicates'), find_duplicates_contacts_path, class: 'btn') %></div>
+        <% end %>
+        <% if current_account_list.monthly_goal.present? && current_account_list.monthly_goal > 0 %>
+          <div class="section right tip" title="<%= _('%% of goal pledged (%{totals})') %
+                                                    {totals: "#{number_to_current_currency(current_account_list.total_pledges.to_i)} / #{number_to_current_currency(current_account_list.monthly_goal)}"} %>">
+            <%= render 'progress_bar' %>
+          </div>
         <% end %>
       </div>
     </div>
@@ -101,6 +107,14 @@
 
     <div id="confirmation_modal" title="<%= _('Are you sure?') %>"></div>
     <div id="page_spinner" title="<%= _('Please Wait') %>" style="display:none"><%= spinner(visible: true) %></div>
+
+    <div id="edit_task_modal" title="<%= _('Task') %>" style="display:none">
+      <div class="form_wrapper">
+        <%= render 'tasks/modal_form' %>
+      </div>
+    </div>
+    <div id="mini_contact_modal" title="<%= _('Contact Details') %>" style="display:none">
+    </div>
   </body>
 
 </html>

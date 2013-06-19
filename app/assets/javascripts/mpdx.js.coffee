@@ -71,8 +71,7 @@ $ ->
 
 
   $(document).ajaxComplete ->
-    $('#page_spinner').dialog('close')
-
+    $('#page_spinner').dialog({ autoOpen: false }).dialog('close')
 
 window.addFields = (link, association, content) ->
   new_id = new Date().getTime()

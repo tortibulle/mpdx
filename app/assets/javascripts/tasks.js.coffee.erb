@@ -1,7 +1,83 @@
 $ ->
+  $(document).on 'click', '.task .people a', ->
+    contact_info = $(this).closest('.people').next('.contact_info')
+    if contact_info[0]? && contact_info.html() != ''
+      $('#mini_contact_modal').html(contact_info.html())
+      $('#mini_contact_modal').dialog
+        modal:'true',
+        width: '400px',
+        title: contact_info.attr('data-title'),
+        buttons: [
+          {
+            text: __('Go to contact'),
+            click: (e) ->
+              document.location = '/contacts/' + contact_info.attr('data-id')
+          },
+          {
+            text: __('Close'),
+            click: ->
+              $(this).dialog("close")
+          }
+        ]
+    else
+      document.location = '/contacts/' + contact_info.attr('data-id')
+
+    false
+
   $(document).on 'click', '.task_show_more', ->
     $(this).closest('.people').html($(this).next('.task_all_contacts').html())
     false
+
+  # new task button
+  $(document).on 'click', '.add_task', ->
+    if $(this).attr('data-contact-id')
+      $('#modal_task_activity_contacts_attributes_0_contact_id').val($(this).attr('data-contact-id'))
+    else
+      $('#modal_task_activity_contacts_attributes_0_contact_id').val('')
+
+    $('#edit_task_modal').dialog
+      resizable: true,
+      modal:'true',
+      width: '400px',
+      buttons: [
+        {
+          text: __('Save'),
+          click: (e) ->
+            form = $('form', this)
+            return false if $.trim($('#modal_task_subject', form).val()) == ''
+            $.rails.handleRemote(form)
+            $('.form_wrapper', this).html('<img src="/assets/spinner.gif" />')
+        },
+        {
+          text: __('Cancel'),
+          click: ->
+            $(this).dialog("close")
+        }
+      ]
+    false
+
+  # Edit task button
+  $(document).on 'click', '.edit_task', ->
+    $('#edit_task_modal .form_wrapper').html('<img src="/assets/spinner.gif" />')
+    $('#edit_task_modal').dialog
+      resizable: true,
+      modal:'true',
+      width: '400px',
+      buttons: [
+        {
+          text: __('Save'),
+          click: (e) ->
+            form = $('form', this)
+            return false if $.trim($('#modal_task_subject', form).val()) == ''
+            $.rails.handleRemote(form)
+            $('.form_wrapper', this).html('<img src="/assets/spinner.gif" />')
+        },
+        {
+          text: __('Cancel'),
+          click: ->
+            $(this).dialog("close")
+        }
+      ]
 
   if $('#tasks_index')[0]?
     $(document).on 'click', '[data-behavior=bulk_complete]', ->
@@ -33,14 +109,14 @@ $ ->
       false
 
     $(document).on 'click', '[data-behavior=bulk_edit]', ->
-      form = $('#edit_task_modal form')
+      form = $('#bulk_edit_task_modal form')
       form.attr('action', '/tasks/bulk_update')
       form.append('<input type="hidden" name="_method" value="put" />')
       $('select', form).prepend('<option></option>')
       $('select', form).val('')
       $('#bulk_task_update_ids', form).val($.mpdx.getSelectedTaskIds($(this).closest('table')).join(','))
 
-      $('#edit_task_modal').dialog
+      $('#bulk_edit_task_modal').dialog
         resizable: true,
         modal:'true',
         width: '400px',
@@ -48,9 +124,10 @@ $ ->
           {
             text: __('Save'),
             click: (e) ->
-              $('form', this).submit()
-              $(this).dialog("close")
-              $('#page_spinner').dialog(modal: true)
+              return false if $.trim($('#task_subject', form).val()) == ''
+              form.submit()
+              $('.form_wrapper', this).html('<img src="/assets/spinner.gif" />')
+              $(this).dialog( "option", "buttons", [])
           },
           {
             text: __('Cancel'),

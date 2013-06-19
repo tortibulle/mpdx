@@ -34,6 +34,10 @@ class ContactFilter
         filtered_contacts = filtered_contacts.includes(:addresses).where('addresses.city' => @filters[:city])
       end
 
+      if @filters[:church].present? && @filters[:church].first != ''
+        filtered_contacts = filtered_contacts.where('contacts.church_name' => @filters[:church])
+      end
+
       if @filters[:state].present? && @filters[:state].first != ''
         filtered_contacts = filtered_contacts.includes(:addresses).where('addresses.state' => @filters[:state])
       end
@@ -70,7 +74,7 @@ class ContactFilter
           filtered_contacts = filtered_contacts.joins(:addresses).where('addresses.street is not null')
         when 'email'
           filtered_contacts = filtered_contacts.where(send_newsletter: ['Email', 'Both'])
-          filtered_contacts = filtered_contacts.joins(people: :email_addresses)
+          filtered_contacts = filtered_contacts.joins(people: :email_addresses).includes(people: :email_addresses)
         else
           filtered_contacts = filtered_contacts.where('send_newsletter is not null')
         end
@@ -78,7 +82,7 @@ class ContactFilter
       end
 
       if @filters[:name].present?
-        filtered_contacts = filtered_contacts.where("lower(name) like ?", "%#{@filters[:name].downcase}%")
+        filtered_contacts = filtered_contacts.where("lower(contacts.name) like ?", "%#{@filters[:name].downcase}%")
       end
     end
 

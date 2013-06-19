@@ -10,13 +10,12 @@ class Person::OrganizationAccount < ActiveRecord::Base
 
   serialize :password, Encryptor.new
 
-  has_many :designation_profiles
-
   after_create :set_up_account_list, :queue_import_data
   validates :organization_id, :person_id, presence: true
   validates :username, :password, :presence => {if: :requires_username_and_password?}
   validates_with CredentialValidator
   after_validation :set_valid_credentials
+  after_destroy :destroy_designation_profiles
 
   # attr_accessible :username, :password, :organization, :organization_id
 
@@ -44,6 +43,10 @@ class Person::OrganizationAccount < ActiveRecord::Base
 
   def account_list
     user.designation_profiles.first.try(:account_list)
+  end
+
+  def designation_profiles
+    DesignationProfile.where(organization_id: organization_id, user_id: person_id)
   end
 
   private
@@ -89,5 +92,9 @@ class Person::OrganizationAccount < ActiveRecord::Base
       account_list = user.account_lists.create({name: user.to_s, creator_id: user.id}, without_protection: true)
       organization.designation_profiles.create({name: user.to_s, user_id: user.id, account_list_id: account_list.id}, without_protection: true)
     end
+  end
+
+  def destroy_designation_profiles
+    designation_profiles.destroy_all
   end
 end

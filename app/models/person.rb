@@ -98,7 +98,11 @@ class Person < ActiveRecord::Base
         if attributes[:_destroy] == '1' || attributes[:related_person_id].blank?
           fr.destroy
         else
-          fr.update_attributes(attributes.except(:id, :_destroy))
+          begin
+            fr.update_attributes(attributes.except(:id, :_destroy))
+          rescue ActiveRecord::RecordNotUnique
+            fr.destroy
+          end
         end
       else
         FamilyRelationship.add_for_person(self, attributes) if attributes[:related_person_id].present?
@@ -257,9 +261,9 @@ class Person < ActiveRecord::Base
       queue_subscribe_person(self)
     end
   end
-  
+
   def touch_contacts
-    contacts.map(&:touch)
+    contacts.map(&:touch) if sign_in_count == 0
   end
 
 end
