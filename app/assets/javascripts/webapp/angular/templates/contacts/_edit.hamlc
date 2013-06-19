@@ -1,0 +1,57 @@
+.container-fluid
+  #pad-wrapper.settings-wrapper
+    / avatar column
+    .span3.avatar-box
+      .personal-image
+        %img.avatar.img-circle{"ng-src" => "{{data.contact.avatar}}"}/
+        %p Upload a different photo...
+        %input{:type => "file"}/
+    / edit form column
+    .span7.personal-info
+      .alert.alert-info
+        %i.icon-lightbulb
+        This page shows an example of an alternative layout with the main navbar on the top
+        %br/
+        using
+        %strong .content.wide-content
+        for this main container
+      %h5.personal-title Personal info
+      %form
+        .field-box
+          %label Name
+          %input.span5.inline-input{:type => "text", "ng-model" => "data.contact.name"}/
+        .field-box
+          %label Commitment
+          %input.span5.inline-input{:type => "text", "ng-model" => "data.contact.pledge_amount"}/
+        .field-box
+          %label Commitment Frequency
+          %select{"ng-model"=>"contact_frequency", "ng-options"=>"select as label for (key , value) in data.pledge_frequencies"}
+          %input.span5.inline-input{:type => "text", :value => "Design Co."}/
+        .field-box
+          %label Email:
+          %input.span5.inline-input{:type => "text", :value => "alejandra@design.com"}/
+        .field-box
+          %label Time Zone:
+          .ui-select
+            %select#user_time_zone{:name => "user[time_zone]"}
+              %option{:value => "Hawaii"} (GMT-10:00) Hawaii
+              %option{:value => "Alaska"} (GMT-09:00) Alaska
+              %option{:value => "Pacific Time (US & Canada)"} (GMT-08:00) Pacific Time (US & Canada)
+              %option{:value => "Arizona"} (GMT-07:00) Arizona
+              %option{:value => "Mountain Time (US & Canada)"} (GMT-07:00) Mountain Time (US & Canada)
+              %option{:selected => "selected", :value => "Central Time (US & Canada)"} (GMT-06:00) Central Time (US & Canada)
+              %option{:value => "Eastern Time (US & Canada)"} (GMT-05:00) Eastern Time (US & Canada)
+              %option{:value => "Indiana (East)"} (GMT-05:00) Indiana (East)
+        .field-box
+          %label Username:
+          %input.span5.inline-input{:type => "text", :value => "alegalvan"}/
+        .field-box
+          %label Password:
+          %input.span5.inline-input{:type => "password", :value => "blablablabla"}/
+        .field-box
+          %label Confirm password:
+          %input.span5.inline-input{:type => "password", :value => "blablablabla"}/
+        .span6.field-box.actions
+          %input.btn-glow.primary{:type => "button", :value => "Save Changes"}/
+          %span OR
+          %input.reset{:type => "reset", :value => "Cancel"}/

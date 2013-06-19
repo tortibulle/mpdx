@@ -5,7 +5,6 @@ Mpdx::Application.routes.draw do
 
   resources :help_requests
 
-
   #ActiveAdmin.routes(self)
 
 
@@ -36,7 +35,13 @@ Mpdx::Application.routes.draw do
 
   namespace :api do
     api_version(module: 'V1', header: {name: 'API-VERSION', value: 'v1'}, parameter: {name: "version", value: 'v1'}, path: {value: 'v1'}) do
-      resources :contacts
+      resources :contacts do
+        collection do
+          get "pledge_frequencies"
+        end
+        resources :people
+        resources :donations, only: :index
+      end
       resources :tasks
       resources :preferences
       resources :users
@@ -87,6 +92,8 @@ Mpdx::Application.routes.draw do
   get "home/change_account_list"
   get "home/download_data_check"
   get "login" => "home#login"
+
+  get "js" => "home#js"
 
   devise_for :users
   as :user do

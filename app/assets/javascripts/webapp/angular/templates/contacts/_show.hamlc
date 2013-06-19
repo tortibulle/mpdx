@@ -1,0 +1,91 @@
+.container-fluid
+  #pad-wrapper.user-profile
+    / header
+    .row-fluid.header
+      .span8
+        %img.avatar.img-circle{"ng-src" => "{{data.contact.avatar}}"}/
+        %h3.name {{data.contact.name}}
+        %span.area
+          {{data.contact.status}}
+          %br/
+          %small.muted {{data.contact.pledge_amount | currency}} {{pledge_frequencies[data.contact.pledge_frequency]}}
+      %a.btn-flat.icon.pull-right.delete-user{"data-placement" => "top", "data-toggle" => "tooltip", :title => "Delete user"}
+        %i.icon-trash
+      %a.btn-flat.icon.large.pull-right.edit{href: "#/contacts/{{data.contact.id}}/edit"}
+        Edit this Contact
+    .row-fluid.profile
+      / bio, new note & orders column
+      .span9.bio
+        .profile-box
+          / biography
+          .span12
+            %tabs
+              %pane{:active => "true", :heading => "People"}
+                .gallery
+                  .gallery-wrapper
+                    .row.gallery-row
+                      .span2.img-container{"ng-repeat" => "person in data.people"}
+                        .img-box
+                          %a.name{:href => "#/contacts/{{data.contact.id}}/people/{{person.id}}"}
+                            %span.icon.edit
+                              %i.icon-search
+                          %span.icon.trash
+                            %i.icon-trash
+                          %img{"ng-src" => "{{person.avatar}}", width: "134", height: "134"}/
+                          %p.title
+                            %a.name{:href => "#/contacts/{{data.contact.id}}/people/{{person.id}}"} {{person.first_name}} {{person.last_name}}
+                      .span2.new
+              %pane{:heading => "Donations"}
+                %table.table.table-hover
+                  %thead
+                    %tr
+                      %th.span2
+                        Date
+                      %th.span3
+                        %span.line
+                        Amount
+                      %th.span3
+                        %span.line
+                        Designation
+                      %th.span3
+                        %span.line
+                        Method
+                      %th.span3
+                        %span.line
+                        Motivation
+                  %tbody
+                    %tr{"ng-repeat" => "donation in donations.donations"}
+                      %td
+                        {{donation.donation_date}}
+                      %td
+                        {{donation.amount | currency}} {{donation.currency}}
+                      %td
+                        {{donation.designation_id}}
+                      %td
+                        {{donation.payment_method}}
+                      %td
+                        {{donation.motivation}}
+              %pane{:heading => "Notes"}
+                .span12.section.comment
+                  %h6 Add a quick note
+                  %p Add a note about this contact to keep a history of your interactions.
+                  %textarea
+                  .span12.submit-box.pull-right
+                    %input.btn-glow.primary{:type => "submit", :value => "Add Note"}/
+                    %span OR
+                    %input.reset{:type => "reset", :value => "Cancel"}/
+
+      / side address column
+      .span3.address.pull-right
+        %h6 Address
+        %iframe{:frameborder => "0", :height => "133", :marginheight => "0", :marginwidth => "0", :scrolling => "no", :src => "https://maps.google.com.mx/?ie=UTF8&t=m&ll=19.715081,-155.071421&spn=0.010746,0.025749&z=14&output=embed", :width => "300"}
+        %ul
+          %li {{data.addresses[0].street}}
+          %li {{data.addresses[0].city}}, {{data.addresses[0].state}} {{data.addresses[0].country}}
+          %li {{data.addresses[0].postal_code}}
+          %li.ico-li
+            %i.icon-phone
+            1817 274 2933
+          %li.ico-li
+            %i.icon-mail
+            %a{:href => "#"} alejandra@detailcanvas.com

@@ -1,0 +1,90 @@
+.container-fluid
+  #pad-wrapper.users-list
+    .row-fluid.header
+      %h3 Contacts
+      .span10.pull-right
+        %input.span5.search{:placeholder => "Type a contact's name...", :type => "text", "ng-model" => "query"}/
+        / custom popup filter
+        / styles are located in css/elements.css
+        / script that enables this dropdown is located in js/theme.js
+        .ui-dropdown
+          .head{"data-toggle" => "tooltip", :title => "Click me!"}
+            Filter contact
+            %i.arrow-down
+          .dialog
+            .pointer
+              .arrow
+              .arrow_border
+            .body
+              %p.title
+                Show users where:
+              .form
+                %select
+                  %option Name
+                  %option Email
+                  %option Number of orders
+                  %option Signed up
+                  %option Last seen
+                %select
+                  %option is equal to
+                  %option is not equal to
+                  %option is greater than
+                  %option starts with
+                  %option contains
+                %input{:type => "text"}/
+                %a.btn-flat.small Add filter
+        %a.btn-flat.success.pull-right{:href => "new-user.html"}
+          %span +
+          NEW CONTACT
+    / Users table
+    .row-fluid.table-products
+      %table.table.table-hover
+        %thead
+          %tr
+            %th.span4.sortable
+              %input{type:"checkbox"}/
+              Name
+            %th.span3.sortable
+              %span.line>
+              Address
+            %th.span2.sortable
+              %span.line>
+              MPD Phase
+            %th.span3.align-right
+              %span.line>
+              Actions
+        %tbody
+          / row
+          %tr{"ng-repeat" => "contact in data.contacts | filter:query | orderBy:orderProp | startFrom:(currentPage - 1)*pageSize | limitTo:pageSize"}
+            %td
+              %input{type:"checkbox"}/
+              %img.img-circle.avatar.hidden-phone{"ng-src" => "{{contact.avatar}}"}/
+              %a.name{:href => "#/contacts/{{contact.id}}"} {{contact.name}}
+              %span.subtext
+                %span{"ng-repeat" => "person in contact.person_ids"}
+                  {{person.first_name}}
+            %td
+              {{contact.addresses[0].street}}
+              %br/
+              {{data.addresses[0].city}}, {{data.addresses[0].state}} {{data.addresses[0].country}}
+            %td
+              %strong {{contact.status}}
+              %br/
+              {{contact.pledge_amount | currency}} {{pledge_frequencies[contact.pledge_frequency]}}
+            %td
+              %ul.actions
+                %li
+                  %a{href: "#/contacts/{{contact.id}}/tag"}
+                    %i.icon-tags
+                %li
+                  %a{href: "#/contacts/{{contact.id}}"}
+                    %i.icon-search
+                %li
+                  %a{href: "#/contacts/{{contact.id}}/edit"}
+                    %i.icon-pencil
+                %li.last
+                  %a{href: "#/contacts/{{contact.id}}"}
+                    %i.icon-trash
+          / row
+    %pagination.pagination-small.pull-right{ "num-pages" => "numberOfPages()", "current-page" => "currentPage", "previous-text"=>"&laquo;", "next-text"=>"&raquo;"}
+    / end users table

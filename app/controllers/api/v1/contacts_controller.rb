@@ -53,6 +53,11 @@ class Api::V1::ContactsController < Api::V1::BaseController
     render json: contact, callback: params[:callback]
   end
 
+
+  def pledge_frequencies
+    render json: Contact.pledge_frequencies, callback: params[:callback]
+  end
+
   protected
 
   def contacts

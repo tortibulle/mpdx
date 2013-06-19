@@ -14,6 +14,7 @@ group :assets do
 
   gem 'uglifier', '~> 1.3.0'
   gem 'jquery-ui-rails', '~> 3.0.0'
+  gem 'haml_coffee_assets'
 end
 
 gem 'activeadmin'
@@ -66,6 +67,10 @@ gem 'virtus', '~> 0.5.4'
 gem 'whenever', '~> 0.8.1'
 gem 'wicked', '~> 0.3.4'
 gem 'will_paginate', '~> 3.0.3'
+gem 'bootstrap-sass', '~> 2.1.1.0'
+gem 'font-awesome-sass-rails'
+gem "angular-rails"
+gem 'angular-ui-bootstrap-rails'
 
 group :development do
   gem 'railroady'

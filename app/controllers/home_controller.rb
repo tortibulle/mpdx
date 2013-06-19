@@ -24,4 +24,8 @@ class HomeController < ApplicationController
     render text: current_user.organization_accounts.any?(&:downloading?)
   end
 
+  def js
+    render layout: "js"
+  end
+
 end

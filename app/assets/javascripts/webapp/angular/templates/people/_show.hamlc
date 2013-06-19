@@ -1,0 +1,47 @@
+.container-fluid
+  #pad-wrapper.user-profile
+    / header
+    .row-fluid.header
+      .span8
+        %img.avatar.img-circle{"ng-src" => "{{data.person.avatar}}"}/
+        %h3.name {{data.person.first_name}} {{data.person.last_name}}
+        %span.area {{data.addresses[0].city}} {{data.addresses[0].state}}
+      %a.btn-flat.icon.pull-right.delete-user{"data-placement" => "top", "data-toggle" => "tooltip", :title => "Delete user"}
+        %i.icon-trash
+      %a.btn-flat.icon.large.pull-right.edit{href: "#/contacts/{{data.contact.id}}/edit"}
+        Edit this Person
+    .row-fluid.profile
+      / bio, new note & orders column
+      .span9.bio
+        .profile-box.table-wrapper
+          / biography
+          .span12
+            %h6 People
+            %br/
+            .table{"ng-repeat" => "person in data.people"}
+              .img
+                %img{"ng-src" => "{{person.avatar}}"}
+              %a.name{:href => "#/contacts/{{data.contact.id}}/people/{{person.id}}"} {{person.first_name}} {{person.last_name}}
+            / new comment form
+            .span12.section.comment
+              %h6 Add a quick note
+              %p Add a note about this contact to keep a history of your interactions.
+              %textarea
+              .span12.submit-box.pull-right
+                %input.btn-glow.primary{:type => "submit", :value => "Add Note"}/
+                %span OR
+                %input.reset{:type => "reset", :value => "Cancel"}/
+      / side address column
+      .span3.address.pull-right
+        %h6 Address
+        %iframe{:frameborder => "0", :height => "133", :marginheight => "0", :marginwidth => "0", :scrolling => "no", :src => "https://maps.google.com.mx/?ie=UTF8&t=m&ll=19.715081,-155.071421&spn=0.010746,0.025749&z=14&output=embed", :width => "300"}
+        %ul
+          %li {{data.addresses[0].street}}
+          %li {{data.addresses[0].city}}, {{data.addresses[0].state}} {{data.addresses[0].country}}
+          %li {{data.addresses[0].postal_code}}
+          %li.ico-li
+            %i.icon-phone
+            1817 274 2933
+          %li.ico-li
+            %i.icon-mail
+            %a{:href => "#"} alejandra@detailcanvas.com
