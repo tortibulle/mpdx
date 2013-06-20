@@ -34,6 +34,11 @@
         </div>
 
         <div class="field">
+          <%= f.label :greeting, _('Greeting (used in csv download)') %>
+          <%= f.text_field :greeting %>
+        </div>
+
+        <div class="field">
           <%= f.label :pledge_amount, _('Commitment Amount') %>
           <%= f.text_field :pledge_amount %>
         </div>

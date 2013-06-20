@@ -151,6 +151,12 @@ class Contact < ActiveRecord::Base
     spouse.try(:first_name)
   end
 
+  def greeting
+    self[:greeting].present? ?
+      self[:greeting] :
+      [first_name, spouse_name].compact.join(_(' and '))
+  end
+
   def update_donation_totals(donation)
     self.first_donation_date = donation.donation_date if first_donation_date.nil? || donation.donation_date < first_donation_date
     self.last_donation_date = donation.donation_date if last_donation_date.nil? || donation.donation_date > last_donation_date
