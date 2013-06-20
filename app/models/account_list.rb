@@ -114,15 +114,15 @@ class AccountList < ActiveRecord::Base
   end
 
   def people_with_birthdays(start_date, end_date)
-    people.where("birthday_month BETWEEN ? AND ?", start_date.month, end_date.month)
-          .where("birthday_day BETWEEN ? AND ?", start_date.day, end_date.day)
-          .order('birthday_month, birthday_day')
+    people.where("people.birthday_month BETWEEN ? AND ?", start_date.month, end_date.month)
+          .where("people.birthday_day BETWEEN ? AND ?", start_date.day, end_date.day)
+          .order('people.birthday_month, people.birthday_day').merge(contacts.active)
   end
 
   def people_with_anniversaries(start_date, end_date)
     people.where("anniversary_month BETWEEN ? AND ?", start_date.month, end_date.month)
           .where("anniversary_day BETWEEN ? AND ?", start_date.day, end_date.day)
-          .order('anniversary_month, anniversary_day')
+          .order('anniversary_month, anniversary_day').merge(contacts.active)
   end
 
   def top_50_percent
@@ -157,22 +157,23 @@ class AccountList < ActiveRecord::Base
     @no_activity_since
   end
 
-    def merge_contacts
-      ordered_contacts = contacts.includes(:addresses).order('contacts.created_at')
-      ordered_contacts.reload
-      ordered_contacts.each do |contact|
-        other_contact = contacts.where(name: contact.name).where("id <> #{contact.id}").first
-        if other_contact && (other_contact.donor_accounts.first == contact.donor_accounts.first ||
-                             other_contact.addresses.detect {|a| contact.addresses.detect {|ca| ca == a}})
-          contact.merge(other_contact)
-          merge_contacts
-          return
-        end
+  def merge_contacts
+    ordered_contacts = contacts.includes(:addresses).order('contacts.created_at')
+    ordered_contacts.reload
+    ordered_contacts.each do |contact|
+      other_contact = contacts.where(name: contact.name).where("id <> #{contact.id}").first
+      if other_contact && (other_contact.donor_accounts.first == contact.donor_accounts.first ||
+                           other_contact.addresses.detect {|a| contact.addresses.detect {|ca| ca == a}})
+        contact.merge(other_contact)
+        merge_contacts
+        return
       end
-      contacts.reload
-      contacts.map(&:merge_people)
-      contacts.map(&:merge_addresses)
     end
+    contacts.reload
+    contacts.map(&:merge_people)
+    contacts.map(&:merge_addresses)
+  end
+
   # Download all donations / info for all accounts associated with this list
   def self.update_linked_org_accounts
     AccountList.joins(:organization_accounts)
