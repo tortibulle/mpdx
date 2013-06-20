@@ -92,7 +92,7 @@ describe Person do
       create(:facebook_account, person: @loser)
 
       @winner.merge(@loser)
-      @winner.facebook_accounts.should_not be_empty 
+      @winner.facebook_accounts.should_not be_empty
     end
 
     it "should move loser's twitter over" do
@@ -101,7 +101,7 @@ describe Person do
       create(:twitter_account, person: @loser)
 
       @winner.merge(@loser)
-      @winner.twitter_accounts.should_not be_empty 
+      @winner.twitter_accounts.should_not be_empty
     end
   end
 

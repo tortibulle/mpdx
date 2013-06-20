@@ -117,24 +117,24 @@ class Person < ActiveRecord::Base
     hash.each do |key, attributes|
       next if attributes['_destroy'] == '1'
 
-      remote_id = Person::FacebookAccount.get_id_from_url(attributes['url'])
-      if facebook_ids.include?(remote_id)
+      attributes['remote_id'] = Person::FacebookAccount.get_id_from_url(attributes['url'])
+      if facebook_ids.include?(attributes['remote_id'])
         hash.delete(key)
       else
-        facebook_ids << remote_id
+        facebook_ids << attributes['remote_id']
       end
     end
 
     hash.each do |_, attributes|
       if attributes['id']
         fa = facebook_accounts.find(attributes['id'])
-        if attributes['_destroy'] == '1'
+        if attributes['_destroy'] == '1' || attributes['remote_id'].blank?
           fa.destroy
         else
           fa.update_attributes(attributes.except('id', '_destroy'))
         end
       else
-        unless attributes['_destroy'] == '1'
+        unless attributes['_destroy'] == '1' || attributes['remote_id'].blank?
           fa = facebook_accounts.new(attributes.except('_destroy'))
           fa.save unless new_record?
         end
