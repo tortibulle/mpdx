@@ -70,7 +70,8 @@ class Person::OrganizationAccount < ActiveRecord::Base
         update_column(:last_download, Time.now)
       end
     ensure
-      update_attributes({downloading: false, locked_at: nil}, without_protection: true)
+      update_column(:downloading, false)
+      update_column(:locked_at, nil)
     end
   end
 
