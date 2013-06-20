@@ -50,6 +50,16 @@ describe Person do
         })
       person.facebook_accounts.length.should == 2
     end
+
+    it "gracefully handles having an fb account with a blank url" do
+      person.update_attributes("facebook_accounts_attributes" => {
+          "0" => {
+            "_destroy" => "false",
+            "url" => ""
+          }
+        })
+      person.facebook_accounts.length.should == 0
+    end
   end
 
   context '#email=' do

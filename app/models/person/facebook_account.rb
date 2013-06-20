@@ -50,6 +50,11 @@ class Person::FacebookAccount < ActiveRecord::Base
     end
   end
 
+  def facebook_accounts_attributes=(attributes)
+    return nil unless attributes[:url].present?
+    super
+  end
+
   def get_id_from_url(url)
     Person::FacebookAccount.get_id_from_url(url)
   end
