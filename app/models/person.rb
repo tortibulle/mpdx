@@ -164,6 +164,17 @@ class Person < ActiveRecord::Base
     self.phone_number = {number: number}
   end
 
+  def merge_phone_numbers
+    phone_numbers.reload.each do |phone_number|
+      if other_phone = phone_numbers.detect { |pn| pn.id != phone_number.id &&
+                                                   pn == phone_number }
+        phone_number.merge(other_phone)
+        merge_phone_numbers
+        return
+      end
+    end
+  end
+
   def merge(other)
     Person.transaction(:requires_new => true) do
       %w[phone_numbers company_positions].each do |relationship|
@@ -173,6 +184,8 @@ class Person < ActiveRecord::Base
           end
         end
       end
+
+      merge_phone_numbers
 
       # handle a few things separately to check for duplicates
       %w[twitter_accounts facebook_accounts linkedin_accounts

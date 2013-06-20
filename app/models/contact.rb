@@ -58,7 +58,7 @@ class Contact < ActiveRecord::Base
 
   def status=(val)
     # handle deprecated values
-    case val 
+    case val
     when 'Call for Appointment'
       self[:status] = 'Contact for Appointment'
     else
@@ -172,17 +172,6 @@ class Contact < ActiveRecord::Base
 
   def merge(other)
     Contact.transaction do
-      # Merge people that have the same name
-      people.each do |person|
-        if other_person = other.people.detect { |p| p.first_name == person.first_name &&
-                                                p.last_name == person.last_name &&
-                                                p.id != person.id }
-          person.merge(other_person)
-          # don't check this person next time through the loop
-          other.people -= [other_person]
-        end
-      end
-
       # Update related records
       other.contact_people.each do |r|
         unless contact_people.where(person_id: r.person_id).first
@@ -190,11 +179,15 @@ class Contact < ActiveRecord::Base
         end
       end
 
+      merge_people
+
       other.contact_donor_accounts.each do |other_contact_donor_account|
-        unless donor_accounts.include?(other_contact_donor_account.donor_account)
+        unless donor_accounts.collect(&:account_number).include?(other_contact_donor_account.donor_account.account_number)
           other_contact_donor_account.update_column(:contact_id, id)
         end
       end
+
+      merge_donor_accounts
 
       other.activity_contacts.each do |other_activity_contact|
         unless activities.include?(other_activity_contact.activity)
@@ -208,6 +201,8 @@ class Contact < ActiveRecord::Base
         end
       end
 
+      merge_addresses
+
       ContactReferral.where(referred_to_id: other.id).update_all(referred_to_id: id)
       ContactReferral.where(referred_by_id: other.id).update_all(referred_by_id: id)
 
@@ -219,6 +214,11 @@ class Contact < ActiveRecord::Base
          if send(field).blank? && other.send(field).present?
            send("#{field}=".to_sym, other.send(field))
          end
+       end
+
+       # If one of these is marked as a finanical partner, we want that status
+       if status != 'Partner - Financial' && other.status == 'Partner - Financial'
+         self.status = 'Partner - Financial'
        end
 
        self.notes = [notes, other.notes].compact.join("\n") if other.notes.present?
@@ -243,6 +243,46 @@ class Contact < ActiveRecord::Base
       (12.0).to_d => _('Annual'),
       (24.0).to_d => _('Biennial')
     }
+  end
+
+  def merge_addresses
+    ordered_addresses = addresses.order('created_at desc')
+    ordered_addresses.reload
+    ordered_addresses.each do |address|
+      other_address = ordered_addresses.detect { |a| a.id != address.id && a == address }
+      if other_address
+        address.merge(other_address)
+        merge_addresses
+        return
+      end
+    end
+  end
+
+  def merge_people
+    # Merge people that have the same name
+    people.reload.each do |person|
+      if other_person = people.detect { |p| p.first_name == person.first_name &&
+                                            p.last_name == person.last_name &&
+                                            p.id != person.id }
+        person.merge(other_person)
+        merge_people
+        return
+      end
+    end
+    people.reload
+    people.map(&:merge_phone_numbers)
+  end
+
+  def merge_donor_accounts
+    # Merge donor accounts that have the same number
+    donor_accounts.reload.each do |account|
+      if other = donor_accounts.detect { |da| da.id != account.id &&
+                                              da.account_number == account.account_number}
+        other.destroy
+        merge_donor_accounts
+        return
+      end
+    end
   end
 
   private

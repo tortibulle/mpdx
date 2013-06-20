@@ -43,6 +43,15 @@ class PhoneNumber < ActiveRecord::Base
     PhoneNumber.strip_number(number.to_s) == PhoneNumber.strip_number(other.number.to_s)
   end
 
+  def merge(other)
+    self.primary = (primary? || other.primary?)
+    self.country_code = other.country_code if country_code.blank?
+    self.location = other.location if location.blank?
+    self.remote_id = other.remote_id if remote_id.blank?
+    self.save(validate: false)
+    other.destroy
+  end
+
   private
 
   def strip_number!

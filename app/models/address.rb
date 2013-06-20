@@ -15,7 +15,7 @@ class Address < ActiveRecord::Base
       other.street == street &&
       other.city == city &&
       other.state == state &&
-      other.country == country &&
+      (other.country == country || country.blank? || other.country.blank?) &&
       other.postal_code.to_s[0..4] == postal_code.to_s[0..4]
     else
       false
@@ -30,8 +30,25 @@ class Address < ActiveRecord::Base
     self.primary_mailing_address = (primary_mailing_address? || other_address.primary_mailing_address?)
     self.seasonal = (seasonal? || other_address.seasonal?)
     self.location = other_address.location if location.blank?
+    self.remote_id = other_address.remote_id if remote_id.blank?
     self.save(validate: false)
     other_address.destroy
+  end
+
+  def country=(val)
+    countries = ActionView::Helpers::FormOptionsHelper::COUNTRIES
+    if countries.detect {|country| country[:name] == val}
+      self[:country] = val
+    else
+      countries.each do |country|
+        if country[:alternatives].split(' ').include?(val)
+          self[:country] = country[:name]
+          return
+        end
+      end
+      # If we couldn't find a match anywhere, go ahead and save it anyway
+      self[:country] = val
+    end
   end
 
 end

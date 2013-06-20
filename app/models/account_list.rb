@@ -157,6 +157,22 @@ class AccountList < ActiveRecord::Base
     @no_activity_since
   end
 
+    def merge_contacts
+      ordered_contacts = contacts.includes(:addresses).order('contacts.created_at')
+      ordered_contacts.reload
+      ordered_contacts.each do |contact|
+        other_contact = contacts.where(name: contact.name).where("id <> #{contact.id}").first
+        if other_contact && (other_contact.donor_accounts.first == contact.donor_accounts.first ||
+                             other_contact.addresses.detect {|a| contact.addresses.detect {|ca| ca == a}})
+          contact.merge(other_contact)
+          merge_contacts
+          return
+        end
+      end
+      contacts.reload
+      contacts.map(&:merge_people)
+      contacts.map(&:merge_addresses)
+    end
   # Download all donations / info for all accounts associated with this list
   def self.update_linked_org_accounts
     AccountList.joins(:organization_accounts)

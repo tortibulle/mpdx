@@ -1,17 +1,16 @@
 namespace :mpdx do
-  task merge_accounts: :environment do
-    def merge_contacts(al)
-      contacts = al.contacts.order('contacts.created_at')
-      contacts.reload
-      contacts.each do |contact|
-        other_contact = al.contacts.where(name: contact.name).where("id <> #{contact.id}").first
-        if other_contact && other_contact.donor_accounts.first == contact.donor_accounts.first
-          contact.merge(other_contact)
-          merge_contacts(al)
-          return
+
+  task set_special: :environment do
+    AccountList.find_each do |al|
+      al.contacts.includes(:donor_accounts).find_each do |contact|
+        if contact.status.blank? && contact.donor_accounts.present?
+          contact.update_attributes(status: 'Partner - Special')
         end
       end
     end
+  end
+
+  task merge_accounts: :environment do
 
     def merge_account_lists
       AccountList.order('created_at').each do |al|
@@ -19,7 +18,7 @@ namespace :mpdx do
         if other_list# && other_contact.donor_accounts.first == contact.donor_accounts.first
           puts other_list.name
           al.merge(other_list)
-          merge_contacts(al)
+          al.merge_contacts
           merge_account_lists
           return
         end
