@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130607202118) do
+ActiveRecord::Schema.define(:version => 20130620172556) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -121,9 +121,12 @@ ActiveRecord::Schema.define(:version => 20130607202118) do
     t.string   "addressable_type"
     t.string   "remote_id"
     t.boolean  "seasonal",                :default => false
+    t.integer  "master_address_id"
+    t.boolean  "verified",                :default => false, :null => false
   end
 
   add_index "addresses", ["addressable_id"], :name => "index_addresses_on_person_id"
+  add_index "addresses", ["master_address_id"], :name => "index_addresses_on_master_address_id"
   add_index "addresses", ["remote_id"], :name => "index_addresses_on_remote_id"
 
   create_table "admin_users", :force => true do |t|
@@ -275,16 +278,6 @@ ActiveRecord::Schema.define(:version => 20130607202118) do
 
   add_index "designation_profile_accounts", ["designation_profile_id", "designation_account_id"], :name => "designation_p_to_a", :unique => true
 
-  create_table "designation_profile_users", :force => true do |t|
-    t.integer  "designation_profile_id"
-    t.integer  "user_id"
-    t.datetime "created_at",             :null => false
-    t.datetime "updated_at",             :null => false
-  end
-
-  add_index "designation_profile_users", ["designation_profile_id", "user_id"], :name => "profile_user"
-  add_index "designation_profile_users", ["user_id"], :name => "index_designation_profile_users_on_user_id"
-
   create_table "designation_profiles", :force => true do |t|
     t.string   "remote_id"
     t.integer  "user_id",                                          :null => false
@@ -418,6 +411,20 @@ ActiveRecord::Schema.define(:version => 20130607202118) do
   end
 
   add_index "mail_chimp_accounts", ["account_list_id"], :name => "index_mail_chimp_accounts_on_account_list_id"
+
+  create_table "master_addresses", :force => true do |t|
+    t.text     "street"
+    t.string   "city"
+    t.string   "state"
+    t.string   "country"
+    t.string   "postal_code"
+    t.boolean  "verified",    :default => false, :null => false
+    t.boolean  "boolean",     :default => false, :null => false
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
+  end
+
+  add_index "master_addresses", ["street", "city", "state", "country", "postal_code"], :name => "all_fields"
 
   create_table "master_companies", :force => true do |t|
     t.string   "name"

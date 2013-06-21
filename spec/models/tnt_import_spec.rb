@@ -11,6 +11,12 @@ describe TntImport do
   let(:history_contact_rows) { Array.wrap(import.read_xml(tnt_import.file.file.file)['Database']['Tables']['HistoryContact']['row']) }
   let(:property_rows) { Array.wrap(import.read_xml(tnt_import.file.file.file)['Database']['Tables']['Property']['row']) }
 
+  before do
+    stub_request(:get, /api\.smartystreets\.com\/.*/).
+         with(:headers => {'Accept'=>'application/json', 'Accept-Encoding'=>'gzip, deflate', 'Content-Type'=>'application/json', 'User-Agent'=>'Ruby'}).
+         to_return(:status => 200, :body => "{}", :headers => {})
+  end
+
   context '#import_contacts' do
     it 'associates referrals' do
       import.should_receive(:add_or_update_donor_accounts).and_return([create(:donor_account)])

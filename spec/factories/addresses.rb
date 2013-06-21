@@ -3,6 +3,7 @@
 FactoryGirl.define do
   factory :address do
     association :addressable, factory: :contact
+    association :master_address
     street "MyString"
     city "MyString"
     state "MyString"
