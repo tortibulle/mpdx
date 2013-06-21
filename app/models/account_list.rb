@@ -158,17 +158,24 @@ class AccountList < ActiveRecord::Base
   end
 
   def merge_contacts
-    ordered_contacts = contacts.includes(:addresses).order('contacts.created_at')
-    ordered_contacts.reload
+    merged_contacts = []
+
+    ordered_contacts = contacts.includes(:addresses, :donor_accounts).order('contacts.created_at')
     ordered_contacts.each do |contact|
-      other_contact = contacts.where(name: contact.name).where("id <> #{contact.id}").first
-      if other_contact && (other_contact.donor_accounts.first == contact.donor_accounts.first ||
-                           other_contact.addresses.detect {|a| contact.addresses.detect {|ca| ca == a}})
-        contact.merge(other_contact)
-        merge_contacts
-        return
+      next if merged_contacts.include?(contact)
+
+      other_contacts = ordered_contacts.find_all {|c| c.name == contact.name &&
+                                                           c.id != contact.id &&
+                                                           (c.donor_accounts.first == contact.donor_accounts.first ||
+                                                            c.addresses.detect {|a| contact.addresses.detect {|ca| ca == a}}) }
+      if other_contacts.present?
+        other_contacts.each do |other_contact|
+          contact.merge(other_contact)
+          merged_contacts << other_contact
+        end
       end
     end
+
     contacts.reload
     contacts.map(&:merge_people)
     contacts.map(&:merge_addresses)
