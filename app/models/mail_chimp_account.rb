@@ -129,7 +129,15 @@ class MailChimpAccount < ActiveRecord::Base
         gb.list_unsubscribe(id: primary_list_id, email_address: email,
                             send_goodbye: false, delete_member: true)
       rescue Gibbon::MailChimpError => e
-        raise e unless e.message.include?('code 232') || e.message.include?('code 215')
+        case
+        when e.message.include?('code 232') || e.message.include?('code 215')
+          # do nothing
+        when e.message.include?('code 232')
+          # Invalid MailChimp List ID
+          update_column(:primary_list_id, nil)
+        else
+          raise e
+        end
       end
     end
   end
