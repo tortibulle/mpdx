@@ -132,7 +132,7 @@ class MailChimpAccount < ActiveRecord::Base
         case
         when e.message.include?('code 232') || e.message.include?('code 215')
           # do nothing
-        when e.message.include?('code 232')
+        when e.message.include?('code 232') || e.message.include?('code 200')
           # Invalid MailChimp List ID
           update_column(:primary_list_id, nil)
         else
@@ -166,7 +166,7 @@ class MailChimpAccount < ActiveRecord::Base
           # Notify user and nulify primary_list_id until they fix the problem
           update_column(:primary_list_id, nil)
           AccountMailer.mailchimp_required_merge_field(account_list).deliver
-        when e.message.include?('code 200') # Invalid MailChimp List ID (code 250)
+        when e.message.include?('code 200') # Invalid MailChimp List ID (code 200)
           # TODO: Notify user and nulify primary_list_id until they fix the problem
           update_column(:primary_list_id, nil)
         else
