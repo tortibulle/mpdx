@@ -20,7 +20,7 @@ class FacebookImport
           begin
             friend = Retryable.retryable :on => FbGraph::Unauthorized, :times => 5, :sleep => 60 do
                        Retryable.retryable :on => [FbGraph::InvalidRequest, OpenSSL::SSL::SSLError, HTTPClient::ConnectTimeoutError, HTTPClient::ReceiveTimeoutError], :times => 5, :sleep => 5 do
-                         sleep 1.5 unless Rails.env.test? # facebook apparently limits api calls to 600 calls every 600s
+                         sleep 3 unless Rails.env.test? # facebook apparently limits api calls to 600 calls every 600s
                          f.fetch
                        end
                      end
