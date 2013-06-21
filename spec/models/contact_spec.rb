@@ -106,6 +106,32 @@ describe Contact do
       contact.tasks.reload.should include(task, shared_task)
       shared_task.contacts.should match_array [contact]
     end
+
+    it "should not duplicate referrals" do
+      referrer = create(:contact)
+      loser_contact.referrals_to_me << referrer
+      contact.referrals_to_me << referrer
+
+      contact.merge(loser_contact)
+
+      contact.referrals_to_me.length.should == 1
+    end
+
+    it "should not remove the facebook account of a person on the merged contact" do
+      loser_person = create(:person)
+      loser_contact.people << loser_person
+      fb = create(:facebook_account, person: loser_person)
+
+      winner_person = create(:person, first_name: loser_person.first_name, last_name: loser_person.last_name)
+      contact.people << winner_person
+
+      contact.merge(loser_contact)
+
+      contact.people.reload.length.should == 1
+
+      contact.people.first.facebook_accounts.should == [fb]
+    end
+
   end
 
 end

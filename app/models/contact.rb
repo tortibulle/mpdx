@@ -185,15 +185,11 @@ class Contact < ActiveRecord::Base
         end
       end
 
-      merge_people
-
       other.contact_donor_accounts.each do |other_contact_donor_account|
         unless donor_accounts.collect(&:account_number).include?(other_contact_donor_account.donor_account.account_number)
           other_contact_donor_account.update_column(:contact_id, id)
         end
       end
-
-      merge_donor_accounts
 
       other.activity_contacts.each do |other_activity_contact|
         unless activities.include?(other_activity_contact.activity)
@@ -209,7 +205,10 @@ class Contact < ActiveRecord::Base
 
       merge_addresses
 
-      ContactReferral.where(referred_to_id: other.id).update_all(referred_to_id: id)
+      ContactReferral.where(referred_to_id: other.id).each do |contact_referral|
+        contact_referral.update_column(:referred_to_id, id) unless contact_referrals_to_me.detect {|crtm| crtm.referred_by_id == contact_referral.referred_by_id }
+      end
+
       ContactReferral.where(referred_by_id: other.id).update_all(referred_by_id: id)
 
       # Copy fields over updating any field that's blank on the winner
@@ -235,6 +234,10 @@ class Contact < ActiveRecord::Base
        other.reload
        other.destroy
     end
+
+    reload
+    merge_people
+    merge_donor_accounts
   end
 
   def self.pledge_frequencies
@@ -266,13 +269,18 @@ class Contact < ActiveRecord::Base
 
   def merge_people
     # Merge people that have the same name
+    merged_people = []
+
     people.reload.each do |person|
-      if other_person = people.detect { |p| p.first_name == person.first_name &&
-                                            p.last_name == person.last_name &&
-                                            p.id != person.id }
-        person.merge(other_person)
-        merge_people
-        return
+      next if merged_people.include?(person)
+
+      if other_people = people.find_all { |p| p.first_name == person.first_name &&
+                                              p.last_name == person.last_name &&
+                                              p.id != person.id }
+        other_people.each do |other_person|
+          person.merge(other_person)
+          merged_people << other_person
+        end
       end
     end
     people.reload
