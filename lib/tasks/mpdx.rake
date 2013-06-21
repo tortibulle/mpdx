@@ -11,7 +11,8 @@ namespace :mpdx do
   end
 
   task merge_contacts: :environment do
-    AccountList.where("id > 124").find_each do |al|
+    AccountList.where("id > 125").find_each do |al|
+      puts al.id
       al.merge_contacts
     end
   end
