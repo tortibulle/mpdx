@@ -128,7 +128,7 @@ class Person < ActiveRecord::Base
     hash.each do |_, attributes|
       if attributes['id']
         fa = facebook_accounts.find(attributes['id'])
-        if attributes['_destroy'] == '1' || attributes['remote_id'].blank?
+        if attributes['_destroy'] == '1'
           fa.destroy
         else
           fa.update_attributes(attributes.except('id', '_destroy'))
