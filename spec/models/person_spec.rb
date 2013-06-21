@@ -89,10 +89,10 @@ describe Person do
     it "should move loser's facebook over" do
       @winner = create(:person)
       @loser = create(:person)
-      create(:facebook_account, person: @loser)
+      fb = create(:facebook_account, person: @loser)
 
       @winner.merge(@loser)
-      @winner.facebook_accounts.should_not be_empty
+      @winner.facebook_accounts.should == [fb]
     end
 
     it "should move loser's twitter over" do
