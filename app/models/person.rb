@@ -240,7 +240,7 @@ class Person < ActiveRecord::Base
                                               'sign_in_count'), without_protection: true)
     person.email_addresses.each { |e| new_person.email = e.email }
     person.phone_numbers.each { |pn| new_person.phone_number = pn.attributes.slice(:number, :country_code, :location) }
-    new_person.save!
+    new_person.save(validate: false)
     new_person
   end
 
