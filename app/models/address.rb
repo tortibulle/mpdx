@@ -106,10 +106,12 @@ class Address < ActiveRecord::Base
   end
 
   def find_master_address
-    master_address = MasterAddress.where(attributes_for_master_address).first
+    master_address = MasterAddress.where(attributes_for_master_address.slice(:street, :city, :state, :country, :postal_code)).first
 
     # See if another address in the database matches this one and has a master address
-    where_clause = attributes_for_master_address.collect {|k, v| "lower(#{k}) = :#{k}" }.join(' AND ')
+    where_clause = attributes_for_master_address.symbolize_keys
+                                                .slice(:street, :city, :state, :country, :postal_code)
+                                                .collect {|k, v| "lower(#{k}) = :#{k}" }.join(' AND ')
 
     master_address ||= Address.where(where_clause, attributes_for_master_address)
                               .where("master_address_id is not null")
