@@ -83,11 +83,17 @@ Mpdx::Application.routes.draw do
     resources :organization_accounts
   end
 
-  get "home/index"
-  get "home/care"
+  resource :home, only: [:index], controller: :home do
+    get "index"
+    get "connect"
+    get "care"
+    get "cultivate"
+    get "progress"
+    get "change_account_list"
+    get "download_data_check"
+  end
+
   get "privacy" => "home#privacy"
-  get "home/change_account_list"
-  get "home/download_data_check"
   get "login" => "home#login"
 
   devise_for :users

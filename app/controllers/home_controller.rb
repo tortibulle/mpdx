@@ -3,8 +3,9 @@ class HomeController < ApplicationController
 
   def index
     @page_title = _('Dashboard')
+  end
 
-    @tasks = current_account_list.tasks.uncompleted.includes(:contacts).limit(6)
+  def connect
   end
 
   def care

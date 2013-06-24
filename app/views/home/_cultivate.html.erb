@@ -1,0 +1,16 @@
+<strong><%= _('Last Prayer letter sent:') %></strong>
+<% current_account_list.tasks.completed.of_type('Newsletter').first.tap do |newsletter| %>
+  <% if newsletter %>
+    <%= l(newsletter.completed_at) %>
+  <% else %>
+    <%= _('Never') %>
+  <% end %>
+<% end %>
+
+<%#Contacts%>
+<%#-Never Asked to Call for decision%>
+
+<%#Referrals%>
+<%#-Never Asked to Call for decision%>
+
+<%#Pledge Report%>

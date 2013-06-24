@@ -1,0 +1,16 @@
+<% current_account_list.tasks.uncompleted.includes(:contacts).limit(6).tap do |tasks| %>
+  <% if tasks[0] %>
+    <table class="list tasklist">
+      <% tasks[0..4].each do |task| %>
+        <%= render 'tasks/task', task: task %>
+      <% end %>
+    </table>
+  <% else %>
+    <%= _("Good news! You don't have any pending tasks.") %>
+  <% end %>
+  <% if tasks.length > 5 %>
+    <div class="seemore">
+      <%= link_to(_('See All'), tasks_path) %>
+    </div>
+  <% end %>
+<% end %>

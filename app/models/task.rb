@@ -2,6 +2,10 @@ class Task < Activity
 
   before_validation :update_completed_at
 
+  scope :of_type, ->(activity_type) { where(activity_type: activity_type) }
+  scope :with_result, ->(result) { where(result: result) }
+  scope :completed_between, -> (start_date, end_date) { where("completed_at BETWEEN ? and ?", start_date, end_date) }
+
   assignable_values_for :activity_type, :allow_blank => true do
     [_('Call'), _('Appointment'), _('Email'), _('Text Message'), _('Facebook Message'),
      _('Letter'), _('Newsletter'), _('Pre Call Letter'), _('Reminder Letter'),
