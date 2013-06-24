@@ -86,7 +86,7 @@ class Address < ActiveRecord::Base
   def update_or_create_master_address
     new_master_address_match = find_master_address
 
-    unless self.master_address == new_master_address_match
+    if self.master_address.nil? || self.master_address != new_master_address_match
       unless new_master_address_match
         new_master_address_match = MasterAddress.create(attributes_for_master_address)
       end
