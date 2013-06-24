@@ -1,5 +1,5 @@
-<% start_date = 1.week.ago.beginning_of_week(:sunday) %>
-<% end_date = 1.week.ago.end_of_week(:sunday) %>
+<% start_date = 1.week.ago.beginning_of_week %>
+<% end_date = 1.week.ago.end_of_week %>
 <h2><%= _('Week of %{date1} to %{date2}') % {date1: l(start_date.to_date), date2: l(end_date.to_date)} %></h2>
 <strong><%#= _('Support Raised:') %></strong>
 <%#= number_to_current_currency(current_account_list.total_pledges) %>
