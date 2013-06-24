@@ -6,7 +6,7 @@ class CreateMasterAddresses < ActiveRecord::Migration
       t.string :state
       t.string :country
       t.string :postal_code
-      t.boolean :verified, :boolean, default: false, null: false
+      t.boolean :verified, default: false, null: false
       t.text :smarty_response
 
       t.timestamps
