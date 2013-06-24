@@ -129,9 +129,9 @@ class Address < ActiveRecord::Base
         attributes_for_master_address[:state] = ss_address['state_abbreviation'].downcase
         attributes_for_master_address[:country] = 'united states'
         attributes_for_master_address[:verified] = true
-
         master_address = MasterAddress.where(attributes_for_master_address).first
       end
+      attributes_for_master_address[:smarty_response] = results
     end
 
 

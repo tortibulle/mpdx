@@ -257,10 +257,10 @@ ActiveRecord::Schema.define(:version => 20130620172556) do
 
   create_table "designation_accounts", :force => true do |t|
     t.string   "designation_number"
-    t.datetime "created_at",                                       :null => false
-    t.datetime "updated_at",                                       :null => false
+    t.datetime "created_at",                                        :null => false
+    t.datetime "updated_at",                                        :null => false
     t.integer  "organization_id"
-    t.decimal  "balance",            :precision => 8, :scale => 2
+    t.decimal  "balance",            :precision => 19, :scale => 2
     t.datetime "balance_updated_at"
     t.string   "name"
     t.string   "staff_account_id"
@@ -280,13 +280,13 @@ ActiveRecord::Schema.define(:version => 20130620172556) do
 
   create_table "designation_profiles", :force => true do |t|
     t.string   "remote_id"
-    t.integer  "user_id",                                          :null => false
-    t.integer  "organization_id",                                  :null => false
+    t.integer  "user_id",                                           :null => false
+    t.integer  "organization_id",                                   :null => false
     t.string   "name"
-    t.datetime "created_at",                                       :null => false
-    t.datetime "updated_at",                                       :null => false
+    t.datetime "created_at",                                        :null => false
+    t.datetime "updated_at",                                        :null => false
     t.string   "code"
-    t.decimal  "balance",            :precision => 8, :scale => 2
+    t.decimal  "balance",            :precision => 19, :scale => 2
     t.datetime "balance_updated_at"
     t.integer  "account_list_id"
   end
@@ -418,10 +418,11 @@ ActiveRecord::Schema.define(:version => 20130620172556) do
     t.string   "state"
     t.string   "country"
     t.string   "postal_code"
-    t.boolean  "verified",    :default => false, :null => false
-    t.boolean  "boolean",     :default => false, :null => false
-    t.datetime "created_at",                     :null => false
-    t.datetime "updated_at",                     :null => false
+    t.boolean  "verified",        :default => false, :null => false
+    t.boolean  "boolean",         :default => false, :null => false
+    t.text     "smarty_response"
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
   end
 
   add_index "master_addresses", ["street", "city", "state", "country", "postal_code"], :name => "all_fields"
@@ -732,7 +733,7 @@ ActiveRecord::Schema.define(:version => 20130620172556) do
     t.datetime "created_at"
   end
 
+  add_index "versions", ["item_type", "item_id", "related_object_type", "related_object_id", "created_at"], :name => "related_object_index"
   add_index "versions", ["item_type", "item_id"], :name => "index_versions_on_item_type_and_item_id"
-  add_index "versions", ["item_type", "related_object_type", "related_object_id", "created_at"], :name => "related_object_index"
 
 end
