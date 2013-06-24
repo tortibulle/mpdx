@@ -41,27 +41,85 @@
                             .count %>
   </li>
   <li>
-    <%= _('Attempted:') %> 
+    <%= _('Set up:') %> 
     <%= current_account_list.tasks.of_type('Appointment')
-                            .with_result('Attempted')
-                            .completed_between(start_date, end_date)
+                            .uncompleted
+                            .created_between(start_date, end_date)
                             .count %>
 
   </li>
+</ul>
+
+<strong><%= _('Emails:') %></strong>
+<ul>
+  <li>
+    <%= _('Sent:') %> 
+    <%= current_account_list.tasks.of_type('Email')
+                            .with_result('Done')
+                            .completed_between(start_date, end_date)
+                            .count %>
+  </li>
   <li>
     <%= _('Received:') %> 
-    <%= current_account_list.tasks.of_type('Appointment')
+    <%= current_account_list.tasks.of_type('Email')
                             .with_result('Received')
                             .completed_between(start_date, end_date)
                             .count %>
   </li>
 </ul>
-<%#Appointments - completed, set up, group mtg%>
 
-<%#Emails - sent, received%>
+<strong><%= _('Facebook Message:') %></strong>
+<ul>
+  <li>
+    <%= _('Sent:') %> 
+    <%= current_account_list.tasks.of_type('Facebook Message')
+                            .with_result('Done')
+                            .completed_between(start_date, end_date)
+                            .count %>
+  </li>
+  <li>
+    <%= _('Received:') %> 
+    <%= current_account_list.tasks.of_type('Facebook Message')
+                            .with_result('Received')
+                            .completed_between(start_date, end_date)
+                            .count %>
+  </li>
+</ul>
 
-<%#FB MSG - sent, received%>
+<strong><%= _('Snail Mail:') %></strong>
 
-<%#Hours on electronic contacts%>
+<ul>
+  <li>
+    <%= _('Pre-call Letters:') %> 
+    <%= current_account_list.tasks.of_type('Pre Call Letter')
+                            .with_result('Done')
+                            .completed_between(start_date, end_date)
+                            .count %>
+  </li>
+  <li>
+    <%= _('Support Letters:') %> 
+    <%= current_account_list.tasks.of_type('Support Letter')
+                            .with_result('Done')
+                            .completed_between(start_date, end_date)
+                            .count %>
 
-<%#Snail Mail - pre-call letters, support letters, thank you, reminders.%>
+  </li>
+  <li>
+    <%= _('Thank you notes:') %> 
+    <%= current_account_list.tasks.of_type('Thank')
+                            .with_result('Done')
+                            .completed_between(start_date, end_date)
+                            .count %>
+
+  </li>
+  <li>
+    <%= _('Reminder Letters:') %> 
+    <%= current_account_list.tasks.of_type('Reminder Letter')
+                            .with_result('Done')
+                            .completed_between(start_date, end_date)
+                            .count %>
+
+  </li>
+
+</ul>
+

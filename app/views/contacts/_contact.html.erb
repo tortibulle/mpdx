@@ -10,7 +10,7 @@
           <%== contact.people.collect do |person|
             link_to(exhibit(person, self), person_path(person)) +
               (person.primary_phone_number ? " - #{exhibit(person.primary_phone_number, self)}" : '')
-          end.join(', ') %>
+          end.join('<br />') %>
         </div>
         <span class="address"><%= exhibit(contact.primary_address, self).to_html if contact.primary_address %></span>
         <div class="tags">
