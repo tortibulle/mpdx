@@ -8,7 +8,14 @@
       <div class="key">
         <span class="name"><%= link_to(contact_exhibit, contact_path(contact), data: {name: contact_exhibit.to_s}) %>
         <% if contact.send_newsletter.present? %>
-          <%= image_tag('email.png', style: 'width:10px') %>
+          <i class="icon-envelope" title="<%= _(contact.send_newsletter) %>"></i>
+        <% end %>
+        <% if contact.status == 'Partner - Special' %>
+          <i class="icon-usd" title="<%= _('Partner - Special') %>"></i>
+        <% end %>
+        <% if contact.status == 'Partner - Financial' %>
+          <i class="icon-<%= current_currency.downcase %>" title="<%= _('Partner - Financial') %>"></i>
+          <i class="icon-<%= current_currency.downcase %>" title="<%= _('Partner - Financial') %>"></i>
         <% end %>
         </span>
         <div class="people">
