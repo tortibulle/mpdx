@@ -19,6 +19,7 @@
             </td>
             <td class="connections">
               <%= render 'network_connections', provider: provider %>
+              <%= _('MPDX does not currently import any data from this source, but it will soon! Connect your account now to be ready for when it does') unless %w[facebook relay key].include?(provider) %>
             </td>
           </tr>
         </table>
