@@ -9,5 +9,14 @@ class ActivityComment < ActiveRecord::Base
 
   validates :body, presence: true
 
-  # attr_accessible :body, :person_id
+  before_create :ensure_person
+
+  private
+
+  def ensure_person
+    unless person_id
+      self.person = Thread.current[:user]
+    end
+  end
+
 end

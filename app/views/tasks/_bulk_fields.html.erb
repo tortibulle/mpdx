@@ -38,3 +38,11 @@
   <%= f.text_field :tag_list %>
 </div>
 
+<div class="field">
+
+  <% comment = task.activity_comments.build %>
+  <%= f.fields_for :activity_comments, [comment] do |builder| %>
+    <%= builder.label :body, _('Add Comment') %>
+    <%= builder.text_area :body, rows: 3 %>
+  <% end %>
+</div>
