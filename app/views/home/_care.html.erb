@@ -27,46 +27,65 @@
     <% end %>
   </ul>
 <% end %>
-
-<% no_call = current_account_list.no_activity_since(6.months.ago, current_account_list.top_50_percent, 'Call') %>
-<% if no_call.present? %>
-  <h3><%= _(' It has been more than 6 months since you have called these important financial partners.') %></h3>
-  <table class="list top_50_no_call">
-    <% no_call.collect {|c| exhibit(c, self)}.sort_by(&:to_s).each do |contact| %>
-      <tr>
-        <td>
-          <strong><%= link_to(contact, contact) %></strong>:
-        </td>
-        <% contact.people[0..1].each do |person| %>
-          <td>
-            <strong><%= person.first_name %></strong>:
-            <% if person.primary_phone_number %> - <%= exhibit(person.primary_phone_number) %> <% end %>
-            <% if person.primary_email_address %> - <%= mail_to(person.primary_email_address) %> <% end %>
-          </td>
+<div>
+  <div style="float:left;width:48%">
+    <% no_call = current_account_list.no_activity_since(6.months.ago, current_account_list.top_50_percent, 'Call') %>
+    <% if no_call.present? %>
+      <h3><%= _(' It has been more than 6 months since you have called these important financial partners.') %></h3>
+      <table class="list top_50_no_call socstatus">
+        <% no_call.collect {|c| exhibit(c, self)}.sort_by(&:to_s).each do |contact| %>
+          <tr>
+            <td>
+              <%= link_to(contact, contact) %>
+            </td>
+            <td><%= link_to(_('Add Task'), '#', class: "add_task", data: {contact_id: contact.id, activity_type: 'Call'}) %></td>
+          </tr>
         <% end %>
-      </tr>
+      </table>
     <% end %>
-  </table>
-<% end %>
-
-<% no_thank = current_account_list.no_activity_since(1.year.ago, current_account_list.bottom_50_percent, 'Thank') %>
-<% if no_thank.present? %>
-  <h3><%= _('It has been more than a year since you have thanked these important financial partners.') %></h3>
-  <table class="list top_50_no_call">
-    <% no_thank.collect {|c| exhibit(c, self)}.sort_by(&:to_s).each do |contact| %>
-      <tr>
-        <td nowrap="nowrap">
-          <strong><%= link_to(contact, contact) %></strong>
-        </td>
-        <% contact.people[0..1].each do |person| %>
-          <td>
-            <strong><%= person.first_name %></strong>:
-            <% if person.primary_phone_number %> - <%= exhibit(person.primary_phone_number) %> <% end %>
-            <% if person.primary_email_address %> - <%= mail_to(person.primary_email_address) %> <% end %>
-          </td>
+  </div>
+  <div style="float:left;width:48%">
+    <% no_thank = current_account_list.no_activity_since(1.year.ago, current_account_list.bottom_50_percent, 'Thank') %>
+    <% if no_thank.present? %>
+      <h3><%= _('It has been more than a year since you have thanked these important financial partners.') %></h3>
+      <table class="list top_50_no_call socstatus">
+        <% no_thank.collect {|c| exhibit(c, self)}.sort_by(&:to_s).each do |contact| %>
+          <tr>
+            <td nowrap="nowrap">
+              <%= link_to(contact, contact) %>
+              &nbsp;&nbsp;
+            </td>
+            <td>
+              <%= link_to(_('Add Task'), '#', class: "add_task", data: {contact_id: contact.id, activity_type: 'Thank'}) %>
+            </td>
+          </tr>
         <% end %>
-      </tr>
+      </table>
     <% end %>
-  </table>
-<% end %>
-
+  </div>
+</div>
+<div class="clr"></div>
+<br />
+<h3><%= _('Top Partners') %></h3>
+<div id="top5-mp">
+  <ul class="list socstatus">
+    <% current_account_list.top_partners.each do |contact| %>
+      <li>
+        <!-- <div class="profile_close"><%= link_to("Close", "Close", :class=> "corner_close") %></div> -->
+        <div class="profile_content">
+          <%== _('%{link} has given %{total} since %{since}') %
+                    {link: ('<span class="name">' + link_to(contact.name, contact, :class => "profile_name") + '</span>').html_safe,
+                     total: ('<span class="hl amt">' + number_to_current_currency(contact.total_donations) + '</span>').html_safe,
+                     since: ('<span class="hl date">' + (contact.first_donation_date ? l(contact.first_donation_date) : '') + '</span>').html_safe } %>
+          <p class="desc"></p>
+          <!-- <ul class="network_tags list">
+            <li><%= link_to("Facebook","#", :class => "icos ico_fb") %></li>
+            <li><%= link_to("LinkedIn","#", :class => "icos ico_linkedin") %></li>
+            <li><%= link_to("Twitter","#", :class => "icos ico_twitter") %></li>
+            <li><%= link_to("Gmail","#", :class => "icos ico_google") %></li>
+          </ul> -->
+        </div>
+      </li>
+    <% end %>
+  </ul>
+</div>

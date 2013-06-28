@@ -518,12 +518,17 @@ div.name {font-size: 14px; margin-bottom: 4px;}
 /* ************************************************************** */
 
 .socstatus {
-  > li {
+  > li, td {
     border-bottom: 1px solid $gray_light;
     padding-bottom: 10px;
     margin-bottom: 10px;
   }
-  > li:last-child {
+  tr td {
+    padding-top: 10px;
+    margin-top: 10px;
+  }
+
+  > li:last-child, tr:last-child td  {
     padding-bottom: 0;
     border-bottom: none;
   }
