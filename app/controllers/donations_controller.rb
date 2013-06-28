@@ -1,26 +1,26 @@
 class DonationsController < ApplicationController
   def index
-    donor_account_ids = [params[:donor_account_id]]
     if params[:contact_id]
       @contact = current_account_list.contacts.where(id: params[:contact_id]).first
       if @contact.donor_account_ids.present?
-        donor_account_ids << @contact.donor_account_ids
+        @all_donations = current_account_list.donations.where(donor_account_id: donor_account_ids)
       else
         # If the contact isn't linked to a donor account, they're not going to have any donations.
         @all_donations = Donation.where('1 <> 1')
       end
+      @donations = @all_donations.page(params[:page])
+      setup_chart unless params[:page]
+    else
+      designation_account_ids = current_account_list.designation_accounts.pluck('designation_accounts.id')
+      if params[:start_date]
+        @start_date = Date.parse(params[:start_date])
+      else
+        @start_date = Date.today.beginning_of_month
+      end
+      @end_date = @start_date.end_of_month
+      @donations = current_account_list.donations.where(designation_account_id: designation_account_ids)
+                                                 .where("donation_date BETWEEN ? AND ?", @start_date, @end_date)
     end
-    unless @all_donations
-      donor_account_ids.compact!
-      #raise donor_account_ids.inspect
-      base = donor_account_ids.present? ? current_account_list.donations.where(donor_account_id: donor_account_ids) : Donation
-      designation_account_ids = params[:designation_account_id] ? 
-                                current_account_list.designation_accounts.where(id: params[:designation_account_id]).pluck('designation_accounts.id') :
-                                current_account_list.designation_accounts.pluck('designation_accounts.id')
-      @all_donations = base.where(designation_account_id: designation_account_ids)
-    end
-    @donations = @all_donations.page(params[:page])
-    setup_chart unless params[:page]
   end
 
   private
