@@ -56,6 +56,8 @@ class Contact < ActiveRecord::Base
      _('Research Abandoned'), _('Expired Referral')]
   end
 
+  IN_PROGRESS_STATUSES = ['Never Contacted', 'Ask in Future', 'Contact for Appointment', 'Appointment Scheduled', 'Call for Decision']
+
   def status=(val)
     # handle deprecated values
     case val

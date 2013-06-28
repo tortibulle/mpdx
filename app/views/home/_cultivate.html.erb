@@ -7,10 +7,14 @@
   <% end %>
 <% end %>
 
-<%#Contacts%>
-<%#-Never Asked to Call for decision%>
+<br /><br />
 
-<%#Referrals%>
-<%#-Never Asked to Call for decision%>
+<%= link_to(_('Contacts still in process:'), contacts_path(filters: {status: Contact::IN_PROGRESS_STATUSES})) %> 
+<%= current_account_list.contacts.where(status: Contact::IN_PROGRESS_STATUSES).count %>
+
+<br /><br />
+
+<%= link_to(_('Referrals on hand'), contacts_path(filters: {referrer: '*', status: Contact::IN_PROGRESS_STATUSES})) %>
+<%= current_account_list.contacts.joins(:contact_referrals_to_me).where(status: Contact::IN_PROGRESS_STATUSES).where("contact_referrals.id is NOT NULL").count %>
 
 <%#Pledge Report%>
