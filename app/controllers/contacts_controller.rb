@@ -2,6 +2,7 @@ class ContactsController < ApplicationController
   respond_to :html, :js
   before_filter :get_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals, :details]
   before_filter :setup_filters, only: [:index, :show]
+  before_filter :setup_view_options, only: [:index]
 
   def index
     if params[:filters] && params[:filters][:name].present?
@@ -24,8 +25,8 @@ class ContactsController < ApplicationController
         @contacts = @filtered_contacts.includes([{primary_person: :facebook_account},
                                                  :tags, :primary_address,
                                                  {people: :primary_phone_number}])
-                                      .page(page)
-                                      .per_page(per_page)
+                                      .page(params[:page] || 1)
+                                      .per_page(params[:per_page] || 25)
       end
 
       wants.csv do
@@ -53,12 +54,16 @@ class ContactsController < ApplicationController
   end
 
   def new
+    session[:contact_return_to] = request.referrer if request.referrer.present?
+
     @page_title = _('New Contact')
 
     @contact = current_account_list.contacts.new
   end
 
   def edit
+    session[:contact_return_to] = request.referrer if request.referrer.present?
+
     @page_title = _('Edit - %{contact}') % {contact: @contact.name}
   end
 
@@ -68,7 +73,7 @@ class ContactsController < ApplicationController
 
       respond_to do |format|
         if @contact.save
-          format.html { redirect_to @contact }
+          format.html { redirect_to(session[:contact_return_to] || @contact) }
         else
           format.html { render action: "new" }
         end
@@ -80,7 +85,7 @@ class ContactsController < ApplicationController
     respond_to do |format|
       begin
         if @contact.update_attributes(params[:contact])
-          format.html { redirect_to @contact }
+          format.html { redirect_to(session[:contact_return_to] || @contact) }
           format.js
         else
           format.html { render action: "edit" }
@@ -303,9 +308,33 @@ class ContactsController < ApplicationController
     end
 
     if filters_params.present?
-      ContactFilter.new(filters_params).filter(filtered_contacts)
+      filtered_contacts = ContactFilter.new(filters_params).filter(filtered_contacts)
     else
-      filtered_contacts.active
+      filtered_contacts = filtered_contacts.active
+    end
+    filtered_contacts
+  end
+
+  def setup_view_options
+    current_user.contacts_view_options ||= {}
+    params.slice(:per_page, :page).map {|k,v| params[k] = v.to_i}
+    if params[:per_page].present? || params[:page].present?
+      view_options = current_user.contacts_view_options[current_account_list.id] || {}
+      if params[:per_page] && view_options[:per_page] != params[:per_page]
+        view_options[:page] = 1
+      else
+        view_options[:page] = params[:page] if params[:page]
+      end
+      view_options[:per_page] = params[:per_page]
+
+      current_user.contacts_view_options[current_account_list.id] = view_options
+      current_user.save
+    end
+
+    if current_user.contacts_view_options.present? && current_user.contacts_view_options[current_account_list.id].present?
+      view_options = current_user.contacts_view_options[current_account_list.id]
+      params[:per_page] = view_options[:per_page]
+      params[:page] = view_options[:page]
     end
   end
 

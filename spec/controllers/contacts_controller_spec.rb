@@ -131,11 +131,11 @@ describe ContactsController do
     end
 
     describe "#destroy" do
-      it "should destroy a contact" do
+      it "should hide a contact" do
         contact # instantiate object
-        -> {
-          delete :destroy, id: contact.id
-        }.should change(Contact, :count).by(-1)
+        delete :destroy, id: contact.id
+
+        contact.reload.status.should == 'Never Ask'
       end
     end
 
