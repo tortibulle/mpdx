@@ -18,7 +18,7 @@ class ContactExhibit < DisplayCase::Exhibit
     people.collect {|p|
       person_exhibit = exhibit(p, @context)
       email = p.primary_email_address || p.email_addresses.first
-      [@context.link_to(p, @context.contact_person_path(to_model, p)), [person_exhibit.phone_number, person_exhibit.email].compact.map {|e| exhibit(e, @context)}.join(', ')].select(&:present?).join(': ')
+      [@context.link_to(person_exhibit, @context.contact_person_path(to_model, p)), [person_exhibit.phone_number, person_exhibit.email].compact.map {|e| exhibit(e, @context)}.join(', ')].select(&:present?).join(': ')
     }.join('<br />').html_safe
   end
 

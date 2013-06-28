@@ -34,7 +34,11 @@ class PersonExhibit < DisplayCase::Exhibit
   end
 
   def to_s
-    [first_name, last_name].compact.join(' ')
+    name = [first_name, last_name].compact.join(' ')
+    if deceased?
+      name = "<del>#{name}</del>".html_safe
+    end
+    name
   end
 
 end

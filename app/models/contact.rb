@@ -213,7 +213,7 @@ class Contact < ActiveRecord::Base
 
       # Copy fields over updating any field that's blank on the winner
       [:name, :pledge_amount, :status, :greeting, :website,
-       :pledge_frequency, :pledge_start_date, :deceased, :next_ask, :never_ask, :likely_to_give,
+       :pledge_frequency, :pledge_start_date, :next_ask, :never_ask, :likely_to_give,
        :church_name, :send_newsletter, :direct_deposit, :magazine, :last_activity, :last_appointment,
        :last_letter, :last_phone_call, :last_pre_call, :last_thank].each do |field|
          if send(field).blank? && other.send(field).present?
@@ -240,6 +240,14 @@ class Contact < ActiveRecord::Base
     reload
     merge_people
     merge_donor_accounts
+  end
+
+  def deceased
+    people.all?(&:deceased)
+  end
+
+  def deceased?
+    deceased
   end
 
   def self.pledge_frequencies

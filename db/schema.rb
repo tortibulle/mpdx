@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130620172556) do
+ActiveRecord::Schema.define(:version => 20130628201906) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -231,7 +231,6 @@ ActiveRecord::Schema.define(:version => 20130620172556) do
     t.string   "website",             :limit => 1000
     t.decimal  "pledge_frequency"
     t.date     "pledge_start_date"
-    t.boolean  "deceased",                                                           :default => false, :null => false
     t.date     "next_ask"
     t.boolean  "never_ask",                                                          :default => false, :null => false
     t.string   "likely_to_give"
@@ -428,9 +427,10 @@ ActiveRecord::Schema.define(:version => 20130620172556) do
     t.string   "state"
     t.string   "country"
     t.string   "postal_code"
-    t.datetime "created_at",                     :null => false
-    t.datetime "updated_at",                     :null => false
-    t.boolean  "verified",    :default => false, :null => false
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
+    t.boolean  "verified",        :default => false, :null => false
+    t.text     "smarty_response"
   end
 
   add_index "master_addresses", ["street", "city", "state", "country", "postal_code"], :name => "all_fields"
@@ -537,7 +537,7 @@ ActiveRecord::Schema.define(:version => 20130620172556) do
   add_index "organizations", ["query_ini_url"], :name => "index_organizations_on_query_ini_url", :unique => true
 
   create_table "people", :force => true do |t|
-    t.string   "first_name",                                      :null => false
+    t.string   "first_name",                                          :null => false
     t.string   "legal_first_name"
     t.string   "last_name"
     t.integer  "birthday_month"
@@ -556,12 +556,13 @@ ActiveRecord::Schema.define(:version => 20130620172556) do
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
-    t.datetime "created_at",                                      :null => false
-    t.datetime "updated_at",                                      :null => false
-    t.integer  "master_person_id",                                :null => false
+    t.datetime "created_at",                                          :null => false
+    t.datetime "updated_at",                                          :null => false
+    t.integer  "master_person_id",                                    :null => false
     t.string   "middle_name"
     t.string   "access_token",       :limit => 32
     t.string   "profession"
+    t.boolean  "deceased",                         :default => false, :null => false
   end
 
   add_index "people", ["access_token"], :name => "index_people_on_access_token", :unique => true

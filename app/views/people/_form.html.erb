@@ -46,6 +46,13 @@
         <%= builder.radio_button :gender, 'female' %> <%= builder.label :gender_female, t('g.Female') %>
       </div>
     </div>
+    
+    <div class="fieldset">
+      <div class="field radiocheck">
+        <%= builder.check_box :deceased %>
+        <%= builder.label :deceased, _('Deceased') %>
+      </div>
+    </div>
 
     <div class="field">
       <%= builder.label :birthday %>
