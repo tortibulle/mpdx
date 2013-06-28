@@ -17,7 +17,7 @@
 
       <div class="actions">
         <%= link_to(_('Add Referrals'), add_referrals_contact_path(contact), remote: true, :class=> "btn smallbtn add_referrals") %>
-        <%= link_to(_('Log Task'), new_task_path(contact_id: contact.id, completed: true), class: "btn smallbtn") %>
+        <%= link_to(_('Log Task'), new_task_path(contact_id: contact.id, completed: true), class: "btn smallbtn add_task", remote: true, data: {completed: true}) %>
         <%= link_to(_('Add Task'), new_task_path(contact_id: contact.id), class: "btn smallbtn add_task", data: {contact_id: contact.id}) %>
         <%= link_to(_('Edit'), edit_contact_path(contact), :class=> "btn smallbtn") %>
         <%#= link_to(_('Quick'), "", :class => "btn smallbtn quick")%>

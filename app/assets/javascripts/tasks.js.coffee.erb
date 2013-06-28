@@ -30,15 +30,18 @@ $ ->
 
   # new task button
   $(document).on 'click', '.add_task', ->
-    if $(this).attr('data-contact-id')
-      $('#modal_task_activity_contacts_attributes_0_contact_id').val($(this).attr('data-contact-id'))
+    if $(this).attr('data-complete') == 'true'
+      $('#edit_task_modal .form_wrapper').html('<img src="/assets/spinner.gif" />')
     else
-      $('#modal_task_activity_contacts_attributes_0_contact_id').val('')
+      if $(this).attr('data-contact-id')
+        $('#modal_task_activity_contacts_attributes_0_contact_id').val($(this).attr('data-contact-id'))
+      else
+        $('#modal_task_activity_contacts_attributes_0_contact_id').val('')
 
-    if $(this).attr('data-activity-type')
-      $('#modal_task_activity_type').val($(this).attr('data-activity-type'))
-    else
-      $('#modal_task_activity_type').val('Call')
+      if $(this).attr('data-activity-type')
+        $('#modal_task_activity_type').val($(this).attr('data-activity-type'))
+      else
+        $('#modal_task_activity_type').val('Call')
 
     $('#edit_task_modal').dialog
       resizable: true,

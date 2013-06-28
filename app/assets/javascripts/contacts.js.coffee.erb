@@ -128,7 +128,19 @@ $ ->
         false
 
       $(document).on 'click', '[data-behavior=add_task_to_list]', ->
-        $('#add_task_modal #add_task_contact_ids').val($('#selected_ids').val())
+        if $(this).attr('data-completed') == 'true'
+          $('#add_task_modal .form_wrapper').html('<img src="/assets/spinner.gif" />')
+          ids = $.mpdx.updateSelectedContactIds()
+
+          $.ajax {
+            url: '/tasks/new',
+            data: {add_task_contact_ids: ids, completed: true},
+            dataType: 'script',
+            type: 'GET'
+          }
+        else
+          $('#add_task_modal #add_task_contact_ids').val($('#selected_ids').val())
+
         $('#add_task_modal').dialog {
           width: 'auto',
           buttons: [
@@ -147,7 +159,6 @@ $ ->
             }
           ]
         }
-        $('#add_tag_name').focus()
         false
 
       $(document).on 'click', '[data-behavior=bulk_edit]', ->
