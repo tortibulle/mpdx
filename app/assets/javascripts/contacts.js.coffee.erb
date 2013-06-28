@@ -287,6 +287,25 @@ $ ->
         $('a.quick', $(this)).removeClass('on')
     }
 
+    $(document).on 'click', '[data-behavior=hide_contact]', ->
+      $(this).closest('tr').fadeOut('fast')
+
+    $(document).on 'click', '[data-behavior=bulk_hide_contact]', ->
+      ids = $.mpdx.updateSelectedContactIds()
+
+      # remove items
+      $(ids).each ->
+        $('#contact_' + this).fadeOut('fast')
+
+      $.ajax {
+        url: '/contacts/bulk_destroy',
+        data: {ids: ids},
+        dataType: 'script',
+        type: 'DELETE'
+        error: ->
+          alert(__('There was an error hiding your contacts'))
+      }
+
     <%#$(document).on 'focus', '[data-behavior*=social-field]', ->%>
       <%#wrapper = $(this).closest('[data-behavior*=field-wrapper]')%>
 
@@ -319,6 +338,7 @@ $.mpdx.updateSelectedContactIds = ->
   $('[name="contact_ids[]"]:checked').each ->
     ids.push($(this).val())
   $('#selected_ids').val(ids.join(','))
+  ids
 
 $.mpdx.loadTabData = (hash) ->
   switch hash

@@ -137,10 +137,21 @@ class ContactsController < ApplicationController
 
   def destroy
     @contact = current_account_list.contacts.find(params[:id])
-    @contact.destroy
+    @contact.hide
 
     respond_to do |format|
       format.html { redirect_to contacts_path }
+      format.js { render nothing: true }
+    end
+  end
+
+  def bulk_destroy
+    @contacts = current_account_list.contacts.find(params[:ids])
+    @contacts.map(&:hide)
+
+    respond_to do |format|
+      format.html { redirect_to contacts_path }
+      format.js { render nothing: true }
     end
   end
 

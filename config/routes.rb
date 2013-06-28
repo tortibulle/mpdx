@@ -55,6 +55,7 @@ Mpdx::Application.routes.draw do
     collection do
       get :social_search
       put :bulk_update
+      delete :bulk_destroy
       post :merge
       get  :find_duplicates
       put :not_duplicates
