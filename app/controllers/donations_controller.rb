@@ -3,7 +3,7 @@ class DonationsController < ApplicationController
     if params[:contact_id]
       @contact = current_account_list.contacts.where(id: params[:contact_id]).first
       if @contact.donor_account_ids.present?
-        @all_donations = current_account_list.donations.where(donor_account_id: donor_account_ids)
+        @all_donations = current_account_list.donations.where(donor_account_id: @contact.donor_account_ids)
       else
         # If the contact isn't linked to a donor account, they're not going to have any donations.
         @all_donations = Donation.where('1 <> 1')
