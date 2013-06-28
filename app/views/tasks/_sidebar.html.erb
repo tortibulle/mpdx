@@ -9,8 +9,8 @@
     <%= form_tag params.slice(:controller, :action), method: :get do %>
       <ul class="left_filters">
         <% if params[:action] == 'history' %>
-          <li>
-            <label><%= _('Date Range') %></label>
+          <li class="opened">
+            <label class="opened"><%= _('Date Range') %></label>
             <div class="collapse">
               <%= radio_button_tag 'filters[date_range]', 'last_week', filters_params[:date_range].blank? || filters_params[:date_range] == 'last_week' %> <%= _('Last Week') %><br />
               <%= radio_button_tag 'filters[date_range]', 'last_month', filters_params[:date_range] == 'last_month'  %> <%= _('Last 31 Days') %><br />
