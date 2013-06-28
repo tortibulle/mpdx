@@ -76,7 +76,7 @@ class ContactFilter
           filtered_contacts = filtered_contacts.where(send_newsletter: ['Email', 'Both'])
           filtered_contacts = filtered_contacts.joins(people: :email_addresses).includes(people: :email_addresses)
         else
-          filtered_contacts = filtered_contacts.where('send_newsletter is not null')
+          filtered_contacts = filtered_contacts.where("send_newsletter is not null AND send_newsletter <> ''")
         end
         filtered_contacts = filtered_contacts.uniq unless filtered_contacts.to_sql.include?('DISTINCT')
       end

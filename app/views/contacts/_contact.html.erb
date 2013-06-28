@@ -2,10 +2,15 @@
   <tr id="<%= dom_id(contact) %>" data-hook="contact">
     <td class="avatar">
       <%= link_to(image_tag(contact_exhibit.avatar, class: "avatar small"), contact_path(contact))%>
+
     </td>
     <td class="profile">
       <div class="key">
-        <span class="name"><%= link_to(contact_exhibit, contact_path(contact), data: {name: contact_exhibit.to_s}) %></span>
+        <span class="name"><%= link_to(contact_exhibit, contact_path(contact), data: {name: contact_exhibit.to_s}) %>
+        <% if contact.send_newsletter.present? %>
+          <%= image_tag('email.png', style: 'width:10px') %>
+        <% end %>
+        </span>
         <div class="people">
           <%== contact.people.collect do |person|
             link_to(exhibit(person, self), person_path(person)) +
