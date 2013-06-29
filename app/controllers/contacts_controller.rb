@@ -28,7 +28,7 @@ class ContactsController < ApplicationController
         if @view_options[:per_page] == 'All'
           @contacts = @contacts.page(1)
         else
-          @contacts = @contacts.page(@view_options[:page] ? @view_options[:page].to_i : 1).per_page(@view_options[:per_page] ? @view_options[:per_page].to_i : 25)
+          @contacts = @contacts.page(@view_options[:page].to_i > 0 ? @view_options[:page].to_i : 1).per_page(@view_options[:per_page].to_i > 0 ? @view_options[:per_page].to_i : 25)
         end
       end
 
