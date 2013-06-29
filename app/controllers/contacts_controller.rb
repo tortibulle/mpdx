@@ -25,11 +25,8 @@ class ContactsController < ApplicationController
         @contacts = @filtered_contacts.includes([{primary_person: :facebook_account},
                                                  :tags, :primary_address,
                                                  {people: :primary_phone_number}])
-        if @view_options[:per_page] == 'All'
-          @contacts = @contacts.page(1)
-        else
-          @contacts = @contacts.page(@view_options[:page].to_i > 0 ? @view_options[:page].to_i : 1).per_page(@view_options[:per_page].to_i > 0 ? @view_options[:per_page].to_i : 25)
-        end
+
+        @contacts = @contacts.page(@view_options[:page].to_i > 0 ? @view_options[:page].to_i : 1).per_page(@view_options[:per_page].to_i > 0 ? @view_options[:per_page].to_i : 25)
       end
 
       wants.csv do

@@ -2,5 +2,5 @@
   <%= page_entries_info objects %>
   <%= will_paginate(objects) if !@view_options[:per_page] || (@view_options[:per_page] && @view_options[:per_page] != 'All') %>
 </div>
-<div style="float:right"><%= _('Show:') %> <%= select_tag(:per_page, options_for_select(['25', '50', '100', [_('All'), 'All']], @view_options[:per_page])) %></div>
+<div style="float:right"><%= _('Show:') %> <%= select_tag(:per_page, options_for_select(['25', '50', '100', '1000'], @view_options[:per_page])) %></div>
 
