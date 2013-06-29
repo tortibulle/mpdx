@@ -1,8 +1,8 @@
 class ContactsController < ApplicationController
   respond_to :html, :js
   before_filter :get_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals, :details]
-  before_filter :setup_filters, only: [:index, :show]
   before_filter :setup_view_options, only: [:index]
+  before_filter :setup_filters, only: [:index, :show]
 
   def index
     if params[:filters] && params[:filters][:name].present?
@@ -25,8 +25,11 @@ class ContactsController < ApplicationController
         @contacts = @filtered_contacts.includes([{primary_person: :facebook_account},
                                                  :tags, :primary_address,
                                                  {people: :primary_phone_number}])
-                                      .page(params[:page] || 1)
-                                      .per_page(params[:per_page] || 25)
+        if @view_options[:per_page] == 'All'
+          @contacts = @contacts.page(1)
+        else
+          @contacts = @contacts.page(@view_options[:page] ? @view_options[:page].to_i : 1).per_page(@view_options[:per_page] ? @view_options[:per_page].to_i : 25)
+        end
       end
 
       wants.csv do
@@ -284,6 +287,7 @@ class ContactsController < ApplicationController
     current_user.contacts_filter ||= {}
     clear_filters = params.delete(:clear_filter)
     if filters_params.present?
+      @view_options[:page] = 1
       current_user.contacts_filter[current_account_list.id] = filters_params
       current_user.save
     elsif clear_filters == 'true'
@@ -317,10 +321,9 @@ class ContactsController < ApplicationController
 
   def setup_view_options
     current_user.contacts_view_options ||= {}
-    params.slice(:per_page, :page).map {|k,v| params[k] = v.to_i}
     if params[:per_page].present? || params[:page].present?
       view_options = current_user.contacts_view_options[current_account_list.id] || {}
-      if params[:per_page] && view_options[:per_page] != params[:per_page]
+      if params[:per_page] && view_options[:per_page].to_s != params[:per_page]
         view_options[:page] = 1
       else
         view_options[:page] = params[:page] if params[:page]
@@ -333,9 +336,8 @@ class ContactsController < ApplicationController
 
     if current_user.contacts_view_options.present? && current_user.contacts_view_options[current_account_list.id].present?
       view_options = current_user.contacts_view_options[current_account_list.id]
-      params[:per_page] = view_options[:per_page]
-      params[:page] = view_options[:page]
     end
+    @view_options = view_options || params.slice(:per_page, :page)
   end
 
 end

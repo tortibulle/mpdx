@@ -37,6 +37,13 @@ describe ContactsController do
         assigns(:contacts).should == [contact]
       end
 
+      it "doest the right thing when per_page is set to 'All'" do
+        24.times {create(:contact, account_list: user.account_lists.first)} # prior statements create 2 other contacts
+        get :index, per_page: 'All'
+        response.should be_success
+        assigns(:contacts).length.should == 26
+      end
+
       it "gets companies" do
         get :index, filter: 'companies'
         response.should be_success
