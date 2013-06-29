@@ -34,6 +34,7 @@ class TasksController < ApplicationController
                                        .page(page).per_page(per_page)
     filters = filters_params || {}
     filters[:date_range] ||= 'last_week'
+    @view_options = params.slice(:per_page, :page)
     @tasks = TaskFilter.new(filters).filter(@tasks)
 
   end
