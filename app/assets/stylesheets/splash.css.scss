@@ -1,3 +1,8 @@
+/* ...
+*= require_self
+*= require notices
+*/
+
 @font-face {
   font-family: 'NillandBlackRegular';
   src: font-url('splash/nilland-black-webfont.eot');
@@ -23,17 +28,23 @@
 
 
 html {font-family: Arial; line-height: 1.25em;}
-body {margin: 0; padding: 0; background: image-url("splash/bg_blue.jpg");}
+body {
+  margin: 0;
+  padding: 0;
+  background: image-url("splash/bg_blue.jpg");
+  font-size: .8em;
+  text-align: center;
+}
 .margin {margin: 0 auto;}
 .pagewidth {width: 482px;}
+.mwrap p {margin: 0;}
 header {background: image-url("splash/bottomshadow.png") 0 100% repeat-x, image-url("splash/bg_gray.jpg"); border-bottom: 1px solid #c2c2c2;}
-.headercontent {text-align: center; height: 210px;}
+.headercontent {height: 210px;}
 #logo {margin-top: 38px;}
 #main {
   font-family: 'NillandRegular', Arial; 
   border: 1px solid #cfcfcf; 
   box-shadow: 0 5px 12px rgba(0,0,0,.63), inset 0 0 21px rgba(0,0,0,.14); 
-  text-align: center; 
   background: #fafafa; 
   min-height: 90px; 
   position: relative; 
@@ -78,7 +89,7 @@ header {background: image-url("splash/bottomshadow.png") 0 100% repeat-x, image-
 .loginlink img {vertical-align: middle;}
 .loginlink.relay img {margin-top: -5px;}
 
-footer {text-align: center; font-size: .8em; margin-bottom: 30px; min-height: 60px;}
+footer {margin-bottom: 30px; min-height: 60px;}
 footer, footer a {color: #76a2b7;}
 
 @media screen and (min-width: 0px) and (max-width: 480px) {

@@ -3,6 +3,7 @@
 *= require typography
 *= require forms
 *= require layout
+*= require notices
 *= require ico
 *= require errors
 *= require adaptive

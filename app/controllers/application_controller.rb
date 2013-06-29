@@ -37,6 +37,7 @@ class ApplicationController < ActionController::Base
         when request.host =~ /mpdxs|key/
           redirect_to '/auth/key'
         else
+          flash[:timeout] = true
           redirect_to '/login'
         end
         return false

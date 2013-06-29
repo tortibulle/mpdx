@@ -10,6 +10,13 @@
 </head>
 
 <body>
+  <% if flash[:timeout] %>
+    <div class="mwrap">
+      <div class="inside notice">
+        <p><%= _('Your session has timed out. Please login again.') %></p>
+      </div>
+    </div>
+  <% end %>
 
   <header>
     <div class="margin pagewidth headercontent">

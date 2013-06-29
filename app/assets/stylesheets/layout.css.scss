@@ -731,69 +731,6 @@ tr.taskgroup {
 }
 
 /* ************************************************************** */
-#dismissable {
-  background: #F7E5C1;
-  padding: 0px;
-  border: 1px solid #ccc;
-  border-width: 0 1px 0 1px;
-  overflow: hidden;
-  border-bottom: 1px solid #ccc;
-  .item {
-    border-bottom: 1px dotted $gray;
-    padding: 10px;
-    background: #FFFCF5;
-  }
-  .item:hover {
-    box-shadow: 0 0 10px #999;
-    position: relative;
-    z-index: 100;
-    border-bottom: 1px solid #FFFCF5;
-  }
-  .item:last-child {
-    border: none;
-  }
-  .dismiss_item {
-    float: right;
-  }
-  .dismiss_content {
-    width: 90%;
-  }
-}
-
-.mwrap {
-  .inside {
-    border: 2px solid gray;
-    border-top: none;
-    padding: 10px;
-    background: $white;
-  }
-  .nohide {
-    border: 2px solid gray;
-    border-top: none;
-    padding: 10px;
-    background: $white;
-  }
-  .floating {
-    border-top:2px solid;
-  }
-  .notice {
-    border-color: green;
-    color: green;
-    background: #def8cf;
-  }
-  .info {
-    border-color: $blue;
-    color: $blue;
-    background: $blue_light;
-  }
-  .alert {
-    border-color: red;
-    color: red;
-    background: #f8cfcf;
-  }
-}
-
-/* ************************************************************** */
 
 .profiletop {
   h1 {font-weight: normal; margin-bottom: .25em;}
