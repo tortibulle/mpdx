@@ -144,6 +144,17 @@ describe ContactsController do
         xhr :put, :bulk_update, bulk_edit_contact_ids: '1', contact: {send_newsletter: ''}
         response.should be_success
       end
+
+      it "correctly updates the 'next ask' field" do
+        xhr :put, :bulk_update, {"bulk_edit_contact_ids"=>contact.id, "contact"=>{"next_ask(2i)"=>"3", "next_ask(3i)"=>"3", "next_ask(1i)"=>"2012"}}
+        contact.reload.next_ask.should == Date.parse('2012-03-03')
+      end
+      
+      it "ignores a partial 'next ask' value" do
+        xhr :put, :bulk_update, {"bulk_edit_contact_ids"=>contact.id, "contact"=>{"next_ask(3i)"=>"3", "next_ask(1i)"=>"2012"}}
+        contact.reload.next_ask.should == nil
+      end
+
     end
 
 
