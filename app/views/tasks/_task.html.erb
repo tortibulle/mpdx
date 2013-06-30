@@ -6,7 +6,7 @@
     </td>
     <td class="data">
       <div class="primary">
-        <span class="ico <%= task.starred? ? 'ico_fav' : 'ico_fav_off' %> fav">Fav</span>
+        <i class="<%= task.starred? ? 'icon-star' : 'icon-star-empty' %> icon-large fav"></i>
         <a class="comment_status" href=""><span id="comment_count_<%= task.id %>"><%= task.activity_comments.length  %></span></a>
         <div class="actions">
           <%= link_to(_('Edit'), edit_task_path(task), :class=> "ico ico_edit edit_task", data: {id: task.id}, remote: true) %>

@@ -1,14 +1,31 @@
+@import "elements";
+
 .ico {background: image-url("sprite.png") no-repeat 50% 0; width: 16px; height: 16px; display: inline-block; overflow: hidden; text-indent: -100000px;}
 .icos {background: image-url("sprite_social.png") no-repeat 50% 0; width: 16px; height: 16px; display: inline-block; overflow: hidden; text-indent: -100000px;}
 
+.fav {
+  cursor: pointer;
+  position: relative;
+  top: -1px;
+}
+.fav.icon-star {color: #e3cf7a;}
+
 .ico_fav {background-position: 50% -610px;}
 .ico_fav_off {background-position: 50% -679px;}
-.ico_edit {margin-left: 4px; background-position: 50% -543px;}
-.ico_trash {margin-left: 4px; background-position: 0 0; background-image: image-url("trash-gray.png") }
-.ico_trash:hover {background-position: 0 0; background-image: image-url("trash-blue.png") }
+.ico_trash, .ico_comment, .ico_edit {
+  background: none;
+  color: $gray_dark;
+  font: 0 FontAwesome;
+  margin-left: 4px;
+  text-indent: 0;
+  &:before {font-size: 16px;}
+}
+.ico_trash:before {content: "\f014";}
+.ico_comment:before {content: "\f086";}
+.ico_edit:before {content: "\f040";}
+.ico_trash:hover .ico_trash:hover {color: $links;}
 
 .ico_individual {background-position: 50% -467px;}
-.ico_comment {background-position: 0 0; background-image: image-url("comments.png"); }
 .ico_close {background-position: 0 0; background-image: image-url("close.png"); }
 
 .ico_google {background-position: 0 0; }

@@ -701,13 +701,12 @@ tr.taskgroup {
 /* ************************************************************** */
 
 .comments {
- background: $blue_comments;
  width: 400px;
  font-size: 11px;
  margin-bottom: 0px;
  border-radius: 5px;
-
- header {background: image-url("comment_head.png") no-repeat $white -1px 0; height: 7px;}
+ > * {background: $blue_comments;}
+ header {background: image-url("comment_head.png") no-repeat -1px 0; height: 7px;}
  .comment {padding: 5px 10px; border-bottom: 1px dotted $white; position: relative;}
  .comment:hover .corner_close {display: block;}
  .comment:last-child {border-bottom: none;}

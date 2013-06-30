@@ -181,12 +181,15 @@ p:last-child {margin-bottom: 0;}
 }
 
 .comment_status {
-  background: image-url("comments.png") no-repeat 0 -2px;
-  padding-left: 18px;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.5em;
-  height: 1.5em;
   margin-left: 4px;
+  :before {
+    color: $gray_dark;
+    font: 15px FontAwesome;
+    content: "\f0e6";
+    padding-right: 4px;
+  }
 }
 
 .translation_missing {

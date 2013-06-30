@@ -10,7 +10,7 @@
 </head>
 
 <body>
-  <% if flash[:timeout] %>
+  <% if flash[:timeout] || true %>
     <div class="mwrap">
       <div class="inside notice">
         <p><%= _('Your session has timed out. Please login again.') %></p>
