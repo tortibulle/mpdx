@@ -3,7 +3,7 @@ class ContactSerializer < ActiveModel::Serializer
 
   cached
   delegate :cache_key, to: :object
-  
+
   embed :ids, include: true
 
   ATTRIBUTES = [:id, :name, :pledge_amount, :pledge_frequency, :pledge_start_date, :status, :deceased,
@@ -40,7 +40,8 @@ class ContactSerializer < ActiveModel::Serializer
 
   INCLUDES.each do |relationship|
     define_method(relationship) do
-      add_since(object.send(relationship))
+      #add_since(object.send(relationship))
+      object.send(relationship)
     end
   end
 end
