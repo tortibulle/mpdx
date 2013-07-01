@@ -113,7 +113,7 @@ class TntImport
       if referred_by = @tnt_contacts.detect {|tnt_id, c| c.name == row['ReferredBy'] ||
                                                          c.full_name == row['ReferredBy'] ||
                                                          c.greeting == row['ReferredBy'] }
-        contact = @tnt_contacts[referred_by[0]]
+        contact = @tnt_contacts[row['id']]
         contact.referrals_to_me << referred_by[1] unless contact.referrals_to_me.include?(referred_by[1])
       end
     end
