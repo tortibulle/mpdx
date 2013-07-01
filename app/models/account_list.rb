@@ -186,13 +186,15 @@ class AccountList < ActiveRecord::Base
     AccountList.joins(:organization_accounts)
                .where("locked_at is null").order('last_download asc')
                .each do |al|
-      al.users.collect(&:organization_accounts).flatten.uniq.collect(&:queue_import_data)
-      al.async(:send_account_notifications)
+      al.async(:import_data)
     end
   end
 
-  def self.queue_send_account_notifications
-    AccountList.find_each { |al| al.async(:send_account_notifications) }
+  private
+
+  def import_data
+    users.collect(&:organization_accounts).flatten.uniq.map(&:import_all_data)
+    send_account_notifications
   end
 
   def self.find_or_create_from_profile(profile, org_account)

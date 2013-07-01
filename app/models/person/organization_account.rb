@@ -49,7 +49,6 @@ class Person::OrganizationAccount < ActiveRecord::Base
     DesignationProfile.where(organization_id: organization_id, user_id: person_id)
   end
 
-  private
   def import_all_data
     return if locked_at
     update_column(:downloading, true)
@@ -74,6 +73,8 @@ class Person::OrganizationAccount < ActiveRecord::Base
       update_column(:locked_at, nil)
     end
   end
+
+  private
 
   def set_valid_credentials
     self.valid_credentials = true
