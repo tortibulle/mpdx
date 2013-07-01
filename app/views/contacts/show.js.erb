@@ -10,4 +10,5 @@ switch (window.location.hash) {
   case '#stream-tab':
     $.mpdx.loadSocialStream();
 }
+document.title = '<%= @page_title %> - MPDX'
 History.pushState({contact_id: <%= @contact.id %>}, "<%== sanitize @contact.name %>", '<%= contact_path(@contact) %>' + document.location.hash)
