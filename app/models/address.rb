@@ -124,21 +124,25 @@ class Address < ActiveRecord::Base
        (attributes_for_master_address[:country].to_s.downcase == 'united states' ||
         (attributes_for_master_address[:country].blank? && US_STATES.flatten.map(&:upcase).include?(attributes_for_master_address[:state].to_s.upcase)))
 
-      results = SmartyStreets.get(attributes_for_master_address)
-      if results.length == 1
-        ss_address = results.first['components']
-        attributes_for_master_address[:street] = results.first['delivery_line_1'].downcase
-        attributes_for_master_address[:city] = ss_address['city_name'].downcase
-        attributes_for_master_address[:state] = ss_address['state_abbreviation'].downcase
-        attributes_for_master_address[:postal_code] = [ss_address['zipcode'], ss_address['plus4_code']].compact.join('-').downcase
-        attributes_for_master_address[:state] = ss_address['state_abbreviation'].downcase
-        attributes_for_master_address[:country] = 'united states'
-        attributes_for_master_address[:verified] = true
-        master_address = MasterAddress.where(attributes_for_master_address.symbolize_keys
-                                                                          .slice(:street, :city, :state, :country, :postal_code))
-                                      .first
+      begin
+        results = SmartyStreets.get(attributes_for_master_address)
+        if results.length == 1
+          ss_address = results.first['components']
+          attributes_for_master_address[:street] = results.first['delivery_line_1'].downcase
+          attributes_for_master_address[:city] = ss_address['city_name'].downcase
+          attributes_for_master_address[:state] = ss_address['state_abbreviation'].downcase
+          attributes_for_master_address[:postal_code] = [ss_address['zipcode'], ss_address['plus4_code']].compact.join('-').downcase
+          attributes_for_master_address[:state] = ss_address['state_abbreviation'].downcase
+          attributes_for_master_address[:country] = 'united states'
+          attributes_for_master_address[:verified] = true
+          master_address = MasterAddress.where(attributes_for_master_address.symbolize_keys
+                                                                            .slice(:street, :city, :state, :country, :postal_code))
+                                        .first
+        end
+        attributes_for_master_address[:smarty_response] = results
+      rescue RestClient::RequestFailed
+        # Don't blow up if smarty didn't like the request
       end
-      attributes_for_master_address[:smarty_response] = results
     end
 
 
