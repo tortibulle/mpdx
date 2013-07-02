@@ -22,6 +22,7 @@ gem 'acts-as-taggable-on', '~> 2.3.3'
 gem 'airbrake'#, '~> 3.1.6'
 gem 'assignable_values', '~> 0.5.3'
 gem 'carrierwave', git: 'git://github.com/jnicklas/carrierwave.git' # tracking master because of fixes made since last gem version
+gem 'cloudinary'
 gem 'country_select', git: 'git://github.com/26am/country_select.git' # My fork has the meta data for the fancy select
 gem 'dalli'
 gem 'deadlock_retry', '~> 1.2.0'
