@@ -9,7 +9,7 @@
 
 
 <script type="text/javascript" charset="utf-8">
-  var months_to_dates = <%== Hash[12.downto(0).collect {|i| [i.months.ago.to_date.localize('en').to_s(format: 'MMM'), i.months.ago.to_date.beginning_of_month]}].to_json %>;
+  var months_to_dates = <%== 12.downto(0).collect {|i| i.months.ago.to_date.beginning_of_month}.to_json %>;
   var chart;
   $(document).ready(function() {
     chart = new Highcharts.Chart({
@@ -87,7 +87,7 @@
             cursor: 'pointer',
             events: {
                 click: function(event) {
-                  document.location = '/donations?start_date=' + months_to_dates[event.point.category]
+                  document.location = '/donations?start_date=' + months_to_dates[event.point.x]
                 }
             }
         }

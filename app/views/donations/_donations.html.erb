@@ -2,6 +2,13 @@
 <% multiple_designations = current_account_list.designation_accounts.length > 1 ? true : false %>
 <% unless params[:page] %>
   <% if @start_date %>
+    <div>
+      <div style="float:left"><%= link_to(_('<< Previous Month'), donations_path(start_date: @start_date - 1.month)) %></div>
+      <% unless @end_date > Date.today %>
+        <div style="float:right"><%= link_to(_('Next Month >>'), donations_path(start_date: @end_date + 1.month)) %></div>
+      <% end %>
+    </div>
+    <div class="clr"></div>
     <h2><%= _('Donations for %{start_date} through %{end_date}') % {start_date: l(@start_date), end_date: l(@end_date)} %></h2>
   <% end %>
 <table class="tablelist donations" id="donations_table">
@@ -45,6 +52,7 @@
         <td></td>
         <td class="right"><%= _('Total Donations (%{count}):') % {count: donations.length} %></td>
         <td class="right"><%= number_to_current_currency(donations.sum(&:amount)) %></td>
+        <td colspan="2"></td>
       </tr>
     </tfoot>
   <% end %>
