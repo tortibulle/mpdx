@@ -35,6 +35,7 @@ class Contact < ActiveRecord::Base
   scope :with_referrals, joins(:contact_referrals_by_me).uniq
   scope :active, lambda { where(active_conditions) }
   scope :inactive, lambda { where(inactive_conditions) }
+  scope :late_by, ->(min_days, max_days=nil) { financial_partners.where("last_donation_date BETWEEN ? AND ?", max_days ? Date.today - max_days : Date.new(1951, 1, 1), Date.today - min_days) }
 
 
   validates :name, presence: true

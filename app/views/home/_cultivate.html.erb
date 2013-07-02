@@ -17,4 +17,24 @@
 <%= link_to(_('Referrals on hand'), contacts_path(filters: {referrer: '*', status: Contact::IN_PROGRESS_STATUSES})) %>
 <%= current_account_list.contacts.joins(:contact_referrals_to_me).where(status: Contact::IN_PROGRESS_STATUSES).where("contact_referrals.id is NOT NULL").count %>
 
-<%#Pledge Report%>
+<% late_by_30 = current_account_list.contacts.late_by(31.days, 60.days) %>
+<% if late_by_30.length > 0 %>
+  <h3><%= _('Partners more than 30 days late') %></h3>
+  <ul>
+    <% late_by_30.each do |contact| %>
+      <% contact_exhibit = exhibit(contact, self) %>
+      <li><%= link_to(contact_exhibit, contact) %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<% late_by_60 = current_account_list.contacts.late_by(60.days) %>
+<% if late_by_60.length > 0 %>
+  <h3><%= _('Partners more than 60 days late') %></h3>
+  <ul>
+    <% late_by_60.each do |contact| %>
+      <% contact_exhibit = exhibit(contact, self) %>
+      <li><%= link_to(contact_exhibit, contact) %></li>
+    <% end %>
+  </ul>
+<% end %>
