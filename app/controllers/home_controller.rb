@@ -11,6 +11,15 @@ class HomeController < ApplicationController
   def care
   end
 
+  def progress
+    if params[:start_date]
+      @start_date = Date.parse(params[:start_date])
+    else
+      @start_date = 1.week.ago.beginning_of_week
+    end
+    @end_date = @start_date.end_of_week
+  end
+
   def login
     render layout: false
   end

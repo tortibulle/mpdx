@@ -1,6 +1,11 @@
-<% start_date = 1.week.ago.beginning_of_week %>
-<% end_date = 1.week.ago.end_of_week %>
-<h2><%= _('Week of %{date1} to %{date2}') % {date1: l(start_date.to_date), date2: l(end_date.to_date)} %></h2>
+<div>
+  <div style="float:left"><%= link_to(_('<< Previous Week'), progress_home_path(start_date: @start_date - 1.week), remote: true) %></div>
+  <% unless @end_date >= 1.week.ago.to_date %>
+    <div style="float:right"><%= link_to(_('Next Week >>'), progress_home_path(start_date: @start_date + 1.week), remote: true) %></div>
+  <% end %>
+</div>
+<div class="clr"></div>
+<h2><%= _('Week of %{date1} to %{date2}') % {date1: l(@start_date.to_date), date2: l(@end_date.to_date)} %></h2>
 <strong><%#= _('Support Raised:') %></strong>
 <%#= number_to_current_currency(current_account_list.total_pledges) %>
 <%#= _(' / month') %>
@@ -8,25 +13,25 @@
 <strong><%= _('Phone Dials:') %></strong>
 <ul>
   <li>
-    <%= _('Completed:') %> 
+    <%= _('Completed:') %>
     <%= current_account_list.tasks.of_type('Call')
                             .with_result('Done')
-                            .completed_between(start_date, end_date)
+                            .completed_between(@start_date, @end_date)
                             .count %>
   </li>
   <li>
-    <%= _('Attempted:') %> 
+    <%= _('Attempted:') %>
     <%= current_account_list.tasks.of_type('Call')
                             .with_result('Attempted')
-                            .completed_between(start_date, end_date)
+                            .completed_between(@start_date, @end_date)
                             .count %>
 
   </li>
   <li>
-    <%= _('Received:') %> 
+    <%= _('Received:') %>
     <%= current_account_list.tasks.of_type('Call')
                             .with_result('Received')
-                            .completed_between(start_date, end_date)
+                            .completed_between(@start_date, @end_date)
                             .count %>
   </li>
 </ul>
@@ -34,17 +39,17 @@
 <strong><%= _('Appointments:') %></strong>
 <ul>
   <li>
-    <%= _('Completed:') %> 
+    <%= _('Completed:') %>
     <%= current_account_list.tasks.of_type('Appointment')
                             .with_result('Done')
-                            .completed_between(start_date, end_date)
+                            .completed_between(@start_date, @end_date)
                             .count %>
   </li>
   <li>
-    <%= _('Set up:') %> 
+    <%= _('Set up:') %>
     <%= current_account_list.tasks.of_type('Appointment')
                             .uncompleted
-                            .created_between(start_date, end_date)
+                            .created_between(@start_date, @end_date)
                             .count %>
 
   </li>
@@ -53,17 +58,17 @@
 <strong><%= _('Emails:') %></strong>
 <ul>
   <li>
-    <%= _('Sent:') %> 
+    <%= _('Sent:') %>
     <%= current_account_list.tasks.of_type('Email')
                             .with_result('Done')
-                            .completed_between(start_date, end_date)
+                            .completed_between(@start_date, @end_date)
                             .count %>
   </li>
   <li>
-    <%= _('Received:') %> 
+    <%= _('Received:') %>
     <%= current_account_list.tasks.of_type('Email')
                             .with_result('Received')
-                            .completed_between(start_date, end_date)
+                            .completed_between(@start_date, @end_date)
                             .count %>
   </li>
 </ul>
@@ -71,17 +76,17 @@
 <strong><%= _('Facebook Message:') %></strong>
 <ul>
   <li>
-    <%= _('Sent:') %> 
+    <%= _('Sent:') %>
     <%= current_account_list.tasks.of_type('Facebook Message')
                             .with_result('Done')
-                            .completed_between(start_date, end_date)
+                            .completed_between(@start_date, @end_date)
                             .count %>
   </li>
   <li>
-    <%= _('Received:') %> 
+    <%= _('Received:') %>
     <%= current_account_list.tasks.of_type('Facebook Message')
                             .with_result('Received')
-                            .completed_between(start_date, end_date)
+                            .completed_between(@start_date, @end_date)
                             .count %>
   </li>
 </ul>
@@ -90,33 +95,33 @@
 
 <ul>
   <li>
-    <%= _('Pre-call Letters:') %> 
+    <%= _('Pre-call Letters:') %>
     <%= current_account_list.tasks.of_type('Pre Call Letter')
                             .with_result('Done')
-                            .completed_between(start_date, end_date)
+                            .completed_between(@start_date, @end_date)
                             .count %>
   </li>
   <li>
-    <%= _('Support Letters:') %> 
+    <%= _('Support Letters:') %>
     <%= current_account_list.tasks.of_type('Support Letter')
                             .with_result('Done')
-                            .completed_between(start_date, end_date)
+                            .completed_between(@start_date, @end_date)
                             .count %>
 
   </li>
   <li>
-    <%= _('Thank you notes:') %> 
+    <%= _('Thank you notes:') %>
     <%= current_account_list.tasks.of_type('Thank')
                             .with_result('Done')
-                            .completed_between(start_date, end_date)
+                            .completed_between(@start_date, @end_date)
                             .count %>
 
   </li>
   <li>
-    <%= _('Reminder Letters:') %> 
+    <%= _('Reminder Letters:') %>
     <%= current_account_list.tasks.of_type('Reminder Letter')
                             .with_result('Done')
-                            .completed_between(start_date, end_date)
+                            .completed_between(@start_date, @end_date)
                             .count %>
 
   </li>
