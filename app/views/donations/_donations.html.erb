@@ -4,8 +4,8 @@
   <% if @start_date %>
     <div>
       <div style="float:left"><%= link_to(_('<< Previous Month'), donations_path(start_date: @start_date - 1.month)) %></div>
-      <% unless @end_date > Date.today %>
-        <div style="float:right"><%= link_to(_('Next Month >>'), donations_path(start_date: @end_date + 1.month)) %></div>
+      <% unless @end_date >= Date.today %>
+        <div style="float:right"><%= link_to(_('Next Month >>'), donations_path(start_date: @start_date + 1.month)) %></div>
       <% end %>
     </div>
     <div class="clr"></div>
