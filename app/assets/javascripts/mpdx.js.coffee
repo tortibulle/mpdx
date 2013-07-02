@@ -67,11 +67,10 @@ $ ->
       $(this).parent().fadeOut()
 
   $(document).on 'ajax:before', 'a', ->
-    $('#page_spinner').dialog(modal: true, closeOnEscape: false)
-
+    $('#page_spinner').dialog({modal: true, closeOnEscape: false})
 
   $(document).ajaxComplete ->
-    $('#page_spinner').dialog({ autoOpen: false }).dialog('close')
+    $('#page_spinner').dialog('close')
 
 window.addFields = (link, association, content) ->
   new_id = new Date().getTime()
