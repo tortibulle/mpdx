@@ -190,12 +190,6 @@ class AccountList < ActiveRecord::Base
     end
   end
 
-  private
-
-  def import_data
-    users.collect(&:organization_accounts).flatten.uniq.map(&:import_all_data)
-    send_account_notifications
-  end
 
   def self.find_or_create_from_profile(profile, org_account)
     user = org_account.user
@@ -287,6 +281,11 @@ class AccountList < ActiveRecord::Base
   end
 
   private
+
+  def import_data
+    users.collect(&:organization_accounts).flatten.uniq.map(&:import_all_data)
+    send_account_notifications
+  end
 
   # trigger any notifications for designation accounts in this account list
   def send_account_notifications
