@@ -30,7 +30,7 @@ $ ->
 
   # new task button
   $(document).on 'click', '.add_task', ->
-    if $(this).attr('data-complete') == 'true'
+    if $(this).attr('data-remote') == 'true'
       $('#edit_task_modal .form_wrapper').html('<img src="/assets/spinner.gif" />')
     else
       if $(this).attr('data-contact-id')

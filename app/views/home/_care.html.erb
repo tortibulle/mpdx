@@ -39,7 +39,7 @@
               <%= link_to(contact, contact) %>
               &nbsp;&nbsp;
             </td>
-            <td><%= link_to(_('Add Task'), '#', class: "add_task", data: {contact_id: contact.id, activity_type: 'Call'}) %></td>
+            <td><%= link_to(_('Add Task'), new_task_path(contact_id: contact.id, activity_type: 'Call'), class: "add_task", remote: true) %></td>
           </tr>
         <% end %>
       </table>
@@ -57,7 +57,7 @@
               &nbsp;&nbsp;
             </td>
             <td>
-              <%= link_to(_('Add Task'), '#', class: "add_task", data: {contact_id: contact.id, activity_type: 'Thank'}) %>
+              <%= link_to(_('Add Task'), new_task_path(contact_id: contact.id, activity_type: 'Thank'), class: "add_task", remote: true) %>
             </td>
           </tr>
         <% end %>
