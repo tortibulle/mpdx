@@ -289,10 +289,10 @@ class ContactsController < ApplicationController
   def setup_filters
     current_user.contacts_filter ||= {}
     clear_filters = params.delete(:clear_filter)
-    if filters_params.present?
-      @view_options[:page] = 1
-      current_user.contacts_filter[current_account_list.id] = filters_params
-      current_user.save
+    if filters_params.present? && current_user.contacts_filter[current_account_list.id] != filters_params
+        @view_options[:page] = 1 
+        current_user.contacts_filter[current_account_list.id] = filters_params
+        current_user.save
     elsif clear_filters == 'true'
       current_user.contacts_filter[current_account_list.id] = nil
       current_user.save
