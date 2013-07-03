@@ -20,7 +20,7 @@
     <% people_with_anniversaries.each do |person|
       person_exhibit = exhibit(person, self) %>
       <li>
-        <strong><%= link_to(person_exhibit, person) %></strong>: <%= l(Date.new(Time.now.year, person.birthday_month, person.birthday_day), format: 'MMM-d') %>
+        <strong><%= link_to(person_exhibit, person) %></strong>: <%= l(Date.new(Time.now.year, person.anniversary_month, person.anniversary_day), format: 'MMM-d') %>
         <% if person.primary_phone_number %> - <%= exhibit(person.primary_phone_number) %> <% end %>
         <% if person.primary_email_address %> - <%= mail_to(person.primary_email_address) %> <% end %>
       </li>
