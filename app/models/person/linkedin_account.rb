@@ -1,7 +1,7 @@
 class Person::LinkedinAccount < ActiveRecord::Base
   extend Person::Account
 
-  scope :valid_token, where('(token_expires_at is null OR token_expires_at > ?) AND valid_token = 1', Time.now)
+  scope :valid_token, where('(token_expires_at is null OR token_expires_at > ?) AND valid_token = ?', Time.now, true)
 
   # attr_accessible :first_name, :last_name, :url
 
