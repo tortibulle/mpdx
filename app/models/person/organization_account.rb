@@ -50,7 +50,7 @@ class Person::OrganizationAccount < ActiveRecord::Base
   end
 
   def import_all_data
-    return if locked_at
+    return if locked_at || new_record?
     update_column(:downloading, true)
     begin
       # we only want to set the last_download date if at least one donation was downloaded
