@@ -54,19 +54,20 @@ class Person::OrganizationAccount < ActiveRecord::Base
     update_column(:downloading, true)
     begin
       # we only want to set the last_download date if at least one donation was downloaded
-      starting_donation_count = user.designation_profiles.where(organization_id: organization_id).collect(&:designation_accounts).flatten.sum { |da| da.donations.count }
+      starting_donation_count = user.donations.count
 
       update_attributes({downloading: true, locked_at: Time.now}, without_protection: true)
-      date_from = last_download ? (last_download - 2.week).strftime("%m/%d/%Y") : ''
+      date_from = last_download ? (last_download - 1.week).strftime("%m/%d/%Y") : ''
       organization.api(self).import_all(date_from)
 
-      ending_donation_count = user.designation_profiles.where(organization_id: organization_id).collect(&:designation_accounts).flatten.sum { |da| da.donations.count }
+      ending_donation_count = user.donations.count
 
       if ending_donation_count - starting_donation_count > 0
         # If this is the first time downloading, update the financial status of partners
         account_list.update_partner_statuses if last_download.nil? && account_list
 
-        update_column(:last_download, Time.now)
+        # Set the last download date to whenever the last donation was received
+        update_column(:last_download, user.donations.order('donation_date desc').first.donation_date)
       end
     ensure
       update_column(:downloading, false)

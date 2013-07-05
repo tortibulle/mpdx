@@ -7,6 +7,7 @@ class User < Person
   has_many :people, through: :contact_people
   has_many :account_list_entries, through: :account_lists
   has_many :designation_accounts, through: :account_list_entries
+  has_many :donations, through: :designation_accounts
   has_many :designation_profiles, dependent: :destroy
   has_many :partner_companies, through: :account_lists, source: :companies
   has_many :imports, dependent: :destroy
