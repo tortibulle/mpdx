@@ -218,3 +218,5 @@ p:last-child {margin-bottom: 0;}
   .hl {color: $gray_dark;}
   .hl.amt {font-weight: bold;}
 }
+
+.pagination .current { font-weight: bold; }

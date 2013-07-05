@@ -681,7 +681,7 @@ tr.taskgroup {
 
 /* ************************************************************** */
 
-.qaction ul.quick_action_list, ul.action_list {
+.qaction ul.quick_action_list, .action_list {
   @include listclear;
   padding: 4px;
   background: $white;
@@ -696,6 +696,10 @@ tr.taskgroup {
   a.none {padding-left: 10px; background: none;}
   a:hover {background-color: $green; color: $white;}
   a:active {background-color: $green_dark;}
+}
+
+.action_list--bottom {
+  margin-top: -15em; /* Warning: kinda a magic number :( */
 }
 
 /* ************************************************************** */

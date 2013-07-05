@@ -1,0 +1,8 @@
+<ul style="display:none" class="action_list <% if local_assigns[:bottom].present? %>action_list--bottom<% end %>">
+  <li><%= link_to(_('Add Tag'), '#', class: 'none', data: {behavior: 'add_tag_to_list'}) %></li>
+  <li><%= link_to(_('Remove Tag'), '#', class: 'none', data: {behavior: 'remove_tag_from_list'}) %></li>
+  <li><%= link_to(_('Add Task'), '#', class: 'none', data: {behavior: 'add_task_to_list'}) %></li>
+  <li><%= link_to(_('Log Task'), '#', class: 'none', data: {behavior: 'add_task_to_list', completed: true}) %></li>
+  <li><%= link_to(_('Edit Fields'), '#', class: 'none', data: {behavior: 'bulk_edit'}) %></li>
+  <li><%= link_to(_('Hide Contacts'), '#', class: 'none', data: {behavior: 'bulk_hide_contact'}) %></li>
+</ul>
