@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130708194848) do
+ActiveRecord::Schema.define(:version => 20130708222442) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -596,14 +596,15 @@ ActiveRecord::Schema.define(:version => 20130708194848) do
     t.string   "token"
     t.string   "refresh_token"
     t.datetime "expires_at"
-    t.boolean  "valid_token",   :default => false
-    t.datetime "created_at",                       :null => false
-    t.datetime "updated_at",                       :null => false
-    t.string   "email",                            :null => false
-    t.boolean  "authenticated", :default => false, :null => false
-    t.boolean  "primary",       :default => false
-    t.boolean  "downloading",   :default => false, :null => false
+    t.boolean  "valid_token",     :default => false
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
+    t.string   "email",                              :null => false
+    t.boolean  "authenticated",   :default => false, :null => false
+    t.boolean  "primary",         :default => false
+    t.boolean  "downloading",     :default => false, :null => false
     t.datetime "last_download"
+    t.datetime "last_email_sync"
   end
 
   add_index "person_google_accounts", ["person_id"], :name => "index_person_google_accounts_on_person_id"

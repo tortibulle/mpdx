@@ -5,6 +5,7 @@ class ActivityContact < ActiveRecord::Base
                              related_object_id: :activity_id }
 
   belongs_to :activity
+  belongs_to :task, foreign_key: 'activity_id'
   belongs_to :contact
 
   # attr_accessible :contact_id, :activity_id

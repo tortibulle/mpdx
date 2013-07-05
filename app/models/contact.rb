@@ -22,7 +22,7 @@ class Contact < ActiveRecord::Base
   has_many :referrals_by_me, through: :contact_referrals_by_me, source: :referred_to
   has_many :activity_contacts, dependent: :destroy
   has_many :activities, through: :activity_contacts
-  has_many :tasks, through: :activity_contacts, source: :activity
+  has_many :tasks, through: :activity_contacts, source: :task
   has_many :notifications, inverse_of: :contact, dependent: :destroy
 
 

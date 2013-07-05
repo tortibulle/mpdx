@@ -2,7 +2,7 @@
   <%= link_to(_('delete'), activity_comment_path(comment, activity_id: comment.activity.id), confirm: t('g.confirm'), method: :delete, remote: true, data: {selector: '.comment'}, :class => "corner_close") %>
   <i class="icon-comment-alt icon-large pull-left"></i>
   <div class="body">
-    <%= link_to(comment.person, comment.person) %>: <%= comment.body %>
+    <%= link_to(comment.person, comment.person) %>: <%= simple_format(comment.body) %>
   </div>
   <span class="time"><%= l(comment.created_at, format: :date_time) %></span>
 </div>
