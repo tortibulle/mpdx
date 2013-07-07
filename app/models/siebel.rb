@@ -16,8 +16,13 @@ class Siebel < DataServer
 
     profiles.each do |profile|
       designation_profile = Retryable.retryable do
-        @org.designation_profiles.where(user_id: @org_account.person_id, name: profile.name, code: profile.id)
-                                 .first_or_create
+        if profile.id
+          @org.designation_profiles.where(user_id: @org_account.person_id, code: profile.id)
+                                   .first_or_create(name: profile.name)
+        else
+          @org.designation_profiles.where(user_id: @org_account.person_id)
+                                   .first_or_create(name: profile.name)
+        end
       end
 
       import_profile_balance(designation_profile)
