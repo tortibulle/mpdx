@@ -114,7 +114,7 @@ describe Contact do
 
       contact.merge(loser_contact)
 
-      contact.tasks.reload.should include(task, shared_task)
+      contact.tasks.should include(task, shared_task)
       shared_task.contacts.should match_array [contact]
     end
 
@@ -138,7 +138,7 @@ describe Contact do
 
       contact.merge(loser_contact)
 
-      contact.people.reload.length.should == 1
+      contact.people.length.should == 1
 
       contact.people.first.facebook_accounts.should == [fb]
     end

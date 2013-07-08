@@ -30,12 +30,7 @@
 }
 
 .mwrap {
-  .inside {
-    border: 2px solid gray;
-    border-top: none;
-    padding: 10px;
-    background: $white;
-  }
+
   .nohide {
     border: 2px solid gray;
     border-top: none;
@@ -55,9 +50,16 @@
     color: $blue;
     background: $blue_light;
   }
-  .alert {
-    border-color: red;
-    color: red;
-    background: #f8cfcf;
-  }
+}  
+.inside {
+  border: 2px solid gray;
+  border-top: none;
+  padding: 10px;
+  background: $white;
 }
+.alert {
+  border-color: red;
+  color: red;
+  background: #f8cfcf;
+}
+

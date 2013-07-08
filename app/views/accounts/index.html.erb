@@ -86,8 +86,7 @@
                   </div>
                   <div class="hint">
                     <%= link_to(_('Note: You must be upgraded to the latest version of TntMPD to do this. Click here to download the latest version.'), 'http://www.tntware.com/tntmpd/downloads/') %><br />
-                    <%= _('Not sure how to export your data from TNT?') %>
-                    <%= link_to(_('Watch this video'), 'http://screencast.com/t/CU4y51KbRMkr', target: '_blank') %>.
+                    <div class="name inside alert"><%= link_to(_('Please watch this video to learn how to export from TNT in the specific format for MPDx.'), 'http://screencast.com/t/CU4y51KbRMkr', target: '_blank') %></div>
                   </div>
                   <a href="#" class="btn btngreen" data-behavior="import_button"><%= _('Import') %></a>
                 <% end %>
