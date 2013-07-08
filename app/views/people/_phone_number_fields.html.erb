@@ -1,5 +1,5 @@
 <div class="field phone_field" data-behavior="field-wrapper">
-  <div class="ls"><%= builder.label :number, t('g.number') %></div>
+  <div class="ls"><%= builder.label :number, _('Number') %></div>
   <div class="rs">
     <%= builder.phone_field :number %>
     <%= builder.select :location, %w[mobile home work].collect {|l| [t("g.#{l}"), l]} %>

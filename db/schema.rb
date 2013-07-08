@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130708145444) do
+ActiveRecord::Schema.define(:version => 20130708164710) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -278,6 +278,16 @@ ActiveRecord::Schema.define(:version => 20130708145444) do
 
   add_index "designation_profile_accounts", ["designation_profile_id", "designation_account_id"], :name => "designation_p_to_a", :unique => true
 
+  create_table "designation_profile_users", :force => true do |t|
+    t.integer  "designation_profile_id"
+    t.integer  "user_id"
+    t.datetime "created_at",             :null => false
+    t.datetime "updated_at",             :null => false
+  end
+
+  add_index "designation_profile_users", ["designation_profile_id", "user_id"], :name => "profile_user"
+  add_index "designation_profile_users", ["user_id"], :name => "index_designation_profile_users_on_user_id"
+
   create_table "designation_profiles", :force => true do |t|
     t.string   "remote_id"
     t.integer  "user_id",                                          :null => false
@@ -418,11 +428,10 @@ ActiveRecord::Schema.define(:version => 20130708145444) do
     t.string   "state"
     t.string   "country"
     t.string   "postal_code"
-    t.boolean  "verified",        :default => false, :null => false
-    t.boolean  "boolean",         :default => false, :null => false
-    t.text     "smarty_response"
     t.datetime "created_at",                         :null => false
     t.datetime "updated_at",                         :null => false
+    t.boolean  "verified",        :default => false, :null => false
+    t.text     "smarty_response"
   end
 
   add_index "master_addresses", ["street", "city", "state", "country", "postal_code"], :name => "all_fields"
@@ -705,6 +714,17 @@ ActiveRecord::Schema.define(:version => 20130708145444) do
 
   add_index "phone_numbers", ["person_id"], :name => "index_phone_numbers_on_person_id"
   add_index "phone_numbers", ["remote_id"], :name => "index_phone_numbers_on_remote_id"
+
+  create_table "pictures", :force => true do |t|
+    t.integer  "picture_of_id"
+    t.string   "picture_of_type"
+    t.string   "image"
+    t.boolean  "primary",         :default => false, :null => false
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
+  end
+
+  add_index "pictures", ["picture_of_id", "picture_of_type"], :name => "picture_of"
 
   create_table "taggings", :force => true do |t|
     t.integer  "tag_id"

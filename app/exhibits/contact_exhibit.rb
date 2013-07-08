@@ -27,12 +27,16 @@ class ContactExhibit < DisplayCase::Exhibit
   end
 
   def avatar(size = :square)
-    fb = primary_or_first_person.facebook_account
-    return "https://graph.facebook.com/#{fb.remote_id}/picture?type=#{size}" if fb
-    'https://mpdx.org/assets/' + if primary_or_first_person.gender == 'female'
-      'avatar_f.png'
+    if picture = primary_or_first_person.pictures.where(primary: true).first
+      picture.image.url(size)
     else
-      'avatar.png'
+      fb = primary_or_first_person.facebook_account
+      return "https://graph.facebook.com/#{fb.remote_id}/picture?type=#{size}" if fb
+      'https://mpdx.org/assets/' + if primary_or_first_person.gender == 'female'
+        'avatar_f.png'
+      else
+        'avatar.png'
+      end
     end
   end
 

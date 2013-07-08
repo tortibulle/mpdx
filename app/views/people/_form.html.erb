@@ -126,6 +126,18 @@
 
     <div class="spacer"></div>
 
+    <div class="fieldset">
+      <label class="fieldset_label"><%= _('Picture') %></label>
+      <%= builder.fields_for :pictures do |builder| %>
+        <%= render 'people/picture_fields', builder: builder, object: person %>
+      <% end %>
+      <div class="sfield field_indent" data-behavior="add-wrapper">
+        <%= link_to_add_fields(_('Add Picture'), builder, :pictures, partial: 'people/picture_fields') %>
+      </div>
+
+    </div>
+
+    <div class="spacer"></div>
     <% if (current_account_list.contacts - [person]).present? %>
       <div class="fieldset">
         <label class="fieldset_label">Relationships</label>

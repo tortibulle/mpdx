@@ -27,6 +27,7 @@ class Person < ActiveRecord::Base
   has_many :contact_people, dependent: :destroy
   has_many :contacts, through: :contact_people
   has_many :account_lists, through: :contacts
+  has_many :pictures, as: :picture_of, dependent: :destroy
 
   accepts_nested_attributes_for :email_addresses, :reject_if => lambda { |e| e[:email].blank? }, :allow_destroy => true
   accepts_nested_attributes_for :phone_numbers, :reject_if => lambda { |p| p[:number].blank? }, :allow_destroy => true
@@ -34,6 +35,7 @@ class Person < ActiveRecord::Base
   accepts_nested_attributes_for :facebook_accounts, :reject_if => lambda { |p| p[:url].blank? }, :allow_destroy => true
   accepts_nested_attributes_for :twitter_accounts, :reject_if => lambda { |p| p[:handle].blank? }, :allow_destroy => true
   accepts_nested_attributes_for :linkedin_accounts, :reject_if => lambda { |p| p[:url].blank? }, :allow_destroy => true
+  accepts_nested_attributes_for :pictures, :reject_if => lambda { |p| p[:image].blank? && p[:image_cache].blank? }, :allow_destroy => true
 
 
   #attr_accessible :first_name, :last_name, :legal_first_name, :birthday_month, :birthday_year, :birthday_day, :anniversary_month,

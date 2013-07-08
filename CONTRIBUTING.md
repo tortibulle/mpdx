@@ -25,10 +25,11 @@ working on):
     $> git checkout -b 325-add-japanese-translations
 
 
-### 3. Create database.yml and config.yml
+### 3. Create database.yml, config.yml and cloudinary.yml
 
-In the config folder, copy database.example.yml to database.yml
-and config.example.yml to config.yml. Edit the two new files and
+In the config folder, copy database.example.yml to database.yml,
+config.example.yml to config.yml and cloudinary.example.yml to
+cloudinary.yml. Edit the new files and
 fill in the required values. In config.yml, `encryption_key` and
 `itg_auth_key` can both be random values that you make up. The
 rest should be real credentials for the corresponding service.
@@ -50,7 +51,7 @@ Then install the development the development dependencies:
 
     $> bundle install
     $> bundle exec rake db:migrate
-    
+
 Make sure memcached and redis are running
 
 Now you should be able to run the entire suite using:
