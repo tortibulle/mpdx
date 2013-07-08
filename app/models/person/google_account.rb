@@ -40,6 +40,10 @@ class Person::GoogleAccount < ActiveRecord::Base
     expires_at < Time.now
   end
 
+  def email_body(email)
+    email.text_part.body.decoded
+  end
+
   def client
     unless @client
       @client = Google::APIClient.new(application_name: 'MPDX', application_version: '1.0')
@@ -50,6 +54,20 @@ class Person::GoogleAccount < ActiveRecord::Base
 
   def plus
     @plus ||= client.discovered_api('plus')
+  end
+
+  def imap
+    refresh_token! if token_expired?
+
+    unless @imap
+      @imap = Net::IMAP.new('imap.gmail.com', 993, usessl = true, certs = nil, verify = false)
+      @imap.authenticate('XOAUTH2', email, token)
+    end
+    @imap
+  end
+
+  def token_expired?
+    expires_at < Time.now
   end
 
   def contacts
