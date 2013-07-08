@@ -261,6 +261,15 @@ describe Siebel do
         siebel.send(:add_or_update_address, siebel_address, contact)
       }.to raise_exception
     end
+
+    it "doesn't add a new address when there is a matching deleted address" do
+      address = create(:address, addressable: contact, street: siebel_address.address1, city: siebel_address.city,
+                                 state: siebel_address.state, postal_code: siebel_address.zip, deleted: true)
+      expect {
+        siebel.send(:add_or_update_address, siebel_address, contact)
+      }.not_to change { Address.count }
+
+    end
   end
 
   context '#add_or_update_phone_number' do

@@ -2,10 +2,13 @@ module AddressMethods
   extend ActiveSupport::Concern
 
   included do
-    has_many :addresses, as: :addressable, dependent: :destroy
+    has_many :addresses, as: :addressable, conditions: {deleted: false}
+    has_many :addresses_including_deleted, class_name: 'Address', as: :addressable
     has_one :primary_address, class_name: 'Address', conditions: {primary_mailing_address: true}, as: :addressable
 
     accepts_nested_attributes_for :addresses, reject_if: :blank_or_duplicate_address?, allow_destroy: true
+
+    after_destroy :destroy_addresses
   end
 
   def blank_or_duplicate_address?(attributes)
@@ -16,6 +19,10 @@ module AddressMethods
 
   def address
     primary_address || addresses.first
+  end
+
+  def destroy_addresses
+    addresses.map(&:destroy!)
   end
 
 end

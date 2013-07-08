@@ -9,9 +9,13 @@ class Address < ActiveRecord::Base
   belongs_to :addressable, polymorphic: true, touch: true
   belongs_to :master_address
 
+  scope :current, -> { where(deleted: false) }
+
   before_create :find_or_create_master_address
   before_update :update_or_create_master_address
   after_destroy :clean_up_master_address
+
+  alias_method :destroy!, :destroy
 
 
   assignable_values_for :location, :allow_blank => true do
@@ -32,6 +36,10 @@ class Address < ActiveRecord::Base
     false
   end
 
+  def destroy
+    update_attributes(deleted: true)
+  end
+
   def not_blank?
     attributes.with_indifferent_access.slice(:street, :city, :state, :country, :postal_code).any? { |_, v| v.present? && v.strip != '(UNDELIVERABLE)' }
   end
@@ -42,7 +50,7 @@ class Address < ActiveRecord::Base
     self.location = other_address.location if location.blank?
     self.remote_id = other_address.remote_id if remote_id.blank?
     self.save(validate: false)
-    other_address.destroy
+    other_address.destroy!
   end
 
   def country=(val)
@@ -84,15 +92,17 @@ class Address < ActiveRecord::Base
   end
 
   def update_or_create_master_address
-    new_master_address_match = find_master_address
+    if (changed & ['street', 'city', 'state', 'country', 'postal_code']).present?
+      new_master_address_match = find_master_address
 
-    if self.master_address.nil? || self.master_address != new_master_address_match
-      unless new_master_address_match
-        new_master_address_match = MasterAddress.create(attributes_for_master_address)
+      if self.master_address.nil? || self.master_address != new_master_address_match
+        unless new_master_address_match
+          new_master_address_match = MasterAddress.create(attributes_for_master_address)
+        end
+
+        self.master_address_id = new_master_address_match.id
+        self.verified = new_master_address_match.verified
       end
-
-      self.master_address_id = new_master_address_match.id
-      self.verified = new_master_address_match.verified
     end
 
     true

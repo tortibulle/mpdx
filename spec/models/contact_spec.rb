@@ -12,12 +12,13 @@ describe Contact do
       }.should change(Address, :count).by(1)
     end
 
-    it 'should destroy an address' do
+    it 'should mark an address deleted' do
       address = create(:address, addressable: contact)
-      -> {
-        contact.addresses_attributes = [ {id: address.id, _destroy: '1'} ]
-        contact.save!
-      }.should change(Address, :count).from(1).to(0)
+
+      contact.addresses_attributes = [ {id: address.id, _destroy: '1'} ]
+      contact.save!
+
+      address.reload.deleted.should == true
     end
 
     it 'should update an address' do
@@ -70,6 +71,12 @@ describe Contact do
       -> {
         contact.destroy
       }.should_not change(Person, :count)
+    end
+
+    it "deletes associated addresses" do
+      create(:address, addressable: contact)
+      expect { contact.destroy }
+        .to change(Address, :count).by(-1)
     end
 
   end

@@ -32,7 +32,6 @@ module SmartyStreets
     params << "candidates=2&auth-id=#{auth_id}&auth-token=#{auth_token}"
 
     url += params.join('&')
-    puts url
 
     response = RestClient.get(url, content_type: :json, accept: :json)
 
