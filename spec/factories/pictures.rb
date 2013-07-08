@@ -2,8 +2,7 @@
 
 FactoryGirl.define do
   factory :picture do
-    belongs_to ""
-    polymorphic ""
     image "MyString"
+    association :picture_of
   end
 end

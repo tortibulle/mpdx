@@ -208,6 +208,11 @@ class Person < ActiveRecord::Base
         end
       end
 
+      other.pictures.each do |picture|
+        picture.picture_of = self
+        picture.save
+      end
+
       # because we're in a transaction, we need to keep track of which relationships we've updated so
       # we don't create duplicates on the next part
       FamilyRelationship.where(related_person_id: other.id).each do |fr|

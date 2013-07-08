@@ -74,34 +74,39 @@ describe Person do
   end
 
   describe 'merging two people' do
+    let(:winner) { create(:person) }
+    let(:loser) { create(:person) }
+
     it "shouldn't fail if the winner has the same facebook account as the loser" do
-      @winner = create(:person)
-      fb_account = create(:facebook_account, person: @winner)
-      @loser = create(:person)
-      create(:facebook_account, person: @loser, remote_id: fb_account.remote_id)
+      fb_account = create(:facebook_account, person: winner)
+      create(:facebook_account, person: loser, remote_id: fb_account.remote_id)
 
       # this shouldn't blow up
       -> {
-        @winner.merge(@loser)
+        winner.merge(loser)
       }.should change(Person::FacebookAccount, :count)
     end
 
     it "should move loser's facebook over" do
-      @winner = create(:person)
-      @loser = create(:person)
-      fb = create(:facebook_account, person: @loser)
+      loser = create(:person)
+      fb = create(:facebook_account, person: loser)
 
-      @winner.merge(@loser)
-      @winner.facebook_accounts.should == [fb]
+      winner.merge(loser)
+      winner.facebook_accounts.should == [fb]
     end
 
     it "should move loser's twitter over" do
-      @winner = create(:person)
-      @loser = create(:person)
-      create(:twitter_account, person: @loser)
+      loser = create(:person)
+      create(:twitter_account, person: loser)
 
-      @winner.merge(@loser)
-      @winner.twitter_accounts.should_not be_empty
+      winner.merge(loser)
+      winner.twitter_accounts.should_not be_empty
+    end
+
+    it "moves pictures over" do
+      picture = create(:picture, picture_of: loser)
+      winner.merge(loser)
+      winner.pictures.should include(picture)
     end
   end
 

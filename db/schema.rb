@@ -278,16 +278,6 @@ ActiveRecord::Schema.define(:version => 20130708164710) do
 
   add_index "designation_profile_accounts", ["designation_profile_id", "designation_account_id"], :name => "designation_p_to_a", :unique => true
 
-  create_table "designation_profile_users", :force => true do |t|
-    t.integer  "designation_profile_id"
-    t.integer  "user_id"
-    t.datetime "created_at",             :null => false
-    t.datetime "updated_at",             :null => false
-  end
-
-  add_index "designation_profile_users", ["designation_profile_id", "user_id"], :name => "profile_user"
-  add_index "designation_profile_users", ["user_id"], :name => "index_designation_profile_users_on_user_id"
-
   create_table "designation_profiles", :force => true do |t|
     t.string   "remote_id"
     t.integer  "user_id",                                          :null => false
@@ -428,10 +418,11 @@ ActiveRecord::Schema.define(:version => 20130708164710) do
     t.string   "state"
     t.string   "country"
     t.string   "postal_code"
+    t.boolean  "verified",        :default => false, :null => false
+    t.boolean  "boolean",         :default => false, :null => false
+    t.text     "smarty_response"
     t.datetime "created_at",                         :null => false
     t.datetime "updated_at",                         :null => false
-    t.boolean  "verified",        :default => false, :null => false
-    t.text     "smarty_response"
   end
 
   add_index "master_addresses", ["street", "city", "state", "country", "postal_code"], :name => "all_fields"
