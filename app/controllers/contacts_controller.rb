@@ -22,7 +22,7 @@ class ContactsController < ApplicationController
     respond_to do |wants|
 
       wants.html do
-        @contacts = @filtered_contacts.includes([{primary_person: :facebook_account},
+        @contacts = @filtered_contacts.includes([{primary_person: [:facebook_account, :primary_picture]},
                                                  :tags, :primary_address,
                                                  {people: :primary_phone_number}])
 

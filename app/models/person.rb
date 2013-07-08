@@ -28,6 +28,7 @@ class Person < ActiveRecord::Base
   has_many :contacts, through: :contact_people
   has_many :account_lists, through: :contacts
   has_many :pictures, as: :picture_of, dependent: :destroy
+  has_one :primary_picture, as: :picture_of, class_name: 'Picture', conditions: {primary: true}
 
   accepts_nested_attributes_for :email_addresses, :reject_if => lambda { |e| e[:email].blank? }, :allow_destroy => true
   accepts_nested_attributes_for :phone_numbers, :reject_if => lambda { |p| p[:number].blank? }, :allow_destroy => true

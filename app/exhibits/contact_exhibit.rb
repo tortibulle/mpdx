@@ -27,7 +27,7 @@ class ContactExhibit < DisplayCase::Exhibit
   end
 
   def avatar(size = :square)
-    if picture = primary_or_first_person.pictures.where(primary: true).first
+    if picture = primary_or_first_person.primary_picture
       picture.image.url(size)
     else
       fb = primary_or_first_person.facebook_account

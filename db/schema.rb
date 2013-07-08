@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130708164710) do
+ActiveRecord::Schema.define(:version => 20130708194848) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -218,36 +218,37 @@ ActiveRecord::Schema.define(:version => 20130708164710) do
   create_table "contacts", :force => true do |t|
     t.string   "name"
     t.integer  "account_list_id"
-    t.datetime "created_at",                                                                            :null => false
-    t.datetime "updated_at",                                                                            :null => false
-    t.decimal  "pledge_amount",                       :precision => 8,  :scale => 2
+    t.datetime "created_at",                                                                                :null => false
+    t.datetime "updated_at",                                                                                :null => false
+    t.decimal  "pledge_amount",                           :precision => 8,  :scale => 2
     t.string   "status"
-    t.decimal  "total_donations",                     :precision => 10, :scale => 2
+    t.decimal  "total_donations",                         :precision => 10, :scale => 2
     t.date     "last_donation_date"
     t.date     "first_donation_date"
     t.text     "notes"
     t.datetime "notes_saved_at"
     t.string   "full_name"
     t.string   "greeting"
-    t.string   "website",             :limit => 1000
+    t.string   "website",                 :limit => 1000
     t.decimal  "pledge_frequency"
     t.date     "pledge_start_date"
     t.date     "next_ask"
-    t.boolean  "never_ask",                                                          :default => false, :null => false
+    t.boolean  "never_ask",                                                              :default => false, :null => false
     t.string   "likely_to_give"
     t.string   "church_name"
     t.string   "send_newsletter"
-    t.boolean  "direct_deposit",                                                     :default => false, :null => false
-    t.boolean  "magazine",                                                           :default => false, :null => false
+    t.boolean  "direct_deposit",                                                         :default => false, :null => false
+    t.boolean  "magazine",                                                               :default => false, :null => false
     t.date     "last_activity"
     t.date     "last_appointment"
     t.date     "last_letter"
     t.date     "last_phone_call"
     t.date     "last_pre_call"
     t.date     "last_thank"
-    t.boolean  "pledge_received",                                                    :default => false, :null => false
+    t.boolean  "pledge_received",                                                        :default => false, :null => false
     t.integer  "tnt_id"
-    t.string   "not_duplicated_with", :limit => 2000
+    t.string   "not_duplicated_with",     :limit => 2000
+    t.integer  "uncompleted_tasks_count",                                                :default => 0,     :null => false
   end
 
   add_index "contacts", ["account_list_id"], :name => "index_contacts_on_account_list_id"
@@ -277,6 +278,16 @@ ActiveRecord::Schema.define(:version => 20130708164710) do
   end
 
   add_index "designation_profile_accounts", ["designation_profile_id", "designation_account_id"], :name => "designation_p_to_a", :unique => true
+
+  create_table "designation_profile_users", :force => true do |t|
+    t.integer  "designation_profile_id"
+    t.integer  "user_id"
+    t.datetime "created_at",             :null => false
+    t.datetime "updated_at",             :null => false
+  end
+
+  add_index "designation_profile_users", ["designation_profile_id", "user_id"], :name => "profile_user"
+  add_index "designation_profile_users", ["user_id"], :name => "index_designation_profile_users_on_user_id"
 
   create_table "designation_profiles", :force => true do |t|
     t.string   "remote_id"
@@ -418,11 +429,10 @@ ActiveRecord::Schema.define(:version => 20130708164710) do
     t.string   "state"
     t.string   "country"
     t.string   "postal_code"
-    t.boolean  "verified",        :default => false, :null => false
-    t.boolean  "boolean",         :default => false, :null => false
-    t.text     "smarty_response"
     t.datetime "created_at",                         :null => false
     t.datetime "updated_at",                         :null => false
+    t.boolean  "verified",        :default => false, :null => false
+    t.text     "smarty_response"
   end
 
   add_index "master_addresses", ["street", "city", "state", "country", "postal_code"], :name => "all_fields"
