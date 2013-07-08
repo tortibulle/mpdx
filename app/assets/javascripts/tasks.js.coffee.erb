@@ -132,7 +132,6 @@ $ ->
           {
             text: __('Save'),
             click: (e) ->
-              return false if $.trim($('#task_subject', form).val()) == ''
               form.submit()
               $('.form_wrapper', this).html('<img src="/assets/spinner.gif" />')
               $(this).dialog( "option", "buttons", [])
