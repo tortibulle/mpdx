@@ -67,14 +67,17 @@ class Person::GoogleAccount < ActiveRecord::Base
     else
       message = gmail_message.message.body.decoded
     end
-    task = contact.tasks.create!(subject: gmail_message.subject,
-                                start_at: gmail_message.envelope.date,
-                                completed: true,
-                                completed_at: gmail_message.envelope.date,
-                                account_list_id: account_list.id,
-                                activity_type: 'Email',
-                                result: result)
-    task.activity_comments.create!(body: message.to_s.unpack("C*").pack("U*").force_encoding("UTF-8").encode!, person: person)
+    message = message.to_s.unpack("C*").pack("U*").force_encoding("UTF-8").encode!
+    if message.strip.present?
+      task = contact.tasks.create!(subject: gmail_message.subject,
+                                  start_at: gmail_message.envelope.date,
+                                  completed: true,
+                                  completed_at: gmail_message.envelope.date,
+                                  account_list_id: account_list.id,
+                                  activity_type: 'Email',
+                                  result: result)
+      task.activity_comments.create!(body: message, person: person)
+    end
   end
 
   def gmail
