@@ -40,8 +40,57 @@ class Person::GoogleAccount < ActiveRecord::Base
     expires_at < Time.now
   end
 
-  def email_body(email)
-    email.text_part.body.decoded
+  def import_emails(account_list)
+    since = last_email_sync || 30.days.ago
+
+    gmail do |g|
+      # loop through all contacts, logging email addresses
+      account_list.contacts.each do |contact|
+        contact.people.each do |person|
+          person.email_addresses.collect(&:email).uniq.each do |email|
+            # sent emails
+            sent = g.mailbox("[Gmail]/Sent Mail")
+            sent.emails(to: email, after: since).each do |gmail_message|
+              log_email(gmail_message, account_list, contact, person, 'Done')
+            end
+
+            # received emails
+            all = g.mailbox("[Gmail]/All Mail")
+            all.emails(from: email, after: since).each do |gmail_message|
+              log_email(gmail_message, account_list, contact, person, 'Received')
+            end
+          end
+        end
+      end
+    end
+    update_attributes(last_email_sync: Time.now)
+  end
+
+  def log_email(gmail_message, account_list, contact, person, result)
+    if gmail_message.message.multipart?
+      message = gmail_message.message.text_part.body.decoded
+    else
+      message = gmail_message.message.body.decoded
+    end
+    task = contact.tasks.create!(subject: gmail_message.subject,
+                                start_at: gmail_message.envelope.date,
+                                completed: true,
+                                completed_at: gmail_message.envelope.date,
+                                account_list_id: account_list.id,
+                                activity_type: 'Email',
+                                result: result)
+    task.activity_comments.create!(body: message, person: person)
+  end
+
+  def gmail
+    refresh_token! if token_expired?
+
+    begin
+      client = Gmail.connect(:xoauth2, email, token)
+      yield client
+    ensure
+      client.logout
+    end
   end
 
   def client
