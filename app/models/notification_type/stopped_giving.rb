@@ -6,7 +6,7 @@ class NotificationType::StoppedGiving < NotificationType
   def check(designation_account)
     notifications = []
     designation_account.contacts.financial_partners.each do |contact|
-      date = contact.direct_deposit? ? 60.days.ago : ((contact.pledge_frequency.to_i || 1) + 1).months.ago
+      date = contact.direct_deposit? ? 60.days.ago : ((contact.pledge_frequency.to_i > 0 ? contact.pledge_frequency.to_i : 1) + 1).months.ago
       prior_notification = Notification.active.where(contact_id: contact.id, notification_type_id: id).first
 
       if contact.donations.for(designation_account).since(date).first
