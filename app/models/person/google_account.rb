@@ -35,19 +35,24 @@ class Person::GoogleAccount < ActiveRecord::Base
 
     gmail do |g|
       # loop through all contacts, logging email addresses
-      account_list.contacts.each do |contact|
+      email_addresses = []
+      account_list.contacts.active.includes(people: :email_addresses).each do |contact|
         contact.people.each do |person|
           person.email_addresses.collect(&:email).uniq.each do |email|
-            # sent emails
-            sent = g.mailbox("[Gmail]/Sent Mail")
-            sent.emails(to: email, after: since).each do |gmail_message|
-              log_email(gmail_message, account_list, contact, person, 'Done')
-            end
+            unless email_addresses.include?(email)
+              email_addresses << email
 
-            # received emails
-            all = g.mailbox("[Gmail]/All Mail")
-            all.emails(from: email, after: since).each do |gmail_message|
-              log_email(gmail_message, account_list, contact, person, 'Received')
+              # sent emails
+              sent = g.mailbox("[Gmail]/Sent Mail")
+              sent.emails(to: email, after: since).each do |gmail_message|
+                log_email(gmail_message, account_list, contact, person, 'Done')
+              end
+
+              # received emails
+              all = g.mailbox("[Gmail]/All Mail")
+              all.emails(from: email, after: since).each do |gmail_message|
+                log_email(gmail_message, account_list, contact, person, 'Received')
+              end
             end
           end
         end
@@ -69,7 +74,7 @@ class Person::GoogleAccount < ActiveRecord::Base
                                 account_list_id: account_list.id,
                                 activity_type: 'Email',
                                 result: result)
-    task.activity_comments.create!(body: message, person: person)
+    task.activity_comments.create!(body: message.to_s.unpack("C*").pack("U*").force_encoding("UTF-8").encode!, person: person)
   end
 
   def gmail
@@ -91,8 +96,21 @@ class Person::GoogleAccount < ActiveRecord::Base
     @client
   end
 
-  def plus
-    @plus ||= client.discovered_api('plus')
+  def plus_api
+    @plus_api ||= client.discovered_api('plus')
+  end
+
+  def calendar_api
+    @calendar_api ||= client.discovered_api('calendar', 'v3')
+  end
+
+  def calendars
+    result = client.execute(
+      :api_method => calendar_api.calendar_list.list,
+      :parameters => {'userId' => 'me'}
+    )
+    calendar_list = result.data
+    calendar_list.items.detect_all {|c| c.accessRole == 'owner'}
   end
 
   def imap
@@ -103,6 +121,10 @@ class Person::GoogleAccount < ActiveRecord::Base
       @imap.authenticate('XOAUTH2', email, token)
     end
     @imap
+  end
+
+  def folders
+    @folders ||= imap.list '/', '*'
   end
 
   def token_expired?
@@ -122,6 +144,8 @@ class Person::GoogleAccount < ActiveRecord::Base
   end
 
   def refresh_token!
+    raise 'No refresh token' if refresh_token.blank?
+
     # Refresh auth token from google_oauth2.
     params = {
         client_id: APP_CONFIG['google_key'],
