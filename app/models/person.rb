@@ -30,6 +30,8 @@ class Person < ActiveRecord::Base
   has_many :pictures, as: :picture_of, dependent: :destroy
   has_one :primary_picture, as: :picture_of, class_name: 'Picture', conditions: {primary: true}
   has_many :activity_comments, dependent: :destroy
+  has_many :messages_sent, class_name: 'Message', foreign_key: :from_id, dependent: :destroy
+  has_many :messages_received, class_name: 'Message', foreign_key: :to_id, dependent: :destroy
 
   accepts_nested_attributes_for :email_addresses, :reject_if => lambda { |e| e[:email].blank? }, :allow_destroy => true
   accepts_nested_attributes_for :phone_numbers, :reject_if => lambda { |p| p[:number].blank? }, :allow_destroy => true
@@ -184,6 +186,9 @@ class Person < ActiveRecord::Base
 
   def merge(other)
     Person.transaction(:requires_new => true) do
+      other.messages_sent.update_all(from_id: id)
+      other.messages_received.update_all(to_id: id)
+
       %w[phone_numbers company_positions].each do |relationship|
         other.send(relationship.to_sym).each do |other_rel|
           unless send(relationship.to_sym).detect { |rel| rel == other_rel }

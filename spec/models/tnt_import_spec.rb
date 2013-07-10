@@ -100,12 +100,12 @@ describe TntImport do
     it 'creates a new task' do
       expect {
         tasks = import.send(:import_tasks)
-        tasks.first[1].tnt_id.should_not be_nil
+        tasks.first[1].remote_id.should_not be_nil
       }.to change(Task, :count).by(1)
     end
 
     it 'updates an existing task' do
-      create(:task, tnt_id: task_rows.first['id'], account_list: tnt_import.account_list)
+      create(:task, source: 'tnt', remote_id: task_rows.first['id'], account_list: tnt_import.account_list)
 
       expect {
         import.send(:import_tasks)
@@ -123,12 +123,12 @@ describe TntImport do
     it 'creates a new completed task' do
       expect {
         tasks = import.send(:import_history)
-        tasks.first[1].tnt_id.should_not be_nil
+        tasks.first[1].remote_id.should_not be_nil
       }.to change(Task, :count).by(1)
     end
 
     it 'marks an existing task as completed' do
-      create(:task, tnt_id: history_rows.first['id'], account_list: tnt_import.account_list)
+      create(:task, source: 'tnt', remote_id: history_rows.first['id'], account_list: tnt_import.account_list)
 
       expect {
         import.send(:import_history)

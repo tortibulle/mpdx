@@ -7,6 +7,7 @@ class Activity < ActiveRecord::Base
 
   belongs_to :account_list
   belongs_to :notification, inverse_of: :tasks
+  belongs_to :contact
   has_many :activity_contacts, dependent: :destroy
   has_many :contacts, through: :activity_contacts
   has_many :activity_comments, dependent: :destroy

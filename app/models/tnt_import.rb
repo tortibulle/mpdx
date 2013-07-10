@@ -126,7 +126,7 @@ class TntImport
 
     Array.wrap(xml['Task']['row']).each do |row|
       task = Retryable.retryable do
-        @account_list.tasks.where(tnt_id: row['id']).first_or_initialize
+        @account_list.tasks.where(remote_id: row['id'], source: 'tnt').first_or_initialize
       end
 
       task.attributes = {
@@ -154,7 +154,7 @@ class TntImport
 
     Array.wrap(xml['History']['row']).each do |row|
       task = Retryable.retryable do
-        @account_list.tasks.where(tnt_id: row['id']).first_or_initialize
+        @account_list.tasks.where(remote_id: row['id'], source: 'tnt').first_or_initialize
       end
 
       task.attributes = {

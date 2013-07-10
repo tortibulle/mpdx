@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130708222442) do
+ActiveRecord::Schema.define(:version => 20130710152055) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -74,14 +74,14 @@ ActiveRecord::Schema.define(:version => 20130708222442) do
     t.string   "result"
     t.datetime "completed_at"
     t.integer  "notification_id"
-    t.string   "tnt_id"
+    t.string   "remote_id"
+    t.string   "source"
   end
 
   add_index "activities", ["account_list_id"], :name => "index_activities_on_account_list_id"
   add_index "activities", ["activity_type"], :name => "index_activities_on_activity_type"
   add_index "activities", ["notification_id"], :name => "index_activities_on_notification_id"
   add_index "activities", ["start_at"], :name => "index_activities_on_start_at"
-  add_index "activities", ["tnt_id"], :name => "index_activities_on_tnt_id"
 
   create_table "activity_comments", :force => true do |t|
     t.integer  "activity_id"
@@ -279,16 +279,6 @@ ActiveRecord::Schema.define(:version => 20130708222442) do
 
   add_index "designation_profile_accounts", ["designation_profile_id", "designation_account_id"], :name => "designation_p_to_a", :unique => true
 
-  create_table "designation_profile_users", :force => true do |t|
-    t.integer  "designation_profile_id"
-    t.integer  "user_id"
-    t.datetime "created_at",             :null => false
-    t.datetime "updated_at",             :null => false
-  end
-
-  add_index "designation_profile_users", ["designation_profile_id", "user_id"], :name => "profile_user"
-  add_index "designation_profile_users", ["user_id"], :name => "index_designation_profile_users_on_user_id"
-
   create_table "designation_profiles", :force => true do |t|
     t.string   "remote_id"
     t.integer  "user_id",                                          :null => false
@@ -429,10 +419,11 @@ ActiveRecord::Schema.define(:version => 20130708222442) do
     t.string   "state"
     t.string   "country"
     t.string   "postal_code"
+    t.boolean  "verified",        :default => false, :null => false
+    t.boolean  "boolean",         :default => false, :null => false
+    t.text     "smarty_response"
     t.datetime "created_at",                         :null => false
     t.datetime "updated_at",                         :null => false
-    t.boolean  "verified",        :default => false, :null => false
-    t.text     "smarty_response"
   end
 
   add_index "master_addresses", ["street", "city", "state", "country", "postal_code"], :name => "all_fields"
@@ -468,6 +459,25 @@ ActiveRecord::Schema.define(:version => 20130708222442) do
   end
 
   add_index "master_person_sources", ["organization_id", "remote_id"], :name => "organization_remote_id", :unique => true
+
+  create_table "messages", :force => true do |t|
+    t.integer  "from_id"
+    t.integer  "to_id"
+    t.string   "subject"
+    t.text     "body"
+    t.datetime "sent_at"
+    t.string   "source"
+    t.string   "remote_id"
+    t.integer  "contact_id"
+    t.integer  "account_list_id"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
+  end
+
+  add_index "messages", ["account_list_id"], :name => "index_messages_on_account_list_id"
+  add_index "messages", ["contact_id"], :name => "index_messages_on_contact_id"
+  add_index "messages", ["from_id"], :name => "index_messages_on_from_id"
+  add_index "messages", ["to_id"], :name => "index_messages_on_to_id"
 
   create_table "notification_preferences", :force => true do |t|
     t.integer  "notification_type_id"

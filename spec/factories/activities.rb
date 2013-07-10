@@ -2,7 +2,7 @@
 
 FactoryGirl.define do
   factory :activity do
-    account_list nil
+    association :account_list
     starred false
     location "MyString"
     subject "MyString"

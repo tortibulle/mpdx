@@ -36,7 +36,7 @@ class AccountList < ActiveRecord::Base
   has_many :imports, dependent: :destroy
   has_one  :mail_chimp_account, dependent: :destroy
   has_many :notification_preferences, dependent: :destroy, autosave: true
-
+  has_many :messages
   has_many :designation_profiles
 
   accepts_nested_attributes_for :contacts, reject_if: :all_blank, allow_destroy: true
@@ -216,6 +216,7 @@ class AccountList < ActiveRecord::Base
   def merge(other)
     AccountList.transaction do
       other.designation_profiles.update_all(account_list_id: id)
+      other.messages.update_all(account_list_id: id)
 
       other.users.each do |user|
         users << user unless users.include?(user)

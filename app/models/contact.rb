@@ -24,6 +24,7 @@ class Contact < ActiveRecord::Base
   has_many :activities, through: :activity_contacts
   has_many :tasks, through: :activity_contacts, source: :task
   has_many :notifications, inverse_of: :contact, dependent: :destroy
+  has_many :messages
 
 
   scope :people, where('donor_accounts.master_company_id is null').includes(:donor_accounts)
@@ -180,6 +181,8 @@ class Contact < ActiveRecord::Base
   def merge(other)
     Contact.transaction do
       # Update related records
+      other.messages.update_all(contact_id: id)
+
       other.contact_people.each do |r|
         unless contact_people.where(person_id: r.person_id).first
           r.update_attributes({contact_id: id}, without_protection: true)

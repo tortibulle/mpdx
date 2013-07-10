@@ -30,74 +30,6 @@ class Person::GoogleAccount < ActiveRecord::Base
 
   end
 
-  def import_emails(account_list)
-    since = last_email_sync || 30.days.ago
-
-    gmail do |g|
-      # loop through all contacts, logging email addresses
-      email_addresses = []
-      account_list.contacts.active.includes(people: :email_addresses).each do |contact|
-        contact.people.each do |person|
-          person.email_addresses.collect(&:email).uniq.each do |email|
-            unless email_addresses.include?(email)
-              email_addresses << email
-
-              # sent emails
-              sent = g.mailbox("[Gmail]/Sent Mail")
-              sent.emails(to: email, after: since).each do |gmail_message|
-                log_email(gmail_message, account_list, contact, person, 'Done')
-              end
-
-              # received emails
-              all = g.mailbox("[Gmail]/All Mail")
-              all.emails(from: email, after: since).each do |gmail_message|
-                log_email(gmail_message, account_list, contact, person, 'Received')
-              end
-            end
-          end
-        end
-      end
-    end
-    update_attributes(last_email_sync: Time.now)
-  end
-
-  def log_email(gmail_message, account_list, contact, person, result)
-    if gmail_message.message.multipart?
-      message = gmail_message.message.text_part.body.decoded
-    else
-      message = gmail_message.message.body.decoded
-    end
-    message = message.to_s.unpack("C*").pack("U*").force_encoding("UTF-8").encode!
-    if message.strip.present?
-      task = contact.tasks.create!(subject: gmail_message.subject,
-                                  start_at: gmail_message.envelope.date,
-                                  completed: true,
-                                  completed_at: gmail_message.envelope.date,
-                                  account_list_id: account_list.id,
-                                  activity_type: 'Email',
-                                  result: result)
-      task.activity_comments.create!(body: message, person: person)
-    end
-  end
-
-  def gmail
-    refresh_token! if token_expired?
-
-    begin
-      client = Gmail.connect(:xoauth2, email, token)
-      yield client
-    ensure
-      client.logout
-    end
-  end
-
-  def client
-    unless @client
-      @client = Google::APIClient.new(application_name: 'MPDX', application_version: '1.0')
-      @client.authorization.access_token = token
-    end
-    @client
-  end
 
   def plus_api
     @plus_api ||= client.discovered_api('plus')
@@ -114,20 +46,6 @@ class Person::GoogleAccount < ActiveRecord::Base
     )
     calendar_list = result.data
     calendar_list.items.detect_all {|c| c.accessRole == 'owner'}
-  end
-
-  def imap
-    refresh_token! if token_expired?
-
-    unless @imap
-      @imap = Net::IMAP.new('imap.gmail.com', 993, usessl = true, certs = nil, verify = false)
-      @imap.authenticate('XOAUTH2', email, token)
-    end
-    @imap
-  end
-
-  def folders
-    @folders ||= imap.list '/', '*'
   end
 
   def token_expired?

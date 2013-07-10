@@ -1,10 +1,10 @@
 require 'spec_helper'
 
 describe Person::GoogleAccount do
-    describe 'create from auth' do
+  describe 'create from auth' do
     it 'should create an account linked to a person' do
-      auth_hash = Hashie::Mash.new(uid: '1', 
-                                   info: {email: 'foo@example.com'}, 
+      auth_hash = Hashie::Mash.new(uid: '1',
+                                   info: {email: 'foo@example.com'},
                                    credentials: {token: 'a', refresh_token: 'b', expires: true, expires_at: Time.now.to_i + 100})
       person = FactoryGirl.create(:person)
       -> {
@@ -15,8 +15,8 @@ describe Person::GoogleAccount do
   end
   describe 'update from auth' do
     it 'should update an account that already exists' do
-      auth_hash = Hashie::Mash.new(uid: '1', 
-                                   info: {email: 'foo@example.com'}, 
+      auth_hash = Hashie::Mash.new(uid: '1',
+                                   info: {email: 'foo@example.com'},
                                    credentials: {token: 'a', refresh_token: 'b', expires: true, expires_at: Time.now.to_i + 100})
       person = FactoryGirl.create(:person)
       Person::GoogleAccount.find_or_create_from_auth(auth_hash, person)
