@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 describe Contact do
-  let(:contact) { create(:contact) }
+  let(:account_list) { create(:account_list) }
+  let(:contact) { create(:contact, account_list: account_list) }
 
   describe 'saving addresses' do
     it 'should create an address' do
@@ -90,7 +91,7 @@ describe Contact do
   end
 
   describe 'when merging' do
-    let(:loser_contact) { create(:contact) }
+    let(:loser_contact) { create(:contact, account_list: account_list) }
 
     it "should move all people" do
       contact.people << create(:person)
@@ -141,6 +142,17 @@ describe Contact do
       contact.people.length.should == 1
 
       contact.people.first.facebook_accounts.should == [fb]
+    end
+
+    it "should never delete a task" do
+      task = create(:task, account_list: account_list)
+      loser_contact.tasks << task
+      contact.tasks << task
+      expect {
+      expect {
+        contact.merge(loser_contact)
+      }.not_to change(Task, :count)
+      }.to change(ActivityContact, :count).by(-1)
     end
 
   end

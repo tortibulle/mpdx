@@ -134,7 +134,7 @@ $ ->
 
           $.ajax {
             url: '/tasks/new',
-            data: {add_task_contact_ids: ids, completed: true},
+            data: {add_task_contact_ids: ids.join(','), completed: true},
             dataType: 'script',
             type: 'GET'
           }
