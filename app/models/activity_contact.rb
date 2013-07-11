@@ -7,6 +7,15 @@ class ActivityContact < ActiveRecord::Base
   belongs_to :activity
   belongs_to :task, foreign_key: 'activity_id'
   belongs_to :contact
+  after_create :update_contact_uncompleted_tasks_count
+  after_destroy :update_contact_uncompleted_tasks_count
+
 
   # attr_accessible :contact_id, :activity_id
+  
+    def update_contact_uncompleted_tasks_count
+      contact.uncompleted_tasks_count = contact.tasks.uncompleted.count
+      contact.save(validate: false)
+    end
+
 end
