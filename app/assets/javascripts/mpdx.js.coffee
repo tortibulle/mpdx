@@ -70,7 +70,7 @@ $ ->
     $('#page_spinner').dialog({modal: true, closeOnEscape: false})
 
   $(document).ajaxComplete ->
-    $('#page_spinner').dialog('close')
+    $('#page_spinner').dialog('close') if $('#page_spinner').hasClass('ui-dialog-content')
 
 window.addFields = (link, association, content) ->
   new_id = new Date().getTime()
