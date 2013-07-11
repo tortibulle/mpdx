@@ -6,8 +6,11 @@ namespace :mailchimp do
       if u.email
         vars = { :EMAIL => u.email.email, :FNAME => u.first_name,
                :LNAME => u.last_name}
-        gb.list_subscribe(id: APP_CONFIG['mailchimp_list'], email_address: vars[:EMAIL], update_existing: true,
-                          double_optin: false, merge_vars: vars, send_welcome: false, replace_interests: true)
+        begin
+          gb.list_subscribe(id: APP_CONFIG['mailchimp_list'], email_address: vars[:EMAIL], update_existing: true,
+                            double_optin: false, merge_vars: vars, send_welcome: false, replace_interests: true)
+        rescue Gibbon::MailChimpError
+        end
       end
     end
   end

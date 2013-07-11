@@ -335,7 +335,9 @@ class TntImport
 
     person.save(validate: false)
 
-    contact.people << person unless contact.people.include?(person)
+    Retryable.retryable do
+      contact.people << person unless contact.people.include?(person)
+    end
 
     person
   end

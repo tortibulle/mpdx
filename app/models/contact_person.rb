@@ -5,6 +5,8 @@ class ContactPerson < ActiveRecord::Base
   belongs_to :contact, touch: true
   belongs_to :person
 
+  validates_presence_of :contact_id, :person_id
+
   after_commit :delete_orphaned_person, on: :destroy
   before_create :set_primary_contact
 
@@ -19,7 +21,7 @@ class ContactPerson < ActiveRecord::Base
   end
 
   def set_primary_contact
-    unless contact.primary_person
+    if contact && !contact.primary_person
       self.primary = true
     end
   end

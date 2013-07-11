@@ -61,9 +61,13 @@ class FacebookImport
 
             contact.people.reload
             if fb_spouse
-              contact.people << fb_spouse unless contact.person_ids.include?(fb_spouse.id)
+              Retryable.retryable do
+                contact.people << fb_spouse unless contact.people.include?(fb_spouse)
+              end
             end
-            contact.people << fb_person unless contact.person_ids.include?(fb_person.id)
+            Retryable.retryable do
+              contact.people << fb_person unless contact.people.include?(fb_person)
+            end
 
           rescue => e
             Airbrake.raise_or_notify(e)

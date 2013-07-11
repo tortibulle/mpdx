@@ -72,9 +72,14 @@ class ContactsController < ApplicationController
       @contact = current_account_list.contacts.new(params[:contact])
 
       respond_to do |format|
-        if @contact.save
-          format.html { redirect_to(session[:contact_return_to] || @contact) }
-        else
+        begin
+          if @contact.save
+            format.html { redirect_to(session[:contact_return_to] || @contact) }
+          else
+            format.html { render action: "new" }
+          end
+        rescue Errors::FacebookLink => e
+          flash.now[:alert] = e.message
           format.html { render action: "new" }
         end
       end
