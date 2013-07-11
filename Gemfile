@@ -13,7 +13,7 @@ group :assets do
   #gem 'therubyrhino', '~> 2.0.2'
 
   gem 'uglifier', '~> 1.3.0'
-  gem 'jquery-ui-rails', '~> 3.0.0'
+  gem 'jquery-ui-rails', '~> 3.0.1'
 end
 
 gem 'activeadmin'

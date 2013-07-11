@@ -596,7 +596,7 @@ DEPENDENCIES
   guard-spork
   iniparse (~> 1.1.6)
   jquery-rails (~> 2.1.4)
-  jquery-ui-rails (~> 3.0.0)
+  jquery-ui-rails (~> 3.0.1)
   koala (~> 1.6.0)
   linkedin (~> 0.3.7)
   mailcatcher

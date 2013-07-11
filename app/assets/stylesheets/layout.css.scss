@@ -123,13 +123,6 @@ div.right {
     right: 0;
     color: $white;
   }
-  .account_balances_lots {
-    padding-top: 4px;
-    line-height: 1.1em;
-    font-size: -4px;
-    max-height: 50px;
-    overflow: hidden;
-  }
   a.plain {
     box-shadow: none;
     background: $blue_dark;
@@ -215,7 +208,6 @@ div.right {
 #feedback {
   position: fixed;
   bottom: 0;
-  fixed: fixed;
   background: #0b486b;
   right: 0;
   overflow: hidden;
