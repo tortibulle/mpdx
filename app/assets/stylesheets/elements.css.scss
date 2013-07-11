@@ -36,13 +36,14 @@ $leftmenuwidth: 200px;
 .col_25 {width: 23%;}
 .col_50 {width: 48%;}
 .col_30 {width: 30%;}
+.col_33 {width: 30%;}
 
 @mixin listclear {list-style: none; margin: 0; padding: 0;}
 
 .avatar.small {width: 50px; height: 50px}
 .avatar.mid {width: 125px;}
 .avatar.large {width: 200px;}
-  
+
 
 
 /* ************************************************************** */
@@ -63,7 +64,7 @@ $leftmenuwidth: 200px;
   border: 1px solid #ccc;
   border-bottom: 1px solid #bbb;
   border-radius: 3px;
-  padding: 8px 15px;  
+  padding: 8px 15px;
   width: auto;
   display: inline-block;}
 .btn:hover {
