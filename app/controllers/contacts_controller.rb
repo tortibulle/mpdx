@@ -3,6 +3,7 @@ class ContactsController < ApplicationController
   before_filter :get_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals, :details]
   before_filter :setup_view_options, only: [:index]
   before_filter :setup_filters, only: [:index, :show]
+  before_filter :clear_annoying_redirect_locations
 
   def index
     if params[:filters] && params[:filters][:name].present?
@@ -69,6 +70,8 @@ class ContactsController < ApplicationController
 
   def create
     Contact.transaction do
+      session[:contact_return_to] = nil if session[:contact_return_to].to_s.include?('edit')
+
       @contact = current_account_list.contacts.new(params[:contact])
 
       respond_to do |format|
@@ -295,7 +298,7 @@ class ContactsController < ApplicationController
     current_user.contacts_filter ||= {}
     clear_filters = params.delete(:clear_filter)
     if filters_params.present? && current_user.contacts_filter[current_account_list.id] != filters_params
-        @view_options[:page] = 1 
+        @view_options[:page] = 1
         current_user.contacts_filter[current_account_list.id] = filters_params
         current_user.save
     elsif clear_filters == 'true'
@@ -348,4 +351,10 @@ class ContactsController < ApplicationController
     @view_options = view_options || params.slice(:per_page, :page)
   end
 
+  def clear_annoying_redirect_locations
+    if session[:contact_return_to].to_s.include?('edit') ||
+       session[:contact_return_to].to_s.include?('new')
+      session[:contact_return_to] = nil
+    end
+  end
 end

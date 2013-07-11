@@ -8,6 +8,8 @@
       <%= @mail_chimp_account.validation_error %><br /><br />
     <% end %>
 
+    <%= link_to(_('Click here to watch a video showing you how to link to Mailchimp'), 'https://sites.google.com/a/cru.org/mpdx/sync-with-mail-chimp', target: '_blank') %>
+    <br />
     <%= form_for @mail_chimp_account do |f| %>
       <div class="field">
         <%= f.label :api_key, _('Api Key') %>
