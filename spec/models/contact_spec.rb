@@ -113,7 +113,9 @@ describe Contact do
       contact.tasks << shared_task
       loser_contact.tasks << shared_task
 
-      contact.merge(loser_contact)
+      contact.update_uncompleted_tasks_count
+      expect { contact.merge(loser_contact) }
+        .to change(contact, :uncompleted_tasks_count).by(1)
 
       contact.tasks.should include(task, shared_task)
       shared_task.contacts.should match_array [contact]

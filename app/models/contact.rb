@@ -200,6 +200,7 @@ class Contact < ActiveRecord::Base
           other_activity_contact.update_column(:contact_id, id)
         end
       end
+      update_uncompleted_tasks_count
 
       other.addresses.each do |other_address|
         unless addresses.detect { |address| address == other_address }
@@ -311,6 +312,11 @@ class Contact < ActiveRecord::Base
         return
       end
     end
+  end
+
+  def update_uncompleted_tasks_count
+    self.uncompleted_tasks_count = tasks.uncompleted.count
+    save(validate: false)
   end
 
   private

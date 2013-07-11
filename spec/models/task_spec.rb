@@ -10,8 +10,14 @@ describe Task do
     contact.reload.uncompleted_tasks_count.should == 2
 
     task1.update_attributes(completed: true)
-    task1.send(:update_contact_uncompleted_tasks_count)
 
+    contact.reload.uncompleted_tasks_count.should == 1
+
+    task1.update_attributes(completed: false)
+
+    contact.reload.uncompleted_tasks_count.should == 2
+
+    task2.destroy
     contact.reload.uncompleted_tasks_count.should == 1
   end
 end
