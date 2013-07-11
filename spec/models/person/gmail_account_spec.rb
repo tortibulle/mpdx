@@ -75,7 +75,7 @@ describe Person::GmailAccount do
 
   context '#log_email' do
     let(:gmail_message) { double(message: double(multipart?: false, body: double(decoded: 'message body')),
-                                 envelope: double(date: Time.now, message_id: '1'),
+                                 envelope: double(date: '2013-07-11 15:12:47', message_id: '1'),
                                  subject: 'subject') }
 
     it "creates a completed task" do
@@ -88,7 +88,7 @@ describe Person::GmailAccount do
       task = Task.last
       task.subject.should == 'subject'
       task.completed.should == true
-      task.completed_at.should == gmail_message.envelope.date
+      task.completed_at.should == DateTime.parse(gmail_message.envelope.date)
       task.result.should == 'Done'
     end
 
@@ -111,7 +111,7 @@ describe Person::GmailAccount do
       task.subject.should == 'subject'
       task.body.should == 'message body'
       task.remote_id.should == gmail_message.envelope.message_id
-      task.sent_at.should == gmail_message.envelope.date
+      task.sent_at.should == DateTime.parse(gmail_message.envelope.date)
     end
 
     it "doesn't create a duplicate message" do
