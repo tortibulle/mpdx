@@ -32,9 +32,11 @@ class Task < Activity
     end
 
     def update_contact_uncompleted_tasks_count
-      if changed.include?('completed')
-        contact.uncompleted_tasks_count = contact.tasks.uncompleted.count
-        contact.save(validate: false)
+      if completed?
+        contacts.each do |contact|
+          contact.uncompleted_tasks_count = contact.tasks.uncompleted.count
+          contact.save(validate: false)
+        end
       end
     end
 end
