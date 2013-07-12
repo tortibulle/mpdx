@@ -1,15 +1,19 @@
-<% @by_month = current_account_list.donations.where("donation_date >= ?", 12.months.ago.utc.beginning_of_month).group_by {|r| r.donation_date.beginning_of_month}
-   @by_month_index = 12.downto(0).collect {|i| i.months.ago.to_date.beginning_of_month}
+<% 
+  first_donation_date = current_account_list.donations.select('donation_date').last.donation_date
+  @time_span = ((Date.today.end_of_month - first_donation_date).to_f / 30).floor
+  @time_span = 12 if @time_span > 12
+  @by_month = current_account_list.donations.where("donation_date >= ?", @time_span.months.ago.utc.beginning_of_month).group_by {|r| r.donation_date.beginning_of_month}
+   @by_month_index = @time_span.downto(0).collect {|i| i.months.ago.to_date.beginning_of_month}
 
    pledges = current_account_list.total_pledges.to_i
    total = 0
    @by_month.each { |month| month[1].each { |d| total += d.amount if d.donation_date < Date.today.beginning_of_month } }
-   monthly_average = (total / 12).to_i
+   monthly_average = (total / @time_span).to_i
    plot_line_values = [pledges, current_account_list.monthly_goal, monthly_average] %>
 
 
 <script type="text/javascript" charset="utf-8">
-  var months_to_dates = <%== 12.downto(0).collect {|i| i.months.ago.to_date.beginning_of_month}.to_json %>;
+  var months_to_dates = <%== @time_span.downto(0).collect {|i| i.months.ago.to_date.beginning_of_month}.to_json %>;
   var chart;
   $(document).ready(function() {
     chart = new Highcharts.Chart({
@@ -39,7 +43,7 @@
       },
       xAxis: {
         categories: [
-          <%== 12.downto(0).collect {|i| l(i.months.ago.to_date, format: :month_abbrv).inspect}.join(",\n") %>
+          <%== @time_span.downto(0).collect {|i| l(i.months.ago.to_date, format: :month_abbrv).inspect}.join(",\n") %>
         ]
       },
       yAxis: {

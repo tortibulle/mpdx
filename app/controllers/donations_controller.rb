@@ -1,6 +1,8 @@
 class DonationsController < ApplicationController
   def index
     if params[:contact_id]
+      @page_title = _('Donations')
+
       @contact = current_account_list.contacts.where(id: params[:contact_id]).first
       if @contact.donor_account_ids.present?
         @all_donations = current_account_list.donations.where(donor_account_id: @contact.donor_account_ids)
