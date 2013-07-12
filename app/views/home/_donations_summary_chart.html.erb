@@ -1,7 +1,12 @@
 <% 
-  first_donation_date = current_account_list.donations.select('donation_date').last.donation_date
-  @time_span = ((Date.today.end_of_month - first_donation_date).to_f / 30).floor
-  @time_span = 12 if @time_span > 12
+  first_donation = current_account_list.donations.select('donation_date').last
+  if(first_donation)
+    first_donation_date = first_donation.donation_date
+    @time_span = ((Date.today.end_of_month - first_donation_date).to_f / 30).floor
+    @time_span = 12 if @time_span > 12
+  else
+    @time_span = 1
+  end
   @by_month = current_account_list.donations.where("donation_date >= ?", @time_span.months.ago.utc.beginning_of_month).group_by {|r| r.donation_date.beginning_of_month}
    @by_month_index = @time_span.downto(0).collect {|i| i.months.ago.to_date.beginning_of_month}
 
