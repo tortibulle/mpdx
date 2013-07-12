@@ -2,6 +2,7 @@ class Task < Activity
 
   before_validation :update_completed_at
   after_save :update_contact_uncompleted_tasks_count
+  after_destroy :update_contact_uncompleted_tasks_count
 
   scope :of_type, ->(activity_type) { where(activity_type: activity_type) }
   scope :with_result, ->(result) { where(result: result) }
@@ -32,6 +33,6 @@ class Task < Activity
     end
 
     def update_contact_uncompleted_tasks_count
-      contacts.map(&:update_uncompleted_tasks_count) if completed
+      contacts.map(&:update_uncompleted_tasks_count)
     end
 end

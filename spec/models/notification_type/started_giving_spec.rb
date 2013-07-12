@@ -41,7 +41,7 @@ describe NotificationType::StartedGiving do
 
     it "associates the contact with the task created" do
       task = started_giving.create_task(account_list, contact.notifications.new)
-      task.contacts.should include contact
+      task.contacts.reload.should include contact
     end
   end
 end

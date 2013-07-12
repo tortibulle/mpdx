@@ -33,7 +33,7 @@ describe NotificationType::SpecialGift do
 
     it "associates the contact with the task created" do
       task = special_gift.create_task(account_list, contact.notifications.new(donation_id: donation.id))
-      task.contacts.should include contact
+      task.contacts.reload.should include contact
     end
   end
 end

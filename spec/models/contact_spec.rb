@@ -118,7 +118,7 @@ describe Contact do
         .to change(contact, :uncompleted_tasks_count).by(1)
 
       contact.tasks.should include(task, shared_task)
-      shared_task.contacts.should match_array [contact]
+      shared_task.contacts.reload.should match_array [contact]
     end
 
     it "should not duplicate referrals" do
