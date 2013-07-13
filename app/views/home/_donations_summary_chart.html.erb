@@ -4,6 +4,7 @@
     first_donation_date = first_donation.donation_date
     @time_span = ((Date.today.end_of_month - first_donation_date).to_f / 30).floor
     @time_span = 12 if @time_span > 12
+    @time_span = 1 if @time_span < 1
   else
     @time_span = 1
   end
