@@ -12,6 +12,10 @@ class HomeController < ApplicationController
   end
 
   def progress
+    if !request.xhr?
+      redirect_to '/'
+    end
+
     if params[:start_date]
       @start_date = Date.parse(params[:start_date])
     else
