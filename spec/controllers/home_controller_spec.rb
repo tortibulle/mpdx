@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe HomeController do
+  render_views
 
   describe "when not logged in" do
     describe "GET 'index'" do
@@ -45,6 +46,12 @@ describe HomeController do
         @user.update_attributes(preferences: {setup: true})
         get 'index'
         response.should redirect_to('/setup/org_accounts')
+      end
+
+      it 'should include graph' do
+        @user.account_lists.first.update_attributes(monthly_goal: "100")
+        get 'index'
+        response.should render_template("donations_summary_chart")
       end
     end
   end
