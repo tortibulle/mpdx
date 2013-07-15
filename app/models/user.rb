@@ -23,7 +23,8 @@ class User < Person
   # Queue data imports
   def queue_imports
     organization_accounts.each do |oa|
-      oa.queue_import_data unless oa.downloading? || (oa.last_download && oa.last_download > 1.day.ago)
+      oa.queue_import_data unless oa.last_download
+      #oa.queue_import_data unless oa.downloading? || (oa.last_download && oa.last_download > 1.day.ago)
     end
   end
 
