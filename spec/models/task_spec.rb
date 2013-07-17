@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Task do
+  let(:account_list) { create(:account_list) }
   it "updates a related contacts uncompleted tasks count" do
-    account_list = create(:account_list)
     task1 = create(:task, account_list: account_list)
     task2 = create(:task, account_list: account_list)
     contact = create(:contact, account_list: account_list)

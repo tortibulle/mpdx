@@ -12,10 +12,10 @@ class ActivityContact < ActiveRecord::Base
 
 
   # attr_accessible :contact_id, :activity_id
-  
+
   private
   def update_contact_uncompleted_tasks_count
-    contact.update_uncompleted_tasks_count
+    contact.try(:update_uncompleted_tasks_count)
   end
 
 end

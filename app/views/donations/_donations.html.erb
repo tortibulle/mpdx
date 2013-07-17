@@ -33,7 +33,7 @@
       <tr id="<%= donation.id %>">
         <td class="date"><%= l donation.donation_date %></td>
         <% unless @contact %>
-          <td><%= donation.donor_account.name %></td>
+          <td><%= link_to(donation.donor_account.contacts.first.name, donation.donor_account.contacts.first) %></td>
         <% end %>
         <td class="right"><%= donation.tendered_amount %></td>
         <% if multiple_designations %>

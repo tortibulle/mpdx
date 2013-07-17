@@ -20,8 +20,9 @@ class DonationsController < ApplicationController
         @start_date = Date.today.beginning_of_month
       end
       @end_date = @start_date.end_of_month
-      @donations = current_account_list.donations.where(designation_account_id: designation_account_ids)
-                                                 .where("donation_date BETWEEN ? AND ?", @start_date, @end_date)
+      @donations = current_account_list.donations.where("donation_date BETWEEN ? AND ?", @start_date, @end_date)
+                                                 .where("contacts.account_list_id" => current_account_list.id)
+                                                 .includes(donor_account: :contacts)
     end
   end
 
