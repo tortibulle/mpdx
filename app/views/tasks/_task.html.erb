@@ -37,6 +37,13 @@
                        <%= _('No phone number') %><br />
                   <% end
                    end
+                   if contact.referrals_to_me.present? %>
+                     <br />
+                     <strong><%= _('Referred by:') %></strong>
+                     <%== contact.referrals_to_me.collect do |c| 
+                       link_to(exhibit(c, self).to_s, c, target: '_blank')
+                     end.join(', ') %>
+                <% end
                  when 'Email'
                    contact.people.each do |person| %>
                      <strong><%= person.to_s %></strong>:
