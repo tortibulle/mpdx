@@ -33,3 +33,4 @@ public/mobile
 *.sublime-project
 *.sublime-workspace
 cloudinary.yml
+config/sidekiq.yml
