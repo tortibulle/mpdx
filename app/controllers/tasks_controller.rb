@@ -130,7 +130,26 @@ class TasksController < ApplicationController
     tasks = current_account_list.tasks.where(id: params[:bulk_task_update_ids].split(','))
     attributes_to_update = params[:task].select { |_, v| v.present? }
 
-    tasks.map {|t| t.update_attributes(attributes_to_update) } if attributes_to_update.present?
+    # Set default date values for parts of date that aren't set
+    if attributes_to_update["start_at(1i)"] || attributes_to_update["start_at(2i)"] || attributes_to_update["start_at(3i)"]
+      today = Date.today
+      attributes_to_update["start_at(1i)"] ||= today.year.to_s
+      attributes_to_update["start_at(2i)"] ||= today.month.to_s
+      attributes_to_update["start_at(3i)"] ||= today.day.to_s
+    end
+
+    if attributes_to_update.present?
+      tasks.map do |t|
+        if attributes_to_update["start_at(1i)"] || attributes_to_update["start_at(2i)"] || attributes_to_update["start_at(3i)"]
+          attributes_with_date = attributes_to_update.dup
+          attributes_with_date["start_at(4i)"] ||= t.start_at.hour.to_s
+          attributes_with_date["start_at(5i)"] ||= t.start_at.min.to_s
+          t.update_attributes(attributes_with_date)
+        else
+          t.update_attributes(attributes_to_update)
+        end
+      end
+    end
 
     respond_to do |format|
       format.html { redirect_to :back }
