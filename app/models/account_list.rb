@@ -111,6 +111,7 @@ class AccountList < ActiveRecord::Base
 
   def total_pledges
     @total_pledges ||= contacts.financial_partners.sum(&:monthly_pledge)
+    @total_pledges.round(2)
   end
 
   def people_with_birthdays(start_date, end_date)
