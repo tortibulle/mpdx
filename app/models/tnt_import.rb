@@ -19,8 +19,12 @@ class TntImport
           # just strip them out.
           # The eval is dirty, but it was all I could come up with at the time
           # to unescape a unicode character.
-          bad_char = e.message.match(/"([^"]*)"/)[1]
-          subbed = @contents.gsub!(eval(%Q{"#{bad_char}"}), " ")
+          begin
+            bad_char = e.message.match(/"([^"]*)"/)[1]
+            subbed = @contents.gsub!(eval(%Q{"#{bad_char}"}), " ")
+          rescue => new_error
+            raise e
+          end
           retry
         end
       end
