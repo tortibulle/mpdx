@@ -282,6 +282,10 @@ class AccountList < ActiveRecord::Base
     @all_contacts
   end
 
+  def cache_key
+    super + total_pledges.to_s
+  end
+
   private
 
   def import_data

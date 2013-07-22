@@ -1,7 +1,7 @@
 require 'digest/sha1'
 
 class UserSerializer < ActiveModel::Serializer
-  # cached
+  cached
 
   embed :ids, include: true
   attributes :id, :first_name, :last_name, :master_person_id, :created_at, :updated_at
