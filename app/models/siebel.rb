@@ -105,8 +105,6 @@ class Siebel < DataServer
     @profiles_with_designation_numbers
   end
 
-  protected
-
   def profiles
     unless @profiles
       unless relay_account = @org_account.user.relay_accounts.first
@@ -120,6 +118,8 @@ class Siebel < DataServer
     end
     @profiles
   end
+
+  protected
 
   def find_or_create_designation_account(number, profile, extra_attributes = {})
     @designation_accounts ||= {}

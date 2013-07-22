@@ -19,7 +19,8 @@ class Person::RelayAccount < ActiveRecord::Base
     }
 
     account = super
-    account.find_or_create_org_account(auth_hash)
+    org = Organization.find_by_name('Campus Crusade for Christ - USA')
+    account.find_or_create_org_account(auth_hash) if user.organization_accounts.where(organization_id: org.id).blank?
     account
   end
 
@@ -41,18 +42,22 @@ class Person::RelayAccount < ActiveRecord::Base
   end
 
   def find_or_create_org_account(auth_hash)
-    org = Organization.find_by_name('Campus Crusade for Christ - USA')
-    if (emplid = auth_hash.extra.attributes.first.emplid) && (designation = auth_hash.extra.attributes.first.designation)
+    if SiebelDonations::Profile.find(ssoGuid: remote_id).present?
+      org = Organization.find_by_name('Campus Crusade for Christ - USA')
+
       # we need to create an organization account if we don't already have one
       account = person.organization_accounts.where(organization_id: org.id).first_or_initialize
-      account.assign_attributes({organization_id: org.id,
-                                  remote_id: emplid,
+
+      emplid = auth_hash.extra.attributes.first.emplid || 'NO-EMPLID'
+      designation = auth_hash.extra.attributes.first.designation || 'NO-DESIG'
+
+      account.assign_attributes({ remote_id: remote_id,
                                   token: "#{APP_CONFIG['itg_auth_key']}_#{designation}_#{emplid}",
                                   authenticated: true,
                                   valid_credentials: true}, without_protection: true)
+
       account.save(validate: false)
     end
-
   end
 
   private

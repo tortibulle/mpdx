@@ -18,11 +18,11 @@ FactoryGirl.define do
     account_balance_params 'UserName=$ACCOUNT$&Password=$PASSWORD$&Profile=$PROFILE$&Action=AccountBalance'
 
   end
-  
+
 
   factory :ccc, parent: :organization do
     name "Campus Crusade for Christ - USA"
-    api_class 'SiebelTemp'
+    api_class 'Siebel'
     profiles_params 'Action=Profiles'
     addresses_params 'Profile=$PROFILE$&DateFrom=$DATEFROM$&Action=Donors'
     donations_params 'Profile=$PROFILE$&DateFrom=$DATEFROM$&DateTo=$DATETO$&Action=Gifts'
