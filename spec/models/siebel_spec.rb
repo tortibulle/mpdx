@@ -11,7 +11,7 @@ describe Siebel do
   let(:da2) { build(:designation_account, staff_account_id: 2, organization: org) }
   let(:donor_account) { create(:donor_account, organization: org) }
   let(:contact) { create(:contact) }
-  let(:siebel_donor) { SiebelDonations::Donor.new(Oj.load('{ "id": "602506447", "accountName": "Hillside Evangelical Free Church", "contacts": [ { "id": "1-2XH-663", "primary": true, "firstName": "Friend", "lastName": "of the Ministry", "sex": "Unspecified", "phoneNumbers": [ { "id": "1-CI7-4832", "type": "Work", "primary": true, "phone": "408/269-4782" } ] } ], "addresses": [ { "id": "1-HS7-779", "type": "Mailing", "primary": true, "seasonal": false, "address1": "545 Hillsdale Ave", "city": "San Jose", "state": "CA", "zip": "95136-1202" } ], "type": "Business" }')) }
+  let(:siebel_donor) { SiebelDonations::Donor.new(Oj.load('{ "id": "602506447", "accountName": "Hillside Evangelical Free Church", "contacts": [ { "updatedAt":"' + 1.day.ago.to_s(:db) + '","id": "1-2XH-663", "primary": true, "firstName": "Friend", "lastName": "of the Ministry", "sex": "Unspecified", "phoneNumbers": [ { "updatedAt":"' + 1.day.ago.to_s(:db) + '","id": "1-CI7-4832", "type": "Work", "primary": true, "phone": "408/269-4782" } ] } ], "addresses": [ { "updatedAt":"' + 1.day.ago.to_s(:db) + '","id": "1-HS7-779", "type": "Mailing", "primary": true, "seasonal": false, "address1": "545 Hillsdale Ave", "city": "San Jose", "state": "CA", "zip": "95136-1202" } ], "type": "Business" }')) }
 
   before do
     account_list.users << person.to_user
@@ -127,7 +127,7 @@ describe Siebel do
     end
 
     it "updates an existing donation" do
-      donation = create(:donation, remote_id: "1-IGQAM", amount: 5, designation_account: da1)
+      create(:donation, remote_id: "1-IGQAM", amount: 5, designation_account: da1)
 
       expect {
         siebel.send(:add_or_update_donation, siebel_donation, da1, designation_profile)
@@ -148,11 +148,21 @@ describe Siebel do
       designation_profile.designation_accounts << da1
 
       stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/donors?having_given_to_designations=#{da1.designation_number}&response_timeout=60000").
-        to_return(:status => 200, :body => '[{"id":"602506447","accountName":"HillsideEvangelicalFreeChurch","type":"Business"}]')
+        to_return(:status => 200, :body => '[{"id":"602506447","accountName":"HillsideEvangelicalFreeChurch","type":"Business","updatedAt":"' + Date.today.to_s(:db) +'"}]')
 
       siebel.should_receive(:add_or_update_donor_account)
       siebel.should_receive(:add_or_update_company)
-      siebel.import_donors(designation_profile)
+      siebel.import_donors(designation_profile, Date.today)
+    end
+
+    it "skips a donor who hasn't been updated since the last download" do
+      designation_profile.designation_accounts << da1
+
+      stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/donors?having_given_to_designations=#{da1.designation_number}&response_timeout=60000").
+        to_return(:status => 200, :body => '[{"id":"602506447","accountName":"HillsideEvangelicalFreeChurch","type":"Business","updatedAt":"2012-01-01"}]')
+
+      siebel.should_not_receive(:add_or_update_donor_account)
+      siebel.import_donors(designation_profile, Date.today)
     end
   end
 
@@ -178,13 +188,26 @@ describe Siebel do
 
       donor_account.reload.name.should == siebel_donor.account_name
     end
+
+    it "skips people who haven't been updated since the last download" do
+      donor_account = create(:donor_account, organization: org, account_number: siebel_donor.id)
+
+      siebel.should_not_receive(:add_or_update_person)
+
+      expect {
+        siebel.send(:add_or_update_donor_account, account_list, siebel_donor, designation_profile, Date.today)
+      }.not_to change { DonorAccount.count }
+
+      donor_account.reload.name.should == siebel_donor.account_name
+    end
+
   end
 
   context '#add_or_update_person' do
     let(:siebel_person) { SiebelDonations::Contact.new(Oj.load('{"id":"1-3GJ-2744","primary":true,"firstName":"Jean","preferredName":"Jean","lastName":"Spansel","title":"Mrs","sex":"F"}')) }
 
     it "adds a new person" do
-      siebel_person_with_rels = SiebelDonations::Contact.new(Oj.load('{"id":"1-3GJ-2744","primary":true,"firstName":"Jean","preferredName":"Jean","lastName":"Spansel","title":"Mrs","sex":"F","emailAddresses":[{"id":"1-CEX-8425","type":"Home","primary":true,"email":"markmarthaspansel@gmail.com"}],"phoneNumbers":[{"id":"1-BTE-2524","type":"Work","primary":true,"phone":"510/656-7873"}]}'))
+      siebel_person_with_rels = SiebelDonations::Contact.new(Oj.load('{"id":"1-3GJ-2744","primary":true,"firstName":"Jean","preferredName":"Jean","lastName":"Spansel","title":"Mrs","sex":"F","emailAddresses":[{"updatedAt":"' + 1.day.ago.to_s(:db) + '","id":"1-CEX-8425","type":"Home","primary":true,"email":"markmarthaspansel@gmail.com"}],"phoneNumbers":[{"id":"1-BTE-2524","type":"Work","primary":true,"phone":"510/656-7873"}]}'))
 
       siebel.should_receive(:add_or_update_email_address).twice
       siebel.should_receive(:add_or_update_phone_number).twice
@@ -194,12 +217,21 @@ describe Siebel do
       }.to change { Person.count }.by(2)
     end
 
+    it "skips phone numbers and emails that have not been updated" do
+      siebel_person_with_rels = SiebelDonations::Contact.new(Oj.load('{"id":"1-3GJ-2744","primary":true,"firstName":"Jean","preferredName":"Jean","lastName":"Spansel","title":"Mrs","sex":"F","emailAddresses":[{"updatedAt":"' + 1.day.ago.to_s(:db) + '","id":"1-CEX-8425","type":"Home","primary":true,"email":"markmarthaspansel@gmail.com"}],"phoneNumbers":[{"updatedAt":"' + 1.day.ago.to_s(:db) + '","id":"1-BTE-2524","type":"Work","primary":true,"phone":"510/656-7873"}]}'))
+
+      siebel.should_not_receive(:add_or_update_email_address)
+      siebel.should_not_receive(:add_or_update_phone_number)
+
+      siebel.send(:add_or_update_person, siebel_person_with_rels, donor_account, contact, Date.today)
+    end
+
     it "updates an existing person" do
       mp = MasterPerson.create
-      mps = MasterPersonSource.create({master_person_id: mp.id, organization_id: org.id, remote_id: siebel_person.id}, without_protection: true)
+      MasterPersonSource.create({master_person_id: mp.id, organization_id: org.id, remote_id: siebel_person.id}, without_protection: true)
       p = create(:person, master_person_id: mp.id)
       donor_account.people << p
-      cp = contact.add_person(p)
+      contact.add_person(p)
 
       expect {
         siebel.send(:add_or_update_person, siebel_person, donor_account, contact)
@@ -263,7 +295,7 @@ describe Siebel do
     end
 
     it "doesn't add a new address when there is a matching deleted address" do
-      address = create(:address, addressable: contact, street: siebel_address.address1, city: siebel_address.city,
+      create(:address, addressable: contact, street: siebel_address.address1, city: siebel_address.city,
                                  state: siebel_address.state, postal_code: siebel_address.zip, deleted: true)
       expect {
         siebel.send(:add_or_update_address, siebel_address, contact)

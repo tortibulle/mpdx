@@ -66,7 +66,9 @@ class Siebel < DataServer
       account_list = profile.account_list
 
       SiebelDonations::Donor.find(having_given_to_designations: designation_numbers.join(',')).each do |siebel_donor|
-        donor_account = add_or_update_donor_account(account_list, siebel_donor, profile)
+        next if date_from && Date.parse(siebel_donor.updated_at) < date_from
+
+        donor_account = add_or_update_donor_account(account_list, siebel_donor, profile, date_from)
 
         if siebel_donor.type == 'Business'
           add_or_update_company(account_list, siebel_donor, donor_account)
@@ -186,7 +188,7 @@ class Siebel < DataServer
     company
   end
 
-  def add_or_update_donor_account(account_list, donor, profile)
+  def add_or_update_donor_account(account_list, donor, profile, date_from = nil)
     donor_account = @org.donor_accounts.where(account_number: donor.id).first_or_initialize
     donor_account.attributes = {name: donor.account_name,
                                 donor_type: donor.type}
@@ -197,21 +199,29 @@ class Siebel < DataServer
 
     # Save addresses
     if donor.addresses
-      donor.addresses.each { |address| add_or_update_address(address, donor_account) }
+      donor.addresses.each do |address|
+        next if date_from && Date.parse(address.updated_at) < date_from
 
-      # Make sure the contact has the primary address
-      donor.addresses.each { |address| add_or_update_address(address, contact) if address.primary == true }
+        add_or_update_address(address, donor_account)
+
+        # Make sure the contact has the primary address
+        add_or_update_address(address, contact) if address.primary == true
+      end
     end
 
     # Save people (siebel calls them contacts)
     if donor.contacts
-      donor.contacts.each { |person| add_or_update_person(person, donor_account, contact) }
+      donor.contacts.each do |person|
+        next if date_from && Date.parse(person.updated_at) < date_from
+
+        add_or_update_person(person, donor_account, contact, date_from)
+      end
     end
 
     donor_account
   end
 
-  def add_or_update_person(siebel_person, donor_account, contact)
+  def add_or_update_person(siebel_person, donor_account, contact, date_from = nil)
     master_person_from_source = @org.master_people.where('master_person_sources.remote_id' => siebel_person.id).first
 
     # If we didn't find someone using the real remote_id, try the "old style"
@@ -266,18 +276,26 @@ class Siebel < DataServer
 
     # Phone Numbers
     if siebel_person.phone_numbers
-      siebel_person.phone_numbers.each { |pn| add_or_update_phone_number(pn, person) }
+      siebel_person.phone_numbers.each do |pn| 
+        next if date_from && Date.parse(pn.updated_at) < date_from
 
-      # Make sure the contact person has the primary phone number
-      siebel_person.phone_numbers.each { |pn| add_or_update_phone_number(pn, contact_person) if pn.primary == true }
+        add_or_update_phone_number(pn, person)
+
+        # Make sure the contact person has the primary phone number
+        add_or_update_phone_number(pn, contact_person) if pn.primary == true 
+      end
     end
 
     # Email Addresses
     if siebel_person.email_addresses
-      siebel_person.email_addresses.each { |email| add_or_update_email_address(email, person) }
+      siebel_person.email_addresses.each do |email| 
+        next if date_from && Date.parse(email.updated_at) < date_from
 
-      # Make sure the contact person has the primary phone number
-      siebel_person.email_addresses.each { |email| add_or_update_email_address(email, contact_person) if email.primary == true }
+        add_or_update_email_address(email, person)
+
+        # Make sure the contact person has the primary phone number
+        add_or_update_email_address(email, contact_person) if email.primary == true
+      end
     end
 
     [person, contact_person]

@@ -61,7 +61,7 @@ gem 'ruby-rtf'
 gem 'secure-headers', require: 'secure_headers'
 gem 'sidekiq', git: 'git://github.com/mperham/sidekiq.git'
 gem 'sidekiq-failures', git: 'git://github.com/mhfs/sidekiq-failures.git'
-gem 'siebel_donations', git: 'git://github.com/twinge/siebel_donations.git'
+gem 'siebel_donations', git: 'git://github.com/CruGlobal/siebel_donations.git'
 gem 'sinatra', :require => nil
 gem 'slim'
 gem 'twitter_cldr', '~> 2.0.0'

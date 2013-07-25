@@ -14,6 +14,16 @@ GIT
       mime (>= 0.1)
 
 GIT
+  remote: git://github.com/CruGlobal/siebel_donations.git
+  revision: 28b8b35d26f6027ecd82c8f9b46e277c8baf1f57
+  specs:
+    siebel_donations (1.0.3)
+      activesupport
+      oj (~> 2.0.0)
+      rest-client (~> 1.6.7)
+      retryable-rb (~> 1.1.0)
+
+GIT
   remote: git://github.com/jnicklas/carrierwave.git
   revision: 90157c58f6dae241b832d71ac7cb0674373081e5
   specs:
@@ -46,16 +56,6 @@ GIT
   specs:
     active_model_serializers (0.8.1)
       activemodel (>= 3.2)
-
-GIT
-  remote: git://github.com/twinge/siebel_donations.git
-  revision: b5f2cfa5583a5b9bd6283706860035a82fd25ac4
-  specs:
-    siebel_donations (1.0.3)
-      activesupport
-      oj (~> 2.0.0)
-      rest-client (~> 1.6.7)
-      retryable-rb (~> 1.1.0)
 
 GEM
   remote: http://rubygems.org/
