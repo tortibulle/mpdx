@@ -1,8 +1,6 @@
 class DonationsController < ApplicationController
   def index
     if params[:contact_id]
-      @page_title = _('Donations')
-
       @contact = current_account_list.contacts.where(id: params[:contact_id]).first
       if @contact.donor_account_ids.present?
         @all_donations = current_account_list.donations.where(donor_account_id: @contact.donor_account_ids)
@@ -13,6 +11,8 @@ class DonationsController < ApplicationController
       @donations = @all_donations.page(params[:page])
       setup_chart unless params[:page]
     else
+      @page_title = _('Donations')
+
       designation_account_ids = current_account_list.designation_accounts.pluck('designation_accounts.id')
       if params[:start_date]
         @start_date = Date.parse(params[:start_date])

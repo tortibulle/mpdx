@@ -34,8 +34,10 @@
         <div class="quickprofile">
           <h1><%= contact_exhibit %></h1>
           <div class="metaset">
-            <%= _('Donor ID: %{donor_id}') % {donor_id: contact_exhibit.donor_ids } %><br />
-            <%= contact_exhibit.location %>
+            <%= _('Donor ID: %{donor_id}') % {donor_id: contact_exhibit.donor_ids } %>
+            <% if contact_exhibit.location.present? %>
+              <br /><%= contact_exhibit.location %>
+            <% end %>
           </div>
         </div>
 
