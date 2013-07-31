@@ -286,7 +286,7 @@ describe DataServer do
       @data_server.should_receive(:check_credentials!)
       @data_server.should_receive(:find_or_create_designation_account)
       @data_server.should_receive(:add_or_update_donation)
-      @data_server.import_donations(profile, '1/1/1951','2/2/2012')
+      @data_server.import_donations(profile, DateTime.new(1951, 1, 1), '2/2/2012')
     end
 
     it "should find an existing designation account" do

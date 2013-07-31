@@ -47,6 +47,8 @@ class DataServer
 
   def import_donors(profile, date_from = nil)
     check_credentials!
+    date_from = date_from.strftime("%m/%d/%Y")if date_from.present?
+
     user = @org_account.user
 
     account_list = profile.account_list
@@ -104,6 +106,7 @@ class DataServer
     check_credentials!
 
     # if no date_from was passed in, use min date from query_ini
+    date_from = date_from.strftime("%m/%d/%Y") if date_from.present?
     date_from = @org.minimum_gift_date || '1/1/2004' if date_from.blank?
     date_to = Time.now.strftime("%m/%d/%Y") if date_to.blank?
 

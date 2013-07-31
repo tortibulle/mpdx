@@ -66,7 +66,7 @@ class Siebel < DataServer
       account_list = profile.account_list
 
       SiebelDonations::Donor.find(having_given_to_designations: designation_numbers.join(',')).each do |siebel_donor|
-        next if date_from && Date.parse(siebel_donor.updated_at) < date_from
+        next if date_from.present? && DateTime.parse(siebel_donor.updated_at) < date_from
 
         donor_account = add_or_update_donor_account(account_list, siebel_donor, profile, date_from)
 
@@ -81,9 +81,10 @@ class Siebel < DataServer
     # if no date_from was passed in, use min date from query_ini
     if start_date.blank?
       start_date = @org.minimum_gift_date ? @org.minimum_gift_date : '01/01/2004'
+      start_date = Date.strptime(start_date, '%m/%d/%Y').strftime("%Y-%m-%d")
+    else
+      start_date = start_date.strftime("%Y-%m-%d")
     end
-
-    start_date = Date.strptime(start_date, '%m/%d/%Y').strftime("%Y-%m-%d")
 
     end_date = end_date ? Date.strptime(end_date, '%m/%d/%Y').strftime("%Y-%m-%d") : Time.now.strftime("%Y-%m-%d")
 
@@ -200,7 +201,7 @@ class Siebel < DataServer
     # Save addresses
     if donor.addresses
       donor.addresses.each do |address|
-        next if date_from && Date.parse(address.updated_at) < date_from
+        next if date_from.present? && DateTime.parse(address.updated_at) < date_from
 
         add_or_update_address(address, donor_account)
 
@@ -212,7 +213,7 @@ class Siebel < DataServer
     # Save people (siebel calls them contacts)
     if donor.contacts
       donor.contacts.each do |person|
-        next if date_from && Date.parse(person.updated_at) < date_from
+        next if date_from.present? && DateTime.parse(person.updated_at) < date_from
 
         add_or_update_person(person, donor_account, contact, date_from)
       end
@@ -277,7 +278,7 @@ class Siebel < DataServer
     # Phone Numbers
     if siebel_person.phone_numbers
       siebel_person.phone_numbers.each do |pn| 
-        next if date_from && Date.parse(pn.updated_at) < date_from
+        next if date_from.present? && DateTime.parse(pn.updated_at) < date_from
 
         add_or_update_phone_number(pn, person)
 
@@ -289,7 +290,7 @@ class Siebel < DataServer
     # Email Addresses
     if siebel_person.email_addresses
       siebel_person.email_addresses.each do |email| 
-        next if date_from && Date.parse(email.updated_at) < date_from
+        next if date_from.present? && DateTime.parse(email.updated_at) < date_from
 
         add_or_update_email_address(email, person)
 
