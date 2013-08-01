@@ -341,8 +341,9 @@ class TntImport
 
     person.save(validate: false)
 
-    Retryable.retryable do
+    begin
       contact.people << person unless contact.people.include?(person)
+    rescue ActiveRecord::RecordNotUnique
     end
 
     person
