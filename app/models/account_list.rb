@@ -115,15 +115,33 @@ class AccountList < ActiveRecord::Base
   end
 
   def people_with_birthdays(start_date, end_date)
-    people.where("people.birthday_month BETWEEN ? AND ?", start_date.month, end_date.month)
-          .where("people.birthday_day BETWEEN ? AND ?", start_date.day, end_date.day)
-          .order('people.birthday_month, people.birthday_day').merge(contacts.active)
+    start_month = start_date.month
+    end_month = end_date.month
+    if start_month == end_month
+      people_with_birthdays = people.where("people.birthday_month = ?", start_month)
+                                    .where("people.birthday_day BETWEEN ? AND ?", start_date.day, end_date.day)
+    else
+      people_with_birthdays = people.where("(people.birthday_month = ? AND people.birthday_day >= ?)
+                                           OR (people.birthday_month = ? AND people.birthday_day <= ?)",
+                                           start_month, start_date.day, end_month, end_date.day)
+
+    end
+    people_with_birthdays.order('people.birthday_month, people.birthday_day').merge(contacts.active)
   end
 
   def people_with_anniversaries(start_date, end_date)
-    people.where("anniversary_month BETWEEN ? AND ?", start_date.month, end_date.month)
-          .where("anniversary_day BETWEEN ? AND ?", start_date.day, end_date.day)
-          .order('anniversary_month, anniversary_day').merge(contacts.active)
+    start_month = start_date.month
+    end_month = end_date.month
+    if start_month == end_month
+      people_with_birthdays = people.where("people.anniversary_month = ?", start_month)
+                                    .where("people.anniversary_day BETWEEN ? AND ?", start_date.day, end_date.day)
+    else
+      people_with_birthdays = people.where("(people.anniversary_month = ? AND people.anniversary_day >= ?)
+                                           OR (people.anniversary_month = ? AND people.anniversary_day <= ?)",
+                                           start_month, start_date.day, end_month, end_date.day)
+
+    end
+    people_with_birthdays.order('people.anniversary_month, people.anniversary_day').merge(contacts.active)
   end
 
   def top_50_percent
