@@ -19,7 +19,7 @@ class HomeController < ApplicationController
     if params[:start_date]
       @start_date = Date.parse(params[:start_date])
     else
-      @start_date = 1.week.ago.beginning_of_week
+      @start_date = Date.today.beginning_of_week
     end
     @end_date = @start_date.end_of_week
   end
