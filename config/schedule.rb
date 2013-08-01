@@ -26,7 +26,7 @@ job_type :runner,    "cd :path && RAILS_ENV=:environment /usr/local/bin/bundle e
 #every 30.minutes do
   #runner "AccountList.update_linked_org_accounts"
 #end
-every 2.days do
+every :day, at: '5am' do
   runner "AccountList.update_linked_org_accounts"
 end
 
