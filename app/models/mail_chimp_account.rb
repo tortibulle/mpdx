@@ -169,6 +169,7 @@ class MailChimpAccount < ActiveRecord::Base
         when e.message.include?('code 200') # Invalid MailChimp List ID (code 200)
           # TODO: Notify user and nulify primary_list_id until they fix the problem
           update_column(:primary_list_id, nil)
+        when e.message.include?('code 502') # Invalid Email Address: "Rajah Tony" <amrajah@gmail.com> (code 502)
         else
           raise e
         end
