@@ -20,7 +20,7 @@ class Siebel < DataServer
           @org.designation_profiles.where(user_id: @org_account.person_id, code: profile.id)
                                    .first_or_create(name: profile.name)
         else
-          @org.designation_profiles.where(user_id: @org_account.person_id)
+          @org.designation_profiles.where(user_id: @org_account.person_id, code: nil)
                                    .first_or_create(name: profile.name)
         end
       end
@@ -277,19 +277,19 @@ class Siebel < DataServer
 
     # Phone Numbers
     if siebel_person.phone_numbers
-      siebel_person.phone_numbers.each do |pn| 
+      siebel_person.phone_numbers.each do |pn|
         next if date_from.present? && DateTime.parse(pn.updated_at) < date_from
 
         add_or_update_phone_number(pn, person)
 
         # Make sure the contact person has the primary phone number
-        add_or_update_phone_number(pn, contact_person) if pn.primary == true 
+        add_or_update_phone_number(pn, contact_person) if pn.primary == true
       end
     end
 
     # Email Addresses
     if siebel_person.email_addresses
-      siebel_person.email_addresses.each do |email| 
+      siebel_person.email_addresses.each do |email|
         next if date_from.present? && DateTime.parse(email.updated_at) < date_from
 
         add_or_update_email_address(email, person)
