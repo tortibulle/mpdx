@@ -139,6 +139,11 @@ class TntImport
                          start_at: DateTime.parse(row['TaskDate'] + ' ' + DateTime.parse(row['TaskTime']).strftime("%I:%M%p"))
                         }
       if task.save
+        # Add any notes as a comment
+        if row['Notes'].present?
+          task.activity_comments.create(body: row['Notes'].strip)
+        end
+
         tnt_tasks[row['id']] = task
       end
     end
@@ -170,6 +175,11 @@ class TntImport
                          result: lookup_history_result(row['HistoryResultID'])
                         }
       if task.save
+        # Add any notes as a comment
+        if row['Notes'].present?
+          task.activity_comments.create(body: row['Notes'].strip)
+        end
+
         tnt_history[row['id']] = task
       end
     end

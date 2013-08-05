@@ -219,6 +219,7 @@ State, CA  12345</HomeAddressBlock>
         <TaskTypeID>1</TaskTypeID>
         <HistoryDate>2004-08-26 19:00:00</HistoryDate>
         <HistoryResultID>1</HistoryResultID>
+        <Notes>History Notes</Notes>
       </row>
     </History>
     <HistoryContact>
@@ -366,6 +367,7 @@ State, CA  12345</HomeAddressBlock>
         <TotalWork>0</TotalWork>
         <ActualWork>0</ActualWork>
         <BusyStatus>0</BusyStatus>
+        <Notes>Notes</Notes>
       </row>
     </Task>
     <TaskContact>

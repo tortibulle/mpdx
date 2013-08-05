@@ -1,15 +1,16 @@
 require 'spec_helper'
 
 describe TntImport do
+  let(:xml) { import.read_xml(tnt_import.file.file.file) }
   let(:tnt_import) { create(:tnt_import, override: true) }
   let(:import) { TntImport.new(tnt_import) }
   let(:contact) { create(:contact) }
-  let(:contact_rows) { Array.wrap(import.read_xml(tnt_import.file.file.file)['Database']['Tables']['Contact']['row']) }
-  let(:task_rows) { Array.wrap(import.read_xml(tnt_import.file.file.file)['Database']['Tables']['Task']['row']) }
-  let(:task_contact_rows) { Array.wrap(import.read_xml(tnt_import.file.file.file)['Database']['Tables']['TaskContact']['row']) }
-  let(:history_rows) { Array.wrap(import.read_xml(tnt_import.file.file.file)['Database']['Tables']['History']['row']) }
-  let(:history_contact_rows) { Array.wrap(import.read_xml(tnt_import.file.file.file)['Database']['Tables']['HistoryContact']['row']) }
-  let(:property_rows) { Array.wrap(import.read_xml(tnt_import.file.file.file)['Database']['Tables']['Property']['row']) }
+  let(:contact_rows) { Array.wrap(xml['Database']['Tables']['Contact']['row']) }
+  let(:task_rows) { Array.wrap(xml['Database']['Tables']['Task']['row']) }
+  let(:task_contact_rows) { Array.wrap(xml['Database']['Tables']['TaskContact']['row']) }
+  let(:history_rows) { Array.wrap(xml['Database']['Tables']['History']['row']) }
+  let(:history_contact_rows) { Array.wrap(xml['Database']['Tables']['HistoryContact']['row']) }
+  let(:property_rows) { Array.wrap(xml['Database']['Tables']['Property']['row']) }
 
   before do
     stub_request(:get, /api\.smartystreets\.com\/.*/).
@@ -116,6 +117,14 @@ describe TntImport do
       expect {
         import.send(:import_tasks, {task_contact_rows.first['ContactID'] => contact})
       }.to change(ActivityContact, :count).by(1)
+    end
+
+    it "adds notes as a task comment" do
+      task = create(:task, source: 'tnt', remote_id: task_rows.first['id'], account_list: tnt_import.account_list)
+
+      import.send(:import_tasks)
+
+      task.activity_comments.first.body.should == 'Notes'
     end
   end
 
