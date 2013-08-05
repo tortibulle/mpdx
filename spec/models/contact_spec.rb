@@ -34,6 +34,33 @@ describe Contact do
     end
   end
 
+  describe 'saving donor accounts' do
+    it "links to an existing donor account if one matches" do
+      donor_account = create(:donor_account)
+      contact.donor_accounts_attributes = {'0' => {account_number: donor_account.account_number, organization_id: donor_account.organization_id}}
+      contact.save!
+      contact.donor_accounts.should include(donor_account)
+    end
+
+    it "creates a new donor account" do
+      expect {
+        contact.donor_accounts_attributes = {'0' => {account_number: 'asdf', organization_id: 1}}
+        contact.save!
+      }.to change(DonorAccount, :count).by(1)
+    end
+
+    it "updates an existing donor account" do
+      donor_account = create(:donor_account)
+      donor_account.contacts << contact
+
+      contact.donor_accounts_attributes = {'0' => {id: donor_account.id, account_number: 'asdf'}}
+      contact.save!
+
+      donor_account.reload.account_number.should == 'asdf'
+    end
+
+  end
+
   describe 'create_from_donor_account' do
     before do
       @account_list = create(:account_list)
@@ -119,16 +146,6 @@ describe Contact do
 
       contact.tasks.should include(task, shared_task)
       shared_task.contacts.reload.should match_array [contact]
-    end
-
-    it "should move a loser's donors" do
-      donor_account = create(:donor_account)
-      contact.donor_accounts << create(:donor_account, account_number: donor_account.account_number)
-      donation = create(:donation, donor_account: donor_account)
-      loser_contact.donor_accounts << donor_account
-      contact.merge(loser_contact)
-
-      contact.donations.should include(donation)
     end
 
     it "should not duplicate referrals" do

@@ -34,6 +34,22 @@ namespace :mpdx do
     merge_account_lists
   end
 
+  task merge_donor_accounts: :environment do
+
+    def merge_donor_accounts
+      DonorAccount.order('created_at').each do |al|
+        other_account = DonorAccount.where(account_number: al.account_number, organization_id: al.organization_id).where("id <> #{al.id}").first
+        if other_account
+          puts other_account.account_number
+          al.merge(other_account)
+          merge_account_lists
+          return
+        end
+      end
+    end
+    merge_donor_accounts
+  end
+
   task address_cleanup: :environment do
     def merge_addresses(contact)
       addresses = contact.addresses.order('addresses.created_at')

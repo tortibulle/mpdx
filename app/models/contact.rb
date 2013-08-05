@@ -178,6 +178,17 @@ class Contact < ActiveRecord::Base
     not_duplicated_with.to_s.split(',').include?(other.id.to_s)
   end
 
+  def donor_accounts_attributes=(attribute_collection)
+    attribute_collection = attribute_collection.with_indifferent_access.values
+    attribute_collection.each do |attrs|
+      if donor_account = DonorAccount.where(account_number: attrs[:account_number], organization_id: attrs[:organization_id]).first
+        donor_account.contacts << self unless donor_account.contacts.include?(self)
+      else
+        assign_nested_attributes_for_collection_association(:donor_accounts, [attrs])
+      end
+    end
+  end
+
   def merge(other)
     Contact.transaction do
       # Update related records
@@ -307,7 +318,7 @@ class Contact < ActiveRecord::Base
     donor_accounts.reload.each do |account|
       if other = donor_accounts.detect { |da| da.id != account.id &&
                                               da.account_number == account.account_number}
-        other.destroy
+        account.merge(other)
         merge_donor_accounts
         return
       end

@@ -2,6 +2,7 @@
   <div class="ls">
     <%= builder.label :account_number %>
     <%= builder.text_field :account_number %>
+    <%= builder.hidden_field :organization_id, value: builder.object.organization_id || current_account_list.designation_profiles.first.try(:organization_id) || current_account_list.users.first.organization_accounts.first.try(:organization_id) %>
     <div class="field_action">
       <%= link_to_remove_fields(builder) %>
     </div>
