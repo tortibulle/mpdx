@@ -3,8 +3,8 @@ class User < Person
   has_many :account_list_users, dependent: :destroy
   has_many :account_lists, through: :account_list_users
   has_many :contacts, through: :account_lists
-  has_many :contact_people, through: :contacts
-  has_many :people, through: :contact_people
+  #has_many :contact_people, through: :contacts
+  #has_many :people, through: :contact_people
   has_many :account_list_entries, through: :account_lists
   has_many :designation_accounts, through: :account_list_entries
   has_many :donations, through: :designation_accounts
@@ -26,6 +26,22 @@ class User < Person
       oa.queue_import_data unless oa.last_download
       #oa.queue_import_data unless oa.downloading? || (oa.last_download && oa.last_download > 1.day.ago)
     end
+  end
+
+  def merge(other)
+    User.transaction do
+      other.account_list_users.each do |other_alu|
+        other_alu.update_column(:user_id, id) unless account_list_users.detect {|alu| alu.account_list_id == other_alu.account_list_id }
+      end
+
+      other.designation_profiles.each do |other_dp|
+        other_dp.update_column(:user_id, id) unless designation_profiles.detect {|dp| dp.code == other_dp.code}
+      end
+
+      imports.update_all(user_id: id)
+    end
+
+    super
   end
 
   def setup_mode?
