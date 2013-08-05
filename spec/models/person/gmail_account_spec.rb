@@ -18,7 +18,7 @@ describe Person::GmailAccount do
 
   context '#folders' do
     it "returns a list of gmail folders/labels" do
-      gmail_account.stub!(:client).and_return(client)
+      gmail_account.stub(:client).and_return(client)
 
       client.should_receive(:labels).and_return(double(all: []))
 
@@ -28,7 +28,7 @@ describe Person::GmailAccount do
 
   context '#gmail' do
     it "refreshes the google account token if expired" do
-      Gmail.stub!(:connect).and_return(double(logout: true))
+      Gmail.stub(:connect).and_return(double(logout: true))
       google_account.expires_at = 1.hour.ago
 
       google_account.should_receive(:refresh_token!).once
@@ -49,9 +49,9 @@ describe Person::GmailAccount do
       google_account.save
       account_list.users << user
 
-      Gmail.stub!(:connect).and_return(client)
-      client.stub!(:mailbox).with('[Gmail]/Sent Mail').and_return(sent_mailbox)
-      client.stub!(:mailbox).with('[Gmail]/All Mail').and_return(all_mailbox)
+      Gmail.stub(:connect).and_return(client)
+      client.stub(:mailbox).with('[Gmail]/Sent Mail').and_return(sent_mailbox)
+      client.stub(:mailbox).with('[Gmail]/All Mail').and_return(all_mailbox)
     end
 
     it "logs a sent email" do

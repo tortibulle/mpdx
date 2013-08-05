@@ -121,6 +121,16 @@ describe Contact do
       shared_task.contacts.reload.should match_array [contact]
     end
 
+    it "should move a loser's donors" do
+      donor_account = create(:donor_account)
+      contact.donor_accounts << create(:donor_account, account_number: donor_account.account_number)
+      donation = create(:donation, donor_account: donor_account)
+      loser_contact.donor_accounts << donor_account
+      contact.merge(loser_contact)
+
+      contact.donations.should include(donation)
+    end
+
     it "should not duplicate referrals" do
       referrer = create(:contact)
       loser_contact.referrals_to_me << referrer

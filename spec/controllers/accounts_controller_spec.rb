@@ -46,14 +46,14 @@ describe AccountsController do
 
       it "should redirect to social accounts if the user is in setup mode" do
         @user.update_attributes(preferences: {setup: true})
-        Person::FacebookAccount.stub!(:find_or_create_from_auth)
+        Person::FacebookAccount.stub(:find_or_create_from_auth)
         post 'create', provider: 'facebook'
         response.should redirect_to(setup_path(:social_accounts))
       end
 
       it "should redirect to a stored user_return_to" do
         session[:user_return_to] = '/foo'
-        Person::FacebookAccount.stub!(:find_or_create_from_auth)
+        Person::FacebookAccount.stub(:find_or_create_from_auth)
         post 'create', provider: 'facebook'
         response.should redirect_to('/foo')
       end

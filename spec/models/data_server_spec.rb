@@ -28,8 +28,8 @@ describe DataServer do
   it "should return a list of all profiles with their associated designation numbers" do
     designation_numbers = ['031231']
     profiles = [{name: 'Profile 1', code: 'Profile 1'}, {name: 'Profile 2', code: ''}]
-    @data_server.stub!(:designation_numbers).and_return(designation_numbers)
-    @data_server.stub!(:profiles).and_return(profiles)
+    @data_server.stub(:designation_numbers).and_return(designation_numbers)
+    @data_server.stub(:profiles).and_return(profiles)
     @data_server.profiles_with_designation_numbers.first[:name].should == 'Profile 1'
     @data_server.profiles_with_designation_numbers.first[:designation_numbers].should == designation_numbers
   end

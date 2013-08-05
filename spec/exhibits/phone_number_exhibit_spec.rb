@@ -6,7 +6,7 @@ describe PhoneNumberExhibit do
   let(:context) { double }
 
   it "returns a formatted number" do
-    context.stub!(:number_to_phone).and_return('(123) 456-7890')
+    context.stub(:number_to_phone).and_return('(123) 456-7890')
     subject.number.should == '(123) 456-7890'
   end
 

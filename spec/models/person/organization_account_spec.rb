@@ -17,8 +17,8 @@ describe Person::OrganizationAccount do
     let(:account_list) { create(:account_list) }
 
     before do
-      org_account.organization.stub!(:api).and_return(api)
-      api.stub!(:profiles_with_designation_numbers).and_return([{name: 'Profile 1', code: '', designation_numbers: ['1234']}])
+      org_account.organization.stub(:api).and_return(api)
+      api.stub(:profiles_with_designation_numbers).and_return([{name: 'Profile 1', code: '', designation_numbers: ['1234']}])
     end
 
     it "doesn't create a new list if an existing list contains only the designation number for a profile" do

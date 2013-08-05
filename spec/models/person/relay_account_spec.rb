@@ -11,7 +11,7 @@ describe Person::RelayAccount do
   describe 'find or create from auth' do
     it 'should create an account linked to a person' do
       person = create(:user)
-      @org.stub!(:api).and_return(FakeApi.new)
+      @org.stub(:api).and_return(FakeApi.new)
       -> {
         @account = Person::RelayAccount.find_or_create_from_auth(@auth_hash, person)
       }.should change(Person::RelayAccount, :count).from(0).to(1)
@@ -21,7 +21,7 @@ describe Person::RelayAccount do
     it "should gracefully handle a duplicate" do
       @person = create(:user)
       @person2 = create(:user)
-      @org.stub!(:api).and_return(FakeApi.new)
+      @org.stub(:api).and_return(FakeApi.new)
       @account = Person::RelayAccount.find_or_create_from_auth(@auth_hash, @person)
       -> {
         @account2 = Person::RelayAccount.find_or_create_from_auth(@auth_hash, @person2)
@@ -34,7 +34,7 @@ describe Person::RelayAccount do
          with(:headers => {'Accept'=>'*/*; q=0.5, application/xml', 'Accept-Encoding'=>'gzip, deflate', 'Authorization'=>"Bearer #{APP_CONFIG['itg_auth_key']}", 'User-Agent'=>'Ruby'}).
          to_return(:status => 200, :body => '[{"name":"Staff Account(000555555)","designations":[{"number":"0555555","description":"Jon and Jane Doe(000555555)","staffAccountId":"000555555"}]}]', :headers => {})
       person = create(:user)
-      @org.stub!(:api).and_return(FakeApi.new)
+      @org.stub(:api).and_return(FakeApi.new)
       expect {
         @account = Person::RelayAccount.find_or_create_from_auth(@auth_hash, person)
       }.to change(Person::OrganizationAccount, :count).from(0).to(1)
@@ -54,7 +54,7 @@ describe Person::RelayAccount do
 
   it 'should use guid to find an authenticated user' do
     user = create(:user)
-    @org.stub!(:api).and_return(FakeApi.new)
+    @org.stub(:api).and_return(FakeApi.new)
     Person::RelayAccount.find_or_create_from_auth(@auth_hash, user)
     Person::RelayAccount.find_authenticated_user(@auth_hash).should == user
   end

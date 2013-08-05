@@ -10,22 +10,23 @@ describe MailChimpAccountsController do
   end
 
   context 'index' do
+    let(:chimp) { create(:mail_chimp_account, account_list: @account_list) }
+
     before do
-      @chimp = create(:mail_chimp_account, account_list: @account_list)
-      @account_list.stub(:mail_chimp_account).and_return(@chimp)
+      @account_list.stub(:mail_chimp_account).and_return(chimp)
     end
 
     it "should validate the current key if there is a mail chimp account" do
-      @chimp.should_receive(:validate_key).and_return(false)
-      @chimp.stub!(:primary_list)
+      chimp.should_receive(:validate_key).and_return(false)
+      chimp.stub(:primary_list)
 
       get :index
     end
 
     it "should redirect to the 'new' page if the current account is not active" do
-      @chimp.stub!(:validate_key)
+      chimp.stub(:validate_key)
 
-      @chimp.should_receive(:active?).and_return(false)
+      chimp.should_receive(:active?).and_return(false)
 
       get :index
 
@@ -33,13 +34,14 @@ describe MailChimpAccountsController do
     end
 
     it "should redirect to the 'edit' page if there is no primary list" do
-      @chimp.stub!(:validate_key, :active)
+      chimp.stub(:validate_key)
+      chimp.stub(:active)
 
-      @chimp.should_receive(:primary_list).and_return(false)
+      chimp.should_receive(:primary_list).and_return(false)
 
       get :index
 
-      response.should redirect_to(edit_mail_chimp_account_path(@chimp))
+      response.should redirect_to(edit_mail_chimp_account_path(chimp))
     end
 
 
