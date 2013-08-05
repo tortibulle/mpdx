@@ -37,12 +37,13 @@ namespace :mpdx do
   task merge_donor_accounts: :environment do
 
     def merge_donor_accounts
-      DonorAccount.order('created_at').each do |al|
+      account_numbers = DonorAccount.connection.select_values("select account_number, organization_id from donor_accounts where account_number <> '' group by account_number, organization_id having count(*) > 1")
+      DonorAccount.where(account_number: account_numbers).order('created_at').each do |al|
         other_account = DonorAccount.where(account_number: al.account_number, organization_id: al.organization_id).where("id <> #{al.id}").first
         if other_account
           puts other_account.account_number
           al.merge(other_account)
-          merge_account_lists
+          merge_donor_accounts
           return
         end
       end

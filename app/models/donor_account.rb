@@ -12,7 +12,7 @@ class DonorAccount < ActiveRecord::Base
   belongs_to :organization
   belongs_to :master_company
   validates_uniqueness_of :account_number, scope: :organization_id
-  validates_presence_of :organization_id
+  validates_presence_of :organization_id, :account_number
 
   def primary_master_person
     master_people.where('master_person_donor_accounts.primary' => true).first
@@ -39,7 +39,7 @@ class DonorAccount < ActiveRecord::Base
   def merge(other)
     return false unless other.account_number == account_number
     self.total_donations = case
-                           when total_donations & other.total_donations
+                           when total_donations && other.total_donations
                              total_donations + other.total_donations
                            when total_donations
                              total_donations
@@ -71,10 +71,12 @@ class DonorAccount < ActiveRecord::Base
     self.organization_id = other.organization_id if organization_id.blank?
     self.name = other.name if name.blank?
 
-    other.master_person_donor_accounts.update_all(donor_account_id: id)
+    other.master_person_donor_accounts.each do |mpda|
+      mpda.update_column(:donor_account_id, id) unless master_person_donor_accounts.detect { |master_person_donor_account| master_person_donor_account.master_person_id == mpda.master_person_id }
+    end
     other.donations.update_all(donor_account_id: id)
     other.contact_donor_accounts.each do |cda|
-      cda.update_column(donor_account_id: id) unless contact_donor_accounts.detect { |contact_donor_account| contact_donor_account.contact_id == cda.contact_id }
+      cda.update_column(:donor_account_id, id) unless contact_donor_accounts.detect { |contact_donor_account| contact_donor_account.contact_id == cda.contact_id }
     end
 
     other.reload
