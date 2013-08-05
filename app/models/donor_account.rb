@@ -38,7 +38,15 @@ class DonorAccount < ActiveRecord::Base
 
   def merge(other)
     return false unless other.account_number == account_number
-    self.total_donations = total_donations + other.total_donations
+    self.total_donations = case
+                           when total_donations & other.total_donations
+                             total_donations + other.total_donations
+                           when total_donations
+                             total_donations
+                           else other.total_donations
+                             other.total_donations
+                           end
+
     self.last_donation_date = case
                               when last_donation_date && other.last_donation_date
                                 last_donation_date > other.last_donation_date ?
@@ -48,6 +56,7 @@ class DonorAccount < ActiveRecord::Base
                               else
                                 other.last_donation_date
                               end
+
     self.first_donation_date = case
                                when first_donation_date && other.first_donation_date
                                  first_donation_date > other.first_donation_date ?
