@@ -38,8 +38,8 @@ describe DataServer do
     let(:data_server) { DataServer.new(@org_account) }
 
     it "in US format" do
-      stub_request(:post, @org.profiles_url).to_return(body: "ROLE_CODE,ROLE_DESCRIPTION\n,\"Staff Account (0559826)\"\n")
-      stub_request(:post, @org.account_balance_url).to_return(body: "\"EMPLID\",\"EFFDT\",\"BALANCE\",\"ACCT_NAME\"\n\"0000000\",\"2012-03-23 16:01:39.0\",\"123.45\",\"Test Account\"\n")
+      stub_request(:post, /.*profiles/).to_return(body: "ROLE_CODE,ROLE_DESCRIPTION\n,\"Staff Account (0559826)\"\n")
+      stub_request(:post, /.*accounts/).to_return(body: "\"EMPLID\",\"EFFDT\",\"BALANCE\",\"ACCT_NAME\"\n\"0000000\",\"2012-03-23 16:01:39.0\",\"123.45\",\"Test Account\"\n")
       data_server.should_receive(:import_profile_balance)
 
       -> {
@@ -47,8 +47,8 @@ describe DataServer do
       }.should change(DesignationProfile, :count).by(1)
     end
     it "in DataServer format" do
-      stub_request(:post, @org.profiles_url).to_return(body: "\xEF\xBB\xBF\"PROFILE_CODE\",\"PROFILE_DESCRIPTION\"\r\n\"1769360689\",\"MPD Coach (All Staff Donations)\"\r\n\"1769360688\",\"My Campus Accounts\"\r\n\"\",\"My Staff Account\"\r\n")
-      stub_request(:post, @org.account_balance_url).to_return(body: "\"EMPLID\",\"EFFDT\",\"BALANCE\",\"ACCT_NAME\"\n\"0000000\",\"2012-03-23 16:01:39.0\",\"123.45\",\"Test Account\"\n")
+      stub_request(:post, /.*profiles/).to_return(body: "\xEF\xBB\xBF\"PROFILE_CODE\",\"PROFILE_DESCRIPTION\"\r\n\"1769360689\",\"MPD Coach (All Staff Donations)\"\r\n\"1769360688\",\"My Campus Accounts\"\r\n\"\",\"My Staff Account\"\r\n")
+      stub_request(:post, /.*accounts/).to_return(body: "\"EMPLID\",\"EFFDT\",\"BALANCE\",\"ACCT_NAME\"\n\"0000000\",\"2012-03-23 16:01:39.0\",\"123.45\",\"Test Account\"\n")
       -> {
         data_server.import_profiles
       }.should change(DesignationProfile, :count).by(3)
@@ -57,22 +57,22 @@ describe DataServer do
 
   describe "import donors" do
     it "should update the addresses_url on the org if the url changed" do
-      stub_request(:post, @org.addresses_url).to_return(body: "whatever\nRedirectQueryIni=foo")
-      stub_request(:post, "http://foo/")
+      stub_request(:post, /.*addresses/).to_return(body: "whatever\nRedirectQueryIni=foo")
+      stub_request(:post, "http://foo:bar@foo/")
       -> {
         @data_server.import_donors(profile)
       }.should change(@org, :addresses_url).to('foo')
     end
 
     it "should import a company" do
-      stub_request(:post, @org.addresses_url).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"19238\",\"ACorporation\",\"123 mi casa blvd.\",\"Colima\",\"COL\",\"456788\",\"(52) 45 456-5678\",\"MEX\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"8/15/2003\",\"8/15/2003\",\"\",\"O\",\"ACorporation\",\"\"\r\n")
+      stub_request(:post, /.*addresses/).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"19238\",\"ACorporation\",\"123 mi casa blvd.\",\"Colima\",\"COL\",\"456788\",\"(52) 45 456-5678\",\"MEX\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"8/15/2003\",\"8/15/2003\",\"\",\"O\",\"ACorporation\",\"\"\r\n")
       @data_server.should_receive(:add_or_update_donor_account)
       @data_server.should_receive(:add_or_update_company)
       @data_server.import_donors(profile)
     end
 
     it "should import an individual" do
-      stub_request(:post, @org.addresses_url).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodriguez, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\",\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\",\"\",\"P\",\"Rodriguez\",\"\"\r\n")
+      stub_request(:post, /.*addresses/).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodriguez, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\",\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\",\"\",\"P\",\"Rodriguez\",\"\"\r\n")
       primary_contact = double('person')
       other_person = double('person')
       @data_server.should_receive(:add_or_update_primary_contact).and_return([primary_contact, other_person])
@@ -83,7 +83,7 @@ describe DataServer do
     end
 
     it 'should create a new contact in the right account list' do
-      stub_request(:post, @org.addresses_url).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodriguez, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\",\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\",\"\",\"P\",\"Rodriguez\",\"\"\r\n")
+      stub_request(:post, /.*addresses/).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodriguez, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\",\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\",\"\",\"P\",\"Rodriguez\",\"\"\r\n")
       @account_list1 = create(:account_list)
       @account_list2 = create(:account_list)
       profile = create(:designation_profile, user: @org_account.user, account_list: @account_list2)
@@ -95,7 +95,7 @@ describe DataServer do
     end
 
     it "should notify Airbrake if PERSON_TYPE is not 'O' or 'P'" do
-      stub_request(:post, @org.addresses_url).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodriguez, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\",\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\",\"\",\"BAD_PERSON_TYPE\",\"Rodriguez\",\"\"\r\n")
+      stub_request(:post, /.*addresses/).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodriguez, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\",\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\",\"\",\"BAD_PERSON_TYPE\",\"Rodriguez\",\"\"\r\n")
       Airbrake.should_receive(:notify)
       @data_server.import_donors(profile)
     end
@@ -247,13 +247,13 @@ describe DataServer do
 
   describe 'get_response' do
     it "should raise a DataServerError if the first line of the response is ERROR" do
-      stub_request(:post, 'http://example.com').to_return(body: "ERROR\nmessage")
+      stub_request(:post, 'http://foo:bar@example.com').to_return(body: "ERROR\nmessage")
       -> {
         @data_server.send(:get_response, 'http://example.com', {})
       }.should raise_error(DataServerError, "ERROR\nmessage")
     end
     it "should raise a DataServerError if the first line of the response is BAD_PASSWORD" do
-      stub_request(:post, 'http://example.com').to_return(body: "BAD_PASSWORD\nmessage")
+      stub_request(:post, 'http://foo:bar@example.com').to_return(body: "BAD_PASSWORD\nmessage")
       -> {
         @data_server.send(:get_response, 'http://example.com', {})
       }.should raise_error(OrgAccountInvalidCredentialsError, 'Your username and password for MyString are invalid.')
@@ -263,14 +263,14 @@ describe DataServer do
 
   describe "import account balances" do
     it "should update a profile balance" do
-      stub_request(:post, @org.account_balance_url).to_return(body: "\"EMPLID\",\"EFFDT\",\"BALANCE\",\"ACCT_NAME\"\n\"0000000\",\"2012-03-23 16:01:39.0\",\"123.45\",\"Test Account\"\n")
+      stub_request(:post, /.*accounts/).to_return(body: "\"EMPLID\",\"EFFDT\",\"BALANCE\",\"ACCT_NAME\"\n\"0000000\",\"2012-03-23 16:01:39.0\",\"123.45\",\"Test Account\"\n")
       @data_server.should_receive(:check_credentials!)
       -> {
         @data_server.import_profile_balance(profile)
       }.should change(profile, :balance).to(123.45)
     end
     it "should update a designation account balance" do
-      stub_request(:post, @org.account_balance_url).to_return(body: "\"EMPLID\",\"EFFDT\",\"BALANCE\",\"ACCT_NAME\"\n\"0000000\",\"2012-03-23 16:01:39.0\",\"123.45\",\"Test Account\"\n")
+      stub_request(:post, /.*accounts/).to_return(body: "\"EMPLID\",\"EFFDT\",\"BALANCE\",\"ACCT_NAME\"\n\"0000000\",\"2012-03-23 16:01:39.0\",\"123.45\",\"Test Account\"\n")
       @designation_account = create(:designation_account, organization: @org, designation_number: '0000000')
       @data_server.import_profile_balance(profile)
       @designation_account.reload.balance.should == 123.45
@@ -282,7 +282,7 @@ describe DataServer do
     let(:line) { {"DONATION_ID" => "1062", "PEOPLE_ID" => "12271", "ACCT_NAME" => "Garci, Reynaldo", "DESIGNATION" => "10640", "MOTIVATION" => "", "PAYMENT_METHOD" => "EFECTIVO", "TENDERED_CURRENCY" => "MXN", "MEMO" => "", "DISPLAY_DATE" => "4/23/2003", "AMOUNT" => "1000.0000", "TENDERED_AMOUNT" => "1000.0000"} }
 
     it "should create a donation" do
-      stub_request(:post, @org.donations_url).to_return(body: "\xEF\xBB\xBF\"DONATION_ID\",\"PEOPLE_ID\",\"ACCT_NAME\",\"DESIGNATION\",\"MOTIVATION\",\"PAYMENT_METHOD\",\"TENDERED_CURRENCY\",\"MEMO\",\"DISPLAY_DATE\",\"AMOUNT\",\"TENDERED_AMOUNT\"\r\n\"1062\",\"12271\",\"Garcia, Reynaldo\",\"10640\",\"\",\"EFECTIVO\",\"MXN\",\"\",\"4/23/2003\",\"1000.0000\",\"1000.0000\"\r\n")
+      stub_request(:post, /.*donations/).to_return(body: "\xEF\xBB\xBF\"DONATION_ID\",\"PEOPLE_ID\",\"ACCT_NAME\",\"DESIGNATION\",\"MOTIVATION\",\"PAYMENT_METHOD\",\"TENDERED_CURRENCY\",\"MEMO\",\"DISPLAY_DATE\",\"AMOUNT\",\"TENDERED_AMOUNT\"\r\n\"1062\",\"12271\",\"Garcia, Reynaldo\",\"10640\",\"\",\"EFECTIVO\",\"MXN\",\"\",\"4/23/2003\",\"1000.0000\",\"1000.0000\"\r\n")
       @data_server.should_receive(:check_credentials!)
       @data_server.should_receive(:find_or_create_designation_account)
       @data_server.should_receive(:add_or_update_donation)
