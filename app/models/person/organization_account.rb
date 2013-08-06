@@ -91,7 +91,7 @@ class Person::OrganizationAccount < ActiveRecord::Base
       Airbrake.notify(e)
     end
     # If this org account doesn't have any profiles, create a default account list and profile for them
-    if user.account_lists.reload.empty?
+    if user.account_lists.reload.empty? || organization.designation_profiles.where(user_id: person_id).blank?
       account_list = user.account_lists.create({name: user.to_s, creator_id: user.id}, without_protection: true)
       organization.designation_profiles.create({name: user.to_s, user_id: user.id, account_list_id: account_list.id}, without_protection: true)
     end
