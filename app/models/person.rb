@@ -288,7 +288,7 @@ class Person < ActiveRecord::Base
 
   def sync_with_mailchimp
     if mail_chimp_account && contact && contact.send_email_letter?
-      queue_subscribe_person(self)
+      mail_chimp_account.queue_subscribe_person(self)
     end
   end
 
