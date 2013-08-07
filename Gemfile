@@ -21,7 +21,7 @@ gem 'active_model_serializers', git: 'git://github.com/rails-api/active_model_se
 gem 'acts-as-taggable-on', '~> 2.3.3'
 gem 'airbrake'#, '~> 3.1.6'
 gem 'assignable_values', '~> 0.5.3'
-gem 'carrierwave', git: 'git://github.com/jnicklas/carrierwave.git' # tracking master because of fixes made since last gem version
+gem 'carrierwave'
 gem 'cloudinary'
 gem 'country_select', git: 'git://github.com/26am/country_select.git' # My fork has the meta data for the fancy select
 gem 'dalli'
@@ -59,7 +59,7 @@ gem 'rest-client', '~> 1.6.7'
 gem 'retryable-rb', '~> 1.1.0'
 gem 'ruby-rtf'
 gem 'secure-headers', require: 'secure_headers'
-gem 'sidekiq', git: 'git://github.com/mperham/sidekiq.git'
+gem 'sidekiq'
 gem 'sidekiq-failures', git: 'git://github.com/mhfs/sidekiq-failures.git'
 gem 'siebel_donations', git: 'git://github.com/CruGlobal/siebel_donations.git'
 gem 'sinatra', :require => nil
