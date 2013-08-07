@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130710152055) do
+ActiveRecord::Schema.define(:version => 20130805160836) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -342,6 +342,7 @@ ActiveRecord::Schema.define(:version => 20130710152055) do
   end
 
   add_index "donor_accounts", ["last_donation_date"], :name => "index_donor_accounts_on_last_donation_date"
+  add_index "donor_accounts", ["organization_id", "account_number"], :name => "index_donor_accounts_on_organization_id_and_account_number", :unique => true
   add_index "donor_accounts", ["organization_id"], :name => "index_donor_accounts_on_organization_id"
   add_index "donor_accounts", ["total_donations"], :name => "index_donor_accounts_on_total_donations"
 
@@ -420,7 +421,6 @@ ActiveRecord::Schema.define(:version => 20130710152055) do
     t.string   "country"
     t.string   "postal_code"
     t.boolean  "verified",        :default => false, :null => false
-    t.boolean  "boolean",         :default => false, :null => false
     t.text     "smarty_response"
     t.datetime "created_at",                         :null => false
     t.datetime "updated_at",                         :null => false
@@ -766,7 +766,7 @@ ActiveRecord::Schema.define(:version => 20130710152055) do
     t.datetime "created_at"
   end
 
+  add_index "versions", ["item_type", "item_id", "related_object_type", "related_object_id", "created_at"], :name => "related_object_index"
   add_index "versions", ["item_type", "item_id"], :name => "index_versions_on_item_type_and_item_id"
-  add_index "versions", ["item_type", "related_object_type", "related_object_id", "created_at"], :name => "related_object_index"
 
 end

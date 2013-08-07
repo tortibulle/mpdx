@@ -80,7 +80,7 @@ describe Siebel do
 
   context '#import_donations' do
     it "imports a new donation from the donor system" do
-      stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/donations?designations=#{da1.designation_number}&end_date=#{Date.today.strftime('%Y-%m-%d')}&response_timeout=60000&start_date=2004-01-01").
+      stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/donations?designations=#{da1.designation_number}&posted_date_end=#{Date.today.strftime('%Y-%m-%d')}&response_timeout=60000&posted_date_start=2004-01-01").
         to_return(:status => 200, :body => '[ { "id": "1-IGQAM", "amount": "100.00", "designation": "' + da1.designation_number + '", "donorId": "439362786", "donationDate": "2012-12-18", "postedDate": "2012-12-21", "paymentMethod": "Check", "channel": "Mail", "campaignCode": "000000" } ]')
 
       designation_profile.designation_accounts << da1

@@ -89,8 +89,8 @@ class Siebel < DataServer
     end_date = end_date ? Date.strptime(end_date, '%m/%d/%Y').strftime("%Y-%m-%d") : Time.now.strftime("%Y-%m-%d")
 
     profile.designation_accounts.each do |da|
-      SiebelDonations::Donation.find(designations: da.designation_number, start_date: start_date,
-                                     end_date: end_date).each do |donation|
+      SiebelDonations::Donation.find(designations: da.designation_number, posted_date_start: start_date,
+                                     posted_date_end: end_date).each do |donation|
         add_or_update_donation(donation, da, profile)
       end
     end
