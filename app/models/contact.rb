@@ -181,6 +181,7 @@ class Contact < ActiveRecord::Base
   def donor_accounts_attributes=(attribute_collection)
     attribute_collection = attribute_collection.with_indifferent_access.values
     attribute_collection.each do |attrs|
+      next if attrs[:account_number].blank?
       if donor_account = DonorAccount.where(account_number: attrs[:account_number], organization_id: attrs[:organization_id]).first
         donor_account.contacts << self unless donor_account.contacts.include?(self)
       else

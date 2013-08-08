@@ -58,6 +58,11 @@ describe Contact do
 
       donor_account.reload.account_number.should == 'asdf'
     end
+    
+    it "saves a contact when posting a blank donor account number" do
+      contact.donor_accounts_attributes = {'0' => {account_number: '', organization_id: 1}}
+      contact.save.should == true
+    end
 
   end
 
