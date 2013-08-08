@@ -92,7 +92,7 @@ class AccountList < ActiveRecord::Base
   end
 
   def valid_mail_chimp_account
-    mail_chimp_account.try(:active?) && mail_chimp_account.primary_list
+    mail_chimp_account.try(:active?) && mail_chimp_account.primary_list.present?
   end
 
   def top_partners
