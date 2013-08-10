@@ -6,7 +6,7 @@ class Contact < ActiveRecord::Base
     :meta => { related_object_type: 'AccountList',
                related_object_id: :account_list_id }
 
-  has_many :contact_donor_accounts, dependent: :destroy
+  has_many :contact_donor_accounts, dependent: :destroy, inverse_of: :contact
   has_many :donor_accounts, through: :contact_donor_accounts
   has_many :donations, through: :donor_accounts
   belongs_to :account_list
@@ -181,9 +181,13 @@ class Contact < ActiveRecord::Base
   def donor_accounts_attributes=(attribute_collection)
     attribute_collection = attribute_collection.with_indifferent_access.values
     attribute_collection.each do |attrs|
-      next if attrs[:account_number].blank?
-      if donor_account = DonorAccount.where(account_number: attrs[:account_number], organization_id: attrs[:organization_id]).first
-        donor_account.contacts << self unless donor_account.contacts.include?(self)
+      case
+      when attrs[:id].present? && (attrs[:account_number].blank? || attrs[:_destroy] == '1')
+        ContactDonorAccount.where(donor_account_id: attrs[:id], contact_id: self.id).destroy_all
+      when attrs[:account_number].blank?
+        next
+      when donor_account = DonorAccount.where(account_number: attrs[:account_number], organization_id: attrs[:organization_id]).first
+        self.contact_donor_accounts.new(donor_account: donor_account) unless donor_account.contacts.include?(self)
       else
         assign_nested_attributes_for_collection_association(:donor_accounts, [attrs])
       end

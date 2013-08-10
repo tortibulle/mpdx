@@ -58,11 +58,42 @@ describe Contact do
 
       donor_account.reload.account_number.should == 'asdf'
     end
-    
+
+    it "deletes an existing donor account" do
+      donor_account = create(:donor_account)
+      donor_account.contacts << contact
+
+      expect {
+        contact.donor_accounts_attributes = {'0' => {id: donor_account.id, account_number: 'asdf', _destroy: '1'}}
+        contact.save!
+      }.to change(ContactDonorAccount, :count).by(-1)
+    end
+
+    it "deletes an existing donor account when posting a blank account number" do
+      donor_account = create(:donor_account)
+      donor_account.contacts << contact
+
+      expect {
+        contact.donor_accounts_attributes = {'0' => {id: donor_account.id, account_number: ''}}
+        contact.save!
+      }.to change(ContactDonorAccount, :count).by(-1)
+    end
+
+
     it "saves a contact when posting a blank donor account number" do
       contact.donor_accounts_attributes = {'0' => {account_number: '', organization_id: 1}}
       contact.save.should == true
     end
+
+    it "won't let you assign the same donor account number to two contacts" do
+      donor_account = create(:donor_account)
+      donor_account.contacts << contact
+
+      contact2 = create(:contact, account_list: contact.account_list)
+      contact2.update_attributes({donor_accounts_attributes: {'0' => {account_number: donor_account.account_number, organization_id: donor_account.organization_id}}}).should == false
+    end
+
+
 
   end
 
