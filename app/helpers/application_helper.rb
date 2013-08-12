@@ -5,7 +5,7 @@ module ApplicationHelper
     if current_user.send("#{provider}_accounts".to_sym).length == 0
       prompt = _('Add an Account')
     else
-      prompt = _('Add another Account') unless "Person::#{provider.titleize}Account".constantize.one_per_user?
+      prompt = _('Add another Account') unless "Person::#{provider.camelcase}Account".constantize.one_per_user?
     end
     link_to(prompt, "/auth/#{provider}", :class => "btn") if prompt
   end

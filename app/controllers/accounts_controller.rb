@@ -16,7 +16,7 @@ class AccountsController < ApplicationController
 
   def create
     User.transaction do
-      provider = "Person::#{params[:provider].titleize}Account".constantize
+      provider = "Person::#{params[:provider].camelcase}Account".constantize
 
       # If we don't have a current user, login with this method
       unless user_signed_in?

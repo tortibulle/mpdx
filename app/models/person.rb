@@ -19,6 +19,8 @@ class Person < ActiveRecord::Base
   has_many :linkedin_accounts, class_name: 'Person::LinkedinAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
   has_one :linkedin_account, class_name: 'Person::LinkedinAccount', foreign_key: :person_id, conditions: {'person_linkedin_accounts.valid_token' => true}
   has_many :google_accounts, class_name: 'Person::GoogleAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
+  has_many :prayer_letters_accounts, class_name: 'Person::PrayerLettersAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
+  has_one :prayer_letters_account, class_name: 'Person::PrayerLettersAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
   has_many :relay_accounts, class_name: 'Person::RelayAccount', foreign_key: :person_id, dependent: :destroy
   has_many :organization_accounts, class_name: 'Person::OrganizationAccount', foreign_key: :person_id, dependent: :destroy
   has_many :key_accounts, class_name: 'Person::KeyAccount', foreign_key: :person_id, dependent: :destroy

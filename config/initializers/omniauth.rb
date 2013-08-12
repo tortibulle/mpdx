@@ -8,4 +8,5 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   provider :cas, name: 'relay', host: 'signin.relaysso.org/cas'
   provider :cas, name: 'key', host: 'thekey.me/cas'
   provider :cas, name: 'admin', host: 'signin.relaysso.org/cas'
+  provider :prayer_letters, APP_CONFIG['prayer_letters_key'], APP_CONFIG['prayer_letters_secret']
 end

@@ -10,7 +10,13 @@
             <td class="identify">
 
               <div class="network_logo">
-                <%= image_tag("logos/#{provider}_logo.png", alt: provider) %>
+                <% image = image_tag("logos/#{provider}_logo.png", alt: provider) %>
+                <% case provider
+                   when 'prayer_letters' %>
+                 <%= link_to(image, 'http://prayerletters.com', target: '_blank') %>
+               <% else %>
+                 <%= image %>
+               <% end %>
               </div>
 
               <div class="network_button">
