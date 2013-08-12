@@ -8,7 +8,7 @@ module Person::Account
 
   def find_or_create_from_auth(auth_hash, person)
     @attributes.merge!(authenticated: true)
-    @account ||= @rel.find_by_remote_id_and_authenticated(@remote_id, true)
+    @account = @rel.find_by_remote_id_and_authenticated(@remote_id, true)
     if @account
       @account.update_attributes(@attributes)
     else
