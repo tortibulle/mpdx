@@ -8,8 +8,6 @@ class Person::PrayerLettersAccount < ActiveRecord::Base
   sidekiq_options queue: :general
   SERVICE_URL = 'https://www.prayerletters.com/api/v1/contacts'
 
-  belongs_to :person
-
   validates :token, :secret, :person_id, presence: true
 
   def self.find_or_create_from_auth(auth_hash, person)

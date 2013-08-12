@@ -14,6 +14,12 @@ GIT
       mime (>= 0.1)
 
 GIT
+  remote: git://github.com/CruGlobal/oauth-ruby
+  revision: 8d659d10229df298eda8007b4f09d5d392f69b1c
+  specs:
+    oauth (0.4.7)
+
+GIT
   remote: git://github.com/CruGlobal/siebel_donations.git
   revision: 28b8b35d26f6027ecd82c8f9b46e277c8baf1f57
   specs:
@@ -319,7 +325,6 @@ GEM
     net-ssh (2.6.8)
     newrelic_rpm (3.6.6.147)
     nokogiri (1.5.10)
-    oauth (0.4.7)
     oauth2 (0.8.1)
       faraday (~> 0.8)
       httpauth (~> 0.1)
@@ -596,6 +601,7 @@ DEPENDENCIES
   linkedin (~> 0.3.7)
   mailcatcher
   newrelic_rpm (~> 3.6.3)
+  oauth!
   oj (~> 2.0.0)
   omniauth-cas (= 1.0.1)
   omniauth-facebook (~> 1.4.1)
