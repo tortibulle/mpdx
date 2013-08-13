@@ -16,8 +16,6 @@ class User < Person
   store :preferences, accessors: [:time_zone, :locale, :setup, :contacts_filter,
                                   :tasks_filter, :default_account_list, :contacts_view_options]
 
-  # attr_accessible :first_name, :last_name
-
   after_create :set_setup_mode
 
   # Queue data imports
