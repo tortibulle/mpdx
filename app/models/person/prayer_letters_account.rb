@@ -6,7 +6,7 @@ class Person::PrayerLettersAccount < ActiveRecord::Base
   include Async
   include Sidekiq::Worker
   sidekiq_options queue: :general
-  SERVICE_URL = 'https://www.prayerletters.com/api/v1/contacts'
+  SERVICE_URL = 'https://www.prayerletters.com'
 
   validates :token, :secret, :person_id, presence: true
 
@@ -41,17 +41,17 @@ class Person::PrayerLettersAccount < ActiveRecord::Base
     person.to_s
   end
 
-  def get_response(method, params = nil)
-    RestClient::Request.execute(:method => method, :url => SERVICE_URL, :payload => params, :timeout => -1) { |response, request, result, &block|
-      ap request
-      ap response
-      ap result
-      response
-    }
-
+  def contacts(params = {})
+    JSON.parse(get_response(:get, '/api/v1/contacts?' + params.collect {|k,v| "#{k}=#{v}"}.join('&')))['contacts']
   end
 
+  def get_response(method, path, params = nil)
+    consumer = OAuth::Consumer.new(APP_CONFIG['prayer_letters_key'], APP_CONFIG['prayer_letters_secret'], {site: SERVICE_URL, scheme: :query_string, oauth_version: '1.0'})
+    oauth_token = OAuth::Token.new(token, secret)
 
+    response = consumer.request(method, path, oauth_token, {}, params)
+    response.body
+  end
 
 end
 

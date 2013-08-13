@@ -318,7 +318,7 @@ GEM
     omniauth-oauth2 (1.1.1)
       oauth2 (~> 0.8.0)
       omniauth (~> 1.0)
-    omniauth-prayer-letters (0.0.1)
+    omniauth-prayer-letters (0.0.2)
       multi_json
       omniauth-oauth
     omniauth-twitter (0.0.18)
