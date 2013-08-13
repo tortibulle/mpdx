@@ -1,7 +1,7 @@
 require 'sidekiq/web'
 Mpdx::Application.routes.draw do
 
-  devise_for :admin_users, ActiveAdmin::Devise.config
+  #devise_for :admin_users, ActiveAdmin::Devise.config
 
   resources :help_requests
 
@@ -9,14 +9,14 @@ Mpdx::Application.routes.draw do
   #ActiveAdmin.routes(self)
 
 
-  namespace :admin do
-    resources :sessions do
-      collection do
-        get "failure"
-        get "no_access"
-      end
-    end
-  end
+  #namespace :admin do
+    #resources :sessions do
+      #collection do
+        #get "failure"
+        #get "no_access"
+      #end
+    #end
+  #end
 
   resources :notifications
 
@@ -105,7 +105,7 @@ Mpdx::Application.routes.draw do
 
   match 'monitors/lb' => 'monitors#lb'
 
-  match '/auth/admin/callback', to: 'admin::sessions#create'
+  #match '/auth/admin/callback', to: 'admin::sessions#create'
   match '/auth/:provider/callback', to: 'accounts#create'
   match '/auth/failure', to: 'accounts#failure'
 
