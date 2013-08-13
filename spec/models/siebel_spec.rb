@@ -189,6 +189,16 @@ describe Siebel do
       donor_account.reload.name.should == siebel_donor.account_name
     end
 
+    it "doesn't create a new contact if one already exists with this account number" do
+      donor_account = create(:donor_account, organization: org, account_number: siebel_donor.id)
+      contact = create(:contact, account_list: account_list)
+      donor_account.contacts << contact
+
+      expect {
+        siebel.send(:add_or_update_donor_account, account_list, siebel_donor, designation_profile)
+      }.not_to change { Contact.count }
+    end
+
     it "skips people who haven't been updated since the last download" do
       donor_account = create(:donor_account, organization: org, account_number: siebel_donor.id)
 
