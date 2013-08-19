@@ -41,7 +41,8 @@
           <label class="<%= 'opened' if filters_params[:newsletter] %>"><%= _('Newsletter Recipients') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:newsletter] %>">
 						<%= radio_button_tag 'filters[newsletter]', '', filters_params[:newsletter] == '' %> <%= _('-- Any --') %><br />
-	          <%= radio_button_tag 'filters[newsletter]', 'all', filters_params[:newsletter] == 'all' %> <%= _('All') %><br />
+            <%= radio_button_tag 'filters[newsletter]', 'none', filters_params[:newsletter] == 'none' %> <%= _('None Selected') %><br />
+            <%= radio_button_tag 'filters[newsletter]', 'all', filters_params[:newsletter] == 'all' %> <%= _('All') %><br />
 	          <div>
 	            <%= radio_button_tag 'filters[newsletter]', 'address', filters_params[:newsletter] == 'address' %> <%= _('With Mailing Address') %>
 	            <%= tip(_('This filter will search for people who are set to receive your physical newsletter and have a mailing address'), style: 'margin: 0 6px -2px') %>
