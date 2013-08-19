@@ -5,7 +5,7 @@
 
 <div class="field">
   <%= f.label :next_ask, _('Next Ask') %>
-  <%= f.date_select :next_ask, include_blank: true, order: [:month, :day, :year], end_year: Time.now.year + 5 %>
+  <%= f.date_select :next_ask, include_blank: true, order: [:month, :day, :year], start_year: Time.now.year + 2, end_year: Time.now.year - 5 %>
 </div>
 
 <div class="field">
