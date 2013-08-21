@@ -49,6 +49,8 @@ class Contact < ActiveRecord::Base
   before_destroy :delete_people
   before_save    :set_notes_saved_at
   after_update   :sync_with_mail_chimp
+  after_save     :sync_with_prayer_letters
+  after_destroy  :delete_from_prayer_letters
 
   assignable_values_for :status, allow_blank: true do
     # Don't change these willy-nilly, they break the mobile app
@@ -159,6 +161,10 @@ class Contact < ActiveRecord::Base
       [first_name, spouse_name].compact.join(_(' and '))
   end
 
+  def envelope_greeting
+    greeting.include?(last_name.to_s) ? greeting : [greeting, last_name].compact.join(' ')
+  end
+
   def update_donation_totals(donation)
     self.first_donation_date = donation.donation_date if first_donation_date.nil? || donation.donation_date < first_donation_date
     self.last_donation_date = donation.donation_date if last_donation_date.nil? || donation.donation_date > last_donation_date
@@ -172,6 +178,10 @@ class Contact < ActiveRecord::Base
 
   def send_email_letter?
     %w[Email Both].include?(send_newsletter)
+  end
+
+  def send_physical_letter?
+    %w[Physical Both].include?(send_newsletter)
   end
 
   def not_same_as?(other)
@@ -358,6 +368,28 @@ class Contact < ActiveRecord::Base
           mail_chimp_account.queue_subscribe_contact(self)
         else
           mail_chimp_account.queue_unsubscribe_contact(self)
+        end
+      end
+    end
+  end
+
+  def sync_with_prayer_letters
+    if send_physical_letter?
+      account_list.users.each do |user|
+        user.prayer_letters_accounts.each do |pl|
+          pl.add_or_update_contact(self)
+        end
+      end
+    else
+      delete_from_prayer_letters
+    end
+  end
+
+  def delete_from_prayer_letters
+    if prayer_letters_id.present?
+      account_list.users.each do |user|
+        user.prayer_letters_accounts.each do |pl|
+          pl.delete_contact(self)
         end
       end
     end

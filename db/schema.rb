@@ -43,21 +43,6 @@ ActiveRecord::Schema.define(:version => 20130812175422) do
 
   add_index "account_lists", ["creator_id"], :name => "index_account_lists_on_creator_id"
 
-  create_table "active_admin_comments", :force => true do |t|
-    t.string   "resource_id",   :null => false
-    t.string   "resource_type", :null => false
-    t.integer  "author_id"
-    t.string   "author_type"
-    t.text     "body"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
-    t.string   "namespace"
-  end
-
-  add_index "active_admin_comments", ["author_type", "author_id"], :name => "index_active_admin_comments_on_author_type_and_author_id"
-  add_index "active_admin_comments", ["namespace"], :name => "index_active_admin_comments_on_namespace"
-  add_index "active_admin_comments", ["resource_type", "resource_id"], :name => "index_admin_notes_on_resource_type_and_resource_id"
-
   create_table "activities", :force => true do |t|
     t.integer  "account_list_id"
     t.boolean  "starred",                 :default => false, :null => false
@@ -129,23 +114,6 @@ ActiveRecord::Schema.define(:version => 20130812175422) do
   add_index "addresses", ["addressable_id"], :name => "index_addresses_on_person_id"
   add_index "addresses", ["master_address_id"], :name => "index_addresses_on_master_address_id"
   add_index "addresses", ["remote_id"], :name => "index_addresses_on_remote_id"
-
-  create_table "admin_users", :force => true do |t|
-    t.string   "email",                :default => "", :null => false
-    t.string   "guid",                                 :null => false
-    t.integer  "sign_in_count",        :default => 0
-    t.datetime "current_sign_in_at"
-    t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip"
-    t.string   "last_sign_in_ip"
-    t.string   "authentication_token"
-    t.datetime "created_at",                           :null => false
-    t.datetime "updated_at",                           :null => false
-  end
-
-  add_index "admin_users", ["authentication_token"], :name => "index_admin_users_on_authentication_token", :unique => true
-  add_index "admin_users", ["email"], :name => "index_admin_users_on_email", :unique => true
-  add_index "admin_users", ["guid"], :name => "index_admin_users_on_guid", :unique => true
 
   create_table "companies", :force => true do |t|
     t.string   "name"
@@ -778,7 +746,7 @@ ActiveRecord::Schema.define(:version => 20130812175422) do
     t.datetime "created_at"
   end
 
-  add_index "versions", ["item_type", "item_id", "related_object_type", "related_object_id", "created_at"], :name => "related_object_index"
   add_index "versions", ["item_type", "item_id"], :name => "index_versions_on_item_type_and_item_id"
+  add_index "versions", ["item_type", "related_object_type", "related_object_id", "created_at"], :name => "related_object_index"
 
 end

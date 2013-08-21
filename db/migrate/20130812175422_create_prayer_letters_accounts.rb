@@ -9,6 +9,6 @@ class CreatePrayerLettersAccounts < ActiveRecord::Migration
       t.timestamps
     end
     add_index :person_prayer_letters_accounts, :person_id
-    add_column :contacts, :prayer_letters_id, :integer
+    add_column :contacts, :prayer_letters_id, :string
   end
 end

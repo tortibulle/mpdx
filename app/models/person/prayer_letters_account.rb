@@ -45,12 +45,59 @@ class Person::PrayerLettersAccount < ActiveRecord::Base
     JSON.parse(get_response(:get, '/api/v1/contacts?' + params.collect {|k,v| "#{k}=#{v}"}.join('&')))['contacts']
   end
 
+  def add_or_update_contact(contact)
+    if contact.prayer_letters_id.present?
+      update_contact(contact)
+    else
+      create_contact(contact)
+    end
+  end
+
+  def create_contact(contact)
+    json = JSON.parse(get_response(:post, '/api/v1/contacts', contact_params(contact)))
+    contact.update_column(:prayer_letters_id, json['contact_id'])
+  end
+
+
+  def update_contact(contact)
+    get_response(:post, "/api/v1/contacts/#{contact.prayer_letters_id}", contact_params(contact))
+  end
+
+  def delete_contact(contact)
+    get_response(:delete, "/api/v1/contacts/#{contact.prayer_letters_id}")
+  end
+
+  def contact_params(contact)
+    params = {
+              name: contact.envelope_greeting,
+              greeting: contact.greeting,
+              file_as: contact.name,
+              street: contact.mailing_address.street,
+              city: contact.mailing_address.city,
+              state: contact.mailing_address.state,
+              postal_code: contact.mailing_address.postal_code,
+              external_id: contact.id
+             }
+    params[:country] = contact.mailing_address.country unless contact.mailing_address.country == 'United States'
+    if contact.primary_person
+      name = contact.primary_person.companies.first.try(:name)
+      params[:company] = name if name
+    end
+    params
+  end
+
   def get_response(method, path, params = nil)
     consumer = OAuth::Consumer.new(APP_CONFIG['prayer_letters_key'], APP_CONFIG['prayer_letters_secret'], {site: SERVICE_URL, scheme: :query_string, oauth_version: '1.0'})
     oauth_token = OAuth::Token.new(token, secret)
 
     response = consumer.request(method, path, oauth_token, {}, params)
-    response.body
+    case response.code
+    when '200','201','202','204'
+      response.body
+    else
+      raise response.body.inspect
+    end
+
   end
 
 end
