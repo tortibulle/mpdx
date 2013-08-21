@@ -61,7 +61,7 @@ gem 'rest-client', '~> 1.6.7'
 gem 'retryable-rb', '~> 1.1.0'
 gem 'rollout', '~> 2.0.0'
 gem 'ruby-rtf'
-gem 'secure-headers', require: 'secure_headers'
+gem 'secure_headers'
 gem 'sidekiq', '~> 2.13.0'
 gem 'sidekiq-failures', git: 'git://github.com/mhfs/sidekiq-failures.git'
 gem 'siebel_donations', git: 'git://github.com/CruGlobal/siebel_donations.git'
@@ -103,6 +103,7 @@ group :test do
   gem 'capybara'
   gem 'resque_spec'
   gem 'fuubar'
+  gem 'emoji_spec', :git => "https://gist.github.com/6112257.git"
 end
 
 # RAILS 4 -- should be able to remove these after upgrading
