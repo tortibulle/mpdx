@@ -73,9 +73,14 @@ class ContactExhibit < DisplayCase::Exhibit
   end
 
   def send_newsletter_error
-    if send_newsletter == _('Physical') && primary_address.blank?
-      _('No address on file')
-    elsif send_newsletter == _('Email') && people.joins(:email_addresses).blank?
+    missing_address = mailing_address == Address.new
+    missing_email_address = people.joins(:email_addresses).blank?
+
+    if send_newsletter == _('Both') && missing_address && missing_email_address
+      _('No mailing address or email addess on file')
+    elsif (send_newsletter == _('Physical') || send_newsletter == _('Both')) && missing_address
+      _('No mailing address on file')
+    elsif (send_newsletter == _('Email') || send_newsletter == _('Both')) && missing_email_address
       _('No email addess on file')
     end
   end

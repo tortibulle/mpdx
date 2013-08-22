@@ -30,16 +30,17 @@ describe ContactExhibit do
 
   it "should not have a newsletter error" do
     contact.send_newsletter = _('Physical')
-    contact.addresses << create(:address, addressable: contact, primary_mailing_address: true)
-    contact.primary_address.should_not be_nil
+    contact.addresses << create(:address, addressable: contact)
+    contact.mailing_address.should_not eq Address.new
     exhib.send_newsletter.should be_present
     exhib.send_newsletter_error.should_not be_present
   end
 
   it "should have a newsletter error" do
     contact.send_newsletter = _('Physical')
-    contact.primary_address.should be_nil
-    exhib.send_newsletter.should be_present
+    contact.mailing_address.should eq Address.new
+    exhib.send_newsletter_error.should be_present
+    contact.send_newsletter = _('Both')
     exhib.send_newsletter_error.should be_present
   end
 
