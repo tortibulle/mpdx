@@ -30,10 +30,10 @@ describe ContactExhibit do
 
   it "should not have a newsletter error" do
     contact.send_newsletter = _('Physical')
-    contact.addresses << create(:address, addressable: contact)
-    contact.mailing_address.should_not eq Address.new
-    exhib.send_newsletter.should be_present
-    exhib.send_newsletter_error.should_not be_present
+    address = create(:address, addressable: contact)
+    contact.addresses << address
+    contact.mailing_address.should eq address
+    exhib.send_newsletter_error.should == nil
   end
 
   it "should have a newsletter error" do
@@ -41,7 +41,7 @@ describe ContactExhibit do
     contact.mailing_address.should eq Address.new
     exhib.send_newsletter_error.should be_present
     contact.send_newsletter = _('Both')
-    exhib.send_newsletter_error.should be_present
+    exhib.send_newsletter_error.should == 'No mailing address or email addess on file'
   end
 
   #it "should show return the default avatar filename" do
