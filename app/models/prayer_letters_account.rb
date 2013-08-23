@@ -18,11 +18,13 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def subscribe_contacts
+    delete_all_contacts
+
     account_list.contacts.includes(:addresses).each do |contact|
       if contact.send_physical_letter? && contact.addresses.present? && contact.active?
         add_or_update_contact(contact)
-      else
-        delete_contact(contact) if contact.prayer_letters_id
+      #else
+        #delete_contact(contact) if contact.prayer_letters_id
       end
     end
   end
@@ -56,7 +58,17 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def create_contact(contact)
-    json = JSON.parse(get_response(:post, '/api/v1/contacts', contact_params(contact)))
+    begin
+      json = JSON.parse(get_response(:post, '/api/v1/contacts', contact_params(contact)))
+    rescue => e
+      json = JSON.parse(e.message)
+      case json['status']
+      when 400
+        # A contact must have a name or company.
+      else
+        raise e.message
+      end
+    end
     contact.update_column(:prayer_letters_id, json['contact_id'])
   end
 
