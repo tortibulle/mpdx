@@ -107,7 +107,7 @@ class Contact < ActiveRecord::Base
   end
 
   def active?
-    Contact.inactive_statuses.include?(status)
+    !Contact.inactive_statuses.include?(status)
   end
 
   def self.active_conditions

@@ -78,10 +78,12 @@ class PrayerLettersAccount < ActiveRecord::Base
 
   def delete_contact(contact)
     get_response(:delete, "/api/v1/contacts/#{contact.prayer_letters_id}")
+    contact.update_column(:prayer_letters_id, nil)
   end
 
   def delete_all_contacts
     get_response(:delete, '/api/v1/contacts')
+    account_list.contacts.update_all(prayer_letters_id: nil)
   end
 
   def contact_params(contact)
