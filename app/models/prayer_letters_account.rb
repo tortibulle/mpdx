@@ -18,8 +18,8 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def subscribe_contacts
-    account_list.contacts.each do |contact|
-      if contact.send_physical_letter?
+    account_list.contacts.includes(:addresses).each do |contact|
+      if contact.send_physical_letter? && contact.addresses.present? && contact.active?
         add_or_update_contact(contact)
       else
         delete_contact(contact)

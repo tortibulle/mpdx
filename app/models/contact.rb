@@ -106,6 +106,10 @@ class Contact < ActiveRecord::Base
     update_attributes(status: 'Never Ask')
   end
 
+  def active?
+    Contact.inactive_statuses.include?(status)
+  end
+
   def self.active_conditions
     "status NOT IN('#{inactive_statuses.join("','")}') or status is null"
   end
