@@ -1,0 +1,18 @@
+<%= render 'settings_sidebar' %>
+<div id="contentbody" class="withleft">
+  <div class="wpp">
+    <%= image_tag('logos/mailchimp_logo.png') %><br />
+    <div>
+      <%= _('You can now export your contacts to MailChimp.') %><br />
+      <%= _('MailChimp API key:') %> <strong><%= @mail_chimp_account.api_key %></strong><br />
+      <%= _('MailChimp list to use for your newsletter:') %> <strong><%= @mail_chimp_account.primary_list.name %></strong>
+
+      <br /><br />
+
+      <%= link_to(_('Back'), integrations_settings_path, class: 'btn desired_action') %>
+      <%= link_to(_('Edit'), edit_mail_chimp_account_path(@mail_chimp_account), class: 'btn') %>
+      <%= link_to(_('Delete'), mail_chimp_account_path(@mail_chimp_account), method: :delete, class: 'btn', confirm: _('Are you sure?')) %>
+    </div>
+
+  </div>
+</div>

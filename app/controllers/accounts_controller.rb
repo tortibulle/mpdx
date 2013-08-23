@@ -5,7 +5,6 @@ class AccountsController < ApplicationController
   def index
     @page_title = _('Accounts')
     @providers = %w[google facebook twitter linkedin key relay]
-    @providers << 'prayer_letters' if $rollout.active?(:prayer_letters, current_account_list)
   end
 
   def new

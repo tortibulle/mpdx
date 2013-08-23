@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130812175422) do
+ActiveRecord::Schema.define(:version => 20130821201443) do
 
   create_table "account_list_entries", :force => true do |t|
     t.integer  "account_list_id"
@@ -644,17 +644,6 @@ ActiveRecord::Schema.define(:version => 20130812175422) do
 
   add_index "person_organization_accounts", ["person_id", "organization_id"], :name => "index_organization_accounts_on_user_id_and_organization_id", :unique => true
 
-  create_table "person_prayer_letters_accounts", :force => true do |t|
-    t.string   "token"
-    t.string   "secret"
-    t.integer  "person_id"
-    t.boolean  "valid_token", :default => true
-    t.datetime "created_at",                    :null => false
-    t.datetime "updated_at",                    :null => false
-  end
-
-  add_index "person_prayer_letters_accounts", ["person_id"], :name => "index_person_prayer_letters_accounts_on_person_id"
-
   create_table "person_relay_accounts", :force => true do |t|
     t.integer  "person_id"
     t.string   "remote_id"
@@ -717,6 +706,17 @@ ActiveRecord::Schema.define(:version => 20130812175422) do
   end
 
   add_index "pictures", ["picture_of_id", "picture_of_type"], :name => "picture_of"
+
+  create_table "prayer_letters_accounts", :force => true do |t|
+    t.string   "token"
+    t.string   "secret"
+    t.boolean  "valid_token",     :default => true
+    t.datetime "created_at",                        :null => false
+    t.datetime "updated_at",                        :null => false
+    t.integer  "account_list_id"
+  end
+
+  add_index "prayer_letters_accounts", ["account_list_id"], :name => "index_prayer_letters_accounts_on_account_list_id"
 
   create_table "taggings", :force => true do |t|
     t.integer  "tag_id"

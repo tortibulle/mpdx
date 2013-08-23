@@ -14,7 +14,7 @@ class Contact < ActiveRecord::Base
   has_many :people, through: :contact_people, order: 'contact_people.primary::int'
   has_one  :primary_contact_person, class_name: 'ContactPerson', conditions: {primary: true}
   has_one  :primary_person, through: :primary_contact_person, source: :person
-  has_one  :spouse_contact_person, class_name: 'ContactPerson', conditions: {primary: false}
+  has_one  :spouse_contact_person, class_name: 'ContactPerson', conditions: ['"primary" = ? OR "primary" is NULL', false]
   has_one  :spouse, through: :spouse_contact_person, source: :person
   has_many :contact_referrals_to_me, foreign_key: :referred_to_id, class_name: 'ContactReferral', dependent: :destroy
   has_many :contact_referrals_by_me, foreign_key: :referred_by_id, class_name: 'ContactReferral', dependent: :destroy
@@ -374,14 +374,13 @@ class Contact < ActiveRecord::Base
   end
 
   def sync_with_prayer_letters
-    if send_physical_letter?
-      account_list.users.each do |user|
-        user.prayer_letters_accounts.each do |pl|
-          pl.add_or_update_contact(self)
-        end
+    if account_list.valid_prayer_letters_account
+      pl = account_list.prayer_letters_account
+      if send_physical_letter?
+        pl.add_or_update_contact(self)
+      else
+        delete_from_prayer_letters
       end
-    else
-      delete_from_prayer_letters
     end
   end
 

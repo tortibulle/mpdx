@@ -38,6 +38,7 @@ class AccountList < ActiveRecord::Base
   has_many :notification_preferences, dependent: :destroy, autosave: true
   has_many :messages
   has_many :designation_profiles
+  has_one :prayer_letters_account, dependent: :destroy, autosave: true
 
   accepts_nested_attributes_for :contacts, reject_if: :all_blank, allow_destroy: true
 
@@ -93,6 +94,10 @@ class AccountList < ActiveRecord::Base
 
   def valid_mail_chimp_account
     mail_chimp_account.try(:active?) && mail_chimp_account.primary_list.present?
+  end
+
+  def valid_prayer_letters_account
+    prayer_letters_account.try(:valid_token?)
   end
 
   def top_partners

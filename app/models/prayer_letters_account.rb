@@ -1,27 +1,29 @@
 require 'async'
 
-class Person::PrayerLettersAccount < ActiveRecord::Base
-  extend Person::Account
+class PrayerLettersAccount < ActiveRecord::Base
 
   include Async
   include Sidekiq::Worker
   sidekiq_options queue: :general
   SERVICE_URL = 'https://www.prayerletters.com'
 
-  validates :token, :secret, :person_id, presence: true
+  belongs_to :account_list
 
-  def self.find_or_create_from_auth(auth_hash, person)
-    @rel = person.prayer_letters_accounts
-    @remote_id = auth_hash['uid']
-    params = auth_hash.credentials
-    @attributes = {
-                    token: params.token,
-                    secret: params.secret
-                  }
-    if @account = person.prayer_letters_account
-      @account.update_attributes(@attributes)
-    else
-      @rel.create!(@attributes)
+  validates :token, :secret, :account_list_id, presence: true
+
+  after_create :queue_subscribe_contacts
+
+  def queue_subscribe_contacts
+    async(:subscribe_contacts)
+  end
+
+  def subscribe_contacts
+    account_list.contacts.each do |contact|
+      if contact.send_physical_letter?
+        add_or_update_contact(contact)
+      else
+        delete_contact(contact)
+      end
     end
   end
 
@@ -30,15 +32,15 @@ class Person::PrayerLettersAccount < ActiveRecord::Base
     begin
       contacts(limit: 1) # If this works, the tokens are valid
       self.valid_token = true
-    rescue RestClient::Unauthorized => e
+    rescue RestClient::Unauthorized
       self.valid_token = false
     end
     update_column(:valid_token, valid_token) unless new_record?
     valid_token
   end
 
-  def to_s
-    person.to_s
+  def active?
+    valid_token?
   end
 
   def contacts(params = {})
@@ -60,11 +62,26 @@ class Person::PrayerLettersAccount < ActiveRecord::Base
 
 
   def update_contact(contact)
-    get_response(:post, "/api/v1/contacts/#{contact.prayer_letters_id}", contact_params(contact))
+    begin
+      get_response(:post, "/api/v1/contacts/#{contact.prayer_letters_id}", contact_params(contact))
+    rescue => e
+      json = JSON.parse(e.message)
+      case json['status']
+      when 410
+        contact.update_column(:prayer_letters_id, nil)
+        create_contact(contact)
+      else
+        raise e.message
+      end
+    end
   end
 
   def delete_contact(contact)
     get_response(:delete, "/api/v1/contacts/#{contact.prayer_letters_id}")
+  end
+
+  def delete_all_contacts
+    get_response(:delete, '/api/v1/contacts')
   end
 
   def contact_params(contact)
@@ -95,7 +112,7 @@ class Person::PrayerLettersAccount < ActiveRecord::Base
     when '200','201','202','204'
       response.body
     else
-      raise response.body.inspect
+      raise response.body
     end
 
   end

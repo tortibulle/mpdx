@@ -28,6 +28,12 @@ Mpdx::Application.routes.draw do
     end
   end
 
+  resources :prayer_letters_accounts do
+    collection do
+      get :sync
+    end
+  end
+
   get "settings/integrations", as: :integrations_settings
 
   resources :tags, only: [:create, :destroy]
@@ -105,7 +111,7 @@ Mpdx::Application.routes.draw do
 
   match 'monitors/lb' => 'monitors#lb'
 
-  #match '/auth/admin/callback', to: 'admin::sessions#create'
+  match '/auth/prayer_letters/callback', to: 'prayer_letters_accounts#create'
   match '/auth/:provider/callback', to: 'accounts#create'
   match '/auth/failure', to: 'accounts#failure'
 

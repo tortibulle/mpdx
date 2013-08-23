@@ -34,7 +34,39 @@
         </tr>
       </table>
     </div>
+    <% if $rollout.active?(:prayer_letters, current_account_list) %>
+      <div class="network_connect">
+        <table>
+          <tr>
+            <td class="identify">
+              <% if current_account_list.prayer_letters_account %>
+                <% if current_account_list.valid_prayer_letters_account %>
+                  <div class="statusIcon statusIcon-enabled">&nbsp;</div>
+                <% else %>
+                  <div class="statusIcon statusIcon-error">&nbsp;</div>
+                <% end %>
+              <% else %>
+                <div class="statusIcon statusIcon-disabled">&nbsp;</div>
+              <% end %>
+              <div class="network_logo">
+                <%= image_tag("logos/prayer_letters_logo.png", alt: 'Prayer Letters') %>
+              </div>
 
+            </td>
+          <td class="connections">
+            <div class="network_button">
+              <% if current_account_list.valid_prayer_letters_account %>
+                <%#= link_to(_('Settings'), prayer_letters_accounts_path, :class => "btn") %>
+                <%= link_to(_('Sync Now'), sync_prayer_letters_accounts_path, :class => "btn") %>
+              <% else %>
+                <%= link_to(_('Enable'), '/auth/prayer_letters', :class => "btn") %>
+              <% end %>
+            </div>
+          </td>
+          </tr>
+        </table>
+      </div>
+    <% end %>
   </div>
 </div>
 
