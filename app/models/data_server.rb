@@ -65,35 +65,33 @@ class DataServer
       line['FIRST_NAME'] = line['ACCT_NAME'] if line['FIRST_NAME'].blank?
 
       begin
-        Person.transaction do
-          donor_account = add_or_update_donor_account(line, profile, account_list)
+        donor_account = add_or_update_donor_account(line, profile, account_list)
 
-          # handle bad data
-          unless %w[P O].include?(line['PERSON_TYPE'])
-            Airbrake.notify(
-              :error_class   => "Unknown PERSON_TYPE",
-              :error_message => "Unknown PERSON_TYPE: #{line['PERSON_TYPE']}",
-              :parameters    => {line: line, org: @org.inspect, user: @user.inspect, org_account: @org_account.inspect}
-            )
-            # Go ahead and assume this is a person
-            line['PERSON_TYPE'] = 'P'
+        # handle bad data
+        unless %w[P O].include?(line['PERSON_TYPE'])
+          Airbrake.notify(
+            :error_class   => "Unknown PERSON_TYPE",
+            :error_message => "Unknown PERSON_TYPE: #{line['PERSON_TYPE']}",
+            :parameters    => {line: line, org: @org.inspect, user: @user.inspect, org_account: @org_account.inspect}
+          )
+          # Go ahead and assume this is a person
+          line['PERSON_TYPE'] = 'P'
+        end
+
+        case line['PERSON_TYPE']
+        when 'P' # Person
+          # Create or update people associated with this account
+          primary_person, primary_contact_person = add_or_update_primary_contact(account_list, user, line, donor_account)
+
+          # Now the secondary person (persumably spouse)
+          if line['SP_FIRST_NAME'].present?
+            spouse, contact_spouse = add_or_update_spouse(account_list, user, line, donor_account)
+            # Wed the two peple
+            primary_person.add_spouse(spouse)
+            primary_contact_person.add_spouse(contact_spouse)
           end
-
-          case line['PERSON_TYPE']
-          when 'P' # Person
-            # Create or update people associated with this account
-            primary_person, primary_contact_person = add_or_update_primary_contact(account_list, user, line, donor_account)
-
-            # Now the secondary person (persumably spouse)
-            if line['SP_FIRST_NAME'].present?
-              spouse, contact_spouse = add_or_update_spouse(account_list, user, line, donor_account)
-              # Wed the two peple
-              primary_person.add_spouse(spouse)
-              primary_contact_person.add_spouse(contact_spouse)
-            end
-          when 'O' # Company/Organization
-            add_or_update_company(account_list, user, line, donor_account)
-          end
+        when 'O' # Company/Organization
+          add_or_update_company(account_list, user, line, donor_account)
         end
       rescue ArgumentError => e
         raise line.inspect + "\n\n" + e.message.inspect
