@@ -24,7 +24,7 @@ class Address < ActiveRecord::Base
 
   def ==(other)
     if other
-      return true if other.master_address_id == self.master_address_id
+      return true if other.master_address_id && other.master_address_id == self.master_address_id
 
       return true if other.street.to_s.downcase == street.to_s.downcase &&
                      other.city.to_s.downcase == city.to_s.downcase &&
