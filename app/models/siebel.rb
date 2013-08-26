@@ -195,10 +195,12 @@ class Siebel < DataServer
   end
 
   def add_or_update_donor_account(account_list, donor, profile, date_from = nil)
-    donor_account = @org.donor_accounts.where(account_number: donor.id).first_or_initialize
-    donor_account.attributes = {name: donor.account_name,
-                                donor_type: donor.type}
-    donor_account.save!
+    Retryable.retryable do
+      donor_account = @org.donor_accounts.where(account_number: donor.id).first_or_initialize
+      donor_account.attributes = {name: donor.account_name,
+                                  donor_type: donor.type}
+      donor_account.save!
+    end
 
     contact = donor_account.link_to_contact_for(account_list)
     raise 'Failed to link to contact' unless contact
