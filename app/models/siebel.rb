@@ -200,33 +200,33 @@ class Siebel < DataServer
       donor_account.attributes = {name: donor.account_name,
                                   donor_type: donor.type}
       donor_account.save!
-    end
 
-    contact = donor_account.link_to_contact_for(account_list)
-    raise 'Failed to link to contact' unless contact
+      contact = donor_account.link_to_contact_for(account_list)
+      raise 'Failed to link to contact' unless contact
 
-    # Save addresses
-    if donor.addresses
-      donor.addresses.each do |address|
-        next if date_from.present? && DateTime.parse(address.updated_at) < date_from
+      # Save addresses
+      if donor.addresses
+        donor.addresses.each do |address|
+          next if date_from.present? && DateTime.parse(address.updated_at) < date_from
 
-        add_or_update_address(address, donor_account)
+          add_or_update_address(address, donor_account)
 
-        # Make sure the contact has the primary address
-        add_or_update_address(address, contact) if address.primary == true
+          # Make sure the contact has the primary address
+          add_or_update_address(address, contact) if address.primary == true
+        end
       end
-    end
 
-    # Save people (siebel calls them contacts)
-    if donor.contacts
-      donor.contacts.each do |person|
-        next if date_from.present? && DateTime.parse(person.updated_at) < date_from
+      # Save people (siebel calls them contacts)
+      if donor.contacts
+        donor.contacts.each do |person|
+          next if date_from.present? && DateTime.parse(person.updated_at) < date_from
 
-        add_or_update_person(person, donor_account, contact, date_from)
+          add_or_update_person(person, donor_account, contact, date_from)
+        end
       end
-    end
 
-    donor_account
+      donor_account
+    end
   end
 
   def add_or_update_person(siebel_person, donor_account, contact, date_from = nil)

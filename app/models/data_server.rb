@@ -162,6 +162,8 @@ class DataServer
       else
         raise e
       end
+    rescue Errno::ETIMEDOUT
+      return false
     end
     true
   end
