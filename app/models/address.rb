@@ -150,7 +150,7 @@ class Address < ActiveRecord::Base
                                         .first
         end
         attributes_for_master_address[:smarty_response] = results
-      rescue RestClient::RequestFailed, SocketError
+      rescue RestClient::RequestFailed, SocketError, RestClient::ResourceNotFound
         # Don't blow up if smarty didn't like the request
       end
     end
