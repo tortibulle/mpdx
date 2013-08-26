@@ -72,7 +72,7 @@ class ContactExhibit < DisplayCase::Exhibit
   end
 
   def send_newsletter_error
-    missing_address = (mailing_address == Address.new)
+    missing_address = !mailing_address.id
     missing_email_address = people.joins(:email_addresses).blank?
 
     case
