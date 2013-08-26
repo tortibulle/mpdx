@@ -266,11 +266,14 @@ class Contact < ActiveRecord::Base
        self.tag_list += other.tag_list
 
        save(validate: false)
-       begin
-         other.reload
-         other.destroy
-       rescue ActiveRecord::RecordNotFound; end
+
     end
+
+    # Delete the losing record
+    begin
+      other.reload
+      other.destroy
+    rescue ActiveRecord::RecordNotFound; end
 
     reload
     merge_people
