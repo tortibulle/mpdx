@@ -5,6 +5,9 @@ $('#spinner_donations').hide();
   $('#donations').html('<%= j(render('chart', donations: @donations)) %>');
   $('#donations').append('<%= j(render('donations', donations: @donations)) %>');
 <% end %>
+if($('.pagination')[0]) {
+  $('.pagination').remove()
+}
 <% if @donations.next_page %>
   $('#donations').append('<%= j(will_paginate @donations, remote: true, page_links: false, previous_label: '', next_label: 'More') %>')
 <% end %>
