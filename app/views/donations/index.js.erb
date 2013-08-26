@@ -8,6 +8,6 @@ $('#spinner_donations').hide();
 if($('.pagination')[0]) {
   $('.pagination').remove()
 }
-<% if @donations.next_page %>
+<% if @donations.respond_to?(:next_page) && @donations.next_page %>
   $('#donations').append('<%= j(will_paginate @donations, remote: true, page_links: false, previous_label: '', next_label: 'More') %>')
 <% end %>
