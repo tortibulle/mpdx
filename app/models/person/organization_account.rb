@@ -70,8 +70,11 @@ class Person::OrganizationAccount < ActiveRecord::Base
         update_column(:last_download, user.donations.order('donation_date desc').first.donation_date)
       end
     ensure
-      update_column(:downloading, false)
-      update_column(:locked_at, nil)
+      begin
+        update_column(:downloading, false)
+        update_column(:locked_at, nil)
+      rescue ActiveRecord::ActiveRecordError
+      end
     end
   end
 
