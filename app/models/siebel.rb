@@ -65,7 +65,12 @@ class Siebel < DataServer
     if designation_numbers.present?
       account_list = profile.account_list
 
-      SiebelDonations::Donor.find(having_given_to_designations: designation_numbers.join(',')).each do |siebel_donor|
+      SiebelDonations::Donor.find(having_given_to_designations: designation_numbers.join(','),
+                                  contact_filter: :all,
+                                  account_address_filter: :all,
+                                  contact_email_filter: :all,
+                                  contact_phone_filter: :all
+                                  ).each do |siebel_donor|
         next if date_from.present? && DateTime.parse(siebel_donor.updated_at) < date_from
 
         donor_account = add_or_update_donor_account(account_list, siebel_donor, profile, date_from)
