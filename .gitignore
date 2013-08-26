@@ -34,3 +34,4 @@ public/mobile
 *.sublime-workspace
 cloudinary.yml
 config/sidekiq.yml
+db/schema.rb
