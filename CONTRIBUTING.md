@@ -50,8 +50,12 @@ Make sure you have a recent version of bundler:
 Then install the development the development dependencies:
 
     $> bundle install
-    $> bundle exec rake db:migrate
 
+Make sure the database specified in database.yml exists, then run:
+
+    $> bundle exec rake db:migrate
+    $> bundle exec rake db:migrate RAILS_ENV=test
+    
 Make sure memcached and redis are running
 
 Now you should be able to run the entire suite using:
