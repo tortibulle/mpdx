@@ -89,6 +89,10 @@ To boot up a test rails application, use:
 You should be able to open `http://localhost:3000/` and view a test
 environment.
 
+Run:
+
+`rake organizations:fetch`
+
 
 ### 7. Make a pull request
 
@@ -99,3 +103,5 @@ there are any merge conflicts, your pull request will not be merged in.
 
 Now push your changes up to your feature branch on GitHub and make a pull request!
 We will pull your changes, run the test suite, review the code and merge it in.
+
+
