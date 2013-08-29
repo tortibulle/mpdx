@@ -18,4 +18,19 @@ production:
 
 staging:
   <<: *common
+  
+test: 
+  twitter_key:
+  twitter_secret:
+  facebook_key:
+  facebook_secret:
+  linkedin_key:
+  linkedin_secret:
+  google_key:
+  google_secret:
+  s3_key:
+  s3_secret:
+  s3_bucket:
+  encryption_key:
+  itg_auth_key:
 
