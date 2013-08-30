@@ -71,7 +71,7 @@ Several callback services (including facebook and CAS) like to have a real hostn
 to redirect to. To work with those we recommend that you create an entry in your `hosts`
 file for local.mpdx.org like this:
 
-`local.mpdx.org 127.0.0.1`
+`127.0.0.1 local.mpdx.org`
 
 You might have to reboot after editing /etc/hosts before your computer picks up on it.
 
@@ -89,6 +89,10 @@ To boot up a test rails application, use:
 You should be able to open `http://localhost:3000/` and view a test
 environment.
 
+Run:
+
+`rake organizations:fetch`
+
 
 ### 7. Make a pull request
 
@@ -99,3 +103,5 @@ there are any merge conflicts, your pull request will not be merged in.
 
 Now push your changes up to your feature branch on GitHub and make a pull request!
 We will pull your changes, run the test suite, review the code and merge it in.
+
+
