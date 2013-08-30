@@ -50,7 +50,7 @@
       <ul style="display:none" class="quick_action_list">
         <li><%= link_to(_('Show'), contact_path(contact), :class => "none") %></li>
         <li><%= link_to(_('Edit'), edit_contact_path(contact), :class => "none") %></li>
-        <li><%= link_to(_('Hide'), contact_path(contact), method: :delete, remote: true, :class => "none", data: {behavior: 'hide_contact'}) %></li>
+        <li><%= link_to(_('Delete'), contact_path(contact), method: :delete, remote: true, :class => "none", data: {behavior: 'hide_contact'}) %></li>
       </ul>
     </td>
     <td class="checks"><input type="checkbox" name="contact_ids[]" value="<%= contact.id %>" /></td>
