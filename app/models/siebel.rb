@@ -145,8 +145,18 @@ class Siebel < DataServer
   def add_or_update_donation(siebel_donation, designation_account, profile)
     default_currency = @org.default_currency_code || 'USD'
     donor_account = @org.donor_accounts.find_by_account_number(siebel_donation.donor_id)
+
+    # find donor account from siebel if we don't already have this donor
     unless donor_account
-      Rails.logger.info "Can't find donor account for #{siebel_donation.inspect}"
+      siebel_donor = SiebelDonations::Donor.find(ids: siebel_donation.donor_id).first
+      if siebel_donor
+        account_list = profile.account_list
+        donor_account = add_or_update_donor_account(account_list, siebel_donor, profile)
+      end
+    end
+
+    unless donor_account
+       Airbrake.raise_or_notify("Can't find donor account for #{siebel_donation.inspect}")
       return
     end
 
