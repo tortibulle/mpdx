@@ -134,12 +134,14 @@ describe Siebel do
       }.not_to change { Donation.count }.by(1)
     end
 
-    it "doesn't save the donation if the donor can't be found" do
+    it "fetches the donor from siebel if the donor isn't already on this account list" do
       donor_account.destroy
+      stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/donors?ids=MyString&response_timeout=60000").
+        to_return(:status => 200, :body => '[{ "id": "602506447", "accountName": "Hillside Evangelical Free Church"}]', :headers => {})
 
       expect {
         siebel.send(:add_or_update_donation, siebel_donation, da1, designation_profile)
-      }.not_to change { Donation.count }.by(1)
+      }.to change { DonorAccount.count }.by(1)
     end
   end
 
