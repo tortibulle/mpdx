@@ -15,6 +15,13 @@ describe NotificationType::StoppedGiving do
         notifications.length.should == 1
       end
 
+      it "skips people with future pledge_start_date" do
+        create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 60.days.ago)
+        contact.update_attributes(pledge_start_date: 1.day.from_now)
+        notifications = stopped_giving.check(da)
+        notifications.length.should == 0
+      end
+
       it "doesn't add a notification if not late" do
         create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 37.days.ago)
         notifications = stopped_giving.check(da)
