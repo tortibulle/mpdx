@@ -5,6 +5,7 @@ Mpdx::Application.routes.draw do
 
   resources :help_requests
 
+  match '/help', to: 'help_requests#new'
 
   #ActiveAdmin.routes(self)
 
