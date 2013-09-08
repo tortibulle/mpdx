@@ -35,3 +35,4 @@ public/mobile
 cloudinary.yml
 config/sidekiq.yml
 db/schema.rb
+.idea
