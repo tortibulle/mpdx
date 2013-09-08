@@ -74,6 +74,11 @@ class Address < ActiveRecord::Base
     end
   end
 
+  def valid_mailing_address?
+    city.present? && street.present?
+  end
+
+
   private
 
   def find_or_create_master_address

@@ -18,15 +18,38 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def subscribe_contacts
-    delete_all_contacts
+    contacts = []
 
-    account_list.contacts.includes(:addresses).each do |contact|
-      if contact.send_physical_letter? && contact.addresses.present? && contact.active?
-        add_or_update_contact(contact)
-      #else
-        #delete_contact(contact) if contact.prayer_letters_id
+    account_list.contacts.includes([:primary_address, {primary_person: :companies}]).each do |contact|
+      if contact.send_physical_letter? &&
+         contact.addresses.present? &&
+         contact.active? &&
+         contact.mailing_address.valid_mailing_address?
+
+        params = {
+          name: contact.envelope_greeting,
+          greeting: contact.greeting,
+          file_as: contact.name,
+          contact_id: contact.prayer_letters_id,
+          address: {
+            street: contact.mailing_address.street,
+            city: contact.mailing_address.city,
+            state: contact.mailing_address.state,
+            postal_code: contact.mailing_address.postal_code,
+            country: contact.mailing_address.country
+          },
+          external_id: contact.id
+        }
+        if contact.primary_person
+          name = contact.primary_person.companies.first.try(:name)
+          params[:company] = name if name
+        end
+        contacts << params
       end
     end
+
+    get_response(:put, '/api/v1/contacts', {contacts: contacts}.to_json)
+
   end
 
   def validate_token
