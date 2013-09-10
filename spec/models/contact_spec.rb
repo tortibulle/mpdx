@@ -222,4 +222,27 @@ describe Contact do
 
   end
 
+  context '#destroy' do
+    before do
+      create(:prayer_letters_account, account_list: account_list)
+    end
+
+    it 'deletes this person from prayerletters.com if no other contact has the prayer_letters_id' do
+      stub_request(:delete, /www.prayerletters.com\/.*/).
+         to_return(:status => 200, :body => "", :headers => {})
+
+      prayer_letters_id  = 'foo'
+      contact.prayer_letters_id = prayer_letters_id
+      contact.send(:delete_from_prayer_letters)
+    end
+
+    it 'DOESN"T delete this person from prayerletters.com if another contact has the prayer_letters_id' do
+      # This spec passes because no external web call is made
+      prayer_letters_id  = 'foo'
+      contact.prayer_letters_id = prayer_letters_id
+      create(:contact, account_list: account_list, prayer_letters_id: prayer_letters_id)
+      contact.send(:delete_from_prayer_letters)
+    end
+  end
+
 end

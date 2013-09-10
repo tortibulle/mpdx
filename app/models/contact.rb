@@ -250,7 +250,7 @@ class Contact < ActiveRecord::Base
       [:name, :pledge_amount, :status, :greeting, :website,
        :pledge_frequency, :pledge_start_date, :next_ask, :never_ask, :likely_to_give,
        :church_name, :send_newsletter, :direct_deposit, :magazine, :last_activity, :last_appointment,
-       :last_letter, :last_phone_call, :last_pre_call, :last_thank].each do |field|
+       :last_letter, :last_phone_call, :last_pre_call, :last_thank, :prayer_letters_id].each do |field|
          if send(field).blank? && other.send(field).present?
            send("#{field}=".to_sym, other.send(field))
          end
@@ -392,12 +392,10 @@ class Contact < ActiveRecord::Base
   end
 
   def delete_from_prayer_letters
-    if prayer_letters_id.present?
-      account_list.users.each do |user|
-        user.prayer_letters_accounts.each do |pl|
-          pl.delete_contact(self)
-        end
-      end
+    # If this contact was at prayerletters.com and no other contact on this list has the
+    # same prayer_letters_id, remove this contact from prayerletters.com
+    if prayer_letters_id.present? && account_list.valid_prayer_letters_account
+      account_list.prayer_letters_account.delete_contact(self) unless account_list.contacts.where(prayer_letters_id: prayer_letters_id).present?
     end
   end
 
