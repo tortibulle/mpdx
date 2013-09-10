@@ -156,6 +156,21 @@ class Person < ActiveRecord::Base
     EmailAddress.add_for_person(self, hash) if hash['email'].present?
   end
 
+  def email_addresses_attributes=(attributes)
+    case
+    when attributes.is_a?(Hash)
+      attributes.each do |k, v|
+        self.email_address = v
+      end
+    when attributes.is_a?(Array)
+      attributes.each do |v|
+        self.email_address = v
+      end
+    else
+      super
+    end
+  end
+
   def phone_number=(hash)
     hash = hash.with_indifferent_access
     PhoneNumber.add_for_person(self, hash) if hash.with_indifferent_access['number'].present?

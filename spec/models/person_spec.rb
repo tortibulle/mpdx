@@ -73,6 +73,29 @@ describe Person do
     end
   end
 
+  context '#email_address=' do
+    it "doesn't barf when someone puts in the same email address twice" do
+      person = build(:person)
+
+      email_addresses_attributes = {
+        "1378494030167" => {
+          "_destroy" => "false",
+          "email" => "monfortcody@yahoo.com",
+          "primary" => "0"
+        },
+        "1378494031857" => {
+          "_destroy" => "false",
+          "email" => "monfortcody@yahoo.com",
+          "primary" => "0"
+        }
+      }
+
+      person.email_addresses_attributes = email_addresses_attributes
+
+      person.save
+    end
+  end
+
   describe 'merging two people' do
     let(:winner) { create(:person) }
     let(:loser) { create(:person) }
