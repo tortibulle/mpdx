@@ -20,6 +20,10 @@ class Person::GoogleAccount < ActiveRecord::Base
     super
   end
 
+  def self.create_user_from_auth(auth_hash)
+    raise Person::Account::NoSessionError, "Somehow a user without an account/session is trying to sign in using google"
+  end
+
   def to_s
     email
   end

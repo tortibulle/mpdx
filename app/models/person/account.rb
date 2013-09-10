@@ -42,4 +42,6 @@ module Person::Account
 
   def one_per_user?() true; end
 
+  class NoSessionError < StandardError
+  end
 end

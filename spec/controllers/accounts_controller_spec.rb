@@ -18,10 +18,15 @@ describe AccountsController do
       @user.should_receive(:queue_imports)
       post 'create', provider: 'facebook'
     end
+
+    it "redirects to the homepage if someone tries to connect to google without a session" do
+      post 'create', provider: 'google'
+      assert_redirected_to '/'
+    end
   end
 
   describe 'when signed in' do
-    before(:each) do 
+    before(:each) do
       @user = create(:user_with_account)
       sign_in(:user, @user)
     end
