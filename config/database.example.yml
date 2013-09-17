@@ -3,3 +3,11 @@ development:
   database: mpdx_development
   username: mpdx
   password: mpdx
+  host: localhost
+
+test:
+  adapter: postgresql
+  database: mpdx_test
+  username: mpdx
+  password: mpdx
+  host: localhost
