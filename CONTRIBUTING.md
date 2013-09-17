@@ -41,6 +41,11 @@ MPDX is a tool that many people rely on for managing their partner
 relationships in their production applications. Bugs are not cool. Although we're not perfect,
 we pride ourselves on writing well tested code. I hope you do too :)
 
+Install SSL Certificate Bundle
+    $> brew install curl-ca-bundle
+
+MPDX requires Postgres. You can download and install the installer from their [site](http://postgresapp.com).
+
 MPDX uses rspec for it's test suite.
 
 Make sure you have a recent version of bundler:
@@ -53,6 +58,7 @@ Then install the development the development dependencies:
 
 Make sure the database specified in database.yml exists, then run:
 
+    $> bundle exec rake db:create
     $> bundle exec rake db:migrate
     $> bundle exec rake db:migrate RAILS_ENV=test
     
@@ -74,6 +80,8 @@ file for local.mpdx.org like this:
 `127.0.0.1 local.mpdx.org`
 
 You might have to reboot after editing /etc/hosts before your computer picks up on it.
+You can avoid a reboot by clearing your DNS cache.
+    $> dscacheutil -flushcache
 
 
 ### 6. View your changes in a Rails application
@@ -88,6 +96,10 @@ To boot up a test rails application, use:
 
 You should be able to open `http://localhost:3000/` and view a test
 environment.
+You will need to join and log into an organization.
+    Organization: ToonTown
+    Username: test@test.com
+    Password: Test1234
 
 Run:
 
