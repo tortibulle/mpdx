@@ -50,7 +50,7 @@ class Contact < ActiveRecord::Base
   before_save    :set_notes_saved_at
   after_update   :sync_with_mail_chimp
   after_save     :sync_with_prayer_letters
-  after_destroy  :delete_from_prayer_letters
+  before_destroy  :delete_from_prayer_letters
 
   assignable_values_for :status, allow_blank: true do
     # Don't change these willy-nilly, they break the mobile app
@@ -394,8 +394,10 @@ class Contact < ActiveRecord::Base
   def delete_from_prayer_letters
     # If this contact was at prayerletters.com and no other contact on this list has the
     # same prayer_letters_id, remove this contact from prayerletters.com
-    if prayer_letters_id.present? && account_list.valid_prayer_letters_account
-      account_list.prayer_letters_account.delete_contact(self) unless account_list.contacts.where(prayer_letters_id: prayer_letters_id).present?
+    if prayer_letters_id.present? &&
+       account_list.valid_prayer_letters_account &&
+       !account_list.contacts.where("prayer_letters_id = '#{prayer_letters_id}' AND id <> #{id}").present?
+      account_list.prayer_letters_account.delete_contact(self)
     end
   end
 
