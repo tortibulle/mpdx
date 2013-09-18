@@ -17,25 +17,23 @@ class AccountsController < ApplicationController
 
   def create
     begin
-      User.transaction do
-        provider = "Person::#{params[:provider].camelcase}Account".constantize
+      provider = "Person::#{params[:provider].camelcase}Account".constantize
 
-        # If we don't have a current user, login with this method
-        unless user_signed_in?
-          session[:signed_in_with] = params[:provider]
-          sign_in(User.from_omniauth(provider, request.env['omniauth.auth']))
-          session[:user_return_to] ||= '/'
+      # If we don't have a current user, login with this method
+      unless user_signed_in?
+        session[:signed_in_with] = params[:provider]
+        sign_in(User.from_omniauth(provider, request.env['omniauth.auth']))
+        session[:user_return_to] ||= '/'
 
-          # queue up data imports
-          current_user.queue_imports
-        end
-
-        # Connect this account to the user
-        @account = provider.find_or_create_from_auth(request.env['omniauth.auth'], current_user)
-
-        redirect_to redirect_path
-        session[:user_return_to] = nil
+        # queue up data imports
+        current_user.queue_imports
       end
+
+      # Connect this account to the user
+      @account = provider.find_or_create_from_auth(request.env['omniauth.auth'], current_user)
+
+      redirect_to redirect_path
+      session[:user_return_to] = nil
     rescue Person::Account::NoSessionError
       redirect_to '/'
     end
