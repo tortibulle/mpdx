@@ -153,7 +153,11 @@ class Person < ActiveRecord::Base
 
   def email_address=(hash)
     hash = hash.with_indifferent_access
-    EmailAddress.add_for_person(self, hash) if hash['email'].present?
+    if hash['_destroy'] == '1'
+      email_addresses.find(hash['id']).destroy
+    else
+      EmailAddress.add_for_person(self, hash) if hash['email'].present?
+    end
   end
 
   def email_addresses_attributes=(attributes)

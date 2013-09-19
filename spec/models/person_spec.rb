@@ -96,6 +96,27 @@ describe Person do
     end
   end
 
+  context '#email_addresses_attributes=' do
+    it "deletes nested email address" do
+      person = create(:person)
+      email = create(:email_address, person: person)
+
+      email_addresses_attributes = {
+        "0" => {
+          "_destroy" => "1",
+          "email" => "monfortcody@yahoo.com",
+          "primary" => "0",
+          "id" => email.id.to_s
+        }
+      }
+
+      expect {
+        person.email_addresses_attributes = email_addresses_attributes
+
+        person.save
+      }.to change(person.email_addresses, :count).by(-1)
+    end
+  end
   describe 'merging two people' do
     let(:winner) { create(:person) }
     let(:loser) { create(:person) }
