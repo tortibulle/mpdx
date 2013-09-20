@@ -11,20 +11,20 @@ describe NotificationType::StoppedGiving do
 
       it 'adds a notification if late' do
         create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 60.days.ago)
-        notifications = stopped_giving.check(da)
+        notifications = stopped_giving.check(da, contact.account_list)
         notifications.length.should == 1
       end
 
       it "skips people with future pledge_start_date" do
         create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 60.days.ago)
         contact.update_attributes(pledge_start_date: 1.day.from_now)
-        notifications = stopped_giving.check(da)
+        notifications = stopped_giving.check(da, contact.account_list)
         notifications.length.should == 0
       end
 
       it "doesn't add a notification if not late" do
         create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 37.days.ago)
-        notifications = stopped_giving.check(da)
+        notifications = stopped_giving.check(da, contact.account_list)
         notifications.length.should == 0
       end
     end
@@ -34,20 +34,20 @@ describe NotificationType::StoppedGiving do
 
       it 'adds a notification if late' do
         create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 65.days.ago)
-        notifications = stopped_giving.check(da)
+        notifications = stopped_giving.check(da, contact.account_list)
         notifications.length.should == 1
       end
 
       it "doesn't add a notification if not late" do
         create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 37.days.ago)
-        notifications = stopped_giving.check(da)
+        notifications = stopped_giving.check(da, contact.account_list)
         notifications.length.should == 0
       end
     end
 
     context 'has never given' do
       it "doesn't add a notification" do
-        notifications = stopped_giving.check(da)
+        notifications = stopped_giving.check(da, contact.account_list)
         notifications.length.should == 0
       end
     end

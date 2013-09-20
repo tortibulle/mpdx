@@ -15,7 +15,7 @@ class NotificationType < ActiveRecord::Base
       type_instance = type.constantize.first
       actions = account_list.notification_preferences.find_by_notification_type_id(type_instance.id).try(:actions)
       if (Array.wrap(actions) & NotificationPreference.default_actions).present?
-        contacts[type] = type_instance.check(designation_account)
+        contacts[type] = type_instance.check(designation_account, account_list)
       end
     end
     contacts
