@@ -153,7 +153,13 @@ class MailChimpAccount < ActiveRecord::Base
   end
 
   def subscribe_person(person_id)
-    person = Person.find(person_id)
+    begin
+      person = Person.find(person_id)
+    rescue ActiveRecord::RecordNotFound
+      # This person was deleted after the background job was created
+      return false
+    end
+
     if person.primary_email_address
       vars = { :EMAIL => person.primary_email_address.email, :FNAME => person.first_name,
                :LNAME => person.last_name}
