@@ -21,6 +21,7 @@
         <%= link_to(_('Add Task'), new_task_path(contact_id: contact.id), class: "btn smallbtn add_task", data: {contact_id: contact.id}, remote: true) %>
         <%= link_to(_('Edit'), edit_contact_path(contact), :class=> "btn smallbtn") %>
         <%#= link_to(_('Quick'), "", :class => "btn smallbtn quick")%>
+        <%= link_to(_('Delete'), contact_path(contact), :class=> "btn smallbtn", method: :delete) %>
       </div>
     </div>
     <div class="wpp">
