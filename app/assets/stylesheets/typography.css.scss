@@ -47,7 +47,7 @@ $font_basic: Arial, Helvetica, sans-serif;
 
 
 
-html, body {font-family: $font_basic; font-size: 12px; line-height: 1.25em; color: $type;}
+html, body {font-family: $font_basic; font-size: 16px; line-height: 1.75em; color: $type;}
 
 h1, h2, h3, h4, h5, h6 {font-family: $font_heading; letter-spacing: -1px; line-height: 1em; color: #333; color: $type;}
 
@@ -82,9 +82,9 @@ p:last-child {margin-bottom: 0;}
 #user {
   color: $white;
   .links a {
-    background: $blue_dark;
+    background: $belize-hole;
     color: $white;
-    font-size: 13px;
+    font-size: 14px;
   }
 }
 

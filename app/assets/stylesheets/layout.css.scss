@@ -17,18 +17,7 @@ hr.thin {margin: .5em 0; border: none; border-top: 1px solid $gray_mid;}
 $userheight: 60px;
 
 #user {
-  background-image: linear-gradient(bottom, #00556D 0%, #0077AE 22%);
-  background-image: -o-linear-gradient(bottom, #00556D 0%, #0077AE 22%);
-  background-image: -moz-linear-gradient(bottom, #00556D 0%, #0077AE 22%);
-  background-image: -webkit-linear-gradient(bottom, #00556D 0%, #0077AE 22%);
-  background-image: -ms-linear-gradient(bottom, #00556D 0%, #0077AE 22%);
-  background-image: -webkit-gradient(
-  	linear,
-  	left bottom,
-  	left top,
-  	color-stop(0, #00556D),
-  	color-stop(0.22, #0077AE)
-  );
+  background-color: $peter-river;
 
   .links {
     position: relative;
