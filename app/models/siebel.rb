@@ -67,7 +67,7 @@ class Siebel < DataServer
 
       SiebelDonations::Donor.find(having_given_to_designations: designation_numbers.join(','),
                                   contact_filter: :all,
-                                  account_address_filter: :all,
+                                  account_address_filter: :primary,
                                   contact_email_filter: :all,
                                   contact_phone_filter: :all
                                   ).each do |siebel_donor|
