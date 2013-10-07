@@ -16,19 +16,25 @@
       </tr>
     <% end %>
   </table>
-  <%#<table class="meta">%>
-    <%#<tr>%>
-      <%#<th colspan="2">Social:</th>%>
-    <%#</tr>%>
-    <%#<tr>%>
-      <%#<td class="meta_name">twitter:</td>%>
-      <%#<td class="meta_data">@rainbowpiano</td>%>
-    <%#</tr>%>
-    <%#<tr>%>
-      <%#<td class="meta_name">facebook:</td>%>
-      <%#<td class="meta_data">David Sudarma</td>%>
-    <%#</tr>%>
-  <%#</table>%>
+  <% if person.twitter_accounts.present? || person.facebook_account || person.linkedin_accounts.present? %>
+    <table class="meta">
+      <tr>
+        <th colspan="2">Social:</th>
+      </tr>
+      <% if person.twitter_accounts.present? %>
+        <tr>
+          <td class="meta_name">twitter:</td>
+          <td class="meta_data"><%= person_exhibit.twitter_handles %></td>
+        </tr>
+      <% end %>
+      <% if person.facebook_account %>
+        <tr>
+          <td class="meta_name">facebook:</td>
+          <td class="meta_data"><%= link_to(person_exhibit.to_s, "http://facebook.com/profile.php?id=#{person.facebook_account.remote_id}", target: '_blank') %></td>
+        </tr>
+      <% end %>
+    </table>
+  <% end %>
 </div>
 <div class="cols col_50">
   <table class="meta">

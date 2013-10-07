@@ -32,6 +32,7 @@ class Person::TwitterAccount < ActiveRecord::Base
     else
       handle = value.gsub('@', '')
     end
+    self[:remote_id] = handle
     self[:screen_name] = handle
   end
 
