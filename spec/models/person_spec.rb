@@ -117,7 +117,7 @@ describe Person do
       }.to change(person.email_addresses, :count).by(-1)
     end
   end
-  describe 'merging two people' do
+  context '#merge' do
     let(:winner) { create(:person) }
     let(:loser) { create(:person) }
 
@@ -151,6 +151,13 @@ describe Person do
       picture = create(:picture, picture_of: loser)
       winner.merge(loser)
       winner.pictures.should include(picture)
+    end
+
+    it "copies over master person sources" do
+      loser.master_person.master_person_sources.create(organization_id: 1, remote_id: 2)
+
+      winner.merge(loser)
+      expect(winner.master_person.master_person_sources.where(organization_id: 1, remote_id: 2)).to_not be_nil
     end
   end
 
