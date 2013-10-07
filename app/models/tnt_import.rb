@@ -342,7 +342,8 @@ class TntImport
     row[prefix + 'FirstName'] = 'Unknown' if row[prefix + 'FirstName'].blank?
 
     # See if there's already a person by this name on this contact (This is a contact with multiple donation accounts)
-    person = contact.people.where(first_name: row[prefix + 'FirstName'], last_name: row[prefix + 'LastName'], middle_name: row[prefix + 'MiddleName']).first
+    person = contact.people.where(first_name: row[prefix + 'FirstName'], last_name: row[prefix + 'LastName'])
+                           .where("middle_name = ? OR middle_name = '' OR middle_name is NULL", row[prefix + 'MiddleName']).first
     person ||= Person.new
 
     update_person_attributes(person, row, prefix)
