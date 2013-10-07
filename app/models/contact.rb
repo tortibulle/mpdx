@@ -62,6 +62,16 @@ class Contact < ActiveRecord::Base
 
   IN_PROGRESS_STATUSES = ['Never Contacted', 'Ask in Future', 'Contact for Appointment', 'Appointment Scheduled', 'Call for Decision']
 
+  TABS = {
+      'donations' => _('Donations'),
+      'details' => _('Details'),
+      'tasks' => _('Tasks'),
+      'history' => _('History'),
+      'referrals' => _('Referrals'),
+      'notes' => _('Notes'),
+      'social' => _('Social')
+  }
+
   def status=(val)
     # handle deprecated values
     case val

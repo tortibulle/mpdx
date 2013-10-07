@@ -220,23 +220,7 @@ $ ->
 
 
     if $('#contacts_show')[0]?
-      # draggable ui tabs
-      $('#contact .ui-tabs-nav').sortable({
-        axis: 'x',
-        update: (event, ui) ->
-          data = $('#contact .ui-tabs-nav').sortable('serialize')
-          data += "&location=contact"
-
-          $.ajax {
-            url: '/preferences/update_tab_order',
-            data: data,
-            type: 'POST',
-            mode: 'abort'
-          }
-
-      }).disableSelection()
-
-
+      $.mpdx.sortableTabs('contact')
       # Add referrals
       $(document).on 'ajax:before', '.add_referrals', ->
         $('#referrals_modal').dialog {

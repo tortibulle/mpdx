@@ -2,6 +2,7 @@ $('#contentbody').replaceWith('<%= j(render('contact_body', contacts: @filtered_
 $('.contact_list a').removeClass('active')
 $('[data-id=<%= @contact.id %>]').addClass('active')
 $.mpdx.activateTabs()
+$.mpdx.sortableTabs('contact')
 switch (window.location.hash) {
   case '#donations-tab':
   case '':
