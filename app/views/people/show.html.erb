@@ -38,15 +38,15 @@
       </div>
       <div class="cols col_30">
         <table class="meta">
-          <% if person_exhibit.age %>
+          <% if person_exhibit.age.present? %>
             <tr>
-              <td class="meta_name"><%= t('.age') %></td>
+              <td class="meta_name"><%= _('Age') %></td>
               <td class="meta_data"><%= person_exhibit.age %></td>
             </tr>
           <% end %>
-          <% if person_exhibit.marital_status %>
+          <% if person_exhibit.marital_status.present? %>
             <tr>
-              <td class="meta_name"><%= t('.marital_status') %></td>
+              <td class="meta_name"><%= _('Marital:') %></td>
               <td class="meta_data"><%= person_exhibit.marital_status %></td>
             </tr>
           <% end %>

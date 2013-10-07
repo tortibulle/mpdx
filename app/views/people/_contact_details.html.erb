@@ -19,17 +19,17 @@
   <% if person.twitter_accounts.present? || person.facebook_account || person.linkedin_accounts.present? %>
     <table class="meta">
       <tr>
-        <th colspan="2">Social:</th>
+        <th colspan="2"><%= _('Social:') %></th>
       </tr>
       <% if person.twitter_accounts.present? %>
         <tr>
-          <td class="meta_name">twitter:</td>
+          <td class="meta_name"><a href="" class="icos ico_twitter"></a></td>
           <td class="meta_data"><%= person_exhibit.twitter_handles %></td>
         </tr>
       <% end %>
       <% if person.facebook_account %>
         <tr>
-          <td class="meta_name">facebook:</td>
+          <td class="meta_name"><a href="" class="icos ico_fb"></a></td>
           <td class="meta_data"><%= link_to(person_exhibit.to_s, "http://facebook.com/profile.php?id=#{person.facebook_account.remote_id}", target: '_blank') %></td>
         </tr>
       <% end %>

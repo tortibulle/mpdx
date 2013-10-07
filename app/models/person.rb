@@ -239,11 +239,6 @@ class Person < ActiveRecord::Base
         picture.save
       end
 
-      # copy over master person sources from loser
-      other.master_person.master_person_sources.each do |source|
-        master_person.master_person_sources.where(organization_id: source.organization_id, remote_id: source.remote_id).first_or_create
-      end
-
       # because we're in a transaction, we need to keep track of which relationships we've updated so
       # we don't create duplicates on the next part
       FamilyRelationship.where(related_person_id: other.id).each do |fr|
@@ -267,10 +262,15 @@ class Person < ActiveRecord::Base
         end
       end
 
-      save(validate: false)
+      # copy over master person sources from loser
+      other.master_person.master_person_sources.each do |source|
+        master_person.master_person_sources.where(organization_id: source.organization_id, remote_id: source.remote_id).first_or_initialize
+      end
+
       other.reload
       other.destroy
     end
+    save(validate: false)
   end
 
   def self.clone(person)
