@@ -220,6 +220,23 @@ $ ->
 
 
     if $('#contacts_show')[0]?
+      # draggable ui tabs
+      $('#contact .ui-tabs-nav').sortable({
+        axis: 'x',
+        update: (event, ui) ->
+          data = $('#contact .ui-tabs-nav').sortable('serialize')
+          data += "&location=contact"
+
+          $.ajax {
+            url: '/preferences/update_tab_order',
+            data: data,
+            type: 'POST',
+            mode: 'abort'
+          }
+
+      }).disableSelection()
+
+
       # Add referrals
       $(document).on 'ajax:before', '.add_referrals', ->
         $('#referrals_modal').dialog {
@@ -269,7 +286,8 @@ $ ->
       $(document).on 'tabsshow', '#contact', (event, ui)->
         $.mpdx.loadTabData(ui.tab.hash)
 
-      $.mpdx.loadTabData(window.location.hash)
+      initial_tab = window.location.hash || $('#contact .ui-tabs-anchor').first().attr('href')
+      $.mpdx.loadTabData(initial_tab)
 
       $(document).on 'click', '.next_page', ->
         $(this).replaceWith('<%= image_tag('spinner.gif', class: 'spinner') %>')
@@ -353,7 +371,7 @@ $.mpdx.updateSelectedContactIds = ->
 
 $.mpdx.loadTabData = (hash) ->
   switch hash
-    when '#contact-details'
+    when '#details-tab'
       $.mpdx.loadContactDetails()
     when '#donations-tab', ''
       $.mpdx.loadDonations()

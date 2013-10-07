@@ -14,4 +14,11 @@ class PreferencesController < ApplicationController
       render "index"
     end
   end
+
+  def update_tab_order
+    current_user.tab_orders ||= {}
+    current_user.tab_orders[params[:location]] = params[:tabs]
+    current_user.save
+    render nothing: true
+  end
 end

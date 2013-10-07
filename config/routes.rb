@@ -56,7 +56,11 @@ Mpdx::Application.routes.draw do
 
   resources :donations, only: :index
   resources :accounts
-  resources :preferences
+  resources :preferences do
+    collection do
+      post :update_tab_order
+    end
+  end
 
   resources :contacts do
     collection do

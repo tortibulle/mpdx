@@ -15,6 +15,7 @@
 //= require jquery.ui.dialog
 //= require jquery.ui.tabs
 //= require jquery.ui.autocomplete
+//= require jquery.ui.sortable
 //= require jquery.observe_field
 //= require jquery.cookie
 //= require history

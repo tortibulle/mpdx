@@ -91,16 +91,13 @@
 
       <div id="contact" class="tabgroup">
         <ul>
-          <li><a href="#donations-tab"><%= _('Donations') %></a></li>
-          <li><a href="#contact-details"><%= _('Contact Details') %></a></li>
-          <li><a href="#tasks-tab"><%= _('Tasks') %></a></li>
-          <li><a href="#history-tab"><%= _('History') %></a></li>
-          <li><a href="#referrals-tab"><%= _('Referrals') %></a></li>
-          <li><a href="#notes-tab"><%= _('Notes') %></a></li>
-          <li><a href="#stream-tab"><%= _('Social') %></a></li>
+          <% (current_user.tab_order_by_location('contact') | %w[donations details tasks history referrals notes social]).each do |tab_name| %>
+            <li id="tabs_<%= tab_name %>"><a href="#<%= tab_name %>-tab"><%= _(tab_name.titleize) %></a></li>
+          <% end %>
         </ul>
         <div class="clr"></div>
-        <div id="contact-details">
+
+        <div id="details-tab">
           <%= spinner(extra: 'details', visible: true) %>
           <div id="details"></div>
         </div>
@@ -141,7 +138,7 @@
           <% end %>
         </div>
 
-        <div id="stream-tab">
+        <div id="social-tab">
           <%= spinner(extra: 'social', visible: true) %>
           <div id="social"></div>
         </div>
