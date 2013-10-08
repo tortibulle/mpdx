@@ -139,8 +139,8 @@ class DataServer
   end
 
   def check_credentials!
-    raise OrgAccountMissingCredentialsError, I18n.t('data_server.missing_username_password') unless @org_account.username && @org_account.password
-    raise OrgAccountInvalidCredentialsError, I18n.t('data_server.invalid_username_password', org: @org) unless @org_account.valid_credentials?
+    raise OrgAccountMissingCredentialsError, _('Your username and password are missing for this account.') unless @org_account.username && @org_account.password
+    raise OrgAccountInvalidCredentialsError, _('Your username and password for %{org} are invalid.') % {org: @org} unless @org_account.valid_credentials?
   end
 
   def validate_username_and_password
@@ -244,7 +244,7 @@ class DataServer
       case
       when first_line.include?('BAD_PASSWORD') || first_line.include?('username or password were incorrect')
         @org_account.update_column(:valid_credentials, false) if @org_account.valid_credentials? && !@org_account.new_record?
-        raise OrgAccountInvalidCredentialsError, I18n.t('data_server.invalid_username_password', org: @org)
+        raise OrgAccountInvalidCredentialsError, _('Your username and password for %{org} are invalid.') % {org: @org}
       when response.code.to_i == 500 || first_line.include?('ERROR') || first_line.include?('HTML')
         raise DataServerError, response
       end
