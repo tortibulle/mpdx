@@ -44,6 +44,17 @@ describe ContactExhibit do
     exhib.send_newsletter_error.should == 'No mailing address or email addess on file'
   end
 
+  context '#avatar' do
+    it 'should ignore images with nil content' do
+      person = double(facebook_account: nil,
+                      primary_picture: double(image: double(url: nil)),
+                      gender: nil
+      )
+      contact.stub(:primary_person).and_return(person)
+      expect(exhib.avatar).to eq('https://mpdx.org/assets/avatar.png')
+    end
+  end
+
   #it "should show return the default avatar filename" do
     #contact.gender = 'female'
     #exhib.avatar.should == 'avatar_f.png'

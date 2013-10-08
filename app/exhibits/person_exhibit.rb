@@ -25,7 +25,7 @@ class PersonExhibit < DisplayCase::Exhibit
   end
 
   def avatar(size = :square)
-    return primary_picture.image.url(size) if primary_picture
+    return primary_picture.image.url(size) if primary_picture && primary_picture.image.url(size)
     return "https://graph.facebook.com/#{facebook_account.remote_id}/picture?type=#{size}" if facebook_account
 
     'https://mpdx.org/assets/' + if gender == 'female'

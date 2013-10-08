@@ -2,7 +2,7 @@
 
 FactoryGirl.define do
   factory :picture do
-    image "MyString"
+    image nil
     association :picture_of
   end
 end
