@@ -1,18 +1,23 @@
 <div class="cols col_50">
   <table class="meta">
     <tr>
-      <th colspan="2"><%= t('.phone_numbers') %></th>
+      <th colspan="2"><%= _('Phone Numbers') %></th>
     </tr>
     <% if person.phone_numbers.present? %>
       <% person.phone_numbers.map {|pn| exhibit(pn, self)}.each do |phone_number| %>
         <tr>
-          <td class="meta_name"><%= t('g.' + (phone_number.location || 'mobile')) %>:</td>
+          <td class="meta_name" nowrap="nowrap">
+            <%= _(phone_number.location.titleize || 'Mobile') %>
+            <% if person.phone_numbers.length > 1 && phone_number.primary? %>
+              <i class="icon-ok green"></i>
+            <% end %>
+          </td>
           <td class="meta_data"><%= phone_number.to_s %></td>
         </tr>
       <% end %>
     <% else %>
       <tr>
-        <td colspan="2"><%= link_to(t('.add_phone_number'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %></td>
+        <td colspan="2"><%= link_to(_('Click here to add a phone number'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %></td>
       </tr>
     <% end %>
   </table>
@@ -39,19 +44,23 @@
 <div class="cols col_50">
   <table class="meta">
     <tr>
-      <th colspan="2"><%= t('g.email') %></th>
+      <th colspan="2"><%= _('Email Addresses') %></th>
     </tr>
     <% if person.email_addresses.present? %>
       <% person.email_addresses.each do |email| %>
         <% email = exhibit(email, self) %>
         <tr>
-          <td class="meta_name"><%= t('g.primary') if email.primary? %></td>
+          <td class="meta_name">
+            <% if person.email_addresses.length > 1 && email.primary? %>
+              <i class="icon-ok green"></i>
+            <% end %>
+          </td>
           <td class="meta_data"><%= email %></td>
         </tr>
       <% end %>
     <% else %>
       <tr>
-        <td colspan="2"><%= link_to(t('.add_email_address'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %></td>
+        <td colspan="2"><%= link_to(_('Click here to add an email address'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %></td>
       </tr>
     <% end %>
 

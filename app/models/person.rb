@@ -4,9 +4,9 @@ class Person < ActiveRecord::Base
                              related_object_id: :contact_id }
 
   belongs_to :master_person
-  has_many :email_addresses, dependent: :destroy, autosave: true
+  has_many :email_addresses, order: 'email_addresses.primary::int desc', dependent: :destroy, autosave: true
   has_one :primary_email_address, class_name: 'EmailAddress', foreign_key: :person_id, conditions: {'email_addresses.primary' => true}
-  has_many :phone_numbers, dependent: :destroy
+  has_many :phone_numbers, order: 'phone_numbers.primary::int desc', dependent: :destroy
   has_one :primary_phone_number, class_name: 'PhoneNumber', foreign_key: :person_id, conditions: {'phone_numbers.primary' => true}
   has_many :family_relationships, dependent: :destroy
   has_many :related_people, through: :family_relationships

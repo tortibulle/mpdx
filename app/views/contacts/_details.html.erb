@@ -4,10 +4,15 @@
       <tr>
         <th colspan="2"><%= _('Addresses') %></th>
       </tr>
-      <% contact_exhibit.addresses.each do |address| %>
+      <% contact.addresses.each do |address| %>
         <% exhibit(address, self).tap do |address_exhibit| %>
           <tr>
-            <td class="meta_name"><%= _(address.location) %></td>
+            <td class="meta_name" nowrap="nowrap">
+              <%= _(address.location.present? ? address.location : 'Mailing') %>
+              <% if contact.addresses.length > 1 && address.primary_mailing_address? %>
+                <i class="icon-ok green"></i>
+              <% end %>
+            </td>
             <td class="meta_data">
               <%= address_exhibit.to_html %>
               <br />
