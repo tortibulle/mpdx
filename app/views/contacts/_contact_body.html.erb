@@ -44,28 +44,46 @@
 
         <div class="cols col_50">
           <table class="meta">
-            <tr>
-              <td class="meta_name"><%= _('Status') %></td>
-              <td class="meta_data"><%= _(contact_exhibit.status) if contact_exhibit.status.present? %></td>
-            </tr>
-            <% if contact_exhibit.likely_to_give.present? %>
+            <% if contact.status.present? %>
+              <tr>
+                <td class="meta_name"><%= _('Status') %></td>
+                <td class="meta_data"><%= _(contact_exhibit.status) %></td>
+              </tr>
+            <% end %>
+            <% if contact.send_newsletter.present? %>
+              <tr>
+                <td class="meta_name"><%= _('Newsletter') %></td>
+                <td class="meta_data"><%= _(contact_exhibit.send_newsletter) %></td>
+              </tr>
+            <% end %>
+            <% if contact.likely_to_give.present? %>
               <tr>
                 <td class="meta_name"><%= _('Likelihood') %></td>
                 <td class="meta_data"><%= _(contact_exhibit.likely_to_give) %></td>
               </tr>
             <% end %>
-            <tr>
-              <td class="meta_name"><%= _('People') %> </td>
-              <td class="meta_data"><%= contact_exhibit.contact_info %></td>
-            </tr>
-            <tr>
-              <td class="meta_name"><%= _('Commitment') %> </td>
-              <td class="meta_data"><%= contact_exhibit.pledge_as_currency %></td>
-            </tr>
-            <% if contact_exhibit.referrals_to_me.present? %>
+            <% if contact.people.present? %>
+              <tr>
+                <td class="meta_name"><%= _('People') %> </td>
+                <td class="meta_data"><%= contact_exhibit.contact_info %></td>
+              </tr>
+            <% end %>
+            <% if contact.pledge_amount.to_i > 0 %>
+              <tr>
+                <td class="meta_name"><%= _('Commitment') %> </td>
+                <td class="meta_data"><%= contact_exhibit.pledge_as_currency %></td>
+              </tr>
+            <% end %>
+            <% if contact.referrals_to_me.present? %>
               <tr>
                 <td class="meta_name"><%= _('Referrer') %></td>
                 <td class="meta_data"><%= contact_exhibit.referrer_links %></td>
+              </tr>
+            <% end %>
+            <% if contact.church_name.present? %>
+              <tr>
+                <td class="meta_name"><%= _('Church') %></td>
+                <td class="meta_data"><%= contact_exhibit.church_name %></td>
               </tr>
             <% end %>
             <% if contact.tags.present? %>
