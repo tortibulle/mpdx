@@ -34,6 +34,10 @@ every :day, at: '10pm' do
   rake 'mailchimp:sync'
 end
 
+every :day, at: '9pm' do
+  rake 'organizations:fetch'
+end
+
 every :day, at: '11pm' do
   runner "Person::FacebookAccount.refresh_tokens"
 end
