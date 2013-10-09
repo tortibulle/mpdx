@@ -22,7 +22,7 @@ class SetupController < ApplicationController
     def ensure_org_account
       return if step == :org_accounts
       unless current_user.organization_accounts.present?
-        redirect_to wizard_path(:org_accounts), alert: I18n.t('setup.org_account_required')
+        redirect_to wizard_path(:org_accounts), alert: _('You need to be connected to an organization to use MPDX.')
         return false
       end
     end

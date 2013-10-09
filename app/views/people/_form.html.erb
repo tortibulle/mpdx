@@ -13,7 +13,7 @@
 
   <div class="col_50 cols">
     <div class="fieldset_label">
-      <%= t('.basic_information') %>
+      <%= _('Basic Information') %>
     </div>
 
     <div class="field">
@@ -31,19 +31,19 @@
     <div class="fieldset">
       <div class="field">
         <%= builder.label :title %>
-        <%= builder.select :title, t('g.titles'), include_blank: true %>
+        <%= builder.select :title, Person::TITLES.collect(&:_), include_blank: true %>
       </div>
       <div class="field">
         <%= builder.label :suffix %>
-        <%= builder.select :suffix, t('g.suffixes'), include_blank: true %>
+        <%= builder.select :suffix, Person::SUFFIXES.collect(&:_), include_blank: true %>
       </div>
     </div>
     <div class="fieldset">
       <div class="field radiocheck">
-        <%= builder.radio_button :gender, 'male' %> <%= builder.label :gender_male, t('g.Male') %>
+        <%= builder.radio_button :gender, 'male' %> <%= builder.label :gender_male, _('Male') %>
       </div>
       <div class="field radiocheck">
-        <%= builder.radio_button :gender, 'female' %> <%= builder.label :gender_female, t('g.Female') %>
+        <%= builder.radio_button :gender, 'female' %> <%= builder.label :gender_female, _('Female') %>
       </div>
     </div>
     
@@ -62,7 +62,7 @@
     </div><br />
     <div class="field">
       <%= builder.label :marital_status %>
-      <%= builder.select :marital_status, t('g.marital_statuses'), include_blank: true %>
+      <%= builder.select :marital_status, Person::MARITAL_STATUSES.collect(&:_), include_blank: true %>
     </div><br />
 
     <div class="field">
@@ -149,7 +149,7 @@
       <div class="sfield" data-behavior="add-wrapper">
         <div class="ls"></div>
         <div class="rs">
-          <%= link_to_add_fields(t('.add_relationship'), builder, :family_relationships, partial: 'people/family_relationship_fields') %>
+          <%= link_to_add_fields(_('Add Relationship'), builder, :family_relationships, partial: 'people/family_relationship_fields') %>
         </div>
       </div>
     <% end %>

@@ -6,6 +6,7 @@ class PhoneNumber < ActiveRecord::Base
                   :meta => { related_object_type: 'Person',
                              related_object_id: :person_id }
 
+  LOCATIONS = [_('Mobile'), _('Home'), _('Work')]
 
   belongs_to :person, touch: true
 

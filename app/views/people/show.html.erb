@@ -17,7 +17,7 @@
     <div class="profiletop">
 
       <div class="actions">
-        <%= link_to(t('g.edit'), edit_person_path(@person), :class=> "btn smallbtn") %>
+        <%= link_to(t('Edit'), edit_person_path(@person), :class=> "btn smallbtn") %>
       </div>
       <div class="avatar"><%= image_tag(person_exhibit.avatar(:large), class: "mid") %></div>
       <div class="quickprofile">
@@ -61,7 +61,7 @@
         <%#= link_to("Send Message", "", class: "btn smallbtn") %>
       </div>
       <ul>
-        <li class="killround"><a href="#person-details">Details</a></li>
+        <li class="killround"><a href="#person-details"><%= _('Details') %></a></li>
         <%#<li class="killround"><a href="#messages-tab">Messages</a></li>%>
         <%#<li class="killround"><a href="#stream-tab">Social Stream</a></li>%>
       </ul>

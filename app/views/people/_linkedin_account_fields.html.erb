@@ -1,5 +1,4 @@
 <div class="field social_field" data-behavior="field-wrapper social-field" data-network="linkedin">
-    <%#= builder.label :url, t('.linkedin_url') %>
     <div class="ls">
       <%= builder.label :url, 'LinkedIn' %>
     </div>
@@ -7,7 +6,7 @@
       <% if current_user.linkedin_account %>
         <%= builder.text_field :url, placeholder: 'http://' %>
       <% else %>
-        <%= link_to(t('.need_linkedin'), '/auth/linkedin') %>
+        <%= link_to(_('Connect to your LinkedIn account to add a url for your contact'), '/auth/linkedin') %>
       <% end %>
       <div class="field_action">
         <%= link_to_remove_fields(builder) %>
