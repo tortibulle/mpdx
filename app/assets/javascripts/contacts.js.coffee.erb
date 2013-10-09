@@ -220,6 +220,46 @@ $ ->
 
 
     if $('#contacts_show')[0]?
+      # Merge people stuff
+      $(document).on 'click', '.js-merge_people', ->
+        $(this).hide()
+        $('.js-merge_related').show()
+
+      $(document).on 'click', '.js-cancel_merge_people', ->
+        $('.js-merge_related').hide()
+        $('.js-merge_people').show()
+
+      $(document).on 'click', '.js-people input[type=submit]', ->
+        form = $(this)
+        person_ids = []
+        $('.js-merge_checkbox:checked').each ->
+          person_ids.push($(this).val())
+          $('#merge_winner_' + $(this).val()).show()
+
+          $('#person_merge_winner').dialog {
+            buttons: [
+              {
+                text: __('Merge'),
+                click: ->
+                  if $('input[name=merge_winner]:checked')[0]
+                    form = $('form', this)
+                    $('#merge_people_ids').val(person_ids)
+                    form.submit()
+                    $(this).dialog('close')
+                    $('#page_spinner').dialog({modal: true, closeOnEscape: false})
+                  else
+                    alert(__('You need to specify which person will "win" the merge'))
+              },
+              {
+                text: __('Cancel'),
+                click: ->
+                  $(this).dialog('close')
+              }
+
+            ]
+          }
+        false
+
       $.mpdx.sortableTabs('contact')
       # Add referrals
       $(document).on 'ajax:before', '.add_referrals', ->
