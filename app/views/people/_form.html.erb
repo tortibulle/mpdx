@@ -31,11 +31,11 @@
     <div class="fieldset">
       <div class="field">
         <%= builder.label :title %>
-        <%= builder.select :title, Person::TITLES.collect(&:_), include_blank: true %>
+        <%= builder.select :title, Person::TITLES.collect {|t| _(t)}, include_blank: true %>
       </div>
       <div class="field">
         <%= builder.label :suffix %>
-        <%= builder.select :suffix, Person::SUFFIXES.collect(&:_), include_blank: true %>
+        <%= builder.select :suffix, Person::SUFFIXES.collect {|t| _(t)}, include_blank: true %>
       </div>
     </div>
     <div class="fieldset">
@@ -62,7 +62,7 @@
     </div><br />
     <div class="field">
       <%= builder.label :marital_status %>
-      <%= builder.select :marital_status, Person::MARITAL_STATUSES.collect(&:_), include_blank: true %>
+      <%= builder.select :marital_status, Person::MARITAL_STATUSES.collect {|t| _(t)}, include_blank: true %>
     </div><br />
 
     <div class="field">

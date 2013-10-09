@@ -2,6 +2,6 @@
   <div class="ls"><%= builder.label :related_person_id, _('Related To') %></div>
   <div class="rs">
     <%= builder.select :related_person_id, (current_account_list.people.order('last_name, first_name') - [object]).collect {|c| [c.to_s, c.id]}, include_blank: true %>
-    <%= builder.select :relationship, Person::RELATIONSHIPS_MALE.collect(&:_) + Person::RELATIONSHIPS_FEMALE.collect(&:_), include_blank: true  %>
+    <%= builder.select :relationship, Person::RELATIONSHIPS_MALE.collect {|t| _(t)} + Person::RELATIONSHIPS_FEMALE.collect {|t| _(t)}, include_blank: true  %>
   </div>
 </div>
