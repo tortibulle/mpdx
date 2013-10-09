@@ -35,6 +35,7 @@
               <%= link_to(_('(Cancel merging)'), '#', class: 'js-cancel_merge_people js-merge_related', style: 'display:none') %>
             </small>
             <div id="person_merge_winner" style="display:none" title="<%= _('Pick the winner of the merge') %>">
+              <%= _('Data from the "losers" will get copied to the "winner". No data will be lost by merging.') %>
               <%= form_tag(merge_contact_people_path(contact), id: 'merge_people_form', remote: true) do %>
                 <%= hidden_field_tag :merge_people_ids %>
                 <ul>

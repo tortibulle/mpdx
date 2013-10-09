@@ -821,7 +821,9 @@ table.meta {
 }
 
 /* ************************************************************** */
-
+#person_merge_winner ul {
+  @include listclear;
+}
 .contact_controls {
   background: $gray_lightest;
   border-bottom: 1px solid $gray_mid;
