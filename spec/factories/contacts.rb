@@ -7,7 +7,7 @@ FactoryGirl.define do
     status 'Partner - Financial'
     pledge_amount 100
     pledge_frequency 1
-    pledge_start_date { 1.day.ago }
+    pledge_start_date { 35.days.ago }
     notes 'Test Note.'
   end
 end
