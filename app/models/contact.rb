@@ -121,11 +121,11 @@ class Contact < ActiveRecord::Base
   end
 
   def self.active_conditions
-    "contacts.status NOT IN('#{inactive_statuses.join("','")}') or status is null"
+    "status NOT IN('#{inactive_statuses.join("','")}') or status is null"
   end
 
   def self.inactive_conditions
-    "contacts.status IN('#{inactive_statuses.join("','")}')"
+    "status IN('#{inactive_statuses.join("','")}')"
   end
 
   def self.inactive_statuses
