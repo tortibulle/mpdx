@@ -35,7 +35,7 @@ $userheight: 60px;
       line-height: 25px;
       height: 25px;
       display: inline-block;
-      padding: 0 10px;
+      padding: 5px 15px;
       border-radius: 4px;
     }
     a:hover {
@@ -102,9 +102,10 @@ div.right {
 }
 
 #mainmenu {
+  padding: 5px 0;
   $mainmenuheight: 35px;
   height: $mainmenuheight;
-  background: image-url("mainmenu_gradient.png") repeat-x #58595b 0 0;
+  background: image-url("mainmenu_gradient.png") #58595b repeat-x 0 0;
 
   .account_balances {
     padding-top: 0px;
@@ -123,10 +124,14 @@ div.right {
     height: auto;
   }
 
+  .item:first-child {
+    a {
+      padding: 0 20px 0 0;
+    }
+  }
+
   .item {
     float: left;
-    border-right: 1px solid #231F20;
-    border-left: 1px solid #808184;
     a {
       line-height: $mainmenuheight;
       height: $mainmenuheight;
@@ -136,7 +141,6 @@ div.right {
     a:hover {
     }
     a:active {
-      box-shadow: inset 0 6px 7px rgba(0,0,0,.5);
     }
   }
   .item.active {
@@ -146,15 +150,12 @@ div.right {
     border: none;
   }
   .item.active a {
-    background: image-url("menuselected.png") repeat-x 0 0;
-    text-shadow: 1px 1px 1px #999 !important;
   }
   .item:first-child {
     border-left: none;
   }
   .item.last {
-    border-right: 1px solid #808184;
-    a {border-right: 1px solid #231F20; }
+    a { }
   }
   .items.search {
     border: none;

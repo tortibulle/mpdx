@@ -47,7 +47,7 @@ $font_basic: Arial, Helvetica, sans-serif;
 
 
 
-html, body {font-family: $font_basic; font-size: 16px; line-height: 1.75em; color: $type;}
+html, body {font-family: $font_basic; font-size: 14px; line-height: 1.75em; color: $type;}
 
 h1, h2, h3, h4, h5, h6 {font-family: $font_heading; letter-spacing: -1px; line-height: 1em; color: #333; color: $type;}
 
@@ -67,7 +67,7 @@ p:last-child {margin-bottom: 0;}
   font-family: $font_highlight;
   z-index: 10;
   position: relative;
-  #mainmenu {font-size: 14px; a {color: $white; text-shadow: 1px 1px 1px #111;} a:hover {color: $gray_mid;} .active a {color: $black;;}}
+  #mainmenu {font-size: 14px; a {color: $white;} a:hover {color: $gray_mid;} .active a {color: #c5d974;;}}
   #submenu {font-size: 12px;}
   .bal {
     font-size: 15px;
