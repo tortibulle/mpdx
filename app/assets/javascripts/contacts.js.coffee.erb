@@ -224,10 +224,12 @@ $ ->
       $(document).on 'click', '.js-merge_people', ->
         $(this).hide()
         $('.js-merge_related').show()
+        false
 
       $(document).on 'click', '.js-cancel_merge_people', ->
         $('.js-merge_related').hide()
         $('.js-merge_people').show()
+        false
 
       $(document).on 'click', '.js-people input[type=submit]', ->
         form = $(this)
