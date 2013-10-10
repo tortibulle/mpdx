@@ -8,11 +8,14 @@ namespace :organizations do
     organizations = open('http://download.tntware.com/tntmpd/TntMPD_Organizations.csv').read.unpack("C*").pack("U*")
     CSV.new(organizations, :headers => :first_row).each do |line|
 
-      next unless line[1].present?
+      next unless line[1].present? && line[0] == 'Campus Crusade for Christ - Australia'
 
-      unless org = Organization.where(name: line[0]).first
+      if org = Organization.where(name: line[0]).first
+        org.update_attributes(query_ini_url: line[1])
+      else
         org = Organization.create(name: line[0], query_ini_url: line[1], iso3166: line[2], api_class: 'DataServer')
       end
+
       # Grab latest query.ini file for this org
       begin
         uri = URI.parse(org.query_ini_url)

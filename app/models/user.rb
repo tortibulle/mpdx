@@ -14,7 +14,8 @@ class User < Person
 
   devise :trackable
   store :preferences, accessors: [:time_zone, :locale, :setup, :contacts_filter,
-                                  :tasks_filter, :default_account_list, :contacts_view_options]
+                                  :tasks_filter, :default_account_list, :contacts_view_options,
+                                  :tab_orders]
 
   after_create :set_setup_mode
 
@@ -24,6 +25,11 @@ class User < Person
       oa.queue_import_data unless oa.last_download
       #oa.queue_import_data unless oa.downloading? || (oa.last_download && oa.last_download > 1.day.ago)
     end
+  end
+
+  def tab_order_by_location(location)
+    orders = tab_orders || {}
+    orders[location] || []
   end
 
   def merge(other)

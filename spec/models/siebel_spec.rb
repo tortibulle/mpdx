@@ -149,7 +149,7 @@ describe Siebel do
     it "imports a new donor from the donor system" do
       designation_profile.designation_accounts << da1
 
-      stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/donors?account_address_filter=all&contact_email_filter=all&contact_filter=all&contact_phone_filter=all&having_given_to_designations=#{da1.designation_number}&response_timeout=60000").
+      stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/donors?account_address_filter=primary&contact_email_filter=all&contact_filter=all&contact_phone_filter=all&having_given_to_designations=#{da1.designation_number}&response_timeout=60000").
         to_return(:status => 200, :body => '[{"id":"602506447","accountName":"HillsideEvangelicalFreeChurch","type":"Business","updatedAt":"' + Date.today.to_s(:db) +'"}]')
 
       siebel.should_receive(:add_or_update_donor_account)
@@ -160,7 +160,7 @@ describe Siebel do
     it "skips a donor who hasn't been updated since the last download" do
       designation_profile.designation_accounts << da1
 
-      stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/donors?account_address_filter=all&contact_email_filter=all&contact_filter=all&contact_phone_filter=all&having_given_to_designations=#{da1.designation_number}&response_timeout=60000").
+      stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/donors?account_address_filter=primary&contact_email_filter=all&contact_filter=all&contact_phone_filter=all&having_given_to_designations=#{da1.designation_number}&response_timeout=60000").
         to_return(:status => 200, :body => '[{"id":"602506447","accountName":"HillsideEvangelicalFreeChurch","type":"Business","updatedAt":"2012-01-01"}]')
 
       siebel.should_not_receive(:add_or_update_donor_account)

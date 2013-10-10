@@ -737,7 +737,7 @@ table.meta {
   width: 100%;
   margin-bottom: 20px;
   td {padding-top: 4px; padding-bottom: 1px;}
-  .meta_name {width: 30%; font-weight: bold; padding-right: 15px; padding-left: 8px;}
+  .meta_name {width: 5%; font-weight: bold; padding-right: 15px; padding-left: 8px;}
   .meta_data {}
   th {font-family: FreightSansProMedium; padding-bottom: 8px; border-bottom: 1px solid $gray_mid; padding-left: 8px; font-size: 16px; font-weight: normal;}
 }
@@ -811,7 +811,9 @@ table.meta {
 }
 
 /* ************************************************************** */
-
+#person_merge_winner ul {
+  @include listclear;
+}
 .contact_controls {
   background: $gray_lightest;
   border-bottom: 1px solid $gray_mid;

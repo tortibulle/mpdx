@@ -5,7 +5,7 @@ FactoryGirl.define do
     person nil
     number "MyString"
     country_code "MyString"
-    location "MyString"
+    location "mobile"
     primary false
   end
 end

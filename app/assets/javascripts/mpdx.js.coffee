@@ -90,6 +90,23 @@ $.mpdx.activateTabs = ->
       window.location.hash = ui.tab.hash
   })
 
+$.mpdx.sortableTabs = (location) ->
+  # draggable ui tabs
+  container = '#'+location+' .ui-tabs-nav'
+  $(container).sortable({
+    axis: 'x',
+    update: (event, ui) ->
+      data = $(container).sortable('serialize')
+      data += "&location=" + location
+
+      $.ajax {
+        url: '/preferences/update_tab_order',
+        data: data,
+        type: 'POST',
+        mode: 'abort'
+      }
+  }).disableSelection()
+
 # Stub method for translation
 window.__ = (val) ->
   val

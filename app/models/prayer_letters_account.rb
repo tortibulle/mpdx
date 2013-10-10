@@ -11,8 +11,6 @@ class PrayerLettersAccount < ActiveRecord::Base
 
   validates :token, :secret, :account_list_id, presence: true
 
-  after_create :queue_subscribe_contacts
-
   def queue_subscribe_contacts
     async(:subscribe_contacts)
   end
@@ -50,6 +48,19 @@ class PrayerLettersAccount < ActiveRecord::Base
 
     get_response(:put, '/api/v1/contacts', {contacts: contacts}.to_json)
 
+    # Now that we've replaced the list, we need to fetch the whole list and match it to our existing contacts
+
+    import_list
+  end
+
+  def import_list
+    contacts = JSON.parse(get_response(:get, '/api/v1/contacts'))['contacts']
+
+    contacts.each do |pl_contact|
+      if pl_contact['external_id'] && contact = account_list.contacts.where(id: pl_contact['external_id']).first
+        contact.update_column(:prayer_letters_id, pl_contact['contact_id'])
+      end
+    end
   end
 
   def validate_token
@@ -73,6 +84,11 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def add_or_update_contact(contact)
+    async(:async_add_or_update_contact, contact.id)
+  end
+
+  def async_add_or_update_contact(contact_id)
+    contact = account_list.contacts.find(contact_id)
     if contact.prayer_letters_id.present?
       update_contact(contact)
     else

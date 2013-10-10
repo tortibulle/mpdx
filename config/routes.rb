@@ -7,18 +7,6 @@ Mpdx::Application.routes.draw do
 
   match '/help', to: 'help_requests#new'
 
-  #ActiveAdmin.routes(self)
-
-
-  #namespace :admin do
-    #resources :sessions do
-      #collection do
-        #get "failure"
-        #get "no_access"
-      #end
-    #end
-  #end
-
   resources :notifications
 
   resources :account_lists, only: :update
@@ -56,7 +44,11 @@ Mpdx::Application.routes.draw do
 
   resources :donations, only: :index
   resources :accounts
-  resources :preferences
+  resources :preferences do
+    collection do
+      post :update_tab_order
+    end
+  end
 
   resources :contacts do
     collection do
@@ -72,7 +64,11 @@ Mpdx::Application.routes.draw do
       post :save_referrals
       get :details
     end
-    resources :people
+    resources :people do
+      collection do
+        post :merge
+      end
+    end
   end
 
   resources :tasks do
@@ -84,7 +80,9 @@ Mpdx::Application.routes.draw do
       put :bulk_update
     end
   end
+
   resources :people
+
   resources :setup
 
   namespace :person do

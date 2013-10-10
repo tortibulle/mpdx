@@ -10,7 +10,7 @@
         <div id="account_list" style="<% current_user.organization_accounts.blank? ? '' : 'display:none' %>">
           <%= select_tag(:organization_id, options_for_select(Organization.active.order('name').collect {|o| [o.name, o.id]}), include_blank: true) %>
           <br />
-          <%= link_to(t('.connect_to_org'), new_person_organization_account_path, class: 'btn', id: 'connect_to_org') %>
+          <%= link_to(_('Connect to selected organization'), new_person_organization_account_path, class: 'btn', id: 'connect_to_org') %>
         </div>
       </div>
 
@@ -19,7 +19,7 @@
   <% end %>
 
   <div class="continue">
-    <%= link_to(t('g.continue'), next_wizard_path, :class => "btn") %>
+    <%= link_to(_('continue'), next_wizard_path, class: 'btn') %>
   </div>
 </div>
 

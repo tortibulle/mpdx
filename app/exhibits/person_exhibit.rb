@@ -25,12 +25,19 @@ class PersonExhibit < DisplayCase::Exhibit
   end
 
   def avatar(size = :square)
+    return primary_picture.image.url(size) if primary_picture && primary_picture.image.url(size)
     return "https://graph.facebook.com/#{facebook_account.remote_id}/picture?type=#{size}" if facebook_account
+
     'https://mpdx.org/assets/' + if gender == 'female'
       'avatar_f.png'
     else
       'avatar.png'
     end
+  end
+
+
+  def twitter_handles
+    twitter_accounts.collect {|t| @context.link_to("@#{t.screen_name}", "http://twitter.com/#{t.screen_name}", target: '_blank') }.join(', ').html_safe
   end
 
   def to_s

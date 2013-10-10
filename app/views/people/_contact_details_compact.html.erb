@@ -1,22 +1,29 @@
 <div class="set phone">
   <% if person.phone_numbers.present? %>
     <% person.phone_numbers.map {|pn| exhibit(pn, self)}.each do |phone_number| %>
-      <%= phone_number %><br/>
+      <%= phone_number %>
+      <% if person.phone_numbers.length > 1 && phone_number.primary? %>
+        <i class="icon-ok green"></i>
+      <% end %>
+      <br/>
     <% end %>
   <% else %>
-    <%= link_to(t('people.contact_details.add_phone_number'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %>
+    <%= link_to(_('Click here to add a phone number'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %>
   <% end %>
 </div>
 
 <div class="set email">
   <% if person.email_addresses.present? %>
     <% person.email_addresses.each do |email| %>
-      <% email = exhibit(email, self) %>
-      <%= t('g.primary') if email.primary? %>
-      <%= email %><br/>
+      <%= exhibit(email, self) %>
+
+      <% if person.email_addresses.length > 1 && email.primary? %>
+        <i class="icon-ok green"></i>
+      <% end %>
+      <br/>
     <% end %>
   <% else %>
-    <%= link_to(t('people.contact_details.add_email_address'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %>
+    <%= link_to(_('Click here to add an email address'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %>
   <% end %>
 </div>
 

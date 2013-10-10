@@ -11,7 +11,7 @@ class Contact < ActiveRecord::Base
   has_many :donations, through: :donor_accounts
   belongs_to :account_list
   has_many :contact_people, dependent: :destroy
-  has_many :people, through: :contact_people, order: 'contact_people.primary::int'
+  has_many :people, through: :contact_people, order: 'contact_people.primary::int desc'
   has_one  :primary_contact_person, class_name: 'ContactPerson', conditions: {primary: true}
   has_one  :primary_person, through: :primary_contact_person, source: :person
   has_one  :spouse_contact_person, class_name: 'ContactPerson', conditions: ['"primary" = ? OR "primary" is NULL', false]
@@ -60,7 +60,17 @@ class Contact < ActiveRecord::Base
      _('Research Abandoned'), _('Expired Referral')]
   end
 
-  IN_PROGRESS_STATUSES = ['Never Contacted', 'Ask in Future', 'Contact for Appointment', 'Appointment Scheduled', 'Call for Decision']
+  IN_PROGRESS_STATUSES = [_('Never Contacted'), _('Ask in Future'), _('Contact for Appointment'), _('Appointment Scheduled'), _('Call for Decision')]
+
+  TABS = {
+      'donations' => _('Donations'),
+      'details' => _('Details'),
+      'tasks' => _('Tasks'),
+      'history' => _('History'),
+      'referrals' => _('Referrals'),
+      'notes' => _('Notes'),
+      'social' => _('Social')
+  }
 
   def status=(val)
     # handle deprecated values

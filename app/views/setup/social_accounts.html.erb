@@ -16,7 +16,7 @@
           <div class="account_single">
             <%= account %>
             <div class="actions">
-              <%= link_to(t('delete'), account_path(account, provider: provider), method: :delete, :class => "inlineaction delete") %>
+              <%= link_to(_('delete'), account_path(account, provider: provider), method: :delete, class: 'inlineaction delete') %>
             </div>
           </div>
         <% end %>
@@ -28,6 +28,6 @@
   <% end %>
 
   <div class="continue">
-    <%= link_to(t('g.continue'), next_wizard_path, :class => "btn") %>
+    <%= link_to(_('continue'), next_wizard_path, :class => "btn") %>
   </div>
 </div>

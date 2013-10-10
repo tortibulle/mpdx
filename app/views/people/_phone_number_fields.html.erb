@@ -2,7 +2,7 @@
   <div class="ls"><%= builder.label :number, _('Number') %></div>
   <div class="rs">
     <%= builder.phone_field :number %>
-    <%= builder.select :location, %w[mobile home work].collect {|l| [t("g.#{l}"), l]} %>
+    <%= builder.select :location, PhoneNumber::LOCATIONS.collect { |s| [_(s), s.downcase] } %>
     <div class="field_action">
       <%= builder.check_box :primary, class: 'primary' %>
       <%= builder.label :primary %>

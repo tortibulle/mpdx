@@ -1,12 +1,17 @@
 class Person < ActiveRecord::Base
+  RELATIONSHIPS_MALE = [_('Husband'), _('Son'), _('Father'), _('Brother'), _('Uncle'), _('Nephew'), _('Cousin (Male)'), _('Grandfather'), _('Grandson')]
+  RELATIONSHIPS_FEMALE = [_('Wife'), _('Daughter'), _('Mother'), _('Sister'), _('Aunt'), _('Niece'), _('Cousin (Female)'), _('Grandmother'), _('Granddaughter')]
+  TITLES = [_('Mr.'), _('Mrs.'), _('Ms.'), _('Rev.'), _('Hon.'), _('Dr.')]
+  SUFFIXES = [_('Jr.'), _('Sr.')]
+  MARITAL_STATUSES = [_('Single'), _('Engaged'), _('Married'), _('Separated'), _('Divorced'), _('Widowed')]
   has_paper_trail :on => [:destroy],
                   :meta => { related_object_type: 'Contact',
                              related_object_id: :contact_id }
 
   belongs_to :master_person
-  has_many :email_addresses, dependent: :destroy, autosave: true
+  has_many :email_addresses, order: 'email_addresses.primary::int desc', dependent: :destroy, autosave: true
   has_one :primary_email_address, class_name: 'EmailAddress', foreign_key: :person_id, conditions: {'email_addresses.primary' => true}
-  has_many :phone_numbers, dependent: :destroy
+  has_many :phone_numbers, order: 'phone_numbers.primary::int desc', dependent: :destroy
   has_one :primary_phone_number, class_name: 'PhoneNumber', foreign_key: :person_id, conditions: {'phone_numbers.primary' => true}
   has_many :family_relationships, dependent: :destroy
   has_many :related_people, through: :family_relationships
@@ -37,7 +42,7 @@ class Person < ActiveRecord::Base
   accepts_nested_attributes_for :phone_numbers, :reject_if => lambda { |p| p[:number].blank? }, :allow_destroy => true
   accepts_nested_attributes_for :family_relationships, :reject_if => lambda { |p| p[:related_contact_id].blank? }, :allow_destroy => true
   accepts_nested_attributes_for :facebook_accounts, :reject_if => lambda { |p| p[:url].blank? }, :allow_destroy => true
-  accepts_nested_attributes_for :twitter_accounts, :reject_if => lambda { |p| p[:handle].blank? }, :allow_destroy => true
+  accepts_nested_attributes_for :twitter_accounts, :reject_if => lambda { |p| p[:screen_name].blank? }, :allow_destroy => true
   accepts_nested_attributes_for :linkedin_accounts, :reject_if => lambda { |p| p[:url].blank? }, :allow_destroy => true
   accepts_nested_attributes_for :pictures, :reject_if => lambda { |p| p[:image].blank? && p[:image_cache].blank? }, :allow_destroy => true
 
@@ -153,7 +158,11 @@ class Person < ActiveRecord::Base
 
   def email_address=(hash)
     hash = hash.with_indifferent_access
-    EmailAddress.add_for_person(self, hash) if hash['email'].present?
+    if hash['_destroy'] == '1'
+      email_addresses.find(hash['id']).destroy
+    else
+      EmailAddress.add_for_person(self, hash) if hash['email'].present?
+    end
   end
 
   def email_addresses_attributes=(attributes)
@@ -258,10 +267,15 @@ class Person < ActiveRecord::Base
         end
       end
 
-      save(validate: false)
+      # copy over master person sources from loser
+      other.master_person.master_person_sources.each do |source|
+        master_person.master_person_sources.where(organization_id: source.organization_id, remote_id: source.remote_id).first_or_initialize
+      end
+
       other.reload
       other.destroy
     end
+    save(validate: false)
   end
 
   def self.clone(person)

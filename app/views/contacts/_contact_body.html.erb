@@ -21,6 +21,7 @@
         <%= link_to(_('Add Task'), new_task_path(contact_id: contact.id), class: "btn smallbtn add_task", data: {contact_id: contact.id}, remote: true) %>
         <%= link_to(_('Edit'), edit_contact_path(contact), :class=> "btn smallbtn") %>
         <%#= link_to(_('Quick'), "", :class => "btn smallbtn quick")%>
+        <%= link_to(_('Delete'), contact_path(contact), :class=> "btn smallbtn", method: :delete, confirm: _("This contact will be set to 'Never Ask'. Is that what you want to do?")) %>
       </div>
     </div>
     <div class="wpp">
@@ -43,28 +44,46 @@
 
         <div class="cols col_50">
           <table class="meta">
-            <tr>
-              <td class="meta_name"><%= _('Status') %></td>
-              <td class="meta_data"><%= _(contact_exhibit.status) if contact_exhibit.status.present? %></td>
-            </tr>
-            <% if contact_exhibit.likely_to_give.present? %>
+            <% if contact.status.present? %>
+              <tr>
+                <td class="meta_name"><%= _('Status') %></td>
+                <td class="meta_data"><%= _(contact_exhibit.status) %></td>
+              </tr>
+            <% end %>
+            <% if contact.send_newsletter.present? %>
+              <tr>
+                <td class="meta_name"><%= _('Newsletter') %></td>
+                <td class="meta_data"><%= _(contact_exhibit.send_newsletter) %></td>
+              </tr>
+            <% end %>
+            <% if contact.likely_to_give.present? %>
               <tr>
                 <td class="meta_name"><%= _('Likelihood') %></td>
                 <td class="meta_data"><%= _(contact_exhibit.likely_to_give) %></td>
               </tr>
             <% end %>
-            <tr>
-              <td class="meta_name"><%= _('People') %> </td>
-              <td class="meta_data"><%= contact_exhibit.contact_info %></td>
-            </tr>
-            <tr>
-              <td class="meta_name"><%= _('Commitment') %> </td>
-              <td class="meta_data"><%= contact_exhibit.pledge_as_currency %></td>
-            </tr>
-            <% if contact_exhibit.referrals_to_me.present? %>
+            <% if contact.people.present? %>
+              <tr>
+                <td class="meta_name"><%= _('People') %> </td>
+                <td class="meta_data"><%= contact_exhibit.contact_info %></td>
+              </tr>
+            <% end %>
+            <% if contact.pledge_amount.to_i > 0 %>
+              <tr>
+                <td class="meta_name"><%= _('Commitment') %> </td>
+                <td class="meta_data"><%= contact_exhibit.pledge_as_currency %></td>
+              </tr>
+            <% end %>
+            <% if contact.referrals_to_me.present? %>
               <tr>
                 <td class="meta_name"><%= _('Referrer') %></td>
                 <td class="meta_data"><%= contact_exhibit.referrer_links %></td>
+              </tr>
+            <% end %>
+            <% if contact.church_name.present? %>
+              <tr>
+                <td class="meta_name"><%= _('Church') %></td>
+                <td class="meta_data"><%= contact_exhibit.church_name %></td>
               </tr>
             <% end %>
             <% if contact.tags.present? %>
@@ -90,16 +109,13 @@
 
       <div id="contact" class="tabgroup">
         <ul>
-          <li><a href="#donations-tab"><%= _('Donations') %></a></li>
-          <li><a href="#contact-details"><%= _('Contact Details') %></a></li>
-          <li><a href="#tasks-tab"><%= _('Tasks') %></a></li>
-          <li><a href="#history-tab"><%= _('History') %></a></li>
-          <li><a href="#referrals-tab"><%= _('Referrals') %></a></li>
-          <li><a href="#notes-tab"><%= _('Notes') %></a></li>
-          <li><a href="#stream-tab"><%= _('Social') %></a></li>
+          <% (current_user.tab_order_by_location('contact') | Contact::TABS.keys).each do |tab_name| %>
+            <li id="tabs_<%= tab_name %>"><a href="#<%= tab_name %>-tab"><%= _(Contact::TABS[tab_name]) %></a></li>
+          <% end %>
         </ul>
         <div class="clr"></div>
-        <div id="contact-details">
+
+        <div id="details-tab">
           <%= spinner(extra: 'details', visible: true) %>
           <div id="details"></div>
         </div>
@@ -140,7 +156,7 @@
           <% end %>
         </div>
 
-        <div id="stream-tab">
+        <div id="social-tab">
           <%= spinner(extra: 'social', visible: true) %>
           <div id="social"></div>
         </div>

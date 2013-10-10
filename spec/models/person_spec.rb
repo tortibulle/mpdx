@@ -96,7 +96,28 @@ describe Person do
     end
   end
 
-  describe 'merging two people' do
+  context '#email_addresses_attributes=' do
+    it "deletes nested email address" do
+      person = create(:person)
+      email = create(:email_address, person: person)
+
+      email_addresses_attributes = {
+        "0" => {
+          "_destroy" => "1",
+          "email" => "monfortcody@yahoo.com",
+          "primary" => "0",
+          "id" => email.id.to_s
+        }
+      }
+
+      expect {
+        person.email_addresses_attributes = email_addresses_attributes
+
+        person.save
+      }.to change(person.email_addresses, :count).by(-1)
+    end
+  end
+  context '#merge' do
     let(:winner) { create(:person) }
     let(:loser) { create(:person) }
 
@@ -130,6 +151,13 @@ describe Person do
       picture = create(:picture, picture_of: loser)
       winner.merge(loser)
       winner.pictures.should include(picture)
+    end
+
+    it "copies over master person sources" do
+      loser.master_person.master_person_sources.create(organization_id: 1, remote_id: 2)
+
+      winner.merge(loser)
+      expect(winner.master_person.master_person_sources.where(organization_id: 1, remote_id: 2)).to_not be_nil
     end
   end
 

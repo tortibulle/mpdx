@@ -220,6 +220,56 @@ $ ->
 
 
     if $('#contacts_show')[0]?
+      # Merge people stuff
+      $(document).on 'click', '.js-merge_people', ->
+        $(this).hide()
+        $('.js-merge_related').show()
+        false
+
+      $(document).on 'click', '.js-cancel_merge_people', ->
+        $('.js-merge_related').hide()
+        $('.js-merge_people').show()
+        false
+
+      $(document).on 'click', '.js-people input[type=submit]', ->
+        form = $(this)
+        person_ids = []
+
+        $('#person_merge_winner li').hide()
+
+        $('.js-merge_checkbox:checked').each ->
+          person_ids.push($(this).val())
+          $('#merge_winner_' + $(this).val()).show()
+
+        unless person_ids.length > 1
+          alert(__("You have to pick at least 2 people to merge"))
+          return false
+
+        $('#person_merge_winner').dialog {
+          buttons: [
+            {
+              text: __('Merge'),
+              click: ->
+                if $('input[name=merge_winner]:checked')[0]
+                  form = $('form', this)
+                  $('#merge_people_ids').val(person_ids)
+                  form.submit()
+                  $(this).dialog('destroy')
+                  $('#page_spinner').dialog({modal: true, closeOnEscape: false})
+                else
+                  alert(__('You need to specify which person will "win" the merge'))
+            },
+            {
+              text: __('Cancel'),
+              click: ->
+                $(this).dialog('destroy')
+            }
+
+          ]
+        }
+        false
+
+      $.mpdx.sortableTabs('contact')
       # Add referrals
       $(document).on 'ajax:before', '.add_referrals', ->
         $('#referrals_modal').dialog {
@@ -269,7 +319,7 @@ $ ->
       $(document).on 'tabsshow', '#contact', (event, ui)->
         $.mpdx.loadTabData(ui.tab.hash)
 
-      $.mpdx.loadTabData(window.location.hash)
+      $.mpdx.loadTabData()
 
       $(document).on 'click', '.next_page', ->
         $(this).replaceWith('<%= image_tag('spinner.gif', class: 'spinner') %>')
@@ -352,8 +402,9 @@ $.mpdx.updateSelectedContactIds = ->
   ids
 
 $.mpdx.loadTabData = (hash) ->
+  hash ||= window.location.hash || $('#contact .ui-tabs-anchor').first().attr('href')
   switch hash
-    when '#contact-details'
+    when '#details-tab'
       $.mpdx.loadContactDetails()
     when '#donations-tab', ''
       $.mpdx.loadDonations()
@@ -403,3 +454,9 @@ $.mpdx.loadSocialStream = ->
       dataType: 'script'
     }
 
+$.mpdx.reloadContact = ->
+  $('#page_spinner').dialog({modal: true, closeOnEscape: false})
+  $.ajax {
+    url: '/contacts/' + $('#contentbody').attr('data-contact-id'),
+    dataType: 'script'
+  }
