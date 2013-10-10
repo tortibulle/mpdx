@@ -25,23 +25,26 @@
       <th><%= _('Method') %></th>
       <th><%= _('Motivation') %></th>
       <%#<th class="appeal">Appeal</th>%>
+      <th></th>
     </tr>
   </thead>
   <tbody>
 <% end %>
-    <% donations.map {|d| exhibit(d, self)}.each do |donation| %>
+    <% donations.each do |donation|
+      donation_exhibit = exhibit(donation, self) %>
       <tr id="<%= donation.id %>">
-        <td class="date"><%= l donation.donation_date %></td>
+        <td class="date"><%= l donation_exhibit.donation_date %></td>
         <% unless @contact %>
           <td><%= link_to(donation.donor_account.contacts.first.name, donation.donor_account.contacts.first) %></td>
         <% end %>
-        <td class="right"><%= donation.tendered_amount %></td>
+        <td class="right"><%= donation_exhibit.tendered_amount %></td>
         <% if multiple_designations %>
           <td><%= donation.designation_account.designation_number %></td>
         <% end %>
-        <td><%= donation.payment_method %></td>
-        <td><%= donation.motivation %></td>
+        <td><%= donation_exhibit.payment_method %></td>
+        <td><%= donation_exhibit.motivation %></td>
         <%#<td class="appeal">Dinner</td>%>
+        <td><%= link_to('<i class="icon-edit"></i>'.html_safe, edit_donation_path(donation), remote: true) %></td>
       </tr>
     <% end %>
 <% unless params[:page] %>
@@ -58,4 +61,9 @@
   <% end %>
 </table>
 <% end %>
+
+<div id="js-edit_donation" style="display:none" title="<%= _('Edit Donation') %>">
+  <%= spinner(extra: 'edit-donation') %>
+  <div class="form_wrapper"></div>
+</div>
 

@@ -42,7 +42,7 @@ Mpdx::Application.routes.draw do
 
   resources :activity_comments
 
-  resources :donations, only: :index
+  resources :donations
   resources :accounts
   resources :preferences do
     collection do

@@ -25,12 +25,11 @@
 //= require tooltipsy.min
 //= require mpdx
 //= require accounts
+//= require donations
 //= require activity_comments
 //= require contacts
 //= require imports
 //= require mail_chimp_accounts
-//= require notifications
-//= require preferences
 //= require setup
 //= require social_streams
 //= require tags

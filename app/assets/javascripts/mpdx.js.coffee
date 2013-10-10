@@ -67,7 +67,7 @@ $ ->
       $(this).parent().fadeOut()
 
   $(document).on 'ajax:before', 'a', ->
-    $('#page_spinner').dialog({modal: true, closeOnEscape: false})
+    $.mpdx.ajaxBefore()
 
   $(document).ajaxComplete ->
     $('#page_spinner').dialog('close') if $('#page_spinner').hasClass('ui-dialog-content')
@@ -89,6 +89,9 @@ $.mpdx.activateTabs = ->
     select: (event, ui) ->
       window.location.hash = ui.tab.hash
   })
+
+$.mpdx.ajaxBefore = ->
+  $('#page_spinner').dialog({modal: true, closeOnEscape: false})
 
 $.mpdx.sortableTabs = (location) ->
   # draggable ui tabs

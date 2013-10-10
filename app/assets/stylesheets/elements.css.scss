@@ -14,6 +14,7 @@ $blue_comments: #e7f8ff;
 $green: #56AA00;
 $green_dark: #437C00;
 $green_darkest: #3C6B00;
+$error_red: #c63333;
 
 $page_bg: #F7F7F7;
 $content_bg: $white;
@@ -164,4 +165,4 @@ $leftmenuwidth: 200px;
 .green { color: $green; }
 .green_dark { color: $green_dark; }
 .green_darkest { color: $green_darkest; }
-
+.red { color: $error_red }

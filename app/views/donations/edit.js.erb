@@ -1,0 +1,16 @@
+$('.form_wrapper').html('<%= j(render('form', donation: @donation)) %>')
+$('#js-edit_donation').dialog({
+  buttons: [
+    {
+      text: __('Save'),
+      click: function(e) {
+        $('form', this).trigger('submit')
+      }
+    }, {
+      text: __('Cancel'),
+      click: function() {
+        $(this).dialog("destroy");
+      }
+    }
+  ]
+});
