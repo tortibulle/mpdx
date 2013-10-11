@@ -1,5 +1,4 @@
 <% @contact = exhibit(@contact, self) if @contact %>
-<% multiple_designations = current_account_list.designation_accounts.length > 1 ? true : false %>
 <% unless params[:page] %>
   <% if @start_date %>
     <div>
@@ -10,6 +9,8 @@
     </div>
     <div class="clr"></div>
     <h2><%= _('Donations for %{start_date} through %{end_date}') % {start_date: l(@start_date), end_date: l(@end_date)} %></h2>
+    <%= link_to('<i class="icon-plus-sign-alt"></i> '.html_safe + _('Add a donation'), new_donation_path, remote: true) %>
+    <br /><br />
   <% end %>
 <table class="tablelist donations" id="donations_table">
   <thead>
@@ -19,7 +20,7 @@
         <th>Donor</th>
       <% end %>
       <th class="right">Amount</th>
-      <% if multiple_designations %>
+      <% if current_account_list.multiple_designations %>
         <th>Designation</th>
       <% end %>
       <th><%= _('Method') %></th>
@@ -30,23 +31,9 @@
   </thead>
   <tbody>
 <% end %>
-    <% donations.each do |donation|
-      donation_exhibit = exhibit(donation, self) %>
-      <tr id="<%= donation.id %>">
-        <td class="date"><%= l donation_exhibit.donation_date %></td>
-        <% unless @contact %>
-          <td><%= link_to(donation.donor_account.contacts.first.name, donation.donor_account.contacts.first) %></td>
-        <% end %>
-        <td class="right"><%= donation_exhibit.tendered_amount %></td>
-        <% if multiple_designations %>
-          <td><%= donation.designation_account.designation_number %></td>
-        <% end %>
-        <td><%= donation_exhibit.payment_method %></td>
-        <td><%= donation_exhibit.motivation %></td>
-        <%#<td class="appeal">Dinner</td>%>
-        <td><%= link_to('<i class="icon-edit"></i>'.html_safe, edit_donation_path(donation), remote: true) %></td>
-      </tr>
-    <% end %>
+
+<%= render donations %>
+
 <% unless params[:page] %>
   </tbody>
   <% unless @contact %>

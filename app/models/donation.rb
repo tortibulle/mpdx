@@ -12,10 +12,18 @@ class Donation < ActiveRecord::Base
   default_scope order("donation_date desc")
 
   after_create :update_totals
+  before_validation :set_amount_from_tendered_amount
 
   private
     def update_totals
       donor_account.update_donation_totals(self)
       designation_account.update_donation_totals(self)
+    end
+
+    def set_amount_from_tendered_amount
+      if tendered_amount.present?
+        self.tendered_amount = tendered_amount_before_type_cast.to_s.gsub(/[^\d\.\-]+/, '').to_f
+        self.amount ||= tendered_amount_before_type_cast
+      end
     end
 end

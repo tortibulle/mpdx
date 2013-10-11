@@ -1,5 +1,5 @@
 <%= form_for donation, remote: true do |f| %>
-
+  <%= hidden_field_tag :contact_id, params[:contact_id] %>
   <% if donation.errors.any? %>
     <div id="error_explanation">
       <ul>
@@ -17,12 +17,34 @@
   </div>
 
   <div class="field">
-    <%= f.label :amount, _('Amount') %>
-    <%= f.text_field :amount %>
+    <%= f.label :tendered_amount, _('Amount') %>
+    <%= f.text_field :tendered_amount %>
   </div>
 
-  <div class="field">
-    <%= link_to(_('Click here to delete this donation'), donation_path(donation), method: :delete, class: 'red delete_donation', data: {confirm: 'Are you sure?'}, remote: true) %>
-  </div>
+  <% if @donor_accounts.length > 1 %>
+    <div class="field">
+      <%= f.label :donor_account_id, _('Donor') %>
+      <%= f.select :donor_account_id, @donor_accounts %>
+    </div>
+  <% else %>
+    <%= f.hidden_field :donor_account_id, value: @donor_accounts.first[1] %>
+  <% end %>
+
+
+  <% if current_account_list.multiple_designations %>
+    <div class="field">
+      <%= f.label :designation_account_id, _('Designation Account') %>
+      <%= f.select :designation_account_id, current_account_list.designation_accounts.collect {|da| [da.designation_number, da.id]} %>
+    </div>
+  <% else %>
+    <%= f.hidden_field :designation_account_id %>
+  <% end %>
+
+
+  <% unless donation.new_record? %>
+    <div class="field">
+      <%= link_to(_('Click here to delete this donation'), donation_path(donation), method: :delete, class: 'red delete_donation', data: {confirm: 'Are you sure?'}, remote: true) %>
+    </div>
+  <% end %>
 
 <% end %>

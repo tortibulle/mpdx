@@ -1,8 +1,10 @@
 class DonationsController < ApplicationController
   before_filter :get_donation, only: [:edit, :destroy, :update]
+  before_filter :get_contact
+  before_filter :get_donor_accounts, only: [:edit, :new]
 
   def index
-    if params[:contact_id] && @contact = current_account_list.contacts.where(id: params[:contact_id]).first
+    if @contact
       if @contact.donor_account_ids.present?
         @all_donations = current_account_list.donations.where(donor_account_id: @contact.donor_account_ids)
       else
@@ -29,15 +31,28 @@ class DonationsController < ApplicationController
   def edit
   end
 
+  def new
+    @donation = current_account_list.donations.new(designation_account_id: current_account_list.designation_accounts.first.try(:id))
+  end
+
+  def create
+    @donation = current_account_list.donations.new(donation_params)
+
+    unless @donation.save
+      get_donor_accounts
+      render action: :new
+    end
+  end
+
   def update
     unless @donation.update_attributes(donation_params)
+      get_donor_accounts
       render action: :edit
     end
   end
 
   def destroy
     @donation.destroy
-    render action: :update
   end
 
   private
@@ -55,5 +70,24 @@ class DonationsController < ApplicationController
 
   def donation_params
     params[:donation]
+  end
+
+  def get_contact
+    @contact = current_account_list.contacts.where(id: params[:contact_id]).first if params[:contact_id]
+  end
+
+  def get_donor_accounts
+    @donor_accounts = []
+    if @contact
+      @contact.donor_accounts.each do |da|
+        @donor_accounts << ["#{@contact.name} (#{da.account_number})", da.id]
+      end
+    else
+      current_account_list.contacts.active.joins(:donor_accounts).includes(:donor_accounts).each do |c|
+        c.donor_accounts.each do |da|
+          @donor_accounts << ["#{c.name} (#{da.account_number})", da.id]
+        end
+      end
+    end
   end
 end

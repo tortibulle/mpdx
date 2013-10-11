@@ -1,5 +1,6 @@
 $('.form_wrapper').html('<%= j(render('form', donation: @donation)) %>')
 $('#js-edit_donation').dialog({
+  title: __('New Donation'),
   width: 'auto',
   buttons: [
     {

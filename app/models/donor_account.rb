@@ -8,7 +8,7 @@ class DonorAccount < ActiveRecord::Base
   has_many :people, through: :donor_account_people
   has_many :donations, dependent: :destroy
   has_many :contact_donor_accounts, dependent: :destroy
-  has_many :contacts, through: :contact_donor_accounts
+  has_many :contacts, through: :contact_donor_accounts, inverse_of: :donor_accounts
   belongs_to :organization
   belongs_to :master_company
   validates_uniqueness_of :account_number, scope: :organization_id

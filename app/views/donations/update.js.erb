@@ -1,3 +1,1 @@
-$.mpdx.ajaxBefore();
-$('#donations').html('')
-$.mpdx.loadDonations()
+$('#<%= dom_id(@donation) %>').replaceWith('<%= j(render @donation) %>')
