@@ -621,7 +621,7 @@ tbody.tasks {
   .primary {height: auto; line-height: 1.5em;}
 }
 
-tr.taskgroup {
+.taskgroup {
   background: #EC1C24;
   width: 150px;
   position: relative;
@@ -633,10 +633,10 @@ tr.taskgroup {
   }
 }
 
-.taskgroup.orange {background: #F6921E; border-color: #A55E00;}
-.taskgroup.green {background: $green; border-color: green;}
-.taskgroup.red {background: #EC1C24; border-color: #AF1524;}
-.taskgroup.gray {background: #999; border-color: #666;}
+.taskgroup--orange {background: #F6921E; border-color: #A55E00;}
+.taskgroup--green {background: $green; border-color: green;}
+.taskgroup--red {background: #EC1C24; border-color: #AF1524;}
+.taskgroup--gray {background: #999; border-color: #666;}
 
 .snapshot {
   .data {}
