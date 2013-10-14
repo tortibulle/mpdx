@@ -17,8 +17,4 @@ execute "rake assets:precompile" do
   cwd release_path
   command "bundle exec rake assets:precompile"
   environment "RAILS_ENV" => rails_env
-
-  only_if do
-    File.exists?("#{deploy[:deploy_to]}") && File.exists?("#{deploy[:deploy_to]}/shared/config/") && File.exists?("#{deploy[:deploy_to]}/shared/config/config.yml")
-  end
 end
