@@ -123,13 +123,6 @@ div.right {
     line-height: 1;
     height: auto;
   }
-
-  .item:first-child {
-    a {
-      padding: 0 20px 0 0;
-    }
-  }
-
   .item {
     float: left;
     a {
@@ -153,6 +146,9 @@ div.right {
   }
   .item:first-child {
     border-left: none;
+    a {
+      padding-left: 0;
+    }
   }
   .item.last {
     a { }
