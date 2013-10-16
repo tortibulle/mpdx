@@ -75,9 +75,10 @@ gem 'whenever', '~> 0.8.1'
 gem 'wicked', '~> 0.3.4'
 gem 'will_paginate', '~> 3.0.3'
 
+gem 'unicorn'
+
 group :development do
   gem 'railroady'
-  gem 'unicorn'
   gem 'rails-footnotes'
   gem 'bluepill'
 end
