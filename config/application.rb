@@ -50,7 +50,12 @@ module Mpdx
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
 
-    config.cache_store = :dalli_store, 'localhost', { :namespace => 'mpdx', :expires_in => 1.day, :compress => true }
+    if File.exist?(Rails.root.join('config','memcached.yml'))
+      cache_server = YAML.load_file(Rails.root.join('config','memcached.yml'))[Rails.env]['host']
+    else
+      cache_server = 'localhost'
+    end
+    config.cache_store = :dalli_store, cache_server, { :namespace => 'mpdx', :expires_in => 1.day, :compress => true }
     config.assets.paths << "#{Rails.root}/app/assets/fonts"
 
     #config.log_tags = [ :uuid, :remote_ip ]
