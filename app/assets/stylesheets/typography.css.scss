@@ -49,7 +49,7 @@ $font_basic: Arial, Helvetica, sans-serif;
 
 html, body {font-family: $font_basic; font-size: 14px; line-height: 1.75em; color: $type;}
 
-h1, h2, h3, h4, h5, h6 {font-family: $font_heading; letter-spacing: -1px; line-height: 1em; color: #333; color: $type;}
+h1, h2, h3, h4, h5, h6 {font-family: $font_heading; letter-spacing: -1px; line-height: 1em; color: $type;}
 
 a {color: $links; text-decoration: none;}
 
@@ -97,14 +97,12 @@ p:last-child {margin-bottom: 0;}
 
 .btn {
   text-align: center;
-  text-shadow: 0 1px 0 #eee;
   font: normal 12px $font_buttons;
   color: #000;
   line-height: 1;
 }
 
 .btndark, .btndark:hover {
-  text-shadow: 0 1px 0 #111 !important;
   color: #fff;
 }
 
@@ -113,6 +111,10 @@ p:last-child {margin-bottom: 0;}
   font-size: 11px;
   font-weight: normal;
   text-shadow: 0 1px 0 #000;
+}
+
+.taskaction {
+	color: #D98445;
 }
 
 /* ************************************************************************ */
