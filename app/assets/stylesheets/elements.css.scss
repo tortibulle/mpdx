@@ -59,6 +59,12 @@ $leftmenuwidth: 200px;
 
 /* ************************************************************** */
 
+input:focus,
+select:focus,
+textarea:focus,
+button:focus, a:focus {
+	outline: none;
+}
 
 .btn {
   background-color: #ffffff;
