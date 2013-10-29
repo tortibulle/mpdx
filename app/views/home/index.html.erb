@@ -1,6 +1,6 @@
 <div id="contentbody">
   <div class="wpp">
-    <h1><%= _('Hi') %> <%= current_user.first_name %>! <span class="smallhead"><%= _("Here's whats happening...") %></span></h1>
+    <h1><%= _('Hi') %> <%= current_user.first_name %>! <span class="smallhead"><%= _("Here's whats happening . . .") %></span></h1>
 
     <% if current_account_list.monthly_goal.present? %>
       <% cache(['donations_summary_chart', current_account_list], expires_in: 24.hours) do %>
