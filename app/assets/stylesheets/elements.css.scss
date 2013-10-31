@@ -5,6 +5,7 @@ $orange: #f39c12;
 $green-sea: #16a085;
 $belize-hole: #2980b9;
 $asbestos: #7f8c8d;
+$pasty-blue: #94B8C9;
 
 $white: #FFF;
 $black: #000;
@@ -137,6 +138,18 @@ button:focus, a:focus {
   padding: 4px 8px;
 }
 
+.prev-btn, .next-btn {
+	display: inline-block;
+}
+.prev-btn a, .next-btn a {
+	background-color: $pasty-blue;
+	border-radius: 3px;
+	padding: 8px 15px;
+	width: auto;
+	display: inline-block;
+	color: #FFFFFF;
+	letter-spacing: normal;
+}
 
 /* ************************************************************** */
 

@@ -1,11 +1,22 @@
-<div>
-  <div style="float:left"><%= link_to(_('<< Previous Week'), progress_home_path(start_date: @start_date - 1.week), remote: true) %></div>
-  <% unless @end_date >= Date.today %>
-    <div style="float:right"><%= link_to(_('Next Week >>'), progress_home_path(start_date: @start_date + 1.week), remote: true) %></div>
-  <% end %>
-</div>
-<div class="clr"></div>
-<h2><%= _('Week of %{date1} to %{date2}') % {date1: l(@start_date.to_date), date2: l(@end_date.to_date)} %></h2>
+<table class="dash-tabs-progress" width="100%">
+  <tr>
+    <td width="33%">
+      <div class="prev-btn" style="float: left;"><%= link_to(_('Previous Week'), progress_home_path(start_date: @start_date - 1.week), remote: true) %></div>
+    </td>
+
+    <td width="33%">
+      <div style="display: inline-block; padding: 7px 0 0 75px;"><span style="font-size: 1.5em; font-weight: bold; font-family: FreightSansProSemibold;"><%= _('%{date1} to %{date2}') % {date1: l(@start_date.to_date), date2: l(@end_date.to_date)} %></span></div>
+    </td>
+
+    <td width="33%">&nbsp;
+      <% unless @end_date >= Date.today %>
+          <div class="next-btn" style="display: inline-block; float: right;"><%= link_to(_('Next Week'), progress_home_path(start_date: @start_date + 1.week), remote: true) %></div>
+      <% end %>
+    </td>
+  </tr>
+</table>
+<br><br>
+
 <% if current_user.organization_accounts.detect {|oa| oa.organization_id == 48} %>
   <%= link_to('Click here to go to the weekly report form for coaches', 'https://staffweb.cru.org/mpd-donations/reports/mpd-weekly-update/index.htm', target: '_blank') %>
   <br /><br />
