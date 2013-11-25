@@ -102,7 +102,7 @@ class Person::FacebookAccount < ActiveRecord::Base
   end
 
   # Refresh any tokens that will be expiring soon
-  def refresh_tokens
+  def self.refresh_tokens
     Person::FacebookAccount.where("token_expires_at < ? AND token_expires_at > ?", 2.days.from_now, Time.now).each do |fa|
       fa.refresh_token
     end
