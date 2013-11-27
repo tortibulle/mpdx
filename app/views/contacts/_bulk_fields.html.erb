@@ -15,7 +15,11 @@
 
 <div class="field">
   <%= f.label :send_newsletter, _('Newsletter') %>
-  <%= f.select :send_newsletter, [[_('None'), 'none']] + f.object.assignable_send_newsletters.collect { |s| [_(s), s] }, include_blank: true %>
+  <% if @contact %>
+    <%= f.select :send_newsletter, f.object.assignable_send_newsletters.collect { |s| [_(s), s] }, include_blank: true %>
+  <% else %>
+    <%= f.select :send_newsletter, [[_('None'), 'none']] + f.object.assignable_send_newsletters.collect { |s| [_(s), s] }, include_blank: true %>
+  <% end %>
 </div>
 
 <div class="field">
