@@ -247,7 +247,16 @@ class TntImport
     contact.likely_to_give = contact.assignable_likely_to_gives[row['LikelyToGiveID'].to_i - 1] if (@import.override? || contact.likely_to_give.blank?) && row['LikelyToGiveID'].to_i != 0
     contact.never_ask = is_true?(row['NeverAsk']) if @import.override? || contact.never_ask.blank?
     contact.church_name = row['ChurchName'] if @import.override? || contact.church_name.blank?
-    contact.send_newsletter = 'Both' if (@import.override? || contact.send_newsletter.blank?) && is_true?(row['SendNewsletter'])
+    if (@import.override? || contact.send_newsletter.blank?) && is_true?(row['SendNewsletter'])
+      case row['NewsletterMediaPref']
+      when '+E'
+        contact.send_newsletter = 'Email'
+      when '+P'
+        contact.send_newsletter = 'Physical'
+      else
+        contact.send_newsletter = 'Both'
+      end
+    end
     contact.direct_deposit = is_true?(row['DirectDeposit']) if @import.override? || contact.direct_deposit.blank?
     contact.magazine = is_true?(row['Magazine']) if @import.override? || contact.magazine.blank?
     contact.last_activity = parse_date(row['LastActivity']) if (@import.override? || contact.last_activity.blank?) && row['LastActivity'].present?
