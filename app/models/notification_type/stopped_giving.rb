@@ -5,7 +5,7 @@ class NotificationType::StoppedGiving < NotificationType
   # If a donor gives via check, notify when their gift is 30 days past due
   def check(designation_account, account_list)
     notifications = []
-    designation_account.contacts(account_list_id: account_list.id).financial_partners.where(['pledge_start_date is NULL OR pledge_start_date < ?', 30.days.ago]).each do |contact|
+    designation_account.contacts.where(account_list_id: account_list.id).financial_partners.where(['pledge_start_date is NULL OR pledge_start_date < ?', 30.days.ago]).each do |contact|
       date = contact.direct_deposit? ? 60.days.ago : ((contact.pledge_frequency.to_i > 0 ? contact.pledge_frequency.to_i : 1) + 1).months.ago
       prior_notification = Notification.active.where(contact_id: contact.id, notification_type_id: id).first
 

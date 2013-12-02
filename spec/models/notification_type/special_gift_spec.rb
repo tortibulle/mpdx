@@ -20,6 +20,14 @@ describe NotificationType::SpecialGift do
       notifications.length.should == 0
     end
 
+    it "doesn't add a notification if the contact is on a different account list with a shared designation account" do
+      donation # create donation object from let above
+      account_list2 = create(:account_list)
+      account_list2.account_list_entries.create!(designation_account: da)
+      notifications = special_gift.check(da, account_list2)
+      notifications.length.should == 0
+    end
+
   end
 
   describe '.create_task' do

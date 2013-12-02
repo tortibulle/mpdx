@@ -2,7 +2,7 @@ class NotificationType::StartedGiving < NotificationType
 
   def check(designation_account, account_list)
     notifications = []
-    designation_account.contacts(account_list_id: account_list.id).financial_partners.each do |contact|
+    designation_account.contacts.where(account_list_id: account_list.id).financial_partners.each do |contact|
       prior_notification = Notification.active.where(contact_id: contact.id, notification_type_id: id).first
       unless prior_notification
         # If they just gave their first gift, note it as such

@@ -27,6 +27,14 @@ describe NotificationType::StoppedGiving do
         notifications = stopped_giving.check(da, contact.account_list)
         notifications.length.should == 0
       end
+
+      it "doesn't add a notification if the contact is on a different account list with a shared designation account" do
+        create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 60.days.ago)
+        account_list2 = create(:account_list)
+        account_list2.account_list_entries.create!(designation_account: da)
+        notifications = stopped_giving.check(da, account_list2)
+        notifications.length.should == 0
+      end
     end
 
     context 'non-direct deposit donor' do
