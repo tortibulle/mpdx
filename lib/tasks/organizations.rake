@@ -8,7 +8,7 @@ namespace :organizations do
     organizations = open('http://download.tntware.com/tntmpd/TntMPD_Organizations.csv').read.unpack("C*").pack("U*")
     CSV.new(organizations, :headers => :first_row).each do |line|
 
-      next unless line[1].present? && line[0] == 'Campus Crusade for Christ - Australia'
+      next unless line[1].present?
 
       if org = Organization.where(name: line[0]).first
         org.update_attributes(query_ini_url: line[1])
