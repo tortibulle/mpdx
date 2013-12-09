@@ -118,7 +118,7 @@ class Siebel < DataServer
       unless relay_account = @org_account.user.relay_accounts.first
         # This org account is no longer useful
         @org_account.destroy
-        raise 'No guid for user'
+        return []
       end
       Retryable.retryable on: RestClient::InternalServerError, sleep: 10 do
         @profiles = SiebelDonations::Profile.find(ssoGuid: relay_account.remote_id)
