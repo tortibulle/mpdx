@@ -53,11 +53,19 @@ class DataServer
 
     account_list = profile.account_list
 
-    response = Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:addresses_url) do
-      get_response(@org.addresses_url,
-                   get_params(@org.addresses_params, {profile: profile.code.to_s,
-                                                      datefrom: (date_from || @org.minimum_gift_date).to_s,
-                                                      personid: @org_account.remote_id}))
+    begin
+      response = Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:addresses_url) do
+        get_response(@org.addresses_url,
+                     get_params(@org.addresses_params, {profile: profile.code.to_s,
+                                                        datefrom: (date_from || @org.minimum_gift_date).to_s,
+                                                        personid: @org_account.remote_id}))
+      end
+    rescue DataServerError => e
+      if e.message.include?('no profile associated')
+        profile.destroy
+        return
+      end
+      raise
     end
 
     CSV.new(response, headers: :first_row).each do |line|

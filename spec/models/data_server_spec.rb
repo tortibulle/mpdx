@@ -64,6 +64,14 @@ describe DataServer do
       }.should change(@org, :addresses_url).to('foo')
     end
 
+    it 'removes a profile that a user no longer has access to' do
+      stub_request(:post, /.*addresses/).to_return(body: 'ERROR The user logging in has no profile associated with "1983834942".')
+      profile # instantiate record
+      expect {
+        @data_server.import_donors(profile)
+      }.to change(DesignationProfile, :count).by(-1)
+    end
+
     it "should import a company" do
       stub_request(:post, /.*addresses/).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"19238\",\"ACorporation\",\"123 mi casa blvd.\",\"Colima\",\"COL\",\"456788\",\"(52) 45 456-5678\",\"MEX\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"8/15/2003\",\"8/15/2003\",\"\",\"O\",\"ACorporation\",\"\"\r\n")
       @data_server.should_receive(:add_or_update_donor_account)
