@@ -7,7 +7,7 @@
       <% person.phone_numbers.map {|pn| exhibit(pn, self)}.each do |phone_number| %>
         <tr>
           <td class="meta_name" nowrap="nowrap">
-            <%= _(phone_number.location.titleize || 'Mobile') %>
+            <%= _(phone_number.location.try(:titleize) || 'Mobile') %>
             <% if person.phone_numbers.length > 1 && phone_number.primary? %>
               <i class="icon-ok green"></i>
             <% end %>
