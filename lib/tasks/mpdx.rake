@@ -71,6 +71,11 @@ namespace :mpdx do
       merge_addresses(c)
     end
   end
+
+  task clear_stalled_downloads: :environment do
+    Person::OrganizationAccount.where("locked_at is not null and locked_at < ?", 2.days.ago).update_all(downloading: false, locked_at: nil)
+  end
+
 end
 
 

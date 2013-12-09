@@ -26,16 +26,14 @@ job_type :runner,    "cd :path && RAILS_ENV=:environment /usr/local/bin/bundle e
 #every 30.minutes do
   #runner "AccountList.update_linked_org_accounts"
 #end
-every :day, at: '5am' do
+every :day, at: '2am' do
   runner "AccountList.update_linked_org_accounts"
-end
-
-every :day, at: '10pm' do
-  rake 'mailchimp:sync'
 end
 
 every :day, at: '9pm' do
   rake 'organizations:fetch'
+  rake 'clear_stalled_downloads'
+  rake 'mailchimp:sync'
 end
 
 every :day, at: '11pm' do
