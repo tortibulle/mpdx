@@ -398,11 +398,14 @@ class TntImport
 
     if designation_profile
       donor_accounts = row['OrgDonorCodes'].to_s.split(',').collect do |account_number|
-        donor_account = designation_profile.organization.donor_accounts.where(account_number: account_number).first
-        unless donor_account
-          donor_account = designation_profile.organization.donor_accounts.new(account_number: account_number, name: row['FileAs'])
-          donor_account.addresses_attributes = build_address_array(row)
-          donor_account.save!
+        donor_account = Retryable.retryable do
+          da = designation_profile.organization.donor_accounts.where(account_number: account_number).first
+          unless da
+            da = designation_profile.organization.donor_accounts.new(account_number: account_number, name: row['FileAs'])
+            da.addresses_attributes = build_address_array(row)
+            da.save!
+          end
+          da
         end
         donor_account
       end
