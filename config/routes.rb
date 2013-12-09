@@ -86,7 +86,7 @@ Mpdx::Application.routes.draw do
   resources :setup
 
   namespace :person do
-    resources :organization_accounts
+    resources :organization_accounts, only: [:new, :create]
   end
 
   resource :home, only: [:index], controller: :home do
