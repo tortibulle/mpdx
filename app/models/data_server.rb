@@ -222,10 +222,14 @@ class DataServer
           get_response(@org.profiles_url, get_params(@org.profiles_params))
         end
 
-        CSV.new(response, headers: :first_row).each do |line|
-          name = line['PROFILE_DESCRIPTION'] || line['ROLE_DESCRIPTION']
-          code = line['PROFILE_CODE'] || line['ROLE_CODE']
-          @profiles << {name: name, code: code}
+        begin
+          CSV.new(response, headers: :first_row).each do |line|
+            name = line['PROFILE_DESCRIPTION'] || line['ROLE_DESCRIPTION']
+            code = line['PROFILE_CODE'] || line['ROLE_CODE']
+            @profiles << {name: name, code: code}
+          end
+        rescue CSV::MalformedCSVError
+          raise "CSV::MalformedCSVError: #{response}"
         end
       end
     end
@@ -286,7 +290,7 @@ class DataServer
     master_person_from_source = organization.master_people.where('master_person_sources.remote_id' => remote_id.to_s).first
     person = donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
 
-    person ||= Person.new({master_person: master_person_from_source}, without_protection: true)
+    person ||= Person.new({master_person: master_person_from_source})
     person.attributes = {first_name: line[prefix + 'FIRST_NAME'], last_name: line[prefix + 'LAST_NAME'], middle_name: line[prefix + 'MIDDLE_NAME'],
                           title: line[prefix + 'TITLE'], suffix: line[prefix + 'SUFFIX'], gender: prefix.present? ? 'female' : 'male'}
     # Phone numbers
