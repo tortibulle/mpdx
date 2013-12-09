@@ -72,10 +72,9 @@ class ContactsController < ApplicationController
     Contact.transaction do
       session[:contact_return_to] = nil if session[:contact_return_to].to_s.include?('edit')
 
-      @contact = current_account_list.contacts.new(params[:contact])
-
       respond_to do |format|
         begin
+          @contact = current_account_list.contacts.new(params[:contact])
           if @contact.save
             format.html { redirect_to(session[:contact_return_to] || @contact) }
           else
