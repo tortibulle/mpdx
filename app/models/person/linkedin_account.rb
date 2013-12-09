@@ -32,6 +32,7 @@ class Person::LinkedinAccount < ActiveRecord::Base
 
   def url=(value)
     begin
+      value = 'http://' + value unless value.include?('http')
       # grab some valid linkedin credentials
       l = Person::LinkedinAccount.valid_token.first
       LINKEDIN.authorize_from_access(l.token, l.secret)
