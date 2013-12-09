@@ -88,6 +88,7 @@ class DonationsController < ApplicationController
           @donor_accounts << ["#{c.name} (#{da.account_number})", da.id]
         end
       end
+      @donor_accounts.sort_by! { |da| da.first }
     end
   end
 end
