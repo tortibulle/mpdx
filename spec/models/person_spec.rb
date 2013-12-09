@@ -159,6 +159,20 @@ describe Person do
       winner.merge(loser)
       expect(winner.master_person.master_person_sources.where(organization_id: 1, remote_id: 2)).to_not be_nil
     end
+
+    it 'creates a Version with a related_object_id' do
+      p1 = create(:person)
+      p2 = create(:person)
+      c = create(:contact)
+      p1.contacts << c
+      p2.contacts << c
+      expect {
+        p1.merge(p2)
+      }.to change(Version, :count).by(1)
+
+      v = Version.last
+      expect(v.related_object_id).to eq(c.id)
+    end
   end
 
 end

@@ -29,7 +29,7 @@ class Person < ActiveRecord::Base
   has_many :key_accounts, class_name: 'Person::KeyAccount', foreign_key: :person_id, dependent: :destroy
   has_many :companies, through: :company_positions
   has_many :donor_accounts, through: :master_person
-  has_many :contact_people, dependent: :destroy
+  has_many :contact_people#, dependent: :destroy
   has_many :contacts, through: :contact_people
   has_many :account_lists, through: :contacts
   has_many :pictures, as: :picture_of, dependent: :destroy
@@ -54,7 +54,7 @@ class Person < ActiveRecord::Base
                   #:time_zone, :locale, :phone
 
   before_create :find_master_person
-  after_destroy :clean_up_master_person
+  after_destroy :clean_up_master_person, :clean_up_contact_people
   after_commit  :sync_with_mailchimp
   after_save :touch_contacts
 
@@ -275,6 +275,7 @@ class Person < ActiveRecord::Base
       other.reload
       other.destroy
     end
+
     save(validate: false)
   end
 
@@ -309,6 +310,10 @@ class Person < ActiveRecord::Base
 
   def clean_up_master_person
     self.master_person.destroy if self.master_person && (self.master_person.people - [self]).blank?
+  end
+
+  def clean_up_contact_people
+    contact_people.destroy_all
   end
 
   def mail_chimp_account
