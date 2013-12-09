@@ -14,6 +14,15 @@ class ContactExhibit < DisplayCase::Exhibit
     [address.city, address.state, address.country].select(&:present?).join(', ') if address
   end
 
+  def website
+    if to_model.website.present?
+      url = to_model.website.include?('http') ? to_model.website : 'http://' + to_model.website
+      @context.link_to(@context.truncate(url, length: 30), url, target: '_blank')
+    else
+      ''
+    end
+  end
+
   def contact_info
     people.collect {|p|
       person_exhibit = exhibit(p, @context)

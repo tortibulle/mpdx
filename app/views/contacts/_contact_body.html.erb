@@ -86,6 +86,12 @@
                 <td class="meta_data"><%= contact_exhibit.church_name %></td>
               </tr>
             <% end %>
+            <% if contact.website.present? %>
+              <tr>
+                <td class="meta_name"><%= _('Website') %></td>
+                <td class="meta_data"><%= contact_exhibit.website %></td>
+              </tr>
+            <% end %>
             <% if contact.tags.present? %>
               <tr>
                 <td class="meta_name"><%= _('Tags') %> </td>

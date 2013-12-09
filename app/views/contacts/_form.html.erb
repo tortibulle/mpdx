@@ -56,6 +56,11 @@
         <%= render 'contacts/bulk_fields', f: f %>
 
         <div class="field">
+          <%= f.label :website, _('Website') %>
+          <%= f.text_field :website %>
+        </div>
+
+        <div class="field">
           <%= f.label :tag_list, _('Tags') %>
           <%= f.text_field :tag_list %>
         </div>
