@@ -51,7 +51,7 @@ class FacebookImport
             unless contact
               # Create a contact
               name = "#{fb_person.last_name}, #{fb_person.first_name}"
-              name += " & #{fb_spouse.first_name}" if fb_spouse
+              name += " #{_('and')} #{fb_spouse.first_name}" if fb_spouse
 
               contact = @account_list.contacts.find_or_create_by_name(name)
             end
@@ -61,12 +61,15 @@ class FacebookImport
 
             contact.people.reload
             if fb_spouse
-              Retryable.retryable do
+              begin
                 contact.people << fb_spouse unless contact.people.include?(fb_spouse)
+              rescue ActiveRecord::RecordNotUnique
               end
             end
-            Retryable.retryable do
+
+            begin
               contact.people << fb_person unless contact.people.include?(fb_person)
+            rescue ActiveRecord::RecordNotUnique
             end
 
           rescue => e
