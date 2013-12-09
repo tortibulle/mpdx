@@ -156,7 +156,7 @@ class Siebel < DataServer
     end
 
     unless donor_account
-       Airbrake.raise_or_notify("Can't find donor account for #{siebel_donation.inspect}")
+       Airbrake.raise_or_notify(Exception.new("Can't find donor account for #{siebel_donation.inspect}"))
       return
     end
 
