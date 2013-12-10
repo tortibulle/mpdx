@@ -240,3 +240,7 @@ $.mpdx.getSelectedTaskIds = (scope) ->
   $('[name="task_ids[]"]:checked', scope).each ->
     ids.push($(this).val())
   ids
+
+$.mpdx.activateTaskTagAutocomplete = ->
+  $.getJSON '/tasks/tags', (tags) ->
+    $('#modal_task_tag_list').autocomplete(source: tags)

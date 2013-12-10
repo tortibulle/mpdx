@@ -43,6 +43,10 @@ class Api::V1::TasksController < Api::V1::BaseController
     render json: task, callback: params[:callback]
   end
 
+  def tags
+    render json:
+  end
+
   protected
 
   def tasks
