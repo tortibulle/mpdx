@@ -103,7 +103,6 @@ group :test do
   gem 'growl'
   gem 'capybara'
   gem 'resque_spec'
-  gem 'fuubar'
   gem 'emoji_spec', :git => "https://gist.github.com/6112257.git"
 end
 
