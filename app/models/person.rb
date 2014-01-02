@@ -169,7 +169,7 @@ class Person < ActiveRecord::Base
     case
     when attributes.is_a?(Hash)
       attributes.each do |k, v|
-        self.email_address = v
+        self.email_address = attributes
       end
     when attributes.is_a?(Array)
       attributes.each do |v|

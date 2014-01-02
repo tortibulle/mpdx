@@ -583,7 +583,7 @@ DEPENDENCIES
   ruby-rtf
   sass-rails (~> 3.2.3)
   secure_headers
-  sidekiq
+  sidekiq (~> 2.17.0)
   sidekiq-failures!
   siebel_donations!
   simplecov

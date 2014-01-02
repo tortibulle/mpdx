@@ -26,12 +26,26 @@ class EmailAddress < ActiveRecord::Base
     email = Retryable.retryable on: ActiveRecord::RecordNotUnique,
                                 then: then_cb do
 
-      if email = person.email_addresses.detect {|e| e.email == attributes['email'].to_s.strip}
-        email.attributes = attributes
+      if attributes['id']
+        existing_email = person.email_addresses.find(attributes['id'])
+        # make sure we're not updating this record to another email that already exists
+        if email = person.email_addresses.detect {|e| e.email == attributes['email'].to_s.strip}
+          email.attributes = attributes
+          existing_email.destroy
+          email
+        else
+          existing_email.attributes = attributes
+          existing_email
+        end
       else
-        attributes['primary'] = (person.email_addresses.present? ? false : true) if attributes['primary'].nil?
-        new_or_create = person.new_record? ? :new : :create
-        email = person.email_addresses.send(new_or_create, attributes)
+        if email = person.email_addresses.detect {|e| e.email == attributes['email'].to_s.strip}
+          email.attributes = attributes
+        else
+          attributes['primary'] = (person.email_addresses.present? ? false : true) if attributes['primary'].nil?
+          new_or_create = person.new_record? ? :new : :create
+          email = person.email_addresses.send(new_or_create, attributes)
+        end
+        email
       end
     end
     email

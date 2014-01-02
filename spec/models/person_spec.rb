@@ -97,10 +97,10 @@ describe Person do
   end
 
   context '#email_addresses_attributes=' do
-    it "deletes nested email address" do
-      person = create(:person)
-      email = create(:email_address, person: person)
+    let(:person) { create(:person) }
+    let(:email) { create(:email_address, person: person) }
 
+    it "deletes nested email address" do
       email_addresses_attributes = {
         "0" => {
           "_destroy" => "1",
@@ -116,7 +116,44 @@ describe Person do
         person.save
       }.to change(person.email_addresses, :count).by(-1)
     end
+
+    it 'updates an existing email address' do
+      email_addresses_attributes = {
+        "0" => {
+          "_destroy" => "0",
+          "email" => 'asdf' + email.email,
+          "primary" => "1",
+          "id" => email.id.to_s
+        }
+      }
+
+      expect {
+        person.email_addresses_attributes = email_addresses_attributes
+
+        person.save
+      }.to_not change(person.email_addresses, :count)
+    end
+
+    it "doesn't create a duplicate if updating to an address that already exists" do
+      email2 = create(:email_address, person: person)
+
+      email_addresses_attributes = {
+        "0" => {
+          "_destroy" => "0",
+          "email" => email.email,
+          "primary" => "0",
+          "id" => email2.id.to_s
+        }
+      }
+
+      expect {
+        person.email_addresses_attributes = email_addresses_attributes
+
+        person.save
+      }.to change(person.email_addresses, :count).by(-1)
+    end
   end
+
   context '#merge' do
     let(:winner) { create(:person) }
     let(:loser) { create(:person) }
