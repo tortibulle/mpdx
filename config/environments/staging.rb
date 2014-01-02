@@ -9,9 +9,9 @@ Mpdx::Application.configure do
   config.action_controller.perform_caching = true
 
   # Disable Rails's static asset server (Apache or nginx will already do this)
-  #config.serve_static_assets = false
-   config.serve_static_assets = true
-  
+  # config.serve_static_assets = false
+  config.serve_static_assets = true
+
 
   # Compress JavaScripts and CSS
   config.assets.compress = true
@@ -32,19 +32,25 @@ Mpdx::Application.configure do
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  # config.force_ssl = true
+  #config.force_ssl = true
 
   # See everything in the log (default is :info)
-  config.log_level = :debug
+  # config.log_level = :debug
 
   # Prepend all log lines with the following tags
-  #config.log_tags = [ :subdomain, :uuid ]
+  # config.log_tags = [ :subdomain, :uuid ]
 
   # Use a different logger for distributed setups
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
 
   # Use a different cache store in production
-  # config.cache_store = :mem_cache_store
+  if File.exist?(Rails.root.join('config','memcached.yml'))
+    cache_servers = YAML.load_file(Rails.root.join('config','memcached.yml'))[Rails.env]['host']
+  else
+    cache_servers = ['10.181.146.139', '10.181.25.99']
+  end
+
+  config.cache_store = :dalli_store, cache_servers,  { :namespace => 'MPDXCache', :expire_after => 1.day, :compress => true }
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server
   # config.action_controller.asset_host = "http://assets.example.com"
@@ -65,7 +71,5 @@ Mpdx::Application.configure do
   # Log the query plan for queries taking more than this (works
   # with SQLite, MySQL, and PostgreSQL)
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
-
-  #config.action_mailer.default_url_options = { :host => 'mpdx.org' }
   config.action_mailer.default_url_options = { :host => 'stage.mpdx.org' }
 end
