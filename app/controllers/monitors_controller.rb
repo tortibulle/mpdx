@@ -5,7 +5,7 @@ class MonitorsController < ApplicationController
 
   def lb
     ActiveRecord::Base.connection.select_values("select id from people limit 1")
-    render text: File.read(Rails.public_path + '/lb.txt')
+    render text: File.read(Rails.public_path.join('lb.txt'))
   end
 
 
