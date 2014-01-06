@@ -1,5 +1,5 @@
 class Person::KeyAccount < ActiveRecord::Base
-  extend Person::Account
+  include Person::Account
 
   #attr_accessible :email
 

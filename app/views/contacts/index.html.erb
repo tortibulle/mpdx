@@ -113,11 +113,11 @@
           <tr id="select_more" style="display:none">
             <td colspan="6">
               <span id="select_all_prompt">
-                <%= _('All <strong>%{this_page}</strong> conversations on this page are selected. <a data-behavior="select_all">Select all <strong>%{total}</strong> contacts</a>') %
+                <%= _('All <strong>%{this_page}</strong> conversations on this page are selected. <a data-behavior="select_all">Select all <strong>%{total}</strong> contacts</a>').localize %
                   {this_page: @contacts.length, total: @contacts.total_entries} %>
               </span>
               <span id="clear_selection_prompt" style="display:none">
-                <%= _('All <strong>%{total}</strong> contacts are selected. <a data-behavior="clear_selection">Clear selection</a>') %
+                <%= _('All <strong>%{total}</strong> contacts are selected. <a data-behavior="clear_selection">Clear selection</a>').localize %
                   {total: @contacts.total_entries} %>
               </span>
             </td>

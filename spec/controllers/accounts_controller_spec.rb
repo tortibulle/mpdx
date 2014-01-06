@@ -10,7 +10,7 @@ describe AccountsController do
     end
     it "should sign a user in" do
       post 'create', provider: 'facebook'
-      request.session["warden.user.user.key"].should == ["User", [@user.id], nil]
+      request.session["warden.user.user.key"].should == [[@user.id], nil]
     end
 
     it "should queue data imports on sign in" do

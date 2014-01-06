@@ -3,13 +3,6 @@ $('.contact_list a').removeClass('active')
 $('[data-id=<%= @contact.id %>]').addClass('active')
 $.mpdx.activateTabs()
 $.mpdx.sortableTabs('contact')
-switch (window.location.hash) {
-  case '#donations-tab':
-  case '':
-    $.mpdx.loadDonations();
-    break;
-  case '#stream-tab':
-    $.mpdx.loadSocialStream();
-}
+$.mpdx.loadTabData(window.location.hash)
 document.title = '<%= @page_title %> - MPDX'
 History.pushState({contact_id: <%= @contact.id %>}, "<%== sanitize @contact.name %>", '<%= contact_path(@contact) %>' + document.location.hash)

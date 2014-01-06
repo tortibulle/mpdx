@@ -7,7 +7,7 @@
             <% if current_index > 0 %>
               <%= link_to('&lt;'.html_safe, contacts[current_index - 1], class: 'flatbtn', remote: true) %>
             <% end %>
-            <span><%== _('Navigate contacts: <strong>%{index} of %{total}</strong>') %{index: current_index + 1, total: contacts.length} %></span>
+            <span><%== _('Navigate contacts: <strong>%{index} of %{total}</strong>').localize % {index: current_index + 1, total: contacts.length} %></span>
             <% if current_index < contacts.length - 1 %>
               <%= link_to('&gt;'.html_safe, contacts[current_index + 1], class: 'flatbtn', remote: true) %>
             <% end %>
@@ -21,7 +21,7 @@
         <%= link_to(_('Add Task'), new_task_path(contact_id: contact.id), class: "btn smallbtn add_task", data: {contact_id: contact.id}, remote: true) %>
         <%= link_to(_('Edit'), edit_contact_path(contact), :class=> "btn smallbtn") %>
         <%#= link_to(_('Quick'), "", :class => "btn smallbtn quick")%>
-        <%= link_to(_('Delete'), contact_path(contact), :class=> "btn smallbtn", method: :delete, confirm: _("This contact will be set to 'Never Ask'. Is that what you want to do?")) %>
+        <%= link_to(_('Delete'), contact_path(contact), class: "btn smallbtn", method: :delete, data: { confirm: _("This contact will be set to 'Never Ask'. Is that what you want to do?") }) %>
       </div>
     </div>
     <div class="wpp">
@@ -35,7 +35,7 @@
         <div class="quickprofile">
           <h1><%= contact_exhibit %></h1>
           <div class="metaset">
-            <%= _('Donor ID: %{donor_id}') % {donor_id: contact_exhibit.donor_ids } %>
+            <%= _('Donor ID: %{donor_id}').localize % {donor_id: contact_exhibit.donor_ids } %>
             <% if contact_exhibit.location.present? %>
               <br /><%= contact_exhibit.location %>
             <% end %>

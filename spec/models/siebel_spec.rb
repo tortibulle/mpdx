@@ -240,7 +240,7 @@ describe Siebel do
 
     it "updates an existing person" do
       mp = MasterPerson.create
-      MasterPersonSource.create({master_person_id: mp.id, organization_id: org.id, remote_id: siebel_person.id}, without_protection: true)
+      MasterPersonSource.create({master_person_id: mp.id, organization_id: org.id, remote_id: siebel_person.id})
       p = create(:person, master_person_id: mp.id)
       donor_account.people << p
       contact.add_person(p)
@@ -256,7 +256,7 @@ describe Siebel do
     it "find and updates an old-style remote_id" do
       # Set up a person with the old style remote id
       mp = MasterPerson.create
-      mps = MasterPersonSource.create({master_person_id: mp.id, organization_id: org.id, remote_id: donor_account.account_number + '-1'}, without_protection: true)
+      mps = MasterPersonSource.create({master_person_id: mp.id, organization_id: org.id, remote_id: donor_account.account_number + '-1'})
 
       expect {
         siebel.send(:add_or_update_person, siebel_person, donor_account, contact)

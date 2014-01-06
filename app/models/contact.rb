@@ -11,10 +11,10 @@ class Contact < ActiveRecord::Base
   has_many :donations, through: :donor_accounts
   belongs_to :account_list
   has_many :contact_people, dependent: :destroy
-  has_many :people, through: :contact_people, order: 'contact_people.primary::int desc'
-  has_one  :primary_contact_person, class_name: 'ContactPerson', conditions: {primary: true}
+  has_many :people, -> { order('contact_people.primary::int desc') }, through: :contact_people
+  has_one  :primary_contact_person, -> { where(primary: true) }, class_name: 'ContactPerson'
   has_one  :primary_person, through: :primary_contact_person, source: :person
-  has_one  :spouse_contact_person, class_name: 'ContactPerson', conditions: ['"primary" = ? OR "primary" is NULL', false]
+  has_one  :spouse_contact_person, -> { where(['"primary" = ? OR "primary" is NULL', false]) }, class_name: 'ContactPerson'
   has_one  :spouse, through: :spouse_contact_person, source: :person
   has_many :contact_referrals_to_me, foreign_key: :referred_to_id, class_name: 'ContactReferral', dependent: :destroy
   has_many :contact_referrals_by_me, foreign_key: :referred_by_id, class_name: 'ContactReferral', dependent: :destroy
@@ -27,16 +27,16 @@ class Contact < ActiveRecord::Base
   has_many :messages
 
 
-  scope :people, where('donor_accounts.master_company_id is null').includes(:donor_accounts)
-  scope :companies, where('donor_accounts.master_company_id is not null').includes(:donor_accounts)
-  scope :with_person, lambda { |person| includes(:people).where('people.id' => person.id) }
-  scope :for_donor_account, lambda { |donor_account| where('donor_accounts.id' => donor_account.id).includes(:donor_accounts) }
-  scope :financial_partners, where(status: 'Partner - Financial')
-  scope :non_financial_partners, where("status <> 'Partner - Financial' OR status is NULL")
-  scope :with_referrals, joins(:contact_referrals_by_me).uniq
-  scope :active, lambda { where(active_conditions) }
-  scope :inactive, lambda { where(inactive_conditions) }
-  scope :late_by, ->(min_days, max_days=nil) { financial_partners.where("last_donation_date BETWEEN ? AND ?", max_days ? Date.today - max_days : Date.new(1951, 1, 1), Date.today - min_days) }
+  scope :people, -> { where('donor_accounts.master_company_id is null').includes(:donor_accounts).references('donor_accounts') }
+  scope :companies, -> { where('donor_accounts.master_company_id is not null').includes(:donor_accounts).references('donor_accounts') }
+  scope :with_person, -> (person) { includes(:people).where('people.id' => person.id) }
+  scope :for_donor_account, -> (donor_account) { where('donor_accounts.id' => donor_account.id).includes(:donor_accounts).references('donor_accounts') }
+  scope :financial_partners, -> { where(status: 'Partner - Financial') }
+  scope :non_financial_partners, -> { where("status <> 'Partner - Financial' OR status is NULL") }
+  scope :with_referrals, -> { joins(:contact_referrals_by_me).uniq }
+  scope :active, -> { where(active_conditions) }
+  scope :inactive, -> { where(inactive_conditions) }
+  scope :late_by, -> (min_days, max_days=nil) { financial_partners.where("last_donation_date BETWEEN ? AND ?", max_days ? Date.today - max_days : Date.new(1951, 1, 1), Date.today - min_days) }
 
 
   validates :name, presence: true
@@ -133,7 +133,7 @@ class Contact < ActiveRecord::Base
   end
 
   def self.create_from_donor_account(donor_account, account_list)
-    contact = account_list.contacts.new({name: donor_account.name}, without_protection: true)
+    contact = account_list.contacts.new({name: donor_account.name})
     contact.addresses_attributes = Hash[donor_account.addresses.collect.with_index { |address, i| [i, address.attributes.slice(*%w{street city state country postal_code})] }]
     contact.save!
     contact.donor_accounts << donor_account
@@ -225,7 +225,7 @@ class Contact < ActiveRecord::Base
 
       other.contact_people.each do |r|
         unless contact_people.where(person_id: r.person_id).first
-          r.update_attributes({contact_id: id}, without_protection: true)
+          r.update_attributes({contact_id: id})
         end
       end
 

@@ -23,7 +23,7 @@ describe HelpRequestsController do
     end
 
     it 'shows the form again if the submission was invalid' do
-      post :create, help_request: {}
+      post :create, help_request: {name: ''}
 
       response.should render_template('help_requests/new')
     end

@@ -1,5 +1,5 @@
 class Person::TwitterAccount < ActiveRecord::Base
-  extend Person::Account
+  include Person::Account
   after_save :ensure_only_one_primary
 
   # attr_accessible :screen_name

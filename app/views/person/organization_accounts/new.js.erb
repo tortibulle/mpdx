@@ -5,7 +5,7 @@
   var nothing = function() {};
   $('#org_connection_box').dialog('option', 
                                   {
-                                    title: '<%= j(_('Connect to %{org}') % {org: @organization}) %>',
+                                    title: '<%= j(_('Connect to %{org}').localize % {org: @organization}) %>',
                                     buttons: {
                                       '<%= j(_('Connect!')) %>': function(e) { $(this).dialog( "option", "title", '<%= j(spinner(visible: true)) %>'); $(this).dialog( "option", "buttons", []); $('form', this).submit(); },
                                       '<%= j(_('Cancel')) %>': function() { $(this).dialog("close"); $(this).html(''); }

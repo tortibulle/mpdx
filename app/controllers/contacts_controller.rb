@@ -65,7 +65,7 @@ class ContactsController < ApplicationController
   def edit
     session[:contact_return_to] = request.referrer if request.referrer.present?
 
-    @page_title = _('Edit - %{contact}') % {contact: @contact.name}
+    @page_title = _('Edit - %{contact}').localize % {contact: @contact.name}
   end
 
   def create
@@ -74,7 +74,7 @@ class ContactsController < ApplicationController
 
       respond_to do |format|
         begin
-          @contact = current_account_list.contacts.new(params[:contact])
+          @contact = current_account_list.contacts.new(contact_params)
           if @contact.save
             format.html { redirect_to(session[:contact_return_to] || @contact) }
           else
@@ -91,7 +91,7 @@ class ContactsController < ApplicationController
   def update
     respond_to do |format|
       begin
-        if @contact.update_attributes(params[:contact])
+        if @contact.update_attributes(contact_params)
           format.html { redirect_to(session[:contact_return_to] || @contact) }
           format.js
         else
@@ -109,12 +109,12 @@ class ContactsController < ApplicationController
   def bulk_update
     contacts = current_account_list.contacts.where(id: params[:bulk_edit_contact_ids].split(','))
 
-    next_ask_year, next_ask_month, next_ask_day = params[:contact].delete('next_ask(1i)'), params[:contact].delete('next_ask(2i)'), params[:contact].delete('next_ask(3i)')
+    next_ask_year, next_ask_month, next_ask_day = contact_params.delete('next_ask(1i)'), contact_params.delete('next_ask(2i)'), contact_params.delete('next_ask(3i)')
     if [next_ask_year, next_ask_month, next_ask_day].all?(&:present?)
-      params[:contact]['next_ask'] = Date.new(next_ask_year.to_i, next_ask_month.to_i, next_ask_day.to_i)
+      contact_params['next_ask'] = Date.new(next_ask_year.to_i, next_ask_month.to_i, next_ask_day.to_i)
     end
 
-    attributes_to_update = params[:contact].select { |_, v| v.present? }
+    attributes_to_update = contact_params.select { |_, v| v.present? }
     if attributes_to_update.present?
       # Since update_all doesn't trigger callbacks, we need to manually sync with mail chimp
       if attributes_to_update['send_newsletter'].present?
@@ -153,7 +153,7 @@ class ContactsController < ApplicationController
         end
       end
     end if params[:merge_sets].present?
-    redirect_to :back, notice: _('You just merged %{count} contacts') % {count: merged_contacts_count}
+    redirect_to :back, notice: _('You just merged %{count} contacts').localize % {count: merged_contacts_count}
   end
 
   def destroy
@@ -260,7 +260,9 @@ class ContactsController < ApplicationController
         @contact_sets = []
         contacts_checked = []
         people_with_duplicate_names.each do |pair|
-          contacts = current_account_list.contacts.people.includes(:people).where('people.id' => pair.split(','))[0..1]
+          contacts = current_account_list.contacts.people.includes(:people)
+                                                         .where('people.id' => pair.split(','))
+                                                         .references('people')[0..1]
           if contacts.length > 1
             already_included = false
             contacts.each { |c| already_included = true if contacts_checked.include?(c) }
@@ -358,5 +360,28 @@ class ContactsController < ApplicationController
        session[:contact_return_to].to_s.include?('new')
       session[:contact_return_to] = nil
     end
+  end
+
+  def contact_params
+   @contact_params ||= params.require(:contact).permit(:name, :pledge_amount, :status, :notes, :full_name, :greeting, :website, :pledge_frequency,
+                                    :pledge_start_date, :next_ask, :never_ask, :likely_to_give, :church_name, :send_newsletter,
+                                    :direct_deposit, :magazine, :pledge_received, :not_duplicated_with, :tag_list, :primary_person_id,
+                                    {contact_referrals_to_me_attributes: [:referred_by_id, :_destroy, :id],
+                                     donor_accounts_attributes: [:account_number, :organization_id, :_destroy, :id],
+                                     addresses_attributes: [:remote_id, :master_address_id, :location, :street, :city, :state, :postal_code, :country, :primary_mailing_address, :_destroy, :id],
+                                     people_attributes: [:first_name, :last_name, :legal_first_name, :title, :suffix, :deceased, :birthday_month, :birthday_day,
+                                                         :birthday_year, :marital_status, :anniversary_month, :anniversary_day, :anniversary_year, :_destroy, :id,
+                                                         {
+                                                           email_addresses_attributes: [:email, :primary, :_destroy, :id],
+                                                           phone_numbers_attributes: [:number, :location, :primary, :_destroy, :id],
+                                                           linkedin_accounts_attributes: [:url, :_destroy, :id],
+                                                           facebook_accounts_attributes: [:url, :_destroy, :id],
+                                                           twitter_accounts_attributes: [:screen_name, :_destroy, :id],
+                                                           pictures_attributes: [:image_cache, :primary, :_destroy, :id],
+                                                           family_relationships_attributes: [:related_person_id, :relationship, :_destroy, :id]
+                                                         }
+                                     ]
+                                    }
+   )
   end
 end

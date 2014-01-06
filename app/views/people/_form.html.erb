@@ -72,7 +72,7 @@
       <%= builder.select :anniversary_year, Time.now.year.downto(1900).to_a, include_blank: true %>
     </div>
     <div class="spacer"></div>
-    <% if builder.parent_builder && builder.parent_builder.object.is_a?(Contact) %>
+    <% if builder.options[:parent_builder] && builder.options[:parent_builder].object.is_a?(Contact) %>
       <%= link_to_remove_fields(builder) %>
     <% end %>
   </div>
@@ -116,7 +116,7 @@
           <%= render "people/#{network}_account_fields", builder: pf, object: person %>
         <% end %>
         <div class="sfield field_indent" data-behavior="add-wrapper">
-          <%= link_to_add_fields(_("Add %{network} Account") % { network: network }, builder, :"#{network}_accounts", partial: "people/#{network}_account_fields") %>
+          <%= link_to_add_fields(_("Add %{network} Account").localize % { network: network }, builder, :"#{network}_accounts", partial: "people/#{network}_account_fields") %>
         </div>
 
         <hr class="thin"/>

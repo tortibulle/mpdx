@@ -136,7 +136,7 @@ class DataServer
 
     balance = profile_balance(profile.code)
     attributes = {balance: balance[:balance], balance_updated_at: balance[:date]}
-    profile.update_attributes(attributes, without_protection: true)
+    profile.update_attributes(attributes)
 
     if balance[:designation_numbers]
       attributes.merge!(:name => balance[:account_names].first) if balance[:designation_numbers].length == 1
@@ -148,7 +148,7 @@ class DataServer
 
   def check_credentials!
     raise OrgAccountMissingCredentialsError, _('Your username and password are missing for this account.') unless @org_account.username && @org_account.password
-    raise OrgAccountInvalidCredentialsError, _('Your username and password for %{org} are invalid.') % {org: @org} unless @org_account.valid_credentials?
+    raise OrgAccountInvalidCredentialsError, _('Your username and password for %{org} are invalid.').localize % {org: @org} unless @org_account.valid_credentials?
   end
 
   def validate_username_and_password
@@ -258,7 +258,7 @@ class DataServer
            first_line.include?('password') ||
            lines[1].to_s.include?('password')
         @org_account.update_column(:valid_credentials, false) if @org_account.valid_credentials? && !@org_account.new_record?
-        raise OrgAccountInvalidCredentialsError, _('Your username and password for %{org} are invalid.') % {org: @org}
+        raise OrgAccountInvalidCredentialsError, _('Your username and password for %{org} are invalid.').localize % {org: @org}
       when response.code.to_i == 500 || first_line.include?('ERROR') || first_line.include?('HTML')
         raise DataServerError, response
       end
@@ -311,7 +311,7 @@ class DataServer
     # create the master_person_source if needed
     unless master_person_from_source
       Retryable.retryable do
-        organization.master_person_sources.where(remote_id: remote_id.to_s).first_or_create({master_person_id: person.master_person.id}, without_protection: true)
+        organization.master_person_sources.where(remote_id: remote_id.to_s).first_or_create({master_person_id: person.master_person.id})
       end
     end
 
@@ -322,14 +322,14 @@ class DataServer
     master_company = MasterCompany.find_by_name(line['LAST_NAME_ORG'])
     company = user.partner_companies.where(master_company_id: master_company.id).first if master_company
 
-    company ||= account_list.companies.new({master_company: master_company}, without_protection: true)
+    company ||= account_list.companies.new({master_company: master_company})
     company.assign_attributes( {name: line['LAST_NAME_ORG'],
                                 phone_number: line['PHONE'],
                                 street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select {|a| a.present?}.join("\n"),
                                 city: line['CITY'],
                                 state: line['STATE'],
                                 postal_code: line['ZIP'],
-                                country: line['CNTRY_DESCR']}, without_protection: true )
+                                country: line['CNTRY_DESCR']} )
     company.save!
     donor_account.update_attributes(master_company_id: company.master_company_id) unless donor_account.master_company_id == company.master_company.id
     company
@@ -366,7 +366,7 @@ class DataServer
         @org.designation_accounts.where(designation_number: number).first_or_create
       end
       profile.designation_accounts << da unless profile.designation_accounts.include?(da)
-      da.update_attributes(extra_attributes, without_protection: true) if extra_attributes.present?
+      da.update_attributes(extra_attributes) if extra_attributes.present?
       @designation_accounts[number] = da
     end
     @designation_accounts[number]
@@ -389,7 +389,7 @@ class DataServer
         amount: line['AMOUNT'],
         tendered_amount: line['TENDERED_AMOUNT'] || line['AMOUNT'],
         currency: default_currency
-      }, without_protection: true )
+      } )
       donation.save!
       donation
     end

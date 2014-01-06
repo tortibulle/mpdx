@@ -1,7 +1,7 @@
 $ ->
   if $('.home_controller')[0]?
-    $(document).on 'tabsshow', '#dash-tabs', (event, ui)->
-      $.mpdx.loadDashTabData(ui.tab.hash)
+    $(document).on 'tabsactivate', '#dash-tabs', (event, ui)->
+      $.mpdx.loadDashTabData(ui.newPanel.selector)
 
     $.mpdx.loadDashTabData(window.location.hash)
 
@@ -17,4 +17,3 @@ $.mpdx.loadDashbaordTab = (hash)->
       url: '/home/' + tab,
       dataType: 'script'
     }
-

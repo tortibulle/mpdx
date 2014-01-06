@@ -5,7 +5,7 @@ Mpdx::Application.routes.draw do
 
   resources :help_requests
 
-  match '/help', to: 'help_requests#new'
+  get '/help' => 'help_requests#new'
 
   resources :notifications
 
@@ -108,11 +108,11 @@ Mpdx::Application.routes.draw do
   end
 
 
-  match 'monitors/lb' => 'monitors#lb'
+  get 'monitors/lb' => 'monitors#lb'
 
-  match '/auth/prayer_letters/callback', to: 'prayer_letters_accounts#create'
-  match '/auth/:provider/callback', to: 'accounts#create'
-  match '/auth/failure', to: 'accounts#failure'
+  get '/auth/prayer_letters/callback', to: 'prayer_letters_accounts#create'
+  get '/auth/:provider/callback', to: 'accounts#create'
+  get '/auth/failure', to: 'accounts#failure'
 
   constraint = lambda { |request| request.env["rack.session"] and
                                   request.env["rack.session"]["warden.user.user.key"] and

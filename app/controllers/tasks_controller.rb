@@ -59,7 +59,7 @@ class TasksController < ApplicationController
       @task.activity_contacts.build(contact_id: params[:contact_id])
       session[:contact_redirect_to] = contact_path(params[:contact_id], anchor: 'tasks-tab')
 
-      @page_title += _(' For %{contact}') % {contact: @task.activity_contacts.first.contact.name} if @task.activity_contacts.length == 1
+      @page_title += _(' For %{contact}').localize % {contact: @task.activity_contacts.first.contact.name} if @task.activity_contacts.length == 1
     end
     if params[:completed]
       @task.completed = true
@@ -70,7 +70,7 @@ class TasksController < ApplicationController
   def edit
     @task = current_account_list.tasks.find(params[:id])
 
-    @page_title = _('Edit Task - %{task}') % {task: @task.subject}
+    @page_title = _('Edit Task - %{task}').localize % {task: @task.subject}
 
     respond_to do |wants|
       wants.html
@@ -79,7 +79,7 @@ class TasksController < ApplicationController
   end
 
   def create
-    @task = current_account_list.tasks.new(params[:task])
+    @task = current_account_list.tasks.new(task_params)
 
     if params[:add_task_contact_ids].present?
       # First validate the task fields
@@ -87,7 +87,7 @@ class TasksController < ApplicationController
         # Create a copy of the task for each contact selected
         contacts = current_account_list.contacts.find_all_by_id(params[:add_task_contact_ids].split(/[, ]/))
         contacts.each do |c|
-          @task = current_account_list.tasks.create(params[:task])
+          @task = current_account_list.tasks.create(task_params)
           ActivityContact.create(activity_id: @task.id, contact_id: c.id)
         end
       else
@@ -116,7 +116,7 @@ class TasksController < ApplicationController
     @task = current_account_list.tasks.find(params[:id])
 
     respond_to do |format|
-      if @task.update_attributes(params[:task])
+      if @task.update_attributes(task_params)
         format.html { redirect_to tasks_path }
         format.js
       else
@@ -128,7 +128,7 @@ class TasksController < ApplicationController
 
   def bulk_update
     tasks = current_account_list.tasks.where(id: params[:bulk_task_update_ids].split(','))
-    attributes_to_update = params[:task].select { |_, v| v.present? }
+    attributes_to_update = task_params.select { |_, v| v.present? }
 
     # Set default date values for parts of date that aren't set
     if attributes_to_update["start_at(1i)"] || attributes_to_update["start_at(2i)"] || attributes_to_update["start_at(3i)"]
@@ -187,5 +187,9 @@ class TasksController < ApplicationController
     if current_user.tasks_filter.present? && current_user.tasks_filter[current_account_list.id].present?
       @filters_params = current_user.tasks_filter[current_account_list.id]
     end
+  end
+
+  def task_params
+    params.require(:task).permit(:starred, :location, :subject, :start_at, :end_at, :activity_type, :result, :completed_at)
   end
 end

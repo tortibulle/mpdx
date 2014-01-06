@@ -1,4 +1,4 @@
-<h2><%= _('Week of %{date1} to %{date2}') % {date1: l(Date.today.beginning_of_week), date2: l(Date.today.end_of_week)} %></h2>
+<h2><%= _('Week of %{date1} to %{date2}').localize % {date1: l(Date.today.beginning_of_week), date2: l(Date.today.end_of_week)} %></h2>
 <% people_with_birthdays = current_account_list.people_with_birthdays(Time.now.beginning_of_week, Time.now.end_of_week) %>
 <% if people_with_birthdays.present? %>
   <h3><%= _('Birthdays') %></h3>
@@ -74,7 +74,7 @@
       <li>
         <!-- <div class="profile_close"><%= link_to("Close", "Close", :class=> "corner_close") %></div> -->
         <div class="profile_content">
-          <%== _('%{link} has given %{total} since %{since}') %
+          <%== _('%{link} has given %{total} since %{since}').localize %
                     {link: ('<span class="name">' + link_to(contact.name, contact, :class => "profile_name") + '</span>').html_safe,
                      total: ('<span class="hl amt">' + number_to_current_currency(contact.total_donations) + '</span>').html_safe,
                      since: ('<span class="hl date">' + (contact.first_donation_date ? l(contact.first_donation_date) : '') + '</span>').html_safe } %>

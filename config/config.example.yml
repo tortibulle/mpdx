@@ -12,6 +12,7 @@ development: &common
   s3_bucket:
   encryption_key:
   itg_auth_key:
+  secret_key_base: 'asdfadsfasdfadsfasdfadsfasdfadsfasdfadsfasdfadsfasdfadsfasdfadsfasdfadsfasdfadsfasdfadsf'
 
 production:
   <<: *common

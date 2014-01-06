@@ -2,7 +2,7 @@ class MasterPersonDonorAccount < ActiveRecord::Base
   belongs_to :master_person
   belongs_to :donor_account
 
-  scope :primary, where(primary: true)
+  scope :primary, -> { where(primary: true) }
 
   before_save :make_first_donor_primary
   after_save :ensure_only_one_primary

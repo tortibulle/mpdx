@@ -10,13 +10,13 @@
         <a class="comment_status" href=""><span id="comment_count_<%= task.id %>"><%= task.activity_comments.length  %></span></a>
         <div class="actions">
           <%= link_to(_('Edit'), edit_task_path(task), :class=> "ico ico_edit edit_task", data: {id: task.id}, remote: true) %>
-          <%= link_to(_('Delete'), task, confirm: _("Are you sure you want to delete this task instead of marking it as completed?"), method: :delete, remote: true, :class=> "ico ico_trash") %>
+          <%= link_to(_('Delete'), task, data: { confirm: _("Are you sure you want to delete this task instead of marking it as completed?") }, method: :delete, remote: true, :class=> "ico ico_trash") %>
         </div>
 
         <span class="taskaction"><%= _(task.activity_type) %></span> -
         <strong><span class="tasktitle"><%= task_exhibit %></span></strong> -
         <% if task.completed? %>
-          <%= _("%{action} - %{time}") % {action: _(task.result),
+          <%= _("%{action} - %{time}").localize % {action: _(task.result),
                                           time: task_exhibit.completed_at} %>
         <% else %>
           <%= task_exhibit.start_at %>

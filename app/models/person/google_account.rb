@@ -1,7 +1,7 @@
 require 'google/api_client'
 require 'gmail'
 class Person::GoogleAccount < ActiveRecord::Base
-  extend Person::Account
+  include Person::Account
 
   # attr_accessible :email
 

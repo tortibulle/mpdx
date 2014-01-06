@@ -316,8 +316,8 @@ $ ->
         else
           document.location = State.url
 
-      $(document).on 'tabsshow', '#contact', (event, ui)->
-        $.mpdx.loadTabData(ui.tab.hash)
+      $(document).on 'tabsactivate', '#contact', (event, ui)->
+        $.mpdx.loadTabData(ui.newPanel.selector)
 
       $.mpdx.loadTabData()
 

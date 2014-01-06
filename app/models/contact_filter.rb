@@ -31,7 +31,9 @@ class ContactFilter
       end
 
       if @filters[:city].present? && @filters[:city].first != ''
-        filtered_contacts = filtered_contacts.includes(:addresses).where('addresses.city' => @filters[:city])
+        filtered_contacts = filtered_contacts.where('addresses.city' => @filters[:city])
+                                             .includes(:addresses)
+                                             .references('addresses')
       end
 
       if @filters[:church].present? && @filters[:church].first != ''
@@ -39,7 +41,9 @@ class ContactFilter
       end
 
       if @filters[:state].present? && @filters[:state].first != ''
-        filtered_contacts = filtered_contacts.includes(:addresses).where('addresses.state' => @filters[:state])
+        filtered_contacts = filtered_contacts.where('addresses.state' => @filters[:state])
+                                             .includes(:addresses)
+                                             .references('addresses')
       end
 
       if @filters[:likely].present? && @filters[:likely].first != ''
@@ -74,7 +78,10 @@ class ContactFilter
         when 'address'
           filtered_contacts = filtered_contacts.joins(:addresses).where(send_newsletter: ['Physical', 'Both'])
         when 'email'
-          filtered_contacts = filtered_contacts.includes(people: :email_addresses).where(send_newsletter: ['Email', 'Both']).where('email_addresses.email is not null')
+          filtered_contacts = filtered_contacts.where(send_newsletter: ['Email', 'Both'])
+                                               .where('email_addresses.email is not null')
+                                               .includes(people: :email_addresses)
+                                               .references('email_addresses')
         else
           filtered_contacts = filtered_contacts.where("send_newsletter is not null AND send_newsletter <> ''")
         end

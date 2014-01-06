@@ -56,7 +56,7 @@
         min: 0,
         max: <%= plot_line_values.max * 1.1 %>,
         title: {
-          text: '<%= _('Amount (%{currency})') % {currency: current_currency} %>'
+          text: '<%= _('Amount (%{currency})').localize % {currency: current_currency} %>'
         },
         plotLines: [{
           value: <%= pledges %>,

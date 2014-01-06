@@ -51,7 +51,7 @@ describe HomeController do
       it 'should include graph' do
         @user.account_lists.first.update_attributes(monthly_goal: "100")
         get 'index'
-        response.should render_template("donations_summary_chart")
+        response.should render_template("home/_donations_summary_chart")
       end
     end
   end

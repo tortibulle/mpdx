@@ -24,7 +24,7 @@ class AccountList < ActiveRecord::Base
   has_many :account_list_entries, dependent: :destroy
   has_many :designation_accounts, through: :account_list_entries
   has_many :contacts, dependent: :destroy
-  has_many :active_contacts, conditions: Contact.active_conditions, class_name: 'Contact'
+  has_many :active_contacts, -> { where(Contact.active_conditions) }, class_name: 'Contact'
   has_many :notifications, through: :contacts
   has_many :addresses, through: :contacts
   has_many :people, through: :contacts
@@ -121,7 +121,7 @@ class AccountList < ActiveRecord::Base
   end
 
   def total_pledges
-    @total_pledges ||= contacts.financial_partners.sum(&:monthly_pledge)
+    @total_pledges ||= contacts.financial_partners.to_a.sum(&:monthly_pledge)
     @total_pledges.round(2)
   end
 
@@ -262,7 +262,7 @@ class AccountList < ActiveRecord::Base
 
       unless mail_chimp_account
         if other.mail_chimp_account
-          other.mail_chimp_account.update_attributes({account_list_id: id}, without_protection: true)
+          other.mail_chimp_account.update_attributes({account_list_id: id})
         end
       end
       other.reload

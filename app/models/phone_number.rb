@@ -15,7 +15,7 @@ class PhoneNumber < ActiveRecord::Base
   # attr_accessible :number, :primary, :country_code, :location, :remote_id
 
   def self.add_for_person(person, attributes)
-    attributes = attributes.except(:_destroy)
+    attributes = attributes.with_indifferent_access.except(:_destroy)
     normalized_number = PhoneNumber.new(attributes)
     normalized_number.clean_up_number
 

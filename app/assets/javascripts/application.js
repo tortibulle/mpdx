@@ -19,6 +19,7 @@
 //= require jquery.observe_field
 //= require jquery.cookie
 //= require history
+//= require jquery.browser.min
 //= require jquery.select-to-autocomplete
 //= require jquery.hoverIntent.minified
 //= require highcharts

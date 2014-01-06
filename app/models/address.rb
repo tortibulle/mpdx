@@ -59,7 +59,7 @@ class Address < ActiveRecord::Base
       return
     end
 
-    countries = ActionView::Helpers::FormOptionsHelper::COUNTRIES
+    countries = CountrySelect::COUNTRIES
     if country = countries.detect {|c| c[:name].downcase == val.downcase}
       self[:country] = country[:name]
     else

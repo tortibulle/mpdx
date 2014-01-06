@@ -3,7 +3,7 @@
     <div class="account_single" data-behavior="account">
       <div class="actions">
         <%= link_to(_('delete'), account_path(account, provider: provider), method: :delete, :class => "inlineaction delete",
-                    confirm: _('Are you sure you want to remove this connection?')) %>
+                    data: { confirm: _('Are you sure you want to remove this connection?') }) %>
       </div>
       <span class="account_name"><%= account %></span>
 

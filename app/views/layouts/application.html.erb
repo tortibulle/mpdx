@@ -71,7 +71,7 @@
           <div class="section"><%= link_to(_('Find Duplicates'), find_duplicates_contacts_path, class: 'btn') %></div>
         <% end %>
         <% if current_account_list.monthly_goal.present? && current_account_list.monthly_goal > 0 %>
-          <div class="section right tip" title="<%= _('%% of goal pledged (%{totals})') %
+          <div class="section right tip" title="<%= _('%% of goal pledged (%{totals})').localize %
                                                     {totals: "#{number_to_current_currency(current_account_list.total_pledges.to_i)} / #{number_to_current_currency(current_account_list.monthly_goal)}"} %>">
             <%= render 'progress_bar' %>
           </div>
@@ -103,9 +103,9 @@
     </div>
     <div id="feedback">
       <h2><%= _('Need Help?') %></h2>
-      <p><%= _("Check out %{help_site} for training videos and FAQs. If you can't find the answer you need there or need to report a bug, %{link}") % 
-      {link: link_to(_('click here to let us know'), new_help_request_path),
-       help_site: link_to('help.mpdx.org', 'http://help.mpdx.org', target: '_blank')} %>
+      <p><%== _("Check out %{help_site} for training videos and FAQs. If you can't find the answer you need there or need to report a bug, %{link}").localize %
+               {link: link_to(_('click here to let us know'), new_help_request_path),
+                help_site: link_to('help.mpdx.org', 'http://help.mpdx.org', target: '_blank')} %>
       </p>
     </div>
 

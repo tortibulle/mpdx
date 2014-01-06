@@ -16,9 +16,9 @@ class Activity < ActiveRecord::Base
   scope :today, -> {where("start_at BETWEEN ? AND ?", Time.now.beginning_of_day, Time.now.end_of_day).order('start_at')}
   scope :tomorrow, -> {where("start_at BETWEEN ? AND ?", Time.now.end_of_day, Time.now.end_of_day + 1.day).order('start_at')}
   scope :upcoming, -> {where("start_at > ?", Time.now.end_of_day + 1.day).order('start_at')}
-  scope :completed, where(completed: true).order('completed_at desc, start_at desc')
-  scope :uncompleted, where(completed: false).order('start_at')
-  scope :starred, where(starred: true).order('start_at')
+  scope :completed, -> { where(completed: true).order('completed_at desc, start_at desc') }
+  scope :uncompleted, -> { where(completed: false).order('start_at') }
+  scope :starred, -> { where(starred: true).order('start_at') }
 
 
   accepts_nested_attributes_for :activity_contacts, allow_destroy: true

@@ -65,14 +65,8 @@ describe TasksController do
       it "assigns a newly created but unsaved task as @task" do
         # Trigger the behavior that occurs when invalid params are submitted
         Task.any_instance.stub(:save).and_return(false)
-        post :create, {:task => {}}
+        post :create, {:task => {subject: ''}}
         assigns(:task).should be_a_new(Task)
-      end
-
-      it "re-renders the 'new' template" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Task.any_instance.stub(:save).and_return(false)
-        post :create, {:task => {}}
         response.should render_template("new")
       end
     end
@@ -86,8 +80,8 @@ describe TasksController do
         # specifies that the Task created on the previous line
         # receives the :update_attributes message with whatever params are
         # submitted in the request.
-        Task.any_instance.should_receive(:update_attributes).with({'these' => 'params'})
-        put :update, {:id => task.to_param, :task => {'these' => 'params'}}
+        Task.any_instance.should_receive(:update_attributes).with({'subject' => 'foo'})
+        put :update, {:id => task.to_param, :task => {'subject' => 'foo'}}
       end
 
       it "assigns the requested task as @task" do
@@ -108,15 +102,8 @@ describe TasksController do
         task = @account_list.tasks.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
         Task.any_instance.stub(:save).and_return(false)
-        put :update, {:id => task.to_param, :task => {}}
+        put :update, {:id => task.to_param, :task => {'subject' => ''}}
         assigns(:task).should eq(task)
-      end
-
-      it "re-renders the 'edit' template" do
-        task = @account_list.tasks.create! valid_attributes
-        # Trigger the behavior that occurs when invalid params are submitted
-        Task.any_instance.stub(:save).and_return(false)
-        put :update, {:id => task.to_param, :task => {}}
         response.should render_template("edit")
       end
     end

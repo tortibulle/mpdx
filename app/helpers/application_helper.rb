@@ -60,16 +60,18 @@ module ApplicationHelper
 
   def l(date, options = {})
     options[:format] ||= :short
+    date = date.is_a?(Date) ? date.to_datetime.localize(locale).to_date : date.localize(locale)
+
     if [:full, :long, :medium, :short].include?(options[:format])
-      date.localize(locale).send("to_#{options[:format]}_s".to_sym)
+      date.send("to_#{options[:format]}_s".to_sym)
     else
       case options[:format]
       when :month_abbrv
-        date.localize(locale).to_s(format: 'MMM')
+        date.to_s(format: 'MMM')
       when :date_time
-        date.to_datetime.localize(locale).to_short_s
+        date.to_short_s
       else
-        date.localize(locale).to_s(format: options[:format])
+        date.to_s(format: options[:format])
       end
     end
   end
@@ -97,11 +99,11 @@ module ApplicationHelper
     case collection.total_entries
     when 0, 1; ''
     else
-       _("Displaying #{b}%{from}#{sp}-#{sp}%{to}#{eb} of #{b}%{count}#{eb}") % {
+       _("Displaying #{b}%{from}#{sp}-#{sp}%{to}#{eb} of #{b}%{count}#{eb}").localize % {
         :count => collection.total_entries,
         :from => collection.offset + 1, :to => collection.offset + collection.length
       }
-    end
+    end.html_safe
   end
 
 end

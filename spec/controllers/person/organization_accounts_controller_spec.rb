@@ -75,14 +75,8 @@ describe Person::OrganizationAccountsController do
       it "assigns a newly created but unsaved organization_account as @organization_account" do
         # Trigger the behavior that occurs when invalid params are submitted
         Person::OrganizationAccount.any_instance.stub(:save).and_return(false)
-        xhr :post, :create, {:person_organization_account => {}}
+        xhr :post, :create, {:person_organization_account => {username: ''}}
         assigns(:organization_account).should be_a_new(Person::OrganizationAccount)
-      end
-
-      it "re-renders the 'new' template" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Person::OrganizationAccount.any_instance.stub(:save).and_return(false)
-        xhr :post, :create, {:person_organization_account => {}}
         response.should render_template("new")
       end
     end

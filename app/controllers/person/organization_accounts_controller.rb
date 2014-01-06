@@ -13,7 +13,7 @@ class Person::OrganizationAccountsController < ApplicationController
   end
 
   def create
-    @organization_account = current_user.organization_accounts.new(params[:person_organization_account])
+    @organization_account = current_user.organization_accounts.new(person_organization_account_params)
     @organization = @organization_account.organization
 
     respond_to do |format|
@@ -23,6 +23,11 @@ class Person::OrganizationAccountsController < ApplicationController
         format.js { render action: "new" }
       end
     end
+  end
+
+  private
+  def person_organization_account_params
+    params.require(:person_organization_account).permit(:username, :password, :organization_id)
   end
 
 end

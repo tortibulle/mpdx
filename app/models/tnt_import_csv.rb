@@ -139,14 +139,14 @@ class TntImportCsv < TntImport
     master_company = MasterCompany.find_by_name(line['Organization Name'])
     company = @user.partner_companies.where(master_company_id: master_company.id).first if master_company
 
-    company ||= @account_list.companies.new({master_company: master_company}, without_protection: true)
+    company ||= @account_list.companies.new({master_company: master_company})
     company.assign_attributes( {name: line['Organization Name'],
                                 phone_number: line['Phone'],
                                 street: line['Mailing Street Address'],
                                 city: line['Mailing City'],
                                 state: line['Mailing State'],
                                 postal_code: line['Mailing Postal Code'],
-                                country: line['Mailing Country']}, without_protection: true )
+                                country: line['Mailing Country']} )
     company.save!
     donor_account.update_attribute(:master_company_id, company.master_company_id) unless donor_account.master_company_id == company.master_company.id
     company
@@ -169,12 +169,12 @@ class TntImportCsv < TntImport
     # See if there's already a person by this name on this contact (This is a contact with multiple donation accounts)
     contact_person = contact.people.where(first_name: line[prefix + 'First/Given Name'], last_name: line[prefix + 'Last/Family Name'], middle_name: line[prefix + 'Middle Name']).first
     if contact_person
-      person = Person.new({master_person: contact_person.master_person}, without_protection: true)
+      person = Person.new({master_person: contact_person.master_person})
     else
       master_person_from_source = organization.master_people.where('master_person_sources.remote_id' => remote_id).first
       person = donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
 
-      person ||= Person.new({master_person: master_person_from_source}, without_protection: true)
+      person ||= Person.new({master_person: master_person_from_source})
     end
 
     update_person_attributes(person, line, prefix)
@@ -190,7 +190,7 @@ class TntImportCsv < TntImport
 
     # create the master_person_source if needed
     unless master_person_from_source
-      organization.master_person_sources.where(remote_id: remote_id).first_or_create({master_person_id: person.master_person.id}, without_protection: true)
+      organization.master_person_sources.where(remote_id: remote_id).first_or_create({master_person_id: person.master_person.id})
     end
 
     [person, contact_person]

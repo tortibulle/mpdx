@@ -5,5 +5,5 @@ class Notification < ActiveRecord::Base
   has_many :tasks, inverse_of: :notification, dependent: :destroy
   # attr_accessible :event_date, :cleared, :notification_type_id
 
-  scope :active, where(cleared: false)
+  scope :active, -> { where(cleared: false) }
 end

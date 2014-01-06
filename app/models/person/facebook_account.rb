@@ -1,12 +1,13 @@
 require 'async'
 require 'retryable'
+
 class Person::FacebookAccount < ActiveRecord::Base
+  include Person::Account
   include Redis::Objects
   include Async
   include Sidekiq::Worker
   sidekiq_options queue: :facebook
 
-  extend Person::Account
 
   set :friends
   # attr_accessible :remote_id, :token, :token_expires_at, :first_name, :last_name, :valid_token, :authenticated, :url

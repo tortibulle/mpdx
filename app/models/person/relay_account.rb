@@ -1,5 +1,5 @@
 class Person::RelayAccount < ActiveRecord::Base
-  extend Person::Account
+  include Person::Account
 
   after_commit :delete_corresponding_org_account, on: :destroy
 
@@ -54,7 +54,7 @@ class Person::RelayAccount < ActiveRecord::Base
       account.assign_attributes({ remote_id: remote_id,
                                   token: "#{APP_CONFIG['itg_auth_key']}_#{designation}_#{emplid}",
                                   authenticated: true,
-                                  valid_credentials: true}, without_protection: true)
+                                  valid_credentials: true})
 
       account.save(validate: false)
     end

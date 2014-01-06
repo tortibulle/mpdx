@@ -44,9 +44,9 @@
         },
         subtitle: {
           text: '<%== if prior_average > average 
-                        _('Average donations down <span style="color:red">%{amount}</span> from last year') % { amount: number_to_current_currency(prior_average - average) }
+                        _('Average donations down <span style="color:red">%{amount}</span> from last year').localize % { amount: number_to_current_currency(prior_average - average) }
                      elsif average > prior_average
-                       _('Average donations up <span style="color:green">%{amount}</span> from last year') % { amount: number_to_current_currency(average - prior_average) }
+                       _('Average donations up <span style="color:green">%{amount}</span> from last year').localize % { amount: number_to_current_currency(average - prior_average) }
                      else
                        ''
                       end %>'

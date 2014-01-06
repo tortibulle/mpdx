@@ -9,20 +9,20 @@ class Person < ActiveRecord::Base
                              related_object_id: :contact_id }
 
   belongs_to :master_person
-  has_many :email_addresses, order: 'email_addresses.primary::int desc', dependent: :destroy, autosave: true
-  has_one :primary_email_address, class_name: 'EmailAddress', foreign_key: :person_id, conditions: {'email_addresses.primary' => true}
-  has_many :phone_numbers, order: 'phone_numbers.primary::int desc', dependent: :destroy
-  has_one :primary_phone_number, class_name: 'PhoneNumber', foreign_key: :person_id, conditions: {'phone_numbers.primary' => true}
+  has_many :email_addresses, -> { order('email_addresses.primary::int desc') }, dependent: :destroy, autosave: true
+  has_one :primary_email_address, -> { where('email_addresses.primary' => true) }, class_name: 'EmailAddress', foreign_key: :person_id
+  has_many :phone_numbers, -> { order('phone_numbers.primary::int desc') }, dependent: :destroy
+  has_one :primary_phone_number, -> { where('phone_numbers.primary' => true) }, class_name: 'PhoneNumber', foreign_key: :person_id
   has_many :family_relationships, dependent: :destroy
   has_many :related_people, through: :family_relationships
-  has_one :company_position, class_name: 'CompanyPosition', foreign_key: :person_id, conditions: "company_positions.end_date is null", order: "company_positions.start_date desc"
+  has_one :company_position, -> { where("company_positions.end_date is null").order("company_positions.start_date desc") }, class_name: 'CompanyPosition', foreign_key: :person_id
   has_many :company_positions, dependent: :destroy
   has_many :twitter_accounts, class_name: 'Person::TwitterAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
-  has_one :twitter_account, class_name: 'Person::TwitterAccount', foreign_key: :person_id, conditions: {'person_twitter_accounts.primary' => true}
+  has_one :twitter_account, -> { where('person_twitter_accounts.primary' => true) }, class_name: 'Person::TwitterAccount', foreign_key: :person_id
   has_many :facebook_accounts, class_name: 'Person::FacebookAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
   has_one  :facebook_account, class_name: 'Person::FacebookAccount', foreign_key: :person_id
   has_many :linkedin_accounts, class_name: 'Person::LinkedinAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
-  has_one :linkedin_account, class_name: 'Person::LinkedinAccount', foreign_key: :person_id, conditions: {'person_linkedin_accounts.valid_token' => true}
+  has_one :linkedin_account, -> { where('person_linkedin_accounts.valid_token' => true) }, class_name: 'Person::LinkedinAccount', foreign_key: :person_id
   has_many :google_accounts, class_name: 'Person::GoogleAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
   has_many :relay_accounts, class_name: 'Person::RelayAccount', foreign_key: :person_id, dependent: :destroy
   has_many :organization_accounts, class_name: 'Person::OrganizationAccount', foreign_key: :person_id, dependent: :destroy
@@ -33,7 +33,7 @@ class Person < ActiveRecord::Base
   has_many :contacts, through: :contact_people
   has_many :account_lists, through: :contacts
   has_many :pictures, as: :picture_of, dependent: :destroy
-  has_one :primary_picture, as: :picture_of, class_name: 'Picture', conditions: {primary: true}
+  has_one :primary_picture, -> { where(primary: true) }, as: :picture_of, class_name: 'Picture'
   has_many :activity_comments, dependent: :destroy
   has_many :messages_sent, class_name: 'Message', foreign_key: :from_id, dependent: :destroy
   has_many :messages_received, class_name: 'Message', foreign_key: :to_id, dependent: :destroy
@@ -168,8 +168,8 @@ class Person < ActiveRecord::Base
   def email_addresses_attributes=(attributes)
     case
     when attributes.is_a?(Hash)
-      attributes.each do |k, v|
-        self.email_address = attributes
+      attributes.each do |_, v|
+        self.email_address = v
       end
     when attributes.is_a?(Array)
       attributes.each do |v|
@@ -235,7 +235,7 @@ class Person < ActiveRecord::Base
 
       other.email_addresses.each do |email_address|
         unless email_addresses.find_by_email(email_address.email)
-          email_address.update_attributes({person_id: id}, without_protection: true)
+          email_address.update_attributes({person_id: id})
         end
       end
 
@@ -248,13 +248,13 @@ class Person < ActiveRecord::Base
       # we don't create duplicates on the next part
       FamilyRelationship.where(related_person_id: other.id).each do |fr|
         unless FamilyRelationship.where(person_id: fr.person_id, related_person_id: id).first
-          fr.update_attributes({related_person_id: id}, without_protection: true)
+          fr.update_attributes({related_person_id: id})
         end
       end
 
       FamilyRelationship.where(person_id: other.id).each do |fr|
         unless FamilyRelationship.where(related_person_id: fr.person_id, person_id: id)
-          fr.update_attributes({person_id: id}, without_protection: true)
+          fr.update_attributes({person_id: id})
         end
       end
 
@@ -281,7 +281,7 @@ class Person < ActiveRecord::Base
 
   def self.clone(person)
     new_person = new(person.attributes.except('id', 'access_token', 'created_at', 'current_sign_in_at', 'current_sign_in_ip', 'last_sign_in_at', 'last_sign_in_ip', 'preferences',
-                                              'sign_in_count'), without_protection: true)
+                                              'sign_in_count'))
     person.email_addresses.each { |e| new_person.email = e.email }
     person.phone_numbers.each { |pn| new_person.phone_number = pn.attributes.slice(:number, :country_code, :location) }
     new_person.save(validate: false)

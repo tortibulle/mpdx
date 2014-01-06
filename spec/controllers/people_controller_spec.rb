@@ -13,13 +13,6 @@ describe PeopleController do
     @valid_attributes ||= build(:person).attributes.except(*%w{id created_at updated_at sign_in_count current_sign_in_at last_sign_in_at current_sign_in_ip last_sign_in_ip master_person_id access_token})
   end
   
-  #describe "GET index" do
-    #it "assigns all people as @people" do
-      #get :index
-      #assigns(:people).length.should == @contact.people.length
-    #end
-  #end
-
   describe "GET show" do
     it "assigns the requested person as @person" do
       person = @contact.people.create! valid_attributes
@@ -89,14 +82,14 @@ describe PeopleController do
       it "assigns a newly created but unsaved person as @person" do
         # Trigger the behavior that occurs when invalid params are submitted
         Person.any_instance.stub(:save).and_return(false)
-        post :create, {contact_id: @contact.id, :person => {}}
+        post :create, {contact_id: @contact.id, :person => {first_name: ''}}
         assigns(:person).should be_a_new(Person)
       end
 
       it "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
         Person.any_instance.stub(:save).and_return(false)
-        post :create, {contact_id: @contact.id, :person => {}}
+        post :create, {contact_id: @contact.id, :person => {first_name: ''}}
         response.should render_template("new")
       end
     end
@@ -110,8 +103,8 @@ describe PeopleController do
         # specifies that the Person created on the previous line
         # receives the :update_attributes message with whatever params are
         # submitted in the request.
-        Person.any_instance.should_receive(:update_attributes).with({'these' => 'params'})
-        put :update, {:id => person.to_param, :person => {'these' => 'params'}}
+        Person.any_instance.should_receive(:update_attributes).with({'first_name' => 'params'})
+        put :update, {:id => person.to_param, :person => {'first_name' => 'params'}}
       end
 
       it "assigns the requested person as @person" do
@@ -132,7 +125,7 @@ describe PeopleController do
         person = @contact.people.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
         Person.any_instance.stub(:save).and_return(false)
-        put :update, {:id => person.to_param, :person => {}}
+        put :update, {:id => person.to_param, :person => {first_name: ''}}
         assigns(:person).should eq(person)
       end
 
@@ -140,7 +133,7 @@ describe PeopleController do
         person = @contact.people.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
         Person.any_instance.stub(:save).and_return(false)
-        put :update, {:id => person.to_param, :person => {}}
+        put :update, {:id => person.to_param, :person => {first_name: ''}}
         response.should render_template("edit")
       end
     end

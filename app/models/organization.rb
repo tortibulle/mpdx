@@ -6,7 +6,7 @@ class Organization < ActiveRecord::Base
   has_many :master_people, through: :master_person_sources
 
   validates :name, :query_ini_url, presence: true
-  scope :active, where('addresses_url is not null')
+  scope :active, -> { where('addresses_url is not null') }
 
   # attr_accessible :name, :query_ini_url, :iso3166, :redirect_query_ini, :abbreviation, :logo, :account_help_url,
   #                 :minimum_gift_date, :code, :query_authentication, :org_help_email, :org_help_url,

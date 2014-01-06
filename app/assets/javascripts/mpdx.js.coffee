@@ -86,8 +86,8 @@ window.addFields = (link, association, content) ->
 $.mpdx = {}
 $.mpdx.activateTabs = ->
   $(".tabgroup").tabs({
-    select: (event, ui) ->
-      window.location.hash = ui.tab.hash
+    activate: (event, ui) ->
+      window.location.hash = ui.newPanel[0].id
   })
 
 $.mpdx.ajaxBefore = ->

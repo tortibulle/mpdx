@@ -25,7 +25,7 @@ class PeopleController < ApplicationController
   def create
     @contact = current_account_list.contacts.find(params[:contact_id])
     Person.transaction do
-      @person = @contact.people.new(params[:person])
+      @person = @contact.people.new(person_params)
 
       respond_to do |format|
         if @person.save
@@ -39,7 +39,7 @@ class PeopleController < ApplicationController
 
   def update
     respond_to do |format|
-      if @person.update_attributes(params[:person])
+      if @person.update_attributes(person_params)
         format.html { redirect_to @person }
       else
         format.html { render action: "edit" }
@@ -75,5 +75,23 @@ class PeopleController < ApplicationController
 
   def get_contact
     @contact = current_account_list.contacts.find(params[:contact_id]) if params[:contact_id]
+  end
+
+  def person_params
+    params.require(:person).permit(:first_name, :legal_first_name, :last_name, :birthday_month, :birthday_year, :birthday_day, 
+                                   :anniversary_month, :anniversary_year, :anniversary_day, :title, :suffix, :gender, :marital_status, 
+                                   :middle_name, :profession, :deceased,
+                                   {
+                                     email_address: :email,
+                                     phone_number: :number,
+                                     email_addresses_attributes: [:email, :primary, :_destroy, :id],
+                                     phone_numbers_attributes: [:number, :location, :primary, :_destroy, :id],
+                                     linkedin_accounts_attributes: [:url, :_destroy, :id],
+                                     facebook_accounts_attributes: [:url, :_destroy, :id],
+                                     twitter_accounts_attributes: [:screen_name, :_destroy, :id],
+                                     pictures_attributes: [:image_cache, :primary, :_destroy, :id],
+                                     family_relationships_attributes: [:related_person_id, :relationship, :_destroy, :id]
+                                   }
+    )
   end
 end

@@ -161,7 +161,7 @@ describe DataServer do
       end
       it "should add a contact with an existing master person" do
         mp = create(:master_person)
-        @donor_account.organization.master_person_sources.create({master_person_id: mp.id, remote_id: 1}, without_protection: true)
+        @donor_account.organization.master_person_sources.create({master_person_id: mp.id, remote_id: 1})
         -> {
           @data_server.send(:add_or_update_person, @account_list, @user, line, @donor_account, 1)
         }.should_not change(MasterPerson, :count)
@@ -189,7 +189,7 @@ describe DataServer do
         @user.account_lists << @account_list
         @donor_account.master_people << person.master_person
         @donor_account.people << person
-        @donor_account.organization.master_person_sources.create({master_person_id: person.master_person_id, remote_id: 1}, without_protection: true)
+        @donor_account.organization.master_person_sources.create({master_person_id: person.master_person_id, remote_id: 1})
         -> {
           new_contact, other = @data_server.send(:add_or_update_person, @account_list, @user, line, @donor_account, 1)
           new_contact.should == person
@@ -224,7 +224,9 @@ describe DataServer do
     end
     it "raise an error if credentials are invalid" do
       @org_account.valid_credentials = false
-      ->{DataServer.new(@org_account).import_donors(profile)}.should raise_error(OrgAccountInvalidCredentialsError, _('Your username and password for %{org} are invalid.') % {org: @org})
+      ->{DataServer.new(@org_account).import_donors(profile)}.should raise_error(OrgAccountInvalidCredentialsError,
+                                                                                 _('Your username and password for %{org} are invalid.').localize %
+                                                                                {org: @org})
     end
   end
 

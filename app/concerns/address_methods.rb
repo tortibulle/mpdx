@@ -2,9 +2,9 @@ module AddressMethods
   extend ActiveSupport::Concern
 
   included do
-    has_many :addresses, as: :addressable, conditions: {deleted: false}, order: 'addresses.primary_mailing_address::int desc'
+    has_many :addresses, -> { where(deleted: false).order('addresses.primary_mailing_address::int desc') }, as: :addressable
     has_many :addresses_including_deleted, class_name: 'Address', as: :addressable
-    has_one :primary_address, class_name: 'Address', conditions: {primary_mailing_address: true, deleted: false}, as: :addressable
+    has_one :primary_address, -> { where(primary_mailing_address: true, deleted: false) }, class_name: 'Address', as: :addressable
 
     accepts_nested_attributes_for :addresses, reject_if: :blank_or_duplicate_address?, allow_destroy: true
 

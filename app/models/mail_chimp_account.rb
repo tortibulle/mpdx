@@ -193,7 +193,8 @@ class MailChimpAccount < ActiveRecord::Base
     contacts = contacts.
       includes(people: :primary_email_address).
       where(send_newsletter: ['Email', 'Both']).
-      where('email_addresses.email is not null')
+      where('email_addresses.email is not null').
+      references('email_addresses')
 
     export_to_list(primary_list_id, contacts.to_set)
   end

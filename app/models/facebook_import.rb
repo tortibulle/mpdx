@@ -53,7 +53,7 @@ class FacebookImport
               name = "#{fb_person.last_name}, #{fb_person.first_name}"
               name += " #{_('and')} #{fb_spouse.first_name}" if fb_spouse
 
-              contact = @account_list.contacts.find_or_create_by_name(name)
+              contact = @account_list.contacts.find_or_create_by(name: name)
             end
 
             contact.tag_list.add(@import.tags, parse: true) if @import.tags.present?

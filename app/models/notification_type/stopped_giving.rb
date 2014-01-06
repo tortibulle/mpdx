@@ -38,7 +38,7 @@ class NotificationType::StoppedGiving < NotificationType
   end
 
   def task_description(notification)
-    _("%{contact_name} seems to have missed a gift. Call to follow up.") %
+    _("%{contact_name} seems to have missed a gift. Call to follow up.").localize %
       { contact_name: notification.contact.name }
   end
 
