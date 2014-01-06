@@ -9,7 +9,13 @@ class Task < Activity
   scope :completed_between, -> (start_date, end_date) { where("completed_at BETWEEN ? and ?", start_date, end_date) }
   scope :created_between, -> (start_date, end_date) { where("created_at BETWEEN ? and ?", start_date, end_date) }
 
-  PERMITTED_ATTRIBUTES = [:starred, :location, :subject, :start_at, :end_at, :activity_type, :result, :completed_at]
+  PERMITTED_ATTRIBUTES = [
+    :starred, :location, :subject, :start_at, :end_at, :activity_type, :result, :completed_at,
+    :tag_list, {
+      activity_comments_attributes: [:body],
+      activity_contacts_attributes: [:contact_id]
+    }
+  ]
 
   assignable_values_for :activity_type, :allow_blank => true do
     [_('Call'), _('Appointment'), _('Email'), _('Text Message'), _('Facebook Message'),

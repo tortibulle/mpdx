@@ -6,7 +6,6 @@ FactoryGirl.define do
     starred false
     location "MyString"
     subject "MyString"
-    description "MyText"
     start_at "2012-03-08 14:59:46"
     end_at "2012-03-08 14:59:46"
   end

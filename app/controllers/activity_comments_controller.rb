@@ -3,7 +3,7 @@ class ActivityCommentsController < ApplicationController
   respond_to :js
 
   def create
-    @comment = @activity.activity_comments.new(params[:activity_comment])
+    @comment = @activity.activity_comments.new(activity_comment_params)
     @comment.person_id = current_user.id
     @comment.save
   end
@@ -19,6 +19,10 @@ class ActivityCommentsController < ApplicationController
     if params[:activity_id]
       @activity = current_account_list.activities.find(params[:activity_id])
     end
+  end
+
+  def activity_comment_params
+    params.require(:activity_comment).permit(:body)
   end
 
 end
