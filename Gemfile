@@ -77,7 +77,7 @@ gem 'unicorn'
 
 group :development do
   gem 'railroady'
-  gem 'rails-footnotes', git: 'git@github.com:josevalim/rails-footnotes.git'
+  gem 'rails-footnotes', git: 'http://github.com/josevalim/rails-footnotes.git'
   gem 'bluepill'
 end
 

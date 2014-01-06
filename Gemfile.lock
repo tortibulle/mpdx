@@ -1,11 +1,4 @@
 GIT
-  remote: git@github.com:josevalim/rails-footnotes.git
-  revision: 49b7011932dd00c1a80dac63417974a96535f488
-  specs:
-    rails-footnotes (3.7.9)
-      rails (>= 3.0.0)
-
-GIT
   remote: http://github.com/90seconds/gmail.git
   revision: 8cb3baa3ffb016d0af092819f1d251649ae300f4
   specs:
@@ -26,6 +19,13 @@ GIT
   revision: 8d659d10229df298eda8007b4f09d5d392f69b1c
   specs:
     oauth (0.4.7)
+
+GIT
+  remote: http://github.com/josevalim/rails-footnotes.git
+  revision: 49b7011932dd00c1a80dac63417974a96535f488
+  specs:
+    rails-footnotes (3.7.9)
+      rails (>= 3.0.0)
 
 GIT
   remote: http://github.com/mhfs/sidekiq-failures.git
