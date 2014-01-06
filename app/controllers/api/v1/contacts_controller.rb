@@ -31,7 +31,7 @@ class Api::V1::ContactsController < Api::V1::BaseController
 
   def update
     contact = contacts.find(params[:id])
-    if contact.update_attributes(params[:contact])
+    if contact.update_attributes(contact_params)
       render json: contact, callback: params[:callback]
     else
       render json: {errors: contact.errors.full_messages}, callback: params[:callback], status: :bad_request
@@ -39,7 +39,7 @@ class Api::V1::ContactsController < Api::V1::BaseController
   end
 
   def create
-    contact = contacts.new(params[:contact])
+    contact = contacts.new(contact_params)
     if contact.save
       render json: contact, callback: params[:callback], status: :created
     else
@@ -61,6 +61,10 @@ class Api::V1::ContactsController < Api::V1::BaseController
 
   def available_includes
     [{:people => [:email_addresses, :phone_numbers, :facebook_account]}, :addresses, {primary_person: :facebook_account}]
+  end
+
+  def contact_params
+    @contact_params ||= params.require(:contact).permit(Contact::PERMITTED_ATTRIBUTES)
   end
 
 end

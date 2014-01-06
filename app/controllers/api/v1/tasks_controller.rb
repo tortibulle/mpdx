@@ -15,7 +15,7 @@ class Api::V1::TasksController < Api::V1::BaseController
 
   def update
     task = tasks.find(params[:id])
-    if task.update_attributes(params[:task])
+    if task.update_attributes(task_params)
       render json: task, callback: params[:callback]
     else
       render json: {errors: task.errors.full_messages}, callback: params[:callback], status: :bad_request
@@ -23,13 +23,7 @@ class Api::V1::TasksController < Api::V1::BaseController
   end
 
   def create
-
-    # temporary fix for bad api call
-    # added by Spencer on 5/15/13
-    # remove in a few weeks
-    params[:task].delete "contacts"
-    
-    task = tasks.new(params[:task])
+    task = tasks.new(task_params)
     if task.save
       render json: task, callback: params[:callback], status: :created
     else
@@ -49,4 +43,7 @@ class Api::V1::TasksController < Api::V1::BaseController
     add_includes_and_order(current_account_list.tasks.includes(:contacts, :activity_comments, :people), order: params[:order])
   end
 
+  def task_params
+    params.require(:task).permit(Task::PERMITTED_ATTRIBUTES)
+  end
 end

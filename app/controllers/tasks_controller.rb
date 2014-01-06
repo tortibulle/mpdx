@@ -190,6 +190,6 @@ class TasksController < ApplicationController
   end
 
   def task_params
-    params.require(:task).permit(:starred, :location, :subject, :start_at, :end_at, :activity_type, :result, :completed_at)
+    params.require(:task).permit(Task::PERMITTED_ATTRIBUTES)
   end
 end

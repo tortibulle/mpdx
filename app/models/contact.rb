@@ -38,6 +38,17 @@ class Contact < ActiveRecord::Base
   scope :inactive, -> { where(inactive_conditions) }
   scope :late_by, -> (min_days, max_days=nil) { financial_partners.where("last_donation_date BETWEEN ? AND ?", max_days ? Date.today - max_days : Date.new(1951, 1, 1), Date.today - min_days) }
 
+  PERMITTED_ATTRIBUTES = [
+    :name, :pledge_amount, :status, :notes, :full_name, :greeting, :website, :pledge_frequency,
+    :pledge_start_date, :next_ask, :never_ask, :likely_to_give, :church_name, :send_newsletter,
+    :direct_deposit, :magazine, :pledge_received, :not_duplicated_with, :tag_list, :primary_person_id,
+    {
+      contact_referrals_to_me_attributes: [:referred_by_id, :_destroy, :id],
+      donor_accounts_attributes: [:account_number, :organization_id, :_destroy, :id],
+      addresses_attributes: [:remote_id, :master_address_id, :location, :street, :city, :state, :postal_code, :country, :primary_mailing_address, :_destroy, :id],
+      people_attributes: Person::PERMITTED_ATTRIBUTES
+    }
+  ]
 
   validates :name, presence: true
 

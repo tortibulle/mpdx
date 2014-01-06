@@ -46,12 +46,22 @@ class Person < ActiveRecord::Base
   accepts_nested_attributes_for :linkedin_accounts, :reject_if => lambda { |p| p[:url].blank? }, :allow_destroy => true
   accepts_nested_attributes_for :pictures, :reject_if => lambda { |p| p[:image].blank? && p[:image_cache].blank? }, :allow_destroy => true
 
-
-  #attr_accessible :first_name, :last_name, :legal_first_name, :birthday_month, :birthday_year, :birthday_day, :anniversary_month,
-                  #:anniversary_year, :anniversary_day, :title, :suffix, :gender, :marital_status, :preferences, :addresses_attributes,
-                  #:phone_number, :email_address, :middle_name, :phone_numbers_attributes, :family_relationships_attributes, :email,
-                  #:email_addresses_attributes, :facebook_accounts_attributes, :twitter_accounts_attributes, :linkedin_accounts_attributes,
-                  #:time_zone, :locale, :phone
+  PERMITTED_ATTRIBUTES = [
+    :first_name, :legal_first_name, :last_name, :birthday_month, :birthday_year, :birthday_day,
+    :anniversary_month, :anniversary_year, :anniversary_day, :title, :suffix, :gender, :marital_status,
+    :middle_name, :profession, :deceased,
+    {
+      email_address: :email,
+      phone_number: :number,
+      email_addresses_attributes: [:email, :primary, :_destroy, :id],
+      phone_numbers_attributes: [:number, :location, :primary, :_destroy, :id],
+      linkedin_accounts_attributes: [:url, :_destroy, :id],
+      facebook_accounts_attributes: [:url, :_destroy, :id],
+      twitter_accounts_attributes: [:screen_name, :_destroy, :id],
+      pictures_attributes: [:image_cache, :primary, :_destroy, :id],
+      family_relationships_attributes: [:related_person_id, :relationship, :_destroy, :id]
+    }
+  ]
 
   before_create :find_master_person
   after_destroy :clean_up_master_person, :clean_up_contact_people
