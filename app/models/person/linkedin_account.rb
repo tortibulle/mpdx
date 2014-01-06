@@ -31,11 +31,23 @@ class Person::LinkedinAccount < ActiveRecord::Base
   end
 
   def url=(value)
+    return value if value == public_url
+
+    # grab some valid linkedin credentials
+    l = Person::LinkedinAccount.valid_token.first
+    raise LinkedIn::Errors::UnauthorizedError, _('The connection to your LinkedIn account needs to be renewed.') unless l
+
+    begin
+      LINKEDIN.authorize_from_access(l.token, l.secret)
+    rescue LinkedIn::Errors::UnauthorizedError
+      # Apparently this account wasn't valid after all
+      l.update_column(:valid_token, false)
+      self.url = value
+    end
+
     begin
       value = 'http://' + value unless value.include?('http')
-      # grab some valid linkedin credentials
-      l = Person::LinkedinAccount.valid_token.first
-      LINKEDIN.authorize_from_access(l.token, l.secret)
+
       json = LINKEDIN.profile(url: value, fields: %w[id first_name last_name public-profile-url])
       update_attributes_from_json(json)
     rescue RestClient::ResourceNotFound

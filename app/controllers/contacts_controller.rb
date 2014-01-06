@@ -80,7 +80,7 @@ class ContactsController < ApplicationController
           else
             format.html { render action: "new" }
           end
-        rescue Errors::FacebookLink => e
+        rescue Errors::FacebookLink, LinkedIn::Errors::UnauthorizedError => e
           flash.now[:alert] = e.message
           format.html { render action: "new" }
         end
@@ -98,7 +98,7 @@ class ContactsController < ApplicationController
           format.html { render action: "edit" }
           format.js { render nothing: true }
         end
-      rescue Errors::FacebookLink => e
+      rescue Errors::FacebookLink, LinkedIn::Errors::UnauthorizedError => e
         flash.now[:alert] = e.message
         format.html { render action: "edit" }
         format.js { render nothing: true }
@@ -363,25 +363,31 @@ class ContactsController < ApplicationController
   end
 
   def contact_params
-   @contact_params ||= params.require(:contact).permit(:name, :pledge_amount, :status, :notes, :full_name, :greeting, :website, :pledge_frequency,
-                                    :pledge_start_date, :next_ask, :never_ask, :likely_to_give, :church_name, :send_newsletter,
-                                    :direct_deposit, :magazine, :pledge_received, :not_duplicated_with, :tag_list, :primary_person_id,
-                                    {contact_referrals_to_me_attributes: [:referred_by_id, :_destroy, :id],
-                                     donor_accounts_attributes: [:account_number, :organization_id, :_destroy, :id],
-                                     addresses_attributes: [:remote_id, :master_address_id, :location, :street, :city, :state, :postal_code, :country, :primary_mailing_address, :_destroy, :id],
-                                     people_attributes: [:first_name, :last_name, :legal_first_name, :title, :suffix, :deceased, :birthday_month, :birthday_day,
-                                                         :birthday_year, :marital_status, :anniversary_month, :anniversary_day, :anniversary_year, :_destroy, :id,
-                                                         {
-                                                           email_addresses_attributes: [:email, :primary, :_destroy, :id],
-                                                           phone_numbers_attributes: [:number, :location, :primary, :_destroy, :id],
-                                                           linkedin_accounts_attributes: [:url, :_destroy, :id],
-                                                           facebook_accounts_attributes: [:url, :_destroy, :id],
-                                                           twitter_accounts_attributes: [:screen_name, :_destroy, :id],
-                                                           pictures_attributes: [:image_cache, :primary, :_destroy, :id],
-                                                           family_relationships_attributes: [:related_person_id, :relationship, :_destroy, :id]
-                                                         }
-                                     ]
-                                    }
+   @contact_params ||= params.require(:contact).permit(
+     [
+       :name, :pledge_amount, :status, :notes, :full_name, :greeting, :website, :pledge_frequency,
+       :pledge_start_date, :next_ask, :never_ask, :likely_to_give, :church_name, :send_newsletter,
+       :direct_deposit, :magazine, :pledge_received, :not_duplicated_with, :tag_list, :primary_person_id,
+       {
+         contact_referrals_to_me_attributes: [:referred_by_id, :_destroy, :id],
+         donor_accounts_attributes: [:account_number, :organization_id, :_destroy, :id],
+         addresses_attributes: [:remote_id, :master_address_id, :location, :street, :city, :state, :postal_code, :country, :primary_mailing_address, :_destroy, :id],
+         people_attributes:
+           [
+             :first_name, :last_name, :legal_first_name, :title, :suffix, :deceased, :birthday_month, :birthday_day,
+             :birthday_year, :marital_status, :anniversary_month, :anniversary_day, :anniversary_year, :_destroy, :id,
+             {
+               email_addresses_attributes: [:email, :primary, :_destroy, :id],
+               phone_numbers_attributes: [:number, :location, :primary, :_destroy, :id],
+               linkedin_accounts_attributes: [:url, :_destroy, :id],
+               facebook_accounts_attributes: [:url, :_destroy, :id],
+               twitter_accounts_attributes: [:screen_name, :_destroy, :id],
+               pictures_attributes: [:image_cache, :primary, :_destroy, :id],
+               family_relationships_attributes: [:related_person_id, :relationship, :_destroy, :id]
+             }
+         ]
+       }
+     ]
    )
   end
 end
