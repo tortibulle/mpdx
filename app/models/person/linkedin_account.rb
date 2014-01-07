@@ -39,19 +39,17 @@ class Person::LinkedinAccount < ActiveRecord::Base
 
     begin
       LINKEDIN.authorize_from_access(l.token, l.secret)
-    rescue LinkedIn::Errors::UnauthorizedError
-      # Apparently this account wasn't valid after all
-      l.update_column(:valid_token, false)
-      self.url = value
-    end
 
-    begin
       value = 'http://' + value unless value.include?('http')
 
       json = LINKEDIN.profile(url: value, fields: %w[id first_name last_name public-profile-url])
       update_attributes_from_json(json)
     rescue RestClient::ResourceNotFound
       self.destroy
+    rescue LinkedIn::Errors::UnauthorizedError
+      # Apparently this account wasn't valid after all
+      l.update_column(:valid_token, false)
+      self.url = value
     end
   end
 

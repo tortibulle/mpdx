@@ -81,6 +81,7 @@ class ContactsController < ApplicationController
             format.html { render action: "new" }
           end
         rescue Errors::FacebookLink, LinkedIn::Errors::UnauthorizedError => e
+          @contact ||= current_account_list.contacts.new(contact_params.except(:people_attributes))
           flash.now[:alert] = e.message
           format.html { render action: "new" }
         end
