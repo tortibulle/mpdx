@@ -5,6 +5,7 @@ $ ->
       $('#mini_contact_modal').html(contact_info.html())
       $('#mini_contact_modal').dialog
         modal:'true',
+        resizable: false,
         width: '400px',
         title: contact_info.attr('data-title'),
         buttons: [
@@ -31,7 +32,7 @@ $ ->
   # new task button
   $(document).on 'click', '.add_task', ->
     if $(this).attr('data-remote') == 'true'
-      $('#edit_task_modal .form_wrapper').html('<img src="/assets/spinner.gif" />')
+      $('#edit_task_modal .form_wrapper').html('<%= image_tag "spinner.gif" %>')
     else
       if $(this).attr('data-contact-id')
         $('#modal_task_activity_contacts_attributes_0_contact_id').val($(this).attr('data-contact-id'))
@@ -44,7 +45,7 @@ $ ->
         $('#modal_task_activity_type').val('Call')
 
     $('#edit_task_modal').dialog
-      resizable: true,
+      resizable: false,
       modal:'true',
       width: '400px',
       buttons: [
@@ -66,9 +67,9 @@ $ ->
 
   # Edit task button
   $(document).on 'click', '.edit_task', ->
-    $('#edit_task_modal .form_wrapper').html('<img src="/assets/spinner.gif" />')
+    $('#edit_task_modal .form_wrapper').html('<%= image_tag "spinner.gif" %>')
     $('#edit_task_modal').dialog
-      resizable: true,
+      resizable: false,
       modal:'true',
       width: '400px',
       buttons: [
@@ -125,7 +126,7 @@ $ ->
       $('#bulk_task_update_ids', form).val($.mpdx.getSelectedTaskIds($(this).closest('table')).join(','))
 
       $('#bulk_edit_task_modal').dialog
-        resizable: true,
+        resizable: false,
         modal:'true',
         width: '400px',
         buttons: [

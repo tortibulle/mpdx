@@ -1,5 +1,7 @@
 <% if params[:add_task_contact_ids] %>
   $('#add_task_modal .form_wrapper').html('<%= j(render('tasks/bulk_modal_form')) %>')
+  $('#add_task_modal').dialog({position:"center"})
 <% else %>
   $('#edit_task_modal .form_wrapper').html('<%= j(render('tasks/modal_form')) %>')
+  $('#edit_task_modal').dialog({position:"center"})
 <% end %>
