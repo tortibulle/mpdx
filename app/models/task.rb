@@ -11,8 +11,10 @@ class Task < Activity
 
   PERMITTED_ATTRIBUTES = [
     :starred, :location, :subject, :start_at, :end_at, :activity_type, :result, :completed_at,
+    :completed,
     :tag_list, {
       activity_comments_attributes: [:body],
+      activity_comment: [:body],
       activity_contacts_attributes: [:contact_id]
     }
   ]
