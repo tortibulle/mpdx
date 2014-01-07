@@ -135,9 +135,12 @@ class Siebel < DataServer
       da = Retryable.retryable do
         @org.designation_accounts.where(designation_number: number).first_or_create
       end
-      profile.designation_accounts << da unless profile.designation_accounts.include?(da)
-      da.update_attributes(extra_attributes) if extra_attributes.present?
-      @designation_accounts[number] = da
+
+      Retryable.retryable do
+        profile.designation_accounts << da unless profile.designation_accounts.include?(da)
+        da.update_attributes(extra_attributes) if extra_attributes.present?
+        @designation_accounts[number] = da
+      end
     end
     @designation_accounts[number]
   end
