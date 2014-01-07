@@ -9,6 +9,12 @@ class TasksController < ApplicationController
     @tasks = current_account_list.tasks.uncompleted.includes(:contacts, :activity_comments, :tags)
 
     @tasks = TaskFilter.new(filters_params).filter(@tasks) if filters_params.present?
+    @tasks = @tasks.includes(contacts:
+      [
+        :referrals_to_me,
+        {people: [:phone_numbers, :email_addresses]}
+      ]
+    )
 
     @overdue = @tasks.overdue
     @today = @tasks.today
