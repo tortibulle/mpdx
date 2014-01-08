@@ -29,7 +29,7 @@ class EmailAddress < ActiveRecord::Base
       if attributes['id']
         existing_email = person.email_addresses.find(attributes['id'])
         # make sure we're not updating this record to another email that already exists
-        if email = person.email_addresses.detect {|e| e.email == attributes['email'].to_s.strip}
+        if email = person.email_addresses.detect {|e| e.email == attributes['email'].to_s.strip && e.id != attributes['id'].to_i}
           email.attributes = attributes
           existing_email.destroy
           email

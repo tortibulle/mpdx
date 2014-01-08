@@ -20,6 +20,13 @@ describe EmailAddress do
       }.should_not change(EmailAddress, :count)
     end
 
+    it "does nothing when adding itself to a person" do
+      email = EmailAddress.add_for_person(person, {email: address})
+      ->{
+        EmailAddress.add_for_person(person, {email: address, id: email.id})
+      }.should_not change(EmailAddress, :count)
+    end
+
     it "sets only the first email to primary" do
       EmailAddress.add_for_person(person, {email: address})
       person.email_addresses.first.primary?.should == true
