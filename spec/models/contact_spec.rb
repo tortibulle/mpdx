@@ -153,7 +153,7 @@ describe Contact do
     end
   end
 
-  describe 'when merging' do
+  describe '#merge' do
     let(:loser_contact) { create(:contact, account_list: account_list) }
 
     it "should move all people" do
@@ -227,6 +227,27 @@ describe Contact do
         contact.merge(loser_contact)
       }.not_to change(Task, :count)
       }.to change(ActivityContact, :count).by(-1)
+    end
+
+    it 'prepend notes from loser to winner' do
+      loser_contact.notes = 'asdf'
+      contact.notes = 'fdsa'
+      contact.merge(loser_contact)
+      expect(contact.notes).to eq("fdsa\nasdf")
+    end
+
+    it 'keeps winner notes if loser has none' do
+      loser_contact.notes = nil
+      contact.notes = 'fdsa'
+      contact.merge(loser_contact)
+      expect(contact.notes).to eq("fdsa")
+    end
+
+    it 'keeps loser notes if winner has none' do
+      loser_contact.notes = 'fdsa'
+      contact.notes = ''
+      contact.merge(loser_contact)
+      expect(contact.notes).to eq("fdsa")
     end
 
   end

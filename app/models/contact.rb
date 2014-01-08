@@ -282,7 +282,7 @@ class Contact < ActiveRecord::Base
          self.status = 'Partner - Financial'
        end
 
-       self.notes = [notes, other.notes].compact.join("\n") if other.notes.present?
+       self.notes = [notes, other.notes].compact.join("\n").strip if other.notes.present?
 
        self.tag_list += other.tag_list
 
