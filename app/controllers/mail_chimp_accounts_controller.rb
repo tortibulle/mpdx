@@ -45,14 +45,14 @@ class MailChimpAccountsController < ApplicationController
   private
 
   def create_or_update
-    @mail_chimp_account.attributes = params[:mail_chimp_account]
+    @mail_chimp_account.attributes = mail_chimp_account_params
 
     changed_primary = true if @mail_chimp_account.changed.include?('primary_list_id')
 
     if @mail_chimp_account.save && @mail_chimp_account.active?
       if @mail_chimp_account.primary_list
         if changed_primary
-          flash[:notice] = _("MPDX is now uploading your newsletter recipients to MailChimp.")
+          flash[:notice] = _('MPDX is now uploading your newsletter recipients to MailChimp.')
         end
         redirect_to mail_chimp_accounts_path
       else
@@ -68,5 +68,9 @@ class MailChimpAccountsController < ApplicationController
     @mail_chimp_account = current_account_list.mail_chimp_account ||
                           current_account_list.build_mail_chimp_account
 
+  end
+
+  def mail_chimp_account_params
+    params.require(:mail_chimp_account).permit(:api_key, :grouping_id, :primary_list_id)
   end
 end
