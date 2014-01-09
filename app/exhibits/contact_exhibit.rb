@@ -40,10 +40,10 @@ class ContactExhibit < DisplayCase::Exhibit
     else
       fb = primary_or_first_person.facebook_account
       return "https://graph.facebook.com/#{fb.remote_id}/picture?type=#{size}" if fb
-      'https://mpdx.org/assets/' + if primary_or_first_person.gender == 'female'
-        'avatar_f.png'
+      if primary_or_first_person.gender == 'female'
+        @context.image_url('avatar_f.png')
       else
-        'avatar.png'
+        @context.image_url('avatar.png')
       end
     end
   end
