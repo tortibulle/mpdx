@@ -53,6 +53,14 @@ describe ContactExhibit do
       contact.stub(:primary_person).and_return(person)
       expect(exhib.avatar).to eq('https://mpdx.org/assets/avatar.png')
     end
+
+    it 'should make facebook image' do
+      person = double(facebook_account: double(remote_id: 1234),
+                      primary_picture: double(image: double(url: nil))
+      )
+      contact.stub(:primary_person).and_return(person)
+      expect(exhib.avatar).to eq('https://graph.facebook.com/1234/picture?type=square')
+    end
   end
 
   #it "should show return the default avatar filename" do
