@@ -1,5 +1,6 @@
 class ContactExhibit < DisplayCase::Exhibit
   include DisplayCase::ExhibitsHelper
+  include ActionView::Helpers::AssetUrlHelper
 
   def self.applicable_to?(object)
     object.class.name == 'Contact'
@@ -41,9 +42,9 @@ class ContactExhibit < DisplayCase::Exhibit
       fb = primary_or_first_person.facebook_account
       return "https://graph.facebook.com/#{fb.remote_id}/picture?type=#{size}" if fb
       if primary_or_first_person.gender == 'female'
-        @context.image_url('avatar_f.png')
+        image_url('avatar_f.png')
       else
-        @context.image_url('avatar.png')
+        image_url('avatar.png')
       end
     end
   end
