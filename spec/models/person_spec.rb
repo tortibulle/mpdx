@@ -197,7 +197,7 @@ describe Person do
       expect(winner.master_person.master_person_sources.where(organization_id: 1, remote_id: 2)).to_not be_nil
     end
 
-    it 'creates a Version with a related_object_id' do
+    it 'creates a Version with a related_object_id', :versioning => true do
       p1 = create(:person)
       p2 = create(:person)
       c = create(:contact)
