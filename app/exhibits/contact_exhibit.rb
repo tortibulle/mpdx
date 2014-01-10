@@ -38,9 +38,8 @@ class ContactExhibit < DisplayCase::Exhibit
     if (picture = primary_or_first_person.primary_picture) && picture.image.url(size)
       picture.image.url(size)
     else
-      if primary_or_first_person.facebook_account
-        return "https://graph.facebook.com/#{fb.remote_id}/picture?type=#{size}"
-      end
+      fb = primary_or_first_person.facebook_account
+      return "https://graph.facebook.com/#{fb.remote_id}/picture?type=#{size}" if fb
       
       if primary_or_first_person.gender == 'female'
         url = ActionController::Base.helpers.image_url('avatar_f.png')
