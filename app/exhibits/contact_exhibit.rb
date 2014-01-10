@@ -1,6 +1,5 @@
 class ContactExhibit < DisplayCase::Exhibit
   include DisplayCase::ExhibitsHelper
-  include ActionView::Helpers::AssetUrlHelper
 
   def self.applicable_to?(object)
     object.class.name == 'Contact'
@@ -39,13 +38,18 @@ class ContactExhibit < DisplayCase::Exhibit
     if (picture = primary_or_first_person.primary_picture) && picture.image.url(size)
       picture.image.url(size)
     else
-      fb = primary_or_first_person.facebook_account
-      return "https://graph.facebook.com/#{fb.remote_id}/picture?type=#{size}" if fb
-      if primary_or_first_person.gender == 'female'
-        image_url('avatar_f.png')
-      else
-        image_url('avatar.png')
+      if primary_or_first_person.facebook_account
+        return "https://graph.facebook.com/#{fb.remote_id}/picture?type=#{size}"
       end
+      
+      if primary_or_first_person.gender == 'female'
+        url = ActionController::Base.helpers.image_url('avatar_f.png')
+      else
+        url = ActionController::Base.helpers.image_url('avatar.png')
+      end
+
+      url = 'https://mpdx.org' + url if url.start_with?('/')
+      return url
     end
   end
 

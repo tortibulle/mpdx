@@ -1,6 +1,5 @@
 class PersonExhibit < DisplayCase::Exhibit
   include DisplayCase::ExhibitsHelper
-  include ActionView::Helpers::AssetUrlHelper
 
   def self.applicable_to?(object)
     object.class.name == 'Person'
@@ -30,10 +29,13 @@ class PersonExhibit < DisplayCase::Exhibit
     return "https://graph.facebook.com/#{facebook_account.remote_id}/picture?type=#{size}" if facebook_account
 
     if gender == 'female'
-      image_url('avatar_f.png')
+      url = ActionController::Base.helpers.image_url('avatar_f.png')
     else
-      image_url('avatar.png')
+      url = ActionController::Base.helpers.image_url('avatar.png')
     end
+    
+    url = 'https://mpdx.org' + url if url.start_with?('/')
+    return url
   end
 
 
