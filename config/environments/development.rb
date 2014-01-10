@@ -38,4 +38,6 @@ Mpdx::Application.configure do
   config.action_mailer.smtp_settings = { :host => "localhost", :port => 1025 }
 
   config.eager_load = false
+
+  Rails.application.routes.default_url_options[:host] = 'local.mpdx.org:3000'
 end

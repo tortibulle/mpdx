@@ -51,6 +51,7 @@ describe ContactExhibit do
                       gender: nil
       )
       contact.stub(:primary_person).and_return(person)
+      context.stub(:root_url).and_return('https://mpdx.org')
       expect(exhib.avatar).to eq('https://mpdx.org/assets/avatar.png')
     end
 

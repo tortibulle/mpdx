@@ -47,7 +47,10 @@ class ContactExhibit < DisplayCase::Exhibit
         url = ActionController::Base.helpers.image_url('avatar.png')
       end
 
-      url = 'https://mpdx.org' + url if url.start_with?('/')
+      if url.start_with?('/')
+        root_url = (@context) ? @context.root_url : 'https://mpdx.org'
+        url = URI.join(root_url, url).to_s
+      end
       return url
     end
   end

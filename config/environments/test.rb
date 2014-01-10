@@ -32,6 +32,8 @@ Mpdx::Application.configure do
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }
 
   config.eager_load = true
+
+  Rails.application.routes.default_url_options[:host] = 'mpdx.org'
 end
 
 I18n.enforce_available_locales = false
