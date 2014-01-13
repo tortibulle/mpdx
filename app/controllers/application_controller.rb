@@ -15,7 +15,7 @@ class ApplicationController < ActionController::Base
     session[:fullsite] = false if params[:fullsite] == "false"
 
     if !session[:fullsite] && mobile_agent
-      redirect_to '/mobile/' and return false
+      redirect_to 'http://m.mpdx.org/' and return false
     end
   end
 
