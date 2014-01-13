@@ -66,13 +66,6 @@ module Mpdx
     config.assets.precompile += ['jquery-ui.css']
 
     config.active_record.disable_implicit_join_references = true
-
-    config.middleware.use Rack::Cors do
-      allow do
-        origins '*'
-        resource '*', :headers => :any, :methods => [:get, :post, :options, :delete]
-      end
-    end
   end
 end
 

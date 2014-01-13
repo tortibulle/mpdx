@@ -325,7 +325,6 @@ GEM
       method_source (~> 0.8)
       slop (~> 3.4)
     rack (1.5.2)
-    rack-cors (0.2.9)
     rack-oauth2 (1.0.7)
       activesupport (>= 2.3)
       attr_required (>= 0.0.5)
@@ -561,7 +560,6 @@ DEPENDENCIES
   omniauth-twitter (~> 0.0.14)
   paper_trail (~> 3.0.0)
   pg (~> 0.14.1)
-  rack-cors
   railroady
   rails (~> 4.0.0)
   rails-footnotes!

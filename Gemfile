@@ -73,8 +73,6 @@ gem 'whenever', '~> 0.8.1'
 gem 'wicked', '~> 1.0.2'
 gem 'will_paginate', '~> 3.0.3'
 
-gem 'rack-cors'
-
 group :development do
   gem 'railroady'
   gem 'rails-footnotes', git: 'http://github.com/josevalim/rails-footnotes.git'
