@@ -17,7 +17,14 @@ namespace :mailchimp do
                             double_optin: false, merge_vars: vars, send_welcome: false, replace_interests: true)
           u.update_column(:subscribed_to_updates, true)
 
-        #rescue Gibbon::MailChimpError
+        rescue Gibbon::MailChimpError => e
+          case
+            when e.message.include?('code 502')
+              # Invalid email address
+              u.update_column(:subscribed_to_updates, false)
+            else
+              raise
+          end
         end
       end
     end
@@ -32,7 +39,14 @@ namespace :mailchimp do
                               send_goodbye: false, delete_member: true)
           u.update_column(:subscribed_to_updates, nil)
           puts "Unsubscribed #{u.first_name} #{u.last_name} - #{u.email.email}"
-        #rescue Gibbon::MailChimpError
+        rescue Gibbon::MailChimpError => e
+          case
+            when e.message.include?('code 232')
+              # Email address is already unsubscribed
+              u.update_column(:subscribed_to_updates, false)
+            else
+              raise
+          end
         end
       end
     end
