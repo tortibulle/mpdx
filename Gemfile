@@ -73,7 +73,7 @@ gem 'whenever', '~> 0.8.1'
 gem 'wicked', '~> 1.0.2'
 gem 'will_paginate', '~> 3.0.3'
 
-gem 'unicorn'
+gem 'rack-cors'
 
 group :development do
   gem 'railroady'
@@ -92,6 +92,7 @@ group :development, :test do
   gem "gettext", '~> 2.3.2', :require => false
   gem 'mailcatcher'
   gem 'fuubar'
+  gem 'unicorn'
 end
 group :test do
   gem 'webmock', '~> 1.9.0'
