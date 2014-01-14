@@ -2,12 +2,12 @@ require 'spec_helper'
 
 describe ContactSerializer do
   describe "contacts list" do
-    let(:contact) { 
+    let(:contact) {
       c = create(:contact)
       c.addresses << build(:address)
       c
     }
-    let(:person) { 
+    let(:person) {
       p = build(:person)
       p.email_addresses << build(:email_address)
       p.phone_numbers << build(:phone_number)
@@ -33,6 +33,11 @@ describe ContactSerializer do
 
     it "addresses list" do
       json.should include :addresses
+    end
+
+    it "includes the value from the scope[:include] in the cache_key" do
+      ContactSerializer.new(contact, {scope: {include: 'person'}}).cache_key.should == 
+      Digest::SHA1.hexdigest(([contact.cache_key] + ['include', 'person']).join(','))
     end
   end
 end

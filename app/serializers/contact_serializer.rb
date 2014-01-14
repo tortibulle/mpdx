@@ -2,7 +2,6 @@ class ContactSerializer < ActiveModel::Serializer
   include DisplayCase::ExhibitsHelper
 
   cached
-  delegate :cache_key, to: :object
 
   embed :ids, include: true
 
@@ -36,6 +35,11 @@ class ContactSerializer < ActiveModel::Serializer
   def avatar
     contact_exhibit = exhibit(object)
     contact_exhibit.avatar(:large)
+  end
+
+  def cache_key
+    scope = options[:scope] || {}
+    Digest::SHA1.hexdigest(([object.cache_key] + ['include', scope[:include]]).join(','))
   end
 
   INCLUDES.each do |relationship|
