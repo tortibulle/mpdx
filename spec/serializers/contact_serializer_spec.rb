@@ -35,9 +35,13 @@ describe ContactSerializer do
       json.should include :addresses
     end
 
-    it "includes the value from the scope[:include] in the cache_key" do
-      ContactSerializer.new(contact, {scope: {include: 'person'}}).cache_key.should == 
-      Digest::SHA1.hexdigest(([contact.cache_key] + ['include', 'person']).join(','))
+    it "cache_key is dependant on include params" do
+      key = ContactSerializer.new(contact, {scope: {include: 'person'}}).cache_key
+      key.should_not == ContactSerializer.new(contact).cache_key
+    end
+
+    it "cache_key should change when updated" do
+      expect{contact.touch}.to change { ContactSerializer.new(contact).cache_key }
     end
   end
 end
