@@ -53,6 +53,16 @@ class Api::V1::ContactsController < Api::V1::BaseController
     render json: contact, callback: params[:callback]
   end
 
+  def count
+    if params[:filters].present?
+      filtered_contacts = ContactFilter.new(params[:filters]).filter(contacts)
+    else
+      filtered_contacts = contacts.active
+    end
+
+    render json: {contacts_count: filtered_contacts.count}, callback: params[:callback]
+  end
+
   protected
 
   def contacts
