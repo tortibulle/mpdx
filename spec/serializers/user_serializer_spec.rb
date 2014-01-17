@@ -5,4 +5,5 @@ describe UserSerializer do
   subject { UserSerializer.new(user).as_json }
 
   it { should include :account_lists }
+  it { should include :designation_accounts }
 end

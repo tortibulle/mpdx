@@ -9,6 +9,6 @@ class UserSerializer < ActiveModel::Serializer
   has_many :account_lists
 
   def cache_key
-    Digest::SHA1.hexdigest(([object.cache_key] + object.account_lists.collect(&:cache_key)).join('/'))
+    Digest::SHA1.hexdigest(([object.cache_key] + object.account_lists.collect(&:cache_key) + object.designation_accounts.collect(&:cache_key)).join('/'))
   end
 end
