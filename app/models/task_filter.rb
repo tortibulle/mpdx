@@ -3,7 +3,7 @@ class TaskFilter
   attr_accessor :tasks, :filters
 
   def initialize(filters)
-    @filters = filters
+    @filters = filters || {}
 
     # strip extra spaces from filters
     @filters.collect { |k, v| @filters[k] = v.strip if v.is_a?(String) }

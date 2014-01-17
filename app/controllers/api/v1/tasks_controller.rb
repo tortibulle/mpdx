@@ -40,7 +40,9 @@ class Api::V1::TasksController < Api::V1::BaseController
   protected
 
   def tasks
-    add_includes_and_order(current_account_list.tasks.includes(:contacts, :activity_comments, :people), order: params[:order])
+    filtered_tasks = TaskFilter.new(params[:filters]).filter(current_account_list.tasks)
+
+    add_includes_and_order(filtered_tasks.includes(:contacts, :activity_comments, :people), order: params[:order])
   end
 
   def task_params
