@@ -36,7 +36,11 @@ Mpdx::Application.routes.draw do
           get :count
         end
       end
-      resources :tasks
+      resources :tasks do
+        collection do
+          get :count
+        end
+      end
       resources :preferences
       resources :users
     end

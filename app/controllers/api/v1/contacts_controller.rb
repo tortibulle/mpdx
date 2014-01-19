@@ -60,7 +60,7 @@ class Api::V1::ContactsController < Api::V1::BaseController
       filtered_contacts = contacts.active
     end
 
-    render json: {contacts_count: filtered_contacts.count}, callback: params[:callback]
+    render json: {total: filtered_contacts.count}, callback: params[:callback]
   end
 
   protected
