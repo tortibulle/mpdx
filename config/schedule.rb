@@ -19,9 +19,9 @@
 
 set :output, '/tmp/sync.log'
 
-job_type :rake,    "cd :path && RAILS_ENV=:environment /usr/local/bin/bundle exec rake :task --silent :output"
-job_type :rails,    "cd :path && RAILS_ENV=:environment /usr/local/bin/bundle exec rails :task --silent :output"
-job_type :runner,    "cd :path && RAILS_ENV=:environment /usr/local/bin/bundle exec rails runner :task --silent :output"
+job_type :rake,    "cd :path && RAILS_ENV=:environment /usr/local/bin/bundle exec /home/deploy/.bundler/mpdx/ruby/2.0.0/bin/rake :task --silent :output"
+job_type :rails,    "cd :path && RAILS_ENV=:environment /usr/local/bin/bundle exec /home/deploy/.bundler/mpdx/ruby/2.0.0/bin/rails :task --silent :output"
+job_type :runner,    "cd :path && RAILS_ENV=:environment /usr/local/bin/bundle exec /home/deploy/.bundler/mpdx/ruby/2.0.0/bin/rails runner :task --silent :output"
 
 #every 30.minutes do
   #runner "AccountList.update_linked_org_accounts"
