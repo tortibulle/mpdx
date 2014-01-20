@@ -60,7 +60,7 @@ module ApplicationHelper
 
   def l(date, options = {})
     options[:format] ||= :short
-    date = date.is_a?(Date) ? date.to_datetime.localize(locale).to_date : date.localize(locale)
+    date = date.is_a?(Date) ? date.to_datetime.localize(locale).to_date : date.to_datetime.localize(locale)
 
     if [:full, :long, :medium, :short].include?(options[:format])
       date.send("to_#{options[:format]}_s".to_sym)
@@ -68,7 +68,7 @@ module ApplicationHelper
       case options[:format]
       when :month_abbrv
         date.to_s(format: 'MMM')
-      when :date_time
+        when :date_time
         date.to_short_s
       else
         date.to_s(format: options[:format])
