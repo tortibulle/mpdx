@@ -12,7 +12,7 @@ class Activity < ActiveRecord::Base
   has_many :activity_comments, dependent: :destroy
   has_many :people, through: :activity_comments
 
-  scope :overdue, -> {where('start_at < ?', Time.now.beginning_of_day).order('start_at')}
+  scope :overdue, -> {where(completed: false).where('start_at < ?', Time.now.beginning_of_day).order('start_at')}
   scope :today, -> {where("start_at BETWEEN ? AND ?", Time.now.beginning_of_day, Time.now.end_of_day).order('start_at')}
   scope :tomorrow, -> {where("start_at BETWEEN ? AND ?", Time.now.end_of_day, Time.now.end_of_day + 1.day).order('start_at')}
   scope :upcoming, -> {where("start_at > ?", Time.now.end_of_day + 1.day).order('start_at')}
