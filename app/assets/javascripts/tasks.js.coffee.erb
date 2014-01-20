@@ -213,6 +213,12 @@ $ ->
         title =  $('.taskaction', row).html()
         title += ' - ' + $('.people a', row).html() if $('.people', row).html() != ''
         title += ' - ' + $('.tasktitle', row).html()
+        $('#task_result_task_result').empty()
+        $.each $(this).attr('data-results').split(','), (key, value) ->
+          $('#task_result_task_result').append($("<option value=" + value + ">" + value + "</option>"), {
+            value: value,
+            text: value
+          })
 
         # Marking a task off, open the result modal
         $('#task_result_modal').dialog

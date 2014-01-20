@@ -26,7 +26,15 @@ class Task < Activity
   end
 
   assignable_values_for :result, :allow_blank => true do
-    [_('Attempted'), _('Received'), _('Done')]
+    values =  [_('Done')] +
+      case activity_type
+        when 'Call'
+          [_('Attempted')]
+        when 'Email', 'Text Message', 'Facebook Message', 'Letter'
+          [_('Received')]
+        else
+          []
+      end
   end
 
   def attempted?

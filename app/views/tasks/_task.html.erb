@@ -2,7 +2,7 @@
   <tr id="<%= dom_id(task) %>" class="task" data-id="<%= task.id %>">
     <td class="check">
       <a name="<%= dom_id(task) %>" />
-      <input type="checkbox" name="task_ids[]" value="<%= task.id %>" data-behavior="complete_task" data-id="<%= task.id %>" <%= 'disabled="disabled"' if task.attempted? %> <%= 'checked="checked"' if task.completed? %> />
+      <input type="checkbox" name="task_ids[]" value="<%= task.id %>" data-behavior="complete_task" data-results="<%= task.assignable_results.join(',') %>" data-id="<%= task.id %>" <%= 'disabled="disabled"' if task.attempted? %> <%= 'checked="checked"' if task.completed? %> />
     </td>
     <td class="data">
       <div class="primary">
@@ -71,7 +71,7 @@
         <header></header>
 
         <div id="comment_list_<%= task.id %>">
-          <%= render partial: 'activity_comments/comment', collection: task.activity_comments if task.activity_comments.present? %>
+          <%= render partial: 'activity_comments/comment', collection: task.activity_comments if task.activity_comments.length > 0 %>
         </div>
 
         <div class="comment_form">
