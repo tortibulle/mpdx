@@ -16,8 +16,24 @@ class TaskFilter
       filtered_tasks = filtered_tasks.where('contacts.id' => @filters[:contact_ids])
     end
 
+    if @filters[:completed].present?
+      filtered_tasks = filtered_tasks.where(completed: @filters[:completed])
+    end
+
+    if @filters[:overdue].present?
+      if(@filters[:overdue].to_s == 'true')
+        filtered_tasks = filtered_tasks.overdue
+      else
+        filtered_tasks = filtered_tasks.where('start_at > ?', Time.now.beginning_of_day)
+      end
+    end
+
     if @filters[:tags].present?
       filtered_tasks = filtered_tasks.tagged_with(@filters[:tags])
+    end
+
+    if @filters[:starred].present?
+      filtered_tasks = filtered_tasks.where(starred: @filters[:starred])
     end
 
     if @filters[:activity_type].present? && @filters[:activity_type].first != ''
@@ -33,6 +49,10 @@ class TaskFilter
       filtered_tasks = filtered_tasks.where('completed_at > ?', 2.years.ago)
     when 'last_week'
       filtered_tasks = filtered_tasks.where('completed_at > ?', 1.week.ago)
+    when 'today'
+      filtered_tasks = filtered_tasks.today
+    when 'upcoming'
+      filtered_tasks = filtered_tasks.upcoming
     end
 
     filtered_tasks
