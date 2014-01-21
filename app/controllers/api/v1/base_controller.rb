@@ -13,7 +13,7 @@ class Api::V1::BaseController < ApplicationController
   def cors_preflight_check
     headers['Access-Control-Allow-Origin'] = '*'
     headers['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS'
-    headers['Access-Control-Allow-Headers'] = 'X-Requested-With, X-Prototype-Version'
+    headers['Access-Control-Allow-Headers'] = 'X-Requested-With, X-Prototype-Version, API-VERSION, Authorization'
     headers['Access-Control-Max-Age'] = '1728000'
     head(:ok) if request.request_method == "OPTIONS"
   end
@@ -23,6 +23,7 @@ class Api::V1::BaseController < ApplicationController
     def cors_set_access_control_headers
       headers['Access-Control-Allow-Origin'] = '*'
       headers['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS'
+      headers['Access-Control-Allow-Headers'] = 'API-VERSION, Authorization'
       headers['Access-Control-Max-Age'] = "1728000"
     end
 
