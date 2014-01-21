@@ -19,6 +19,11 @@ class Task < Activity
     }
   ]
 
+  CALL_RESULTS = [_('Attempted')]
+  MESSAGE_RESULTS = [_('Received')]
+  STANDARD_RESULTS = [_('Done')]
+  ALL_RESULTS = STANDARD_RESULTS + CALL_RESULTS + MESSAGE_RESULTS
+
   assignable_values_for :activity_type, :allow_blank => true do
     [_('Call'), _('Appointment'), _('Email'), _('Text Message'), _('Facebook Message'),
      _('Letter'), _('Newsletter'), _('Pre Call Letter'), _('Reminder Letter'),
@@ -26,15 +31,14 @@ class Task < Activity
   end
 
   assignable_values_for :result, :allow_blank => true do
-    values =  [_('Done')] +
-      case activity_type
-        when 'Call'
-          [_('Attempted')]
-        when 'Email', 'Text Message', 'Facebook Message', 'Letter'
-          [_('Received')]
-        else
-          []
-      end
+    case activity_type
+      when 'Call'
+        CALL_RESULTS + STANDARD_RESULTS
+      when 'Email', 'Text Message', 'Facebook Message', 'Letter'
+        STANDARD_RESULTS + MESSAGE_RESULTS
+      else
+        STANDARD_RESULTS
+    end
   end
 
   def attempted?

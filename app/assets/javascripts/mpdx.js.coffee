@@ -181,6 +181,14 @@ $.deparam = (param_string) ->
 
   obj
 
+$.mpdx.setOptions = (select_tag, options) ->
+  select_tag.empty()
+  $.each options.split(','), (key, value) ->
+    select_tag.append($("<option value=" + value + ">" + value + "</option>"), {
+      value: value,
+      text: value
+    })
+
 $.set_param = (key, value, params) ->
   params = '?' + params if params
   params = $.deparam(params)
@@ -190,3 +198,4 @@ $.set_param = (key, value, params) ->
 $(document).ready ->
   element = $.deparam(location.search).focus
   $('#' + element).focus() if element
+
