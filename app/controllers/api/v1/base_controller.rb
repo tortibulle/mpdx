@@ -6,6 +6,18 @@ class Api::V1::BaseController < ApplicationController
 
   rescue_from ActiveRecord::RecordNotFound, with: :render_404
 
+  # If this is a preflight OPTIONS request, then short-circuit the
+  # request, return only the necessary headers and return an empty
+  # text/plain.
+
+  def cors_preflight_check
+    headers['Access-Control-Allow-Origin'] = '*'
+    headers['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS'
+    headers['Access-Control-Allow-Headers'] = 'X-Requested-With, X-Prototype-Version'
+    headers['Access-Control-Max-Age'] = '1728000'
+    head(:ok) if request.request_method == "OPTIONS"
+  end
+
   protected
     # For all responses in this controller, return the CORS access control headers.
     def cors_set_access_control_headers
@@ -14,18 +26,8 @@ class Api::V1::BaseController < ApplicationController
       headers['Access-Control-Max-Age'] = "1728000"
     end
 
-    # If this is a preflight OPTIONS request, then short-circuit the
-    # request, return only the necessary headers and return an empty
-    # text/plain.
-
-    def cors_preflight_check
-      headers['Access-Control-Allow-Origin'] = '*'
-      headers['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS'
-      headers['Access-Control-Allow-Headers'] = 'X-Requested-With, X-Prototype-Version'
-      headers['Access-Control-Max-Age'] = '1728000'
-    end
-
     def ensure_login
+      return if request.request_method == "OPTIONS"
       unless oauth_access_token
         render json: {errors: ['Missing access token']}, status: :unauthorized, callback: params[:callback]
         return false
@@ -44,6 +46,7 @@ class Api::V1::BaseController < ApplicationController
     end
 
     def ensure_setup_finished
+      return if request.request_method == "OPTIONS"
       unless current_account_list
         render json: {errors: _('You need to go to http://mpdx.org and set up your account before using the mobile app.')},
                callback: params[:callback],

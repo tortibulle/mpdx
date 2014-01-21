@@ -44,6 +44,7 @@ Mpdx::Application.routes.draw do
       resources :preferences
       resources :users
     end
+    match '*all' => 'v1/base#cors_preflight_check', via: 'OPTIONS'
   end
 
   resources :imports
