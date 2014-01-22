@@ -23,9 +23,6 @@ job_type :rake,    "cd :path && PATH=/usr/local/bin:$PATH RAILS_ENV=:environment
 job_type :rails,    "cd :path && PATH=/usr/local/bin:$PATH RAILS_ENV=:environment /usr/local/bin/bundle exec rails :task --silent :output"
 job_type :runner,    "cd :path && PATH=/usr/local/bin:$PATH RAILS_ENV=:environment /usr/local/bin/bundle exec rails runner :task --silent :output"
 
-#every 30.minutes do
-  #runner "AccountList.update_linked_org_accounts"
-#end
 every :day, at: '2am' do
   runner "AccountList.update_linked_org_accounts"
 end
@@ -39,10 +36,5 @@ end
 every :day, at: '11pm' do
   runner "Person::FacebookAccount.refresh_tokens"
 end
-
-#every 2.days, at: '12pm' do
-  #runner "AccountList.queue_send_account_notifications"
-#end
-
 
 # Learn more: http://github.com/javan/whenever
