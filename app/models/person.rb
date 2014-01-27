@@ -58,7 +58,7 @@ class Person < ActiveRecord::Base
       linkedin_accounts_attributes: [:url, :_destroy, :id],
       facebook_accounts_attributes: [:url, :_destroy, :id],
       twitter_accounts_attributes: [:screen_name, :_destroy, :id],
-      pictures_attributes: [:image_cache, :primary, :_destroy, :id],
+      pictures_attributes: [:image, :image_cache, :primary, :_destroy, :id],
       family_relationships_attributes: [:related_person_id, :relationship, :_destroy, :id]
     }
   ]
