@@ -2,6 +2,11 @@ require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
 
+if defined?(PhusionPassenger)
+  require 'phusion_passenger/rack/out_of_band_gc'
+  require 'phusion_passenger/public_api'
+end
+
 if defined?(Bundler)
   # If you precompile assets before deploying to production, use this line
   Bundler.require(:default, Rails.env)
