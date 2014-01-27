@@ -64,7 +64,7 @@ module ApplicationHelper
       date = date.to_datetime.localize(locale).to_date
     else
       date = Time.zone.utc_to_local(date)
-      date = date.localize(locale)
+      date = date.to_datetime.localize(locale)
     end
 
     if [:full, :long, :medium, :short].include?(options[:format])
