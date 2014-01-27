@@ -10,7 +10,7 @@ Mpdx::Application.configure do
 
   # Disable Rails's static asset server (Apache or nginx will already do this)
   # config.serve_static_assets = false
-  config.serve_static_assets = true
+  config.serve_static_assets = false
 
 
   # Compress JavaScripts and CSS
@@ -53,7 +53,7 @@ Mpdx::Application.configure do
   config.cache_store = :dalli_store, cache_servers,  { :namespace => 'MPDXCache', :expire_after => 1.day, :compress => true }
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server
-  # config.action_controller.asset_host = "http://assets.example.com"
+  config.action_controller.asset_host = "d1k8eizr7zr0k0.cloudfront.net/assets"
 
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
