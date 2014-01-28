@@ -207,7 +207,7 @@ describe Siebel do
       siebel.should_not_receive(:add_or_update_person)
 
       expect {
-        siebel.send(:add_or_update_donor_account, account_list, siebel_donor, designation_profile, Date.today)
+        siebel.send(:add_or_update_donor_account, account_list, siebel_donor, designation_profile, Time.zone.now)
       }.not_to change { DonorAccount.count }
 
       donor_account.reload.name.should == siebel_donor.account_name
@@ -230,12 +230,19 @@ describe Siebel do
     end
 
     it "skips phone numbers and emails that have not been updated" do
-      siebel_person_with_rels = SiebelDonations::Contact.new(Oj.load('{"id":"1-3GJ-2744","primary":true,"firstName":"Jean","preferredName":"Jean","lastName":"Spansel","title":"Mrs","sex":"F","emailAddresses":[{"updatedAt":"' + 1.day.ago.to_s(:db) + '","id":"1-CEX-8425","type":"Home","primary":true,"email":"markmarthaspansel@gmail.com"}],"phoneNumbers":[{"updatedAt":"' + 1.day.ago.to_s(:db) + '","id":"1-BTE-2524","type":"Work","primary":true,"phone":"510/656-7873"}]}'))
+      siebel_person_with_rels = SiebelDonations::Contact.new(
+          Oj.load('{"id":"1-3GJ-2744","primary":true,"firstName":"Jean","preferredName":"Jean","lastName":"Spansel",
+                    "title":"Mrs","sex":"F","emailAddresses":[
+                      {"updatedAt":"' + 1.day.ago.to_s(:db) + '","id":"1-CEX-8425","type":"Home","primary":true,
+                        "email":"markmarthaspansel@gmail.com"}],
+                    "phoneNumbers":[{"updatedAt":"' + 1.day.ago.to_s(:db) + '","id":"1-BTE-2524","type":"Work",
+                          "primary":true,"phone":"510/656-7873"}]}')
+      )
 
       siebel.should_not_receive(:add_or_update_email_address)
       siebel.should_not_receive(:add_or_update_phone_number)
 
-      siebel.send(:add_or_update_person, siebel_person_with_rels, donor_account, contact, Date.today)
+      siebel.send(:add_or_update_person, siebel_person_with_rels, donor_account, contact, Time.zone.now)
     end
 
     it "updates an existing person" do

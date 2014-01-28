@@ -5,7 +5,7 @@ FactoryGirl.define do
     name "MyString"
     browser "MyText"
     problem "MyText"
-    email "foo@example.com"
+    email "foo@cru.org"
     user_id 1
     account_list_id 1
     session "MyText"
