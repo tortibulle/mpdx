@@ -23,17 +23,17 @@ job_type :rake,    "cd :path && PATH=/usr/local/bin:$PATH RAILS_ENV=:environment
 job_type :rails,    "cd :path && PATH=/usr/local/bin:$PATH RAILS_ENV=:environment /usr/local/bin/bundle exec rails :task --silent :output"
 job_type :runner,    "cd :path && PATH=/usr/local/bin:$PATH RAILS_ENV=:environment /usr/local/bin/bundle exec rails runner :task --silent :output"
 
-every :day, at: '2am' do
+every :day, at: '5am' do
   runner "AccountList.update_linked_org_accounts"
 end
 
-every :day, at: '9pm' do
+every :day, at: '10am' do
   rake 'organizations:fetch'
   rake 'mpdx:clear_stalled_downloads'
   rake 'mailchimp:sync'
 end
 
-every :day, at: '11pm' do
+every :day, at: '11am' do
   runner "Person::FacebookAccount.refresh_tokens"
 end
 
