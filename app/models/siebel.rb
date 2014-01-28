@@ -71,7 +71,6 @@ class Siebel < DataServer
                                   contact_email_filter: :all,
                                   contact_phone_filter: :all
                                   ).each do |siebel_donor|
-        next if date_from.present? && DateTime.parse(siebel_donor.updated_at) < date_from
 
         donor_account = add_or_update_donor_account(account_list, siebel_donor, profile, date_from)
 
@@ -220,7 +219,7 @@ class Siebel < DataServer
       # Save addresses
       if donor.addresses
         donor.addresses.each do |address|
-          next if date_from.present? && DateTime.parse(address.updated_at) < date_from
+          next if date_from.present? && DateTime.parse(address.updated_at) < date_from && contact.addresses.present?
 
           add_or_update_address(address, donor_account)
 
@@ -232,7 +231,7 @@ class Siebel < DataServer
       # Save people (siebel calls them contacts)
       if donor.contacts
         donor.contacts.each do |person|
-          next if date_from.present? && DateTime.parse(person.updated_at) < date_from
+          next if date_from.present? && DateTime.parse(person.updated_at) < date_from && contact.people.present?
 
           add_or_update_person(person, donor_account, contact, date_from)
         end
@@ -298,7 +297,7 @@ class Siebel < DataServer
     # Phone Numbers
     if siebel_person.phone_numbers
       siebel_person.phone_numbers.each do |pn|
-        next if date_from.present? && DateTime.parse(pn.updated_at) < date_from
+        next if date_from.present? && DateTime.parse(pn.updated_at) < date_from && contact_person.phone_numbers.present?
 
         add_or_update_phone_number(pn, person)
 
@@ -310,7 +309,7 @@ class Siebel < DataServer
     # Email Addresses
     if siebel_person.email_addresses
       siebel_person.email_addresses.each do |email|
-        next if date_from.present? && DateTime.parse(email.updated_at) < date_from
+        next if date_from.present? && DateTime.parse(email.updated_at) < date_from && contact_person.email_addresses.present?
 
         add_or_update_email_address(email, person)
 

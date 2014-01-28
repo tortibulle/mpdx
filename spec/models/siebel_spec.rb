@@ -157,15 +157,16 @@ describe Siebel do
       siebel.import_donors(designation_profile, Date.today)
     end
 
-    it "skips a donor who hasn't been updated since the last download" do
-      designation_profile.designation_accounts << da1
-
-      stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/donors?account_address_filter=primary&contact_email_filter=all&contact_filter=all&contact_phone_filter=all&having_given_to_designations=#{da1.designation_number}&response_timeout=60000").
-        to_return(:status => 200, :body => '[{"id":"602506447","accountName":"HillsideEvangelicalFreeChurch","type":"Business","updatedAt":"2012-01-01"}]')
-
-      siebel.should_not_receive(:add_or_update_donor_account)
-      siebel.import_donors(designation_profile, Date.today)
-    end
+    # This spec is commented out because we now update the donor account regardless
+    #it "skips a donor who hasn't been updated since the last download" do
+    #  designation_profile.designation_accounts << da1
+    #
+    #  stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/donors?account_address_filter=primary&contact_email_filter=all&contact_filter=all&contact_phone_filter=all&having_given_to_designations=#{da1.designation_number}&response_timeout=60000").
+    #    to_return(:status => 200, :body => '[{"id":"602506447","accountName":"HillsideEvangelicalFreeChurch","type":"Business","updatedAt":"2012-01-01"}]')
+    #
+    #  siebel.should_not_receive(:add_or_update_donor_account)
+    #  siebel.import_donors(designation_profile, Date.today)
+    #end
   end
 
   context '#add_or_update_donor_account' do
@@ -204,11 +205,15 @@ describe Siebel do
     it "skips people who haven't been updated since the last download" do
       donor_account = create(:donor_account, organization: org, account_number: siebel_donor.id)
 
+      donor_account.should_receive(:link_to_contact_for).and_return(contact)
+      org.stub_chain(:donor_accounts, :where, :first_or_initialize).and_return(donor_account)
+      contact.stub_chain(:people, :present?).and_return(true)
+
       siebel.should_not_receive(:add_or_update_person)
 
       expect {
         siebel.send(:add_or_update_donor_account, account_list, siebel_donor, designation_profile, Time.zone.now)
-      }.not_to change { DonorAccount.count }
+      }.not_to change { Person.count }
 
       donor_account.reload.name.should == siebel_donor.account_name
     end
@@ -238,6 +243,11 @@ describe Siebel do
                     "phoneNumbers":[{"updatedAt":"' + 1.day.ago.to_s(:db) + '","id":"1-BTE-2524","type":"Work",
                           "primary":true,"phone":"510/656-7873"}]}')
       )
+
+      contact.should_receive(:add_person).and_return(person)
+
+      person.stub_chain(:phone_numbers, :present?).and_return(true)
+      person.stub_chain(:email_addresses, :present?).and_return(true)
 
       siebel.should_not_receive(:add_or_update_email_address)
       siebel.should_not_receive(:add_or_update_phone_number)
