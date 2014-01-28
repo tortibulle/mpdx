@@ -98,7 +98,11 @@ class Person::FacebookAccount < ActiveRecord::Base
   def refresh_token
     info = Koala::Facebook::OAuth.new(APP_CONFIG['facebook_key'], APP_CONFIG['facebook_secret']).exchange_access_token_info(token)
     self.token = info['access_token']
-    self.token_expires_at = Time.at(info['expires'])
+    begin
+      self.token_expires_at = Time.at(info['expires'].to_i)
+    rescue => e
+      raise e.message + ": " + info.inspect
+    end
     save
   end
 
