@@ -11,6 +11,6 @@
   <td><%= donation_exhibit.payment_method %></td>
   <td><%= donation_exhibit.motivation %></td>
   <%#<td class="appeal">Dinner</td>%>
-  <td><%= link_to('<i class="icon-edit"></i>'.html_safe, edit_donation_path(donation, contact_id: @contact.try(:id)), remote: true) %></td>
+  <td><%= link_to('<i class="fa fa-pencil-square-o"></i>'.html_safe, edit_donation_path(donation, contact_id: @contact.try(:id)), remote: true) %></td>
 </tr>
 <% end %>
