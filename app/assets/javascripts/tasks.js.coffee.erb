@@ -55,7 +55,7 @@ $ ->
             form = $('form', this)
             return false if $.trim($('#modal_task_subject', form).val()) == ''
             $.rails.handleRemote(form)
-            $('.form_wrapper', this).html('<img src="/assets/spinner.gif" />')
+            $('.form_wrapper', this).html('<%= image_tag("spinner.gif") %>')
         },
         {
           text: __('Cancel'),
@@ -79,7 +79,7 @@ $ ->
             form = $('form', this)
             return false if $.trim($('#modal_task_subject', form).val()) == ''
             $.rails.handleRemote(form)
-            $('.form_wrapper', this).html('<img src="/assets/spinner.gif" />')
+            $('.form_wrapper', this).html('<%= image_tag("spinner.gif") %>')
         },
         {
           text: __('Cancel'),
@@ -134,7 +134,7 @@ $ ->
             text: __('Save'),
             click: (e) ->
               form.submit()
-              $('.form_wrapper', this).html('<img src="/assets/spinner.gif" />')
+              $('.form_wrapper', this).html('<%= image_tag("spinner.gif") %>')
               $(this).dialog( "option", "buttons", [])
           },
           {

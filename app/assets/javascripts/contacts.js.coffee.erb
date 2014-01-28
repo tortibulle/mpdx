@@ -129,7 +129,7 @@ $ ->
 
       $(document).on 'click', '[data-behavior=add_task_to_list]', ->
         if $(this).attr('data-completed') == 'true'
-          $('#add_task_modal .form_wrapper').html('<img src="/assets/spinner.gif" />')
+          $('#add_task_modal .form_wrapper').html('<%= image_tag("spinner.gif") %>')
           ids = $.mpdx.updateSelectedContactIds()
 
           $.ajax {
