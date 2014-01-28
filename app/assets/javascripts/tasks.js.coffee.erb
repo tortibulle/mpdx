@@ -53,7 +53,9 @@ $ ->
           text: __('Save'),
           click: (e) ->
             form = $('form', this)
-            return false if $.trim($('#modal_task_subject', form).val()) == ''
+            if $.trim($('#modal_task_subject', form).val()) == ''
+              alert(__("Please enter a subject"))
+              return false
             $.rails.handleRemote(form)
             $('.form_wrapper', this).html('<%= image_tag("spinner.gif") %>')
         },
@@ -77,7 +79,9 @@ $ ->
           text: __('Save'),
           click: (e) ->
             form = $('form', this)
-            return false if $.trim($('#modal_task_subject', form).val()) == ''
+            if $.trim($('#modal_task_subject', form).val()) == ''
+              alert(__("Please enter a subject"))
+              return false
             $.rails.handleRemote(form)
             $('.form_wrapper', this).html('<%= image_tag("spinner.gif") %>')
         },
