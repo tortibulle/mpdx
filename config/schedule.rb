@@ -29,7 +29,7 @@ end
 
 every :day, at: '9pm' do
   rake 'organizations:fetch'
-  rake 'clear_stalled_downloads'
+  rake 'mpdx:clear_stalled_downloads'
   rake 'mailchimp:sync'
 end
 
