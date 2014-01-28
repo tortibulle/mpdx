@@ -1,5 +1,5 @@
 class AccountListSerializer < ActiveModel::Serializer
-  cached
+  #cached
   delegate :cache_key, to: :object
 
   embed :ids, include: true
