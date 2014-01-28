@@ -9,7 +9,13 @@ class HelpRequestMailer < ActionMailer::Base
   def email(help_request)
     @help_request = help_request
 
+    if help_request.email.include?('cru.org')
+      from = "#{help_request.name} <#{help_request.email}>"
+    else
+      from = "support@mpdx.org"
+    end
+    
     mail to: "support@mpdx.org", subject: help_request.request_type,
-         from: "#{help_request.name} <#{help_request.email}>"
+         from: from, reply_to: "#{help_request.name} <#{help_request.email}>"
   end
 end
