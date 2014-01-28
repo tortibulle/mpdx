@@ -10,7 +10,7 @@
             <td class="meta_name" nowrap="nowrap">
               <%= _(address.location.present? ? address.location : 'Mailing') %>
               <% if contact.addresses.length > 1 && address.primary_mailing_address? %>
-                <i class="icon-ok green"></i>
+                <i class="fa fa-check green"></i>
               <% end %>
             </td>
             <td class="meta_data">

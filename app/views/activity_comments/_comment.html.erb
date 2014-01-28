@@ -1,6 +1,6 @@
 <div class="comment">
   <%= link_to(_('delete'), activity_comment_path(comment, activity_id: comment.activity.id), method: :delete, remote: true, data: {selector: '.comment', confirm: _('Are you sure?')}, :class => 'corner_close') %>
-  <i class="icon-comment-alt icon-large pull-left"></i>
+  <i class="fa fa-comments-o fa-lg pull-left"></i>
   <div class="body">
     <%= link_to(comment.person, comment.person) if comment.person %>
     <%= simple_format(comment.body) %>

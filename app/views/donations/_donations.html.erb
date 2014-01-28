@@ -9,7 +9,7 @@
     </div>
     <div class="clr"></div>
     <h2><%= _('Donations for %{start_date} through %{end_date}').localize % {start_date: l(@start_date), end_date: l(@end_date)} %></h2>
-    <%= link_to('<i class="icon-plus-sign-alt"></i> '.html_safe + _('Add a donation'), new_donation_path, remote: true) %>
+    <%= link_to('<i class="fa fa-plus-square"></i> '.html_safe + _('Add a donation'), new_donation_path, remote: true) %>
     <br /><br />
   <% end %>
 <table class="tablelist donations" id="donations_table">

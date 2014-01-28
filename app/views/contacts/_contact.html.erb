@@ -9,17 +9,17 @@
         <span class="name"><%= link_to(contact_exhibit, contact_path(contact), data: {name: contact_exhibit.to_s}) %>
         <% if contact.send_newsletter.present? %>
           <% if contact_exhibit.send_newsletter_error.present? %>
-            <i class="icon-envelope icon-error-red" title="<%= _(contact.send_newsletter + ' - Error: ' + contact_exhibit.send_newsletter_error) %>"></i>
+            <i class="fa fa-envelope icon-error-red" title="<%= _(contact.send_newsletter + ' - Error: ' + contact_exhibit.send_newsletter_error) %>"></i>
           <% else %>
-            <i class="icon-envelope" title="<%= _(contact.send_newsletter) %>"></i>
+            <i class="fa fa-envelope" title="<%= _(contact.send_newsletter) %>"></i>
           <% end %>
         <% end %>
         <% if contact.status == 'Partner - Special' %>
-          <i class="icon-usd" title="<%= _('Partner - Special') %>"></i>
+          <i class="fa fa-usd" title="<%= _('Partner - Special') %>"></i>
         <% end %>
         <% if contact.status == 'Partner - Financial' %>
-          <i class="icon-<%= current_currency.downcase %>" title="<%= _('Partner - Financial') %>"></i>
-          <i class="icon-<%= current_currency.downcase %>" title="<%= _('Partner - Financial') %>"></i>
+          <i class="fa fa-<%= current_currency.downcase %>" title="<%= _('Partner - Financial') %>"></i>
+          <i class="fa fa-<%= current_currency.downcase %>" title="<%= _('Partner - Financial') %>"></i>
         <% end %>
         </span>
         <div class="people">

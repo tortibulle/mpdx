@@ -186,14 +186,14 @@ $ ->
     form.attr('action', '/tasks/' + id)
 
     field = $('input[name="task[starred]"]', form)
-    if $(this).hasClass('icon-star')
+    if $(this).hasClass('fa-star')
       field.val(false)
     else
       field.val(true)
     $('select[name="task[result]"]', form).val('')
     form.submit()
-    $(this).toggleClass('icon-star-empty')
-    $(this).toggleClass('icon-star')
+    $(this).toggleClass('fa-star-o')
+    $(this).toggleClass('fa-star')
 
   # When someone marks off a task, we need to open a modal to ask the result
   $(document).on 'click', '[data-behavior=complete_task]', ->

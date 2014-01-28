@@ -9,7 +9,7 @@
           <td class="meta_name" nowrap="nowrap">
             <%= _(phone_number.location.try(:titleize) || 'Mobile') %>
             <% if person.phone_numbers.length > 1 && phone_number.primary? %>
-              <i class="icon-ok green"></i>
+              <i class="fa fa-check green"></i>
             <% end %>
           </td>
           <td class="meta_data"><%= phone_number.to_s %></td>
@@ -52,7 +52,7 @@
         <tr>
           <td class="meta_name">
             <% if person.email_addresses.length > 1 && email.primary? %>
-              <i class="icon-ok green"></i>
+              <i class="fa fa-check green"></i>
             <% end %>
           </td>
           <td class="meta_data"><%= email %></td>
