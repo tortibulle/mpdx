@@ -6,7 +6,7 @@ class Person::FacebookAccount < ActiveRecord::Base
   include Redis::Objects
   include Async
   include Sidekiq::Worker
-  sidekiq_options queue: :facebook
+  sidekiq_options queue: :facebook, unique: true
 
 
   set :friends
@@ -93,6 +93,7 @@ class Person::FacebookAccount < ActiveRecord::Base
     else
       token.blank? || !token_expires_at || token_expires_at < Time.now
     end
+    false
   end
 
   def refresh_token

@@ -273,6 +273,7 @@ GEM
     mime (0.2.0)
     mime-types (1.25.1)
     minitest (4.7.5)
+    mock_redis (0.11.0)
     mono_logger (1.1.0)
     multi_json (1.8.4)
     multi_xml (0.5.5)
@@ -415,6 +416,9 @@ GEM
       json
       redis (>= 3.0.6)
       redis-namespace (>= 1.3.1)
+    sidekiq-unique-jobs (2.7.1)
+      mock_redis
+      sidekiq (~> 2.6)
     siebel_donations (1.0.5)
       activesupport (>= 3.0.0)
       oj (~> 2.1.0)
@@ -584,6 +588,7 @@ DEPENDENCIES
   secure_headers
   sidekiq (~> 2.17.0)
   sidekiq-failures!
+  sidekiq-unique-jobs
   siebel_donations (~> 1.0.5)
   simplecov
   sinatra

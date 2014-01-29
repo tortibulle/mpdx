@@ -63,6 +63,7 @@ gem 'ruby-rtf'
 gem 'secure_headers'
 gem 'sidekiq', '~> 2.17.0'
 gem 'sidekiq-failures', git: 'http://github.com/mhfs/sidekiq-failures.git'
+gem 'sidekiq-unique-jobs'
 gem 'siebel_donations', '~> 1.0.5'
 gem 'sinatra', :require => nil
 gem 'slim' # used for sidekiq web

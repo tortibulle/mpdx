@@ -13,7 +13,7 @@ require 'async'
 class AccountList < ActiveRecord::Base
   include Async
   include Sidekiq::Worker
-  sidekiq_options queue: :import, retry: false
+  sidekiq_options queue: :import, retry: false, unique: true
 
   store :settings, accessors: [:monthly_goal, :tester]
 
