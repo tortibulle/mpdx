@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140128153112) do
+ActiveRecord::Schema.define(version: 20140204165556) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -45,6 +45,21 @@ ActiveRecord::Schema.define(version: 20140128153112) do
   end
 
   add_index "account_lists", ["creator_id"], name: "index_account_lists_on_creator_id", using: :btree
+
+  create_table "active_admin_comments", force: true do |t|
+    t.string   "resource_id",   null: false
+    t.string   "resource_type", null: false
+    t.integer  "author_id"
+    t.string   "author_type"
+    t.text     "body"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.string   "namespace"
+  end
+
+  add_index "active_admin_comments", ["author_type", "author_id"], name: "index_active_admin_comments_on_author_type_and_author_id", using: :btree
+  add_index "active_admin_comments", ["namespace"], name: "index_active_admin_comments_on_namespace", using: :btree
+  add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_admin_notes_on_resource_type_and_resource_id", using: :btree
 
   create_table "activities", force: true do |t|
     t.integer  "account_list_id"
@@ -117,6 +132,23 @@ ActiveRecord::Schema.define(version: 20140128153112) do
   add_index "addresses", ["addressable_id"], name: "index_addresses_on_person_id", using: :btree
   add_index "addresses", ["master_address_id"], name: "index_addresses_on_master_address_id", using: :btree
   add_index "addresses", ["remote_id"], name: "index_addresses_on_remote_id", using: :btree
+
+  create_table "admin_users", force: true do |t|
+    t.string   "email",                default: "", null: false
+    t.string   "guid",                              null: false
+    t.integer  "sign_in_count",        default: 0
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string   "current_sign_in_ip"
+    t.string   "last_sign_in_ip"
+    t.string   "authentication_token"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
+  add_index "admin_users", ["authentication_token"], name: "index_admin_users_on_authentication_token", unique: true, using: :btree
+  add_index "admin_users", ["email"], name: "index_admin_users_on_email", unique: true, using: :btree
+  add_index "admin_users", ["guid"], name: "index_admin_users_on_guid", unique: true, using: :btree
 
   create_table "companies", force: true do |t|
     t.string   "name"
@@ -250,6 +282,16 @@ ActiveRecord::Schema.define(version: 20140128153112) do
   end
 
   add_index "designation_profile_accounts", ["designation_profile_id", "designation_account_id"], name: "designation_p_to_a", unique: true, using: :btree
+
+  create_table "designation_profile_users", force: true do |t|
+    t.integer  "designation_profile_id"
+    t.integer  "user_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "designation_profile_users", ["designation_profile_id", "user_id"], name: "profile_user", using: :btree
+  add_index "designation_profile_users", ["user_id"], name: "index_designation_profile_users_on_user_id", using: :btree
 
   create_table "designation_profiles", force: true do |t|
     t.string   "remote_id"
@@ -392,10 +434,10 @@ ActiveRecord::Schema.define(version: 20140128153112) do
     t.string   "state"
     t.string   "country"
     t.string   "postal_code"
-    t.boolean  "verified",        default: false, null: false
-    t.text     "smarty_response"
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
+    t.boolean  "verified",        default: false, null: false
+    t.text     "smarty_response"
   end
 
   add_index "master_addresses", ["street", "city", "state", "country", "postal_code"], name: "all_fields", using: :btree
@@ -482,6 +524,7 @@ ActiveRecord::Schema.define(version: 20140128153112) do
 
   add_index "notifications", ["contact_id", "notification_type_id", "donation_id"], name: "notification_index", using: :btree
   add_index "notifications", ["contact_id"], name: "index_notifications_on_contact_id", using: :btree
+  add_index "notifications", ["donation_id"], name: "index_notifications_on_donation_id", using: :btree
   add_index "notifications", ["notification_type_id"], name: "index_notifications_on_notification_type_id", using: :btree
 
   create_table "organizations", force: true do |t|
