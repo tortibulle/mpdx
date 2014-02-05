@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140204165556) do
+ActiveRecord::Schema.define(version: 20140205020709) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -472,6 +472,7 @@ ActiveRecord::Schema.define(version: 20140204165556) do
     t.datetime "updated_at",       null: false
   end
 
+  add_index "master_person_sources", ["master_person_id"], name: "index_master_person_sources_on_master_person_id", using: :btree
   add_index "master_person_sources", ["organization_id", "remote_id"], name: "organization_remote_id", unique: true, using: :btree
 
   create_table "messages", force: true do |t|
@@ -795,6 +796,7 @@ ActiveRecord::Schema.define(version: 20140204165556) do
     t.datetime "created_at"
   end
 
+  add_index "versions", ["item_type", "event", "related_object_type", "related_object_id", "created_at", "item_id"], name: "index_versions_on_item_type", using: :btree
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
   add_index "versions", ["item_type", "related_object_type", "related_object_id", "created_at"], name: "related_object_index", using: :btree
 
