@@ -18,6 +18,6 @@ class ImportsController < ApplicationController
   private
 
   def import_params
-    params.require(:import).permit(:source, :file, :tags, :override)
+    params.require(:import).permit(:source, :source_account_id, :file, :tags, :override)
   end
 end

@@ -12,8 +12,9 @@
           <%= _("Contacts are currently being imported") %>
         <% else %>
           <div class="importoptions formstyles" data-behavior="import_options" style="display:none">
-            <%= form_for Import.new(source: provider) do |f| %>
+            <%= form_for Import.new(source: provider, source_account_id: account.id) do |f| %>
               <%= f.hidden_field :source %>
+              <%= f.hidden_field :source_account_id %>
               <div class="importtags">
                 <%= f.text_field :tags, placeholder: _('Add tags to these contacts') %>
               </div>

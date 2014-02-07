@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140205020709) do
+ActiveRecord::Schema.define(version: 20140207151457) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -283,16 +283,6 @@ ActiveRecord::Schema.define(version: 20140205020709) do
 
   add_index "designation_profile_accounts", ["designation_profile_id", "designation_account_id"], name: "designation_p_to_a", unique: true, using: :btree
 
-  create_table "designation_profile_users", force: true do |t|
-    t.integer  "designation_profile_id"
-    t.integer  "user_id"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  add_index "designation_profile_users", ["designation_profile_id", "user_id"], name: "profile_user", using: :btree
-  add_index "designation_profile_users", ["user_id"], name: "index_designation_profile_users_on_user_id", using: :btree
-
   create_table "designation_profiles", force: true do |t|
     t.string   "remote_id"
     t.integer  "user_id",                                    null: false
@@ -406,11 +396,12 @@ ActiveRecord::Schema.define(version: 20140205020709) do
     t.string   "source"
     t.string   "file"
     t.boolean  "importing"
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
     t.text     "tags"
-    t.boolean  "override",        default: false, null: false
+    t.boolean  "override",          default: false, null: false
     t.integer  "user_id"
+    t.integer  "source_account_id"
   end
 
   add_index "imports", ["account_list_id"], name: "index_imports_on_account_list_id", using: :btree
@@ -434,10 +425,11 @@ ActiveRecord::Schema.define(version: 20140205020709) do
     t.string   "state"
     t.string   "country"
     t.string   "postal_code"
+    t.boolean  "verified",        default: false, null: false
+    t.boolean  "boolean",         default: false, null: false
+    t.text     "smarty_response"
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
-    t.boolean  "verified",        default: false, null: false
-    t.text     "smarty_response"
   end
 
   add_index "master_addresses", ["street", "city", "state", "country", "postal_code"], name: "all_fields", using: :btree
@@ -690,7 +682,7 @@ ActiveRecord::Schema.define(version: 20140205020709) do
     t.datetime "locked_at"
   end
 
-  add_index "person_organization_accounts", ["person_id", "organization_id"], name: "user_id_and_organization_id", unique: true, using: :btree
+  add_index "person_organization_accounts", ["person_id", "organization_id"], name: "index_organization_accounts_on_user_id_and_organization_id", unique: true, using: :btree
 
   create_table "person_relay_accounts", force: true do |t|
     t.integer  "person_id"

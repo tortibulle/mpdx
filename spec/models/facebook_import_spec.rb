@@ -5,7 +5,7 @@ describe Person::FacebookAccount do
     @user = create(:user)
     @account = create(:facebook_account, person_id: @user.id)
     @account_list = create(:account_list, creator: @user)
-    @import = create(:import, source: 'facebook', account_list: @account_list, user: @user)
+    @import = create(:import, source: 'facebook', source_account_id: @account.id, account_list: @account_list, user: @user)
     @facebook_import = FacebookImport.new(@import)
   end
 
