@@ -91,6 +91,25 @@ describe Person::FacebookAccount do
 
       expect(account.token_missing_or_expired?).to be_true
     end
+
+    it 'tries to refresh once if the token is expired' do
+      account = Person::FacebookAccount.new(token: 'asdf', token_expires_at: 10.days.ago)
+      account.should_receive(:refresh_token)
+
+      expect(account.token_missing_or_expired?).to be_true
+    end
+
+    it 'returns true if the token is missing' do
+      account = Person::FacebookAccount.new(token: '', token_expires_at: 10.days.from_now)
+
+      expect(account.token_missing_or_expired?).to be_true
+    end
+
+    it 'returns false if the token is not expired' do
+      account = Person::FacebookAccount.new(token: 'asdf', token_expires_at: 10.days.from_now)
+
+      expect(account.token_missing_or_expired?).to be_false
+    end
   end
 
 end

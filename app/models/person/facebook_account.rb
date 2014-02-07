@@ -85,15 +85,14 @@ class Person::FacebookAccount < ActiveRecord::Base
 
   def token_missing_or_expired?(tries = 0)
     # If we have an expired token, try once to refresh it
-    if tries == 0 && token && (!token_expires_at || token_expires_at > Time.now)
+    if tries == 0 && token && (!token_expires_at || token_expires_at < Time.now)
       begin
         refresh_token
       rescue; end
-      return token_missing_or_expired?(1)
+      token_missing_or_expired?(1)
     else
-      return token.blank? || !token_expires_at || token_expires_at < Time.now
+      token.blank? || !token_expires_at || token_expires_at < Time.now
     end
-    false
   end
 
   def refresh_token
