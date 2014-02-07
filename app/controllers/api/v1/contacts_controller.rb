@@ -70,7 +70,16 @@ class Api::V1::ContactsController < Api::V1::BaseController
   end
 
   def available_includes
-    [{:people => [:email_addresses, :phone_numbers, :facebook_account]}, :addresses, {primary_person: :facebook_account}]
+    if !params[:include]
+      includes = [{:people => [:email_addresses, :phone_numbers, :facebook_account]}, :addresses, {primary_person: :facebook_account}]
+    else
+      includes = []
+
+      includes << {people: [:email_addresses, :phone_numbers, :facebook_account]} if params[:include].include?('Person.')
+      includes << :addresses if params[:include].include?('Address.')
+      includes << {primary_person: :facebook_account} if params[:include].include?('avatar')
+    end
+    includes
   end
 
   def contact_params
