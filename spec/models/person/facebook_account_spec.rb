@@ -38,7 +38,7 @@ describe Person::FacebookAccount do
     account.to_s.should == 'John Doe'
   end
 
-  it "should generate a facebook url if there is a remote_id" do
+  it 'should generate a facebook url if there is a remote_id' do
     account = Person::FacebookAccount.new(remote_id: 1)
     account.url.should == "http://facebook.com/profile.php?id=1"
   end
@@ -48,13 +48,13 @@ describe Person::FacebookAccount do
       @account = Person::FacebookAccount.new
     end
 
-    it "should get an id from a url containing a name" do
+    it 'should get an id from a url containing a name' do
       @account.should_receive(:get_id_from_url).and_return(1)
       @account.url = 'https://www.facebook.com/john.doe'
       @account.remote_id.should == 1
     end
 
-    it "should get an id from a url containing a profile id" do
+    it 'should get an id from a url containing a profile id' do
       @account.should_receive(:get_id_from_url).and_return(1)
       @account.url = 'https://www.facebook.com/profile.php?id=1'
       @account.remote_id.should == 1
@@ -67,22 +67,30 @@ describe Person::FacebookAccount do
       @account = Person::FacebookAccount.new
     end
 
-    it "when url contains profile id" do
+    it 'when url contains profile id' do
       @account.get_id_from_url('https://www.facebook.com/profile.php?id=1').should == 1
     end
 
-    it "when url contains permalink" do
+    it 'when url contains permalink' do
       stub_request(:get, /https:\/\/graph.facebook.com\/.*/).
          with(:headers => {'Accept'=>'application/json'}).to_return(:status => 200, :body => '{"id": 1}')
       @account.get_id_from_url('https://www.facebook.com/john.doe').should == 1
     end
 
-    it "should raise an exception if the url is bad" do
+    it 'should raise an exception if the url is bad' do
       stub_request(:get, /https:\/\/graph.facebook.com\/.*/).
          with(:headers => {'Accept'=>'application/json'}).to_return(:status => 400)
       lambda {@account.get_id_from_url('https://www.facebook.com/john.doe')}.should raise_error(Errors::FacebookLink)
     end
 
+  end
+
+  context '#token_missing_or_expired?' do
+    it 'returns true if the token is expired' do
+      account = Person::FacebookAccount.new(token: 'asdf', token_expires_at: 10.days.ago)
+
+      expect(account.token_missing_or_expired?).to be_true
+    end
   end
 
 end

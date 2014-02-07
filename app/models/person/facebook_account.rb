@@ -89,9 +89,9 @@ class Person::FacebookAccount < ActiveRecord::Base
       begin
         refresh_token
       rescue; end
-      token_missing_or_expired?(1)
+      return token_missing_or_expired?(1)
     else
-      token.blank? || !token_expires_at || token_expires_at < Time.now
+      return token.blank? || !token_expires_at || token_expires_at < Time.now
     end
     false
   end
