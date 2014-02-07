@@ -21,4 +21,8 @@ class Organization < ActiveRecord::Base
     api_class.constantize.new(org_account)
   end
 
+  def requires_username_and_password?
+    api_class.constantize.requires_username_and_password?
+  end
+
 end

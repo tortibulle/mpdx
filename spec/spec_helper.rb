@@ -111,6 +111,9 @@ class FakeApi
   def initialize(*args)
   end
 
+  def self.requires_username_and_password?() true; end
+  def requires_username_and_password?() self.class.requires_username_and_password?; end
+
   def validate_username_and_password(*args)
     true
   end

@@ -113,7 +113,7 @@ Mpdx::Application.routes.draw do
 
   devise_for :users
   as :user do
-    get "/logout" => "devise/sessions#destroy"
+    get "/logout" => "sessions#destroy"
   end
 
 

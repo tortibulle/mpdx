@@ -1,6 +1,6 @@
 class Siebel < DataServer
 
-  def requires_username_and_password?() false; end
+  def self.requires_username_and_password?() false; end
 
   def import_profiles
     designation_profiles = []

@@ -1,12 +1,14 @@
 require 'csv'
 class DataServer
 
+  def self.requires_username_and_password?() true; end
+
   def initialize(org_account)
     @org_account = org_account
     @org = org_account.organization
   end
 
-  def requires_username_and_password?() true; end
+  def requires_username_and_password?() self.class.requires_username_and_password?; end
 
   def import_all(date_from)
     Rails.logger.debug 'Importing Profiles'

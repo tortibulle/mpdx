@@ -5,11 +5,20 @@ class Person::OrganizationAccountsController < ApplicationController
 
   def new
     @organization = Organization.find(params[:id])
-    @organization_account = current_user.organization_accounts.new(organization: @organization)
+    if @organization.requires_username_and_password?
+      @organization_account = current_user.organization_accounts.new(organization: @organization)
 
-    respond_to do |format|
-      format.js
+      respond_to do |format|
+        format.js
+      end
+    else
+      @organization_account = current_user.organization_accounts.create!(organization_id: @organization.id)
+
+      respond_to do |format|
+        format.js { render action: 'create' }
+      end
     end
+
   end
 
   def create
