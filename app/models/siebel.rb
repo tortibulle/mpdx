@@ -1,3 +1,4 @@
+require_dependency 'data_server'
 class Siebel < DataServer
 
   def self.requires_username_and_password?() false; end
