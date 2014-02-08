@@ -7,7 +7,9 @@ describe NotificationType::StoppedGiving do
 
   describe '.check' do
     context 'direct deposit donor' do
-      before { contact.update_column(:direct_deposit, true) }
+      before do
+        contact.update_attributes(direct_deposit: true, pledge_received: true)
+      end
 
       it 'adds a notification if late' do
         create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 60.days.ago)
@@ -38,7 +40,9 @@ describe NotificationType::StoppedGiving do
     end
 
     context 'non-direct deposit donor' do
-      before { contact.update_column(:pledge_frequency, 1) }
+      before do
+        contact.update_attributes(pledge_frequency: 1, pledge_received: true)
+      end
 
       it 'adds a notification if late' do
         create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 65.days.ago)
