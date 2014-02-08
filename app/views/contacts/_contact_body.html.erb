@@ -155,7 +155,7 @@
           <%= form_for contact, remote: true do |f| %>
             <%= f.submit _('Save Notes'), disabled: true %>
             <span class="saved_at">
-              <%= contact_exhibit.notes_saved_at %>
+              <%= l(contact_exhibit.notes_saved_at.to_datetime, format: :medium) %>
             </span>
             <br />
             <%= f.text_area :notes, rows: 10, class: 'contact_notes' %>
