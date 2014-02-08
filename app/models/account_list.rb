@@ -249,7 +249,10 @@ class AccountList < ActiveRecord::Base
       other.messages.update_all(account_list_id: id)
 
       other.users.each do |user|
-        users << user unless users.include?(user)
+        unless users.include?(user)
+          users << user
+          user.update_attributes(preferences: nil)
+        end
       end
       other.designation_accounts.each do |da|
         designation_accounts << da unless designation_accounts.include?(da)
