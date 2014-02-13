@@ -1,6 +1,7 @@
 class Api::V1::BaseController < ApplicationController
   skip_before_filter :redirect_to_mobile
   skip_before_filter :verify_authenticity_token
+  skip_before_filter :redirect_to_mobile
   before_filter :cors_preflight_check
   after_filter :cors_set_access_control_headers
 
@@ -62,7 +63,7 @@ class Api::V1::BaseController < ApplicationController
 
     def current_account_list
       account_list = current_user.account_lists.find(params[:account_list_id]) if params[:account_list_id].present?
-      account_list ||= super
+      account_list ||= default_account_list
       account_list
     end
 
