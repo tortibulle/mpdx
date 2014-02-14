@@ -96,7 +96,7 @@ class ApplicationController < ActionController::Base
 
   def default_account_list
     unless @default_account_list
-      @default_account_list = current_user.account_lists.find(current_user.default_account_list) if current_user.default_account_list.present?
+      @default_account_list = current_user.account_lists.find_by(id: current_user.default_account_list) if current_user.default_account_list.present?
       @default_account_list ||= current_user.account_lists.first
     end
 
