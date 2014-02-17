@@ -3,15 +3,15 @@ class NotificationType::StoppedGiving < NotificationType
   # If the donor uses direct deposit, notify if it's been more than 31 + 14 days
   # (the extra 2 weeks is to allow for a delay in the donation system)
   # If a donor gives via check, notify when their gift is 30 days past due
-  def check(designation_account, account_list)
+  def check(account_list)
     notifications = []
-    designation_account.contacts.where(account_list_id: account_list.id).financial_partners.where(['pledge_start_date is NULL OR pledge_start_date < ?', 30.days.ago]).each do |contact|
+    account_list.contacts.where(account_list_id: account_list.id).financial_partners.where(['pledge_start_date is NULL OR pledge_start_date < ?', 30.days.ago]).each do |contact|
       next unless contact.pledge_received?
 
       date = contact.direct_deposit? ? 60.days.ago : ((contact.pledge_frequency.to_i > 0 ? contact.pledge_frequency.to_i : 1) + 1).months.ago
       prior_notification = Notification.active.where(contact_id: contact.id, notification_type_id: id).first
 
-      if contact.donations.for(designation_account).since(date).first
+      if contact.donations.since(date).first
         # Clear a prior notification if there was one
         if prior_notification
           prior_notification.update_attributes(cleared: true)
@@ -21,7 +21,7 @@ class NotificationType::StoppedGiving < NotificationType
       else
         unless prior_notification
           # If they've never given, they haven't missed a gift
-          if contact.donations.for(designation_account).first
+          if contact.donations.first
             notification = contact.notifications.create!(notification_type_id: id, event_date: Date.today)
             notifications << notification
           end

@@ -10,13 +10,13 @@ describe NotificationType::SpecialGift do
 
     it 'adds a notification if a gift comes from a non financial partner' do
       donation # create donation object from let above
-      notifications = special_gift.check(da, contact.account_list)
+      notifications = special_gift.check(contact.account_list)
       notifications.length.should == 1
     end
 
     it "doesn't add a notification if first gift came more than 2 weeks ago" do
       create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 37.days.ago)
-      notifications = special_gift.check(da, contact.account_list)
+      notifications = special_gift.check(contact.account_list)
       notifications.length.should == 0
     end
 
@@ -24,7 +24,7 @@ describe NotificationType::SpecialGift do
       donation # create donation object from let above
       account_list2 = create(:account_list)
       account_list2.account_list_entries.create!(designation_account: da)
-      notifications = special_gift.check(da, account_list2)
+      notifications = special_gift.check(account_list2)
       notifications.length.should == 0
     end
 

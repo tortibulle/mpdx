@@ -13,7 +13,7 @@ describe NotificationType do
       NotificationType::SpecialGift.should_receive(:first).and_return(special_gift)
       special_gift.should_receive(:check).and_return
 
-      NotificationType.check_all(designation_account, account_list)
+      NotificationType.check_all(account_list)
     end
   end
 

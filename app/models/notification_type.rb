@@ -9,20 +9,20 @@ class NotificationType < ActiveRecord::Base
     @@types ||= connection.select_values("select distinct(type) from #{table_name}")
   end
 
-  def self.check_all(designation_account, account_list)
+  def self.check_all(account_list)
     contacts = {}
     types.each do |type|
       type_instance = type.constantize.first
       actions = account_list.notification_preferences.find_by_notification_type_id(type_instance.id).try(:actions)
       if (Array.wrap(actions) & NotificationPreference.default_actions).present?
-        contacts[type] = type_instance.check(designation_account, account_list)
+        contacts[type] = type_instance.check(account_list)
       end
     end
     contacts
   end
 
   # Check to see if this designation_account has donations that should trigger a notification
-  def check(designation_account)
+  def check(account_list)
     raise 'This method needs to be implemented in a subclass'
   end
 

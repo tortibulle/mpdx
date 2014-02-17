@@ -1,14 +1,14 @@
 class NotificationType::StartedGiving < NotificationType
 
-  def check(designation_account, account_list)
+  def check(account_list)
     notifications = []
-    designation_account.contacts.where(account_list_id: account_list.id).financial_partners.each do |contact|
+    account_list.contacts.where(account_list_id: account_list.id).financial_partners.each do |contact|
       prior_notification = Notification.active.where(contact_id: contact.id, notification_type_id: id).first
       unless prior_notification
         # If they just gave their first gift, note it as such
         if !contact.pledge_received? &&
-           (donation = contact.donations.for(designation_account).where("donation_date > ?", 2.weeks.ago).last) &&
-           contact.donations.for(designation_account).where("donation_date < ?", 2.weeks.ago).count == 0
+           (donation = contact.donations.where("donation_date > ?", 2.weeks.ago).last) &&
+           contact.donations.where("donation_date < ?", 2.weeks.ago).count == 0
 
           # update pledge amount/received
           contact.pledge_amount = donation.amount if contact.pledge_amount.blank?

@@ -11,7 +11,7 @@ describe NotificationType::StartedGiving do
 
     it 'adds a notification if first gift came within past 2 weeks' do
       donation # create donation object from let above
-      notifications = started_giving.check(da, contact.account_list)
+      notifications = started_giving.check(contact.account_list)
       notifications.length.should == 1
     end
 
@@ -19,13 +19,13 @@ describe NotificationType::StartedGiving do
       2.times do |i|
         create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: (i * 30).days.ago)
       end
-      notifications = started_giving.check(da, contact.account_list)
+      notifications = started_giving.check(contact.account_list)
       notifications.length.should == 0
     end
 
     it "doesn't add a notification if first gift came more than 2 weeks ago" do
       create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 37.days.ago)
-      notifications = started_giving.check(da, contact.account_list)
+      notifications = started_giving.check(contact.account_list)
       notifications.length.should == 0
     end
 
@@ -33,7 +33,7 @@ describe NotificationType::StartedGiving do
       donation # create donation object from let above
       account_list2 = create(:account_list)
       account_list2.account_list_entries.create!(designation_account: da)
-      notifications = started_giving.check(da, account_list2)
+      notifications = started_giving.check(account_list2)
       notifications.length.should == 0
     end
 
