@@ -1,0 +1,12 @@
+<h2><%= _('Referrals by this contact') %></h2>
+<% if @contact.contact_referrals_by_me.empty? %>
+  <%= _('There are no referrals by this contact, ') +
+      link_to(_('Add some now'), add_referrals_contact_path(@contact), remote: true, :class => "add_referrals") + "." %>
+<% else %>
+  <ul>
+    <% @contact.contact_referrals_by_me.each do |r| %>
+      <li><%= link_to(r.referred_to, r.referred_to, remote: true) %> on <%= l r.created_at.to_date %></li>
+    <% end %>
+  </ul>
+  <%= link_to(_('Add Referrals'), add_referrals_contact_path(@contact), remote: true, :class => "add_referrals") %>
+<% end %>

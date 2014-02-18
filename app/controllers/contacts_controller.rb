@@ -1,6 +1,6 @@
 class ContactsController < ApplicationController
   respond_to :html, :js
-  before_filter :get_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals, :details]
+  before_filter :get_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals, :details, :referrals]
   before_filter :setup_view_options, only: [:index]
   before_filter :setup_filters, only: [:index, :show]
   before_filter :clear_annoying_redirect_locations
@@ -51,6 +51,10 @@ class ContactsController < ApplicationController
   end
 
   def details
+    respond_with(@contact)
+  end
+
+  def referrals
     respond_with(@contact)
   end
 

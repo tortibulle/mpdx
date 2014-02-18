@@ -412,6 +412,8 @@ $.mpdx.loadTabData = (hash) ->
       $.mpdx.loadContactTasks()
     when '#history-tab'
       $.mpdx.loadContactHistory()
+    when '#referrals-tab', ''
+      $.mpdx.loadReferrals()
     when '#social-tab'
       $.mpdx.loadSocialStream()
 
@@ -443,6 +445,13 @@ $.mpdx.loadContactHistory = ->
     $.ajax {
       url: '/tasks/history',
       data: {filters: {date_range: 'all', contact_ids: $('#contentbody').attr('data-contact-id')}},
+      dataType: 'script'
+    }
+
+$.mpdx.loadReferrals = ->
+  if $('#referrals').html() == ''
+    $.ajax {
+      url: '/contacts/' + $('#contentbody').attr('data-contact-id') + '/referrals',
       dataType: 'script'
     }
 
