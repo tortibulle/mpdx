@@ -25,6 +25,13 @@ describe AccountList do
     end
   end
 
+  context '#send_account_notifications' do
+    it 'checks all notification types' do
+      NotificationType.should_receive(:check_all)
+      AccountList.new.send(:send_account_notifications)
+    end
+  end
+
   context '#valid_mail_chimp_account' do
     let(:account_list) { build(:account_list) }
 
