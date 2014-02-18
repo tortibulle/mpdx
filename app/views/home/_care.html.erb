@@ -36,7 +36,7 @@
         <% no_call.collect {|c| exhibit(c, self)}.sort_by(&:to_s).each do |contact| %>
           <tr>
             <td>
-              <%= link_to(contact, contact) %>
+              <%= link_to(contact) %>
               &nbsp;&nbsp;
             </td>
             <td><%= link_to(_('Add Task'), new_task_path(contact_id: contact.id, activity_type: 'Call'), class: "add_task", remote: true) %></td>
@@ -53,7 +53,7 @@
         <% no_thank.collect {|c| exhibit(c, self)}.sort_by(&:to_s).each do |contact| %>
           <tr>
             <td nowrap="nowrap">
-              <%= link_to(contact, contact) %>
+              <%= link_to(contact) %>
               &nbsp;&nbsp;
             </td>
             <td>

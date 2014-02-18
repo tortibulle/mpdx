@@ -1,7 +1,7 @@
 <div>
-  <div style="float:left"><%= link_to(_('<< Previous Week'), progress_home_path(start_date: @start_date - 1.week), remote: true) %></div>
+  <div style="float:left"><%= link_to(_('<< Previous Week'), progress_home_path(start_date: @start_date - 1.week), remote: true, class: 'no-new-tab') %></div>
   <% unless @end_date >= Date.today %>
-    <div style="float:right"><%= link_to(_('Next Week >>'), progress_home_path(start_date: @start_date + 1.week), remote: true) %></div>
+    <div style="float:right"><%= link_to(_('Next Week >>'), progress_home_path(start_date: @start_date + 1.week), remote: true, class: 'no-new-tab') %></div>
   <% end %>
 </div>
 <div class="clr"></div>
