@@ -32,6 +32,10 @@ class DonationsController < ApplicationController
   end
 
   def new
+    if !request.xhr?
+      redirect_to donations_path and return
+    end
+
     @donation = current_account_list.donations.new(designation_account_id: current_account_list.designation_accounts.first.try(:id))
   end
 
