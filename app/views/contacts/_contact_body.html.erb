@@ -140,16 +140,8 @@
           <div id="history"></div>
         </div>
         <div id="referrals-tab">
-          <h2><%= _('Referrals by this contact') %></h2>
-          <ul>
-            <% contact.contact_referrals_by_me.each do |r| %>
-              <li><%= link_to(r.referred_to, r.referred_to, remote: true) %> on <%= l r.created_at.to_date %></li>
-            <% end %>
-          </ul>
-          <% if contact.contact_referrals_by_me.empty? %>
-            <%= _('There are no referrals by this contact, ') +
-                link_to(_('Add some now'), add_referrals_contact_path(contact), remote: true, :class => "add_referrals") + "." %>
-          <% end %>
+          <%= spinner(extra: 'referrals', visible: true) %>
+          <div id="referrals"></div>
         </div>
         <div id="notes-tab">
           <%= form_for contact, remote: true do |f| %>

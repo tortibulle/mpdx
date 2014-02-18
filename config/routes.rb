@@ -72,6 +72,7 @@ Mpdx::Application.routes.draw do
       get :add_referrals
       post :save_referrals
       get :details
+      get :referrals
     end
     resources :people do
       collection do
