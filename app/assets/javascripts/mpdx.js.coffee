@@ -72,6 +72,10 @@ $ ->
   $(document).ajaxComplete ->
     $('#page_spinner').dialog('close') if $('#page_spinner').hasClass('ui-dialog-content')
 
+  $(document).on 'click', 'a.no-new-tab', (event) ->
+    event.target.click()
+    false
+
 window.addFields = (link, association, content) ->
   new_id = new Date().getTime()
   regexp = new RegExp("new_" + association, "g")
