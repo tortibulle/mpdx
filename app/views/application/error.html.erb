@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+    <title>
+      MPDX - Error
+    </title>
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
+    <%= stylesheet_link_tag "application", :media => "all" %>
+    <%= csrf_meta_tags %>
+    <%= render 'google_analytics' if Rails.env == "production" %>
+  </head>
+  <body>
+    <header id="global">
+    <hgroup id="user">
+    <div class="outer">
+      <div id="brand"><%= link_to("", "/", :class=> "logo") %></div>
+      <div class="links">
+      <% if current_user.present? %>
+        <div class="section lists" data-behavior="account_selector" style="<%= 'display:none' unless current_user.account_lists.length > 1 %>">
+          <a data-behavior="current_account"><span class='cur'><%= current_account_list.name %></span><%= image_tag("list_select.png") %></a>
+          <div style="display:none" class="switcher">
+            <ul>
+              <% (current_user.account_lists - [current_account_list]).each do |al| %>
+                <li><%= link_to(al.name, "/home/change_account_list?id=#{al.id}") %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+
+        <div class="section"><%= link_to(_('Settings'), "/preferences") %></div>
+        <div class="section"><%= link_to(_('Log out'), '/logout') %></div>
+      <% else %>
+        <div class="section"><%= link_to(_('Login'), '/login') %></div>
+      <% end %>
+      </div>
+    </div>
+    </hgroup>
+    <% if current_user.present? %>
+      <hgroup id="menu">
+      <div id="mainmenu">
+        <div class="outer">
+          <div class="item"><%= link_to(_('Dashboard'), "/") %></div>
+          <div class="item"><%= link_to(_('Contacts'), "/contacts") %></div>
+          <div class="item"><%= link_to(_('Tasks'), "/tasks") %></div>
+          <div class="item"><%= link_to(_('Donations'), "/donations") %></div>
+          <div class="item last"><%= link_to(_('Help'), new_help_request_path, target: '_blank') %></div>
+        </div>
+      </div>
+      </hgroup>
+    <% end %>
+    </header>
+
+    <div id="body" class="outer">
+      <div id="content">
+        <h1 class="error-status-huge" style="font-size: 7em; margin-top: 2rem; margin-bottom: 0;"><%= _("Whoops.").localize %></h1>
+        <h1><%= _("We couldn't find what you were looking for. Sorry!").localize %></h1>
+        <h2><%== _("Try going back, or if you keep getting this message, %{link}.").localize % 
+                 {link: link_to(_('ask for help'), new_help_request_path)} %>
+        </h2>
+      </div>
+      <div id="footer">
+        <% if session[:fullsite] == true %>
+        <%= link_to(_('Visit Mobile Version'), '/mobile/') %>
+        <% end %>
+      </div>
+    </div>
+
+    <div id="feedback" style="width: auto; height: auto;">
+      <h2><%= _('Need Help?') %></h2>
+      <p><%== _("Check out %{help_site} for training videos and FAQs. If you can't find the answer you need there or need to report a bug, %{link}").localize %
+               {link: link_to(_('click here to let us know'), new_help_request_path),
+                help_site: link_to('help.mpdx.org', 'http://help.mpdx.org', target: '_blank')} %>
+      </p>
+    </div>
+  </body>
+
+</html>

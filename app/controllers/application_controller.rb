@@ -4,9 +4,9 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery
   before_filter :redirect_to_mobile
-  before_filter :ensure_login, :ensure_setup_finished
+  before_filter :ensure_login, :except => [:error_404, :error_500]
+  before_filter :ensure_setup_finished, :except => [:error_404, :error_500]
   around_filter :do_with_current_user, :set_user_time_zone, :set_locale
-
 
   private
 
