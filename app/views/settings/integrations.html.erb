@@ -56,10 +56,10 @@
           <div class="network_button">
             <% if current_account_list.valid_prayer_letters_account %>
               <%#= link_to(_('Settings'), prayer_letters_accounts_path, :class => "btn") %>
-              <%= link_to(_('Sync Now'), sync_prayer_letters_accounts_path, :class => "btn", data: {confirm: _("This will replace your prayerletters.com list with what you have in MPDX. Are you sure that's what you'd like to do?")}) %>
+              <%= link_to(_('Sync Now'), sync_prayer_letters_accounts_path, :class => 'btn', data: {method: :get, confirm: _("This will replace your prayerletters.com list with what you have in MPDX. Are you sure that's what you'd like to do?")}) %>
               <%= link_to(_('Delete'), prayer_letters_account_path(current_account_list.prayer_letters_account), method: :delete, class: "btn", data: {confirm: _('Are you sure?')}) %>
             <% else %>
-              <%= link_to(_('Enable'), '/auth/prayer_letters', :class => "btn") %>
+              <%= link_to(_('Enable'), '/auth/prayer_letters', :class => 'btn', data: {method: :get, confirm: _("This will replace your prayerletters.com list with what you have in MPDX. Are you sure that's what you'd like to do?")}) %>
             <% end %>
           </div>
         </td>

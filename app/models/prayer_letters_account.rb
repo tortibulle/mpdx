@@ -9,6 +9,8 @@ class PrayerLettersAccount < ActiveRecord::Base
 
   belongs_to :account_list
 
+  after_create :queue_subscribe_contacts
+
   validates :token, :secret, :account_list_id, presence: true
 
   def queue_subscribe_contacts

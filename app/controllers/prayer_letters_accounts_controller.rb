@@ -8,6 +8,7 @@ class PrayerLettersAccountsController < ApplicationController
                                           secret: auth_hash.credentials.secret
                                         }
     prayer_letters_account.save
+    flash[:notice] = _("MPDX is now uploading your newsletter recipients to PrayerLetters.com.")
 
     redirect_to integrations_settings_path
   end
