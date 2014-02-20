@@ -1,6 +1,6 @@
 class NotificationType::LargerGift < NotificationType
 
-  def check(designation_account, account_list)
+  def check(account_list)
     []
   end
 end
