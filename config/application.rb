@@ -71,6 +71,8 @@ module Mpdx
     config.assets.precompile += ['jquery-ui.css']
 
     config.active_record.disable_implicit_join_references = true
+
+    config.exceptions_app = self.routes
   end
 end
 

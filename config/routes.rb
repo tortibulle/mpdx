@@ -132,6 +132,9 @@ Mpdx::Application.routes.draw do
     mount Sidekiq::Web => '/sidekiq'
   end
 
+  get '/404', :to => "errors#error_404"
+  get '/500', :to => "errors#error_500"
+
   root :to => 'home#index'
 
   # See how all your routes lay out with "rake routes"
