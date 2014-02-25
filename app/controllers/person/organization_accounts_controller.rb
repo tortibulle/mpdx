@@ -15,7 +15,7 @@ class Person::OrganizationAccountsController < ApplicationController
       @organization_account = current_user.organization_accounts.create!(organization_id: @organization.id)
 
       respond_to do |format|
-        format.js { render action: 'create' }
+        format.js { render :create }
       end
     end
 
@@ -29,8 +29,19 @@ class Person::OrganizationAccountsController < ApplicationController
       if @organization && @organization_account.save
         format.js
       else
-        format.js { render action: "new" }
+        format.js { render :new }
       end
+    end
+  end
+
+  def edit
+    @organization_account = current_user.organization_accounts.find(params[:id])
+  end
+
+  def update
+    @organization_account = current_user.organization_accounts.find(params[:id])
+    if !@organization_account.update_attributes(person_organization_account_params)
+      render :edit
     end
   end
 

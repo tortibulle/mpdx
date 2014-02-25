@@ -1,5 +1,5 @@
 $ ->
-  if $('#accounts_index')?
+  if $('#accounts_index')[0]?
 
     $(document).on 'click', '[data-behavior="show_import"]', ->
       $(this).closest('div').hide()
@@ -16,6 +16,20 @@ $ ->
         resizable: false,
         modal:'true'
       false
+    $(document).on 'click', '[data-behavior="edit_organization_account"]', (event) ->
+      $.ajax {
+        url: event.target.href,
+        dataType: 'script'
+      }
+      $('#org_connection_box').dialog
+        title: '<%= _('Loading') %>',
+        content: '',
+        modal:'true'
+      false
     $(document).on 'click', '#connect_to_org', ->
       $('[data-behavior="new_org_account"]').dialog('destroy')
       false
+
+    if location.hash.indexOf('account') != -1 && $('a.edit', location.hash)
+      $('a', location.hash).click()
+

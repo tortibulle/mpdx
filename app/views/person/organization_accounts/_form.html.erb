@@ -1,6 +1,13 @@
 <% # encoding: utf-8 %>
 <%= form_for(organization_account, remote: true) do |f| %>
   <%= f.hidden_field :organization_id %>
+  <% if !organization_account.valid_credentials? && !organization_account.new_record? %>
+    <div id="error_explanation">
+      <ul>
+        <li><%= _('Invalid Username/Password Combination. Please update your information.') %></li>
+      </ul>
+    </div>
+  <% end %>
   <% if organization_account.errors.any? %>
     <div id="error_explanation">
       <ul>
@@ -18,5 +25,9 @@
     <div class="ls"><%= f.label :password %></div>
     <div class="rs"><%= f.password_field :password %></div>
   </div>
+  <%= link_to(_('Click here to delete this account connection'), person_organization_account_path(organization_account), 
+                    method: :delete, :class => "red delete",
+                    data: { confirm: _('Are you sure you want to remove this connection?') }) if !organization_account.new_record? %>
+  <%= f.submit style: "position: absolute; left: -9999px; width: 1px; height: 1px;" %>
 
 <% end %>

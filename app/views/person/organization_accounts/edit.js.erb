@@ -1,0 +1,27 @@
+(function() {
+  var dialog_elm = $('#org_connection_box');
+  var org_connection_box_buttons = {
+    '<%= _('Save') %>': function(e) {
+      $(this).dialog( "option", "title", '<%= _('Saving...') %>');
+      $(this).dialog( "option", "buttons", []);
+      $('#error_explanation').remove();
+      $('form', this).submit();
+    },
+    '<%= _('Cancel') %>': function() {
+      $(this).dialog("close");
+      $(this).html('');
+    }
+  };
+  
+  dialog_elm.html('<%= j(render 'form', organization_account: @organization_account) %>');
+  dialog_elm.dialog('option', {
+    title: '<%= @organization_account %>',
+    buttons: org_connection_box_buttons
+  });
+  $('form',dialog_elm).on('ajax:error', function() {
+    dialog_elm.dialog('option', {
+      title: '<%= _('Error Saving!') %>',
+      buttons: org_connection_box_buttons
+    });
+  });
+}).call(this);

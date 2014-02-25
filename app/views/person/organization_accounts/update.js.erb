@@ -1,0 +1,2 @@
+$('#org_connection_box').dialog('close');
+$('#organization-account-<%= @organization_account.id %>').toggleClass('error_element', <%= !@organization_account.try(:valid_credentials) %>);
