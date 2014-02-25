@@ -1,9 +1,15 @@
 <div class="network_connections">
   <% current_user.send("#{provider}_accounts".to_sym).each do |account| %>
-    <div class="account_single" data-behavior="account">
+    <div class="account_single <%= 'error_element' if account.try(:valid_credentials) == false %>" 
+         data-behavior="account" id="<%= provider%>-account-<%= account.id %>">
       <div class="actions">
-        <%= link_to(_('delete'), account_path(account, provider: provider), method: :delete, :class => "inlineaction delete",
-                    data: { confirm: _('Are you sure you want to remove this connection?') }) %>
+        <% if provider == 'organization' %>
+          <%= link_to(_('edit'), edit_person_organization_account_path(account, format: :js), class: "edit ico ico_edit no-new-tab",
+                      data: {behavior: "edit_#{provider}_account"}) %>
+        <% else %>
+          <%= link_to(_('delete'), account_path(account, provider: provider), method: :delete, :class => "inlineaction delete",
+                      data: { confirm: _('Are you sure you want to remove this connection?') }) %>
+        <% end %>
       </div>
       <span class="account_name"><%= account %></span>
 
