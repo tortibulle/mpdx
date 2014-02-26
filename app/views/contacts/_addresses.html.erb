@@ -1,0 +1,16 @@
+<% exhibit(contact, self).tap do |contact_exhibit| %>
+  <% if contact_exhibit.addresses.present? %>
+  <ul>
+    <% contact_exhibit.addresses.each do |address| %>
+      <% exhibit(address, self).tap do |address_exhibit| %>
+        <li>
+          <%= address_exhibit.to_html %>
+          <br />
+          <%= link_to(_('Map It'), "http://maps.google.com?q=#{address_exhibit.to_google}", target: '_blank', class: 'mapit') %>
+        </li>
+      <% end %>
+    <% end %>
+  </ul>
+  <div class="clr"></div>
+  <% end %>
+<% end %>

@@ -224,11 +224,19 @@ $ ->
       $(document).on 'click', '.js-merge_people', ->
         $(this).hide()
         $('.js-merge_related').show()
+        $('#contact-people').addClass('merging-people')
         false
 
       $(document).on 'click', '.js-cancel_merge_people', ->
         $('.js-merge_related').hide()
         $('.js-merge_people').show()
+        $('#contact-people').removeClass('merging-people')
+        $('.merge-person-checked').removeClass('merge-person-checked')
+        false
+
+      $(document).on 'click', '.small-person', ->
+        if $('#contact-people').hasClass('merging-people')
+          $(this).toggleClass('merge-person-checked')
         false
 
       $(document).on 'click', '.js-people input[type=submit]', ->
@@ -237,9 +245,10 @@ $ ->
 
         $('#person_merge_winner li').hide()
 
-        $('.js-merge_checkbox:checked').each ->
-          person_ids.push($(this).val())
-          $('#merge_winner_' + $(this).val()).show()
+        $('.merge-person-checked').each ->
+          id = $(this).attr('id').substr(7)
+          person_ids.push(id)
+          $('#merge_winner_' + id + '_li').show()
 
         unless person_ids.length > 1
           alert(__("You have to pick at least 2 people to merge"))
@@ -366,6 +375,8 @@ $ ->
         error: ->
           alert(__('There was an error hiding your contacts'))
       }
+
+    $.mpdx.loadDonations()
 
     <%#$(document).on 'focus', '[data-behavior*=social-field]', ->%>
       <%#wrapper = $(this).closest('[data-behavior*=field-wrapper]')%>

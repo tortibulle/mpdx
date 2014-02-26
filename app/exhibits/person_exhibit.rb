@@ -34,10 +34,12 @@ class PersonExhibit < DisplayCase::Exhibit
       url = ActionController::Base.helpers.image_url('avatar.png')
     end
     
-    url = 'https://mpdx.org' + url if url.start_with?('/')
+    if url.start_with?('/')
+      root_url = (@context) ? @context.root_url : 'https://mpdx.org'
+      url = URI.join(root_url, url).to_s
+    end
     return url
   end
-
 
   def twitter_handles
     twitter_accounts.collect {|t| @context.link_to("@#{t.screen_name}", "http://twitter.com/#{t.screen_name}", target: '_blank') }.join(', ').html_safe
@@ -49,6 +51,10 @@ class PersonExhibit < DisplayCase::Exhibit
       name = "<del>#{name}</del>".html_safe
     end
     name
+  end
+
+  def has_social?
+    facebook_account || twitter_account || linkedin_account
   end
 
 end

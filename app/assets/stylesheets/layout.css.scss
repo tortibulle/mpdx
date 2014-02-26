@@ -370,7 +370,7 @@ div.right {
 #content {width: auto /* $bodywidth */; min-width: $maxwidth;}
 #contentbody { border: 1px solid $borders; border-top: none; min-height: 430px; background: #fff; padding-top: 1px; min-height: 165px;}
 #contentbody.withleft {width: $maxwidth - $leftmenuwidth - 2px; margin-left: $leftmenuwidth;}
-#contentbody.withright {width: 720px; float: left;min-height: 430px; }
+#contentbody.withright {width: 752px; float: left;min-height: 430px; }
 .seemore {border-top: 4px solid #BBBDBF; padding-top: 6px; padding-left: 6px;}
 
 h2.section {
@@ -397,9 +397,52 @@ h2.section {
 .set.phone {margin-bottom:2px;}
 .set.email {margin-bottom:3px;}
 
-.smallperson {
-  margin-bottom: 10px;
-  padding-left: 8px;
+.small-person {
+  background-color: $gray_light;
+  border: 1px solid $gray_mid;
+  display: inline-block;
+  line-height: 0;
+  margin: 0 1% 1em;
+  width: 47%;
+  .person_details {
+    display: inline-block;
+    line-height: initial;
+    padding: 2px .5em 2px 2px;
+    vertical-align: top;
+  }
+  .person_avatar {
+    height: 80px;
+    width: 80px;
+    padding: 0;
+    margin: 0;
+  }
+  .name {
+    font-size: 1.5em;
+    line-height: 1em;
+  }
+
+  .social {
+    float: right;
+    padding: 6px 6px 6px 0;
+    position: relative;
+    width: 20px;
+    & > * {
+      display: inline-block;
+      height: 20px;
+      width: 20px;
+      text-indent: -9999px;
+      background: center center no-repeat;
+    }
+    .facebook { background-image: image-url('soc_facebook.gif'); }
+    .twitter { background-image: image-url('soc_twitter.gif'); }
+    .linkedin { background-image: image-url('soc_linkedin.gif'); }
+  }
+  &.merge-person-checked {
+    box-shadow: 0 0 5px $blue;
+  }
+}
+.merging-people .small-person:not(.merge-person-checked) {
+  opacity: .5;
 }
 
 div.name {font-size: 14px; margin-bottom: 4px;}
@@ -727,18 +770,74 @@ tbody.tasks {
 /* ************************************************************** */
 
 .profiletop {
-  h1 {font-weight: normal; margin-bottom: .25em;}
+  h1 {
+    font-size: 2.5em;
+    font-family: FreightSansProMedium;
+    margin-bottom: .25em;
+  }
+  .contact_location {
+    font-size: .6em;
+    font-family: FreightSansProLight;
+    margin-left: 10px;
+    white-space: nowrap;
+  }
+  .contact_status { font-size: 1.3em; }
   .avatar {
     float: left;
     border: 1px solid $gray_mid;
     line-height: 0em;
-    padding: 5px;
-    border-radius: 5px;
+    padding: 3px;
+    border-radius: 2px;
     margin-right: 12px;
+    margin-bottom: 10px;
     img {width: 180px;}
     .avatar_wrapper {max-height: 180px; overflow: hidden}
   }
   .quickprofile {margin-bottom: 12px;}
+  .edit_btn_container {
+    height: 0px;
+    text-align: right;
+
+    .btn {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      font-size: 1.5em;
+      font-weight: normal;
+      position: relative;
+      top: -35px;
+    }
+  }
+
+  border-bottom: 1px solid $gray_mid;
+}
+
+#contact-people {
+  border: 1px solid $gray_mid;
+  border-top-color: transparent;
+  padding: 0;
+  &>* {
+    margin-left: 1%;
+  }
+  h2 {
+    margin: .5em 1%;
+  } 
+}
+
+.thirds_row { clear: both; margin-right: -1.25%; }
+.one_third_box {
+  border: 1px solid $gray_mid;
+  display: inline-block;
+  float: left;
+  height: 200px;
+  width: 30%;
+  margin-right: 1%;
+  margin-bottom: .5em;
+  overflow: scroll;
+  padding: 0 1% .5em 1%;
+}
+
+.addresses ul {
+  list-style: none;
 }
 
 table.meta {
@@ -857,10 +956,12 @@ table.meta {
 
 #contact_drawer {
   float: right;
-  width: 237px;
+  width: 204px;
   border: 1px solid $gray_mid;
-  border-width: 0 1px 1px 0;
+  border-width: 0 1px 1px;
   overflow: hidden;
+  position: relative;
+  left: -1px;
   h3 {
     color: $black;
     margin: 0;
