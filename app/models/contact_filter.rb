@@ -51,13 +51,20 @@ class ContactFilter
       end
 
       if @filters[:status].present? && @filters[:status].first != ''
-        case @filters[:status].first
-        when 'null'
-          filtered_contacts = filtered_contacts.where("status = '' or status is NULL")
-        when '*'
-          # allow any status
-        else
-          filtered_contacts = filtered_contacts.where(status: @filters[:status])
+        if !@filters[:status].include? '*'
+          if (@filters[:status].include? '') && !(@filters[:status].include?('null'))
+            @filters[:status] << 'null'
+          end
+
+          if (@filters[:status].include? 'null') && !(@filters[:status].include?(''))
+            @filters[:status] << ''
+          end
+
+          if @filters[:status].include? 'null'
+            filtered_contacts = filtered_contacts.where("status is null OR status in (?)", @filters[:status])
+          else
+            filtered_contacts = filtered_contacts.where(status: @filters[:status])
+          end
         end
       else
         filtered_contacts = filtered_contacts.active
