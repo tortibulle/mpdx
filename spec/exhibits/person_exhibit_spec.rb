@@ -3,7 +3,7 @@ describe PersonExhibit do
 
   let(:exhib) { PersonExhibit.new(person, context) }
   let(:person) { build(:person)}
-  let(:context) { double }
+  let(:context) { double(root_url: 'https://mpdx.org') }
 
   context '#avatar' do
     it 'should ignore images with nil content' do
