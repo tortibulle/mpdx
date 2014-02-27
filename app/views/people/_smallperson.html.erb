@@ -2,7 +2,7 @@
   <div class="small-person" id="person-<%= p.id %>">
     <%= link_to(image_tag(p.avatar(:square), class: "person_avatar"), p) %>
     <div class="person_details">
-      <div class="name"><%= link_to(person) %></div>
+      <div class="name"><%= link_to(p, p) %></div>
       <%= render 'people/contact_details_compact', person: p %>
     </div>
     <% if p.has_social? %>

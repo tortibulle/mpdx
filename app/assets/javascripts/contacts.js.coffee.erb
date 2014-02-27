@@ -237,7 +237,8 @@ $ ->
       $(document).on 'click', '.small-person', ->
         if $('#contact-people').hasClass('merging-people')
           $(this).toggleClass('merge-person-checked')
-        false
+          return false
+        true
 
       $(document).on 'click', '.js-people input[type=submit]', ->
         form = $(this)
