@@ -5,5 +5,9 @@ $.mpdx.activateTabs()
 $.mpdx.sortableTabs('contact')
 $.mpdx.loadTabData(window.location.hash)
 $.mpdx.loadDonations()
+
+// fix to hide mysterious donations tab that won't go away
+$('#tabs_donations').remove()
+
 document.title = '<%= @page_title %> - MPDX'
 History.pushState({contact_id: <%= @contact.id %>}, "<%== sanitize @contact.name %>", '<%= contact_path(@contact) %>' + document.location.hash)

@@ -379,6 +379,9 @@ $ ->
 
     $.mpdx.loadDonations()
 
+    # fix to hide mysterious donations tab that won't go away
+    $('#tabs_donations').remove()
+
     <%#$(document).on 'focus', '[data-behavior*=social-field]', ->%>
       <%#wrapper = $(this).closest('[data-behavior*=field-wrapper]')%>
 
