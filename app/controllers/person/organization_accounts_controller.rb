@@ -45,6 +45,12 @@ class Person::OrganizationAccountsController < ApplicationController
     end
   end
 
+  def destroy
+    @organization_account = current_user.organization_accounts.find(params[:id])
+    @organization_account.destroy
+    redirect_to accounts_path
+  end
+
   private
   def person_organization_account_params
     params.require(:person_organization_account).permit(:username, :password, :organization_id)
