@@ -51,7 +51,10 @@ class ContactsController < ApplicationController
   end
 
   def details
-    respond_with(@contact)
+    respond_to do |wants|
+      wants.html { redirect_to @contact }
+      wants.js { respond_with(@contact) }
+    end
   end
 
   def referrals
