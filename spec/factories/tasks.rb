@@ -5,5 +5,6 @@ FactoryGirl.define do
     location "MyString"
     subject "MyString"
     start_at "2012-03-08 14:59:46"
+    activity_type "Call"
   end
 end

@@ -240,6 +240,22 @@ $ ->
             }
           ]
 
+$(document).on 'change', '[name="task[activity_type]"]', ->
+  $.mpdx.setOptions($('[name="task[result]"]'), $.mpdx.getTaskResultOptions($(this).val()))
+
+$.mpdx.getTaskResultOptions = (activity_type) ->
+  CALL_RESULTS = [__('Attempted')]
+  MESSAGE_RESULTS = [__('Received')]
+  STANDARD_RESULTS = [__('Done')]
+  switch activity_type
+    when 'Call'
+      return CALL_RESULTS + ',' + STANDARD_RESULTS
+    when 'Email', 'Text Message', 'Facebook Message', 'Letter'
+      return STANDARD_RESULTS + ',' + MESSAGE_RESULTS
+    else
+      return STANDARD_RESULTS[0]
+  end
+
 $.mpdx.getSelectedTaskIds = (scope) ->
   scope ||= $(body)
   ids = []

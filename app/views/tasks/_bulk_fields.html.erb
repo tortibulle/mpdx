@@ -23,7 +23,7 @@
 
   <div class="field">
     <%= f.label :result, _('Result') %>
-    <%= f.select :result, Task::ALL_RESULTS.collect { |s| [_(s), s] } %>
+    <%= f.select :result, task.assignable_results.collect { |s| [_(s), s] } %>
   </div>
 <% else %>
   <div class="field due_date">
@@ -34,7 +34,7 @@
 
 <div class="field">
   <%= f.label :activity_type, _('Action') %>
-  <%= f.select :activity_type, f.object.assignable_activity_types.collect { |s| [_(s), s] } %>
+  <%= f.select :activity_type, f.object.assignable_activity_types.collect { |s| [_(s), s] }, include_blank: true %>
 </div>
 
 <div class="field">
