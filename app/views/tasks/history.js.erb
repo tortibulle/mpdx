@@ -2,7 +2,7 @@ $('#spinner_history').hide();
 <% if @tasks.blank? %>
     <% contact = current_account_list.contacts.find(filters_params[:contact_ids]) %>
     $('#history').html('<%= j(_("You don't have any tasks logged for this contact. ") +
-                            link_to(_('Log one now.'), new_task_path(contact_id: contact.id, completed: true))) %>');
+                            link_to(_('Log one now.'), new_task_path(contact_id: contact.id, completed: true), class: "add_task", remote: true)) %>');
 <% else %>
   <% if params[:page] %>
     $('#history_table').append('<%= j(render('tasks/task', collection: @tasks)) %>');
