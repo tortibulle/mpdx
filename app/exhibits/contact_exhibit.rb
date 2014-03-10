@@ -69,7 +69,8 @@ class ContactExhibit < DisplayCase::Exhibit
 
   def notes_saved_at
     return '' unless to_model.notes_saved_at
-    to_model.notes_saved_at.to_datetime.localize(@context.locale).to_medium_s
+    date = Time.zone.utc_to_local(to_model.notes_saved_at.to_datetime)
+    date.to_datetime.localize(@context.locale).to_medium_s
     #@context.l(to_model.notes_saved_at.to_datetime, :medium)
   end
 

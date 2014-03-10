@@ -60,6 +60,9 @@ module ApplicationHelper
 
   def l(date, options = {})
     options[:format] ||= :date_time
+    unless date.class == Date || date.class == DateTime
+      date = date.to_datetime
+    end
     if date.class == Date
       date = date.to_datetime.localize(locale).to_date
     else
