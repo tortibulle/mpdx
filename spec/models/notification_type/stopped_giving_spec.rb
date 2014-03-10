@@ -12,7 +12,7 @@ describe NotificationType::StoppedGiving do
       end
 
       it 'adds a notification if late' do
-        create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 60.days.ago)
+        create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 61.days.ago)
         notifications = stopped_giving.check(contact.account_list)
         notifications.length.should == 1
       end
