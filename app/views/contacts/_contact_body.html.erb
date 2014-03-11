@@ -168,7 +168,7 @@
             <%= f.submit _('Save Notes'), disabled: true %>
             <span class="saved_at">
               <%= begin
-                    l(contact_exhibit.notes_saved_at.to_datetime, format: :medium)
+                    contact_exhibit.notes_saved_at
                   rescue; end
               %>
             </span>

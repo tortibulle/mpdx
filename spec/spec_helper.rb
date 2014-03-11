@@ -97,9 +97,9 @@ end
 
 Spork.each_run do
   # This code will be run each time you run your specs.
+  Zonebie.set_random_timezone
   FactoryGirl.reload
   Dir[Rails.root.join("app/roles/**/*.rb")].each {|f| require f}
-
 end
 
 def login(user)

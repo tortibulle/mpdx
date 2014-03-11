@@ -1,5 +1,6 @@
 class ContactExhibit < DisplayCase::Exhibit
   include DisplayCase::ExhibitsHelper
+  include ApplicationHelper
 
   def self.applicable_to?(object)
     object.class.name == 'Contact'
@@ -69,8 +70,7 @@ class ContactExhibit < DisplayCase::Exhibit
 
   def notes_saved_at
     return '' unless to_model.notes_saved_at
-    to_model.notes_saved_at.to_datetime.localize(@context.locale).to_medium_s
-    #@context.l(to_model.notes_saved_at.to_datetime, :medium)
+    l(to_model.notes_saved_at.to_datetime, format: :medium)
   end
 
   def tag_links
