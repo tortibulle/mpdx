@@ -15,7 +15,8 @@
    total = 0
    @by_month.each { |month| month[1].each { |d| total += d.amount if d.donation_date < Date.today.beginning_of_month } }
    monthly_average = (total / @time_span).to_i
-   plot_line_values = [pledges, current_account_list.monthly_goal, monthly_average] %>
+   plot_line_values = [pledges, current_account_list.monthly_goal, monthly_average]
+   monthly_values = @by_month_index.collect {|month| @by_month[month] || []}.collect {|v| v.sum(&:amount)} %>
 
 
 <script type="text/javascript" charset="utf-8">
@@ -54,7 +55,7 @@
       },
       yAxis: {
         min: 0,
-        max: <%= plot_line_values.max * 1.1 %>,
+        max: <%= (plot_line_values + monthly_values).max * 1.1 %>,
         title: {
           text: '<%= _('Amount (%{currency})').localize % {currency: current_currency} %>'
         },
@@ -104,7 +105,7 @@
       },
       series: [{
         name: '<%= _('Donations') %>',
-        data: [<%= @by_month_index.collect {|month| @by_month[month] || []}.collect {|v| v.sum(&:amount)}.join(',') %>],
+        data: [<%= monthly_values.join(',') %>],
         type: 'column'
       }]
     });
