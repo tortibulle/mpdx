@@ -101,6 +101,8 @@ class PrayerLettersAccount < ActiveRecord::Base
   def create_contact(contact)
     begin
       json = JSON.parse(get_response(:post, '/api/v1/contacts', contact_params(contact)))
+    rescue AccessError
+      # do nothing
     rescue => e
       json = JSON.parse(e.message)
       case json['status']
@@ -117,6 +119,8 @@ class PrayerLettersAccount < ActiveRecord::Base
   def update_contact(contact)
     begin
       get_response(:post, "/api/v1/contacts/#{contact.prayer_letters_id}", contact_params(contact))
+    rescue AccessError
+      # do nothing
     rescue => e
       json = JSON.parse(e.message)
       case json['status']
