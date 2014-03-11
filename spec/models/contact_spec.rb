@@ -23,7 +23,7 @@ describe Contact do
     end
 
     it 'should update an address' do
-      stub_request(:get, "http://api.smartystreets.com/street-address/?auth-id=&auth-token=&candidates=2&city=fremont&state=ca&street=123%20somewhere%20stboo&zipcode=94539").
+      stub_request(:get, /http:\/\/api\.smartystreets\.com\/street-address/).
          with(:headers => {'Accept'=>'application/json', 'Accept-Encoding'=>'gzip, deflate', 'Content-Type'=>'application/json', 'User-Agent'=>'Ruby'}).
          to_return(:status => 200, :body => "[]", :headers => {})
 
