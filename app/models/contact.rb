@@ -57,11 +57,8 @@ class Contact < ActiveRecord::Base
   accepts_nested_attributes_for :contact_people, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :contact_referrals_to_me, reject_if: :all_blank, allow_destroy: true
 
-  before_destroy :delete_people
-  before_save    :set_notes_saved_at
-  after_update   :sync_with_mail_chimp
-  after_save     :sync_with_prayer_letters
-  before_destroy  :delete_from_prayer_letters
+  after_commit    :sync_with_mail_chimp, :sync_with_prayer_letters, :set_notes_saved_at
+  before_destroy  :delete_from_prayer_letters, :delete_people
 
   assignable_values_for :status, allow_blank: true do
     # Don't change these willy-nilly, they break the mobile app

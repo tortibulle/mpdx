@@ -11,5 +11,10 @@ class AccountMailer < ActionMailer::Base
          subject: _('Mailchimp List is requiring an additional merge field')
   end
 
+  def prayer_letters_invalid_token(account_list)
+    mail to: account_list.users.collect(&:email).compact.collect(&:email),
+         subject: _('prayerletters.com account needs to be refreshed')
+  end
+
 end
 

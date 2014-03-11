@@ -163,15 +163,26 @@ class PrayerLettersAccount < ActiveRecord::Base
     oauth_token = OAuth::Token.new(token, secret)
 
     response = consumer.request(method, path, oauth_token, {}, params)
-    case response.code
-    when '200','201','202','204'
+    case response.code.to_i
+    when 200, 201, 202, 204
       response.body
+    when 401
+      handle_bad_token
     else
       raise response.body
     end
 
   end
 
+  def handle_bad_token
+    update_column(:valid_token, false)
+    AccountMailer.prayer_letters_invalid_token(account_list).deliver
+
+    raise AccessError
+  end
+
+  class AccessError < StandardError
+  end
 end
 
 
