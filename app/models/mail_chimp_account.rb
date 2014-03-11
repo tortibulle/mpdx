@@ -147,7 +147,12 @@ class MailChimpAccount < ActiveRecord::Base
       gb.list_subscribe(id: primary_list_id, email_address: email, update_existing: true,
                         double_optin: false, send_welcome: false, replace_interests: true)
     rescue Gibbon::MailChimpError => e
-      raise e unless e.message.include?('code 214') # The new email address "xxxxx@example.com" is already subscribed to this list and must be unsubscribed first. (code 214)
+      case
+      when e.message.include?('code 250') # FNAME must be provided - Please enter a value (code 250)
+      when e.message.include?('code 214') # The new email address "xxxxx@example.com" is already subscribed to this list and must be unsubscribed first. (code 214)
+      else
+        raise e
+      end
     end
 
   end
