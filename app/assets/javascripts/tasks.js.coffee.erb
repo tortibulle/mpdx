@@ -137,7 +137,7 @@ $ ->
           {
             text: __('Save'),
             click: (e) ->
-              form.submit()
+              $.rails.handleRemote(form)
               $('.form_wrapper', this).html('<%= image_tag("spinner.gif") %>')
               $(this).dialog( "option", "buttons", [])
           },
