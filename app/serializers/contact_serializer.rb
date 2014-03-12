@@ -1,7 +1,7 @@
 class ContactSerializer < ActiveModel::Serializer
   include DisplayCase::ExhibitsHelper
 
-#  cached
+  # cached
 
   embed :ids, include: true
 
