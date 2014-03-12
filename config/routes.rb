@@ -135,6 +135,8 @@ Mpdx::Application.routes.draw do
   get '/404', :to => "errors#error_404"
   get '/500', :to => "errors#error_500"
 
+  get '/mobile', to: redirect(subdomain: 'm', path: '/')
+
   root :to => 'home#index'
 
   # See how all your routes lay out with "rake routes"
