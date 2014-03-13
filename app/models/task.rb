@@ -19,7 +19,7 @@ class Task < Activity
     }
   ]
 
-  validates :activity_type, :presence => { :message => _('/ Action is required') }
+  # validates :activity_type, :presence => { :message => _( '/ Action is required') }
 
   CALL_RESULTS = [_('Attempted')]
   MESSAGE_RESULTS = [_('Received')]
