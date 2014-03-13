@@ -24,5 +24,13 @@ describe Api::V1::TasksController do
       response.should be_success
       JSON.parse(response.body)['tasks'].length.should == 1
     end
+
+    # the app currently doesn't have activity_type in it and doesn't require it.
+    it "doesn't require activity type on create" do
+      task_attributes = task1.attributes.except('id', 'activity_type')
+      expect {
+        post '/api/v1/tasks?access_token=' + user.access_token, {:task => task_attributes}
+      }.to change(user.account_lists.first.tasks, :count).by(1)
+    end
   end
 end
