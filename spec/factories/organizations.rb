@@ -32,4 +32,9 @@ FactoryGirl.define do
   factory :fake_org, parent: :organization do
     api_class 'FakeApi'
   end
+
+  factory :nav, parent: :organization do
+    api_class 'DataServerNavigators'
+    account_balance_params 'UserName=$ACCOUNT$&Password=$PASSWORD$'
+  end
 end
