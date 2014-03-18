@@ -42,6 +42,13 @@ class DataServer
         end
       end
 
+    else #still want to update balance if possible
+      designation_profiles.each do |designation_profile|
+        Retryable.retryable do
+          import_profile_balance(designation_profile)
+          AccountList.find_or_create_from_profile(designation_profile, @org_account)
+        end
+      end
     end
 
     designation_profiles.reload
