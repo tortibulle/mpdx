@@ -48,6 +48,10 @@ class Activity < ActiveRecord::Base
   def activity_contacts_attributes=(hash_or_array)
     contacts_array = hash_or_array.is_a?(Hash) ? hash_or_array.values : hash_or_array
     contacts_array.each do |contact_attributes|
+      # this line is so that App version <= 1.4.1 remove weeks after next release
+      # and remove it as an accepted attribute in task.rb
+      contact_attributes['contact_id'] = contact_attributes['id'] if contact_attributes['id'].present?
+      
       next unless contact_attributes['contact_id'].present?
       
       contact = Contact.find(contact_attributes['contact_id'])
