@@ -15,7 +15,7 @@ class Task < Activity
     :tag_list, {
       activity_comments_attributes: [:body],
       activity_comment: [:body],
-      activity_contacts_attributes: [:contact_id, :id, :_destroy]
+      activity_contacts_attributes: [:contact_id, :_destroy]
     }
   ]
 
