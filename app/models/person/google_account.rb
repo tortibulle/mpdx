@@ -79,7 +79,12 @@ class Person::GoogleAccount < ActiveRecord::Base
         self.expires_at = 59.minutes.from_now
         save
       else
-        raise response.inspect
+        case response['error']
+        when 'invalid_grant'
+          raise MissingRefreshToken, 'Invalid Grant'
+        else
+          raise response.inspect
+        end
       end
     }
   end
