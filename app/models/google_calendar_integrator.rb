@@ -7,7 +7,7 @@ class GoogleCalendarIntegrator
 
   def sync_tasks
     if @google_integration.calendar_integration?
-      tasks = @google_integration.account_list.tasks.future.uncompleted.of_type(@google_integration.calendar_integrations)
+      tasks = @google_integration.account_list.tasks.future.uncompleted.of_type(@google_integration.calendar_integrations.to_a)
       tasks.map { |task| sync_task(task) }
     end
   end
