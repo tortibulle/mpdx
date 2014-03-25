@@ -9,7 +9,7 @@ class GoogleIntegration < ActiveRecord::Base
 
   attr_accessor :new_calendar
 
-  serialize :calendar_integrations, Set
+  serialize :calendar_integrations, Array
 
   before_save :create_new_calendar, if: -> { new_calendar.present? }
   before_save :toggle_calendar_integration_for_appointments, :set_default_calendar, if: :calendar_integration_changed?

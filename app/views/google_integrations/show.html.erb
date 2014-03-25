@@ -11,17 +11,24 @@
           <%= (_("Calendar integration has been enabled. Choose from the list of tasks below which things you'd like MPDX to put on your calendar.
                  Tasks will be pushed to the calendar named %{calendar_name}").localize % { calendar_name: "<strong>#{@google_integration.calendar_name}</strong>" }).html_safe %>
           <br/><br/>
-          <ul>
-            <% Task.new.assignable_activity_types.each do |activity_type| %>
-              <li><%= check_box_tag activity_type, true, @google_integration.calendar_integrations.include?(activity_type) %> <%= label_tag activity_type, _(activity_type) %></li>
-            <% end %>
-          </ul>
+          <%= form_for(@google_integration, remote: true) do |f| %>
+            <div>
+            <ul>
+              <% Task.new.assignable_activity_types.each do |activity_type| %>
+                <li class="radiocheck">
+                  <%= check_box_tag 'google_integration[calendar_integrations][]', activity_type, @google_integration.calendar_integrations.include?(activity_type), id: "calendar_integrations_#{activity_type.underscore}", data: { behavior: 'calendar_integration_type' } %>
+                  <%= label_tag "calendar_integrations_#{activity_type.underscore}", _(activity_type) %>
+                </li>
+              <% end %>
+            </ul>
+            </div>
+          <% end %>
           <br/>
           <%= link_to(_('Disable Calendar Integration'), google_integration_path(@google_integration, google_integration: { calendar_integration: false }), method: :put,
                       class: 'btn', data: { confirm: _('Are you sure you want to disable Google Calendar integration?') }) %>
           <%= link_to(_('Sync Now'), sync_google_integration_path(@google_integration, integration: 'calendar'), class: 'btn desired_action') %>
         <% else %>
-          <%= _("Which one of your calendars would you like to push MPDX tasks to?") %>
+          <%= _('Which one of your calendars would you like to push MPDX tasks to?') %>
           <ul>
             <% @google_integration.calendars.each do |calendar| %>
               <li>

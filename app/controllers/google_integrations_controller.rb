@@ -1,5 +1,5 @@
 class GoogleIntegrationsController < ApplicationController
-  respond_to :html
+  respond_to :html, :js
 
   def show
     respond_with google_integration
@@ -8,7 +8,13 @@ class GoogleIntegrationsController < ApplicationController
   def update
     google_integration.update_attributes(google_integration_params)
 
-    redirect_to google_integration
+
+    respond_to do |format|
+      format.html { redirect_to google_integration }
+      format.js { render nothing: true }
+    end
+  rescue Person::GoogleAccount::MissingRefreshToken
+    missing_refresh_token
   end
 
   def create
@@ -32,6 +38,10 @@ class GoogleIntegrationsController < ApplicationController
   end
 
   def google_integration_params
-    params.require(:google_integration).permit(:calendar_integration, :calendar_id, :calendar_name, :new_calendar)
+    params.require(:google_integration).permit([:calendar_integration, {calendar_integrations: []}, :calendar_id, :calendar_name, :new_calendar])
+  end
+
+  def missing_refresh_token
+    redirect_to google_integration_path(google_integration), alert: "<a href=\"#{new_account_path(provider: :google, redirect: google_integration_path(google_integration))}\">#{_('The link to your google account needs to be refreshed. Click here to re-connect to google.')}</a>"
   end
 end

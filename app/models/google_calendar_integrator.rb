@@ -7,7 +7,7 @@ class GoogleCalendarIntegrator
 
   def sync_tasks
     if @google_integration.calendar_integration?
-      tasks = @google_integration.account_list.tasks.future.uncompleted.of_type(@google_integration.calendar_integrations.to_a)
+      tasks = @google_integration.account_list.tasks.future.uncompleted.of_type(@google_integration.calendar_integrations)
       tasks.map { |task| sync_task(task) }
     end
   end
@@ -18,7 +18,7 @@ class GoogleCalendarIntegrator
     google_event = task.google_events.find_by(google_integration_id: @google_integration.id)
     case
     when task.destroyed? && google_event
-      remove_task(task, google_event)
+      remove_task(google_event)
     when google_event
       update_task(task, google_event)
     else
@@ -26,7 +26,7 @@ class GoogleCalendarIntegrator
     end
   end
 
-  def remove_task(task, google_event)
+  def remove_task(google_event)
     result = @client.execute(
       :api_method => @google_integration.calendar_api.events.delete,
       :parameters => {'calendarId' => @google_integration.calendar_id,

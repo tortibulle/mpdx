@@ -7,6 +7,7 @@ class Person::GoogleAccount < ActiveRecord::Base
 
   def self.find_or_create_from_auth(auth_hash, person)
     @rel = person.google_accounts
+    Rails.logger.debug(auth_hash)
     creds = auth_hash.credentials
     @remote_id = auth_hash.uid
     expires_at = creds.expires ? Time.at(creds.expires_at) : nil
@@ -62,7 +63,7 @@ class Person::GoogleAccount < ActiveRecord::Base
   end
 
   def refresh_token!
-    raise 'No refresh token' if refresh_token.blank?
+    raise MissingRefreshToken, 'No refresh token' if refresh_token.blank?
 
     # Refresh auth token from google_oauth2.
     params = {
@@ -73,7 +74,6 @@ class Person::GoogleAccount < ActiveRecord::Base
     }
     RestClient.post('https://accounts.google.com/o/oauth2/token', params, content_type: 'application/x-www-form-urlencoded') {|response, request, result, &block|
       if response.code == 200
-        ap response
         json = JSON.parse(response)
         self.token = json['access_token']
         self.expires_at = 59.minutes.from_now
@@ -82,5 +82,9 @@ class Person::GoogleAccount < ActiveRecord::Base
         raise response.inspect
       end
     }
+  end
+
+  class MissingRefreshToken < StandardError
+
   end
 end
