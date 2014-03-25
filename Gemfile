@@ -45,7 +45,7 @@ gem 'oauth', git: 'http://github.com/CruGlobal/oauth-ruby'
 gem 'oj', '~> 2.1.0'
 gem 'omniauth-cas', '~> 1.0.2'
 gem 'omniauth-facebook', '~> 1.6.0'
-gem 'omniauth-google-oauth2', '~> 0.2.2'
+gem 'omniauth-google-oauth2'#, '~> 0.2.2'
 gem 'omniauth-linkedin', '~> 0.1.0'
 gem 'omniauth-prayer-letters'
 gem 'omniauth-twitter', '~> 1.0.1'
@@ -77,8 +77,9 @@ gem 'will_paginate', '~> 3.0.3'
 
 group :development do
   gem 'railroady'
-  gem 'rails-footnotes', git: 'http://github.com/josevalim/rails-footnotes.git'
+  gem 'rails-footnotes'#, git: 'http://github.com/josevalim/rails-footnotes.git'
   gem 'bluepill'
+  gem 'quiet_assets'
 end
 
 group :development, :test do
