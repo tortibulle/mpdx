@@ -36,3 +36,4 @@
 //= require tags
 //= require tasks
 //= require home
+//= require google_integrations

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140207151457) do
+ActiveRecord::Schema.define(version: 20140325143531) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -342,6 +342,29 @@ ActiveRecord::Schema.define(version: 20140207151457) do
 
   add_index "family_relationships", ["person_id", "related_person_id"], name: "index_family_relationships_on_person_id_and_related_person_id", unique: true, using: :btree
   add_index "family_relationships", ["related_person_id"], name: "index_family_relationships_on_related_person_id", using: :btree
+
+  create_table "google_events", force: true do |t|
+    t.integer  "activity_id"
+    t.integer  "google_integration_id"
+    t.string   "google_event_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "google_events", ["activity_id"], name: "index_google_events_on_activity_id", using: :btree
+  add_index "google_events", ["google_integration_id"], name: "index_google_events_on_google_integration_id", using: :btree
+
+  create_table "google_integrations", force: true do |t|
+    t.integer "account_list_id"
+    t.integer "google_account_id"
+    t.boolean "calendar_integration",  default: false, null: false
+    t.text    "calendar_integrations"
+    t.string  "calendar_id"
+    t.string  "calendar_name"
+  end
+
+  add_index "google_integrations", ["account_list_id"], name: "index_google_integrations_on_account_list_id", using: :btree
+  add_index "google_integrations", ["google_account_id"], name: "index_google_integrations_on_google_account_id", using: :btree
 
   create_table "help_requests", force: true do |t|
     t.string   "name"

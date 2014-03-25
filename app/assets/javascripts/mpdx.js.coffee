@@ -22,7 +22,7 @@ $ ->
   if $('.inside.notice')[0]?
     setTimeout ->
       $('.inside.notice').fadeOut('fast')
-    , 4000
+    , 6000
 
   current_time = new Date()
   $.cookie('timezone', current_time.getTimezoneOffset(), { path: '/', expires: 10 } )

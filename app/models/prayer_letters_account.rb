@@ -4,7 +4,7 @@ class PrayerLettersAccount < ActiveRecord::Base
 
   include Async
   include Sidekiq::Worker
-  sidekiq_options queue: :general, unique: true
+  sidekiq_options unique: true
   SERVICE_URL = 'https://www.prayerletters.com'
 
   belongs_to :account_list

@@ -13,9 +13,21 @@
       </div>
       <span class="account_name"><%= account %></span>
 
-      <% if provider == 'facebook' %>
+      <% case provider %>
+      <% when 'google' %>
+        <% if $rollout.active?(:google_integration, current_account_list) %>
+          <% account.google_integration(current_account_list).tap do |google_integration| %>
+            <% link_text = _('Configure synchronization with this connection') %>
+            <% if google_integration %>
+              <%= link_to(link_text, google_integration_path(google_integration)) %>
+            <% else %>
+              <%= link_to(link_text, google_integrations_path(google_account_id: account.id), method: :post) %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% when 'facebook' %>
         <% if account.downloading? %>
-          <%= _("Contacts are currently being imported") %>
+          <%= _('Contacts are currently being imported') %>
         <% else %>
           <div class="importoptions formstyles" data-behavior="import_options" style="display:none">
             <%= form_for Import.new(source: provider, source_account_id: account.id) do |f| %>

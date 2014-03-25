@@ -1,4 +1,4 @@
-class GoogleImport
+class GoogleIntegration < ActiveRecord::Base
 
   def initialize(import)
     @user = import.user

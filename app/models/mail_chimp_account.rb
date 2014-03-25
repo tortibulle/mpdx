@@ -3,7 +3,7 @@ require 'async'
 class MailChimpAccount < ActiveRecord::Base
   include Async
   include Sidekiq::Worker
-  sidekiq_options queue: :general, unique: true
+  sidekiq_options unique: true
 
   List = Struct.new(:id, :name)
 

@@ -1,7 +1,11 @@
 require 'sidekiq/web'
 Mpdx::Application.routes.draw do
 
-  #devise_for :admin_users, ActiveAdmin::Devise.config
+  resources :google_integrations, only: [:show, :edit, :update, :create] do
+    member do
+      get :sync
+    end
+  end
 
   resources :help_requests
 

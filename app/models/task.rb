@@ -1,8 +1,12 @@
+require 'async'
 class Task < Activity
+  include Async
+  include Sidekiq::Worker
+  sidekiq_options backtrace: true, unique: true
 
   before_validation :update_completed_at
-  after_save :update_contact_uncompleted_tasks_count
-  after_destroy :update_contact_uncompleted_tasks_count
+  after_save :update_contact_uncompleted_tasks_count, :sync_to_google_calendar
+  after_destroy :update_contact_uncompleted_tasks_count, :sync_to_google_calendar
 
   scope :of_type, ->(activity_type) { where(activity_type: activity_type) }
   scope :with_result, ->(result) { where(result: result) }
@@ -47,16 +51,35 @@ class Task < Activity
     'Attempted' == result
   end
 
-  private
-    def update_completed_at
-      if changed.include?('completed')
-        self.completed_at ||= completed? ? Time.now : nil
-        self.start_at ||= completed_at
-        self.result = 'Done' if result.blank?
-      end
+  def default_length
+    case activity_type
+    when 'Appointment'
+      1.hour
+    when 'Call'
+      5.minutes
     end
+  end
 
-    def update_contact_uncompleted_tasks_count
-      contacts.map(&:update_uncompleted_tasks_count)
+  private
+  def update_completed_at
+    if changed.include?('completed')
+      self.completed_at ||= completed? ? Time.now : nil
+      self.start_at ||= completed_at
+      self.result = 'Done' if result.blank?
     end
+  end
+
+  def update_contact_uncompleted_tasks_count
+    contacts.map(&:update_uncompleted_tasks_count)
+  end
+
+  def sync_to_google_calendar
+    async(:async_sync_to_google_calendar)
+  end
+
+  def async_sync_to_google_calendar
+    account_list.google_integrations.each do |google_integration|
+      google_integration.calendar_integrator.sync_task(self)
+    end
+  end
 end

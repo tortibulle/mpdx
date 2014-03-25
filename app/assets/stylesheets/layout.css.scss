@@ -1161,5 +1161,10 @@ span.tip {
 	display: block;
 	width: 0;
 	z-index: 1;
-	}
+}
 
+body.google_integrations_controller {
+  ul {
+    @include listclear;
+  }
+}

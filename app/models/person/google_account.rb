@@ -3,7 +3,7 @@ require 'gmail'
 class Person::GoogleAccount < ActiveRecord::Base
   include Person::Account
 
-  # attr_accessible :email
+  has_many :google_integrations, foreign_key: :google_account_id
 
   def self.find_or_create_from_auth(auth_hash, person)
     @rel = person.google_accounts
@@ -16,7 +16,8 @@ class Person::GoogleAccount < ActiveRecord::Base
       refresh_token: creds.refresh_token,
       expires_at: expires_at,
       email: auth_hash.info.email,
-      valid_token: true}
+      valid_token: true
+    }
     super
   end
 
@@ -24,33 +25,15 @@ class Person::GoogleAccount < ActiveRecord::Base
     raise Person::Account::NoSessionError, "Somehow a user without an account/session is trying to sign in using google"
   end
 
+  def google_integration(account_list_id)
+    google_integrations.find_by(account_list_id: account_list_id)
+  end
+
   def to_s
     email
   end
 
   def self.one_per_user?() false; end
-
-  def queue_import_data
-
-  end
-
-
-  def plus_api
-    @plus_api ||= client.discovered_api('plus')
-  end
-
-  def calendar_api
-    @calendar_api ||= client.discovered_api('calendar', 'v3')
-  end
-
-  def calendars
-    result = client.execute(
-      :api_method => calendar_api.calendar_list.list,
-      :parameters => {'userId' => 'me'}
-    )
-    calendar_list = result.data
-    calendar_list.items.detect_all {|c| c.accessRole == 'owner'}
-  end
 
   def token_expired?
     expires_at < Time.now
@@ -66,6 +49,16 @@ class Person::GoogleAccount < ActiveRecord::Base
       @contacts = contact_user.contacts
     end
     @contacts
+  end
+
+  def client
+    refresh_token! if token_expired?
+
+    unless @client
+      @client = Google::APIClient.new(application_name: 'MPDX', application_version: '1.0')
+      @client.authorization.access_token = token
+    end
+    @client
   end
 
   def refresh_token!
@@ -90,5 +83,4 @@ class Person::GoogleAccount < ActiveRecord::Base
       end
     }
   end
-
 end

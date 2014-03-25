@@ -11,11 +11,13 @@ class Activity < ActiveRecord::Base
   has_many :contacts, through: :activity_contacts
   has_many :activity_comments, dependent: :destroy
   has_many :people, through: :activity_comments
+  has_many :google_events, dependent: :destroy
 
   scope :overdue, -> {where(completed: false).where('start_at < ?', Time.zone.now.beginning_of_day).order('start_at')}
   scope :today, -> {where("start_at BETWEEN ? AND ?", Time.zone.now.beginning_of_day, Time.zone.now.end_of_day).order('start_at')}
   scope :tomorrow, -> {where("start_at BETWEEN ? AND ?", Time.zone.now.end_of_day, Time.zone.now.end_of_day + 1.day).order('start_at')}
   scope :upcoming, -> {where("start_at > ?", Time.zone.now.end_of_day + 1.day).order('start_at')}
+  scope :future, -> {where("start_at > ?", Time.zone.now.end_of_day).order('start_at')}
   scope :completed, -> { where(completed: true).order('completed_at desc, start_at desc') }
   scope :uncompleted, -> { where(completed: false).order('start_at') }
   scope :starred, -> { where(starred: true).order('start_at') }
