@@ -73,13 +73,13 @@ class Person::GoogleAccount < ActiveRecord::Base
         grant_type: 'refresh_token'
     }
     RestClient.post('https://accounts.google.com/o/oauth2/token', params, content_type: 'application/x-www-form-urlencoded') {|response, request, result, &block|
+      json = JSON.parse(response)
       if response.code == 200
-        json = JSON.parse(response)
         self.token = json['access_token']
         self.expires_at = 59.minutes.from_now
         save
       else
-        case response['error']
+        case json['error']
         when 'invalid_grant'
           raise MissingRefreshToken, 'Invalid Grant'
         else
