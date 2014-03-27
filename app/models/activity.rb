@@ -11,7 +11,7 @@ class Activity < ActiveRecord::Base
   has_many :contacts, through: :activity_contacts
   has_many :activity_comments, dependent: :destroy
   has_many :people, through: :activity_comments
-  has_many :google_events, dependent: :destroy
+  has_many :google_events
 
   scope :overdue, -> {where(completed: false).where('start_at < ?', Time.zone.now.beginning_of_day).order('start_at')}
   scope :today, -> {where("start_at BETWEEN ? AND ?", Time.zone.now.beginning_of_day, Time.zone.now.end_of_day).order('start_at')}

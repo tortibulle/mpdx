@@ -17,8 +17,11 @@ class GoogleCalendarIntegrator
 
     google_event = task.google_events.find_by(google_integration_id: @google_integration.id)
     case
-    when task.destroyed? && google_event
-      remove_task(google_event)
+    when task.destroyed?
+      if google_event
+        remove_task(google_event)
+        google_event.destroy
+      end
     when google_event
       update_task(task, google_event)
     else
