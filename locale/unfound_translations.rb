@@ -1,0 +1,13 @@
+# Activity types
+_('Call')
+_('Appointment')
+_('Email')
+_('Text Message')
+_('Facebook Message')
+_('Letter')
+_('Newsletter')
+_('Pre Call Letter')
+_('Reminder Letter')
+_('Support Letter')
+_('Thank')
+_('To Do')

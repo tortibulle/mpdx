@@ -42,7 +42,6 @@ class GoogleCalendarIntegrator
                       'eventId' => google_event.google_event_id},
       :body_object => event_attributes(task)
     )
-    Rails.logger.debug(result)
     handle_error(result)
   rescue GoogleCalendarIntegrator::NotFound
     add_task(task)
@@ -54,7 +53,6 @@ class GoogleCalendarIntegrator
       :parameters => {'calendarId' => @google_integration.calendar_id},
       :body_object => event_attributes(task)
     )
-    Rails.logger.debug(result)
     handle_error(result)
     task.google_events.create!(google_integration_id: @google_integration.id, google_event_id: result.data['id'])
   end
@@ -62,9 +60,10 @@ class GoogleCalendarIntegrator
   def event_attributes(task)
     attributes = {
       summary: task.subject,
-      location: task.location.to_s
+      location: task.calculated_location.to_s,
+      description: task.activity_comments.collect(&:body).join("\n\n"),
+      source: {title: 'MPDX', url: 'https://mpdx.org/tasks'}
     }
-
 
     if task.default_length
       end_at = task.end_at || task.start_at + task.default_length
@@ -74,6 +73,33 @@ class GoogleCalendarIntegrator
       attributes.merge!(start: {date: task.start_at.to_date.to_s(:db), dateTime: nil},
                         end: {date: task.start_at.to_date.to_s(:db), dateTime: nil})
     end
+
+    attributes[:attendees] = []
+
+    if task.contacts.present?
+      task.contacts.each do |contact|
+        contact.people.each do |person|
+          email = person.email ? person.email.to_s : "#{person.to_s.gsub(/[^\w]/,'-')}-fake@mpdx.org"
+          attributes[:attendees] << {
+            displayName: person.to_s,
+            email: email,
+            responseStatus: 'accepted',
+            comment: person.to_s
+          }
+        end
+      end
+    end
+
+    @google_integration.account_list.users.each do |user|
+      if user.email
+        attributes[:attendees] << {
+          displayName: user.to_s,
+          email: user.email.to_s,
+          responseStatus: 'accepted'
+        }
+      end
+    end
+
     Rails.logger.debug(attributes)
     attributes
   end

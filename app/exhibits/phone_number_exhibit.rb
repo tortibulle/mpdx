@@ -8,10 +8,11 @@ class PhoneNumberExhibit < DisplayCase::Exhibit
 
   def number
     return nil unless self[:number]
+    global = GlobalPhone.parse(self[:number])
     if country_code == '1' || (country_code.blank? && (self[:number].length == 10 || self[:number].length == 7))
-      @context.number_to_phone(self[:number], area_code: self[:number].length == 10)
+      global.national_format
     else
-      self[:number]
+      global.international_format
     end
 
   end

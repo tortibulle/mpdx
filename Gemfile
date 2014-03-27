@@ -74,6 +74,8 @@ gem 'virtus', '~> 0.5.4'
 gem 'whenever', '~> 0.8.1'
 gem 'wicked', '~> 1.0.2'
 gem 'will_paginate', '~> 3.0.3'
+gem 'global_phone', git: 'https://github.com/sstephenson/global_phone.git'
+gem 'global_phone_dbgen'
 
 group :development do
   gem 'railroady'
@@ -87,10 +89,10 @@ group :development, :test do
   gem 'database_cleaner'
   gem 'rspec-rails'
   gem 'factory_girl_rails'
-  gem "guard-rspec"
+  gem 'guard-rspec'
   gem 'simplecov', :require => false
   #only used for mo/po file generation in development, !do not load(:require=>false)! since it will eat 7mb ram
-  gem "gettext", '~> 2.3.2', :require => false
+  gem 'gettext', '~> 2.3.2', :require => false
   gem 'mailcatcher'
   gem 'fuubar'
   gem 'unicorn'

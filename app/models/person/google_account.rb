@@ -3,7 +3,7 @@ require 'gmail'
 class Person::GoogleAccount < ActiveRecord::Base
   include Person::Account
 
-  has_many :google_integrations, foreign_key: :google_account_id
+  has_many :google_integrations, foreign_key: :google_account_id, dependent: :destroy
 
   def self.find_or_create_from_auth(auth_hash, person)
     @rel = person.google_accounts

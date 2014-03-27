@@ -33,6 +33,14 @@ GIT
   specs:
     emoji_spec (0.1)
 
+GIT
+  remote: https://github.com/sstephenson/global_phone.git
+  revision: 9b2772c4678dc9e323c58d9258663812bbd9fc73
+  specs:
+    global_phone (1.0.1)
+    global_phone_dbgen (1.0.1)
+      nokogiri (~> 1.5)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -548,6 +556,8 @@ DEPENDENCIES
   gettext_i18n_rails
   gibberish (~> 1.2.0)
   gibbon (~> 0.4.2)
+  global_phone!
+  global_phone_dbgen
   gmail!
   google-api-client
   google_contacts_api

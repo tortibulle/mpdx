@@ -31,9 +31,9 @@ class Task < Activity
   ALL_RESULTS = STANDARD_RESULTS + CALL_RESULTS + MESSAGE_RESULTS
 
   assignable_values_for :activity_type, :allow_blank => true do
-    [_('Call'), _('Appointment'), _('Email'), _('Text Message'), _('Facebook Message'),
-     _('Letter'), _('Newsletter'), _('Pre Call Letter'), _('Reminder Letter'),
-     _('Support Letter'), _('Thank'), _('To Do')]
+    ['Call', 'Appointment', 'Email', 'Text Message', 'Facebook Message',
+     'Letter', 'Newsletter', 'Pre Call Letter', 'Reminder Letter',
+     'Support Letter', 'Thank', 'To Do']
   end
 
   assignable_values_for :result, :allow_blank => true do
@@ -57,6 +57,20 @@ class Task < Activity
       1.hour
     when 'Call'
       5.minutes
+    end
+  end
+
+  def calculated_location
+    return location if location.present?
+
+    case activity_type
+    when 'Call'
+      numbers = contacts.collect(&:people).flatten.collect do |person|
+        "#{person} #{PhoneNumberExhibit.new(person.phone_number, nil)}"
+      end
+      numbers.join("\n")
+    else
+      return AddressExhibit.new(contacts.first.address, nil).to_google if contacts.first && contacts.first.address
     end
   end
 
