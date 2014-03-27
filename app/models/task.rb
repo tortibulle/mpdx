@@ -66,9 +66,11 @@ class Task < Activity
     case activity_type
     when 'Call'
       numbers = contacts.collect(&:people).flatten.collect do |person|
-        "#{person} #{PhoneNumberExhibit.new(person.phone_number, nil)}"
+        if person.phone_number && person.phone_number.present?
+          "#{person} #{PhoneNumberExhibit.new(person.phone_number, nil)}"
+        end
       end
-      numbers.join("\n")
+      numbers.compact.join("\n")
     else
       return AddressExhibit.new(contacts.first.address, nil).to_google if contacts.first && contacts.first.address
     end

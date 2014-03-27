@@ -10,10 +10,10 @@ describe PhoneNumberExhibit do
     subject.number.should == '(123) 456-7890'
   end
 
-  it "should return unformatted number if we don't know what kind of number it is" do
+  it "should return nil number if it's not a valid phone number" do
     phone_number.number = '555'
     phone_number.country_code = '2'
-    subject.number.should == '555'
+    subject.number.should == nil
   end
 
 end
