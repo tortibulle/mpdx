@@ -32,7 +32,7 @@ class GoogleCalendarIntegrator
       :parameters => {'calendarId' => @google_integration.calendar_id,
                       'eventId' => google_event.google_event_id}
     )
-    handle_error(result)
+    handle_error(result, task)
   end
 
   def update_task(task, google_event)
@@ -42,7 +42,7 @@ class GoogleCalendarIntegrator
                       'eventId' => google_event.google_event_id},
       :body_object => event_attributes(task)
     )
-    handle_error(result)
+    handle_error(result, task)
   rescue GoogleCalendarIntegrator::NotFound
     add_task(task)
   end
@@ -53,7 +53,7 @@ class GoogleCalendarIntegrator
       :parameters => {'calendarId' => @google_integration.calendar_id},
       :body_object => event_attributes(task)
     )
-    handle_error(result)
+    handle_error(result, task)
     task.google_events.create!(google_integration_id: @google_integration.id, google_event_id: result.data['id'])
   end
 
@@ -81,7 +81,7 @@ class GoogleCalendarIntegrator
     if task.contacts.present?
       task.contacts.each do |contact|
         contact.people.each do |person|
-          if person.email.to_s.present?
+          if person.email.present? && person.email.valid?
             attributes[:attendees] << {
               displayName: person.to_s,
               email: person.email.to_s,
@@ -113,18 +113,25 @@ class GoogleCalendarIntegrator
     attributes
   end
 
-  def handle_error(result)
+  def handle_error(result, task)
     case result.status
     when 404
       raise NotFound
     else
-      if result.data['error']
+      return unless result.data['error'] # no error, everything is fine.
+      case result.data['error']['message']
+      when 'Invalid attendee email.'
+        raise InvalidEmail, event_attributes(task).inspect
+      else
         raise Error, result.data['error']['message']
       end
     end
   end
 
   class NotFound < StandardError
+  end
+
+  class InvalidEmail < StandardError
   end
 
   class Error < StandardError
