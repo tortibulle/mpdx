@@ -52,9 +52,12 @@ class Api::V1::TasksController < Api::V1::BaseController
 
   def task_params
     # this segment is to support App version <= 1.4.1, remove weeks after next release
+    if params[:task].present? && params[:task][:contacts_attributes].present? && params[:task][:activity_contacts_attributes].blank?
+      params[:task][:activity_contacts_attributes] = params[:task].delete(:contacts_attributes).first
+    end
     if params[:task].present? && params[:task][:activity_contacts_attributes].present?
       params[:task][:activity_contacts_attributes].map do |ac|
-        ac[:contact_id] = ac.delete(:id) if ac[:id].present? && ac[:contact_id].blank?
+        ac[:contact_id] = ac.delete(:id) if ac.respond_to?(:each) && ac[:id].present? && ac[:contact_id].blank?
       end
     end
 
