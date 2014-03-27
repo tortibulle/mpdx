@@ -76,16 +76,21 @@ class GoogleCalendarIntegrator
 
     attributes[:attendees] = []
 
+    attendees_without_emails = []
+
     if task.contacts.present?
       task.contacts.each do |contact|
         contact.people.each do |person|
-          email = person.email ? person.email.to_s : "#{person.to_s.gsub(/[^\w]/,'-')}-fake@mpdx.org"
-          attributes[:attendees] << {
-            displayName: person.to_s,
-            email: email,
-            responseStatus: 'accepted',
-            comment: person.to_s
-          }
+          if person.email.to_s.present?
+            attributes[:attendees] << {
+              displayName: person.to_s,
+              email: person.email.to_s,
+              responseStatus: 'accepted',
+              comment: person.to_s
+            }
+          else
+            attendees_without_emails << person.to_s
+          end
         end
       end
     end
@@ -95,8 +100,12 @@ class GoogleCalendarIntegrator
         attributes[:attendees] << {
           displayName: user.to_s,
           email: user.email.to_s,
-          responseStatus: 'accepted'
+          responseStatus: 'accepted',
+          comment: attendees_without_emails.join(', ')
         }
+
+        # clear out the attendees_without_emails variable so this comment doesn't get added multiple times
+        attendees_without_emails = []
       end
     end
 
