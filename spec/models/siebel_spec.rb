@@ -349,7 +349,7 @@ describe Siebel do
         siebel.send(:add_or_update_phone_number, siebel_phone_number, person)
       }.not_to change { PhoneNumber.count }
 
-      pn.reload.number.should == PhoneNumber.strip_number(siebel_phone_number.phone)
+      pn.reload.number.should == GlobalPhone.normalize(siebel_phone_number.phone)
     end
   end
 

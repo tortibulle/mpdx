@@ -9,7 +9,8 @@ describe PhoneNumber do
     it "creates a phone number if it's new" do
       ->{
         PhoneNumber.add_for_person(@person, @attributes)
-        @person.phone_numbers.first.number.should == PhoneNumber.strip_number(@attributes['number'])
+        phone_number = @person.reload.phone_numbers.first
+        phone_number.number.should == '+11233452313'
       }.should change(PhoneNumber, :count).from(0).to(1)
     end
 
@@ -17,7 +18,7 @@ describe PhoneNumber do
       PhoneNumber.add_for_person(@person, @attributes)
       ->{
         PhoneNumber.add_for_person(@person, @attributes)
-        @person.phone_numbers.first.number.should == PhoneNumber.strip_number(@attributes['number'])
+        @person.phone_numbers.first.number.should == '+11233452313'
       }.should_not change(PhoneNumber, :count)
     end
 
@@ -40,10 +41,10 @@ describe PhoneNumber do
 
   end
 
-  describe 'strip_number!' do
+  describe 'clean_up_number' do
     it "should parse out the country code" do
       pn = PhoneNumber.new(number: '+44 12345532')
-      pn.send(:strip_number!)
+      pn.clean_up_number
       pn.country_code.should == '44'
     end
   end

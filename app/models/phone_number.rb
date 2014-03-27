@@ -1,3 +1,5 @@
+require 'phone_number_validator'
+
 class PhoneNumber < ActiveRecord::Base
   include HasPrimary
   @@primary_scope = :person
@@ -11,6 +13,8 @@ class PhoneNumber < ActiveRecord::Base
   belongs_to :person, touch: true
 
   before_save :clean_up_number
+
+  validates :number, presence: true, phone_number: true
 
   # attr_accessible :number, :primary, :country_code, :location, :remote_id
 
@@ -29,19 +33,18 @@ class PhoneNumber < ActiveRecord::Base
     number
   end
 
-  def self.strip_number(number)
-    number.gsub(/\W/,'') if number
-  end
-
   def clean_up_number
-    strip_number!
-    self.country_code ||= '1' if number.length == 10
+    global = GlobalPhone.parse(number)
+    if global
+      self.number = global.international_string
+      self.country_code = global.country_code
+    end
     true
   end
 
   def ==(other)
     return false unless other.is_a?(PhoneNumber)
-    PhoneNumber.strip_number(number.to_s) == PhoneNumber.strip_number(other.number.to_s)
+    number == other.number
   end
 
   def merge(other)
@@ -51,16 +54,6 @@ class PhoneNumber < ActiveRecord::Base
     self.remote_id = other.remote_id if remote_id.blank?
     self.save(validate: false)
     other.destroy
-  end
-
-  private
-
-  def strip_number!
-    if number.first == '+' && (match = number.match(/\+(\d+) /))
-      self.number = number.sub(match[0], '')
-      self.country_code = match[1]
-    end
-    self.number = PhoneNumber.strip_number(number)
   end
 
 end
