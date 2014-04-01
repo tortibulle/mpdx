@@ -46,6 +46,21 @@ ActiveRecord::Schema.define(version: 20140325143531) do
 
   add_index "account_lists", ["creator_id"], name: "index_account_lists_on_creator_id", using: :btree
 
+  create_table "active_admin_comments", force: true do |t|
+    t.string   "resource_id",   null: false
+    t.string   "resource_type", null: false
+    t.integer  "author_id"
+    t.string   "author_type"
+    t.text     "body"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.string   "namespace"
+  end
+
+  add_index "active_admin_comments", ["author_type", "author_id"], name: "index_active_admin_comments_on_author_type_and_author_id", using: :btree
+  add_index "active_admin_comments", ["namespace"], name: "index_active_admin_comments_on_namespace", using: :btree
+  add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_admin_notes_on_resource_type_and_resource_id", using: :btree
+
   create_table "activities", force: true do |t|
     t.integer  "account_list_id"
     t.boolean  "starred",                 default: false, null: false
@@ -117,6 +132,23 @@ ActiveRecord::Schema.define(version: 20140325143531) do
   add_index "addresses", ["addressable_id"], name: "index_addresses_on_person_id", using: :btree
   add_index "addresses", ["master_address_id"], name: "index_addresses_on_master_address_id", using: :btree
   add_index "addresses", ["remote_id"], name: "index_addresses_on_remote_id", using: :btree
+
+  create_table "admin_users", force: true do |t|
+    t.string   "email",                default: "", null: false
+    t.string   "guid",                              null: false
+    t.integer  "sign_in_count",        default: 0
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string   "current_sign_in_ip"
+    t.string   "last_sign_in_ip"
+    t.string   "authentication_token"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
+  add_index "admin_users", ["authentication_token"], name: "index_admin_users_on_authentication_token", unique: true, using: :btree
+  add_index "admin_users", ["email"], name: "index_admin_users_on_email", unique: true, using: :btree
+  add_index "admin_users", ["guid"], name: "index_admin_users_on_guid", unique: true, using: :btree
 
   create_table "companies", force: true do |t|
     t.string   "name"
@@ -417,6 +449,7 @@ ActiveRecord::Schema.define(version: 20140325143531) do
     t.string   "country"
     t.string   "postal_code"
     t.boolean  "verified",        default: false, null: false
+    t.boolean  "boolean",         default: false, null: false
     t.text     "smarty_response"
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
@@ -509,17 +542,6 @@ ActiveRecord::Schema.define(version: 20140325143531) do
   add_index "notifications", ["contact_id"], name: "index_notifications_on_contact_id", using: :btree
   add_index "notifications", ["donation_id"], name: "index_notifications_on_donation_id", using: :btree
   add_index "notifications", ["notification_type_id"], name: "index_notifications_on_notification_type_id", using: :btree
-
-  create_table "organization_accounts", force: true do |t|
-    t.integer  "user_id"
-    t.integer  "organization_id"
-    t.string   "username"
-    t.string   "password"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "organization_accounts", ["user_id", "organization_id"], name: "index_organization_accounts_on_user_id_and_organization_id", unique: true, using: :btree
 
   create_table "organizations", force: true do |t|
     t.string   "name"
@@ -683,7 +705,7 @@ ActiveRecord::Schema.define(version: 20140325143531) do
     t.datetime "locked_at"
   end
 
-  add_index "person_organization_accounts", ["person_id", "organization_id"], name: "user_id_and_organization_id", unique: true, using: :btree
+  add_index "person_organization_accounts", ["person_id", "organization_id"], name: "index_organization_accounts_on_user_id_and_organization_id", unique: true, using: :btree
 
   create_table "person_relay_accounts", force: true do |t|
     t.integer  "person_id"
