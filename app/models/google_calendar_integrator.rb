@@ -1,4 +1,6 @@
 class GoogleCalendarIntegrator
+  attr_accessor :client
+
   def initialize(google_integration)
     @google_integration = google_integration
     @google_account = google_integration.google_account
