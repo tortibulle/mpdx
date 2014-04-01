@@ -48,6 +48,7 @@ class EmailAddress < ActiveRecord::Base
         email
       end
     end
+    email.save unless email.new_record?
     email
   end
 

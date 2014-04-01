@@ -34,6 +34,32 @@ describe Contact do
     end
   end
 
+
+  describe 'saving email addresses' do
+    it 'should change which email address is primary' do
+      person = create(:person)
+      contact.people << person
+      email1 = create(:email_address, primary: true, person: person)
+      email2 = create(:email_address, primary: false, person: person)
+
+      people_attributes =
+        {"people_attributes"=>
+         {"0"=>
+          {"email_addresses_attributes"=>
+            {
+              "0"=>{"email"=>email1.email, "primary"=>"0", "_destroy"=>"false", "id"=>email1.id},
+              "1"=>{"email"=>email2.email, "primary"=>"1", "_destroy"=>"false", "id"=>email2.id}
+            },
+           "id"=>person.id
+          }
+         }
+        }
+      contact.update_attributes(people_attributes)
+      expect(email1.reload.primary?).to be_false
+      expect(email2.reload.primary?).to be_true
+    end
+  end
+
   describe 'saving donor accounts' do
     it "links to an existing donor account if one matches" do
       donor_account = create(:donor_account)
