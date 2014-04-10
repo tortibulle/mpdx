@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  force_ssl(if: :ssl_configured?, except: :lb)
   ensure_security_headers
   MAX_PER_PAGE = 4294967296
 
@@ -9,6 +10,10 @@ class ApplicationController < ActionController::Base
   around_filter :do_with_current_user, :set_user_time_zone, :set_locale
 
   private
+
+  def ssl_configured?
+    !Rails.env.development? && !Rails.env.test?
+  end
 
   def redirect_to_mobile
     session[:fullsite] = true if params[:fullsite] == "true"
