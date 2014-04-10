@@ -55,7 +55,7 @@ class AccountsController < ApplicationController
   end
 
   def failure
-    flash[:alert] = _('We were unnable to connect your account. Please try again.')
+    flash[:alert] = _('We were unable to connect your account. Please try again.')
     redirect_to redirect_path
   end
 
