@@ -64,7 +64,7 @@ class GoogleCalendarIntegrator
 
   def event_attributes(task)
     attributes = {
-      summary: task.subject,
+      summary: task.subject_with_contacts,
       location: task.calculated_location.to_s,
       description: task.activity_comments.collect(&:body).join("\n\n"),
       source: {title: 'MPDX', url: 'https://mpdx.org/tasks'}

@@ -35,6 +35,10 @@ class Activity < ActiveRecord::Base
 
   def to_s() subject; end
 
+  def subject_with_contacts
+    "#{_(activity_type)}: #{subject} - #{contacts.map(&:to_s).join(', ')}"
+  end
+
   def contacts_attributes=(contacts_array)
     contacts_array = contacts_array.values if contacts_array.is_a?(Hash)
     contacts_array.each do |contact_attributes|
