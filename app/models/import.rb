@@ -27,6 +27,9 @@ class Import < ActiveRecord::Base
     begin
       "#{source.titleize}Import".constantize.new(self).import
       ImportMailer.complete(self).deliver
+
+      # clean up data
+      account_list.merge_contacts
       true
     rescue => e
       ImportMailer.failed(self).deliver
