@@ -87,7 +87,8 @@ end
 group :development, :test do
   gem 'awesome_print'
   gem 'database_cleaner'
-  gem 'rspec-rails'
+  gem 'rspec', '~> 2.14.1' #3.0.0.beta2'
+  gem 'rspec-rails'#, '3.0.0.beta2'
   gem 'factory_girl_rails'
   gem 'guard-rspec'
   gem 'simplecov', :require => false
