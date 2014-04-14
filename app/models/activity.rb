@@ -26,11 +26,6 @@ class Activity < ActiveRecord::Base
   accepts_nested_attributes_for :activity_contacts, allow_destroy: true
   accepts_nested_attributes_for :activity_comments, reject_if: :all_blank
 
-  # attr_accessible :starred, :location, :subject, :start_at, :end_at, :completed,
-  #                 :activity_contacts_attributes, :activity_comments_attributes,
-  #                 :contacts_attributes, :tag_list, :result, :notification_id,
-  #                 :activity_type
-
   validates :subject, :start_at, presence: true
 
   def to_s() subject; end

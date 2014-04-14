@@ -14,6 +14,7 @@ class GoogleIntegration < ActiveRecord::Base
   before_save :create_new_calendar, if: -> { new_calendar.present? }
   before_save :toggle_calendar_integration_for_appointments, :set_default_calendar, if: :calendar_integration_changed?
 
+  delegate :sync_task, to: :calendar_integrator
 
   def queue_sync_data(integration = nil)
     async(:sync_data, integration) if integration
@@ -52,9 +53,9 @@ class GoogleIntegration < ActiveRecord::Base
 
   def toggle_calendar_integration_for_appointments
     if calendar_integration?
-      calendar_integrations << 'Appointment'
+      calendar_integrations << 'Appointment' if calendar_integrations.blank?
     else
-      calendar_integrations.delete('Appointment')
+      self.calendar_integrations = []
     end
   end
 
@@ -71,7 +72,6 @@ class GoogleIntegration < ActiveRecord::Base
       :api_method => calendar_api.calendars.insert,
       :body_object => {'summary' => new_calendar}
     )
-    Rails.logger.debug(result)
     self.calendar_id = result.data['id']
     self.calendar_name = new_calendar
   end

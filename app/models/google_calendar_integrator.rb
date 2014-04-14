@@ -14,12 +14,14 @@ class GoogleCalendarIntegrator
     end
   end
 
-  def sync_task(task)
+  def sync_task(task_id)
     return nil unless @google_integration.calendar_id
 
-    google_event = task.google_events.find_by(google_integration_id: @google_integration.id)
+    task = Task.find_by(id: task_id)
+
+    google_event = GoogleEvent.find_by(google_integration_id: @google_integration.id, activity_id: task_id)
     case
-    when task.destroyed?
+    when !task, !@google_integration.calendar_integrations.include?(task.activity_type)
       if google_event
         remove_task(google_event)
         google_event.destroy
@@ -81,21 +83,14 @@ class GoogleCalendarIntegrator
 
     attributes[:attendees] = []
 
+    # We never want google sending partners event notifications, so it's safer to not add them as normal attendees.
+    # Instead we can create a comment with their names.
     attendees_without_emails = []
 
     if task.contacts.present?
       task.contacts.each do |contact|
         contact.people.each do |person|
-          if person.email.present? && person.email.valid?
-            attributes[:attendees] << {
-              displayName: person.to_s,
-              email: person.email.to_s,
-              responseStatus: 'accepted',
-              comment: person.to_s
-            }
-          else
-            attendees_without_emails << person.to_s
-          end
+          attendees_without_emails << person.to_s
         end
       end
     end

@@ -90,12 +90,8 @@ class Task < Activity
   end
 
   def sync_to_google_calendar
-    async(:async_sync_to_google_calendar)
-  end
-
-  def async_sync_to_google_calendar
     account_list.google_integrations.each do |google_integration|
-      google_integration.calendar_integrator.sync_task(self)
+      google_integration.async(:sync_task, id)
     end
   end
 end

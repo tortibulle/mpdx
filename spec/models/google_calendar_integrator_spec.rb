@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 describe GoogleCalendarIntegrator do
-  let(:google_integration) { build(:google_integration) }
+  let(:google_integration) { build(:google_integration, calendar_integrations: ['Appointment']) }
   let(:integrator) { GoogleCalendarIntegrator.new(google_integration) }
-  let(:task) { create(:task) }
+  let(:task) { create(:task, activity_type: 'Appointment') }
 
   context '#sync_tasks' do
     it 'calls #sync_task for each future, uncompleted task that is set to be synced' do
@@ -28,7 +28,7 @@ describe GoogleCalendarIntegrator do
 
   context '#add_task' do
     it 'creates a google_event' do
-      stub_request(:get, "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest")
+      stub_request(:get, 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest')
       google_integration.stub_chain(:calendar_api, :events, :insert).and_return('')
       integrator.client.should_receive(:execute).and_return(double(data: {'id' => 'foo'}, status: 200))
       integrator.should_receive(:event_attributes).and_return({})

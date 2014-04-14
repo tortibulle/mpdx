@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Task do
   let(:account_list) { create(:account_list) }
-  it "updates a related contacts uncompleted tasks count" do
+  it 'updates a related contacts uncompleted tasks count' do
     task1 = create(:task, account_list: account_list)
     task2 = create(:task, account_list: account_list)
     contact = create(:contact, account_list: account_list)
@@ -11,7 +11,6 @@ describe Task do
     contact.reload.uncompleted_tasks_count.should == 2
 
     task1.reload.update_attributes(completed: true)
-    #task1.send(:update_contact_uncompleted_tasks_count)
 
     contact.reload.uncompleted_tasks_count.should == 1
 
@@ -21,5 +20,25 @@ describe Task do
 
     task2.destroy
     contact.reload.uncompleted_tasks_count.should == 1
+  end
+
+  context 'google calendar integration' do
+    let(:google_integration) { double('GoogleIntegration', async: true)}
+
+    before do
+      AccountList.any_instance.stub(:google_integrations) { [google_integration] }
+    end
+
+    it 'syncs a task to google after a save call' do
+      google_integration.should_receive(:async)
+
+      create(:task, account_list: account_list, activity_type: 'Appointment')
+    end
+
+    it 'syncs a task to google after a destroy call' do
+      google_integration.should_receive(:async).twice
+
+      create(:task, account_list: account_list, activity_type: 'Appointment').destroy
+    end
   end
 end
