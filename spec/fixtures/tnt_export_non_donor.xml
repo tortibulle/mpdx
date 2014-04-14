@@ -20,7 +20,7 @@ East Petersburg, PA  17520</MailingAddressBlock>
         <FirstName>Naomi</FirstName>
         <MiddleName>M</MiddleName>
         <LastName>Fisher</LastName>
-        <PreferredAddressType>1</PreferredAddressType>
+        <MailingAddresssType>1</MailingAddresssType>
         <MailingStreetAddress>P.O. Box 303</MailingStreetAddress>
         <MailingCity>East Petersburg</MailingCity>
         <MailingState>PA</MailingState>

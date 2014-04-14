@@ -14,8 +14,8 @@ describe TntImport do
 
   before do
     stub_request(:get, /api\.smartystreets\.com\/.*/).
-         with(:headers => {'Accept'=>'application/json', 'Accept-Encoding'=>'gzip, deflate', 'Content-Type'=>'application/json', 'User-Agent'=>'Ruby'}).
-         to_return(:status => 200, :body => "{}", :headers => {})
+        with(:headers => {'Accept' => 'application/json', 'Accept-Encoding' => 'gzip, deflate', 'Content-Type' => 'application/json', 'User-Agent' => 'Ruby'}).
+        to_return(:status => 200, :body => "{}", :headers => {})
   end
 
   context '#import_contacts' do
@@ -25,6 +25,45 @@ describe TntImport do
       expect {
         import.send(:import_contacts)
       }.to change(ContactReferral, :count).by(1)
+    end
+
+    context 'updating an existing contact' do
+      before do
+        account_list = create(:account_list)
+        tnt_import.account_list = account_list
+        tnt_import.save
+        import = TntImport.new(tnt_import)
+        contact.tnt_id = 1620699916
+        contact.status = 'Ask in Future'
+        contact.account_list = account_list
+        contact.save
+      end
+
+      it 'updates an existing contact' do
+        import.should_receive(:add_or_update_donor_accounts).and_return([create(:donor_account)])
+        import.should_receive(:add_or_update_donor_accounts).and_return([create(:donor_account)])
+        expect {
+          import.send(:import_contacts)
+        }.to change { contact.reload.status }.from('Ask in Future').to('Partner - Pray')
+      end
+
+      it 'changes the primary address of an existing contact' do
+        donor_account_one = create(:donor_account)
+        donor_account_two = create(:donor_account)
+        import.should_receive(:add_or_update_donor_accounts).and_return([donor_account_one])
+        import.should_receive(:add_or_update_donor_accounts).and_return([donor_account_two])
+        import.should_receive(:add_or_update_donor_accounts).and_return([donor_account_one])
+        import.should_receive(:add_or_update_donor_accounts).and_return([donor_account_two])
+        address = create(:address, primary_mailing_address: true)
+        contact.addresses << address
+        contact.save
+        expect {
+          import.send(:import_contacts)
+        }.not_to change { contact.addresses.where(primary_mailing_address: true).count }
+        expect { # make sure it survives a second import
+          import.send(:import_contacts)
+        }.not_to change { contact.addresses.where(primary_mailing_address: true).count }
+      end
     end
 
     it 'imports a contact people details even if the contact is not a donor' do

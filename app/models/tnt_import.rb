@@ -267,7 +267,7 @@ class TntImport
     contact.last_thank = parse_date(row['LastThank']) if (@import.override? || contact.last_thank.blank?) && row['LastThank'].present?
     contact.tag_list.add(@import.tags, parse: true) if @import.tags.present?
     contact.tnt_id = row['id']
-    contact.addresses_attributes = build_address_array(row)
+    contact.addresses_attributes = build_address_array(row, contact, @import.override)
     contact.save
   end
 
@@ -414,18 +414,33 @@ class TntImport
     donor_accounts
   end
 
-  def build_address_array(row)
+  def build_address_array(row, contact = nil, override = true)
     addresses = []
     %w[Home Business Other].each_with_index do |location, i|
-      if [row["#{location}StreetAddress"],row["#{location}City"],row["#{location}State"],row["#{location}PostalCode"]].any?(&:present?)
+      street = row["#{location}StreetAddress"]
+      city = row["#{location}City"]
+      state = row["#{location}State"]
+      postal_code = row["#{location}PostalCode"]
+      country = row["#{location}Country"] == "United States of America" ? "United States" : row["#{location}Country"]
+      if [street, city, state, postal_code].any?(&:present?)
+        primary_address = false
+        primary_address = row['MailingAddressType'].to_i == (i + 1) if override
+        if primary_address && contact
+          contact.addresses.each do |address|
+            unless address.street == street && address.city == city && address.state == state && address.postal_code == postal_code && address.country == country
+              address.primary_mailing_address = false
+              address.save
+            end
+          end
+        end
         addresses << {
-                        street: row["#{location}StreetAddress"],
-                        city: row["#{location}City"],
-                        state: row["#{location}State"],
-                        postal_code: row["#{location}PostalCode"],
-                        country: row["#{location}Country"],
+                        street: street,
+                        city: city,
+                        state: state,
+                        postal_code: postal_code,
+                        country: country,
                         location: location,
-                        primary_mailing_address: row['PreferredAddressType'].to_i == (i + 1)
+                        primary_mailing_address: primary_address
                       }
       end
     end

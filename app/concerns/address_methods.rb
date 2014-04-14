@@ -13,8 +13,8 @@ module AddressMethods
 
   def blank_or_duplicate_address?(attributes)
     return false if attributes['id']
-    attributes.slice('street', 'city', 'state', 'country', 'postal_code').all? { |_, v| v.blank? } ||
-    addresses.where(attributes.slice('street', 'city', 'state', 'country', 'postal_code')).first.present?
+    attributes.slice('street', 'city', 'state', 'country', 'postal_code', :street, :city, :state, :country, :postal_code).all? { |_, v| v.blank? } ||
+    addresses.where(attributes.slice('street', 'city', 'state', 'country', 'postal_code', :street, :city, :state, :country, :postal_code)).first.present?
   end
 
   def address

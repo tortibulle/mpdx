@@ -11,7 +11,7 @@
       </row>
     </Appeal>
     <Contact>
-      <row id="-1620699916">
+      <row id="1620699916">
         <LastEdit>2011-12-16 15:29:33</LastEdit>
         <CreatedDate>2004-07-30</CreatedDate>
         <FileAs>Smith, John and Jane</FileAs>
@@ -29,7 +29,7 @@ Nowhere, CA  12345</MailingAddressBlock>
         <FirstName>John</FirstName>
         <LastName>Smith</LastName>
         <SpouseFirstName>Jane</SpouseFirstName>
-        <PreferredAddressType>1</PreferredAddressType>
+        <MailingAddressType>1</MailingAddressType>
         <MailingStreetAddress>1234 N St.</MailingStreetAddress>
         <MailingCity>Nowhere</MailingCity>
         <MailingState>CA</MailingState>
@@ -121,7 +121,7 @@ State, CA  12345</MailingAddressBlock>
         <FirstName>Bob</FirstName>
         <LastName>Doe</LastName>
         <SpouseFirstName>Dawn</SpouseFirstName>
-        <PreferredAddressType>1</PreferredAddressType>
+        <MailingAddressType>1</MailingAddressType>
         <MailingStreetAddress>2345 Capa Dr.</MailingStreetAddress>
         <MailingCity>State</MailingCity>
         <MailingState>CA</MailingState>
@@ -374,7 +374,7 @@ State, CA  12345</HomeAddressBlock>
       <row id="1">
         <LastEdit>2006-12-19 20:55:53</LastEdit>
         <TaskID>-1918558789</TaskID>
-        <ContactID>-1620699916</ContactID>
+        <ContactID>1620699916</ContactID>
       </row>
     </TaskContact>
     <TaskReason>
