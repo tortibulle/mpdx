@@ -36,7 +36,7 @@ class Api::V1::BaseController < ApplicationController
       end
       begin
         unless current_user
-          render json: {errors: ['Please go to http://mpdx.org and log in using Relay before trying to use the mobile app.']},
+          render json: {errors: ['Please go to https://mpdx.org and log in using Relay before trying to use the mobile app.']},
                  status: :unauthorized,
                  callback: params[:callback]
           return false
@@ -50,7 +50,7 @@ class Api::V1::BaseController < ApplicationController
     def ensure_setup_finished
       return if request.request_method == "OPTIONS"
       unless current_account_list
-        render json: {errors: _('You need to go to http://mpdx.org and set up your account before using the mobile app.')},
+        render json: {errors: _('You need to go to https://mpdx.org and set up your account before using the mobile app.')},
                callback: params[:callback],
                status: :unauthorized
         return false
