@@ -12,7 +12,7 @@ class ApplicationController < ActionController::Base
   private
 
   def ssl_configured?
-    !Rails.env.development? && !Rails.env.test?
+    request.get? && !Rails.env.development? && !Rails.env.test?
   end
 
   def redirect_to_mobile
