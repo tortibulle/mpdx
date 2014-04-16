@@ -35,7 +35,7 @@
         <li class="<%= 'opened' if filters_params[:contact_ids] %>">
           <label class="<%= 'opened' if filters_params[:contact_ids] %>"><%= _('Contact') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:contact_ids] %>">
-            <%= select_tag 'filters[contact_ids]', options_for_select([[_('-- Any --'), '']] + current_account_list.all_contacts.collect { |c| [c.name, c.id] }, filters_params[:contact_ids]), multiple: true, size: 5 %>
+            <%= select_tag 'filters[contact_ids]', options_for_select([[_('-- Any --'), '']] + current_account_list.all_contacts.collect { |c| [c.name, c.id] }, filters_params[:contact_ids]), multiple: true, size: 5, :'ng-model' => 'filterContactsSelect' %>
           </div>
         </li>
         <li class="controls">

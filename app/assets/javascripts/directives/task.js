@@ -10,7 +10,7 @@ angular.module('mpdxApp')
             },
             controller: function ($scope, contactCache) {
                 $scope.contacts = {};
-                //console.log($scope.task);
+                console.log($scope.task);
 
                 angular.forEach($scope.task.contacts, function(contactId){
                     contactCache.get(contactId, function(contact){

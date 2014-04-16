@@ -12,6 +12,24 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $http,
             });
     };
     $scope.refreshTasks();
+    $scope.filterContactsSelect = [''];
+
+    $scope.$watch('filterContactsSelect', function(newValue, oldValue){
+        //console.log(newValue);
+    })
+
+    $scope.filters = function(task){
+        if($scope.filterContactsSelect[0] === ''){
+            return true;
+        }
+        var result = false;
+        angular.forEach(task.contacts, function(contact){
+            if(_.contains($scope.filterContactsSelect, contact.toString())){
+                result = true;
+            }
+        });
+        return result;
+    };
 
     $scope.filterToday = function(task) {
         return ($filter('date')(task.due_date, 'yyyyMMdd') === $filter('date')(Date.now(), 'yyyyMMdd'));
