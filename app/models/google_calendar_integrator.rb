@@ -10,7 +10,7 @@ class GoogleCalendarIntegrator
   def sync_tasks
     if @google_integration.calendar_integration?
       tasks = @google_integration.account_list.tasks.future.uncompleted.of_type(@google_integration.calendar_integrations)
-      tasks.map { |task| sync_task(task) }
+      tasks.map { |task| sync_task(task.id) }
     end
   end
 
@@ -18,14 +18,11 @@ class GoogleCalendarIntegrator
     return nil unless @google_integration.calendar_id
 
     task = Task.find_by(id: task_id)
-
     google_event = GoogleEvent.find_by(google_integration_id: @google_integration.id, activity_id: task_id)
+
     case
     when !task, !@google_integration.calendar_integrations.include?(task.activity_type)
-      if google_event
-        remove_task(google_event)
-        google_event.destroy
-      end
+      remove_google_event(google_event) if google_event
     when google_event
       update_task(task, google_event)
     else
@@ -33,13 +30,15 @@ class GoogleCalendarIntegrator
     end
   end
 
-  def remove_task(google_event)
+  def remove_google_event(google_event)
     result = @client.execute(
       :api_method => @google_integration.calendar_api.events.delete,
       :parameters => {'calendarId' => @google_integration.calendar_id,
                       'eventId' => google_event.google_event_id}
     )
-    handle_error(result, task)
+    handle_error(result, google_event)
+
+    google_event.destroy
   end
 
   def update_task(task, google_event)
@@ -62,6 +61,13 @@ class GoogleCalendarIntegrator
     )
     handle_error(result, task)
     task.google_events.create!(google_integration_id: @google_integration.id, google_event_id: result.data['id'])
+  rescue GoogleCalendarIntegrator::NotFound
+    # a NotFound error here means the calendar being referenced doesn't exist on this google account
+    @google_integration.update_attributes(
+      calendar_id: nil,
+      calendar_name: nil,
+      calendar_integration: false
+    )
   end
 
   def event_attributes(task)
@@ -113,15 +119,15 @@ class GoogleCalendarIntegrator
     attributes
   end
 
-  def handle_error(result, task)
+  def handle_error(result, object)
     case result.status
     when 404
-      raise NotFound
+      raise NotFound, result.data.inspect
     else
       return unless result.data['error'] # no error, everything is fine.
       case result.data['error']['message']
       when 'Invalid attendee email.'
-        raise InvalidEmail, event_attributes(task).inspect
+        raise InvalidEmail, event_attributes(object).inspect
       else
         raise Error, result.data['error']['message']
       end
