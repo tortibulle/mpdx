@@ -4,7 +4,7 @@ class GoogleIntegration < ActiveRecord::Base
   include Sidekiq::Worker
   sidekiq_options backtrace: true, unique: true
 
-  belongs_to :google_account, class_name: 'Person::GoogleAccount', inverse_of: :google_integrations, dependent: :destroy
+  belongs_to :google_account, class_name: 'Person::GoogleAccount', inverse_of: :google_integrations
   belongs_to :account_list, inverse_of: :google_integrations
 
   attr_accessor :new_calendar
