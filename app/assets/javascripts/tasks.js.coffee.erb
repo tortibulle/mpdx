@@ -84,6 +84,7 @@ $ ->
               return false
             $.rails.handleRemote(form)
             $('.form_wrapper', this).html('<%= image_tag("spinner.gif") %>')
+            angular.element(jQuery('#contentbody')).scope().refreshTasks()
         },
         {
           text: __('Cancel'),

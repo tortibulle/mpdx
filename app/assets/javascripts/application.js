@@ -37,3 +37,12 @@
 //= require tasks
 //= require home
 //= require google_integrations
+
+
+//angular
+//= require angular
+//= require lodash
+//= require mpdxApp.js
+//= require controllers/tasks
+//= require directives/task
+//= require services/contactCache

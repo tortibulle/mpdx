@@ -1,10 +1,9 @@
 <%= render 'sidebar' %>
-<div id="contentbody" class="withleft">
+<div id="contentbody" class="withleft" ng-controller="tasksController">
   <div class="wpp">
 
     <h1></h1>
 
-    <% if @overdue.length > 0 %>
       <table>
         <thead>
           <tr class="taskgroup taskgroup--red">
@@ -17,12 +16,10 @@
         </thead>
 
         <tbody class="tablelist tasks">
-          <%= render partial: 'task', collection: @overdue %>
+        <tr task="task" ng-repeat="task in tasks | filter:filterOverdue | orderBy:'due_date'"></tr>
         </tbody>
       </table>
-    <% end %>
 
-    <% if @today.length > 0 %>
       <br /><br />
       <table>
         <thead>
@@ -36,12 +33,10 @@
         </thead>
 
         <tbody class="tablelist tasks">
-          <%= render partial: 'task', collection: @today %>
+          <tr task="task" ng-repeat="task in tasks | filter:filterToday | orderBy:'due_date'"></tr>
         </tbody>
       </table>
-    <% end %>
 
-    <% if @tomorrow.length > 0 %>
       <br /><br />
       <table>
         <thead>
@@ -55,12 +50,10 @@
         </thead>
 
         <tbody class="tablelist tasks">
-          <%= render partial: 'task', collection: @tomorrow %>
+          <tr task="task" ng-repeat="task in tasks | filter:filterTomorrow | orderBy:'due_date'"></tr>
         </tbody>
       </table>
-    <% end %>
 
-    <% if @upcoming.length > 0 %>
       <br /><br />
       <table>
         <thead>
@@ -74,10 +67,9 @@
         </thead>
 
         <tbody class="tablelist tasks">
-          <%= render partial: 'task', collection: @upcoming %>
+        <tr task="task" ng-repeat="task in tasks | filter:filterUpcoming | orderBy:'due_date'"></tr>
         </tbody>
       </table>
-    <% end %>
   </div>
 </div>
 <%= render 'tasks/results_modal' %>
