@@ -45,4 +45,5 @@
 //= require mpdxApp.js
 //= require controllers/tasks
 //= require directives/task
+//= require services/api
 //= require services/contactCache

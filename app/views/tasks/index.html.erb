@@ -6,7 +6,7 @@
       <h1></h1>
       <h1 ng-show="(tasks | filter:filters).length === 0">No tasks to show</h1>
 
-      <div ng-show="(tasks | filter:filterOverdue | filter:filters).length > 0">
+      <div ng-show="(tasks | filter:filterOverdue | filter:filters).length > 0 && filterPage === 'active'">
         <table>
           <thead>
             <tr class="taskgroup taskgroup--red">
@@ -19,13 +19,13 @@
           </thead>
 
           <tbody class="tablelist tasks">
-          <tr task="task" ng-repeat="task in tasks | filter:filterOverdue | filter:filters | orderBy:'due_date'"></tr>
+          <tr task="task" ng-repeat="task in tasks | filter:filterOverdue | filter:filters | orderBy:'due_date'" id="task_{{task.id}}"></tr>
           </tbody>
         </table>
         <br />
       </div>
 
-        <div ng-show="(tasks | filter:filterToday | filter:filters).length > 0">
+        <div ng-show="(tasks | filter:filterToday | filter:filters).length > 0 && filterPage === 'active'">
           <table>
             <thead>
               <tr class="taskgroup taskgroup--green">
@@ -38,13 +38,13 @@
             </thead>
 
             <tbody class="tablelist tasks">
-              <tr task="task" ng-repeat="task in tasks | filter:filterToday | filter:filters | orderBy:'due_date'"></tr>
+              <tr task="task" ng-repeat="task in tasks | filter:filterToday | filter:filters | orderBy:'due_date'" id="task_{{task.id}}"></tr>
             </tbody>
           </table>
           <br />
         </div>
 
-        <div ng-show="(tasks | filter:filterTomorrow | filter:filters).length > 0">
+        <div ng-show="(tasks | filter:filterTomorrow | filter:filters).length > 0 && filterPage === 'active'">
           <table>
             <thead>
               <tr class="taskgroup taskgroup--orange">
@@ -57,13 +57,13 @@
             </thead>
 
             <tbody class="tablelist tasks">
-              <tr task="task" ng-repeat="task in tasks | filter:filterTomorrow | filter:filters | orderBy:'due_date'"></tr>
+              <tr task="task" ng-repeat="task in tasks | filter:filterTomorrow | filter:filters | orderBy:'due_date'" id="task_{{task.id}}"></tr>
             </tbody>
           </table>
           <br />
         </div>
 
-      <div ng-show="(tasks | filter:filterUpcoming | filter:filters).length > 0">
+      <div ng-show="(tasks | filter:filterUpcoming | filter:filters).length > 0 && filterPage === 'active'">
         <table>
           <thead>
             <tr class="taskgroup taskgroup--gray">
@@ -76,7 +76,23 @@
           </thead>
 
           <tbody class="tablelist tasks">
-          <tr task="task" ng-repeat="task in tasks | filter:filterUpcoming | filter:filters | orderBy:'due_date'"></tr>
+          <tr task="task" ng-repeat="task in tasks | filter:filterUpcoming | filter:filters | orderBy:'due_date'" id="task_{{task.id}}"></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div ng-show="(tasks | filter:filters).length > 0 && filterPage === 'starred'">
+        <table>
+          <thead>
+          <tr class="taskgroup taskgroup--orange">
+            <td colspan="100">
+              <%= _('Starred') %>
+            </td>
+          </tr>
+          </thead>
+
+          <tbody class="tablelist tasks">
+          <tr task="task" ng-repeat="task in tasks | filter:filters | orderBy:'due_date'" id="task_{{task.id}}"></tr>
           </tbody>
         </table>
       </div>

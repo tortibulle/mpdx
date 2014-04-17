@@ -8,9 +8,8 @@ angular.module('mpdxApp')
             },
             link: function (scope, element, attrs){
             },
-            controller: function ($scope, contactCache) {
+            controller: function ($scope, contactCache, api) {
                 $scope.contacts = {};
-                console.log($scope.task);
 
                 angular.forEach($scope.task.contacts, function(contactId){
                     contactCache.get(contactId, function(contact){
@@ -21,6 +20,36 @@ angular.module('mpdxApp')
                 $scope.getComment = function(id){
                     return _.find($scope.$parent.comments, { 'id': id });
                 };
+
+                $scope.getPerson = function(id){
+                    var person = _.find($scope.$parent.people, { 'id': id });
+                    person.name = person.first_name + ' ' + person.last_name;
+                    return person;
+                };
+
+                $scope.starTask = function(){
+                    $scope.task.starred = !$scope.task.starred;
+                    api.call('put', 'tasks/'+$scope.task.id, {
+                        task: $scope.task
+                    }, function(data){
+                    });
+                };
+
+                $scope.postNewComment = function(){
+                    api.call('put', 'tasks/'+$scope.task.id, {
+                        task: {
+                            activity_comments_attributes: {
+                                "0": {
+                                    body: $scope.postNewCommentMsg
+                                }}
+                        }
+                    }, function(data){
+                        var latestComment = _.max(data.comments, function(comment) { return comment.id; });
+                        $scope.$parent.comments.push(latestComment);
+                        $scope.task.comments.push(latestComment.id);
+                        $scope.postNewCommentMsg = '';
+                    });
+                }
             }
         };
     });

@@ -1,34 +1,77 @@
-angular.module('mpdxApp').controller('tasksController', function ($scope, $http, $filter) {
+angular.module('mpdxApp').controller('tasksController', function ($scope, $filter, api) {
     $scope.refreshTasks = function(){
-        $http({method: 'GET', url: '/api/v1/tasks'}).
-            success(function(data, status, headers, config) {
-                $scope.tasks = data.tasks;
-                $scope.comments = data.comments;
-                //console.log(data);
-            }).
-            error(function(data, status, headers, config) {
-                // called asynchronously if an error occurs
-                // or server returns response with an error status.
-            });
+        api.call('get','tasks',{},function(data) {
+            $scope.tasks = _.remove(data.tasks, function(task) { return task.completed === false; });
+            $scope.comments = data.comments;
+            $scope.people = data.people;
+
+            $scope.tags = _.sortBy(_.uniq(_.flatten(_.pluck($scope.tasks, 'tag_list'))));
+            $scope.tags = _.zip($scope.tags, $scope.tags);
+            $scope.tags.unshift(['', '-- Any --']);
+
+            $scope.activity_types = _.sortBy(_.uniq(_.pluck($scope.tasks, 'activity_type')));
+            _.remove($scope.activity_types, function(action) { return action === ''; });
+            $scope.activity_types = _.zip($scope.activity_types, $scope.activity_types);
+            $scope.activity_types.unshift(['', '-- Any --']);
+
+            console.log($scope.tasks);
+        });
     };
     $scope.refreshTasks();
     $scope.filterContactsSelect = [''];
+    $scope.filterTagsSelect = [''];
+    $scope.filterActionSelect = [''];
+    $scope.filterPage = 'active';
 
-    $scope.$watch('filterContactsSelect', function(newValue, oldValue){
+    $scope.$watch('filterActionSelect', function(newValue, oldValue){
         //console.log(newValue);
     })
 
-    $scope.filters = function(task){
-        if($scope.filterContactsSelect[0] === ''){
-            return true;
-        }
-        var result = false;
-        angular.forEach(task.contacts, function(contact){
-            if(_.contains($scope.filterContactsSelect, contact.toString())){
-                result = true;
+    $scope.tagIsActive = function(tag){
+        return _.contains($scope.filterTagsSelect, tag);
+    };
+
+    $scope.tagClick = function(tag){
+        if($scope.tagIsActive(tag)){
+            _.remove($scope.filterTagsSelect, function(i) { return i === tag; });
+            if($scope.filterTagsSelect.length === 0){
+                $scope.filterTagsSelect.push('');
             }
-        });
-        return result;
+        }else{
+            _.remove($scope.filterTagsSelect, function(i) { return i === ''; });
+            $scope.filterTagsSelect.push(tag);
+        }
+    };
+
+    $scope.filters = function(task){
+        var filterContact = false;
+        if($scope.filterContactsSelect[0] === ''){
+            filterContact = true;
+        }else{
+            angular.forEach(task.contacts, function(contact){
+                if(_.contains($scope.filterContactsSelect, contact.toString())){
+                    filterContact = true;
+                }
+            });
+        }
+
+        var filterTag = false;
+        if(_.intersection(task.tag_list, $scope.filterTagsSelect).length > 0 || $scope.filterTagsSelect[0] === ''){
+            filterTag = true;
+        }
+
+        var filterAction = false;
+        if(_.contains($scope.filterActionSelect, task.activity_type) || $scope.filterActionSelect[0] === ''){
+            filterAction = true;
+        }
+
+        var filterPage = false;
+        if($scope.filterPage === 'active'){
+            filterPage = true;
+        }else if($scope.filterPage === 'starred'){
+            filterPage = task.starred;
+        }
+        return filterContact && filterTag && filterAction && filterPage;
     };
 
     $scope.filterToday = function(task) {
