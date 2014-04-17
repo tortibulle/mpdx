@@ -1,6 +1,3 @@
-<script type="text/javascript" charset="utf-8">
-  var account_contacts_json = <%= contacts_for_filter.collect { |c| {value: c.name, id: c.id} }.to_json.html_safe %>
-</script>
 <br>
 <p>
   <%= _('Choose one of your contacts from the list below. MPDX will then display the information currently on file for that contact in the donation system.') %>
@@ -16,3 +13,4 @@
     <% end %>
   </ul>
 </div>
+<div id="contentbody"></div>
