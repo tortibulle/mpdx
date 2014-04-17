@@ -84,9 +84,9 @@ describe GoogleCalendarIntegrator do
       integrator.should_receive(:event_attributes).and_return({})
       integrator.should_receive(:add_task)
 
-      expect {
-        integrator.update_task(task, google_event)
-      }.to change(GoogleEvent, :count)
+      integrator.update_task(task, google_event)
+
+      expect(google_event).to_not eq(GoogleEvent.find_by(google_integration_id: google_integration.id, activity_id: task.id))
     end
   end
 
