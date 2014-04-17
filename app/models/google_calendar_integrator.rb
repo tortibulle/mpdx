@@ -37,7 +37,9 @@ class GoogleCalendarIntegrator
                       'eventId' => google_event.google_event_id}
     )
     handle_error(result, google_event)
-
+  rescue GoogleCalendarIntegrator::Deleted
+    # if the task was already deleted manually, don't worry about it
+  ensure
     google_event.destroy
   end
 
@@ -49,7 +51,8 @@ class GoogleCalendarIntegrator
       :body_object => event_attributes(task)
     )
     handle_error(result, task)
-  rescue GoogleCalendarIntegrator::NotFound
+  rescue GoogleCalendarIntegrator::NotFound, GoogleCalendarIntegrator::Deleted
+    google_event.destroy
     add_task(task)
   end
 
@@ -123,18 +126,23 @@ class GoogleCalendarIntegrator
     case result.status
     when 404
       raise NotFound, result.data.inspect
+    when 410
+      raise Deleted, result.data.inspect
     else
-      return unless result.data['error'] # no error, everything is fine.
+      return unless result.data && result.data['error'] # no error, everything is fine.
       case result.data['error']['message']
       when 'Invalid attendee email.'
         raise InvalidEmail, event_attributes(object).inspect
       else
-        raise Error, result.data['error']['message']
+        raise Error, result.data['error']['message'] + " -- #{result.data.inspect}"
       end
     end
   end
 
   class NotFound < StandardError
+  end
+
+  class Deleted < StandardError
   end
 
   class InvalidEmail < StandardError
