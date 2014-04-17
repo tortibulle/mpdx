@@ -3,7 +3,7 @@ require 'spec_helper'
 describe GoogleCalendarIntegrator do
   let(:google_integration) { build(:google_integration, calendar_integrations: ['Appointment']) }
   let(:integrator) { GoogleCalendarIntegrator.new(google_integration) }
-  let(:task) { create(:task, activity_type: 'Appointment') }
+  let(:task) { create(:task, account_list: google_integration.account_list, activity_type: 'Appointment') }
   let(:google_event) { create(:google_event, activity: task, google_integration: google_integration) }
 
   context '#sync_tasks' do
@@ -65,6 +65,31 @@ describe GoogleCalendarIntegrator do
     end
   end
 
+  context '#update_task' do
+    it 'updates a google_event' do
+      google_integration.stub_chain(:calendar_api, :events, :patch).and_return('')
+      integrator.client.should_receive(:execute).and_return(double(data: {'id' => 'foo'}, status: 200))
+      integrator.should_receive(:event_attributes).and_return({})
+      integrator.should_not_receive(:add_task)
+
+      google_event.save
+      expect {
+        integrator.update_task(task, google_event)
+      }.to_not change(GoogleEvent, :count)
+    end
+
+    it 'adds the google event if it is missing from google' do
+      google_integration.stub_chain(:calendar_api, :events, :patch).and_return('')
+      integrator.client.should_receive(:execute).and_return(double(data: {"error"=>{"errors"=>[{"domain"=>"global", "reason"=>"notFound", "message"=>"Not Found"}], "code"=>404, "message"=>"Not Found"}}, status: 404))
+      integrator.should_receive(:event_attributes).and_return({})
+      integrator.should_receive(:add_task)
+
+      expect {
+        integrator.update_task(task, google_event)
+      }.to change(GoogleEvent, :count)
+    end
+  end
+
   context '#remove_google_event' do
     it 'deletes a google_event' do
       google_integration.stub_chain(:calendar_api, :events, :delete).and_return('')
@@ -74,6 +99,44 @@ describe GoogleCalendarIntegrator do
       expect {
         integrator.remove_google_event(google_event)
       }.to change(GoogleEvent, :count).by(-1)
+    end
+  end
+
+  context '#event_attributes' do
+    it 'adds all mpdx users on this account to the event' do
+      google_integration.account_list.users << (user1 = create(:user))
+      google_integration.account_list.users << (user2 = create(:user))
+      user1.email_addresses << build(:email_address)
+      user2.email_addresses << build(:email_address)
+
+      expect(integrator.event_attributes(task)[:attendees].length).to eq(2)
+    end
+
+    it 'addds task contacts as a comment' do
+      google_integration.account_list.users << (user1 = create(:user))
+      user1.email_addresses << build(:email_address)
+      task.contacts << (contact = create(:contact, account_list: google_integration.account_list))
+      contact.people << (person = build(:person))
+
+      expect(integrator.event_attributes(task)[:attendees].first[:comment]).to eq(person.to_s)
+    end
+
+    it 'sets start and end times for tasks with default lengths' do
+      expect(integrator.event_attributes(task)[:start][:dateTime]).to_not be_nil
+      expect(integrator.event_attributes(task)[:end][:dateTime]).to_not be_nil
+
+      expect(integrator.event_attributes(task)[:start][:date]).to be_nil
+      expect(integrator.event_attributes(task)[:end][:date]).to be_nil
+    end
+
+    it 'sets an all day event for tasks without default lengths' do
+      task.activity_type = 'Thank'
+
+      expect(integrator.event_attributes(task)[:start][:dateTime]).to be_nil
+      expect(integrator.event_attributes(task)[:end][:dateTime]).to be_nil
+
+      expect(integrator.event_attributes(task)[:start][:date]).to_not be_nil
+      expect(integrator.event_attributes(task)[:end][:date]).to_not be_nil
     end
   end
 end
