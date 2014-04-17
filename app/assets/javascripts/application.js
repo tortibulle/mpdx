@@ -37,3 +37,4 @@
 //= require tasks
 //= require home
 //= require google_integrations
+//= require research

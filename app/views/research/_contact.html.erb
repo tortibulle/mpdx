@@ -1,0 +1,80 @@
+<div class="wpp">
+<% @donor_data.each do |contact| %>
+  <h2><%= contact.account_name %> - <%= contact.id %></h2>
+  <strong><%= _('People:') %></strong>
+  <ul>
+    <% contact.contacts.each do |person| %>
+      <li>
+        <strong>
+          <%= person.title %>
+          <%= person.first_name %>
+          <%= "(#{person.preferred_name})" if person.preferred_name.present? && person.preferred_name != person.first_name %>
+          <%= person.middle_name %>
+          <%= person.last_name %>
+          <% if person.primary %>
+            <i class="fa fa-check green"></i>
+          <% end %>
+        </strong>
+        <br/>
+        <strong><%= _('Gender:') %></strong>
+        <%= person.sex %>
+        <br/>
+        <% if person.phone_numbers.present? %>
+          <strong><%= _('Phone Numbers:') %></strong>
+          <ul>
+            <% person.phone_numbers.each do |pn| %>
+              <li>
+                <%= GlobalPhone.parse(pn.phone).national_format %>
+                <%= "(#{pn.type})" if pn.type.present? %>
+                <% if person.phone_numbers.length > 1 && pn.primary %>
+                  <i class="fa fa-check green"></i>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+        <% if person.email_addresses.present? %>
+          <strong><%= _('Email Addresses:') %></strong>
+          <ul>
+            <% person.email_addresses.each do |email| %>
+              <li>
+                <%= email.email %>
+                <%= "(#{email.type})" if email.type.present? %>
+                <% if person.email_addresses.length > 1 && email.primary %>
+                  <i class="fa fa-check green"></i>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+  <strong><%= _('Addresses:') %></strong>
+  <ul>
+    <% contact.addresses.each do |address| %>
+      <li>
+        <%= address.address1 %>
+        <br/>
+        <% if address.address2 %>
+          <%= address.address2 %>
+          <br/>
+        <% end %>
+        <%= address.city %>, <%= address.state %> <%= address.zip %>
+        <br/>
+        <strong><%= _('Type:') %></strong>
+        <%= address.type %>
+        <br/>
+        <strong><%= _('Last Updated') %></strong>
+        <%= begin Date.parse(address.updated_at).to_s(:long); rescue; end %>
+        <br/>
+        <strong><%= _('Primary:') %></strong>
+        <%= address.primary %>
+        <br/>
+        <strong><%= _('Seasonal:') %></strong>
+        <%= address.seasonal %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+</div>

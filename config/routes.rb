@@ -97,6 +97,12 @@ Mpdx::Application.routes.draw do
 
   resources :people
 
+  resources :research, only: [:index] do
+    member do
+      get :search
+    end
+  end
+
   resources :setup
 
   namespace :person do
