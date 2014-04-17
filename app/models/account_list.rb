@@ -114,7 +114,11 @@ class AccountList < ActiveRecord::Base
   end
 
   def donations
-    Donation.where(donor_account_id: donor_account_ids, designation_account_id: designation_account_ids)
+    if designation_account_ids.present?
+      Donation.where(donor_account_id: donor_account_ids, designation_account_id: designation_account_ids)
+    else
+      Donation.where(donor_account_id: donor_account_ids)
+    end
   end
 
   def designation_profile(user)
