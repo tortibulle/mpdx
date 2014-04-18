@@ -74,6 +74,7 @@ GEM
     airbrake (3.1.16)
       builder
       multi_json
+    angularjs-rails (1.2.16)
     arel (4.0.2)
     assignable_values (0.5.3)
       activerecord
@@ -259,6 +260,8 @@ GEM
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
     locale (2.1.0)
+    lodash-rails (2.4.1)
+      railties (>= 3.1)
     lumberjack (1.0.5)
     mail (2.5.4)
       mime-types (~> 1.16)
@@ -532,6 +535,7 @@ DEPENDENCIES
   active_model_serializers
   acts-as-taggable-on (~> 3.0.0)
   airbrake
+  angularjs-rails
   assignable_values (~> 0.5.3)
   awesome_print
   bluepill
@@ -568,6 +572,7 @@ DEPENDENCIES
   jquery-ui-rails
   koala (~> 1.9.0)
   linkedin (~> 0.3.7)
+  lodash-rails
   mailcatcher
   newrelic_rpm (~> 3.7.1)
   oauth!

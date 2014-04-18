@@ -1,7 +1,7 @@
 angular.module('mpdxApp').controller('tasksController', function ($scope, $filter, $location, api) {
     $scope.refreshTasks = function(){
-        api.call('get','tasks',{},function(data) {
-            $scope.tasks = _.remove(data.tasks, function(task) { return task.completed === false; });
+        api.call('get','tasks?filters[completed]=false',{},function(data) {
+            $scope.tasks = data.tasks;
             $scope.comments = data.comments;
             $scope.people = data.people;
 
