@@ -8,7 +8,7 @@ angular.module('mpdxApp')
                 url: apiUrl + url,
                 data: data,
                 cache: false,
-                timeout: 5000
+                timeout: 50000
             }).
                 success(function(data, status) {
                     if(_.isFunction(successFn)){
