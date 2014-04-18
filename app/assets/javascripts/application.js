@@ -42,7 +42,7 @@
 //angular
 //= require angular
 //= require lodash
-//= require mpdxApp.js
+//= require mpdxApp
 //= require controllers/tasks
 //= require directives/task
 //= require services/api

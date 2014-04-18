@@ -31,7 +31,15 @@ angular.module('mpdxApp')
                     $scope.task.starred = !$scope.task.starred;
                     api.call('put', 'tasks/'+$scope.task.id, {
                         task: $scope.task
-                    }, function(data){
+                    });
+                };
+
+                $scope.markComplete = function(){
+                    //$scope.task.completed = true;
+                    api.call('put', 'tasks/'+$scope.task.id, {
+                        task: $scope.task
+                    }, function(){
+                        _.remove($scope.$parent.tasks, function(task) { return task.id === $scope.task.id; });
                     });
                 };
 

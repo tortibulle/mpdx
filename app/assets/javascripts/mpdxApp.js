@@ -1,5 +1,5 @@
-angular.module('mpdxApp', []).run(function ($rootScope) {
+angular.module('mpdxApp', []).run(function () {
 
-}).config(["$httpProvider", function(provider) {
-    //provider.defaults.headers.common['X-CSRF-Token'] = jQuery('meta[name=csrf-token]').attr('content');
-}]);
+}).config(function() {
+
+});

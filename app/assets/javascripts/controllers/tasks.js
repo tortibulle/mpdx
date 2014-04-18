@@ -1,4 +1,4 @@
-angular.module('mpdxApp').controller('tasksController', function ($scope, $filter, api) {
+angular.module('mpdxApp').controller('tasksController', function ($scope, $filter, $location, api) {
     $scope.refreshTasks = function(){
         api.call('get','tasks',{},function(data) {
             $scope.tasks = _.remove(data.tasks, function(task) { return task.completed === false; });
@@ -13,15 +13,13 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             _.remove($scope.activity_types, function(action) { return action === ''; });
             $scope.activity_types = _.zip($scope.activity_types, $scope.activity_types);
             $scope.activity_types.unshift(['', '-- Any --']);
-
-            console.log($scope.tasks);
         });
     };
     $scope.refreshTasks();
     $scope.filterContactsSelect = [''];
     $scope.filterTagsSelect = [''];
     $scope.filterActionSelect = [''];
-    $scope.filterPage = 'active';
+    $scope.filterPage = ($location.$$url === '/starred' ? "starred" : 'active');
 
     $scope.$watch('filterActionSelect', function(newValue, oldValue){
         //console.log(newValue);
