@@ -26,10 +26,6 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         jQuery("#leftmenu ul.left_filters li #contact").trigger("click");
     }
 
-    $scope.$watch('filterActionSelect', function(newValue, oldValue){
-        //console.log(newValue);
-    })
-
     $scope.tagIsActive = function(tag){
         return _.contains($scope.filterTagsSelect, tag);
     };
