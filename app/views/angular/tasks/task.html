@@ -1,6 +1,5 @@
 <td class="check">
     <a name="task_{{task.id}}"/>
-    <!--<input type="checkbox" name="task_ids[]" value="{{task.id}}" ng-change="markComplete()" ng-model="task.completed" />-->
     <input type="checkbox" name="task_ids[]" value="{{task.id}}" data-behavior="complete_task" data-results="Done" data-id="{{task.id}}" />
 </td>
 <td class="data">
