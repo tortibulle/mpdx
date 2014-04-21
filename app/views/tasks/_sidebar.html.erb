@@ -3,7 +3,7 @@
   <li ng-class="{'selected': filterPage === 'active'}"><a href="/tasks/" class="inbox menu_item" ng-click="filterPage='active'">Active/Upcoming</a></li>
   <li ng-class="{'selected': filterPage === 'starred'}"><a href="/tasks/#starred" class="starred menu_item" ng-click="filterPage='starred'">Starred</a></li>
   <li class="<%= 'selected' if params[:action] == 'history' %>"><%= link_to(_('History'), history_tasks_path, class: "completed menu_item") %></li>
-  <li ng-show="tags.length > 1">
+  <li ng-show="tags.length > 1" ng-class="{'selected': filterTagsSelect[0]}">
     <span class="tags menu_item">Tags</span>
     <ul class="left_taglist tags">
       <li>
@@ -41,8 +41,8 @@
             <%= select_tag 'filters[activity_type]', options_for_select([]), multiple: true, size: 5, :'ng-model' => 'filterActionSelect', :'ng-options' => 'activity_type[0] as activity_type[1] for activity_type in activity_types' %>
           </div>
         </li>
-        <li class="<%= 'opened' if filters_params[:contact_ids] %>">
-          <label class="<%= 'opened' if filters_params[:contact_ids] %>"><%= _('Contact') %></label>
+        <li>
+          <label id="contact"><%= _('Contact') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:contact_ids] %>">
             <%= select_tag 'filters[contact_ids]', options_for_select([[_('-- Any --'), '']] + current_account_list.all_contacts.collect { |c| [c.name, c.id] }, filters_params[:contact_ids]), multiple: true, size: 5, :'ng-model' => 'filterContactsSelect' %>
           </div>

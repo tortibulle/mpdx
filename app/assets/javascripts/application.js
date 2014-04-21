@@ -47,3 +47,4 @@
 //= require directives/task
 //= require services/api
 //= require services/contactCache
+//= require services/urlParameter

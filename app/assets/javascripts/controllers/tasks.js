@@ -1,4 +1,4 @@
-angular.module('mpdxApp').controller('tasksController', function ($scope, $filter, $location, api) {
+angular.module('mpdxApp').controller('tasksController', function ($scope, $filter, $location, api, urlParameter) {
     $scope.refreshTasks = function(){
         api.call('get','tasks?filters[completed]=false',{},function(data) {
             $scope.tasks = data.tasks;
@@ -16,10 +16,15 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         });
     };
     $scope.refreshTasks();
-    $scope.filterContactsSelect = [''];
+    $scope.filterContactsSelect = [(urlParameter.get('contact_ids') || '')];
     $scope.filterTagsSelect = [''];
     $scope.filterActionSelect = [''];
     $scope.filterPage = ($location.$$url === '/starred' ? "starred" : 'active');
+
+    //auto-open contact filter
+    if($scope.filterContactsSelect[0]){
+        jQuery("#leftmenu ul.left_filters li #contact").trigger("click");
+    }
 
     $scope.$watch('filterActionSelect', function(newValue, oldValue){
         //console.log(newValue);
