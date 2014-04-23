@@ -17,7 +17,7 @@ class Donation < ActiveRecord::Base
   private
     def update_totals
       donor_account.update_donation_totals(self)
-      designation_account.update_donation_totals(self)
+      designation_account.update_donation_totals(self) if designation_account
     end
 
     def set_amount_from_tendered_amount

@@ -2,8 +2,8 @@
 
 FactoryGirl.define do
   factory :google_event do
-    activity nil
-    google_integration nil
+    association :activity
+    association :google_integration
     google_event_id "MyString"
   end
 end

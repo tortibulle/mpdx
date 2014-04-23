@@ -43,6 +43,9 @@
         <!-- <div class="item <%= request.path =~ /\/messages/ ? 'active' : '' %>"><%= link_to((_('Messages') + ' ' + content_tag(:span, 3, class: 'indicator')).html_safe, '') %></div> -->
         <div class="item <%= request.path =~ /\/tasks/ ? 'active' : '' %>"><%= link_to(_('Tasks'), "/tasks/") %></div>
         <div class="item <%= request.path =~ /\/donations/ ? 'active' : '' %>"><%= link_to(_('Donations'), "/donations") %></div>
+        <% if $rollout.active?(:research, current_account_list) %>
+          <div class="item <%= request.path =~ /\/research/ ? 'active' : '' %>"><%= link_to(_('Research'), "/research") %></div>
+        <% end %>
         <div class="item last"><%= link_to(_('Help'), new_help_request_path, target: '_blank') %></div>
         <!-- <div class="item last <%= request.path =~ /\/social/ ? 'active' : '' %>"><%= link_to(_('Social'), "") %></div> -->
         <%#<div class="items search">%>

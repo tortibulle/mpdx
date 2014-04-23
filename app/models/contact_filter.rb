@@ -103,4 +103,3 @@ class ContactFilter
     filtered_contacts
   end
 end
-

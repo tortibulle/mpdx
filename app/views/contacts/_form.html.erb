@@ -15,7 +15,6 @@
         <div id="error_explanation">
           <ul>
             <% contact.errors.each do |attribute, error| %>
-              <% next if attribute.to_s.include?('.') %>
               <li><%= contact.errors.full_message(attribute, error) %></li>
             <% end %>
           </ul>

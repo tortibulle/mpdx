@@ -15,7 +15,7 @@ class AccountList < ActiveRecord::Base
   include Sidekiq::Worker
   sidekiq_options queue: :import, retry: false, unique: true
 
-  store :settings, accessors: [:monthly_goal, :tester]
+  store :settings, accessors: [:monthly_goal, :tester, :owner]
 
   belongs_to :creator, class_name: 'User', foreign_key: 'creator_id'
   has_many :account_list_users, dependent: :destroy
@@ -114,7 +114,11 @@ class AccountList < ActiveRecord::Base
   end
 
   def donations
-    Donation.where(donor_account_id: donor_account_ids, designation_account_id: designation_account_ids)
+    if designation_account_ids.present?
+      Donation.where(donor_account_id: donor_account_ids, designation_account_id: designation_account_ids)
+    else
+      Donation.where(donor_account_id: donor_account_ids)
+    end
   end
 
   def designation_profile(user)
