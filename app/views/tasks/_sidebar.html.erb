@@ -32,7 +32,7 @@
         <li class="<%= 'opened' if filters_params[:tags] %>">
           <label class="<%= 'opened' if filters_params[:tags] %>"><%= _('Tags') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:tags] %>">
-            <%= select_tag 'filters[tags]', options_for_select([]), multiple: true, size: 5, :'ng-model' => 'filterTagsSelect', :'ng-options' => 'tag[0] as tag[1] for tag in tags' %>
+            <%= select_tag 'filters[tags]', options_for_select([]), multiple: true, size: 5, :'ng-model' => 'filterTagsSelect', :'ng-options' => 'i[0] as i[1] for i in tags' %>
           </div>
         </li>
         <li class="<%= 'opened' if filters_params[:activity_type] %>">
@@ -44,7 +44,26 @@
         <li>
           <label id="contact"><%= _('Contact') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:contact_ids] %>">
+            <%= text_field_tag 'filters[name]', filters_params[:name], :'ng-model' => 'filterContactsName' %>
             <%= select_tag 'filters[contact_ids]', options_for_select([[_('-- Any --'), '']] + current_account_list.all_contacts.collect { |c| [c.name, c.id] }, filters_params[:contact_ids]), multiple: true, size: 5, :'ng-model' => 'filterContactsSelect' %>
+          </div>
+        </li>
+        <li>
+          <label><%= _('Contact City') %></label>
+          <div class="collapse" style="display:none;">
+            <%= select_tag '', options_for_select([[_('-- Any --'), '']] + current_account_list.cities.select(&:present?), filters_params[:city]), multiple: true, size: 5, :'ng-model' => 'filterContactCitySelect' %>
+          </div>
+        </li>
+        <li>
+          <label><%= _('Contact State') %></label>
+          <div class="collapse" style="display:none;">
+            <%= select_tag 'filters[state]', options_for_select([[_('-- Any --'), '']] + current_account_list.states.select(&:present?), filters_params[:state]), multiple: true, size: 5, :'ng-model' => 'filterContactStateSelect' %>
+          </div>
+        </li>
+        <li>
+          <label><%= _('Contact Status') %></label>
+          <div class="collapse" style="display:none;">
+            <%= select_tag '', options_for_select([]), multiple: true, size: 5, :'ng-model' => 'filterContactStatusSelect', :'ng-options' => 'i[0] as i[1] for i in contactStatusOptions' %>
           </div>
         </li>
         <% end %>

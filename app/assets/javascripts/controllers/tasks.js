@@ -1,4 +1,4 @@
-angular.module('mpdxApp').controller('tasksController', function ($scope, $filter, $location, api, urlParameter) {
+angular.module('mpdxApp').controller('tasksController', function ($scope, $filter, $location, api, urlParameter, contactCache) {
     $scope.refreshTasks = function(){
         api.call('get','tasks?filters[completed]=false',{},function(data) {
             $scope.tasks = data.tasks;
@@ -13,10 +13,26 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             _.remove($scope.activity_types, function(action) { return action === ''; });
             $scope.activity_types = _.zip($scope.activity_types, $scope.activity_types);
             $scope.activity_types.unshift(['', '-- Any --']);
+
+            $scope.contactStatusOptions = [['', '-- Any --']];
+            //pre-cache contact details
+            angular.forEach(_.uniq(_.flatten($scope.tasks, 'contacts')), function(contact){
+                contactCache.get(contact, function(contact){
+                    //contact status
+                    if(angular.isUndefined(_.find($scope.contactStatusOptions, function(i){ return i[0] === contact.contact.status; }))){
+                        $scope.contactStatusOptions.push([contact.contact.status, contact.contact.status]);
+                        $scope.contactStatusOptions = _.sortBy($scope.contactStatusOptions, function(i) { return i[0]; });
+                    }
+                });
+            });
+
         });
     };
     $scope.refreshTasks();
     $scope.filterContactsSelect = [(urlParameter.get('contact_ids') || '')];
+    $scope.filterContactCitySelect = [''];
+    $scope.filterContactStateSelect = [''];
+    $scope.filterContactStatusSelect = [''];
     $scope.filterTagsSelect = [''];
     $scope.filterActionSelect = [''];
     $scope.filterPage = ($location.$$url === '/starred' ? "starred" : 'active');
@@ -54,6 +70,39 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             });
         }
 
+        var filterContactCity = false;
+        if($scope.filterContactCitySelect[0] === ''){
+            filterContactCity = true;
+        }else{
+            angular.forEach(task.contacts, function(contact){
+                if(_.intersection(_.flatten(contactCache.getFromCache(contact).addresses, 'city'), $scope.filterContactCitySelect).length > 0){
+                    filterContactCity = true;
+                }
+            });
+        }
+
+        var filterContactState = false;
+        if($scope.filterContactStateSelect[0] === ''){
+            filterContactState = true;
+        }else{
+            angular.forEach(task.contacts, function(contact){
+                if(_.intersection(_.flatten(contactCache.getFromCache(contact).addresses, 'state'), $scope.filterContactStateSelect).length > 0){
+                    filterContactState = true;
+                }
+            });
+        }
+
+        var filterContactStatus = false;
+        if($scope.filterContactStatusSelect[0] === ''){
+            filterContactStatus = true;
+        }else{
+            angular.forEach(task.contacts, function(contact){
+                if(_.contains($scope.filterContactStatusSelect, contactCache.getFromCache(contact).contact.status)){
+                    filterContactStatus = true;
+                }
+            });
+        }
+
         var filterTag = false;
         if(_.intersection(task.tag_list, $scope.filterTagsSelect).length > 0 || $scope.filterTagsSelect[0] === ''){
             filterTag = true;
@@ -70,7 +119,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         }else if($scope.filterPage === 'starred'){
             filterPage = task.starred;
         }
-        return filterContact && filterTag && filterAction && filterPage;
+        return filterContact && filterContactCity && filterContactState && filterContactStatus && filterTag && filterAction && filterPage;
     };
 
     $scope.filterToday = function(task) {

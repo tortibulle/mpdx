@@ -20,8 +20,14 @@ angular.module('mpdxApp')
 
         this.get = function (id, callback) {
             checkCache(path(id), function (contact) {
-                callback(contact);
+                if(_.isFunction(callback)) {
+                    callback(contact);
+                }
             });
+        };
+
+        this.getFromCache = function(id){
+            return cache.get(path(id)) || undefined;
         };
 
         this.update = function (id, contact) {
