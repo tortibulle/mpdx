@@ -5,6 +5,48 @@ MPDX
 
 MPDX is an online tool designed to help you maintain and improve your relationships with your ministry partners. 
 
+## Local setup
+
+### Requirements
+
+* PostgreSQL
+* Memcached
+
+### Setup
+
+Copy the example configuration files to active configuration files:
+
+```bash
+$ cd config
+$ cp database.example.yml database.yml
+$ cp config.example.yml config.yml
+$ cp cloudinary.example.yml cloudinary.yml
+```
+
+### Install Gems
+
+```bash
+$ bundle install
+```
+
+### Create databases
+
+```bash
+$ bundle exec rake db:create:all
+```
+
+### Run migrations
+
+```bash
+$ bundle exec rake db:migrate
+```
+
+### Start Server
+
+```bash
+$ bundle exec rails s
+```
+
 ## Bugs Reports & Contributing
 
 * Bug Reports: https://github.com/CruGlobal/mpdx/issues
