@@ -289,6 +289,8 @@ GEM
       net-ssh (>= 2.6.5)
     net-ssh (2.8.0)
     newrelic_rpm (3.7.3.204)
+    ngmin-rails (0.4.0)
+      rails (>= 3.1)
     nio4r (1.0.0)
     nokogiri (1.5.11)
     oauth2 (0.8.1)
@@ -575,6 +577,7 @@ DEPENDENCIES
   lodash-rails
   mailcatcher
   newrelic_rpm (~> 3.7.1)
+  ngmin-rails
   oauth!
   oj (~> 2.1.0)
   omniauth-cas (~> 1.0.2)
