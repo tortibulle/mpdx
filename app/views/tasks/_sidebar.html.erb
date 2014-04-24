@@ -60,9 +60,40 @@
           </div>
         </li>
         <li>
+          <label><%= _('Contact Newsletter') %></label>
+          <div class="collapse" style="display:none;">
+            <%= radio_button_tag '', '', false, :'ng-model' => 'filterContactNewsletterSelect' %> <%= _('-- Any --') %><br />
+            <div>
+              <%= radio_button_tag '', 'Physical', false, :'ng-model' => 'filterContactNewsletterSelect' %> <%= _('Physical') %>
+            </div>
+            <div>
+              <%= radio_button_tag '', 'Email', false, :'ng-model' => 'filterContactNewsletterSelect' %> <%= _('Email') %>
+            </div>
+            <%= radio_button_tag '', 'Both', false, :'ng-model' => 'filterContactNewsletterSelect' %> <%= _('Both') %>
+          </div>
+        </li>
+        <li>
           <label><%= _('Contact Status') %></label>
           <div class="collapse" style="display:none;">
             <%= select_tag '', options_for_select([]), multiple: true, size: 5, :'ng-model' => 'filterContactStatusSelect', :'ng-options' => 'i[0] as i[1] for i in contactStatusOptions' %>
+          </div>
+        </li>
+        <li>
+          <label><%= _('Contact Likely To Give') %></label>
+          <div class="collapse" style="display:none;">
+            <%= select_tag '', options_for_select([]), multiple: true, size: 4, :'ng-model' => 'filterContactLikelyToGiveSelect', :'ng-options' => 'i[0] as i[1] for i in contactLikelyToGiveOptions' %>
+          </div>
+        </li>
+        <li>
+          <label><%= _('Contact Church') %></label>
+          <div class="collapse" style="display:none;">
+            <%= select_tag '', options_for_select([[_('-- Any --'), '']] + current_account_list.churches.select(&:present?), filters_params[:church]), multiple: true, size: 5, :'ng-model' => 'filterContactChurchSelect' %>
+          </div>
+        </li>
+        <li>
+          <label><%= _('Contact Referrer') %></label>
+          <div class="collapse" style="display:none;">
+            <%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), '']] + current_account_list.contacts.with_referrals.order("name").collect { |c| [c.name, c.id] }, filters_params[:referrer]), multiple: true, size: 5, :'ng-model' => 'filterContactReferrerSelect' %>
           </div>
         </li>
         <% end %>

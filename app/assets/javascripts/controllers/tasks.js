@@ -15,6 +15,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             $scope.activity_types.unshift(['', '-- Any --']);
 
             $scope.contactStatusOptions = [['', '-- Any --']];
+            $scope.contactLikelyToGiveOptions = [['', '-- Any --']];
             //pre-cache contact details
             angular.forEach(_.uniq(_.flatten($scope.tasks, 'contacts')), function(contact){
                 contactCache.get(contact, function(contact){
@@ -22,6 +23,12 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
                     if(angular.isUndefined(_.find($scope.contactStatusOptions, function(i){ return i[0] === contact.contact.status; }))){
                         $scope.contactStatusOptions.push([contact.contact.status, contact.contact.status]);
                         $scope.contactStatusOptions = _.sortBy($scope.contactStatusOptions, function(i) { return i[0]; });
+                    }
+
+                    //contact likely to give
+                    if(angular.isUndefined(_.find($scope.contactLikelyToGiveOptions, function(i){ return i[0] === contact.contact.likely_to_give; }))){
+                        $scope.contactLikelyToGiveOptions.push([contact.contact.likely_to_give, contact.contact.likely_to_give]);
+                        $scope.contactLikelyToGiveOptions = _.sortBy($scope.contactLikelyToGiveOptions, function(i) { return i[0]; });
                     }
                 });
             });
@@ -32,7 +39,11 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
     $scope.filterContactsSelect = [(urlParameter.get('contact_ids') || '')];
     $scope.filterContactCitySelect = [''];
     $scope.filterContactStateSelect = [''];
+    $scope.filterContactNewsletterSelect = '';
     $scope.filterContactStatusSelect = [''];
+    $scope.filterContactLikelyToGiveSelect = [''];
+    $scope.filterContactChurchSelect = [''];
+    $scope.filterContactReferrerSelect = [''];
     $scope.filterTagsSelect = [''];
     $scope.filterActionSelect = [''];
     $scope.filterPage = ($location.$$url === '/starred' ? "starred" : 'active');
@@ -92,6 +103,17 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             });
         }
 
+        var filterContactNewsletters = false;
+        if($scope.filterContactNewsletterSelect === ''){
+            filterContactNewsletters = true;
+        }else{
+            angular.forEach(task.contacts, function(contact){
+                if($scope.filterContactNewsletterSelect === contactCache.getFromCache(contact).contact.send_newsletter){
+                    filterContactNewsletters = true;
+                }
+            });
+        }
+
         var filterContactStatus = false;
         if($scope.filterContactStatusSelect[0] === ''){
             filterContactStatus = true;
@@ -99,6 +121,43 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             angular.forEach(task.contacts, function(contact){
                 if(_.contains($scope.filterContactStatusSelect, contactCache.getFromCache(contact).contact.status)){
                     filterContactStatus = true;
+                }
+            });
+        }
+
+        var filterContactLikelyToGive = false;
+        if($scope.filterContactLikelyToGiveSelect[0] === ''){
+            filterContactLikelyToGive = true;
+        }else{
+            angular.forEach(task.contacts, function(contact){
+                if(_.contains($scope.filterContactLikelyToGiveSelect, contactCache.getFromCache(contact).contact.likely_to_give)){
+                    filterContactLikelyToGive = true;
+                }
+            });
+        }
+
+        var filterContactChurch = false;
+        if($scope.filterContactChurchSelect[0] === ''){
+            filterContactChurch = true;
+        }else{
+            angular.forEach(task.contacts, function(contact){
+                if(_.contains($scope.filterContactChurchSelect, contactCache.getFromCache(contact).contact.church_name)){
+                    filterContactChurch = true;
+                }
+            });
+        }
+
+        var filterContactReferrer = false;
+        if($scope.filterContactReferrerSelect[0] === ''){
+            filterContactReferrer = true;
+        }else{
+            angular.forEach(task.contacts, function(contact){
+                var referralsStrings = [];
+                angular.forEach(contactCache.getFromCache(contact).contact.referrals_to_me_ids, function(id){
+                    referralsStrings.push(id.toString());
+                });
+                if(_.intersection(referralsStrings, $scope.filterContactReferrerSelect).length > 0){
+                    filterContactReferrer = true;
                 }
             });
         }
@@ -119,7 +178,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         }else if($scope.filterPage === 'starred'){
             filterPage = task.starred;
         }
-        return filterContact && filterContactCity && filterContactState && filterContactStatus && filterTag && filterAction && filterPage;
+        return filterContact && filterContactCity && filterContactState && filterContactNewsletters && filterContactStatus && filterContactLikelyToGive && filterContactChurch && filterContactReferrer && filterTag && filterAction && filterPage;
     };
 
     $scope.filterToday = function(task) {
