@@ -1,38 +1,53 @@
 angular.module('mpdxApp').controller('tasksController', function ($scope, $filter, $location, api, urlParameter, contactCache) {
     $scope.refreshTasks = function(){
-        api.call('get','tasks?filters[completed]=false',{},function(data) {
-            $scope.tasks = data.tasks;
-            $scope.comments = data.comments;
-            $scope.people = data.people;
+        api.call('get','tasks?filters[completed]=false',{},function(tData) {
+            api.call('get','contacts?filters[ids]='+_.uniq(_.flatten(tData.tasks, 'contacts')).join(),{},function(data) {
+                angular.forEach(data.contacts, function(contact){
+                    contactCache.update(contact.id, {
+                        addresses: data.addresses,
+                        email_addresses: data.email_addresses,
+                        contact: _.find(data.contacts, { 'id': contact.id })
+                    });
+                });
 
-            $scope.tags = _.sortBy(_.uniq(_.flatten(_.pluck($scope.tasks, 'tag_list'))));
-            $scope.tags = _.zip($scope.tags, $scope.tags);
-            $scope.tags.unshift(['', '-- Any --']);
+                $scope.tasks = tData.tasks;
+                $scope.comments = tData.comments;
+                $scope.people = tData.people;
 
-            $scope.activity_types = _.sortBy(_.uniq(_.pluck($scope.tasks, 'activity_type')));
-            _.remove($scope.activity_types, function(action) { return action === ''; });
-            $scope.activity_types = _.zip($scope.activity_types, $scope.activity_types);
-            $scope.activity_types.unshift(['', '-- Any --']);
+                $scope.tags = _.sortBy(_.uniq(_.flatten(_.pluck($scope.tasks, 'tag_list'))));
+                $scope.tags = _.zip($scope.tags, $scope.tags);
+                $scope.tags.unshift(['', '-- Any --']);
 
-            $scope.contactStatusOptions = [['', '-- Any --']];
-            $scope.contactLikelyToGiveOptions = [['', '-- Any --']];
-            //pre-cache contact details
-            angular.forEach(_.uniq(_.flatten($scope.tasks, 'contacts')), function(contact){
-                contactCache.get(contact, function(contact){
-                    //contact status
-                    if(angular.isUndefined(_.find($scope.contactStatusOptions, function(i){ return i[0] === contact.contact.status; }))){
-                        $scope.contactStatusOptions.push([contact.contact.status, contact.contact.status]);
-                        $scope.contactStatusOptions = _.sortBy($scope.contactStatusOptions, function(i) { return i[0]; });
-                    }
+                $scope.activity_types = _.sortBy(_.uniq(_.pluck($scope.tasks, 'activity_type')));
+                _.remove($scope.activity_types, function(action) { return action === ''; });
+                $scope.activity_types = _.zip($scope.activity_types, $scope.activity_types);
+                $scope.activity_types.unshift(['', '-- Any --']);
 
-                    //contact likely to give
-                    if(angular.isUndefined(_.find($scope.contactLikelyToGiveOptions, function(i){ return i[0] === contact.contact.likely_to_give; }))){
-                        $scope.contactLikelyToGiveOptions.push([contact.contact.likely_to_give, contact.contact.likely_to_give]);
-                        $scope.contactLikelyToGiveOptions = _.sortBy($scope.contactLikelyToGiveOptions, function(i) { return i[0]; });
-                    }
+                $scope.contactStatusOptions = [['', '-- Any --']];
+                $scope.contactLikelyToGiveOptions = [['', '-- Any --']];
+                var contactTagPreOptions = [];
+
+                angular.forEach(_.uniq(_.flatten($scope.tasks, 'contacts')), function(contact){
+                    contactCache.get(contact, function(contact){
+                        //contact tag list
+                        contactTagPreOptions = _.sortBy(_.uniq(_.union(contactTagPreOptions, _.flatten(contact.contact.tag_list))));
+                        $scope.contactTagOptions = _.zip(contactTagPreOptions, contactTagPreOptions);
+                        $scope.contactTagOptions.unshift(['', '-- Any --']);
+
+                        //contact status
+                        if(angular.isUndefined(_.find($scope.contactStatusOptions, function(i){ return i[0] === contact.contact.status; }))){
+                            $scope.contactStatusOptions.push([contact.contact.status, contact.contact.status]);
+                            $scope.contactStatusOptions = _.sortBy($scope.contactStatusOptions, function(i) { return i[0]; });
+                        }
+
+                        //contact likely to give
+                        if(angular.isUndefined(_.find($scope.contactLikelyToGiveOptions, function(i){ return i[0] === contact.contact.likely_to_give; }))){
+                            $scope.contactLikelyToGiveOptions.push([contact.contact.likely_to_give, contact.contact.likely_to_give]);
+                            $scope.contactLikelyToGiveOptions = _.sortBy($scope.contactLikelyToGiveOptions, function(i) { return i[0]; });
+                        }
+                    });
                 });
             });
-
         });
     };
     $scope.refreshTasks();
@@ -44,6 +59,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
     $scope.filterContactLikelyToGiveSelect = [''];
     $scope.filterContactChurchSelect = [''];
     $scope.filterContactReferrerSelect = [''];
+    $scope.filterContactTagSelect = [''];
     $scope.filterTagsSelect = [''];
     $scope.filterActionSelect = [''];
     $scope.filterPage = ($location.$$url === '/starred' ? "starred" : 'active');
@@ -57,6 +73,10 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         return _.contains($scope.filterTagsSelect, tag);
     };
 
+    $scope.contactTagIsActive = function(tag){
+        return _.contains($scope.filterContactTagSelect, tag);
+    };
+
     $scope.tagClick = function(tag){
         if($scope.tagIsActive(tag)){
             _.remove($scope.filterTagsSelect, function(i) { return i === tag; });
@@ -66,6 +86,18 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         }else{
             _.remove($scope.filterTagsSelect, function(i) { return i === ''; });
             $scope.filterTagsSelect.push(tag);
+        }
+    };
+
+    $scope.contactTagClick = function(tag){
+        if($scope.contactTagIsActive(tag)){
+            _.remove($scope.filterContactTagSelect, function(i) { return i === tag; });
+            if($scope.filterContactTagSelect.length === 0){
+                $scope.filterContactTagSelect.push('');
+            }
+        }else{
+            _.remove($scope.filterContactTagSelect, function(i) { return i === ''; });
+            $scope.filterContactTagSelect.push(tag);
         }
     };
 
@@ -162,6 +194,17 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             });
         }
 
+        var filterContactTag = false;
+        if($scope.filterContactTagSelect[0] === ''){
+            filterContactTag = true;
+        }else{
+            angular.forEach(task.contacts, function(contact){
+                if(_.intersection(_.flatten(contactCache.getFromCache(contact).contact.tag_list), $scope.filterContactTagSelect).length > 0){
+                    filterContactTag = true;
+                }
+            });
+        }
+
         var filterTag = false;
         if(_.intersection(task.tag_list, $scope.filterTagsSelect).length > 0 || $scope.filterTagsSelect[0] === ''){
             filterTag = true;
@@ -178,7 +221,8 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         }else if($scope.filterPage === 'starred'){
             filterPage = task.starred;
         }
-        return filterContact && filterContactCity && filterContactState && filterContactNewsletters && filterContactStatus && filterContactLikelyToGive && filterContactChurch && filterContactReferrer && filterTag && filterAction && filterPage;
+
+        return filterContact && filterContactCity && filterContactState && filterContactNewsletters && filterContactStatus && filterContactLikelyToGive && filterContactChurch && filterContactReferrer && filterContactTag && filterTag && filterAction && filterPage;
     };
 
     $scope.filterToday = function(task) {

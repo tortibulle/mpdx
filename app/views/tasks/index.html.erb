@@ -5,6 +5,7 @@
 
       <h1></h1>
       <h1 ng-show="(tasks | filter:filters).length === 0">No tasks to show</h1>
+      <h1 ng-show="tasks === undefined">Loading...</h1>
 
       <div ng-show="(tasks | filter:filterOverdue | filter:filters).length > 0 && filterPage === 'active'">
         <table>

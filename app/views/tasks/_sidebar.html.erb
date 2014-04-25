@@ -12,6 +12,15 @@
       </li>
     </ul>
   </li>
+  <li ng-show="contactTagOptions.length > 1" ng-class="{'selected': filterContactTagSelect[0]}">
+    <span class="tags menu_item">Contact Tags</span>
+    <ul class="left_taglist tags">
+      <li>
+        <a class="tag" ng-class="{'selected': contactTagIsActive(tag[0])}" href="" ng-click="contactTagClick(tag[0])" ng-repeat-start="tag in contactTagOptions" ng-show="tag[0] !== ''">{{tag[1]}}</a>
+        <span ng-repeat-end> </span>
+      </li>
+    </ul>
+  </li>
   <li>
     <span class="left_filters menu_item"><%= _('Filters') %></span>
     <%= form_tag params.slice(:controller, :action), method: :get do %>
