@@ -10,12 +10,20 @@ angular.module('mpdxApp')
             },
             controller: function ($scope, contactCache, api) {
                 $scope.contacts = {};
-
                 angular.forEach($scope.task.contacts, function(contactId){
                     contactCache.get(contactId, function(contact){
                         $scope.contacts[contactId] = contact.contact.name;
                     });
                 })
+
+                //complete options
+                if($scope.task.activity_type === 'Call') {
+                    $scope.completeOptions = ['Attempted', 'Done'];
+                }else if(_.contains(['Email', 'Text Message', 'Facebook Message', 'Letter'], $scope.task.activity_type)){
+                    $scope.completeOptions = ['Done', 'Received'];
+                }else{
+                    $scope.completeOptions = ['Done'];
+                }
 
                 $scope.getComment = function(id){
                     return _.find($scope.$parent.comments, { 'id': id });
