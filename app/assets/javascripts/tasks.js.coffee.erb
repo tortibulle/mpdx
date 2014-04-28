@@ -217,10 +217,24 @@ $ ->
     else
       if $(this).prop('checked') == true && !$('#tasks_completed')[0]?
         row = $('#task_' + id)
-        title =  $('.taskaction', row).html()
-        title += ' - ' + $('.people a', row).html() if $('.people', row).html() != ''
-        title += ' - ' + $('.tasktitle', row).html()
-        $.mpdx.setOptions($('#task_result_task_result'), $(this).attr('data-results'))
+        if $(this).attr("data-title")
+          title = $(this).attr("data-title")
+        else
+          title = $(".taskaction", row).html()
+          title += " - " + $(".tasktitle", row).html()
+
+        $("#task_result_task_result").empty()
+        ops = $(this).attr("data-results").split(",")
+        $.each ops, (key, value) ->
+          $("<input type=\"radio\" name=\"task[result]\" value=\""+value+"\" id=\""+key+"\" /><label for=\""+key+"\" style=\"display:inline-block;\">"+value+"</label>").appendTo "#task_result_task_result"
+          return
+        $('#task_result_task_result input').val(['Done']);
+
+        #hide result dropdown if only one option
+        if ops.length is 1
+          $("#task_result_task_result").parent().hide()
+        else
+          $("#task_result_task_result").parent().show()
 
         # Marking a task off, open the result modal
         $('#task_result_modal').dialog

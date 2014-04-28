@@ -18,7 +18,7 @@ angular.module('mpdxApp')
 
                 //complete options
                 if($scope.task.activity_type === 'Call') {
-                    $scope.completeOptions = ['Attempted', 'Done'];
+                    $scope.completeOptions = ['Done', 'Attempted'];
                 }else if(_.contains(['Email', 'Text Message', 'Facebook Message', 'Letter'], $scope.task.activity_type)){
                     $scope.completeOptions = ['Done', 'Received'];
                 }else{
