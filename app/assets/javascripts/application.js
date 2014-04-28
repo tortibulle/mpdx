@@ -42,9 +42,7 @@
 //angular
 //= require angular
 //= require lodash
-//= require mpdxApp
-//= require controllers/tasks
-//= require directives/task
-//= require services/api
-//= require services/contactCache
-//= require services/urlParameter
+//= require angular/mpdxApp
+//= require_tree ./angular/controllers
+//= require_tree ./angular/directives
+//= require_tree ./angular/services

@@ -17,6 +17,7 @@ gem 'jquery-ui-rails'#, '~> 3.0.1'
 gem 'angularjs-rails'#, '~> 1.2.16'
 gem 'lodash-rails'#, '~> 2.4.1'
 gem 'ngmin-rails'
+# gem 'rails_karma'
 
 #gem 'activeadmin'
 gem 'active_model_serializers' #, git: 'http://github.com/rails-api/active_model_serializers.git'
