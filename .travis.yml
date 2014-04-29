@@ -4,8 +4,11 @@ rvm:
 services:
   - memcache
   - redis-server
-script: "bundle exec rake spec"
+script:
+  - "bundle exec rake spec"
+  - "bundle exec rake karma:run"
 before_script:
+  - npm install
   - psql -c 'create database mpdx_test;' -U postgres
   - cp config/database.travis.yml config/database.yml
   - cp config/config.travis.yml config/config.yml
