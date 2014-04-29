@@ -103,7 +103,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
 
     $scope.filters = function(task){
         var filterContact = false;
-        if($scope.filterContactsSelect[0] === ''){
+        if($scope.filterContactsSelect[0] === '' || $scope.filterContactsSelect.length === 0){
             filterContact = true;
         }else{
             angular.forEach(task.contacts, function(contact){
@@ -114,7 +114,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         }
 
         var filterContactCity = false;
-        if($scope.filterContactCitySelect[0] === ''){
+        if($scope.filterContactCitySelect[0] === '' || $scope.filterContactCitySelect.length === 0){
             filterContactCity = true;
         }else{
             angular.forEach(task.contacts, function(contact){
@@ -125,7 +125,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         }
 
         var filterContactState = false;
-        if($scope.filterContactStateSelect[0] === ''){
+        if($scope.filterContactStateSelect[0] === '' || $scope.filterContactStateSelect.length === 0){
             filterContactState = true;
         }else{
             angular.forEach(task.contacts, function(contact){
@@ -147,7 +147,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         }
 
         var filterContactStatus = false;
-        if($scope.filterContactStatusSelect[0] === ''){
+        if($scope.filterContactStatusSelect[0] === '' || $scope.filterContactStatusSelect.length === 0){
             filterContactStatus = true;
         }else{
             angular.forEach(task.contacts, function(contact){
@@ -158,7 +158,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         }
 
         var filterContactLikelyToGive = false;
-        if($scope.filterContactLikelyToGiveSelect[0] === ''){
+        if($scope.filterContactLikelyToGiveSelect[0] === '' || $scope.filterContactLikelyToGiveSelect.length === 0){
             filterContactLikelyToGive = true;
         }else{
             angular.forEach(task.contacts, function(contact){
@@ -169,7 +169,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         }
 
         var filterContactChurch = false;
-        if($scope.filterContactChurchSelect[0] === ''){
+        if($scope.filterContactChurchSelect[0] === '' || $scope.filterContactChurchSelect.length === 0){
             filterContactChurch = true;
         }else{
             angular.forEach(task.contacts, function(contact){
@@ -180,7 +180,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         }
 
         var filterContactReferrer = false;
-        if($scope.filterContactReferrerSelect[0] === ''){
+        if($scope.filterContactReferrerSelect[0] === '' || $scope.filterContactReferrerSelect.length === 0){
             filterContactReferrer = true;
         }else{
             angular.forEach(task.contacts, function(contact){
@@ -195,7 +195,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         }
 
         var filterContactTag = false;
-        if($scope.filterContactTagSelect[0] === ''){
+        if($scope.filterContactTagSelect[0] === '' || $scope.filterContactTagSelect.length === 0){
             filterContactTag = true;
         }else{
             angular.forEach(task.contacts, function(contact){
@@ -211,7 +211,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         }
 
         var filterAction = false;
-        if(_.contains($scope.filterActionSelect, task.activity_type) || $scope.filterActionSelect[0] === ''){
+        if(_.contains($scope.filterActionSelect, task.activity_type) || $scope.filterActionSelect[0] === '' || $scope.filterActionSelect.length === 0){
             filterAction = true;
         }
 
