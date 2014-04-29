@@ -206,7 +206,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         }
 
         var filterTag = false;
-        if(_.intersection(task.tag_list, $scope.filterTagsSelect).length > 0 || $scope.filterTagsSelect[0] === ''){
+        if(_.intersection(task.tag_list, $scope.filterTagsSelect).length > 0 || $scope.filterTagsSelect[0] === '' || $scope.filterTagsSelect.length === 0){
             filterTag = true;
         }
 
