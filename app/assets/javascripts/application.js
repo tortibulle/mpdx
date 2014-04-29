@@ -38,3 +38,11 @@
 //= require home
 //= require google_integrations
 //= require research
+
+//angular
+//= require angular
+//= require lodash
+//= require angular/mpdxApp
+//= require_tree ./angular/controllers
+//= require_tree ./angular/directives
+//= require_tree ./angular/services

@@ -1,90 +1,109 @@
-<%= render 'sidebar' %>
-<div id="contentbody" class="withleft">
-  <div class="wpp">
+<div ng-controller="tasksController">
+  <%= render 'sidebar' %>
+  <div id="contentbody" class="withleft">
+    <div class="wpp">
 
-    <h1></h1>
+      <h1></h1>
+      <h1 ng-show="(tasks | filter:filters).length === 0">No tasks to show</h1>
+      <h1 ng-show="tasks === undefined">Loading...</h1>
 
-    <% if @overdue.length > 0 %>
-      <table>
-        <thead>
-          <tr class="taskgroup taskgroup--red">
-            <td><input type="checkbox" class="select_all" /></td>
-            <td>
-              <%= render 'actions' %>
-              <%= _('Overdue') %>
-            </td>
-          </tr>
-        </thead>
+      <div ng-show="(tasks | filter:filterOverdue | filter:filters).length > 0 && filterPage === 'active'">
+        <table>
+          <thead>
+            <tr class="taskgroup taskgroup--red">
+              <td><input type="checkbox" class="select_all" /></td>
+              <td>
+                <%= render 'actions' %>
+                <%= _('Overdue') %>
+              </td>
+            </tr>
+          </thead>
 
-        <tbody class="tablelist tasks">
-          <%= render partial: 'task', collection: @overdue %>
-        </tbody>
-      </table>
-    <% end %>
+          <tbody class="tablelist tasks">
+          <tr task="task" ng-repeat="task in tasks | filter:filterOverdue | filter:filters | orderBy:'due_date'" id="task_{{task.id}}"></tr>
+          </tbody>
+        </table>
+        <br />
+      </div>
 
-    <% if @today.length > 0 %>
-      <br /><br />
-      <table>
-        <thead>
-          <tr class="taskgroup taskgroup--green">
-            <td><input type="checkbox" class="select_all" /></td>
-            <td>
-              <%= render 'actions' %>
-              <%= _('Today') %>
-            </td>
-          </tr>
-        </thead>
+        <div ng-show="(tasks | filter:filterToday | filter:filters).length > 0 && filterPage === 'active'">
+          <table>
+            <thead>
+              <tr class="taskgroup taskgroup--green">
+                <td><input type="checkbox" class="select_all" /></td>
+                <td>
+                  <%= render 'actions' %>
+                  <%= _('Today') %>
+                </td>
+              </tr>
+            </thead>
 
-        <tbody class="tablelist tasks">
-          <%= render partial: 'task', collection: @today %>
-        </tbody>
-      </table>
-    <% end %>
+            <tbody class="tablelist tasks">
+              <tr task="task" ng-repeat="task in tasks | filter:filterToday | filter:filters | orderBy:'due_date'" id="task_{{task.id}}"></tr>
+            </tbody>
+          </table>
+          <br />
+        </div>
 
-    <% if @tomorrow.length > 0 %>
-      <br /><br />
-      <table>
-        <thead>
+        <div ng-show="(tasks | filter:filterTomorrow | filter:filters).length > 0 && filterPage === 'active'">
+          <table>
+            <thead>
+              <tr class="taskgroup taskgroup--orange">
+                <td><input type="checkbox" class="select_all" /></td>
+                <td>
+                  <%= render 'actions' %>
+                  <%= _('Tomorrow') %>
+                </td>
+              </tr>
+            </thead>
+
+            <tbody class="tablelist tasks">
+              <tr task="task" ng-repeat="task in tasks | filter:filterTomorrow | filter:filters | orderBy:'due_date'" id="task_{{task.id}}"></tr>
+            </tbody>
+          </table>
+          <br />
+        </div>
+
+      <div ng-show="(tasks | filter:filterUpcoming | filter:filters).length > 0 && filterPage === 'active'">
+        <table>
+          <thead>
+            <tr class="taskgroup taskgroup--gray">
+              <td><input type="checkbox" class="select_all" /></td>
+              <td>
+                <%= render 'actions' %>
+                <%= _('Upcoming') %>
+              </td>
+            </tr>
+          </thead>
+
+          <tbody class="tablelist tasks">
+          <tr task="task" ng-repeat="task in tasks | filter:filterUpcoming | filter:filters | orderBy:'due_date'" id="task_{{task.id}}"></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div ng-show="(tasks | filter:filters).length > 0 && filterPage === 'starred'">
+        <table>
+          <thead>
           <tr class="taskgroup taskgroup--orange">
-            <td><input type="checkbox" class="select_all" /></td>
-            <td>
-              <%= render 'actions' %>
-              <%= _('Tomorrow') %>
+            <td colspan="100">
+              <%= _('Starred') %>
             </td>
           </tr>
-        </thead>
+          </thead>
 
-        <tbody class="tablelist tasks">
-          <%= render partial: 'task', collection: @tomorrow %>
-        </tbody>
-      </table>
-    <% end %>
+          <tbody class="tablelist tasks">
+          <tr task="task" ng-repeat="task in tasks | filter:filters | orderBy:'due_date'" id="task_{{task.id}}"></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <%= render 'tasks/results_modal' %>
 
-    <% if @upcoming.length > 0 %>
-      <br /><br />
-      <table>
-        <thead>
-          <tr class="taskgroup taskgroup--gray">
-            <td><input type="checkbox" class="select_all" /></td>
-            <td>
-              <%= render 'actions' %>
-              <%= _('Upcoming') %>
-            </td>
-          </tr>
-        </thead>
-
-        <tbody class="tablelist tasks">
-          <%= render partial: 'task', collection: @upcoming %>
-        </tbody>
-      </table>
-    <% end %>
+  <div id="bulk_edit_task_modal" title="<%= _('Blank fields will not be updated') %>" style="display:none">
+    <div class="form_wrapper">
+      <%= render 'tasks/bulk_modal_form' %>
+    </div>
   </div>
 </div>
-<%= render 'tasks/results_modal' %>
-
-<div id="bulk_edit_task_modal" title="<%= _('Blank fields will not be updated') %>" style="display:none">
-  <div class="form_wrapper">
-    <%= render 'tasks/bulk_modal_form' %>
-  </div>
-</div>
-

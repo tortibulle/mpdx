@@ -1,0 +1,50 @@
+<td class="check">
+    <a name="task_{{task.id}}"/>
+    <input type="checkbox" name="task_ids[]" value="{{task.id}}" data-behavior="complete_task" data-results="{{completeOptions.join()}}" data-id="{{task.id}}" data-title="{{task.activity_type + ' ' + task.subject}}" />
+</td>
+<td class="data">
+    <div class="primary">
+        <i class="fa fa-lg fav" ng-class="{'fa-star-o': !task.starred, 'fa-star': task.starred}" ng-click="starTask()"></i>
+        <a class="comment_status" href=""><span id="comment_count_2">{{task.comments.length}}</span></a>
+
+        <div class="actions">
+            <a class="ico ico_edit edit_task" data-id="{{task.id}}" data-remote="true" ng-href="/tasks/{{task.id}}/edit">Edit</a>
+            <a class="ico ico_trash" data-confirm="Are you sure you want to delete this task instead of marking it as completed?" data-method="delete" data-remote="true" ng-href="/tasks/{{task.id}}" rel="nofollow">Delete</a>
+        </div>
+        <span ng-hide="task.activity_type === ''">{{task.activity_type}} -</span>
+        <strong><span class="tasktitle">{{task.subject}}</span></strong> - {{task.due_date | date:'MM/dd/yyyy, h:mma'}}
+
+        <div style="display:inline" class="tags">
+            <a class="tag" ng-repeat-start="tag in task.tag_list">{{tag}}</a>
+            <span ng-repeat-end> </span>
+        </div>
+        <span class="people" ng-show="task.contacts.length > 0">(<span ng-repeat="contact in task.contacts"><span ng-show="!$first">, </span><a ng-href="/contacts/{{contact}}" ng-bind="contacts[contact]"></a></span>)</span>
+    </div>
+    <div class="comments" style="display:none">
+        <header></header>
+
+        <div id="comment_list_2">
+            <div class="comment" ng-repeat="comment in task.comments">
+                <a class="corner_close" data-confirm="Are you sure?" data-method="delete" data-remote="true" data-selector=".comment" ng-href="/activity_comments/{{comment}}?activity_id={{getComment(comment).activity_id}}" rel="nofollow">delete</a>
+                <i class="fa fa-comments-o fa-lg pull-left"></i>
+
+                <div class="body">
+                    <a ng-href="/people/{{getComment(comment).person_id}}">{{getPerson(getComment(comment).person_id).name}}</a>
+                    <p ng-bind="getComment(comment).body"></p>
+                </div>
+                <span class="time">{{getComment(comment).created_at | date:'MM/dd/yyyy, h:mma'}}</span>
+            </div>
+        </div>
+
+        <div class="comment_form">
+            <form ng-submit="postNewComment()">
+                <div style="margin:0;padding:0;display:inline"></div>
+                <textarea ng-model="postNewCommentMsg"></textarea>
+
+                <div class="buttons">
+                    <button class="btn smallbtn">Add Comment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</td>

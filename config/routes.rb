@@ -149,6 +149,8 @@ Mpdx::Application.routes.draw do
 
   root :to => 'home#index'
 
+  get '/templates/:path.html' => 'templates#template', :constraints => { :path => /.+/  }
+
   # See how all your routes lay out with "rake routes"
 
 end

@@ -1,9 +1,26 @@
 <aside id="leftmenu">
 <ul>
-  <li class="<%= 'selected' if params[:action] == 'index' %>"><%= link_to(_('Active/Upcoming'), tasks_path, class: "inbox menu_item") %></li>
-  <li class="<%= 'selected' if params[:action] == 'starred' %>"><%= link_to(_('Starred'), starred_tasks_path, class: "starred menu_item") %></li>
+  <li ng-class="{'selected': filterPage === 'active'}"><a href="/tasks/" class="inbox menu_item" ng-click="filterPage='active'">Active/Upcoming</a></li>
+  <li ng-class="{'selected': filterPage === 'starred'}"><a href="/tasks/#starred" class="starred menu_item" ng-click="filterPage='starred'">Starred</a></li>
   <li class="<%= 'selected' if params[:action] == 'history' %>"><%= link_to(_('History'), history_tasks_path, class: "completed menu_item") %></li>
-  <%= render 'sidebar_tags', tags: current_account_list.activity_tags if current_account_list.activity_tags.present? %>
+  <li ng-show="tags.length > 1" ng-class="{'selected': filterTagsSelect[0]}">
+    <span class="tags menu_item">Tags</span>
+    <ul class="left_taglist tags">
+      <li>
+        <a class="tag" ng-class="{'selected': tagIsActive(tag[0])}" href="" ng-click="tagClick(tag[0])" ng-repeat-start="tag in tags" ng-show="tag[0] !== ''">{{tag[1]}}</a>
+        <span ng-repeat-end> </span>
+      </li>
+    </ul>
+  </li>
+  <li ng-show="contactTagOptions.length > 1" ng-class="{'selected': filterContactTagSelect[0]}">
+    <span class="tags menu_item">Contact Tags</span>
+    <ul class="left_taglist tags">
+      <li>
+        <a class="tag" ng-class="{'selected': contactTagIsActive(tag[0])}" href="" ng-click="contactTagClick(tag[0])" ng-repeat-start="tag in contactTagOptions" ng-show="tag[0] !== ''">{{tag[1]}}</a>
+        <span ng-repeat-end> </span>
+      </li>
+    </ul>
+  </li>
   <li>
     <span class="left_filters menu_item"><%= _('Filters') %></span>
     <%= form_tag params.slice(:controller, :action), method: :get do %>
@@ -20,31 +37,83 @@
             </div>
           </li>
         <% end %>
+        <% if params[:action] != 'history' %>
         <li class="<%= 'opened' if filters_params[:tags] %>">
           <label class="<%= 'opened' if filters_params[:tags] %>"><%= _('Tags') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:tags] %>">
-            <%= select_tag 'filters[tags]', options_for_select([[_('-- Any --'), '']] + current_account_list.activity_tags, filters_params[:tags]), multiple: true, size: 5 %>
+            <%= select_tag 'filters[tags]', options_for_select([]), multiple: true, size: 5, :'ng-model' => 'filterTagsSelect', :'ng-options' => 'i[0] as i[1] for i in tags' %>
           </div>
         </li>
         <li class="<%= 'opened' if filters_params[:activity_type] %>">
         <label class="<%= 'opened' if filters_params[:activity_type] %>"><%= _('Action') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:activity_type] %>">
-            <%= select_tag 'filters[activity_type]', options_for_select([[_('-- Any --'), '']] + (Task.new.assignable_activity_types & current_account_list.tasks.select(:activity_type).uniq.collect(&:activity_type)).collect { |a| [_(a), a] }, filters_params[:activity_type]), multiple: true, size: 5 %>
+            <%= select_tag 'filters[activity_type]', options_for_select([]), multiple: true, size: 5, :'ng-model' => 'filterActionSelect', :'ng-options' => 'activity_type[0] as activity_type[1] for activity_type in activity_types' %>
           </div>
         </li>
-        <li class="<%= 'opened' if filters_params[:contact_ids] %>">
-          <label class="<%= 'opened' if filters_params[:contact_ids] %>"><%= _('Contact') %></label>
+        <li>
+          <label id="contact"><%= _('Contact') %></label>
           <div class="collapse" style="<%= 'display:none' unless filters_params[:contact_ids] %>">
-            <%= select_tag 'filters[contact_ids]', options_for_select([[_('-- Any --'), '']] + current_account_list.all_contacts.collect { |c| [c.name, c.id] }, filters_params[:contact_ids]), multiple: true, size: 5 %>
+            <%= select_tag 'filters[contact_ids]', options_for_select([[_('-- Any --'), '']] + current_account_list.all_contacts.collect { |c| [c.name, c.id] }, filters_params[:contact_ids]), multiple: true, size: 5, :'ng-model' => 'filterContactsSelect' %>
           </div>
         </li>
+        <li>
+          <label><%= _('Contact City') %></label>
+          <div class="collapse" style="display:none;">
+            <%= select_tag '', options_for_select([[_('-- Any --'), '']] + current_account_list.cities.select(&:present?), filters_params[:city]), multiple: true, size: 5, :'ng-model' => 'filterContactCitySelect' %>
+          </div>
+        </li>
+        <li>
+          <label><%= _('Contact State') %></label>
+          <div class="collapse" style="display:none;">
+            <%= select_tag 'filters[state]', options_for_select([[_('-- Any --'), '']] + current_account_list.states.select(&:present?), filters_params[:state]), multiple: true, size: 5, :'ng-model' => 'filterContactStateSelect' %>
+          </div>
+        </li>
+        <li>
+          <label><%= _('Contact Newsletter') %></label>
+          <div class="collapse" style="display:none;">
+            <%= radio_button_tag '', '', false, :'ng-model' => 'filterContactNewsletterSelect' %> <%= _('-- Any --') %><br />
+            <div>
+              <%= radio_button_tag '', 'Physical', false, :'ng-model' => 'filterContactNewsletterSelect' %> <%= _('Physical') %>
+            </div>
+            <div>
+              <%= radio_button_tag '', 'Email', false, :'ng-model' => 'filterContactNewsletterSelect' %> <%= _('Email') %>
+            </div>
+            <%= radio_button_tag '', 'Both', false, :'ng-model' => 'filterContactNewsletterSelect' %> <%= _('Both') %>
+          </div>
+        </li>
+        <li>
+          <label><%= _('Contact Status') %></label>
+          <div class="collapse" style="display:none;">
+            <%= select_tag '', options_for_select([]), multiple: true, size: 5, :'ng-model' => 'filterContactStatusSelect', :'ng-options' => 'i[0] as i[1] for i in contactStatusOptions' %>
+          </div>
+        </li>
+        <li>
+          <label><%= _('Contact Likely To Give') %></label>
+          <div class="collapse" style="display:none;">
+            <%= select_tag '', options_for_select([]), multiple: true, size: 4, :'ng-model' => 'filterContactLikelyToGiveSelect', :'ng-options' => 'i[0] as i[1] for i in contactLikelyToGiveOptions' %>
+          </div>
+        </li>
+        <li>
+          <label><%= _('Contact Church') %></label>
+          <div class="collapse" style="display:none;">
+            <%= select_tag '', options_for_select([[_('-- Any --'), '']] + current_account_list.churches.select(&:present?), filters_params[:church]), multiple: true, size: 5, :'ng-model' => 'filterContactChurchSelect' %>
+          </div>
+        </li>
+        <li>
+          <label><%= _('Contact Referrer') %></label>
+          <div class="collapse" style="display:none;">
+            <%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), '']] + current_account_list.contacts.with_referrals.order("name").collect { |c| [c.name, c.id] }, filters_params[:referrer]), multiple: true, size: 5, :'ng-model' => 'filterContactReferrerSelect' %>
+          </div>
+        </li>
+        <% end %>
+        <% if params[:action] == 'history' %>
         <li class="controls">
           <%= submit_tag _('Apply Filters') %>
           <%= link_to(_('Reset Filters'), tasks_path(clear_filter: true), style: 'font-size: 11px') if filters_params.present? %>
         </li>
+        <% end %>
       </ul>
     <% end %>
   </li>
 </ul>
 </aside>
-

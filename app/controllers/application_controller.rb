@@ -49,6 +49,7 @@ class ApplicationController < ActionController::Base
         return false
       end
     end
+    true
   end
 
   def ensure_setup_finished

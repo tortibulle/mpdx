@@ -13,7 +13,7 @@
     <%= csrf_meta_tags %>
     <%= render 'google_analytics' if Rails.env == "production" %>
   </head>
-  <body id="<%= controller.controller_name %>_<%= controller.action_name %>" class="<%= controller.controller_name %>_controller">
+  <body id="<%= controller.controller_name %>_<%= controller.action_name %>" class="<%= controller.controller_name %>_controller" ng-app="mpdxApp">
     <header id="global">
     <hgroup id="user">
     <div class="outer">
@@ -41,7 +41,7 @@
         <div class="item <%= request.path == '/' ? 'active' : '' %>"><%= link_to(_('Dashboard'), "/") %></div>
         <div class="item <%= request.path =~ /\/contacts/ ? 'active' : '' %>"><%= link_to(_('Contacts'), "/contacts") %></div>
         <!-- <div class="item <%= request.path =~ /\/messages/ ? 'active' : '' %>"><%= link_to((_('Messages') + ' ' + content_tag(:span, 3, class: 'indicator')).html_safe, '') %></div> -->
-        <div class="item <%= request.path =~ /\/tasks/ ? 'active' : '' %>"><%= link_to(_('Tasks'), "/tasks") %></div>
+        <div class="item <%= request.path =~ /\/tasks/ ? 'active' : '' %>"><%= link_to(_('Tasks'), "/tasks/") %></div>
         <div class="item <%= request.path =~ /\/donations/ ? 'active' : '' %>"><%= link_to(_('Donations'), "/donations") %></div>
         <% if $rollout.active?(:research, current_account_list) %>
           <div class="item <%= request.path =~ /\/research/ ? 'active' : '' %>"><%= link_to(_('Research'), "/research") %></div>
