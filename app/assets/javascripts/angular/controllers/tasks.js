@@ -4,7 +4,9 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             api.call('get','contacts?filters[ids]='+_.uniq(_.flatten(tData.tasks, 'contacts')).join(),{},function(data) {
                 angular.forEach(data.contacts, function(contact){
                     contactCache.update(contact.id, {
-                        addresses: data.addresses,
+                        addresses: _.filter(data.addresses, function(addr) {
+                            return _.contains(contact.address_ids, addr.id);
+                        }),
                         email_addresses: data.email_addresses,
                         contact: _.find(data.contacts, { 'id': contact.id })
                     });
@@ -106,33 +108,39 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         if($scope.filterContactsSelect[0] === '' || $scope.filterContactsSelect.length === 0){
             filterContact = true;
         }else{
+            var taskContacts = [];
             angular.forEach(task.contacts, function(contact){
-                if(_.contains($scope.filterContactsSelect, contact.toString())){
-                    filterContact = true;
-                }
+                taskContacts.push(contact.toString());
             });
+            if(_.intersection($scope.filterContactsSelect, taskContacts).length === $scope.filterContactsSelect.length){
+                filterContact = true;
+            }
         }
 
         var filterContactCity = false;
         if($scope.filterContactCitySelect[0] === '' || $scope.filterContactCitySelect.length === 0){
             filterContactCity = true;
         }else{
+            var taskContactCities = [];
             angular.forEach(task.contacts, function(contact){
-                if(_.intersection(_.flatten(contactCache.getFromCache(contact).addresses, 'city'), $scope.filterContactCitySelect).length > 0){
-                    filterContactCity = true;
-                }
+                taskContactCities = _.union(_.flatten(contactCache.getFromCache(contact).addresses, 'city'), taskContactCities);
             });
+            if(_.intersection(taskContactCities, $scope.filterContactCitySelect).length === $scope.filterContactCitySelect.length){
+                filterContactCity = true;
+            }
         }
 
         var filterContactState = false;
         if($scope.filterContactStateSelect[0] === '' || $scope.filterContactStateSelect.length === 0){
             filterContactState = true;
         }else{
+            var taskContactStates = [];
             angular.forEach(task.contacts, function(contact){
-                if(_.intersection(_.flatten(contactCache.getFromCache(contact).addresses, 'state'), $scope.filterContactStateSelect).length > 0){
-                    filterContactState = true;
-                }
+                taskContactStates = _.union(_.flatten(contactCache.getFromCache(contact).addresses, 'state'), taskContactStates);
             });
+            if(_.intersection(taskContactStates, $scope.filterContactStateSelect).length === $scope.filterContactStateSelect.length){
+                filterContactState = true;
+            }
         }
 
         var filterContactNewsletters = false;
@@ -150,48 +158,54 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         if($scope.filterContactStatusSelect[0] === '' || $scope.filterContactStatusSelect.length === 0){
             filterContactStatus = true;
         }else{
+            var contactStatus = [];
             angular.forEach(task.contacts, function(contact){
-                if(_.contains($scope.filterContactStatusSelect, contactCache.getFromCache(contact).contact.status)){
-                    filterContactStatus = true;
-                }
+                contactStatus.push(contactCache.getFromCache(contact).contact.status);
             });
+            if(_.intersection($scope.filterContactStatusSelect, contactStatus).length === $scope.filterContactStatusSelect.length){
+                filterContactStatus = true;
+            }
         }
 
         var filterContactLikelyToGive = false;
         if($scope.filterContactLikelyToGiveSelect[0] === '' || $scope.filterContactLikelyToGiveSelect.length === 0){
             filterContactLikelyToGive = true;
         }else{
+            var contactStatus = [];
             angular.forEach(task.contacts, function(contact){
-                if(_.contains($scope.filterContactLikelyToGiveSelect, contactCache.getFromCache(contact).contact.likely_to_give)){
-                    filterContactLikelyToGive = true;
-                }
+                contactStatus.push(contactCache.getFromCache(contact).contact.likely_to_give);
             });
+            if(_.intersection($scope.filterContactLikelyToGiveSelect, contactStatus).length === $scope.filterContactLikelyToGiveSelect.length){
+                filterContactLikelyToGive = true;
+            }
         }
 
         var filterContactChurch = false;
         if($scope.filterContactChurchSelect[0] === '' || $scope.filterContactChurchSelect.length === 0){
             filterContactChurch = true;
         }else{
+            var contactChurch = [];
             angular.forEach(task.contacts, function(contact){
-                if(_.contains($scope.filterContactChurchSelect, contactCache.getFromCache(contact).contact.church_name)){
-                    filterContactChurch = true;
-                }
+                contactChurch.push(contactCache.getFromCache(contact).contact.church_name);
             });
+            if(_.intersection($scope.filterContactChurchSelect, contactChurch).length === $scope.filterContactChurchSelect.length){
+                filterContactChurch = true;
+            }
         }
 
         var filterContactReferrer = false;
         if($scope.filterContactReferrerSelect[0] === '' || $scope.filterContactReferrerSelect.length === 0){
             filterContactReferrer = true;
         }else{
+            var referralsStrings = [];
             angular.forEach(task.contacts, function(contact){
-                var referralsStrings = [];
                 angular.forEach(contactCache.getFromCache(contact).contact.referrals_to_me_ids, function(id){
                     referralsStrings.push(id.toString());
                 });
-                if(_.intersection(referralsStrings, $scope.filterContactReferrerSelect).length > 0){
-                    filterContactReferrer = true;
-                }
             });
+            if(_.intersection(referralsStrings, $scope.filterContactReferrerSelect).length === $scope.filterContactReferrerSelect.length){
+                filterContactReferrer = true;
+            }
         }
 
         var filterContactTag = false;
@@ -199,19 +213,20 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             filterContactTag = true;
         }else{
             angular.forEach(task.contacts, function(contact){
-                if(_.intersection(_.flatten(contactCache.getFromCache(contact).contact.tag_list), $scope.filterContactTagSelect).length > 0){
+                if(_.intersection(_.flatten(contactCache.getFromCache(contact).contact.tag_list), $scope.filterContactTagSelect).length === $scope.filterContactTagSelect.length){
                     filterContactTag = true;
                 }
             });
         }
 
         var filterTag = false;
-        if(_.intersection(task.tag_list, $scope.filterTagsSelect).length > 0 || $scope.filterTagsSelect[0] === '' || $scope.filterTagsSelect.length === 0){
+        if(_.intersection(task.tag_list, $scope.filterTagsSelect).length === $scope.filterTagsSelect.length || $scope.filterTagsSelect[0] === '' || $scope.filterTagsSelect.length === 0){
             filterTag = true;
         }
 
         var filterAction = false;
-        if(_.contains($scope.filterActionSelect, task.activity_type) || $scope.filterActionSelect[0] === '' || $scope.filterActionSelect.length === 0){
+        if($scope.filterActionSelect.length > 1) {
+        }else if(_.contains($scope.filterActionSelect, task.activity_type) || $scope.filterActionSelect[0] === '' || $scope.filterActionSelect.length === 0){
             filterAction = true;
         }
 
