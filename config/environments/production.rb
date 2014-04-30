@@ -90,5 +90,5 @@ Mpdx::Application.configure do
 
   config.action_mailer.default_url_options = {:host => 'mpdx.org'}
 
-  config.font_assets.origin = 'https://mpdx.org'
+  #config.font_assets.origin = 'https://mpdx.org'
 end

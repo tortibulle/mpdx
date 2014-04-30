@@ -81,7 +81,7 @@ gem 'wicked', '~> 1.0.2'
 gem 'will_paginate', '~> 3.0.3'
 gem 'global_phone', git: 'https://github.com/sstephenson/global_phone.git'
 gem 'global_phone_dbgen'
-gem 'font_assets'
+#gem 'font_assets'
 
 group :development do
   gem 'railroady'
