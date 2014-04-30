@@ -256,6 +256,8 @@ class Contact < ActiveRecord::Base
         end
       end
 
+      other.notifications.update_all(contact_id: id)
+
       merge_addresses
 
       ContactReferral.where(referred_to_id: other.id).each do |contact_referral|

@@ -219,6 +219,14 @@ describe Contact do
       shared_task.contacts.reload.should match_array [contact]
     end
 
+    it "should move loser's notifications" do
+      notification = create(:notification, contact: loser_contact)
+
+      contact.merge(loser_contact)
+
+      contact.notifications.should include(notification)
+    end
+
     it "should not duplicate referrals" do
       referrer = create(:contact)
       loser_contact.referrals_to_me << referrer
