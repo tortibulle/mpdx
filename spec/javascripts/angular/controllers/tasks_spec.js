@@ -89,11 +89,20 @@ describe('tasks', function() {
         expect($scope.filters(task[0])).toBe(true);
     });
 
-    it('contact filter should have 1 task', function() {
+    it('multiple filters should reduce the number of tasks shown', function() {
         var controller = createController();
 
-        $scope.filterContactsSelect = ['16'];
-        expect($scope.filters(task[1])).toBe(true);
+        $scope.filterContactsSelect = ['18'];
+        $scope.filterActionSelect = ['Appointment'];
+
+        var filteredTasks = [];
+        angular.forEach(task, function(t){
+            if($scope.filters(t)){
+                filteredTasks.push(t);
+            }
+        })
+
+        expect(filteredTasks.length < task.length).toBe(true);
     });
 
     it('tag should be active', function() {
