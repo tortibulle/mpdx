@@ -25,7 +25,7 @@ describe('tasks', function() {
             comments_count: 0,
             completed: false,
             completed_at: null,
-            contacts: [],
+            contacts: [18, 20],
             created_at: "2014-04-28T09:17:15.816-04:00",
             due_date: "2014-04-29T09:17:00.000-04:00",
             id: 1,
@@ -42,7 +42,7 @@ describe('tasks', function() {
             comments_count: 0,
             completed: false,
             completed_at: null,
-            contacts: [],
+            contacts: [16, 12],
             created_at: "2014-04-28T09:17:15.816-04:00",
             due_date: "2014-04-29T09:17:00.000-04:00",
             id: 2,
@@ -89,6 +89,13 @@ describe('tasks', function() {
         expect($scope.filters(task[0])).toBe(true);
     });
 
+    it('contact filter should have 1 task', function() {
+        var controller = createController();
+
+        $scope.filterContactsSelect = ['16'];
+        expect($scope.filters(task[1])).toBe(true);
+    });
+
     it('tag should be active', function() {
         var controller = createController();
 
@@ -98,6 +105,3 @@ describe('tasks', function() {
         expect($scope.tagIsActive('university')).toBe(true);
     });
 });
-
-
-//http://sebastien.saunier.me/blog/2014/02/04/angular--rails-with-no-fuss.html
