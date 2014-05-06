@@ -57,7 +57,7 @@ namespace :mpdx do
       if addresses.length > 1
         addresses.reload
         addresses.each do |address|
-          other_address = addresses.detect {|a| a == address && a.id != address.id}
+          other_address = addresses.detect {|a| a.equal_to?(address) && a.id != address.id}
           if other_address
             address.merge(other_address)
             merge_addresses(contact)
