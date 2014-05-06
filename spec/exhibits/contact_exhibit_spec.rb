@@ -38,7 +38,7 @@ describe ContactExhibit do
 
   it "should have a newsletter error" do
     contact.send_newsletter = _('Physical')
-    contact.mailing_address.should eq Address.new
+    contact.mailing_address.equal_to?(Address.new).should be_true
     exhib.send_newsletter_error.should be_present
     contact.send_newsletter = _('Both')
     exhib.send_newsletter_error.should == 'No mailing address or email addess on file'
