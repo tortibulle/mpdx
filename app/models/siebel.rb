@@ -334,7 +334,7 @@ class Siebel < DataServer
 
     # If we can match it to an existing address, update that address
     object.addresses_including_deleted.each do |a|
-      if a.remote_id == new_address.remote_id || a == new_address
+      if a.remote_id == new_address.remote_id || a.equal_to?(new_address)
         a.update_attributes(new_address.attributes.select {|k,v| v.present?})
         return a
       end

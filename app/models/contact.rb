@@ -251,7 +251,7 @@ class Contact < ActiveRecord::Base
       update_uncompleted_tasks_count
 
       other.addresses.each do |other_address|
-        unless addresses.detect { |address| address == other_address }
+        unless addresses.detect { |address| address.equal_to? other_address }
           other_address.update_column(:addressable_id, id)
         end
       end
@@ -326,7 +326,7 @@ class Contact < ActiveRecord::Base
     ordered_addresses = addresses.order('created_at desc')
     ordered_addresses.reload
     ordered_addresses.each do |address|
-      other_address = ordered_addresses.detect { |a| a.id != address.id && a == address }
+      other_address = ordered_addresses.detect { |a| a.id != address.id && a.equal_to?(address) }
       if other_address
         address.merge(other_address)
         merge_addresses

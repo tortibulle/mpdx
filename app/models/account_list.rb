@@ -202,7 +202,7 @@ class AccountList < ActiveRecord::Base
       other_contacts = ordered_contacts.find_all {|c| c.name == contact.name &&
                                                            c.id != contact.id &&
                                                            (c.donor_accounts.first == contact.donor_accounts.first ||
-                                                            c.addresses.detect {|a| contact.addresses.detect {|ca| ca == a}}) }
+                                                            c.addresses.detect {|a| contact.addresses.detect {|ca| ca.equal_to? a}}) }
       if other_contacts.present?
         other_contacts.each do |other_contact|
           contact.merge(other_contact)

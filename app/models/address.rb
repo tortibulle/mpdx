@@ -22,7 +22,7 @@ class Address < ActiveRecord::Base
     [_('Home'), _('Business'), _('Mailing'), _('Other')]
   end
 
-  def ==(other)
+  def equal_to?(other)
     if other
       return true if other.master_address_id && other.master_address_id == self.master_address_id
 

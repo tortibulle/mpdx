@@ -134,7 +134,7 @@ describe Contact do
       -> {
         @contact = Contact.create_from_donor_account(@donor_account, @account_list)
       }.should change(Address, :count)
-      @contact.addresses.first.should == @donor_account.addresses.first
+      @contact.addresses.first.equal_to?(@donor_account.addresses.first).should be_true
     end
 
   end
