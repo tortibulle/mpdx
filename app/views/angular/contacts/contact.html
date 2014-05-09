@@ -1,0 +1,36 @@
+<td class="avatar">
+    <img class="avatar small" ng-src="{{contact.avatar}}">
+</td>
+<td class="profile">
+    <div class="key">
+        <span class="name"><a href="/contacts/{{contact.id}}">{{contact.name}}</a>
+            <i class="fa fa-envelope" title="{{contact.send_newsletter}}" ng-show="contact.send_newsletter !== '' && contact.send_newsletter"></i>
+            <i class="fa fa-usd" title="Partner - Special" ng-show="contact.status === 'Partner - Special'"></i>
+            <i class="fa fa-<%= current_currency.downcase %>" title="Partner - Financial" ng-show="contact.status === 'Partner - Financial'"></i>
+        </span>
+        <div class="people">
+            <div ng-repeat="i in contact.person_ids">
+                <a href="/people/{{i}}">{{getPerson(i).name}}</a> - (954) 968-6814 - mobile
+            </div>
+        </div>
+        <span class="address" ng-repeat="i in contact.address_ids" ng-bind-html="getAddress(i)"></span>
+        <div class="tags">
+            <a class="tag" href="/contacts?filters%5Btags%5D=tasktag" ng-repeat-start="tag in contact.tag_list">{{tag}}</a><span style="display:inline;" ng-repeat-end> </span>
+        </div>
+    </div>
+</td>
+<td class="contact-tasks" nowrap="nowrap">
+    {{contact.status}}<br>
+    {{contact.pledge_amount | currency:"<%= current_currency %>"}} {{pledgeFrequencyStr(contact.pledge_frequency)}}<br>
+    <a href="/tasks?contact_ids={{contact.id}}">Tasks: 0000</a>
+</td>
+
+<td class="qaction" id="contact_{{contact.id}}_quick">
+    <a href="#" class="btn smallbtn quick">Quick</a>
+    <ul style="display: none;" class="quick_action_list">
+        <li><a class="none" href="/contacts/{{contact.id}}">Show</a></li>
+        <li><a class="none" href="/contacts/{{contact.id}}/edit">Edit</a></li>
+        <li><a class="none" data-behavior="hide_contact" data-method="delete" data-remote="true" href="/contacts/{{contact.id}}" rel="nofollow">Hide</a></li>
+    </ul>
+</td>
+<td class="checks"><input type="checkbox" name="contact_ids[]" value="{{contact.id}}" /></td>

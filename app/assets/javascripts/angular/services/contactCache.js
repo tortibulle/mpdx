@@ -1,5 +1,5 @@
 angular.module('mpdxApp')
-    .service('contactCache', function ($cacheFactory, $rootScope, $http, $q) {
+    .service('contactCache', function ($cacheFactory, $rootScope, $http) {
         var cache = $cacheFactory('contact');
 
         var path = function (id) {
