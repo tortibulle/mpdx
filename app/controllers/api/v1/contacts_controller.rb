@@ -10,15 +10,23 @@ class Api::V1::ContactsController < Api::V1::BaseController
     end
     inactivated = contacts.inactive.where("updated_at > ?", Time.at(params[:since].to_i)).pluck(:id)
 
+    meta = params[:since] ?
+      {
+        deleted: Version.where(item_type: 'Contact', event: 'destroy', related_object_type: 'AccountList', related_object_id: current_account_list.id).where("created_at > ?", Time.at(params[:since].to_i)).pluck(:item_id),
+        inactivated: inactivated
+      } : {}
+
+    if params[:per_page]
+      filtered_contacts = filtered_contacts.page(page).per_page(per_page)
+      meta.merge!({ total: filtered_contacts.total_entries, from: correct_from(filtered_contacts),
+                    to: correct_to(filtered_contacts), page: page,
+                    total_pages: total_pages(filtered_contacts) })
+    end
+    
     render json: add_includes_and_order(filtered_contacts, order: order),
            serializer: ContactArraySerializer,
            scope: {include: includes, since: params[:since], user: current_user},
-           meta:  params[:since] ?
-                    {
-                      deleted: Version.where(item_type: 'Contact', event: 'destroy', related_object_type: 'AccountList', related_object_id: current_account_list.id).where("created_at > ?", Time.at(params[:since].to_i)).pluck(:item_id),
-                      inactivated: inactivated
-                    } :
-                    {},
+           meta: meta,
            callback: params[:callback],
            root: :contacts
   end

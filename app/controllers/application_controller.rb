@@ -180,7 +180,30 @@ class ApplicationController < ActionController::Base
     if params[:per_page] == 'All'
       1
     else
-      params[:page]
+      page_int = params[:page].to_i
+      page_int > 0 ? page_int : 1
+    end
+  end
+
+  def correct_from(collection)
+    if page > total_pages(collection)
+      0
+    else
+      from = collection.offset + 1
+      from > collection.total_entries ? 0 : from
+    end
+  end
+
+  def total_pages(collection)
+    @total_pages ||= (collection.total_entries / per_page.to_f).ceil
+  end
+
+  def correct_to(collection)
+    if page > total_pages(collection)
+      0
+    else
+      to = collection.offset + collection.length
+      to > collection.total_entries ? 0 : to
     end
   end
 end
