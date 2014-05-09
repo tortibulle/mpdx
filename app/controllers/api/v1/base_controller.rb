@@ -93,8 +93,7 @@ class Api::V1::BaseController < ApplicationController
         resource = resource.includes(available_includes) if available_includes.present?
       end
       resource = resource.where("#{resource.table.name}.updated_at > ?", Time.at(params[:since].to_i)) if params[:since].to_i > 0
-      resource = resource.limit(params[:limit]) if params[:limit]
-      resource = resource.offset(params[:offset]) if params[:offset]
+      resource = resource.page(page).per_page(per_page)
       resource = resource.order(options[:order]) if options[:order]
       resource
     end

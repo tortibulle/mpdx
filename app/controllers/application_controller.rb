@@ -166,7 +166,7 @@ class ApplicationController < ActionController::Base
   end
 
   def per_page
-    @per_page = params[:per_page]
+    @per_page = params[:per_page] || params[:limit]
     if @per_page == 'All'
       @per_page =  MAX_PER_PAGE
     else
@@ -180,8 +180,9 @@ class ApplicationController < ActionController::Base
     if params[:per_page] == 'All'
       1
     else
-      page_int = params[:page].to_i
-      page_int > 0 ? page_int : 1
+      page_int = ((params[:offset].to_f + 1) / per_page).ceil if params[:offset]
+      page_int ||= params[:page].to_i if params[:page]
+      page_int.to_i > 0 ? page_int : 1
     end
   end
 
