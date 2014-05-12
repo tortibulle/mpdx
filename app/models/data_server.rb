@@ -206,7 +206,7 @@ class DataServer
       CSV.new(response, headers: :first_row).each do |line|
         balance[:designation_numbers] = line['EMPLID'].split(',').collect {|e| e.gsub('"','')} if line['EMPLID']
         balance[:account_names] = line['ACCT_NAME'].split('\n') if line['ACCT_NAME']
-        balance_match = line['BALANCE'].match(/([-]?\d+\.?\d*)/)
+        balance_match = line['BALANCE'].gsub(',','').match(/([-]?\d+\.?\d*)/)
         balance[:balance] = balance_match[0] if balance_match
         balance[:date] = line['EFFDT'] ? DateTime.strptime(line['EFFDT'], "%Y-%m-%d %H:%M:%S") : Time.now
         break
