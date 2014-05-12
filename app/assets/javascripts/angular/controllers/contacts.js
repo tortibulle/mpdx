@@ -1,33 +1,68 @@
 angular.module('mpdxApp').controller('contactsController', function ($scope, $filter, $location, api, urlParameter, contactCache) {
 
-    $scope.Math = window.Math;
     $scope.totalContacts = 0;
 
     $scope.contactQuery = {
         limit: 25,
-        offset: 0,
+        page: 1,
         name: '',
-        city: ['']
+        city: [''],
+        state: [''],
+        newsletter: '',
+        tags: [''],
+        status: [''],
+        likely: [''],
+        church: [''],
+        referrer: ['']
     };
 
     $scope.page = {
         current: 1,
-        total: 1
+        total: 1,
+        from: 0,
+        to: 0
+    };
+
+    api.call('get','users/me', function(data){
+        console.log(data);
+    });
+
+    $scope.tagIsActive = function(tag){
+        return _.contains($scope.contactQuery.tags, tag);
+    };
+
+    $scope.tagClick = function(tag){
+        if($scope.tagIsActive(tag)){
+            _.remove($scope.contactQuery.tags, function(i) { return i === tag; });
+            if($scope.contactQuery.tags.length === 0){
+                $scope.contactQuery.tags.push('');
+            }
+        }else{
+            _.remove($scope.contactQuery.tags, function(i) { return i === ''; });
+            $scope.contactQuery.tags.push(tag);
+        }
     };
 
     $scope.$watch('contactQuery', function (q, oldq) {
-        if(q.limit > oldq.limit){
-            $scope.page = {
-                current: 1,
-                total: 1
-            };
-            return;
+        if(q.page === oldq.page){
+            $scope.page.current = 1;
+            if(q.page !== 1){
+                return;
+            }
         }
-        api.call('get','contacts?limit='+q.limit+
-            '&offset=' + q.offset +
+        api.call('get','contacts?per_page='+q.limit+
+            '&page=' + q.page +
             '&filters[name]=' + encodeURIComponent(q.name) +
-            '&filters[city]=' + encodeURIComponent('Orlando') +
-            '&filters[city]=' + encodeURIComponent('LA')
+            '&filters[city][]=' + encodeURLarray(q.city).join('&filters[city][]=') +
+            '&filters[state][]=' + encodeURLarray(q.state).join('&filters[state][]=') +
+            '&filters[newsletter]=' + encodeURIComponent(q.newsletter) +
+            '&filters[tags][]=' + encodeURLarray(q.tags).join('&filters[tags][]=') +
+
+            '&filters[status][]=' + encodeURLarray(q.status).join('&filters[status][]=') +
+            '&filters[likely][]=' + encodeURLarray(q.likely).join('&filters[likely][]=') +
+
+            '&filters[church][]=' + encodeURLarray(q.church).join('&filters[church][]=') +
+            '&filters[referrer][]=' + encodeURLarray(q.referrer).join('&filters[referrer][]=')
             , {}, function(data) {
             angular.forEach(data.contacts, function (contact) {
                 contactCache.update(contact.id, {
@@ -43,17 +78,32 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             });
             $scope.contacts = data.contacts;
 
-            $scope.totalContacts = 35;
-
-            $scope.page.total = Math.ceil($scope.totalContacts / q.limit);
-
-            //console.log(q);
-            console.log(data);
+            $scope.totalContacts = data.meta.total;
+            $scope.page.total = data.meta.total_pages;
+            $scope.page.from = data.meta.from;
+            $scope.page.to = data.meta.to;
         }, null, true);
     }, true);
 
     $scope.$watch('page', function (p) {
-        $scope.contactQuery.offset = ((p.current - 1) * $scope.contactQuery.limit);
-        //console.log(p);
+        $scope.contactQuery.page = p.current;
     }, true);
+
+
+
+    //view preferences
+    api.call('get','users/me', {}, function(data) {
+            console.log(data.user.preferences.contacts_filter);
+        }, null, true);
+
+
 });
+
+
+function encodeURLarray(array){
+    var encoded = [];
+    angular.forEach(array, function(value, key){
+        encoded.push(encodeURIComponent(value));
+    });
+    return encoded;
+}

@@ -15,7 +15,7 @@
         </div>
         <span class="address" ng-repeat="i in contact.address_ids" ng-bind-html="getAddress(i)"></span>
         <div class="tags">
-            <a class="tag" href="/contacts?filters%5Btags%5D=tasktag" ng-repeat-start="tag in contact.tag_list">{{tag}}</a><span style="display:inline;" ng-repeat-end> </span>
+            <a class="tag" ng-repeat-start="tag in contact.tag_list">{{tag}}</a><span style="display:inline;" ng-repeat-end> </span>
         </div>
     </div>
 </td>
