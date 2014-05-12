@@ -26,7 +26,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
 
     //view preferences
     api.call('get','users/me', {}, function(data) {
-        var prefs = data.user.preferences.contacts_filter;
+        var prefs = data.user.preferences.contacts_filter[1];
         if(angular.isDefined(prefs.church)){
             $scope.contactQuery.church = prefs.church;
         }
@@ -109,12 +109,16 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
                 user: {
                     preferences: {
                         contacts_filter:{
+                            1:{
                                 name: q.name,
-                                city: q.city
+                                city: q.city,
+                                tags: ''
+                            }
                         }
                     }
                 }
             };
+            console.log(prefs);
             api.call('put','users/me', prefs);
         }, null, true);
     }, true);
