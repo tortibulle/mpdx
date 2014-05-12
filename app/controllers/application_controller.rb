@@ -102,8 +102,14 @@ class ApplicationController < ActionController::Base
 
   def default_account_list
     unless @default_account_list
-      @default_account_list = current_user.account_lists.find_by(id: current_user.default_account_list) if current_user.default_account_list.present?
-      @default_account_list ||= current_user.account_lists.first
+      if current_user.default_account_list.present?
+        @default_account_list = current_user.account_lists.find_by(id: current_user.default_account_list) ||
+          current_user.account_lists.first
+      else
+        @default_account_list = current_user.account_lists.first
+        current_user.default_account_list = @default_account_list.id
+        current_user.save
+      end
     end
 
     @default_account_list
@@ -131,13 +137,13 @@ class ApplicationController < ActionController::Base
 
     if request.env['HTTP_USER_AGENT'] =~ /msie/i
       headers['Pragma'] = 'public'
-      headers["Content-type"] = "text/plain"
+      headers['Content-type'] = 'text/plain'
       headers['Cache-Control'] = 'no-cache, must-revalidate, post-check=0, pre-check=0'
       headers['Content-Disposition'] = "attachment; filename=\"#{filename}\""
-      headers['Expires'] = "0"
+      headers['Expires'] = '0'
     else
-      headers["Content-Type"] ||= 'text/csv'
-      headers["Content-Disposition"] = "attachment; filename=\"#{filename}\""
+      headers['Content-Type'] ||= 'text/csv'
+      headers['Content-Disposition'] = "attachment; filename=\"#{filename}\""
     end
 
     render :layout => false
