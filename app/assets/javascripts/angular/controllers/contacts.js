@@ -114,7 +114,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
                                 city: q.city,
                                 tags: ''
                             }
-                        }
+                        },
+                        contacts_view_options: {}
                     }
                 }
             };
