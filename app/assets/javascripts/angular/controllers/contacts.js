@@ -13,7 +13,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         status: [''],
         likely: [''],
         church: [''],
-        referrer: ['']
+        referrer: [''],
+        viewPrefsLoaded: false
     };
 
     $scope.page = {
@@ -23,9 +24,25 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         to: 0
     };
 
-    api.call('get','users/me', function(data){
-        console.log(data);
-    });
+    //view preferences
+    api.call('get','users/me', {}, function(data) {
+        var prefs = data.user.preferences.contacts_filter;
+        if(angular.isDefined(prefs.church)){
+            $scope.contactQuery.church = prefs.church;
+        }
+        if(angular.isDefined(prefs.city)){
+            $scope.contactQuery.city = prefs.city;
+        }
+        if(angular.isDefined(prefs.name)){
+            $scope.contactQuery.name = prefs.name;
+        }
+        if(angular.isDefined(prefs.tags)){
+            $scope.contactQuery.tags = prefs.tags.split(',');
+        }
+
+        $scope.contactQuery.viewPrefsLoaded = true;
+        console.log(prefs);
+    }, null, true);
 
     $scope.tagIsActive = function(tag){
         return _.contains($scope.contactQuery.tags, tag);
@@ -44,6 +61,9 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
     };
 
     $scope.$watch('contactQuery', function (q, oldq) {
+        if(!q.viewPrefsLoaded){
+            return;
+        }
         if(q.page === oldq.page){
             $scope.page.current = 1;
             if(q.page !== 1){
@@ -82,19 +102,26 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             $scope.page.total = data.meta.total_pages;
             $scope.page.from = data.meta.from;
             $scope.page.to = data.meta.to;
+            console.log(data);
+
+            //Save View Prefs
+            var prefs = {
+                user: {
+                    preferences: {
+                        contacts_filter:{
+                                name: q.name,
+                                city: q.city
+                        }
+                    }
+                }
+            };
+            api.call('put','users/me', prefs);
         }, null, true);
     }, true);
 
     $scope.$watch('page', function (p) {
         $scope.contactQuery.page = p.current;
     }, true);
-
-
-
-    //view preferences
-    api.call('get','users/me', {}, function(data) {
-            console.log(data.user.preferences.contacts_filter);
-        }, null, true);
 
 
 });
