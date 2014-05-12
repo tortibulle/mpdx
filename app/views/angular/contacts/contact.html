@@ -20,9 +20,9 @@
     </div>
 </td>
 <td class="contact-tasks" nowrap="nowrap">
-    {{contact.status}}<br>
-    {{contact.pledge_amount | currency:"<%= current_currency %>"}} {{pledgeFrequencyStr(contact.pledge_frequency)}}<br>
-    <a href="/tasks?contact_ids={{contact.id}}">Tasks: 0000</a>
+    <span ng-show="contact.status !== ''">{{contact.status}}<br></span>
+    <span ng-show="contact.pledge_amount > 0">{{contact.pledge_amount | currency:"<%= current_currency %>"}} {{pledgeFrequencyStr(contact.pledge_frequency)}}<br></span>
+    <a href="/tasks?contact_ids={{contact.id}}" ng-show="contact.uncompleted_tasks_count > 0">Tasks: {{contact.uncompleted_tasks_count}}</a>
 </td>
 
 <td class="qaction" id="contact_{{contact.id}}_quick">

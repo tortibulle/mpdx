@@ -1,15 +1,16 @@
 angular.module('mpdxApp').controller('contactsController', function ($scope, $filter, $location, api, urlParameter, contactCache) {
+    var defaultAccountList;
 
     $scope.totalContacts = 0;
 
     $scope.contactQuery = {
         limit: 25,
         page: 1,
+        tags: [''],
         name: '',
         city: [''],
         state: [''],
         newsletter: '',
-        tags: [''],
         status: [''],
         likely: [''],
         church: [''],
@@ -26,18 +27,59 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
 
     //view preferences
     api.call('get','users/me', {}, function(data) {
-        var prefs = data.user.preferences.contacts_filter[1];
-        if(angular.isDefined(prefs.church)){
-            $scope.contactQuery.church = prefs.church;
-        }
-        if(angular.isDefined(prefs.city)){
-            $scope.contactQuery.city = prefs.city;
+        defaultAccountList = data.user.preferences.default_account_list;
+        var prefs = data.user.preferences.contacts_filter[defaultAccountList];
+
+        if(angular.isDefined(prefs.tags)){
+            $scope.contactQuery.tags = prefs.tags.split(',');
         }
         if(angular.isDefined(prefs.name)){
             $scope.contactQuery.name = prefs.name;
+            if(prefs.name[0]){
+                jQuery("#leftmenu #filter_name").trigger("click");
+            }
         }
-        if(angular.isDefined(prefs.tags)){
-            $scope.contactQuery.tags = prefs.tags.split(',');
+        if(angular.isDefined(prefs.city)){
+            $scope.contactQuery.city = prefs.city;
+            if(prefs.city[0]){
+                jQuery("#leftmenu #filter_city").trigger("click");
+            }
+        }
+        if(angular.isDefined(prefs.state)){
+            $scope.contactQuery.state = prefs.state;
+            if(prefs.state[0]){
+                jQuery("#leftmenu #filter_state").trigger("click");
+            }
+        }
+        if(angular.isDefined(prefs.newsletter)){
+            $scope.contactQuery.newsletter = prefs.newsletter;
+            if(prefs.newsletter[0]){
+                jQuery("#leftmenu #filter_newsletter").trigger("click");
+            }
+        }
+        if(angular.isDefined(prefs.status)){
+            $scope.contactQuery.status = prefs.status;
+            if(prefs.status[0]){
+                jQuery("#leftmenu #filter_status").trigger("click");
+            }
+        }
+        if(angular.isDefined(prefs.likely)){
+            $scope.contactQuery.likely = prefs.likely;
+            if(prefs.likely[0]){
+                jQuery("#leftmenu #filter_likely").trigger("click");
+            }
+        }
+        if(angular.isDefined(prefs.church)){
+            $scope.contactQuery.church = prefs.church;
+            if(prefs.church[0]){
+                jQuery("#leftmenu #filter_church").trigger("click");
+            }
+        }
+        if(angular.isDefined(prefs.referrer)){
+            $scope.contactQuery.referrer = prefs.referrer;
+            if(prefs.referrer[0]){
+                jQuery("#leftmenu #filter_referrer").trigger("click");
+            }
         }
 
         $scope.contactQuery.viewPrefsLoaded = true;
@@ -104,22 +146,28 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             $scope.page.to = data.meta.to;
             console.log(data);
 
+
             //Save View Prefs
             var prefs = {
                 user: {
                     preferences: {
-                        contacts_filter:{
-                            1:{
-                                name: q.name,
-                                city: q.city,
-                                tags: ''
-                            }
+                        contacts_filter: {
                         },
                         contacts_view_options: {}
                     }
                 }
             };
-            console.log(prefs);
+            prefs['user']['preferences']['contacts_filter'][defaultAccountList] = {
+                tags: q.tags.join(),
+                name: q.name,
+                city: q.city,
+                state: q.state,
+                newsletter: q.newsletter,
+                status: q.status,
+                likely: q.likely,
+                church: q.church,
+                referrer: q.referrer
+            };
             api.call('put','users/me', prefs);
         }, null, true);
     }, true);
