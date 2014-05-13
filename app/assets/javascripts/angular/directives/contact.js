@@ -9,6 +9,7 @@ angular.module('mpdxApp')
             link: function (scope, element, attrs){
             },
             controller: function ($scope, $sce, contactCache) {
+                $scope.current_currency_symbol = window.current_currency_symbol;
 
                 $scope.getAddress = function(id){
                     var address = _.find(contactCache.getFromCache($scope.contact.id).addresses, { 'id': id });
@@ -23,6 +24,14 @@ angular.module('mpdxApp')
                     var person = _.find(contactCache.getFromCache($scope.contact.id).people, { 'id': id });
                     person.name = person.first_name + ' ' + person.last_name;
                     return person;
+                };
+
+                $scope.getPrimaryPhone = function(id){
+                    var person = _.find(contactCache.getFromCache($scope.contact.id).people, { 'id': id });
+                    var phone =_.find(contactCache.getFromCache($scope.contact.id).phone_numbers, function (i) {
+                        return _.contains(person.phone_number_ids, i.id) && i.primary;
+                    });
+                    return phone || '';
                 };
 
                 $scope.pledgeFrequencyStr = function(pledgeFrequency){
