@@ -8,7 +8,7 @@ class ContactSerializer < ActiveModel::Serializer
   ATTRIBUTES = [:id, :name, :pledge_amount, :pledge_frequency, :pledge_start_date, :status, :deceased,
                 :notes, :notes_saved_at, :next_ask, :never_ask, :likely_to_give, :church_name, :send_newsletter,
                 :magazine, :last_activity, :last_appointment, :last_letter, :last_phone_call, :last_pre_call,
-                :last_thank, :avatar, :referrals_to_me_ids, :tag_list, :uncompleted_tasks_count]
+                :last_thank, :avatar, :square_avatar, :referrals_to_me_ids, :tag_list, :uncompleted_tasks_count]
 
   attributes *ATTRIBUTES
 
@@ -35,6 +35,11 @@ class ContactSerializer < ActiveModel::Serializer
   def avatar
     contact_exhibit = exhibit(object)
     contact_exhibit.avatar(:large)
+  end
+
+  def square_avatar
+    contact_exhibit = exhibit(object)
+    contact_exhibit.avatar
   end
 
   def cache_key
