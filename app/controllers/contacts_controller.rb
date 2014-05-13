@@ -326,14 +326,6 @@ class ContactsController < ApplicationController
   def filtered_contacts
     filtered_contacts = current_account_list.contacts.order('contacts.name')
 
-    if params[:filter] == 'people'
-      filtered_contacts = filtered_contacts.people
-    end
-
-    if params[:filter] == 'companies'
-      filtered_contacts = filtered_contacts.companies
-    end
-
     if filters_params.present?
       filtered_contacts = ContactFilter.new(filters_params).filter(filtered_contacts)
     else
