@@ -25,11 +25,27 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         to: 0
     };
 
+    $scope.resetFilters = function(){
+        $scope.contactQuery.tags = [''];
+        $scope.contactQuery.name = '';
+        $scope.contactQuery.city = [''];
+        $scope.contactQuery.state = [''];
+        $scope.contactQuery.newsletter = '';
+        $scope.contactQuery.status = [''];
+        $scope.contactQuery.likely = [''];
+        $scope.contactQuery.church = [''];
+        $scope.contactQuery.referrer = [''];
+    };
+
     //view preferences
     api.call('get','users/me', {}, function(data) {
         defaultAccountList = data.user.preferences.default_account_list;
         var prefs = data.user.preferences.contacts_filter[defaultAccountList];
+        $scope.contactQuery.viewPrefsLoaded = true;
 
+        if(_.isNull(prefs)){
+            return;
+        }
         if(angular.isDefined(prefs.tags)){
             $scope.contactQuery.tags = prefs.tags.split(',');
         }
@@ -81,9 +97,6 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
                 jQuery("#leftmenu #filter_referrer").trigger("click");
             }
         }
-
-        $scope.contactQuery.viewPrefsLoaded = true;
-        console.log(prefs);
     }, null, true);
 
     $scope.tagIsActive = function(tag){
@@ -135,7 +148,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
                         return _.contains(contact.person_ids, i.id);
                     }),
                     email_addresses: data.email_addresses,
-                    contact: _.find(data.contacts, { 'id': contact.id })
+                    contact: _.find(data.contacts, { 'id': contact.id }),
+                    phone_numbers: data.phone_numbers
                 });
             });
             $scope.contacts = data.contacts;
@@ -144,8 +158,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             $scope.page.total = data.meta.total_pages;
             $scope.page.from = data.meta.from;
             $scope.page.to = data.meta.to;
-            console.log(data);
-
+console.log(data);
 
             //Save View Prefs
             var prefs = {

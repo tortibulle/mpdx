@@ -6,9 +6,6 @@
   </script>
   <aside id="leftmenu">
   <ul>
-    <li class="<%= 'selected' if params[:filter].blank? %>"><%= link_to(_('All'), contacts_path, class: "all menu_item") %></li>
-    <li class="<%= 'selected' if params[:filter] == 'people' %>"><%= link_to(_('People'), contacts_path(filter: 'people'), class: "people menu_item") %></li>
-    <li class="<%= 'selected' if params[:filter] == 'companies' %>"><%= link_to(_('Companies'), contacts_path(filter: 'companies'), class: "companies menu_item") %></li>
     <%= render 'sidebar_tags', tags: current_account_list.contact_tags %>
     <li>
       <span class="left_filters menu_item"><%= _('Filters') %></span>
@@ -82,6 +79,9 @@
               <%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), ''], [_('-- Someone --'), '*']] + current_account_list.contacts.with_referrals.order("name").collect { |c| [c.name, c.id] }, filters_params[:referrer]), multiple: true, size: 5, :'ng-model' => 'contactQuery.referrer' %>
             </div>
           </li>
+          <li class="controls">
+            <a href="#" ng-click="resetFilters()" style="font-size: 11px;">Reset Filters</a>
+          </li>
         </ul>
       <% end %>
 
@@ -140,6 +140,7 @@
               <div style="float:right">Show: <select ng-model="contactQuery.limit" ng-options="i as i for i in [25, 50, 100, 1000]"></select></div>
             </td>
           </tr>
+          <tr ng-show="contacts.length === 0"><td>No contacts are available to show.  Try <a href="/contacts/new">adding a new contact</a> or <a href="#" ng-click="resetFilters()">resetting your filters</a>.</td></tr>
           <tr contact="contact" ng-repeat="contact in contacts" id="contact_{{contact.id}}" data-hook="contact"></tr>
           <tr>
             <td colspan="10">
