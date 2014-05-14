@@ -51,6 +51,8 @@ class TaskFilter
       filtered_tasks = filtered_tasks.where('completed_at > ?', 1.week.ago)
     when 'today'
       filtered_tasks = filtered_tasks.today
+    when 'future'
+      filtered_tasks = filtered_tasks.future
     when 'upcoming'
       filtered_tasks = filtered_tasks.upcoming
     end

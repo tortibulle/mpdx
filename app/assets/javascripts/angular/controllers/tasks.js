@@ -1,6 +1,6 @@
 angular.module('mpdxApp').controller('tasksController', function ($scope, $filter, $location, api, urlParameter, contactCache) {
     $scope.refreshTasks = function(){
-        api.call('get','tasks?filters[completed]=false',{},function(tData) {
+        api.call('get','tasks?account_list_id=' + window.current_account_list_id + '&filters[completed]=false',{},function(tData) {
             api.call('get','contacts?filters[ids]='+_.uniq(_.flatten(tData.tasks, 'contacts')).join(),{},function(data) {
                 angular.forEach(data.contacts, function(contact){
                     contactCache.update(contact.id, {
