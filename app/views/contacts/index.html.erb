@@ -137,8 +137,10 @@
 
                   <span ng-repeat="n in [1, page.total] | makeRange">
                     <em class="current" ng-show="n === page.current">{{n}}</em>
-                    <a rel="next" ng-show="n !== page.current" href="#" ng-click="page.current=n">{{n}}</a>
+                    <a rel="next" ng-show="n !== page.current && ((n > (page.current-8) && n < (page.current+8)) || n === 1 || n === page.total)" href="#" ng-click="page.current=n">{{n}}</a>
+                    <span ng-show="(n === 2 && page.current > 9) || (n === page.total-1 && page.current < page.total - 8)">...</span>
                   </span>
+
                   <span class="next_page disabled" ng-show="page.current === page.total">Next →</span>
                   <a class="next_page" rel="next" href="#" ng-click="page.current=page.current+1" ng-show="page.current < page.total">Next →</a>
                 </div>
@@ -159,8 +161,10 @@
 
                   <span ng-repeat="n in [1, page.total] | makeRange">
                     <em class="current" ng-show="n === page.current">{{n}}</em>
-                    <a rel="next" ng-show="n !== page.current" href="#" ng-click="page.current=n">{{n}}</a>
+                    <a rel="next" ng-show="n !== page.current && ((n > (page.current-8) && n < (page.current+8)) || n === 1 || n === page.total)" href="#" ng-click="page.current=n">{{n}}</a>
+                    <span ng-show="(n === 2 && page.current > 9) || (n === page.total-1 && page.current < page.total - 8)">...</span>
                   </span>
+
                   <span class="next_page disabled" ng-show="page.current === page.total">Next →</span>
                   <a class="next_page" rel="next" href="#" ng-click="page.current=page.current+1" ng-show="page.current < page.total">Next →</a>
                 </div>
@@ -170,7 +174,6 @@
             </td>
           </tr>
         </table>
-
 
 
         <div class="filters">
