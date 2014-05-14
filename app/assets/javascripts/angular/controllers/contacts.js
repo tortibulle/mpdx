@@ -129,10 +129,11 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             }
         }
         $scope.contactsLoading = true;
-        api.call('get','contacts?per_page=' + q.limit +
+        api.call('get','contacts?account_list_id=' + window.current_account_list_id +
+            '&per_page=' + q.limit +
             '&page=' + q.page +
             '&filters[name]=' + encodeURIComponent(q.name) +
-            //'&filters[contact_type]=' + encodeURIComponent('person') +
+            '&filters[contact_type]=' + encodeURIComponent(q.type) +
             '&filters[city][]=' + encodeURLarray(q.city).join('&filters[city][]=') +
             '&filters[state][]=' + encodeURLarray(q.state).join('&filters[state][]=') +
             '&filters[newsletter]=' + encodeURIComponent(q.newsletter) +
@@ -142,7 +143,6 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             '&filters[church][]=' + encodeURLarray(q.church).join('&filters[church][]=') +
             '&filters[referrer][]=' + encodeURLarray(q.referrer).join('&filters[referrer][]=')
             , {}, function(data) {
-                console.log(data);
             angular.forEach(data.contacts, function (contact) {
                 contactCache.update(contact.id, {
                     addresses: _.filter(data.addresses, function (addr) {
