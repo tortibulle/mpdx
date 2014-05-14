@@ -54,6 +54,6 @@ describe('contacts', function() {
         $scope.$digest();
         expect($scope.contactQuery.page).toEqual(2);
     });
-    
+
     */
 });
