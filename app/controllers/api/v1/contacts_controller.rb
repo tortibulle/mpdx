@@ -1,7 +1,7 @@
 class Api::V1::ContactsController < Api::V1::BaseController
 
   def index
-    order = params[:order] || 'name'
+    order = params[:order] || 'contacts.name'
 
     if params[:filters].present?
       filtered_contacts = ContactFilter.new(params[:filters]).filter(contacts)
