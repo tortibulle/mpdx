@@ -1,6 +1,7 @@
 angular.module('mpdxApp').controller('contactsController', function ($scope, $filter, $location, api, urlParameter, contactCache) {
     var defaultAccountList;
 
+    $scope.contactsLoading = true;
     $scope.totalContacts = 0;
 
     $scope.contactQuery = {
@@ -8,6 +9,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         page: 1,
         tags: [''],
         name: '',
+        type: [''],
         city: [''],
         state: [''],
         newsletter: '',
@@ -28,6 +30,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
     $scope.resetFilters = function(){
         $scope.contactQuery.tags = [''];
         $scope.contactQuery.name = '';
+        $scope.contactQuery.type = [''];
         $scope.contactQuery.city = [''];
         $scope.contactQuery.state = [''];
         $scope.contactQuery.newsletter = '';
@@ -97,7 +100,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
                 jQuery("#leftmenu #filter_referrer").trigger("click");
             }
         }
-    }, null, true);
+    });
 
     $scope.tagIsActive = function(tag){
         return _.contains($scope.contactQuery.tags, tag);
@@ -125,20 +128,21 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
                 return;
             }
         }
-        api.call('get','contacts?per_page='+q.limit+
+        $scope.contactsLoading = true;
+        api.call('get','contacts?per_page=' + q.limit +
             '&page=' + q.page +
             '&filters[name]=' + encodeURIComponent(q.name) +
+            //'&filters[contact_type]=' + encodeURIComponent('person') +
             '&filters[city][]=' + encodeURLarray(q.city).join('&filters[city][]=') +
             '&filters[state][]=' + encodeURLarray(q.state).join('&filters[state][]=') +
             '&filters[newsletter]=' + encodeURIComponent(q.newsletter) +
             '&filters[tags][]=' + encodeURLarray(q.tags).join('&filters[tags][]=') +
-
             '&filters[status][]=' + encodeURLarray(q.status).join('&filters[status][]=') +
             '&filters[likely][]=' + encodeURLarray(q.likely).join('&filters[likely][]=') +
-
             '&filters[church][]=' + encodeURLarray(q.church).join('&filters[church][]=') +
             '&filters[referrer][]=' + encodeURLarray(q.referrer).join('&filters[referrer][]=')
             , {}, function(data) {
+                console.log(data);
             angular.forEach(data.contacts, function (contact) {
                 contactCache.update(contact.id, {
                     addresses: _.filter(data.addresses, function (addr) {
@@ -158,7 +162,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             $scope.page.total = data.meta.total_pages;
             $scope.page.from = data.meta.from;
             $scope.page.to = data.meta.to;
-console.log(data);
+
+            $scope.contactsLoading = false;
 
             //Save View Prefs
             var prefs = {
@@ -188,8 +193,6 @@ console.log(data);
     $scope.$watch('page', function (p) {
         $scope.contactQuery.page = p.current;
     }, true);
-
-
 });
 
 

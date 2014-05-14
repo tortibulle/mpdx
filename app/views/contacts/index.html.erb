@@ -22,16 +22,22 @@
             </div>
           </li>
           <li>
+            <label id="filter_type"><%= _('Type') %></label>
+            <div class="collapse" style="display:none;">
+              <%= select_tag 'filters[city]', options_for_select([[_('-- Any --'), ''], [_('Person'), 'person'], [_('Company'), 'company']]), multiple: true, size: 5, :'ng-model' => 'contactQuery.type' %>
+            </div>
+          </li>
+          <li>
             <label id="filter_city"><%= _('City') %></label>
             <div class="collapse" style="display:none;">
-              <%= select_tag 'filters[city]', options_for_select([[_('-- Any --'), '']] + current_account_list.cities.select(&:present?), filters_params[:city]), multiple: true, size: 5, :'ng-model' => 'contactQuery.city' %>
+              <%= select_tag 'filters[city]', options_for_select([[_('-- Any --'), '']] + current_account_list.cities.select(&:present?)), multiple: true, size: 5, :'ng-model' => 'contactQuery.city' %>
             </div>
           </li>
 
           <li>
             <label id="filter_state"><%= _('State') %></label>
             <div class="collapse" style="display:none;">
-              <%= select_tag 'filters[state]', options_for_select([[_('-- Any --'), '']] + current_account_list.states.select(&:present?), filters_params[:state]), multiple: true, size: 5, :'ng-model' => 'contactQuery.state' %>
+              <%= select_tag 'filters[state]', options_for_select([[_('-- Any --'), '']] + current_account_list.states.select(&:present?)), multiple: true, size: 5, :'ng-model' => 'contactQuery.state' %>
             </div>
           </li>
 
@@ -55,28 +61,28 @@
           <li>
             <label id="filter_status"><%= _('Status') %></label>
             <div class="collapse" style="display:none;">
-              <%= select_tag 'filters[status]', options_for_select([[_('-- Any --'), ''], [_('-- None --'), 'null']] + contact_instance.assignable_statuses.collect { |s| [_(s), s] }, filters_params[:status]), multiple: true, size: 5, :'ng-model' => 'contactQuery.status' %>
+              <%= select_tag 'filters[status]', options_for_select([[_('-- Any --'), ''], [_('-- None --'), 'null']] + contact_instance.assignable_statuses.collect { |s| [_(s), s] }), multiple: true, size: 5, :'ng-model' => 'contactQuery.status' %>
             </div>
           </li>
 
           <li>
             <label id="filter_likely"><%= _('Likely To Give') %></label>
             <div class="collapse" style="display:none;">
-              <%= select_tag '', options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_likely_to_gives, filters_params[:likely]), multiple: true, size: 4, :'ng-model' => 'contactQuery.likely' %>
+              <%= select_tag '', options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_likely_to_gives), multiple: true, size: 4, :'ng-model' => 'contactQuery.likely' %>
             </div>
           </li>
 
           <li>
             <label id="filter_church"><%= _('Church') %></label>
             <div class="collapse" style="display:none;">
-              <%= select_tag 'filters[church]', options_for_select([[_('-- Any --'), '']] + current_account_list.churches.select(&:present?), filters_params[:church]), multiple: true, size: 5, :'ng-model' => 'contactQuery.church' %>
+              <%= select_tag 'filters[church]', options_for_select([[_('-- Any --'), '']] + current_account_list.churches.select(&:present?)), multiple: true, size: 5, :'ng-model' => 'contactQuery.church' %>
             </div>
           </li>
 
           <li>
             <label id="filter_referrer"><%= _('Referrer') %></label>
             <div class="collapse" style="display:none;">
-              <%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), ''], [_('-- Someone --'), '*']] + current_account_list.contacts.with_referrals.order("name").collect { |c| [c.name, c.id] }, filters_params[:referrer]), multiple: true, size: 5, :'ng-model' => 'contactQuery.referrer' %>
+              <%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), ''], [_('-- Someone --'), '*']] + current_account_list.contacts.with_referrals.order("name").collect { |c| [c.name, c.id] }), multiple: true, size: 5, :'ng-model' => 'contactQuery.referrer' %>
             </div>
           </li>
           <li class="controls">
@@ -92,6 +98,7 @@
   <div id="contentbody" class="withleft">
     <div class="filters">
       <input autocomplete="off" class="search_filter ui-autocomplete-input" id="contact_name" placeholder="Type to filter" type="text" ng-model="contactQuery.name">
+      <span ng-show="contactsLoading">Loading...</span>
       <div class="right" class="contacts_actions">
         <%= link_to(_('Actions'), "#", class: "btn smallbtn actionbtn") %>
         <%= link_to(_('Merge'), '#', class: 'btn smallbtn', data: {behavior: 'merge'}) %>
@@ -105,7 +112,7 @@
     </div>
     <div class="">
       <div class="padded">
-        <table class="tablelist">
+        <table class="tablelist" ng-class="{'contact_loading': contactsLoading}">
           <% unless @contacts.length == @contacts.total_entries %>
             <tr id="select_more" style="display:none">
               <td colspan="6">
@@ -140,7 +147,7 @@
               <div style="float:right">Show: <select ng-model="contactQuery.limit" ng-options="i as i for i in [25, 50, 100, 1000]"></select></div>
             </td>
           </tr>
-          <tr ng-show="contacts.length === 0"><td>No contacts are available to show.  Try <a href="/contacts/new">adding a new contact</a> or <a href="#" ng-click="resetFilters()">resetting your filters</a>.</td></tr>
+          <tr ng-show="contacts.length === 0 && contactQuery.viewPrefsLoaded"><td>No contacts are available to show.  Try <a href="/contacts/new">adding a new contact</a> or <a href="#" ng-click="resetFilters()">resetting your filters</a>.</td></tr>
           <tr contact="contact" ng-repeat="contact in contacts" id="contact_{{contact.id}}" data-hook="contact"></tr>
           <tr>
             <td colspan="10">
