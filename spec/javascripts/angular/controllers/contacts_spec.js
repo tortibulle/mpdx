@@ -23,7 +23,7 @@ describe('contacts', function() {
 
         $scope.contactQuery.tags = ['test'];
         $scope.contactQuery.name = 'Steve';
-        $scope.contactQuery.type = ['test'];
+        $scope.contactQuery.type = 'person';
         $scope.contactQuery.city = ['Green Bay'];
         $scope.contactQuery.state = ['WI'];
         $scope.contactQuery.newsletter = 'all';
@@ -36,7 +36,7 @@ describe('contacts', function() {
 
         expect($scope.contactQuery.tags).toEqual(['']);
         expect($scope.contactQuery.name).toEqual('');
-        expect($scope.contactQuery.type).toEqual(['']);
+        expect($scope.contactQuery.type).toEqual('');
         expect($scope.contactQuery.city).toEqual(['']);
         expect($scope.contactQuery.state).toEqual(['']);
         expect($scope.contactQuery.newsletter).toEqual('');

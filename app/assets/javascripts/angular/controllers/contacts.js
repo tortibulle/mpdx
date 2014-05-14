@@ -1,6 +1,5 @@
 angular.module('mpdxApp').controller('contactsController', function ($scope, $filter, $location, api, urlParameter, contactCache) {
-    var defaultAccountList;
-
+    var viewPrefs;
     $scope.contactsLoading = true;
     $scope.totalContacts = 0;
 
@@ -9,7 +8,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         page: 1,
         tags: [''],
         name: '',
-        type: [''],
+        type: '',
         city: [''],
         state: [''],
         newsletter: '',
@@ -30,7 +29,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
     $scope.resetFilters = function(){
         $scope.contactQuery.tags = [''];
         $scope.contactQuery.name = '';
-        $scope.contactQuery.type = [''];
+        $scope.contactQuery.type = '';
         $scope.contactQuery.city = [''];
         $scope.contactQuery.state = [''];
         $scope.contactQuery.newsletter = '';
@@ -42,8 +41,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
 
     //view preferences
     api.call('get','users/me', {}, function(data) {
-        defaultAccountList = data.user.preferences.default_account_list;
-        var prefs = data.user.preferences.contacts_filter[defaultAccountList];
+        viewPrefs = data;
+        var prefs = viewPrefs.user.preferences.contacts_filter[window.current_account_list_id];
         $scope.contactQuery.viewPrefsLoaded = true;
 
         if(_.isNull(prefs)){
@@ -54,8 +53,14 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         }
         if(angular.isDefined(prefs.name)){
             $scope.contactQuery.name = prefs.name;
-            if(prefs.name[0]){
+            if(prefs.name){
                 jQuery("#leftmenu #filter_name").trigger("click");
+            }
+        }
+        if(angular.isDefined(prefs.type)){
+            $scope.contactQuery.type = prefs.type;
+            if(prefs.type){
+                jQuery("#leftmenu #filter_type").trigger("click");
             }
         }
         if(angular.isDefined(prefs.city)){
@@ -72,7 +77,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         }
         if(angular.isDefined(prefs.newsletter)){
             $scope.contactQuery.newsletter = prefs.newsletter;
-            if(prefs.newsletter[0]){
+            if(prefs.newsletter){
                 jQuery("#leftmenu #filter_newsletter").trigger("click");
             }
         }
@@ -166,18 +171,10 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             $scope.contactsLoading = false;
 
             //Save View Prefs
-            var prefs = {
-                user: {
-                    preferences: {
-                        contacts_filter: {
-                        },
-                        contacts_view_options: {}
-                    }
-                }
-            };
-            prefs['user']['preferences']['contacts_filter'][defaultAccountList] = {
+            viewPrefs['user']['preferences']['contacts_filter'][window.current_account_list_id] = {
                 tags: q.tags.join(),
                 name: q.name,
+                type: q.type,
                 city: q.city,
                 state: q.state,
                 newsletter: q.newsletter,
@@ -186,7 +183,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
                 church: q.church,
                 referrer: q.referrer
             };
-            api.call('put','users/me', prefs);
+            api.call('put','users/me', viewPrefs);
         }, null, true);
     }, true);
 

@@ -15,8 +15,6 @@
     <script type="text/javascript">
       window.current_currency = "<%= current_currency %>";
       window.current_currency_symbol = "<%= TwitterCldr::Shared::Currencies.for_code(current_currency)[:symbol] %>";
-    </script>
-    <script type="text/javascript">
       window.current_account_list_id = <%= current_account_list.id %>;
     </script>
   </head>

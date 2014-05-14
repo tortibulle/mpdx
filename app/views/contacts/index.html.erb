@@ -24,7 +24,7 @@
           <li>
             <label id="filter_type"><%= _('Type') %></label>
             <div class="collapse" style="display:none;">
-              <%= select_tag 'filters[city]', options_for_select([[_('-- Any --'), ''], [_('Person'), 'person'], [_('Company'), 'company']]), multiple: true, size: 5, :'ng-model' => 'contactQuery.type' %>
+              <%= select_tag 'filters[city]', options_for_select([[_('-- Any --'), ''], [_('Person'), 'person'], [_('Company'), 'company']]), multiple: false, size: 5, :'ng-model' => 'contactQuery.type' %>
             </div>
           </li>
           <li>
