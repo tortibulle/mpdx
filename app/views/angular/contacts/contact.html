@@ -1,5 +1,5 @@
 <td class="avatar">
-    <img class="avatar small" ng-src="{{contact.avatar}}">
+    <img class="avatar small" ng-src="{{contact.square_avatar}}">
 </td>
 <td class="profile">
     <div class="key">
@@ -10,7 +10,7 @@
         </span>
         <div class="people">
             <div ng-repeat="i in contact.person_ids">
-                <a href="/people/{{i}}">{{getPerson(i).name}}</a> - {{getPrimaryPhone(getPerson(i).id).number}} - mobile
+                <a href="/people/{{i}}">{{getPerson(i).name}}</a><span ng-show="getPrimaryPhone(getPerson(i).id)" style="display:inline;"> - {{getPrimaryPhone(getPerson(i).id).number}} - {{getPrimaryPhone(getPerson(i).id).location}}</span>
             </div>
         </div>
         <span class="address" ng-repeat="i in contact.address_ids" ng-bind-html="getAddress(i)"></span>
