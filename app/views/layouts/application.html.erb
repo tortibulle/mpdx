@@ -12,6 +12,9 @@
     <%= javascript_include_tag "application" %>
     <%= csrf_meta_tags %>
     <%= render 'google_analytics' if Rails.env == "production" %>
+    <script type="text/javascript">
+      window.current_account_list_id = <%= current_account_list.id %>;
+    </script>
   </head>
   <body id="<%= controller.controller_name %>_<%= controller.action_name %>" class="<%= controller.controller_name %>_controller" ng-app="mpdxApp">
     <header id="global">
