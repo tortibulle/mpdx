@@ -149,7 +149,7 @@
               <div style="float:right">Show: <select ng-model="contactQuery.limit" ng-options="i as i for i in [25, 50, 100, 1000]"></select></div>
             </td>
           </tr>
-          <tr ng-show="contacts.length === 0 && contactQuery.viewPrefsLoaded"><td>No contacts are available to show.  Try <a href="/contacts/new">adding a new contact</a> or <a href="#" ng-click="resetFilters()">resetting your filters</a>.</td></tr>
+          <tr ng-show="contacts.length === 0 && contactQuery.viewPrefsLoaded"><td style="color:red;">Sorry, there are no contacts that match the filters and/or tags you have selected. Try <a href="/contacts/new">adding a new contact</a> or <a href="#" ng-click="resetFilters()">resetting your filters</a>.</td></tr>
           <tr contact="contact" ng-repeat="contact in contacts" id="contact_{{contact.id}}" data-hook="contact"></tr>
           <tr>
             <td colspan="10">
