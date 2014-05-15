@@ -4,7 +4,7 @@ class UserSerializer < ActiveModel::Serializer
   # cached
 
   embed :ids, include: true
-  attributes :id, :first_name, :last_name, :master_person_id, :created_at, :updated_at
+  attributes :id, :first_name, :last_name, :master_person_id, :preferences, :created_at, :updated_at
 
   has_many :account_lists
 

@@ -1,7 +1,7 @@
 class Api::V1::ContactsController < Api::V1::BaseController
 
   def index
-    order = params[:order] || 'name'
+    order = params[:order] || 'contacts.name'
 
     if params[:filters].present?
       filtered_contacts = ContactFilter.new(params[:filters]).filter(contacts)
@@ -10,15 +10,22 @@ class Api::V1::ContactsController < Api::V1::BaseController
     end
     inactivated = contacts.inactive.where("updated_at > ?", Time.at(params[:since].to_i)).pluck(:id)
 
-    render json: add_includes_and_order(filtered_contacts, order: order),
+    filtered_contacts = add_includes_and_order(filtered_contacts, order: order)
+
+    meta = params[:since] ?
+      {
+        deleted: Version.where(item_type: 'Contact', event: 'destroy', related_object_type: 'AccountList', related_object_id: current_account_list.id).where("created_at > ?", Time.at(params[:since].to_i)).pluck(:item_id),
+        inactivated: inactivated
+      } : {}
+
+    meta.merge!({ total: filtered_contacts.total_entries, from: correct_from(filtered_contacts),
+                  to: correct_to(filtered_contacts), page: page,
+                  total_pages: total_pages(filtered_contacts) }) if filtered_contacts.respond_to?(:total_entries)
+
+    render json: filtered_contacts,
            serializer: ContactArraySerializer,
            scope: {include: includes, since: params[:since], user: current_user},
-           meta:  params[:since] ?
-                    {
-                      deleted: Version.where(item_type: 'Contact', event: 'destroy', related_object_type: 'AccountList', related_object_id: current_account_list.id).where("created_at > ?", Time.at(params[:since].to_i)).pluck(:item_id),
-                      inactivated: inactivated
-                    } :
-                    {},
+           meta: meta,
            callback: params[:callback],
            root: :contacts
   end

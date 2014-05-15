@@ -32,13 +32,13 @@ describe ContactsController do
 
 
       it "gets people" do
-        get :index, filter: 'people'
+        get :index, filters: { contact_type: 'person' }
         response.should be_success
         assigns(:contacts).should == [contact]
       end
 
       it "gets companies" do
-        get :index, filter: 'companies'
+        get :index, filters: { contact_type: 'company' }
         response.should be_success
         assigns(:contacts).should == [contact2]
       end

@@ -1,158 +1,196 @@
-<% contact_instance = Contact.new %>
-<script type="text/javascript" charset="utf-8">
-  var account_contacts_json = <%= contacts_for_filter.collect { |c| {value: c.name, id: c.id} }.to_json.html_safe %>
-  var filtered_contacts_ids = <%= @filtered_contacts.collect { |c| c.id }.to_json.html_safe %>
-</script>
-<aside id="leftmenu">
-<ul>
-  <li class="<%= 'selected' if params[:filter].blank? %>"><%= link_to(_('All'), contacts_path, class: "all menu_item") %></li>
-  <li class="<%= 'selected' if params[:filter] == 'people' %>"><%= link_to(_('People'), contacts_path(filter: 'people'), class: "people menu_item") %></li>
-  <li class="<%= 'selected' if params[:filter] == 'companies' %>"><%= link_to(_('Companies'), contacts_path(filter: 'companies'), class: "companies menu_item") %></li>
-  <%= render 'sidebar_tags', tags: current_account_list.contact_tags %>
-  <li>
-		<span class="left_filters menu_item"><%= _('Filters') %></span>
-    <%= form_tag contacts_path, method: :get, id: 'filters_form' do %>
+<div ng-controller="contactsController">
+  <% contact_instance = Contact.new %>
+  <script type="text/javascript" charset="utf-8">
+    var account_contacts_json = <%= contacts_for_filter.collect { |c| {value: c.name, id: c.id} }.to_json.html_safe %>
+    var filtered_contacts_ids = <%= @filtered_contacts.collect { |c| c.id }.to_json.html_safe %>
+  </script>
+  <aside id="leftmenu">
+  <ul>
+    <%= render 'sidebar_tags', tags: current_account_list.contact_tags %>
+    <li>
+      <span class="left_filters menu_item"><%= _('Filters') %></span>
+      <form id="filters_form">
 
-      <%= hidden_field_tag 'filters[tags]', tag_params %>
-      <%= hidden_field_tag :per_page, params[:per_page] %>
+        <%= hidden_field_tag 'filters[tags]', tag_params %>
+        <%= hidden_field_tag :per_page, params[:per_page] %>
 
-      <ul class="left_filters">
-        <li class="<%= 'opened' if filters_params[:name] %>">
-          <label class="<%= 'opened' if filters_params[:name] %>"><%= _('Name') %></label>
-          <div class="collapse" style="<%= 'display:none' unless filters_params[:name] %>">
-            <%= text_field_tag 'filters[name]', filters_params[:name] %>
-          </div>
-        </li>
-        <li class="<%= 'opened' if filters_params[:city] %>">
-          <label class="<%= 'opened' if filters_params[:city] %>"><%= _('City') %></label>
-          <div class="collapse" style="<%= 'display:none' unless filters_params[:city] %>">
-            <%= select_tag 'filters[city]', options_for_select([[_('-- Any --'), '']] + current_account_list.cities.select(&:present?), filters_params[:city]), multiple: true, size: 5 %>
-          </div>
-        </li>
+        <ul class="left_filters">
+          <li>
+            <label id="filter_name"><%= _('Name') %></label>
+            <div class="collapse" style="display:none;">
+              <input ng-model="contactQuery.name" type="text">
+            </div>
+          </li>
+          <li>
+            <label id="filter_type"><%= _('Type') %></label>
+            <div class="collapse" style="display:none;">
+              <%= select_tag 'filters[city]', options_for_select([[_('-- Any --'), ''], [_('Person'), 'person'], [_('Company'), 'company']]), multiple: false, size: 5, :'ng-model' => 'contactQuery.type' %>
+            </div>
+          </li>
+          <li>
+            <label id="filter_city"><%= _('City') %></label>
+            <div class="collapse" style="display:none;">
+              <%= select_tag 'filters[city]', options_for_select([[_('-- Any --'), '']] + current_account_list.cities.select(&:present?)), multiple: true, size: 5, :'ng-model' => 'contactQuery.city' %>
+            </div>
+          </li>
 
-        <li class="<%= 'opened' if filters_params[:state] %>">
-          <label class="<%= 'opened' if filters_params[:state] %>"><%= _('State') %></label>
-          <div class="collapse" style="<%= 'display:none' unless filters_params[:state] %>">
-            <%= select_tag 'filters[state]', options_for_select([[_('-- Any --'), '']] + current_account_list.states.select(&:present?), filters_params[:state]), multiple: true, size: 5 %>
-          </div>
-        </li>
+          <li>
+            <label id="filter_state"><%= _('State') %></label>
+            <div class="collapse" style="display:none;">
+              <%= select_tag 'filters[state]', options_for_select([[_('-- Any --'), '']] + current_account_list.states.select(&:present?)), multiple: true, size: 5, :'ng-model' => 'contactQuery.state' %>
+            </div>
+          </li>
 
-        <li class="<%= 'opened' if filters_params[:newsletter] %>">
-          <label class="<%= 'opened' if filters_params[:newsletter] %>"><%= _('Newsletter Recipients') %></label>
-          <div class="collapse" style="<%= 'display:none' unless filters_params[:newsletter] %>">
-						<%= radio_button_tag 'filters[newsletter]', '', filters_params[:newsletter] == '' %> <%= _('-- Any --') %><br />
-            <%= radio_button_tag 'filters[newsletter]', 'none', filters_params[:newsletter] == 'none' %> <%= _('None Selected') %><br />
-            <%= radio_button_tag 'filters[newsletter]', 'all', filters_params[:newsletter] == 'all' %> <%= _('All') %><br />
-	          <div>
-	            <%= radio_button_tag 'filters[newsletter]', 'address', filters_params[:newsletter] == 'address' %> <%= _('With Mailing Address') %>
-	            <%= tip(_('This filter will search for people who are set to receive your physical newsletter and have a mailing address'), style: 'margin: 0 6px -2px') %>
-	          </div>
-	          <div>
-	            <%= radio_button_tag 'filters[newsletter]', 'email', filters_params[:newsletter] == 'email' %> <%= _('With Email Address') %>
-	            <%= tip(_('This filter will search for people who are set to receive your email newsletter and have a valid email address'), style: 'margin: 0 6px -2px') %>
-	          </div>
-					</div>
-        </li>
+          <li>
+            <label id="filter_newsletter"><%= _('Newsletter Recipients') %></label>
+            <div class="collapse" style="display:none;">
+              <%= radio_button_tag '', '', false, :'ng-model' => 'contactQuery.newsletter' %> <%= _('-- Any --') %><br />
+              <%= radio_button_tag '', 'none', false, :'ng-model' => 'contactQuery.newsletter' %> <%= _('None Selected') %><br />
+              <%= radio_button_tag '', 'all', false, :'ng-model' => 'contactQuery.newsletter' %> <%= _('All') %><br />
+              <div>
+                <%= radio_button_tag '', 'address', false, :'ng-model' => 'contactQuery.newsletter' %> <%= _('With Mailing Address') %>
+                <%= tip(_('This filter will search for people who are set to receive your physical newsletter and have a mailing address'), style: 'margin: 0 6px -2px') %>
+              </div>
+              <div>
+                <%= radio_button_tag '', 'email', false, :'ng-model' => 'contactQuery.newsletter' %> <%= _('With Email Address') %>
+                <%= tip(_('This filter will search for people who are set to receive your email newsletter and have a valid email address'), style: 'margin: 0 6px -2px') %>
+              </div>
+            </div>
+          </li>
 
-        <li class="<%= 'opened' if filters_params[:status] %>">
-          <label class="<%= 'opened' if filters_params[:status] %>"><%= _('Status') %></label>
-          <div class="collapse" style="<%= 'display:none' unless filters_params[:status] %>">
-            <%= select_tag 'filters[status]', options_for_select([[_('-- Any --'), ''], [_('-- None --'), 'null']] + contact_instance.assignable_statuses.collect { |s| [_(s), s] }, filters_params[:status]), multiple: true, size: 5 %>
-          </div>
-        </li>
+          <li>
+            <label id="filter_status"><%= _('Status') %></label>
+            <div class="collapse" style="display:none;">
+              <%= select_tag 'filters[status]', options_for_select([[_('-- Any --'), ''], [_('-- None --'), 'null']] + contact_instance.assignable_statuses.collect { |s| [_(s), s] }), multiple: true, size: 5, :'ng-model' => 'contactQuery.status' %>
+            </div>
+          </li>
 
-        <li class="<%= 'opened' if filters_params[:likely] %>">
-          <label class="<%= 'opened' if filters_params[:likely] %>"><%= _('Likely To Give') %></label>
-          <div class="collapse" style="<%= 'display:none' unless filters_params[:likely] %>">
-            <%= select_tag 'filters[likely]', options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_likely_to_gives, filters_params[:likely]), multiple: true, size: 4 %>
-          </div>
-        </li>
+          <li>
+            <label id="filter_likely"><%= _('Likely To Give') %></label>
+            <div class="collapse" style="display:none;">
+              <%= select_tag '', options_for_select([[_('-- Any --'), '']] + contact_instance.assignable_likely_to_gives), multiple: true, size: 4, :'ng-model' => 'contactQuery.likely' %>
+            </div>
+          </li>
 
-        <li class="<%= 'opened' if filters_params[:church] %>">
-          <label class="<%= 'opened' if filters_params[:church] %>"><%= _('Church') %></label>
-          <div class="collapse" style="<%= 'display:none' unless filters_params[:church] %>">
-            <%= select_tag 'filters[church]', options_for_select([[_('-- Any --'), '']] + current_account_list.churches.select(&:present?), filters_params[:church]), multiple: true, size: 5 %>
-          </div>
-        </li>
+          <li>
+            <label id="filter_church"><%= _('Church') %></label>
+            <div class="collapse" style="display:none;">
+              <%= select_tag 'filters[church]', options_for_select([[_('-- Any --'), '']] + current_account_list.churches.select(&:present?)), multiple: true, size: 5, :'ng-model' => 'contactQuery.church' %>
+            </div>
+          </li>
 
-        <li class="<%= 'opened' if filters_params[:referrer] %>">
-          <label class="<%= 'opened' if filters_params[:referrer] %>"><%= _('Referrer') %></label>
-          <div class="collapse" style="<%= 'display:none' unless filters_params[:referrer] %>">
-            <%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), ''], [_('-- Someone --'), '*']] + current_account_list.contacts.with_referrals.order("name").collect { |c| [c.name, c.id] }, filters_params[:referrer]), multiple: true, size: 5 %>
-          </div>
-        </li>
-        <li class="controls">
-          <%= submit_tag _('Apply Filters') %>
-          <%= link_to(_('Reset Filters'), contacts_path(clear_filter: true), style: 'font-size: 11px;') if filters_params.present? %>
-        </li>
-      </ul>
-    <% end %>
+          <li>
+            <label id="filter_referrer"><%= _('Referrer') %></label>
+            <div class="collapse" style="display:none;">
+              <%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), ''], [_('-- Someone --'), '*']] + current_account_list.contacts.with_referrals.order("name").collect { |c| [c.name, c.id] }), multiple: true, size: 5, :'ng-model' => 'contactQuery.referrer' %>
+            </div>
+          </li>
+          <li class="controls">
+            <a href="#" ng-click="resetFilters()" style="font-size: 11px;">Reset Filters</a>
+          </li>
+        </ul>
+      </form>
 
-  </li>
-</ul>
-</aside>
+    </li>
+  </ul>
+  </aside>
 
-<div id="contentbody" class="withleft">
-  <div class="filters">
-    <%= text_field_tag :contact_name, '', autocomplete: 'off', placeholder: _('Type to filter'), class: 'search_filter' %>
-    <div class="right" class="contacts_actions">
-      <%= link_to(_('Actions'), "#", class: "btn smallbtn actionbtn") %>
-      <%= link_to(_('Merge'), '#', class: 'btn smallbtn', data: {behavior: 'merge'}) %>
-      <%= hidden_field_tag :selected_ids %>
-      <%= render 'contacts_action_list' %>
+  <div id="contentbody" class="withleft">
+    <div class="filters">
+      <input autocomplete="off" class="search_filter ui-autocomplete-input" id="contact_name" placeholder="Type to filter" type="text" ng-model="contactQuery.name">
+      <span ng-show="contactsLoading">Loading...</span>
+      <div class="right" class="contacts_actions">
+        <%= link_to(_('Actions'), "#", class: "btn smallbtn actionbtn") %>
+        <%= link_to(_('Merge'), '#', class: 'btn smallbtn', data: {behavior: 'merge'}) %>
+        <%= hidden_field_tag :selected_ids %>
+        <%= render 'contacts_action_list' %>
 
-      <%= link_to(_('Download CSV'), params.merge(format: 'csv'), class: "btn smallbtn") %>
+        <%= link_to(_('Download CSV'), params.merge(format: 'csv'), class: "btn smallbtn") %>
 
-      <span style="margin-right:3px;margin-left:5px"><input type="checkbox" class="checkall" /></span>
+        <span style="margin-right:3px;margin-left:5px"><input type="checkbox" class="checkall" /></span>
+      </div>
     </div>
-  </div>
-  <div class="">
-    <div class="padded">
-      <table class="tablelist">
-        <% unless @contacts.length == @contacts.total_entries %>
-          <tr id="select_more" style="display:none">
-            <td colspan="6">
-              <span id="select_all_prompt">
-                <%= _('All <strong>%{this_page}</strong> conversations on this page are selected. <a data-behavior="select_all">Select all <strong>%{total}</strong> contacts</a>').localize %
-                  {this_page: @contacts.length, total: @contacts.total_entries} %>
-              </span>
-              <span id="clear_selection_prompt" style="display:none">
-                <%= _('All <strong>%{total}</strong> contacts are selected. <a data-behavior="clear_selection">Clear selection</a>').localize %
-                  {total: @contacts.total_entries} %>
-              </span>
+    <div class="">
+      <div class="padded">
+        <table class="tablelist" ng-class="{'contact_loading': contactsLoading}">
+          <% unless @contacts.length == @contacts.total_entries %>
+            <tr id="select_more" style="display:none">
+              <td colspan="6">
+                <span id="select_all_prompt">
+                  <%= _('All <strong>%{this_page}</strong> conversations on this page are selected. <a data-behavior="select_all">Select all <strong>%{total}</strong> contacts</a>').localize %
+                    {this_page: @contacts.length, total: @contacts.total_entries} %>
+                </span>
+                <span id="clear_selection_prompt" style="display:none">
+                  <%= _('All <strong>%{total}</strong> contacts are selected. <a data-behavior="clear_selection">Clear selection</a>').localize %
+                    {total: @contacts.total_entries} %>
+                </span>
+              </td>
+            </tr>
+          <% end %>
+          <tr>
+            <td colspan="10">
+              <div style="float:left">
+                Displaying <b>{{page.from}}&nbsp;-&nbsp;{{page.to}}</b> of <b>{{totalContacts}}</b>
+                <div class="pagination">
+                  <span class="previous_page disabled" ng-show="page.current === 1">← Previous</span>
+                  <a class="previous_page" rel="prev start" href="#" ng-click="page.current=page.current-1" ng-show="page.current > 1">← Previous</a>
+
+                  <span ng-repeat="n in [1, page.total] | makeRange">
+                    <em class="current" ng-show="n === page.current">{{n}}</em>
+                    <a rel="next" ng-show="n !== page.current && ((n > (page.current-8) && n < (page.current+8)) || n === 1 || n === page.total)" href="#" ng-click="page.current=n">{{n}}</a>
+                    <span ng-show="(n === 2 && page.current > 9) || (n === page.total-1 && page.current < page.total - 8)">...</span>
+                  </span>
+
+                  <span class="next_page disabled" ng-show="page.current === page.total">Next →</span>
+                  <a class="next_page" rel="next" href="#" ng-click="page.current=page.current+1" ng-show="page.current < page.total">Next →</a>
+                </div>
+              </div>
+
+              <div style="float:right">Show: <select ng-model="contactQuery.limit" ng-options="i as i for i in [25, 50, 100, 1000]"></select></div>
             </td>
           </tr>
-        <% end %>
-        <tr>
-          <td colspan="10">
-            <%= render 'pagination', objects: @contacts %>
-          </td>
-        </tr>
-        <%= render partial: 'contact', collection: @contacts %>
-        <tr>
-          <td colspan="10">
-            <%= render 'pagination', objects: @contacts %>
-          </td>
-        </tr>
-      </table>
+          <tr ng-show="contacts.length === 0 && contactQuery.viewPrefsLoaded"><td style="color:red;">Sorry, there are no contacts that match the filters and/or tags you have selected. Try <a href="/contacts/new">adding a new contact</a> or <a href="#" ng-click="resetFilters()">resetting your filters</a>.</td></tr>
+          <tr contact="contact" ng-repeat="contact in contacts" id="contact_{{contact.id}}" data-hook="contact"></tr>
+          <tr>
+            <td colspan="10">
+              <div style="float:left">
+                Displaying <b>{{page.from}}&nbsp;-&nbsp;{{page.to}}</b> of <b>{{totalContacts}}</b>
+                <div class="pagination">
+                  <span class="previous_page disabled" ng-show="page.current === 1">← Previous</span>
+                  <a class="previous_page" rel="prev start" href="#" ng-click="page.current=page.current-1" ng-show="page.current > 1">← Previous</a>
+
+                  <span ng-repeat="n in [1, page.total] | makeRange">
+                    <em class="current" ng-show="n === page.current">{{n}}</em>
+                    <a rel="next" ng-show="n !== page.current && ((n > (page.current-8) && n < (page.current+8)) || n === 1 || n === page.total)" href="#" ng-click="page.current=n">{{n}}</a>
+                    <span ng-show="(n === 2 && page.current > 9) || (n === page.total-1 && page.current < page.total - 8)">...</span>
+                  </span>
+
+                  <span class="next_page disabled" ng-show="page.current === page.total">Next →</span>
+                  <a class="next_page" rel="next" href="#" ng-click="page.current=page.current+1" ng-show="page.current < page.total">Next →</a>
+                </div>
+              </div>
+
+              <div style="float:right">Show: <select ng-model="contactQuery.limit" ng-options="i as i for i in [25, 50, 100, 1000]"></select></div>
+            </td>
+          </tr>
+        </table>
 
 
-
-      <div class="filters">
-        <div class="right" class="contacts_actions">
-          <%= link_to(_('Actions'), "#", class: "btn smallbtn actionbtn") %>
-          <%= link_to(_('Merge'), '#', class: 'btn smallbtn', data: {behavior: 'merge'}) %>
-          <%= render 'contacts_action_list', :bottom => true %>
-          <span style="margin-right:3px;margin-left:5px">
-            <label for="checkall"><%= _('Select All Rows') %></label>
-            <input name="checkall" type="checkbox" class="checkall" />
-					</span>
+        <div class="filters">
+          <div class="right" class="contacts_actions">
+            <%= link_to(_('Actions'), "#", class: "btn smallbtn actionbtn") %>
+            <%= link_to(_('Merge'), '#', class: 'btn smallbtn', data: {behavior: 'merge'}) %>
+            <%= render 'contacts_action_list', :bottom => true %>
+            <span style="margin-right:3px;margin-left:5px">
+              <label for="checkall"><%= _('Select All Rows') %></label>
+              <input name="checkall" type="checkbox" class="checkall" />
+            </span>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-
 <%= render 'tag_modals' %>
 <%= render 'task_modal' %>
 <%= render 'edit_modal' %>

@@ -16,7 +16,7 @@ class ContactFilter
         filtered_contacts = filtered_contacts.where('contacts.id' => @filters[:ids].split(','))
       end
 
-      if @filters[:tags].present?
+      if @filters[:tags].present? && @filters[:tags].first != ''
         filtered_contacts = filtered_contacts.tagged_with(@filters[:tags].split(','))
       end
 
@@ -97,6 +97,13 @@ class ContactFilter
 
       if @filters[:name].present?
         filtered_contacts = filtered_contacts.where("lower(contacts.name) like ?", "%#{@filters[:name].downcase}%")
+      end
+
+      case @filters[:contact_type]
+      when 'person'
+        filtered_contacts = filtered_contacts.people
+      when 'company'
+        filtered_contacts = filtered_contacts.companies
       end
     end
 

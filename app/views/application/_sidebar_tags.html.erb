@@ -1,4 +1,4 @@
-<li class="<%= 'selected' if tag_params.present? %>">
+<li ng-class="{'selected': contactQuery.tags[0]}">
   <span class="tags menu_item"><%= _('Tags') %></span>
   <ul class="left_taglist tags">
     <li>
@@ -13,7 +13,7 @@
             url_params['filters']['tags'] = (tags + [tag]).join(',')
           end %>
 
-          <%= link_to(tag, url_params, class: "tag #{'selected' if tags.include?(tag)}") %>
+          <a class="tag" href="#" ng-class="{'selected': tagIsActive('<%= tag %>')}" ng-click="tagClick('<%= tag %>')"><%= tag %></a>
         <% end %>
       <% end %>
     </li>
