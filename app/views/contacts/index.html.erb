@@ -9,7 +9,7 @@
     <%= render 'sidebar_tags', tags: current_account_list.contact_tags %>
     <li>
       <span class="left_filters menu_item"><%= _('Filters') %></span>
-      <%= form_tag contacts_path, method: :get, id: 'filters_form' do %>
+      <form id="filters_form">
 
         <%= hidden_field_tag 'filters[tags]', tag_params %>
         <%= hidden_field_tag :per_page, params[:per_page] %>
@@ -89,7 +89,7 @@
             <a href="#" ng-click="resetFilters()" style="font-size: 11px;">Reset Filters</a>
           </li>
         </ul>
-      <% end %>
+      </form>
 
     </li>
   </ul>
