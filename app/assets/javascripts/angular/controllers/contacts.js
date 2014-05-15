@@ -43,10 +43,12 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
     //view preferences
     api.call('get','users/me', {}, function(data) {
         viewPrefs = data;
+        delete viewPrefs.user.preferences.contacts_filter;
         $scope.contactQuery.viewPrefsLoaded = true;
 
         if(angular.isUndefined(viewPrefs.user.preferences.contacts_filter)){
             var prefs = null;
+            viewPrefs.user.preferences.contacts_filter = {};
         }else{
             var prefs = viewPrefs.user.preferences.contacts_filter[window.current_account_list_id];
         }
