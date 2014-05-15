@@ -45,15 +45,14 @@ describe('contacts', function() {
         expect($scope.contactQuery.church).toEqual(['']);
         expect($scope.contactQuery.referrer).toEqual(['']);
     });
-    /*
-    it('changing page should update the contactQuery', function() {
+
+    it('url array encode should encode vars', function() {
         var controller = createController();
 
-        $httpBackend.when('GET', 'api/v1/users/me').respond({userId: 'userX'}, {'A-Token': 'xxx'});
-        $scope.page.current = 2;
-        $scope.$digest();
-        expect($scope.contactQuery.page).toEqual(2);
-    });
+        var array = ['Testing', '$T$%&^V3'];
+        var encoded = encodeURLarray(array);
 
-    */
+        expect(encoded[0]).toEqual('Testing');
+        expect(encoded[1]).toEqual('%24T%24%25%26%5EV3');
+    });
 });

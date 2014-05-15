@@ -1,5 +1,6 @@
 angular.module('mpdxApp').controller('contactsController', function ($scope, $filter, $location, api, urlParameter, contactCache) {
     var viewPrefs;
+
     $scope.contactsLoading = true;
     $scope.totalContacts = 0;
 
