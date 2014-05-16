@@ -42,10 +42,10 @@ class ContactSerializer < ActiveModel::Serializer
     contact_exhibit.avatar
   end
 
-  def cache_key
-    scope = options[:scope] || {}
-    Digest::SHA1.hexdigest(([object.cache_key] + ['include', scope[:include]]).join(','))
-  end
+  # def cache_key
+  #   scope = options[:scope] || {}
+  #   Digest::SHA1.hexdigest(([object.cache_key] + ['include', scope[:include]]).join(','))
+  # end
 
   INCLUDES.each do |relationship|
     define_method(relationship) do
