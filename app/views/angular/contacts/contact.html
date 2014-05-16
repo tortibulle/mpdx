@@ -4,8 +4,9 @@
 <td class="profile">
     <div class="key">
         <span class="name"><a href="/contacts/{{contact.id}}">{{contact.name}}</a>
-            <i class="fa fa-envelope" title="{{contact.send_newsletter}}" ng-show="contact.send_newsletter !== '' && contact.send_newsletter"></i>
-            <i class="fa fa-usd" title="Partner - Special" ng-show="contact.status === 'Partner - Special'"></i>
+            <i class="fa fa-envelope" title="{{contact.send_newsletter}}" ng-show="contact.send_newsletter"></i>
+            <i class="fa fa-<%= current_currency.downcase %>" title="Partner - Special" ng-show="contact.status === 'Partner - Special'"></i>
+            <i class="fa fa-<%= current_currency.downcase %>" title="Partner - Financial" ng-show="contact.status === 'Partner - Financial'"></i>
             <i class="fa fa-<%= current_currency.downcase %>" title="Partner - Financial" ng-show="contact.status === 'Partner - Financial'"></i>
         </span>
         <div class="people">
