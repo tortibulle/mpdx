@@ -141,7 +141,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             }
         }
         $scope.contactsLoading = true;
-        api.call('get','contacts?account_list_id=' + window.current_account_list_id +
+
+        api.call('get','contacts?account_list_id=' + (window.current_account_list_id || '') +
             '&per_page=' + q.limit +
             '&page=' + q.page +
             '&filters[name]=' + encodeURIComponent(q.name) +
