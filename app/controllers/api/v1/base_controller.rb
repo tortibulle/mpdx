@@ -3,6 +3,7 @@ class Api::V1::BaseController < ApplicationController
   skip_before_filter :verify_authenticity_token
   skip_before_filter :redirect_to_mobile
   before_filter :cors_preflight_check
+  before_filter :set_default_limit_for_mobile
   after_filter :cors_set_access_control_headers
 
   rescue_from ActiveRecord::RecordNotFound, with: :render_404
@@ -106,5 +107,11 @@ class Api::V1::BaseController < ApplicationController
     # Each controller should override this method
     def available_includes
       []
+    end
+
+    def set_default_limit_for_mobile
+      return unless oauth_access_token
+
+      params[:per_page] = MAX_PER_PAGE if params[:per_page].blank? && params[:limit].blank?
     end
 end
