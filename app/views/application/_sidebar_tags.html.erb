@@ -13,7 +13,7 @@
             url_params['filters']['tags'] = (tags + [tag]).join(',')
           end %>
 
-          <a class="tag" href="#" ng-class="{'selected': tagIsActive('<%= tag %>')}" ng-click="tagClick('<%= tag %>')"><%= tag %></a>
+          <a class="tag" href="#" ng-class="{'selected': tagIsActive('<%= j(tag) %>')}" ng-click="tagClick('<%= j(tag) %>')"><%= tag %></a>
         <% end %>
       <% end %>
     </li>

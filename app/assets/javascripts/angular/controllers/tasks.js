@@ -255,4 +255,21 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
     $scope.filterUpcoming= function(task) {
         return ($filter('date')(task.due_date, 'yyyyMMdd') > $filter('date')(new Date(new Date().getTime() + 24 * 60 * 60 * 1000), 'yyyyMMdd'));
     };
+
+    $scope.followUpDialog = function(taskId, taskResult){
+        console.log(taskId, taskResult);
+        var taskType = _.find($scope.tasks, { 'id': parseInt(taskId) }).activity_type;
+        if(taskType === 'Appointment' && taskResult === 'Decision Received'){
+            $scope.followUpDialogData = {
+                'message': 'Update the contact status to:',
+                'options': ['Ask in Future', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Not Interested']
+            };
+            console.log($scope.followUpDialogData);
+            $scope.$apply();
+        }
+        jQuery("#complete_task_followup_modal").dialog({
+            autoOpen: true,
+            modal: true
+        });
+    };
 });

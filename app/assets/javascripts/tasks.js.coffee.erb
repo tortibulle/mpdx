@@ -225,10 +225,15 @@ $ ->
 
         $("#task_result_task_result").empty()
         ops = $(this).attr("data-results").split(",")
+        $("<select name=\"task[result]\"></select>").appendTo "#task_result_task_result"  if ops.length > 3
         $.each ops, (key, value) ->
-          $("<input type=\"radio\" name=\"task[result]\" value=\""+value+"\" id=\""+key+"\" /><label for=\""+key+"\" style=\"display:inline-block;\">"+value+"</label>").appendTo "#task_result_task_result"
+          if ops.length > 3
+            $("#task_result_task_result select").append $("<option></option>").attr("value", value).text(value)
+          else
+            $("<input type=\"radio\" name=\"task[result]\" value=\"" + value + "\" id=\"" + key + "\" /><label for=\"" + key + "\" style=\"display:inline-block;\">" + value + "</label>").appendTo "#task_result_task_result"
           return
-        $('#task_result_task_result input').val(['Done']);
+
+        $("#task_result_task_result input").val ["Done"]
 
         #hide result dropdown if only one option
         if ops.length is 1
@@ -249,6 +254,7 @@ $ ->
                 $('form', this).submit()
                 $('#task_' + id).fadeOut()
                 $(this).dialog("close")
+                angular.element('#tasksController').scope().followUpDialog(id, $('form', this).find('input[name="task[result]"]:checked').val() || $('form', this).find('select[name="task[result]"]').val())
             },
             {
               text: __('Cancel'),

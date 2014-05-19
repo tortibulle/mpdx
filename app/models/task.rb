@@ -25,9 +25,10 @@ class Task < Activity
 
   # validates :activity_type, :presence => { :message => _( '/ Action is required') }
 
-  CALL_RESULTS = [_('Attempted')]
+  CALL_RESULTS = ['Attempted - Left Message', 'Complete - Call Again', 'Appointment Scheduled', 'Decision Received', 'Partner - Financial', 'Attempted - Call Again', 'Received']
   MESSAGE_RESULTS = [_('Received')]
   STANDARD_RESULTS = [_('Done')]
+  APPOINTMENT_RESULTS = ['Done', 'Decision Received', 'Call for Decision', 'Partner - Financial', 'Attempted - Reschedule']
   ALL_RESULTS = STANDARD_RESULTS + CALL_RESULTS + MESSAGE_RESULTS
 
   assignable_values_for :activity_type, :allow_blank => true do
@@ -42,6 +43,8 @@ class Task < Activity
         CALL_RESULTS + STANDARD_RESULTS
       when 'Email', 'Text Message', 'Facebook Message', 'Letter'
         STANDARD_RESULTS + MESSAGE_RESULTS
+      when 'Appointment'
+        APPOINTMENT_RESULTS
       else
         STANDARD_RESULTS
     end
