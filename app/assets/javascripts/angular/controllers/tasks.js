@@ -1,6 +1,124 @@
-angular.module('mpdxApp').controller('tasksController', function ($scope, $filter, $location, api, urlParameter, contactCache) {
-    $scope.refreshTasks = function(){
-        api.call('get','tasks?account_list_id=' + window.current_account_list_id + '&filters[completed]=false',{},function(tData) {
+angular.module('mpdxApp').controller('tasksController', function ($scope, $filter, $location, $timeout, api, urlParameter, contactCache) {
+    $scope.tasks = {};
+    $scope.comments = {};
+    $scope.people = {};
+    var tasksPerGroup = 5;
+    $scope.totalTasksLoading = true;
+
+    $scope.taskGroups = [
+        {
+            filter:'overdue',
+            title: 'Overdue',
+            class: 'taskgroup--red',
+            currentPage: 1,
+            meta: {},
+            loading: false
+        },
+        {
+            filter:'today',
+            title: 'Today',
+            class: 'taskgroup--green',
+            currentPage: 1,
+            meta: {},
+            loading: false
+        },
+        {
+            filter:'tomorrow',
+            title: 'Tomorrow',
+            class: 'taskgroup--orange',
+            currentPage: 1,
+            meta: {},
+            loading: false
+        },
+        {
+            filter:'upcoming',
+            title: 'Upcoming',
+            class: 'taskgroup--gray',
+            currentPage: 1,
+            meta: {},
+            loading: false
+        }
+    ];
+
+    $scope.goToPage = function(group, page){
+        $scope.taskGroups[_.indexOf($scope.taskGroups, group)].currentPage = page;
+        $scope.refreshTasks(group);
+    };
+
+    var refreshAllTasks = function(){
+        angular.forEach($scope.taskGroups, function(g, key){
+            $scope.refreshTasks(g);
+        });
+    };
+
+    var contactFilterExists = function(){
+        return ($scope.filter.contactName !==  '' || $scope.filter.contactType !== '' || $scope.filter.contactCity[0] !== '' || $scope.filter.contactState[0] !== '' || $scope.filter.contactNewsletter !== '' || $scope.filter.contactStatus[0] !== '' || $scope.filter.contactLikely[0] !== '' || $scope.filter.contactChurch[0] !== '' || $scope.filter.contactReferrer[0] !== '');
+    };
+
+    var getContactFilterIds = function(group){
+        api.call('get','contacts?account_list_id=' + (window.current_account_list_id || '') +
+            '&filters[name]=' + encodeURIComponent($scope.filter.contactName) +
+            '&filters[contact_type]=' + encodeURIComponent($scope.filter.contactType) +
+            '&filters[city][]=' + encodeURLarray($scope.filter.contactCity).join('&filters[city][]=') +
+            '&filters[state][]=' + encodeURLarray($scope.filter.contactState).join('&filters[state][]=') +
+            '&filters[newsletter]=' + encodeURIComponent($scope.filter.contactNewsletter) +
+            //'&filters[tags][]=' + encodeURLarray(q.tags).join('&filters[tags][]=') +
+            '&filters[status][]=' + encodeURLarray($scope.filter.contactStatus).join('&filters[status][]=') +
+            '&filters[likely][]=' + encodeURLarray($scope.filter.contactLikely).join('&filters[likely][]=') +
+            '&filters[church][]=' + encodeURLarray($scope.filter.contactChurch).join('&filters[church][]=') +
+            '&filters[referrer][]=' + encodeURLarray($scope.filter.contactReferrer).join('&filters[referrer][]=') +
+            '&include='
+        , {}, function(data) {
+            //console.log(data);
+            $scope.refreshTasks(group, _.flatten(data.contacts, 'id'));
+        }, null, true);
+    };
+
+    $scope.refreshTasks = function(group, contactFilterIds){
+        if(angular.isUndefined(group)){
+            refreshAllTasks();
+            return;
+        }
+
+        var groupIndex = _.indexOf($scope.taskGroups, group);
+        $scope.taskGroups[groupIndex].loading = true;
+
+        if(contactFilterExists()){
+            if(angular.isUndefined(contactFilterIds)) {
+                getContactFilterIds(group);
+                return;
+            }else{
+                if(contactFilterIds.length === 0){
+                    contactFilterIds[0] = '-'
+                }
+            }
+        }else{
+            contactFilterIds = $scope.filter.contactsSelect;
+        }
+        api.call('get','tasks?account_list_id=' + window.current_account_list_id +
+            '&filters[completed]=false' +
+            '&per_page=' + tasksPerGroup +
+            '&page=' + group.currentPage +
+            '&filters[starred]=' + $scope.filter.starred +
+            '&filters[date_range]=' + group.filter +
+            '&filters[contact_ids]=' + _.uniq(contactFilterIds).join() +
+            '&filters[tags][]=' + encodeURLarray($scope.filter.tagsSelect).join('&filters[tags][]=') +
+            '&filters[activity_type][]=' + encodeURLarray($scope.filter.actionSelect).join('&filters[activity_type][]='), {}, function(tData) {
+
+            //save meta
+            $scope.taskGroups[groupIndex].meta = tData.meta;
+
+            if(tData.tasks.length === 0){
+                if($scope.taskGroups[groupIndex].currentPage !== 1){
+                    $scope.taskGroups[groupIndex].currentPage = 1;
+                    $scope.refreshTasks(group);
+                }
+                $scope.taskGroups[groupIndex].loading = false;
+                $scope.tasks[group.filter] = {};
+                return;
+            }
+
+            //retrieve contacts
             api.call('get','contacts?account_list_id=' + window.current_account_list_id + '&filters[status]=*&filters[ids]='+_.uniq(_.flatten(tData.tasks, 'contacts')).join(),{},function(data) {
                 angular.forEach(data.contacts, function(contact){
                     contactCache.update(contact.id, {
@@ -12,67 +130,62 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
                     });
                 });
 
-                $scope.tasks = tData.tasks;
-                $scope.comments = tData.comments;
-                $scope.people = tData.people;
+                $scope.tasks[group.filter] = tData.tasks;
+                $scope.comments = _.union(tData.comments, $scope.comments);
+                $scope.people = _.union(tData.people, $scope.people);
 
-                $scope.tags = _.sortBy(_.uniq(_.flatten(_.pluck($scope.tasks, 'tag_list'))));
-                $scope.tags = _.zip($scope.tags, $scope.tags);
-                $scope.tags.unshift(['', '-- Any --']);
-
-                $scope.activity_types = _.sortBy(_.uniq(_.pluck($scope.tasks, 'activity_type')));
-                _.remove($scope.activity_types, function(action) { return action === ''; });
-                $scope.activity_types = _.zip($scope.activity_types, $scope.activity_types);
-                $scope.activity_types.unshift(['', '-- Any --']);
-
-                $scope.contactStatusOptions = [['', '-- Any --']];
-                $scope.contactLikelyToGiveOptions = [['', '-- Any --']];
-                var contactTagPreOptions = [];
-
-                angular.forEach(_.uniq(_.flatten($scope.tasks, 'contacts')), function(contact){
-                    contactCache.get(contact, function(contact){
-                        //contact tag list
-                        contactTagPreOptions = _.sortBy(_.uniq(_.union(contactTagPreOptions, _.flatten(contact.contact.tag_list))));
-                        $scope.contactTagOptions = _.zip(contactTagPreOptions, contactTagPreOptions);
-                        $scope.contactTagOptions.unshift(['', '-- Any --']);
-
-                        //contact status
-                        if(angular.isUndefined(_.find($scope.contactStatusOptions, function(i){ return i[0] === contact.contact.status; }))){
-                            $scope.contactStatusOptions.push([contact.contact.status, contact.contact.status]);
-                            $scope.contactStatusOptions = _.sortBy($scope.contactStatusOptions, function(i) { return i[0]; });
-                        }
-
-                        //contact likely to give
-                        if(angular.isUndefined(_.find($scope.contactLikelyToGiveOptions, function(i){ return i[0] === contact.contact.likely_to_give; }))){
-                            $scope.contactLikelyToGiveOptions.push([contact.contact.likely_to_give, contact.contact.likely_to_give]);
-                            $scope.contactLikelyToGiveOptions = _.sortBy($scope.contactLikelyToGiveOptions, function(i) { return i[0]; });
-                        }
-                    });
-                });
-            });
+                $scope.taskGroups[groupIndex].loading = false;
+            }, null, true);
         });
     };
-    $scope.refreshTasks();
-    $scope.filterContactsSelect = [(urlParameter.get('contact_ids') || '')];
-    $scope.filterContactCitySelect = [''];
-    $scope.filterContactStateSelect = [''];
-    $scope.filterContactNewsletterSelect = '';
-    $scope.filterContactStatusSelect = [''];
-    $scope.filterContactLikelyToGiveSelect = [''];
-    $scope.filterContactChurchSelect = [''];
-    $scope.filterContactReferrerSelect = [''];
-    $scope.filterContactTagSelect = [''];
-    $scope.filterTagsSelect = [''];
-    $scope.filterActionSelect = [''];
-    $scope.filterPage = ($location.$$url === '/starred' ? "starred" : 'active');
+
+    $scope.resetFilters = function(){
+        $scope.filter = {
+            starred: '',
+            contactsSelect: [(urlParameter.get('contact_ids') || '')],
+            tagsSelect: [''],
+            actionSelect: [''],
+            contactName: '',
+            contactType: '',
+            contactCity: [''],
+            contactState: [''],
+            contactNewsletter: '',
+            contactStatus: [''],
+            contactLikely: [''],
+            contactChurch: [''],
+            contactReferrer: ['']
+        };
+    };
+    $scope.resetFilters();
+
+    $scope.$watch('filter', function (f, oldf) {
+        refreshAllTasks();
+    }, true);
+
+    $scope.$watch('tasks', function(){
+        //total tasks
+        $scope.totalTasksShown = 0;
+        angular.forEach($scope.taskGroups, function(g, key){
+            if(!_.isUndefined($scope.tasks[g.filter])){
+                if(!_.isEmpty($scope.tasks[g.filter])){
+                    $scope.totalTasksShown = $scope.totalTasksShown + $scope.tasks[g.filter].length;
+                }
+            }
+        });
+        $timeout(function(){
+            $scope.totalTasksLoading = _.contains(_.flatten($scope.taskGroups, 'loading'), true);
+        }, 1000);
+    }, true);
+
+    //$scope.filterPage = ($location.$$url === '/starred' ? "starred" : 'active');
 
     //auto-open contact filter
-    if($scope.filterContactsSelect[0]){
+    if($scope.filter.contactsSelect[0]){
         jQuery("#leftmenu ul.left_filters li #contact").trigger("click");
     }
 
     $scope.tagIsActive = function(tag){
-        return _.contains($scope.filterTagsSelect, tag);
+        return _.contains($scope.filter.tagsSelect, tag);
     };
 
     $scope.contactTagIsActive = function(tag){
@@ -81,13 +194,13 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
 
     $scope.tagClick = function(tag){
         if($scope.tagIsActive(tag)){
-            _.remove($scope.filterTagsSelect, function(i) { return i === tag; });
-            if($scope.filterTagsSelect.length === 0){
-                $scope.filterTagsSelect.push('');
+            _.remove($scope.filter.tagsSelect, function(i) { return i === tag; });
+            if($scope.filter.tagsSelect.length === 0){
+                $scope.filter.tagsSelect.push('');
             }
         }else{
-            _.remove($scope.filterTagsSelect, function(i) { return i === ''; });
-            $scope.filterTagsSelect.push(tag);
+            _.remove($scope.filter.tagsSelect, function(i) { return i === ''; });
+            $scope.filter.tagsSelect.push(tag);
         }
     };
 
@@ -101,158 +214,5 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             _.remove($scope.filterContactTagSelect, function(i) { return i === ''; });
             $scope.filterContactTagSelect.push(tag);
         }
-    };
-
-    $scope.filters = function(task){
-        var filterContact = false;
-        if($scope.filterContactsSelect[0] === '' || $scope.filterContactsSelect.length === 0){
-            filterContact = true;
-        }else{
-            var taskContacts = [];
-            angular.forEach(task.contacts, function(contact){
-                taskContacts.push(contact.toString());
-            });
-            if(_.intersection($scope.filterContactsSelect, taskContacts).length === $scope.filterContactsSelect.length){
-                filterContact = true;
-            }
-        }
-
-        var filterContactCity = false;
-        if($scope.filterContactCitySelect[0] === '' || $scope.filterContactCitySelect.length === 0){
-            filterContactCity = true;
-        }else{
-            var taskContactCities = [];
-            angular.forEach(task.contacts, function(contact){
-                taskContactCities = _.union(_.flatten(contactCache.getFromCache(contact).addresses, 'city'), taskContactCities);
-            });
-            if(_.intersection(taskContactCities, $scope.filterContactCitySelect).length === $scope.filterContactCitySelect.length){
-                filterContactCity = true;
-            }
-        }
-
-        var filterContactState = false;
-        if($scope.filterContactStateSelect[0] === '' || $scope.filterContactStateSelect.length === 0){
-            filterContactState = true;
-        }else{
-            var taskContactStates = [];
-            angular.forEach(task.contacts, function(contact){
-                taskContactStates = _.union(_.flatten(contactCache.getFromCache(contact).addresses, 'state'), taskContactStates);
-            });
-            if(_.intersection(taskContactStates, $scope.filterContactStateSelect).length === $scope.filterContactStateSelect.length){
-                filterContactState = true;
-            }
-        }
-
-        var filterContactNewsletters = false;
-        if($scope.filterContactNewsletterSelect === ''){
-            filterContactNewsletters = true;
-        }else{
-            angular.forEach(task.contacts, function(contact){
-                if($scope.filterContactNewsletterSelect === contactCache.getFromCache(contact).contact.send_newsletter){
-                    filterContactNewsletters = true;
-                }
-            });
-        }
-
-        var filterContactStatus = false;
-        if($scope.filterContactStatusSelect[0] === '' || $scope.filterContactStatusSelect.length === 0){
-            filterContactStatus = true;
-        }else{
-            var contactStatus = [];
-            angular.forEach(task.contacts, function(contact){
-                contactStatus.push(contactCache.getFromCache(contact).contact.status);
-            });
-            if(_.intersection($scope.filterContactStatusSelect, contactStatus).length === $scope.filterContactStatusSelect.length){
-                filterContactStatus = true;
-            }
-        }
-
-        var filterContactLikelyToGive = false;
-        if($scope.filterContactLikelyToGiveSelect[0] === '' || $scope.filterContactLikelyToGiveSelect.length === 0){
-            filterContactLikelyToGive = true;
-        }else{
-            var contactStatus = [];
-            angular.forEach(task.contacts, function(contact){
-                contactStatus.push(contactCache.getFromCache(contact).contact.likely_to_give);
-            });
-            if(_.intersection($scope.filterContactLikelyToGiveSelect, contactStatus).length === $scope.filterContactLikelyToGiveSelect.length){
-                filterContactLikelyToGive = true;
-            }
-        }
-
-        var filterContactChurch = false;
-        if($scope.filterContactChurchSelect[0] === '' || $scope.filterContactChurchSelect.length === 0){
-            filterContactChurch = true;
-        }else{
-            var contactChurch = [];
-            angular.forEach(task.contacts, function(contact){
-                contactChurch.push(contactCache.getFromCache(contact).contact.church_name);
-            });
-            if(_.intersection($scope.filterContactChurchSelect, contactChurch).length === $scope.filterContactChurchSelect.length){
-                filterContactChurch = true;
-            }
-        }
-
-        var filterContactReferrer = false;
-        if($scope.filterContactReferrerSelect[0] === '' || $scope.filterContactReferrerSelect.length === 0){
-            filterContactReferrer = true;
-        }else{
-            var referralsStrings = [];
-            angular.forEach(task.contacts, function(contact){
-                angular.forEach(contactCache.getFromCache(contact).contact.referrals_to_me_ids, function(id){
-                    referralsStrings.push(id.toString());
-                });
-            });
-            if(_.intersection(referralsStrings, $scope.filterContactReferrerSelect).length === $scope.filterContactReferrerSelect.length){
-                filterContactReferrer = true;
-            }
-        }
-
-        var filterContactTag = false;
-        if($scope.filterContactTagSelect[0] === '' || $scope.filterContactTagSelect.length === 0){
-            filterContactTag = true;
-        }else{
-            angular.forEach(task.contacts, function(contact){
-                if(_.intersection(_.flatten(contactCache.getFromCache(contact).contact.tag_list), $scope.filterContactTagSelect).length === $scope.filterContactTagSelect.length){
-                    filterContactTag = true;
-                }
-            });
-        }
-
-        var filterTag = false;
-        if(_.intersection(task.tag_list, $scope.filterTagsSelect).length === $scope.filterTagsSelect.length || $scope.filterTagsSelect[0] === '' || $scope.filterTagsSelect.length === 0){
-            filterTag = true;
-        }
-
-        var filterAction = false;
-        if($scope.filterActionSelect.length > 1) {
-        }else if(_.contains($scope.filterActionSelect, task.activity_type) || $scope.filterActionSelect[0] === '' || $scope.filterActionSelect.length === 0){
-            filterAction = true;
-        }
-
-        var filterPage = false;
-        if($scope.filterPage === 'active'){
-            filterPage = true;
-        }else if($scope.filterPage === 'starred'){
-            filterPage = task.starred;
-        }
-
-        return filterContact && filterContactCity && filterContactState && filterContactNewsletters && filterContactStatus && filterContactLikelyToGive && filterContactChurch && filterContactReferrer && filterContactTag && filterTag && filterAction && filterPage;
-    };
-
-    $scope.filterToday = function(task) {
-        return ($filter('date')(task.due_date, 'yyyyMMdd') === $filter('date')(Date.now(), 'yyyyMMdd'));
-    };
-
-    $scope.filterOverdue= function(task) {
-        return ($filter('date')(task.due_date, 'yyyyMMdd') < $filter('date')(Date.now(), 'yyyyMMdd'));
-    };
-
-    $scope.filterTomorrow= function(task) {
-        return ($filter('date')(task.due_date, 'yyyyMMdd') === $filter('date')(new Date(new Date().getTime() + 24 * 60 * 60 * 1000), 'yyyyMMdd'));
-    };
-
-    $scope.filterUpcoming= function(task) {
-        return ($filter('date')(task.due_date, 'yyyyMMdd') > $filter('date')(new Date(new Date().getTime() + 24 * 60 * 60 * 1000), 'yyyyMMdd'));
     };
 });
