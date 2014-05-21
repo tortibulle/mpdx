@@ -4,99 +4,47 @@
     <div class="wpp">
 
       <h1></h1>
-      <h1 ng-show="(tasks | filter:filters).length === 0">No tasks to show</h1>
-      <h1 ng-show="tasks === undefined">Loading...</h1>
+      <p ng-show="totalTasksShown === 0 && !totalTasksLoading" style="color:red;">Sorry, there are no tasks that match the filters and/or tags you have selected. Try <a href="/tasks/new" data-remote="true">creating a new task</a> or <a href="#" ng-click="resetFilters()">resetting your filters</a>.</p>
+      <h2 ng-show="totalTasksShown === 0 && totalTasksLoading">Loading tasks...</h2>
 
-      <div ng-show="(tasks | filter:filterOverdue | filter:filters).length > 0 && filterPage === 'active'">
+    <div ng-repeat="g in taskGroups" ng-class="{'contact_loading': g.loading}">
+      <div ng-show="tasks[g.filter].length > 0">
         <table>
           <thead>
-            <tr class="taskgroup taskgroup--red">
-              <td><input type="checkbox" class="select_all" /></td>
-              <td>
-                <%= render 'actions' %>
-                <%= _('Overdue') %>
-              </td>
-            </tr>
-          </thead>
-
-          <tbody class="tablelist tasks">
-          <tr task="task" ng-repeat="task in tasks | filter:filterOverdue | filter:filters | orderBy:'due_date'" id="task_{{task.id}}"></tr>
-          </tbody>
-        </table>
-        <br />
-      </div>
-
-        <div ng-show="(tasks | filter:filterToday | filter:filters).length > 0 && filterPage === 'active'">
-          <table>
-            <thead>
-              <tr class="taskgroup taskgroup--green">
-                <td><input type="checkbox" class="select_all" /></td>
-                <td>
-                  <%= render 'actions' %>
-                  <%= _('Today') %>
-                </td>
-              </tr>
-            </thead>
-
-            <tbody class="tablelist tasks">
-              <tr task="task" ng-repeat="task in tasks | filter:filterToday | filter:filters | orderBy:'due_date'" id="task_{{task.id}}"></tr>
-            </tbody>
-          </table>
-          <br />
-        </div>
-
-        <div ng-show="(tasks | filter:filterTomorrow | filter:filters).length > 0 && filterPage === 'active'">
-          <table>
-            <thead>
-              <tr class="taskgroup taskgroup--orange">
-                <td><input type="checkbox" class="select_all" /></td>
-                <td>
-                  <%= render 'actions' %>
-                  <%= _('Tomorrow') %>
-                </td>
-              </tr>
-            </thead>
-
-            <tbody class="tablelist tasks">
-              <tr task="task" ng-repeat="task in tasks | filter:filterTomorrow | filter:filters | orderBy:'due_date'" id="task_{{task.id}}"></tr>
-            </tbody>
-          </table>
-          <br />
-        </div>
-
-      <div ng-show="(tasks | filter:filterUpcoming | filter:filters).length > 0 && filterPage === 'active'">
-        <table>
-          <thead>
-            <tr class="taskgroup taskgroup--gray">
-              <td><input type="checkbox" class="select_all" /></td>
-              <td>
-                <%= render 'actions' %>
-                <%= _('Upcoming') %>
-              </td>
-            </tr>
-          </thead>
-
-          <tbody class="tablelist tasks">
-          <tr task="task" ng-repeat="task in tasks | filter:filterUpcoming | filter:filters | orderBy:'due_date'" id="task_{{task.id}}"></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div ng-show="(tasks | filter:filters).length > 0 && filterPage === 'starred'">
-        <table>
-          <thead>
-          <tr class="taskgroup taskgroup--orange">
-            <td colspan="100">
-              <%= _('Starred') %>
+          <tr class="taskgroup" ng-class="g.class">
+            <td><input type="checkbox" class="select_all" /></td>
+            <td>
+              <%= render 'actions' %>
+              {{g.title}}
             </td>
           </tr>
           </thead>
 
           <tbody class="tablelist tasks">
-          <tr task="task" ng-repeat="task in tasks | filter:filters | orderBy:'due_date'" id="task_{{task.id}}"></tr>
+            <tr task="task" ng-repeat="task in tasks[g.filter]" id="task_{{task.id}}"></tr>
+            <tr>
+              <td colspan="2">
+                  <span style="float:right;">Displaying <b>{{g.meta.from}}&nbsp;-&nbsp;{{g.meta.to}}</b> of <b>{{g.meta.total}}</b></span>
+                  <div class="pagination">
+                    <span class="previous_page disabled" ng-show="g.currentPage === 1">← Previous</span>
+                    <a class="previous_page" rel="prev start" href="#" ng-click="goToPage(g, g.currentPage-1)" ng-show="g.currentPage > 1">← Previous</a>
+
+                  <span ng-repeat="n in [1, g.meta.total_pages] | makeRange">
+                    <em class="current" ng-show="n === g.currentPage">{{n}}</em>
+                    <a rel="next" ng-show="n !== g.currentPage && ((n > (g.currentPage-8) && n < (g.currentPage+8)) || n === 1 || n === g.meta.total_pages)" href="#" ng-click="goToPage(g, n)">{{n}}</a>
+                    <span ng-show="(n === 2 && page.current > 9) || (n === page.total-1 && page.current < page.total - 8)">...</span>
+                  </span>
+
+                    <span class="next_page disabled" ng-show="g.currentPage === g.meta.total_pages">Next →</span>
+                    <a class="next_page" rel="next" href="#" ng-click="goToPage(g, g.currentPage+1)" ng-show="g.currentPage < g.meta.total_pages">Next →</a>
+                  </div>
+              </td>
+            </tr>
           </tbody>
         </table>
+        <br />
       </div>
+    </div>
     </div>
   </div>
   <%= render 'tasks/results_modal' %>

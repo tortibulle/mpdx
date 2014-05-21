@@ -28,7 +28,7 @@ class TaskFilter
       end
     end
 
-    if @filters[:tags].present?
+    if @filters[:tags].present? && @filters[:tags].first != ''
       filtered_tasks = filtered_tasks.tagged_with(@filters[:tags])
     end
 
@@ -49,8 +49,12 @@ class TaskFilter
       filtered_tasks = filtered_tasks.where('completed_at > ?', 2.years.ago)
     when 'last_week'
       filtered_tasks = filtered_tasks.where('completed_at > ?', 1.week.ago)
+    when 'overdue'
+      filtered_tasks = filtered_tasks.overdue
     when 'today'
       filtered_tasks = filtered_tasks.today
+    when 'tomorrow'
+      filtered_tasks = filtered_tasks.tomorrow
     when 'future'
       filtered_tasks = filtered_tasks.future
     when 'upcoming'
