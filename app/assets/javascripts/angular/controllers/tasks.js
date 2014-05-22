@@ -1,4 +1,4 @@
-angular.module('mpdxApp').controller('tasksController', function ($scope, $filter, $location, $timeout, api, urlParameter, contactCache) {
+angular.module('mpdxApp').controller('tasksController', function ($scope, $timeout, api, urlParameter, contactCache) {
     $scope.tasks = {};
     $scope.comments = {};
     $scope.people = {};
@@ -133,11 +133,11 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
                 });
 
                 $scope.tasks[group.filter] = tData.tasks;
-                evalTaskTotals();
                 $scope.comments = _.union(tData.comments, $scope.comments);
                 $scope.people = _.union(tData.people, $scope.people);
 
                 $scope.taskGroups[groupIndex].loading = false;
+                evalTaskTotals();
             }, null, true);
         });
     };
@@ -232,6 +232,57 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         }else{
             _.remove($scope.filter.tagsSelect, function(i) { return i === ''; });
             $scope.filter.tagsSelect.push(tag);
+        }
+    };
+
+    $scope.followUpDialog = function(taskId, taskResult){
+        var mergedTasks = [];
+        _($scope.tasks).forEach(function(i) { mergedTasks.push(i); });
+        var followUpTask = _.find(_.flatten(mergedTasks), { 'id': parseInt(taskId) });
+
+        console.log(taskId, followUpTask, taskResult);
+        delete $scope.followUpDialogData;
+
+        if(followUpTask.activity_type === 'Appointment' && taskResult === 'Decision Received' && followUpTask.contacts.length > 0){
+            $scope.followUpDialogData = {
+                'message': 'Update related contact(s) status to:',
+                'options': ['Ask in Future', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Not Interested']
+            };
+            $scope.followUpSaveFunc = function(){
+                angular.forEach(followUpTask.contacts, function(c){
+                    api.call('put', 'contacts/' + c, {
+                        contact: {
+                            status: $scope.followUpDialogResult
+                        }
+                    });
+                });
+                jQuery('#complete_task_followup_modal').dialog('close');
+            };
+        }else if(followUpTask.activity_type === 'Appointment' && taskResult === 'Call for Decision'){
+            $scope.followUpDialogData = {
+                'message': 'Would you like to create a task to make a call in the future?',
+                'options': ['Yes']
+            };
+            $scope.followUpSaveFunc = function(){
+                api.call('post', 'tasks/', {
+                    task: {
+                        due_date: Date.now(),
+                        subject: 'Call for Decision',
+                        activity_type: 'Call',
+                        contacts: followUpTask.contacts
+                    }
+                });
+                jQuery('#complete_task_followup_modal').dialog('close');
+            };
+        }
+
+        if(angular.isDefined($scope.followUpDialogData)){
+            $scope.followUpDialogResult = $scope.followUpDialogData.options[0];
+            $scope.$apply();
+            jQuery("#complete_task_followup_modal").dialog({
+                autoOpen: true,
+                modal: true
+            });
         }
     };
 
