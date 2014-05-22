@@ -4,47 +4,48 @@
     <div class="wpp">
 
       <h1></h1>
-      <p ng-show="totalTasksShown === 0 && !totalTasksLoading" style="color:red;">Sorry, there are no tasks that match the filters and/or tags you have selected. Try <a href="/tasks/new" data-remote="true">creating a new task</a>, <a href="#" ng-click="resetFilters()">resetting your filters</a> or <a href="#" ng-click="filter.page = 'all'">showing all tasks</a>.</p>
+      <p ng-show="totalTasksShown === 0 && !totalTasksLoading" style="color:red;">Sorry, there are no tasks that match the filters and/or tags you have selected.
+        <span ng-show="filter.page === 'all'">Try <a href="/tasks/new" data-remote="true">creating a new task</a> or <a href="#" ng-click="resetFilters()">resetting your filters</a>.</span>
+        <span ng-show="filter.page !== 'all'">Try <a href="/tasks/new" data-remote="true">creating a new task</a>, <a href="#" ng-click="resetFilters()">resetting your filters</a> or <a href="#" ng-click="filter.page = 'all'">showing all tasks</a>.</span>
+      </p>
       <h2 ng-show="totalTasksShown === 0 && totalTasksLoading">Loading tasks...</h2>
 
-    <div ng-repeat="g in taskGroups" ng-class="{'contact_loading': g.loading}" ng-show="g.visible">
-      <div ng-show="tasks[g.filter].length > 0">
-        <table>
-          <thead>
-          <tr class="taskgroup" ng-class="g.class">
-            <td><input type="checkbox" class="select_all" /></td>
-            <td>
-              <div style="float:right">Show: <select ng-model="filter.tasksPerGroup" ng-options="i as i for i in [10, 25, 50, 100, 500]"></select></div>
-              <%= render 'actions' %>
-              {{g.title}}
+    <div ng-repeat="g in taskGroups" ng-class="{'contact_loading': g.loading}" ng-show="g.visible && tasks[g.filter].length > 0">
+      <table>
+        <thead>
+        <tr class="taskgroup" ng-class="g.class">
+          <td><input type="checkbox" class="select_all" /></td>
+          <td>
+            <div style="float:right">Show: <select ng-model="filter.tasksPerGroup" ng-options="i as i for i in [10, 25, 50, 100, 500]"></select></div>
+            <%= render 'actions' %>
+            {{g.title}}
+          </td>
+        </tr>
+        </thead>
+
+        <tbody class="tablelist tasks">
+          <tr task="task" ng-repeat="task in tasks[g.filter]" id="task_{{task.id}}"></tr>
+          <tr>
+            <td colspan="2">
+                <span style="float:right;">Displaying <b>{{g.meta.from}}&nbsp;-&nbsp;{{g.meta.to}}</b> of <b>{{g.meta.total}}</b></span>
+                <div class="pagination">
+                  <span class="previous_page disabled" ng-show="g.currentPage === 1">← Previous</span>
+                  <a class="previous_page" rel="prev start" href="#" ng-click="goToPage(g, g.currentPage-1)" ng-show="g.currentPage > 1">← Previous</a>
+
+                <span ng-repeat="n in [1, g.meta.total_pages] | makeRange">
+                  <em class="current" ng-show="n === g.currentPage">{{n}}</em>
+                  <a rel="next" ng-show="n !== g.currentPage && ((n > (g.currentPage-8) && n < (g.currentPage+8)) || n === 1 || n === g.meta.total_pages)" href="#" ng-click="goToPage(g, n)">{{n}}</a>
+                  <span ng-show="(n === 2 && page.current > 9) || (n === page.total-1 && page.current < page.total - 8)">...</span>
+                </span>
+
+                  <span class="next_page disabled" ng-show="g.currentPage === g.meta.total_pages">Next →</span>
+                  <a class="next_page" rel="next" href="#" ng-click="goToPage(g, g.currentPage+1)" ng-show="g.currentPage < g.meta.total_pages">Next →</a>
+                </div>
             </td>
           </tr>
-          </thead>
-
-          <tbody class="tablelist tasks">
-            <tr task="task" ng-repeat="task in tasks[g.filter]" id="task_{{task.id}}"></tr>
-            <tr>
-              <td colspan="2">
-                  <span style="float:right;">Displaying <b>{{g.meta.from}}&nbsp;-&nbsp;{{g.meta.to}}</b> of <b>{{g.meta.total}}</b></span>
-                  <div class="pagination">
-                    <span class="previous_page disabled" ng-show="g.currentPage === 1">← Previous</span>
-                    <a class="previous_page" rel="prev start" href="#" ng-click="goToPage(g, g.currentPage-1)" ng-show="g.currentPage > 1">← Previous</a>
-
-                  <span ng-repeat="n in [1, g.meta.total_pages] | makeRange">
-                    <em class="current" ng-show="n === g.currentPage">{{n}}</em>
-                    <a rel="next" ng-show="n !== g.currentPage && ((n > (g.currentPage-8) && n < (g.currentPage+8)) || n === 1 || n === g.meta.total_pages)" href="#" ng-click="goToPage(g, n)">{{n}}</a>
-                    <span ng-show="(n === 2 && page.current > 9) || (n === page.total-1 && page.current < page.total - 8)">...</span>
-                  </span>
-
-                    <span class="next_page disabled" ng-show="g.currentPage === g.meta.total_pages">Next →</span>
-                    <a class="next_page" rel="next" href="#" ng-click="goToPage(g, g.currentPage+1)" ng-show="g.currentPage < g.meta.total_pages">Next →</a>
-                  </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <br />
-      </div>
+        </tbody>
+      </table>
+      <br />
     </div>
     </div>
   </div>
