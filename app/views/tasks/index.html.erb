@@ -4,16 +4,17 @@
     <div class="wpp">
 
       <h1></h1>
-      <p ng-show="totalTasksShown === 0 && !totalTasksLoading" style="color:red;">Sorry, there are no tasks that match the filters and/or tags you have selected. Try <a href="/tasks/new" data-remote="true">creating a new task</a> or <a href="#" ng-click="resetFilters()">resetting your filters</a>.</p>
+      <p ng-show="totalTasksShown === 0 && !totalTasksLoading" style="color:red;">Sorry, there are no tasks that match the filters and/or tags you have selected. Try <a href="/tasks/new" data-remote="true">creating a new task</a>, <a href="#" ng-click="resetFilters()">resetting your filters</a> or <a href="#" ng-click="filter.page = 'all'">showing all tasks</a>.</p>
       <h2 ng-show="totalTasksShown === 0 && totalTasksLoading">Loading tasks...</h2>
 
-    <div ng-repeat="g in taskGroups" ng-class="{'contact_loading': g.loading}">
+    <div ng-repeat="g in taskGroups" ng-class="{'contact_loading': g.loading}" ng-show="g.visible">
       <div ng-show="tasks[g.filter].length > 0">
         <table>
           <thead>
           <tr class="taskgroup" ng-class="g.class">
             <td><input type="checkbox" class="select_all" /></td>
             <td>
+              <div style="float:right">Show: <select ng-model="filter.tasksPerGroup" ng-options="i as i for i in [10, 25, 50, 100, 500]"></select></div>
               <%= render 'actions' %>
               {{g.title}}
             </td>

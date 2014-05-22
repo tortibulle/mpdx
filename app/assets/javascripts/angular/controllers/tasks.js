@@ -2,8 +2,8 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
     $scope.tasks = {};
     $scope.comments = {};
     $scope.people = {};
-    var tasksPerGroup = 5;
     $scope.totalTasksLoading = true;
+    $scope.totalTasksShown = 0;
 
     $scope.taskGroups = [
         {
@@ -12,7 +12,8 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             class: 'taskgroup--red',
             currentPage: 1,
             meta: {},
-            loading: false
+            loading: false,
+            visible: false
         },
         {
             filter:'today',
@@ -20,7 +21,8 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             class: 'taskgroup--green',
             currentPage: 1,
             meta: {},
-            loading: false
+            loading: false,
+            visible: false
         },
         {
             filter:'tomorrow',
@@ -28,7 +30,8 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             class: 'taskgroup--orange',
             currentPage: 1,
             meta: {},
-            loading: false
+            loading: false,
+            visible: false
         },
         {
             filter:'upcoming',
@@ -36,18 +39,21 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             class: 'taskgroup--gray',
             currentPage: 1,
             meta: {},
-            loading: false
+            loading: false,
+            visible: false
         }
     ];
 
     $scope.goToPage = function(group, page){
         $scope.taskGroups[_.indexOf($scope.taskGroups, group)].currentPage = page;
-        $scope.refreshTasks(group);
+        refreshTasks(group);
     };
 
-    var refreshAllTasks = function(){
+    $scope.refreshVisibleTasks = function(){
         angular.forEach($scope.taskGroups, function(g, key){
-            $scope.refreshTasks(g);
+            if(g.visible){
+                refreshTasks(g);
+            }
         });
     };
 
@@ -69,17 +75,11 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             '&filters[referrer][]=' + encodeURLarray($scope.filter.contactReferrer).join('&filters[referrer][]=') +
             '&include='
         , {}, function(data) {
-            //console.log(data);
-            $scope.refreshTasks(group, _.flatten(data.contacts, 'id'));
+            refreshTasks(group, _.flatten(data.contacts, 'id'));
         }, null, true);
     };
 
-    $scope.refreshTasks = function(group, contactFilterIds){
-        if(angular.isUndefined(group)){
-            refreshAllTasks();
-            return;
-        }
-
+    var refreshTasks = function(group, contactFilterIds){
         var groupIndex = _.indexOf($scope.taskGroups, group);
         $scope.taskGroups[groupIndex].loading = true;
 
@@ -97,7 +97,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         }
         api.call('get','tasks?account_list_id=' + window.current_account_list_id +
             '&filters[completed]=false' +
-            '&per_page=' + tasksPerGroup +
+            '&per_page=' + $scope.filter.tasksPerGroup +
             '&page=' + group.currentPage +
             '&filters[starred]=' + $scope.filter.starred +
             '&filters[date_range]=' + group.filter +
@@ -111,15 +111,17 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             if(tData.tasks.length === 0){
                 if($scope.taskGroups[groupIndex].currentPage !== 1){
                     $scope.taskGroups[groupIndex].currentPage = 1;
-                    $scope.refreshTasks(group);
+                    refreshTasks(group);
                 }
                 $scope.taskGroups[groupIndex].loading = false;
                 $scope.tasks[group.filter] = {};
+                evalTaskTotals();
                 return;
             }
 
             //retrieve contacts
-            api.call('get','contacts?account_list_id=' + window.current_account_list_id + '&filters[status]=*&filters[ids]='+_.uniq(_.flatten(tData.tasks, 'contacts')).join(),{},function(data) {
+            api.call('get','contacts?account_list_id=' + window.current_account_list_id +
+                '&filters[status]=*&filters[ids]='+_.uniq(_.flatten(tData.tasks, 'contacts')).join(), {} ,function(data) {
                 angular.forEach(data.contacts, function(contact){
                     contactCache.update(contact.id, {
                         addresses: _.filter(data.addresses, function(addr) {
@@ -131,6 +133,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
                 });
 
                 $scope.tasks[group.filter] = tData.tasks;
+                evalTaskTotals();
                 $scope.comments = _.union(tData.comments, $scope.comments);
                 $scope.people = _.union(tData.people, $scope.people);
 
@@ -141,6 +144,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
 
     $scope.resetFilters = function(){
         $scope.filter = {
+            page: 'today',
             starred: '',
             contactsSelect: [(urlParameter.get('contact_ids') || '')],
             tagsSelect: [''],
@@ -153,20 +157,52 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             contactStatus: [''],
             contactLikely: [''],
             contactChurch: [''],
-            contactReferrer: ['']
+            contactReferrer: [''],
+            tasksPerGroup: 25
         };
     };
     $scope.resetFilters();
 
     $scope.$watch('filter', function (f, oldf) {
-        refreshAllTasks();
+        if(f.page === 'starred'){
+            $scope.filter.starred = 'true';
+        }else{
+            $scope.filter.starred = '';
+        }
+
+        switch(f.page) {
+            case 'today':
+                $scope.taskGroups[0].visible = false;
+                $scope.taskGroups[1].visible = true;
+                $scope.taskGroups[2].visible = false;
+                $scope.taskGroups[3].visible = false;
+                break;
+            case 'overdue':
+                $scope.taskGroups[0].visible = true;
+                $scope.taskGroups[1].visible = false;
+                $scope.taskGroups[2].visible = false;
+                $scope.taskGroups[3].visible = false;
+                break;
+            case 'upcoming':
+                $scope.taskGroups[0].visible = false;
+                $scope.taskGroups[1].visible = false;
+                $scope.taskGroups[2].visible = true;
+                $scope.taskGroups[3].visible = true;
+                break;
+            default:
+                $scope.taskGroups[0].visible = true;
+                $scope.taskGroups[1].visible = true;
+                $scope.taskGroups[2].visible = true;
+                $scope.taskGroups[3].visible = true;
+        }
+        $scope.refreshVisibleTasks();
     }, true);
 
-    $scope.$watch('tasks', function(){
+    var evalTaskTotals = function(){
         //total tasks
         $scope.totalTasksShown = 0;
         angular.forEach($scope.taskGroups, function(g, key){
-            if(!_.isUndefined($scope.tasks[g.filter])){
+            if(!_.isUndefined($scope.tasks[g.filter]) && g.visible){
                 if(!_.isEmpty($scope.tasks[g.filter])){
                     $scope.totalTasksShown = $scope.totalTasksShown + $scope.tasks[g.filter].length;
                 }
@@ -175,21 +211,16 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         $timeout(function(){
             $scope.totalTasksLoading = _.contains(_.flatten($scope.taskGroups, 'loading'), true);
         }, 1000);
-    }, true);
-
-    //$scope.filterPage = ($location.$$url === '/starred' ? "starred" : 'active');
+    };
 
     //auto-open contact filter
     if($scope.filter.contactsSelect[0]){
         jQuery("#leftmenu ul.left_filters li #contact").trigger("click");
+        $scope.filter.page = 'all';
     }
 
     $scope.tagIsActive = function(tag){
         return _.contains($scope.filter.tagsSelect, tag);
-    };
-
-    $scope.contactTagIsActive = function(tag){
-        return _.contains($scope.filterContactTagSelect, tag);
     };
 
     $scope.tagClick = function(tag){
@@ -204,6 +235,10 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
         }
     };
 
+/*    $scope.contactTagIsActive = function(tag){
+        return _.contains($scope.filterContactTagSelect, tag);
+    };
+
     $scope.contactTagClick = function(tag){
         if($scope.contactTagIsActive(tag)){
             _.remove($scope.filterContactTagSelect, function(i) { return i === tag; });
@@ -214,5 +249,5 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             _.remove($scope.filterContactTagSelect, function(i) { return i === ''; });
             $scope.filterContactTagSelect.push(tag);
         }
-    };
+    };*/
 });

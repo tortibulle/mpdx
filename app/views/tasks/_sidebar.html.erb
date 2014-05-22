@@ -1,7 +1,10 @@
 <aside id="leftmenu">
   <ul>
-    <li ng-class="{'selected': filter.starred === ''}"><a href="/tasks/#" class="inbox menu_item" ng-click="filter.starred = ''">Active/Upcoming</a></li>
-    <li ng-class="{'selected': filter.starred === 'true'}"><a href="/tasks/#" class="starred menu_item" ng-click="filter.starred = 'true'">Starred</a></li>
+    <li ng-class="{'selected': filter.page === 'all'}"><a href="/tasks/#" class="inbox menu_item" ng-click="filter.page = 'all'">All</a></li>
+    <li ng-class="{'selected': filter.page === 'today'}"><a href="/tasks/#" class="inbox menu_item" ng-click="filter.page = 'today'">Today</a></li>
+    <li ng-class="{'selected': filter.page === 'overdue'}"><a href="/tasks/#" class="inbox menu_item" ng-click="filter.page = 'overdue'">Overdue</a></li>
+    <li ng-class="{'selected': filter.page === 'upcoming'}"><a href="/tasks/#" class="inbox menu_item" ng-click="filter.page = 'upcoming'">Upcoming</a></li>
+    <li ng-class="{'selected': filter.page === 'starred'}"><a href="/tasks/#" class="starred menu_item" ng-click="filter.page = 'starred'">Starred</a></li>
     <li class="<%= 'selected' if params[:action] == 'history' %>"><%= link_to(_('History'), history_tasks_path, class: "completed menu_item") %></li>
     <% if params[:action] == 'index' %>
       <%= render 'sidebar_tags', tags: current_account_list.activity_tags if current_account_list.activity_tags.present? %>
