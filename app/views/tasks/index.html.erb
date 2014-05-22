@@ -4,10 +4,14 @@
     <div class="wpp">
 
       <h1></h1>
-      <p ng-show="totalTasksShown === 0 && !totalTasksLoading" style="color:red;">Sorry, there are no tasks that match the filters and/or tags you have selected.
-        <span ng-show="filter.page === 'all'">Try <a href="/tasks/new" data-remote="true">creating a new task</a> or <a href="#" ng-click="resetFilters()">resetting your filters</a>.</span>
-        <span ng-show="filter.page !== 'all'">Try <a href="/tasks/new" data-remote="true">creating a new task</a>, <a href="#" ng-click="resetFilters()">resetting your filters</a> or <a href="#" ng-click="filter.page = 'all'">showing all tasks</a>.</span>
-      </p>
+
+      <div class="mwrap" ng-show="totalTasksShown === 0 && !totalTasksLoading">
+        <div class="nohide floating" style="background-color: #FDFFD4;">
+          <span ng-show="filter.page === 'all'">There are no tasks that match the filters and/or tags you have selected. Try <a href="/tasks/new" data-remote="true">creating a new task</a> or <a href="#" ng-click="resetFilters()">resetting your filters</a>.</span>
+          <span ng-show="filter.page !== 'all'">You don't have any tasks that are <span ng-show="filter.page === 'today'">set for today</span><span ng-show="filter.page === 'overdue'">overdue</span><span ng-show="filter.page === 'upcoming'">upcoming</span> or match a filter you have set. Try <a href="/tasks/new" data-remote="true">creating a new task</a>, <a href="#" ng-click="resetFilters()">resetting your filters</a> or <a href="#" ng-click="filter.page = 'all'">showing all tasks</a>.</span>
+        </div>
+      </div>
+
       <h2 ng-show="totalTasksShown === 0 && totalTasksLoading">Loading tasks...</h2>
 
     <div ng-repeat="g in taskGroups" ng-class="{'contact_loading': g.loading}" ng-show="g.visible && tasks[g.filter].length > 0">

@@ -1,4 +1,4 @@
-angular.module('mpdxApp').controller('tasksController', function ($scope, $filter, $location, $timeout, api, urlParameter, contactCache) {
+angular.module('mpdxApp').controller('tasksController', function ($scope, $timeout, api, urlParameter, contactCache) {
     $scope.tasks = {};
     $scope.comments = {};
     $scope.people = {};
@@ -7,18 +7,18 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
 
     $scope.taskGroups = [
         {
-            filter:'overdue',
-            title: 'Overdue',
-            class: 'taskgroup--red',
+            filter:'today',
+            title: 'Today',
+            class: 'taskgroup--green',
             currentPage: 1,
             meta: {},
             loading: false,
             visible: false
         },
         {
-            filter:'today',
-            title: 'Today',
-            class: 'taskgroup--green',
+            filter:'overdue',
+            title: 'Overdue',
+            class: 'taskgroup--red',
             currentPage: 1,
             meta: {},
             loading: false,
@@ -144,7 +144,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
 
     $scope.resetFilters = function(){
         $scope.filter = {
-            page: 'today',
+            page: 'all',
             starred: '',
             contactsSelect: [(urlParameter.get('contact_ids') || '')],
             tagsSelect: [''],
@@ -172,14 +172,14 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
 
         switch(f.page) {
             case 'today':
-                $scope.taskGroups[0].visible = false;
-                $scope.taskGroups[1].visible = true;
+                $scope.taskGroups[0].visible = true;
+                $scope.taskGroups[1].visible = false;
                 $scope.taskGroups[2].visible = false;
                 $scope.taskGroups[3].visible = false;
                 break;
             case 'overdue':
-                $scope.taskGroups[0].visible = true;
-                $scope.taskGroups[1].visible = false;
+                $scope.taskGroups[0].visible = false;
+                $scope.taskGroups[1].visible = true;
                 $scope.taskGroups[2].visible = false;
                 $scope.taskGroups[3].visible = false;
                 break;
