@@ -258,19 +258,36 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $timeo
                 });
                 jQuery('#complete_task_followup_modal').dialog('close');
             };
-        }else if(followUpTask.activity_type === 'Appointment' && taskResult === 'Call for Decision'){
+        }else if(followUpTask.activity_type === 'Appointment' && taskResult === 'Call for Decision') {
             $scope.followUpDialogData = {
                 'message': 'Would you like to create a task to make a call in the future?',
                 'options': ['Yes']
             };
-            $scope.followUpSaveFunc = function(){
+            $scope.followUpSaveFunc = function () {
+                var taskDueDate = new Date();
+                taskDueDate = new Date(taskDueDate.getTime() + (7 * 24 * 60 * 60 * 1000));
                 api.call('post', 'tasks/', {
                     task: {
-                        due_date: Date.now(),
+                        start_at: taskDueDate.toISOString(),
                         subject: 'Call for Decision',
                         activity_type: 'Call',
                         contacts: followUpTask.contacts
                     }
+                });
+                jQuery('#complete_task_followup_modal').dialog('close');
+            };
+        }else if(followUpTask.activity_type === 'Appointment' && taskResult === 'Partner - Financial' && followUpTask.contacts.length > 0){
+            $scope.followUpDialogData = {
+                'message': 'Set contact\'s status to \'Partner - Financial?\':',
+                'options': ['Yes']
+            };
+            $scope.followUpSaveFunc = function(){
+                angular.forEach(followUpTask.contacts, function(c){
+                    api.call('put', 'contacts/' + c, {
+                        contact: {
+                            status: 'Partner - Financial'
+                        }
+                    });
                 });
                 jQuery('#complete_task_followup_modal').dialog('close');
             };
