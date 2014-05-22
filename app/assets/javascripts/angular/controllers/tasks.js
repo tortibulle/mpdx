@@ -73,7 +73,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $filte
             '&filters[likely][]=' + encodeURLarray($scope.filter.contactLikely).join('&filters[likely][]=') +
             '&filters[church][]=' + encodeURLarray($scope.filter.contactChurch).join('&filters[church][]=') +
             '&filters[referrer][]=' + encodeURLarray($scope.filter.contactReferrer).join('&filters[referrer][]=') +
-            '&include='
+            '&include=Contact.id'
         , {}, function(data) {
             refreshTasks(group, _.flatten(data.contacts, 'id'));
         }, null, true);
