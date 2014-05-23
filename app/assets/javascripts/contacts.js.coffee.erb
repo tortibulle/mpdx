@@ -26,10 +26,7 @@ $ ->
         select: (event, ui) ->
           document.location = '/contacts/' + ui.item.id
           false
-      }).keyup (event)->
-        if event.which == 13 && $(this).val() != ''
-          $('#filters_name').val($(this).val())
-          $('#filters_form').submit()
+      })
 
       # check all feature
       $(document).on 'click', '.checkall', ->
