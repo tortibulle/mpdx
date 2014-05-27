@@ -368,6 +368,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $timeo
                 autoOpen: true,
                 modal: true
             });
+            jQuery('#followUpDialogDatepicker').datepicker();
         }
     };
 
