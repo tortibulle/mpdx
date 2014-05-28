@@ -63,6 +63,12 @@ Mpdx::Application.routes.draw do
     end
   end
 
+  resources :reports, only: [] do
+    collection do
+      get :contributions
+    end
+  end
+
   resources :contacts do
     collection do
       get :social_search

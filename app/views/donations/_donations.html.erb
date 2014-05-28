@@ -1,11 +1,13 @@
 <% @contact = exhibit(@contact, self) if @contact %>
 <% unless params[:page] %>
   <% if @start_date %>
-    <div>
-      <div style="float:left"><%= link_to(_('<< Previous Month'), donations_path(start_date: @start_date - 1.month)) %></div>
+    <div class="filters">
+      <div style="float:left"><%= link_to(_('<< Previous Month'), donations_path(start_date: @start_date - 1.month), class: 'btn smallbtn') %></div>
+      <div style="float:right"><%= link_to(_('Contribution Report'), contributions_reports_path, class: 'btn smallbtn') %></div>
       <% unless @end_date >= Date.today %>
-        <div style="float:right"><%= link_to(_('Next Month >>'), donations_path(start_date: @start_date + 1.month)) %></div>
+        <div style="float:right"><%= link_to(_('Next Month >>'), donations_path(start_date: @start_date + 1.month), class: 'btn smallbtn') %>&nbsp;|&nbsp;</div>
       <% end %>
+
     </div>
     <div class="clr"></div>
     <h2><%= _('Donations for %{start_date} through %{end_date}').localize % {start_date: l(@start_date), end_date: l(@end_date)} %></h2>
@@ -38,9 +40,9 @@
   </tbody>
   <% unless @contact %>
     <tfoot>
-      <tr>
+      <tr class="sum">
         <td></td>
-        <td class="right"><%= _('Total Donations (%{count}):').localize % {count: donations.length} %></td>
+        <td class="right"><strong><%= _('Total Donations (%{count}):').localize % {count: donations.length} %></strong></td>
         <td class="right"><%= number_to_current_currency(donations.sum(&:amount)) %></td>
         <td colspan="4"></td>
       </tr>
