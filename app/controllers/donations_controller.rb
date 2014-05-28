@@ -59,6 +59,41 @@ class DonationsController < ApplicationController
     @donation.destroy
   end
 
+  def contribution_report
+    if params[:start_date]
+      @start_date = Date.parse(params[:start_date])
+      @end_date = @start_date.end_of_month + 11.months
+    else
+      @end_date = Date.today.end_of_month
+      @start_date = 11.month.ago(@end_date).beginning_of_month
+    end
+    @raw_donations = current_account_list.
+      donations.
+      where("donation_date BETWEEN ? AND ?", @start_date, @end_date).
+      select('"donations"."donor_account_id",' +
+             'date_trunc(\'month\', "donations"."donation_date"),' +
+             'SUM("donations"."amount") as amount'
+            ).
+      group('donor_account_id, date_trunc, donation_date').
+      order('donor_account_id, date_trunc').
+      all
+    @donations = {}
+    @sum_row = {}
+    @raw_donations.each do |donation|
+      if @donations[donation.donor_account_id].nil?
+        @donations[donation.donor_account_id] = { donor: donation.donor_account,
+                                                  amounts: {} }
+      end
+      @donations[donation.donor_account_id]\
+                [:amounts]\
+                [donation.date_trunc.strftime '%b %y'] = donation.amount
+      if @sum_row[donation.date_trunc.strftime '%b %y'].nil?
+        @sum_row[donation.date_trunc.strftime '%b %y'] = 0
+      end
+      @sum_row[donation.date_trunc.strftime '%b %y'] += donation.amount
+    end
+  end
+
   private
 
   def setup_chart

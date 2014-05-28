@@ -55,7 +55,11 @@ Mpdx::Application.routes.draw do
 
   resources :activity_comments
 
-  resources :donations
+  resources :donations do
+    collection do
+      get :contribution_report
+    end
+  end
   resources :accounts
   resources :preferences do
     collection do
