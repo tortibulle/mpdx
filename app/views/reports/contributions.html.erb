@@ -13,12 +13,12 @@
 <table class="tablelist donations" id="donations_table">
   <thead>
     <tr>
-      <th>Donor</th>
+      <th><%= _('Donor') %></th>
       <th></th>
       <% (0..11).reverse_each do |index| %>
         <th class="right"><%= index.month.ago(@end_date).strftime '%b %y' %></th>
       <% end %>
-      <th class="total right">Total</th>
+      <th class="total right"><%= _('Total') %></th>
     </tr>
   </thead>
   <tbody>
@@ -36,7 +36,7 @@
       </tr>
     <% end %>
     <tr class="sum">
-      <td><strong>Total Donations</strong></td><td></td>
+      <td><strong><%= _('Total Donations') %></strong></td><td></td>
       <% (0..11).reverse_each do |index| %>
         <td class="right">
           <% unless @sum_row[index.month.ago(@end_date).strftime '%b %y'].nil? %>

@@ -1,6 +1,6 @@
 class ReportsController < ApplicationController
   def contributions
-    @page_title = 'Contributions'
+    @page_title = _('Contribution Report')
 
     if params[:start_date]
       @start_date = Date.parse(params[:start_date])
