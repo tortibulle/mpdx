@@ -696,6 +696,9 @@ tbody.tasks {
   .right {text-align: right;}
   .date {width: 90px;}
   .appeal {width: 50%}
+  .sum {border-top: 1px solid $blue;}
+  .total {border-left: 1px solid $blue;}
+
 
 
   thead {
@@ -820,7 +823,7 @@ tbody.tasks {
   }
   h2 {
     margin: .5em 1%;
-  } 
+  }
 }
 
 .thirds_row { clear: both; margin-right: -1.25%; }

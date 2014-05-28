@@ -9,7 +9,7 @@ class ContactsController < ApplicationController
     if params[:filters] && params[:filters][:name].present?
       contacts_with_name = ContactFilter.new({name: filters_params[:name], status: ['*']}).filter(current_account_list.contacts)
       if contacts_with_name.count == 1
-        current_user.contacts_filter[current_account_list.id].delete("name")
+        current_user.contacts_filter[current_account_list.id.to_s].delete("name")
         current_user.save
         redirect_to contacts_with_name.first
         return
@@ -309,23 +309,22 @@ class ContactsController < ApplicationController
   def setup_filters
     current_user.contacts_filter ||= {}
     clear_filters = params.delete(:clear_filter)
-    if filters_params.present? && current_user.contacts_filter[current_account_list.id] != filters_params
+    if filters_params.present? && current_user.contacts_filter[current_account_list.id.to_s] != filters_params
         @view_options[:page] = 1
-        current_user.contacts_filter[current_account_list.id] = filters_params
+        current_user.contacts_filter[current_account_list.id.to_s] = filters_params
         current_user.save
     elsif clear_filters == 'true'
-      current_user.contacts_filter[current_account_list.id] = nil
+      current_user.contacts_filter[current_account_list.id.to_s] = nil
       current_user.save
     end
 
-    if current_user.contacts_filter.present? && current_user.contacts_filter[current_account_list.id].present?
-      @filters_params = current_user.contacts_filter[current_account_list.id]
+    if current_user.contacts_filter.present? && current_user.contacts_filter[current_account_list.id.to_s].present?
+      @filters_params = current_user.contacts_filter[current_account_list.id.to_s]
     end
   end
 
   def filtered_contacts
     filtered_contacts = current_account_list.contacts.order('contacts.name')
-
     if filters_params.present?
       filtered_contacts = ContactFilter.new(filters_params).filter(filtered_contacts)
     else
@@ -337,7 +336,7 @@ class ContactsController < ApplicationController
   def setup_view_options
     current_user.contacts_view_options ||= {}
     if params[:per_page].present? || params[:page].present?
-      view_options = current_user.contacts_view_options[current_account_list.id] || {}
+      view_options = current_user.contacts_view_options[current_account_list.id.to_s] || {}
       if params[:per_page] && view_options[:per_page].to_s != params[:per_page]
         view_options[:page] = 1
       else
@@ -345,12 +344,12 @@ class ContactsController < ApplicationController
       end
       view_options[:per_page] = params[:per_page]
 
-      current_user.contacts_view_options[current_account_list.id] = view_options
+      current_user.contacts_view_options[current_account_list.id.to_s] = view_options
       current_user.save
     end
 
-    if current_user.contacts_view_options.present? && current_user.contacts_view_options[current_account_list.id].present?
-      view_options = current_user.contacts_view_options[current_account_list.id]
+    if current_user.contacts_view_options.present? && current_user.contacts_view_options[current_account_list.id.to_s].present?
+      view_options = current_user.contacts_view_options[current_account_list.id.to_s]
     end
     @view_options = view_options || params.slice(:per_page, :page)
   end

@@ -1,0 +1,50 @@
+<% if @start_date %>
+  <div class="filters">
+    <div style="float:left"><%= link_to(_('<< Previous Year'), contributions_reports_path(start_date: @start_date - 1.year), class: 'btn smallbtn') %></div>
+    <div style="float:right"><%= link_to(_('Donations'), donations_path, class: 'btn smallbtn') %></div>
+    <% unless @end_date >= Date.today %>
+      <div style="float:right"><%= link_to(_('Next Year >>'), contributions_reports_path(start_date: @start_date + 1.year), class: 'btn smallbtn') %>&nbsp;|&nbsp;</div>
+    <% end %>
+
+  </div>
+  <div class="clr"></div>
+  <h2><%= _('Contribution Report for %{start_date} through %{end_date}').localize % {start_date: l(@start_date), end_date: l(@end_date)} %></h2>
+<% end %>
+<table class="tablelist donations" id="donations_table">
+  <thead>
+    <tr>
+      <th>Donor</th>
+      <th></th>
+      <% (0..11).reverse_each do |index| %>
+        <th class="right"><%= index.month.ago(@end_date).strftime '%b %y' %></th>
+      <% end %>
+      <th class="total right">Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @donations.each do |key, row| %>
+      <tr>
+        <td><%= link_to(row[:donor].contacts.first.name, row[:donor].contacts.first) %><td>
+        <% (0..11).reverse_each do |index| %>
+          <td class="right">
+            <% unless row[:amounts][index.month.ago(@end_date).strftime '%b %y'].nil? %>
+              <%= number_to_current_currency(row[:amounts][index.month.ago(@end_date).strftime '%b %y'][:value], currency: row[:amounts][index.month.ago(@end_date).strftime '%b %y'][:currency]) %>
+            <% end %>
+          </td>
+        <% end %>
+        <td class="total right"><%= number_to_current_currency(row[:total]) %></td>
+      </tr>
+    <% end %>
+    <tr class="sum">
+      <td><strong>Total Donations</strong></td><td></td>
+      <% (0..11).reverse_each do |index| %>
+        <td class="right">
+          <% unless @sum_row[index.month.ago(@end_date).strftime '%b %y'].nil? %>
+            <%= number_to_current_currency(@sum_row[index.month.ago(@end_date).strftime '%b %y']) %>
+          <% end %>
+        </td>
+      <% end %>
+      <td class="total"></td>
+    </tr>
+  </tbody>
+</table>
