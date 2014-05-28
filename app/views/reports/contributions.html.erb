@@ -1,9 +1,9 @@
 <% if @start_date %>
   <div class="filters">
-    <div style="float:left"><%= link_to(_('<< Previous Year'), contribution_report_donations_path(start_date: @start_date - 1.year), class: 'btn smallbtn') %></div>
+    <div style="float:left"><%= link_to(_('<< Previous Year'), contributions_reports_path(start_date: @start_date - 1.year), class: 'btn smallbtn') %></div>
     <div style="float:right"><%= link_to(_('Donations'), donations_path, class: 'btn smallbtn') %></div>
     <% unless @end_date >= Date.today %>
-      <div style="float:right"><%= link_to(_('Next Year >>'), contribution_report_donations_path(start_date: @start_date + 1.year), class: 'btn smallbtn') %>&nbsp;|&nbsp;</div>
+      <div style="float:right"><%= link_to(_('Next Year >>'), contributions_reports_path(start_date: @start_date + 1.year), class: 'btn smallbtn') %>&nbsp;|&nbsp;</div>
     <% end %>
 
   </div>
@@ -28,7 +28,7 @@
         <% (0..11).reverse_each do |index| %>
           <td class="right">
             <% unless row[:amounts][index.month.ago(@end_date).strftime '%b %y'].nil? %>
-              <%= number_to_current_currency(row[:amounts][index.month.ago(@end_date).strftime '%b %y']) %>
+              <%= number_to_current_currency(row[:amounts][index.month.ago(@end_date).strftime '%b %y'][:value], currency: row[:amounts][index.month.ago(@end_date).strftime '%b %y'][:currency]) %>
             <% end %>
           </td>
         <% end %>

@@ -55,15 +55,17 @@ Mpdx::Application.routes.draw do
 
   resources :activity_comments
 
-  resources :donations do
-    collection do
-      get :contribution_report
-    end
-  end
+  resources :donations
   resources :accounts
   resources :preferences do
     collection do
       post :update_tab_order
+    end
+  end
+
+  resources :reports, only: [] do
+    collection do
+      get :contributions
     end
   end
 
