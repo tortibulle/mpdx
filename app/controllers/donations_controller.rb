@@ -72,7 +72,7 @@ class DonationsController < ApplicationController
       where("donation_date BETWEEN ? AND ?", @start_date, @end_date).
       select('"donations"."donor_account_id",' +
              'date_trunc(\'month\', "donations"."donation_date"),' +
-             'SUM("donations"."amount") as amount'
+             'SUM("donations"."tendered_amount") as tendered_amount'
             ).
       group('donor_account_id, date_trunc, donation_date').
       order('donor_account_id, date_trunc').
@@ -87,13 +87,13 @@ class DonationsController < ApplicationController
       end
       @donations[donation.donor_account_id]\
                 [:amounts]\
-                [donation.date_trunc.strftime '%b %y'] = donation.amount
+                [donation.date_trunc.strftime '%b %y'] = donation.tendered_amount
       @donations[donation.donor_account_id]\
-                [:total] += donation.amount
+                [:total] += donation.tendered_amount
       if @sum_row[donation.date_trunc.strftime '%b %y'].nil?
         @sum_row[donation.date_trunc.strftime '%b %y'] = 0
       end
-      @sum_row[donation.date_trunc.strftime '%b %y'] += donation.amount
+      @sum_row[donation.date_trunc.strftime '%b %y'] += donation.tendered_amount
     end
   end
 
