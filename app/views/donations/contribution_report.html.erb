@@ -18,6 +18,7 @@
       <% (0..11).reverse_each do |index| %>
         <th class="right"><%= index.month.ago(@end_date).strftime '%b %y' %></th>
       <% end %>
+      <th class="total right">Total</th>
     </tr>
   </thead>
   <tbody>
@@ -31,6 +32,7 @@
             <% end %>
           </td>
         <% end %>
+        <td class="total right"><%= number_to_current_currency(row[:total]) %></td>
       </tr>
     <% end %>
     <tr class="sum">
@@ -42,5 +44,7 @@
           <% end %>
         </td>
       <% end %>
+      <td class="total"></td>
+    </tr>
   </tbody>
 </table>

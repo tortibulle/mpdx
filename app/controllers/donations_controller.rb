@@ -82,11 +82,14 @@ class DonationsController < ApplicationController
     @raw_donations.each do |donation|
       if @donations[donation.donor_account_id].nil?
         @donations[donation.donor_account_id] = { donor: donation.donor_account,
-                                                  amounts: {} }
+                                                  amounts: {},
+                                                  total: 0 }
       end
       @donations[donation.donor_account_id]\
                 [:amounts]\
                 [donation.date_trunc.strftime '%b %y'] = donation.amount
+      @donations[donation.donor_account_id]\
+                [:total] += donation.amount
       if @sum_row[donation.date_trunc.strftime '%b %y'].nil?
         @sum_row[donation.date_trunc.strftime '%b %y'] = 0
       end
