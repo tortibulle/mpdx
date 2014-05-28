@@ -40,9 +40,9 @@
   </tbody>
   <% unless @contact %>
     <tfoot>
-      <tr>
+      <tr class="sum">
         <td></td>
-        <td class="right"><%= _('Total Donations (%{count}):').localize % {count: donations.length} %></td>
+        <td class="right"><strong><%= _('Total Donations (%{count}):').localize % {count: donations.length} %></strong></td>
         <td class="right"><%= number_to_current_currency(donations.sum(&:amount)) %></td>
         <td colspan="4"></td>
       </tr>
