@@ -24,7 +24,7 @@
   <tbody>
     <% @donations.each do |key, row| %>
       <tr>
-        <td><%= link_to(row[:donor].contacts.first.name, row[:donor].contacts.first) %><td>
+        <td><%= link_to(row[:donor], contact_path(row[:id])) %><td>
         <% (0..11).reverse_each do |index| %>
           <td class="right">
             <% unless row[:amounts][index.month.ago(@end_date).strftime '%b %y'].nil? %>
