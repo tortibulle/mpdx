@@ -61,20 +61,5 @@
     </div>
   </div>
 
-  <div id="complete_task_followup_modal" title="Task" style="display:none">
-    <div class="form_wrapper">
-      <p ng-bind="followUpDialogData.message"></p>
-      <select ng-options="i as i for i in followUpDialogData.options" ng-model="followUpDialogResult"></select>
-      <input type="text" id="followUpDialogDatepicker">
-    </div>
-    <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
-      <div class="ui-dialog-buttonset">
-        <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" ng-click="followUpSaveFunc()">
-          <span class="ui-button-text">Save</span></button>
-        <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" onClick="jQuery('#complete_task_followup_modal').dialog('close');">
-          <span class="ui-button-text">Cancel</span></button>
-      </div>
-    </div>
-  </div>
-
+  <task-followup-dialog></task-followup-dialog>
 </div>

@@ -1,0 +1,37 @@
+<div id="complete_task_followup_modal" title="Task" style="display:none">
+    <div class="form_wrapper">
+        <p ng-bind="followUpDialogData.message"></p>
+        <select ng-options="i as i for i in followUpDialogData.options" ng-model="followUpDialogResult.select"></select>
+
+        <div style="padding-top:10px;" ng-show="followUpDialogData.showFrequency" >
+            <label>Commitment Frequency</label><br>
+            <select ng-model="followUpDialogResult.frequency">
+                <option value=""></option>
+                <option value="0.23076923076923">Weekly</option>
+                <option value="0.46153846153846">Fortnightly</option>
+                <option value="1.0">Monthly</option>
+                <option value="2.0">Bi-Monthly</option>
+                <option value="3.0">Quarterly</option>
+                <option value="4.0">Quad-Monthly</option>
+                <option value="6.0">Semi-Annual</option>
+                <option value="12.0">Annual</option>
+                <option value="24.0">Biennial</option></select>
+        </div>
+        <div style="padding-top:10px;" ng-show="followUpDialogData.showAmount">
+            <label>Commitment Amount</label>
+            <input type="text" ng-model="followUpDialogResult.amount" placeholder="<%= TwitterCldr::Shared::Currencies.for_code(current_currency)[:symbol] %>">
+        </div>
+        <div style="padding-top:10px;" ng-show="followUpDialogData.showDate">
+            <label ng-bind="followUpDialogData.dateLabel"></label>
+            <input type="text" id="followUpDialogDatepicker" ng-model="followUpDialogResult.date">
+        </div>
+    </div>
+    <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+        <div class="ui-dialog-buttonset">
+            <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" ng-click="followUpSaveFunc()">
+                <span class="ui-button-text">Save</span></button>
+            <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" onClick="jQuery('#complete_task_followup_modal').dialog('close');">
+                <span class="ui-button-text">Cancel</span></button>
+        </div>
+    </div>
+</div>
