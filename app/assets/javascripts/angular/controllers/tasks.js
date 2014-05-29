@@ -74,7 +74,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $timeo
             '&filters[likely][]=' + encodeURLarray($scope.filter.contactLikely).join('&filters[likely][]=') +
             '&filters[church][]=' + encodeURLarray($scope.filter.contactChurch).join('&filters[church][]=') +
             '&filters[referrer][]=' + encodeURLarray($scope.filter.contactReferrer).join('&filters[referrer][]=') +
-            '&include=Contact.id'
+            '&include=Contact.id&per_page=10000'
         , {}, function(data) {
             refreshTasks(group, _.flatten(data.contacts, 'id'));
         }, null, true);
