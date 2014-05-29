@@ -1,11 +1,13 @@
 <div id="complete_task_followup_modal" title="Task" style="display:none">
-    <div class="form_wrapper">
-        <p ng-bind="followUpDialogData.message"></p>
-        <select ng-options="i as i for i in followUpDialogData.options" ng-model="followUpDialogResult.select"></select>
+    <div class="form_wrapper" style="overflow-y:auto; max-height:400px;">
 
-        <div style="padding-top:10px;" ng-show="followUpDialogData.showFrequency" >
+        <p ng-bind="followUpDialogData.message"></p>
+        <select ng-show="followUpDialogData.options.length > 0" ng-options="i as i for i in followUpDialogData.options"
+                ng-model="followUpDialogResult.select"></select>
+
+        <div ng-show="followUpDialogData.financialCommitment" style="padding-top:10px;">
             <label>Commitment Frequency</label><br>
-            <select ng-model="followUpDialogResult.frequency">
+            <select ng-model="followUpDialogResult.financialCommitment.frequency">
                 <option value=""></option>
                 <option value="0.23076923076923">Weekly</option>
                 <option value="0.46153846153846">Fortnightly</option>
@@ -15,17 +17,73 @@
                 <option value="4.0">Quad-Monthly</option>
                 <option value="6.0">Semi-Annual</option>
                 <option value="12.0">Annual</option>
-                <option value="24.0">Biennial</option></select>
+                <option value="24.0">Biennial</option>
+            </select>
+
+            <div style="padding-top:10px;">
+                <label>Commitment Amount</label><br>
+                <input type="text" ng-model="followUpDialogResult.financialCommitment.amount"
+                       placeholder="<%= TwitterCldr::Shared::Currencies.for_code(current_currency)[:symbol] %>">
+            </div>
+            <div style="padding-top:10px;">
+                <label>Commitment Start Date</label><br>
+                <input type="text" class="followUpDialogDatepicker" ng-model="followUpDialogResult.financialCommitment.date">
+            </div>
         </div>
-        <div style="padding-top:10px;" ng-show="followUpDialogData.showAmount">
-            <label>Commitment Amount</label>
-            <input type="text" ng-model="followUpDialogResult.amount" placeholder="<%= TwitterCldr::Shared::Currencies.for_code(current_currency)[:symbol] %>">
+        <hr>
+
+
+        <div ng-show="followUpDialogData.thankTask" style="padding-top:10px;">
+            <input type="checkbox" ng-model="followUpDialogResult.createThankTask"> Create "Thank" task
         </div>
-        <div style="padding-top:10px;" ng-show="followUpDialogData.showDate">
-            <label ng-bind="followUpDialogData.dateLabel"></label>
-            <input type="text" id="followUpDialogDatepicker" ng-model="followUpDialogResult.date">
+        <div ng-show="followUpDialogResult.createThankTask" style="padding-top:10px;">
+            <label>Subject</label><br>
+            <input ng-model="followUpDialogResult.thankTask.subject">
+
+            <div style="padding-top:10px;">
+                <label>Task due date</label><br>
+                <input type="text" class="followUpDialogDatepicker" ng-model="followUpDialogResult.thankTask.date">
+            </div>
+
+            <div style="padding-top:10px;">
+                <label>Comments</label><br>
+                <textarea ng-model="followUpDialogResult.thankTask.comments"></textarea>
+            </div>
+        </div>
+        <hr>
+        <div ng-show="followUpDialogData.givingTask" style="padding-top:10px;">
+            <input type="checkbox" ng-model="followUpDialogResult.createGivingTask"> Create "Setup Giving" task
+        </div>
+        <div ng-show="followUpDialogResult.createGivingTask" style="padding-top:10px;">
+            <label>Subject</label><br>
+            <input ng-model="followUpDialogResult.givingTask.subject">
+
+            <div style="padding-top:10px;">
+                <label>Task due date</label><br>
+                <input type="text" class="followUpDialogDatepicker" ng-model="followUpDialogResult.givingTask.date">
+            </div>
+
+            <div style="padding-top:10px;">
+                <label>Comments</label><br>
+                <textarea ng-model="followUpDialogResult.givingTask.comments"></textarea>
+            </div>
+        </div>
+        <hr>
+        <div ng-show="followUpDialogData.newsletter" style="padding-top:10px;">
+            <input type="checkbox" ng-model="followUpDialogResult.newsletterSignup"> Add contact(s) to newsletter list
+        </div>
+        <div ng-show="followUpDialogResult.newsletterSignup" style="padding-top:10px;">
+            <label>Newsletter type</label>
+            <select ng-model="followUpDialogResult.newsletter.type"><option value=""></option>
+                <option value="Physical">Physical</option>
+                <option value="Email">Email</option>
+                <option value="Both">Both</option></select>
         </div>
     </div>
+
+
+
+
     <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
         <div class="ui-dialog-buttonset">
             <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" ng-click="followUpSaveFunc()">
