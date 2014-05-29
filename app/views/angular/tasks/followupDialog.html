@@ -30,10 +30,9 @@
                 <input type="text" class="followUpDialogDatepicker" ng-model="followUpDialogResult.financialCommitment.date">
             </div>
         </div>
-        <hr>
-
 
         <div ng-show="followUpDialogData.thankTask" style="padding-top:10px;">
+            <hr>
             <input type="checkbox" ng-model="followUpDialogResult.createThankTask"> Create "Thank" task
         </div>
         <div ng-show="followUpDialogResult.createThankTask" style="padding-top:10px;">
@@ -50,8 +49,9 @@
                 <textarea ng-model="followUpDialogResult.thankTask.comments"></textarea>
             </div>
         </div>
-        <hr>
+
         <div ng-show="followUpDialogData.givingTask" style="padding-top:10px;">
+            <hr>
             <input type="checkbox" ng-model="followUpDialogResult.createGivingTask"> Create "Setup Giving" task
         </div>
         <div ng-show="followUpDialogResult.createGivingTask" style="padding-top:10px;">
@@ -68,8 +68,28 @@
                 <textarea ng-model="followUpDialogResult.givingTask.comments"></textarea>
             </div>
         </div>
-        <hr>
+
+        <div ng-show="followUpDialogData.callTask" style="padding-top:10px;">
+            <hr>
+            <input type="checkbox" ng-model="followUpDialogResult.createCallTask"> Create "Call" task
+        </div>
+        <div ng-show="followUpDialogResult.createCallTask" style="padding-top:10px;">
+            <label>Subject</label><br>
+            <input ng-model="followUpDialogResult.callTask.subject">
+
+            <div style="padding-top:10px;">
+                <label>Task due date</label><br>
+                <input type="text" class="followUpDialogDatepicker" ng-model="followUpDialogResult.callTask.date">
+            </div>
+
+            <div style="padding-top:10px;">
+                <label>Comments</label><br>
+                <textarea ng-model="followUpDialogResult.callTask.comments"></textarea>
+            </div>
+        </div>
+
         <div ng-show="followUpDialogData.newsletter" style="padding-top:10px;">
+            <hr>
             <input type="checkbox" ng-model="followUpDialogResult.newsletterSignup"> Add contact(s) to newsletter list
         </div>
         <div ng-show="followUpDialogResult.newsletterSignup" style="padding-top:10px;">
