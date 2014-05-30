@@ -40,7 +40,7 @@
             <input ng-model="followUpDialogResult.thankTask.subject">
 
             <div style="padding-top:10px;">
-                <label>Task due date</label><br>
+                <label>Due date</label><br>
                 <input type="text" class="followUpDialogDatepicker" ng-model="followUpDialogResult.thankTask.date">
             </div>
 
@@ -59,8 +59,20 @@
             <input ng-model="followUpDialogResult.givingTask.subject">
 
             <div style="padding-top:10px;">
-                <label>Task due date</label><br>
+                <label>Due date</label><br>
                 <input type="text" class="followUpDialogDatepicker" ng-model="followUpDialogResult.givingTask.date">
+            </div>
+
+            <div style="padding-top:10px;">
+                <label>Action</label><br>
+                <select ng-model="followUpDialogResult.givingTask.type">
+                    <option value=""></option>
+                    <option value="Email">Email</option>
+                    <option value="Text Message">Text Message</option>
+                    <option value="Facebook Message">Facebook Message</option>
+                    <option value="Letter">Letter</option>
+                    <option value="To Do">To Do</option>
+                </select>
             </div>
 
             <div style="padding-top:10px;">
@@ -78,7 +90,7 @@
             <input ng-model="followUpDialogResult.callTask.subject">
 
             <div style="padding-top:10px;">
-                <label>Task due date</label><br>
+                <label>Due date</label><br>
                 <input type="text" class="followUpDialogDatepicker" ng-model="followUpDialogResult.callTask.date">
             </div>
 

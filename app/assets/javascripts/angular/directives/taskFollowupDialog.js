@@ -5,6 +5,13 @@ angular.module('mpdxApp')
             templateUrl: '/templates/tasks/followupDialog.html',
             controller: function ($scope, api) {
                 $scope.followUpDialog = function(taskId, taskResult){
+
+                    ////////////  testing  ////////////
+                    if(!window.current_account_list_tester){
+                        //return;
+                    }
+                    ////////////  end testing  ////////////
+
                     var mergedTasks = [];
                     _($scope.tasks).forEach(function(i) { mergedTasks.push(i); });
                     var followUpTask = _.find(_.flatten(mergedTasks), { 'id': parseInt(taskId) });
@@ -79,6 +86,10 @@ angular.module('mpdxApp')
                         };
 
                         $scope.followUpSaveFunc = function(){
+                            if(angular.isUndefined($scope.followUpDialogResult.financialCommitment)){
+                                alert('Please enter financial commitment information.');
+                                return;
+                            }
                             //Contact Updates
                             angular.forEach(followUpTask.contacts, function(c){
                                 api.call('put', 'contacts/' + c, {
@@ -299,7 +310,7 @@ angular.module('mpdxApp')
                         task: {
                             start_at: $scope.followUpDialogResult.givingTask.date,
                             subject: $scope.followUpDialogResult.givingTask.subject,
-                            activity_type: 'To Do',
+                            activity_type: $scope.followUpDialogResult.givingTask.type,
                             activity_contacts_attributes: contactsObject,
                             activity_comments_attributes: {
                                 "0": {
