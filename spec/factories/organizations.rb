@@ -21,7 +21,8 @@ FactoryGirl.define do
 
 
   factory :ccc, parent: :organization do
-    name "Campus Crusade for Christ - USA"
+    name "Cru - USA"
+    code 'CCC-USA'
     api_class 'Siebel'
     profiles_params 'Action=Profiles'
     addresses_params 'Profile=$PROFILE$&DateFrom=$DATEFROM$&Action=Donors'

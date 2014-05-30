@@ -19,7 +19,7 @@ class Person::RelayAccount < ActiveRecord::Base
     }
 
     account = super
-    org = Organization.find_by_name('Campus Crusade for Christ - USA')
+    org = Organization.find_by_code('CCC-USA')
     account.find_or_create_org_account(auth_hash) if user.organization_accounts.where(organization_id: org.id).blank?
     account
   end
@@ -43,7 +43,7 @@ class Person::RelayAccount < ActiveRecord::Base
 
   def find_or_create_org_account(auth_hash)
     if SiebelDonations::Profile.find(ssoGuid: remote_id).present?
-      org = Organization.find_by_name('Campus Crusade for Christ - USA')
+      org = Organization.find_by_code('CCC-USA')
 
       # we need to create an organization account if we don't already have one
       account = person.organization_accounts.where(organization_id: org.id).first_or_initialize

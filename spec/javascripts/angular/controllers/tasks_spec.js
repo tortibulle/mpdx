@@ -53,57 +53,6 @@ describe('tasks', function() {
             updated_at: "2014-04-28T09:17:15.816-04:00"
         }
     ];
-    it('tag filter (university) should have 1 task', function() {
-        var controller = createController();
-
-        $scope.filterContactsSelect = [''];
-        $scope.filterContactCitySelect = [''];
-        $scope.filterContactStateSelect = [''];
-        $scope.filterContactNewsletterSelect = '';
-        $scope.filterContactStatusSelect = [''];
-        $scope.filterContactLikelyToGiveSelect = [''];
-        $scope.filterContactChurchSelect = [''];
-        $scope.filterContactReferrerSelect = [''];
-        $scope.filterContactTagSelect = [''];
-        $scope.filterTagsSelect = ['university'];
-        $scope.filterActionSelect = [''];
-
-        expect($scope.filters(task[0])).toBe(true);
-    });
-
-    it('action filter (Appointment) should have 1 task', function() {
-        var controller = createController();
-
-        $scope.filterContactsSelect = [''];
-        $scope.filterContactCitySelect = [''];
-        $scope.filterContactStateSelect = [''];
-        $scope.filterContactNewsletterSelect = '';
-        $scope.filterContactStatusSelect = [''];
-        $scope.filterContactLikelyToGiveSelect = [''];
-        $scope.filterContactChurchSelect = [''];
-        $scope.filterContactReferrerSelect = [''];
-        $scope.filterContactTagSelect = [''];
-        $scope.filterTagsSelect = [''];
-        $scope.filterActionSelect = ['Appointment'];
-
-        expect($scope.filters(task[0])).toBe(true);
-    });
-
-    it('multiple filters should reduce the number of tasks shown', function() {
-        var controller = createController();
-
-        $scope.filterContactsSelect = ['18'];
-        $scope.filterActionSelect = ['Appointment'];
-
-        var filteredTasks = [];
-        angular.forEach(task, function(t){
-            if($scope.filters(t)){
-                filteredTasks.push(t);
-            }
-        })
-
-        expect(filteredTasks.length < task.length).toBe(true);
-    });
 
     it('tag should be active', function() {
         var controller = createController();
