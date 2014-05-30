@@ -13,7 +13,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         city: [''],
         state: [''],
         newsletter: '',
-        status: [''],
+        status: ['*'],
         likely: [''],
         church: [''],
         referrer: [''],
