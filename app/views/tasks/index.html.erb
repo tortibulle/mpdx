@@ -34,16 +34,16 @@
                 <span style="float:right;">Displaying <b>{{g.meta.from}}&nbsp;-&nbsp;{{g.meta.to}}</b> of <b>{{g.meta.total}}</b></span>
                 <div class="pagination">
                   <span class="previous_page disabled" ng-show="g.currentPage === 1">← Previous</span>
-                  <a class="previous_page" rel="prev start" href="#" ng-click="goToPage(g, g.currentPage-1)" ng-show="g.currentPage > 1">← Previous</a>
+                  <a class="previous_page" rel="prev start" href="" ng-click="goToPage(g, g.currentPage-1)" ng-show="g.currentPage > 1">← Previous</a>
 
                 <span ng-repeat="n in [1, g.meta.total_pages] | makeRange">
                   <em class="current" ng-show="n === g.currentPage">{{n}}</em>
-                  <a rel="next" ng-show="n !== g.currentPage && ((n > (g.currentPage-8) && n < (g.currentPage+8)) || n === 1 || n === g.meta.total_pages)" href="#" ng-click="goToPage(g, n)">{{n}}</a>
+                  <a rel="next" ng-show="n !== g.currentPage && ((n > (g.currentPage-8) && n < (g.currentPage+8)) || n === 1 || n === g.meta.total_pages)" href="" ng-click="goToPage(g, n)">{{n}}</a>
                   <span ng-show="(n === 2 && page.current > 9) || (n === page.total-1 && page.current < page.total - 8)">...</span>
                 </span>
 
                   <span class="next_page disabled" ng-show="g.currentPage === g.meta.total_pages">Next →</span>
-                  <a class="next_page" rel="next" href="#" ng-click="goToPage(g, g.currentPage+1)" ng-show="g.currentPage < g.meta.total_pages">Next →</a>
+                  <a class="next_page" rel="next" href="" ng-click="goToPage(g, g.currentPage+1)" ng-show="g.currentPage < g.meta.total_pages">Next →</a>
                 </div>
             </td>
           </tr>

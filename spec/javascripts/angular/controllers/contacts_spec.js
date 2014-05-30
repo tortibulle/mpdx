@@ -41,7 +41,7 @@ describe('contacts', function() {
         expect($scope.contactQuery.city).toEqual(['']);
         expect($scope.contactQuery.state).toEqual(['']);
         expect($scope.contactQuery.newsletter).toEqual('');
-        expect($scope.contactQuery.status).toEqual(['']);
+        expect($scope.contactQuery.status).toEqual(['*']);
         expect($scope.contactQuery.likely).toEqual(['']);
         expect($scope.contactQuery.church).toEqual(['']);
         expect($scope.contactQuery.referrer).toEqual(['']);

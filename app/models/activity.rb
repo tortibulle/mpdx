@@ -31,7 +31,7 @@ class Activity < ActiveRecord::Base
   def to_s() subject; end
 
   def subject_with_contacts
-    "#{_(activity_type)}: #{subject} - #{contacts.map(&:to_s).join(', ')}"
+    "#{contacts.map(&:to_s).join(', ')} - #{_(activity_type)}: #{subject}"
   end
 
   def contacts_attributes=(contacts_array)
