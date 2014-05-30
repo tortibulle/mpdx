@@ -25,4 +25,8 @@ class Organization < ActiveRecord::Base
     api_class.constantize.requires_username_and_password?
   end
 
+  def self.cru_usa
+    Organization.find_by_code('CCC-USA')
+  end
+
 end
