@@ -13,7 +13,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         city: [''],
         state: [''],
         newsletter: '',
-        status: [''],
+        status: ['*'],
         likely: [''],
         church: [''],
         referrer: [''],
@@ -34,7 +34,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         $scope.contactQuery.city = [''];
         $scope.contactQuery.state = [''];
         $scope.contactQuery.newsletter = '';
-        $scope.contactQuery.status = [''];
+        $scope.contactQuery.status = ['*'];
         $scope.contactQuery.likely = [''];
         $scope.contactQuery.church = [''];
         $scope.contactQuery.referrer = [''];
@@ -90,7 +90,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         }
         if(angular.isDefined(prefs.status)){
             $scope.contactQuery.status = prefs.status;
-            if(prefs.status[0]){
+            if(prefs.status[0] !== '*'){
                 jQuery("#leftmenu #filter_status").trigger("click");
             }
         }

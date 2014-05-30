@@ -102,7 +102,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $timeo
             '&page=' + group.currentPage +
             '&filters[starred]=' + $scope.filter.starred +
             '&filters[date_range]=' + group.filter +
-            '&filters[contact_ids]=' + _.uniq(contactFilterIds).join() +
+            '&filters[contact_ids][]=' + _.uniq(contactFilterIds).join('&filters[contact_ids][]=') +
             '&filters[tags][]=' + encodeURLarray($scope.filter.tagsSelect).join('&filters[tags][]=') +
             '&filters[activity_type][]=' + encodeURLarray($scope.filter.actionSelect).join('&filters[activity_type][]='), {}, function(tData) {
 
@@ -155,7 +155,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $timeo
             contactCity: [''],
             contactState: [''],
             contactNewsletter: '',
-            contactStatus: [''],
+            contactStatus: ['*'],
             contactLikely: [''],
             contactChurch: [''],
             contactReferrer: [''],
