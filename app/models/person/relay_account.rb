@@ -19,7 +19,7 @@ class Person::RelayAccount < ActiveRecord::Base
     }
 
     account = super
-    org = Organization.find_by_name('Campus Crusade for Christ - USA')
+    org = Organization.find_by_code('CCC-USA')
     account.find_or_create_org_account(auth_hash) if user.organization_accounts.where(organization_id: org.id).blank?
     account
   end
