@@ -28,8 +28,41 @@
             <div style="padding-top:10px;">
                 <label>Commitment Start Date</label><br>
                 <input type="text" class="followUpDialogDatepicker" ng-model="followUpDialogResult.financialCommitment.date" style="width:100px;">
+            </div>
+        </div>
 
-                <select ng-model="followUpDialogResult.financialCommitment.hour">
+        <div ng-show="followUpDialogData.thankTask" style="padding-top:10px;">
+            <hr>
+            <input type="checkbox" ng-model="followUpDialogResult.createThankTask"> Create "Thank" task
+        </div>
+        <div ng-show="followUpDialogResult.createThankTask" style="padding-top:10px;">
+            <label>Subject</label><br>
+            <input ng-model="followUpDialogResult.thankTask.subject">
+
+            <div style="padding-top:10px;">
+                <label>Due date</label><br>
+                <input type="text" class="followUpDialogDatepicker" ng-model="followUpDialogResult.thankTask.date">
+            </div>
+
+            <div style="padding-top:10px;">
+                <label>Comments</label><br>
+                <textarea ng-model="followUpDialogResult.thankTask.comments"></textarea>
+            </div>
+        </div>
+
+        <div ng-show="followUpDialogData.givingTask" style="padding-top:10px;">
+            <hr>
+            <input type="checkbox" ng-model="followUpDialogResult.createGivingTask"> Create "Setup Giving" task
+        </div>
+        <div ng-show="followUpDialogResult.createGivingTask" style="padding-top:10px;">
+            <label>Subject</label><br>
+            <input ng-model="followUpDialogResult.givingTask.subject">
+
+            <div style="padding-top:10px;">
+                <label>Due date</label><br>
+                <input type="text" class="followUpDialogDatepicker" ng-model="followUpDialogResult.givingTask.date" style="width:100px;">
+
+                <select ng-model="followUpDialogResult.givingTask.hour">
                     <option value="00">12 AM</option>
                     <option value="01">01 AM</option>
                     <option value="02">02 AM</option>
@@ -56,7 +89,7 @@
                     <option value="23">11 PM</option>
                 </select>
                 :
-                <select ng-model="followUpDialogResult.financialCommitment.min">
+                <select ng-model="followUpDialogResult.givingTask.min">
                     <option value="00">00</option>
                     <option value="01">01</option>
                     <option value="02">02</option>
@@ -119,39 +152,6 @@
                     <option value="59">59</option>
                 </select>
             </div>
-        </div>
-
-        <div ng-show="followUpDialogData.thankTask" style="padding-top:10px;">
-            <hr>
-            <input type="checkbox" ng-model="followUpDialogResult.createThankTask"> Create "Thank" task
-        </div>
-        <div ng-show="followUpDialogResult.createThankTask" style="padding-top:10px;">
-            <label>Subject</label><br>
-            <input ng-model="followUpDialogResult.thankTask.subject">
-
-            <div style="padding-top:10px;">
-                <label>Due date</label><br>
-                <input type="text" class="followUpDialogDatepicker" ng-model="followUpDialogResult.thankTask.date">
-            </div>
-
-            <div style="padding-top:10px;">
-                <label>Comments</label><br>
-                <textarea ng-model="followUpDialogResult.thankTask.comments"></textarea>
-            </div>
-        </div>
-
-        <div ng-show="followUpDialogData.givingTask" style="padding-top:10px;">
-            <hr>
-            <input type="checkbox" ng-model="followUpDialogResult.createGivingTask"> Create "Setup Giving" task
-        </div>
-        <div ng-show="followUpDialogResult.createGivingTask" style="padding-top:10px;">
-            <label>Subject</label><br>
-            <input ng-model="followUpDialogResult.givingTask.subject">
-
-            <div style="padding-top:10px;">
-                <label>Due date</label><br>
-                <input type="text" class="followUpDialogDatepicker" ng-model="followUpDialogResult.givingTask.date">
-            </div>
 
             <div style="padding-top:10px;">
                 <label>Action</label><br>
@@ -171,6 +171,117 @@
             </div>
         </div>
 
+
+
+        <div ng-show="followUpDialogData.apptTask" style="padding-top:10px;">
+            <hr>
+            <input type="checkbox" ng-model="followUpDialogResult.createApptTask"> Create "Appointment" task
+        </div>
+        <div ng-show="followUpDialogResult.createApptTask" style="padding-top:10px;">
+            <label>Subject</label><br>
+            <input ng-model="followUpDialogResult.apptTask.subject">
+
+            <div style="padding-top:10px;">
+                <label>Due date</label><br>
+                <input type="text" class="followUpDialogDatepicker" ng-model="followUpDialogResult.apptTask.date" style="width:100px;">
+
+                <select ng-model="followUpDialogResult.apptTask.hour">
+                    <option value="00">12 AM</option>
+                    <option value="01">01 AM</option>
+                    <option value="02">02 AM</option>
+                    <option value="03">03 AM</option>
+                    <option value="04">04 AM</option>
+                    <option value="05">05 AM</option>
+                    <option value="06">06 AM</option>
+                    <option value="07">07 AM</option>
+                    <option value="08">08 AM</option>
+                    <option value="09">09 AM</option>
+                    <option value="10">10 AM</option>
+                    <option value="11">11 AM</option>
+                    <option value="12">12 PM</option>
+                    <option value="13">01 PM</option>
+                    <option value="14">02 PM</option>
+                    <option value="15">03 PM</option>
+                    <option value="16">04 PM</option>
+                    <option value="17">05 PM</option>
+                    <option value="18">06 PM</option>
+                    <option value="19">07 PM</option>
+                    <option value="20">08 PM</option>
+                    <option value="21">09 PM</option>
+                    <option value="22">10 PM</option>
+                    <option value="23">11 PM</option>
+                </select>
+                :
+                <select ng-model="followUpDialogResult.apptTask.min">
+                    <option value="00">00</option>
+                    <option value="01">01</option>
+                    <option value="02">02</option>
+                    <option value="03">03</option>
+                    <option value="04">04</option>
+                    <option value="05">05</option>
+                    <option value="06">06</option>
+                    <option value="07">07</option>
+                    <option value="08">08</option>
+                    <option value="09">09</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                    <option value="16">16</option>
+                    <option value="17">17</option>
+                    <option value="18">18</option>
+                    <option value="19">19</option>
+                    <option value="20">20</option>
+                    <option value="21">21</option>
+                    <option value="22">22</option>
+                    <option value="23">23</option>
+                    <option value="24">24</option>
+                    <option value="25">25</option>
+                    <option value="26">26</option>
+                    <option value="27">27</option>
+                    <option value="28">28</option>
+                    <option value="29">29</option>
+                    <option value="30">30</option>
+                    <option value="31">31</option>
+                    <option value="32">32</option>
+                    <option value="33">33</option>
+                    <option value="34">34</option>
+                    <option value="35">35</option>
+                    <option value="36">36</option>
+                    <option value="37">37</option>
+                    <option value="38">38</option>
+                    <option value="39">39</option>
+                    <option value="40">40</option>
+                    <option value="41">41</option>
+                    <option value="42">42</option>
+                    <option value="43">43</option>
+                    <option value="44">44</option>
+                    <option value="45">45</option>
+                    <option value="46">46</option>
+                    <option value="47">47</option>
+                    <option value="48">48</option>
+                    <option value="49">49</option>
+                    <option value="50">50</option>
+                    <option value="51">51</option>
+                    <option value="52">52</option>
+                    <option value="53">53</option>
+                    <option value="54">54</option>
+                    <option value="55">55</option>
+                    <option value="56">56</option>
+                    <option value="57">57</option>
+                    <option value="58">58</option>
+                    <option value="59">59</option>
+                </select>
+            </div>
+
+            <div style="padding-top:10px;">
+                <label>Comments</label><br>
+                <textarea ng-model="followUpDialogResult.apptTask.comments"></textarea>
+            </div>
+        </div>
+
         <div ng-show="followUpDialogData.callTask" style="padding-top:10px;">
             <hr>
             <input type="checkbox" ng-model="followUpDialogResult.createCallTask"> Create "Call" task
@@ -181,7 +292,97 @@
 
             <div style="padding-top:10px;">
                 <label>Due date</label><br>
-                <input type="text" class="followUpDialogDatepicker" ng-model="followUpDialogResult.callTask.date">
+                <input type="text" class="followUpDialogDatepicker" ng-model="followUpDialogResult.callTask.date"style="width:100px;">
+
+                <select ng-model="followUpDialogResult.callTask.hour">
+                    <option value="00">12 AM</option>
+                    <option value="01">01 AM</option>
+                    <option value="02">02 AM</option>
+                    <option value="03">03 AM</option>
+                    <option value="04">04 AM</option>
+                    <option value="05">05 AM</option>
+                    <option value="06">06 AM</option>
+                    <option value="07">07 AM</option>
+                    <option value="08">08 AM</option>
+                    <option value="09">09 AM</option>
+                    <option value="10">10 AM</option>
+                    <option value="11">11 AM</option>
+                    <option value="12">12 PM</option>
+                    <option value="13">01 PM</option>
+                    <option value="14">02 PM</option>
+                    <option value="15">03 PM</option>
+                    <option value="16">04 PM</option>
+                    <option value="17">05 PM</option>
+                    <option value="18">06 PM</option>
+                    <option value="19">07 PM</option>
+                    <option value="20">08 PM</option>
+                    <option value="21">09 PM</option>
+                    <option value="22">10 PM</option>
+                    <option value="23">11 PM</option>
+                </select>
+                :
+                <select ng-model="followUpDialogResult.callTask.min">
+                    <option value="00">00</option>
+                    <option value="01">01</option>
+                    <option value="02">02</option>
+                    <option value="03">03</option>
+                    <option value="04">04</option>
+                    <option value="05">05</option>
+                    <option value="06">06</option>
+                    <option value="07">07</option>
+                    <option value="08">08</option>
+                    <option value="09">09</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                    <option value="16">16</option>
+                    <option value="17">17</option>
+                    <option value="18">18</option>
+                    <option value="19">19</option>
+                    <option value="20">20</option>
+                    <option value="21">21</option>
+                    <option value="22">22</option>
+                    <option value="23">23</option>
+                    <option value="24">24</option>
+                    <option value="25">25</option>
+                    <option value="26">26</option>
+                    <option value="27">27</option>
+                    <option value="28">28</option>
+                    <option value="29">29</option>
+                    <option value="30">30</option>
+                    <option value="31">31</option>
+                    <option value="32">32</option>
+                    <option value="33">33</option>
+                    <option value="34">34</option>
+                    <option value="35">35</option>
+                    <option value="36">36</option>
+                    <option value="37">37</option>
+                    <option value="38">38</option>
+                    <option value="39">39</option>
+                    <option value="40">40</option>
+                    <option value="41">41</option>
+                    <option value="42">42</option>
+                    <option value="43">43</option>
+                    <option value="44">44</option>
+                    <option value="45">45</option>
+                    <option value="46">46</option>
+                    <option value="47">47</option>
+                    <option value="48">48</option>
+                    <option value="49">49</option>
+                    <option value="50">50</option>
+                    <option value="51">51</option>
+                    <option value="52">52</option>
+                    <option value="53">53</option>
+                    <option value="54">54</option>
+                    <option value="55">55</option>
+                    <option value="56">56</option>
+                    <option value="57">57</option>
+                    <option value="58">58</option>
+                    <option value="59">59</option>
+                </select>
             </div>
 
             <div style="padding-top:10px;">

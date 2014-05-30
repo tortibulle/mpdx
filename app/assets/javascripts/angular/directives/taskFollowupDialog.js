@@ -60,6 +60,37 @@ angular.module('mpdxApp')
                             jQuery('#complete_task_followup_modal').dialog('close');
                         };
 
+                    }else if(taskResult === 'Appointment Scheduled' && followUpTask.contacts.length > 0){
+
+                        $scope.followUpDialogData = {
+                            message: 'Contact\'s status will be updated to \'Appointment Scheduled\'.',
+                            options: [],
+                            apptTask: true
+                        };
+                        $scope.followUpDialogResult = {
+                            apptTask: {
+                                subject: followUpTask.subject + ' appointment',
+                                date: dateTwoDaysFromToday
+                            }
+                        };
+
+                        $scope.followUpSaveFunc = function(){
+                            //Contact Updates
+                            angular.forEach(followUpTask.contacts, function(c){
+                                api.call('put', 'contacts/' + c, {
+                                    contact: {
+                                        status: 'Appointment Scheduled'
+                                    }
+                                });
+                            });
+
+                            //Create Appointment Task
+                            if($scope.followUpDialogResult.createApptTask){
+                                createApptTask(contactsObject);
+                            }
+                            jQuery('#complete_task_followup_modal').dialog('close');
+                        };
+
                     }else if(taskResult === 'Partner - Financial' && followUpTask.contacts.length > 0){
 
                         $scope.followUpDialogData = {
@@ -286,7 +317,7 @@ angular.module('mpdxApp')
                 var createThankTask = function(contactsObject){
                     api.call('post', 'tasks/', {
                         task: {
-                            start_at: $scope.followUpDialogResult.thankTask.date,
+                            start_at: $scope.followUpDialogResult.thankTask.date + ' ' + $scope.followUpDialogResult.thankTask.hour + ':' + $scope.followUpDialogResult.thankTask.min + ':00',
                             subject: $scope.followUpDialogResult.thankTask.subject,
                             activity_type: 'Thank',
                             activity_contacts_attributes: contactsObject,
@@ -304,7 +335,7 @@ angular.module('mpdxApp')
                 var createGivingTask = function(contactsObject){
                     api.call('post', 'tasks/', {
                         task: {
-                            start_at: $scope.followUpDialogResult.givingTask.date,
+                            start_at: $scope.followUpDialogResult.givingTask.date + ' ' + $scope.followUpDialogResult.givingTask.hour + ':' + $scope.followUpDialogResult.givingTask.min + ':00',
                             subject: $scope.followUpDialogResult.givingTask.subject,
                             activity_type: $scope.followUpDialogResult.givingTask.type,
                             activity_contacts_attributes: contactsObject,
@@ -322,13 +353,32 @@ angular.module('mpdxApp')
                 var createCallTask = function(contactsObject){
                     api.call('post', 'tasks/', {
                         task: {
-                            start_at: $scope.followUpDialogResult.callTask.date,
+                            start_at: $scope.followUpDialogResult.callTask.date + ' ' + $scope.followUpDialogResult.callTask.hour + ':' + $scope.followUpDialogResult.callTask.min + ':00',
                             subject: $scope.followUpDialogResult.callTask.subject,
                             activity_type: 'Call',
                             activity_contacts_attributes: contactsObject,
                             activity_comments_attributes: {
                                 "0": {
                                     body: $scope.followUpDialogResult.callTask.comments
+                                }
+                            }
+                        }
+                    }, function () {
+                        $scope.refreshVisibleTasks();
+                    });
+                };
+
+
+                var createApptTask = function(contactsObject){
+                    api.call('post', 'tasks/', {
+                        task: {
+                            start_at: $scope.followUpDialogResult.apptTask.date + ' ' + $scope.followUpDialogResult.apptTask.hour + ':' + $scope.followUpDialogResult.apptTask.min + ':00',
+                            subject: $scope.followUpDialogResult.apptTask.subject,
+                            activity_type: 'Appointment',
+                            activity_contacts_attributes: contactsObject,
+                            activity_comments_attributes: {
+                                "0": {
+                                    body: $scope.followUpDialogResult.apptTask.comments
                                 }
                             }
                         }
