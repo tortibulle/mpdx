@@ -40,9 +40,9 @@ class PrayerLettersAccount < ActiveRecord::Base
           },
           external_id: contact.id
         }
-        if contact.primary_person
-          name = contact.primary_person.companies.first.try(:name)
-          params[:company] = name if name
+        if contact.siebel_organization?
+          params[:name] = nil
+          params[:company] = contact.name
         end
         contacts << params
       end
@@ -155,9 +155,9 @@ class PrayerLettersAccount < ActiveRecord::Base
               external_id: contact.id
              }
     params[:country] = contact.mailing_address.country unless contact.mailing_address.country == 'United States'
-    if contact.primary_person
-      name = contact.primary_person.companies.first.try(:name)
-      params[:company] = name if name
+    if contact.siebel_organization?
+      params[:name] = nil
+      params[:company] = contact.name
     end
     params
   end
