@@ -24,13 +24,9 @@ angular.module('mpdxApp')
                     delete $scope.followUpDialogData;
                     $scope.followUpDialogResult = {};
 
-
-
                     var dateTwoDaysFromToday = new Date();
                     dateTwoDaysFromToday.setDate(dateTwoDaysFromToday.getDate() + 2);
                     dateTwoDaysFromToday = dateTwoDaysFromToday.getFullYear() + '-' + ("0" + (dateTwoDaysFromToday.getMonth() + 1)).slice(-2) + '-' + ("0" + dateTwoDaysFromToday.getDate()).slice(-2);
-
-
 
                     if(taskResult === 'Attempted - Left Message' || taskResult === 'Complete - Call Again' || taskResult === 'Attempted - Call Again') {
 
