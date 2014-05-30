@@ -92,7 +92,7 @@
           <li>
             <label id="filter_status"><%= _('Contact Status') %></label>
             <div class="collapse" style="display:none;">
-              <%= select_tag 'filters[status]', options_for_select([[_('-- Any --'), ''], [_('-- None --'), 'null'], ['Never Contacted', 'Never Contacted'], ['Ask in Future', 'Ask in Future'], ['Contact for Appointment', 'Contact for Appointment'], ['Appointment Scheduled', 'Appointment Scheduled'], ['Call for Decision', 'Call for Decision'], ['Partner - Financial', 'Partner - Financial'], ['Partner - Special', 'Partner - Special'], ['Partner - Pray', 'Partner - Pray'], ['Not Interested', 'Not Interested'], ['Unresponsive', 'Unresponsive'], ['Never Ask', 'Never Ask'], ['Research Abandoned', 'Research Abandoned'], ['Expired Referral', 'Expired Referral']] ), multiple: true, size: 5, :'ng-model' => 'filter.contactStatus' %>
+              <%= select_tag 'filters[status]', options_for_select([[_('-- Any --'), '*'], [_('-- None --'), 'null'], ['Never Contacted', 'Never Contacted'], ['Ask in Future', 'Ask in Future'], ['Contact for Appointment', 'Contact for Appointment'], ['Appointment Scheduled', 'Appointment Scheduled'], ['Call for Decision', 'Call for Decision'], ['Partner - Financial', 'Partner - Financial'], ['Partner - Special', 'Partner - Special'], ['Partner - Pray', 'Partner - Pray'], ['Not Interested', 'Not Interested'], ['Unresponsive', 'Unresponsive'], ['Never Ask', 'Never Ask'], ['Research Abandoned', 'Research Abandoned'], ['Expired Referral', 'Expired Referral']] ), multiple: true, size: 5, :'ng-model' => 'filter.contactStatus' %>
             </div>
           </li>
 
