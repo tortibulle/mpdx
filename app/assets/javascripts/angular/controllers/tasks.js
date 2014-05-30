@@ -154,7 +154,7 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $timeo
             contactCity: [''],
             contactState: [''],
             contactNewsletter: '',
-            contactStatus: ['*'],
+            contactStatus: [''],
             contactLikely: [''],
             contactChurch: [''],
             contactReferrer: [''],
