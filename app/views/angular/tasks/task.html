@@ -5,7 +5,7 @@
 <td class="data">
     <div class="primary">
         <i class="fa fa-lg fav" ng-class="{'fa-star-o': !task.starred, 'fa-star': task.starred}" ng-click="starTask()"></i>
-        <a class="comment_status" href=""><span id="comment_count_2">{{task.comments.length}}</span></a>
+        <a class="comment_status" href="" ng-click="visibleComments=!visibleComments; visibleContactInfo=false"><span id="comment_count_2">{{task.comments.length}}</span></a>
 
         <div class="actions">
             <a class="ico ico_edit edit_task" data-id="{{task.id}}" data-remote="true" ng-href="/tasks/{{task.id}}/edit">Edit</a>
@@ -18,11 +18,41 @@
             <a class="tag" ng-repeat-start="tag in task.tag_list">{{tag}}</a>
             <span ng-repeat-end> </span>
         </div>
-        <span class="people" ng-show="task.contacts.length > 0">(<span ng-repeat="contact in task.contacts"><span ng-show="!$first">, </span><a ng-href="/contacts/{{contact}}" ng-bind="contacts[contact]"></a></span>)</span>
+        <span class="people" ng-show="task.contacts.length > 0">(<span ng-repeat="contact in task.contacts"><span ng-show="!$first">, </span><a ng-click="showContactInfo(contact)" ng-bind="contacts[contact]" href=""></a></span>)</span>
     </div>
-    <div class="comments" style="display:none">
-        <header></header>
 
+    <div ng-show="visibleContactInfo" class="contact-info">
+        <a class="corner_close" href="" ng-click="visibleContactInfo=false">close</a>
+        <h2><a ng-href="/contacts/{{contactInfo.contact.id}}">{{contactInfo.contact.name}}</a></h2>
+        <div class="column">
+            <p ng-repeat="address in contactInfo.addresses">
+                <strong>{{address.location}} Address</strong> <i class="fa fa-check green" ng-show="address.primary_mailing_address"></i>
+                <br>
+                {{address.street}}<br>{{address.city}}, {{address.state}} {{address.postal_code}} {{address.country}}
+            </p>
+            <p ng-show="!contactInfo.addresses.length">No mailing address</p>
+        </div>
+        <div class="column">
+            <p ng-repeat="phone in contactInfo.phone_numbers">
+                <strong>Phone ({{phone.location}})</strong><br>
+                {{phone.number}} <i class="fa fa-check green" ng-show="phone.primary"></i>
+            </p>
+            <p ng-show="!contactInfo.phone_numbers.length">No phone number</p>
+        </div>
+        <div class="column">
+            <p ng-repeat="email in contactInfo.email_addresses">
+                <strong>Email</strong><br>
+                <a ng-href="mailto:{{email.email}}">{{email.email}}</a> <i class="fa fa-check green" ng-show="email.primary"></i>
+            </p>
+            <p ng-show="!contactInfo.email_addresses.length">No email address</p>
+        </div>
+
+        <div class="profile-pic">
+            <img ng-src="{{contactInfo.contact.avatar}}" style="max-width:126px;">
+        </div>
+    </div>
+
+    <div class="comments" ng-show="visibleComments">
         <div id="comment_list_2">
             <div class="comment" ng-repeat="comment in task.comments">
                 <a class="corner_close" data-confirm="Are you sure?" data-method="delete" data-remote="true" data-selector=".comment" ng-href="/activity_comments/{{comment}}?activity_id={{getComment(comment).activity_id}}" rel="nofollow">delete</a>

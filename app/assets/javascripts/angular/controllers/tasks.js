@@ -125,11 +125,15 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $timeo
                 '&filters[status]=*&filters[ids]='+_.uniq(_.flatten(tData.tasks, 'contacts')).join(), {} ,function(data) {
                 angular.forEach(data.contacts, function(contact){
                     contactCache.update(contact.id, {
-                        addresses: _.filter(data.addresses, function(addr) {
+                        addresses: _.filter(data.addresses, function (addr) {
                             return _.contains(contact.address_ids, addr.id);
                         }),
+                        people: _.filter(data.people, function (i) {
+                            return _.contains(contact.person_ids, i.id);
+                        }),
                         email_addresses: data.email_addresses,
-                        contact: _.find(data.contacts, { 'id': contact.id })
+                        contact: _.find(data.contacts, { 'id': contact.id }),
+                        phone_numbers: data.phone_numbers
                     });
                 });
 

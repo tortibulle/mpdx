@@ -9,6 +9,8 @@ angular.module('mpdxApp')
             link: function (scope, element, attrs){
             },
             controller: function ($scope, contactCache, api) {
+                $scope.visibleComments = false;
+
                 $scope.contacts = {};
                 angular.forEach($scope.task.contacts, function(contactId){
                     contactCache.get(contactId, function(contact){
@@ -67,7 +69,44 @@ angular.module('mpdxApp')
                         $scope.task.comments.push(latestComment.id);
                         $scope.postNewCommentMsg = '';
                     });
-                }
+                };
+
+                $scope.showContactInfo = function(contactId){
+                    if($scope.visibleContactInfo && $scope.contactInfo.contact.id === contactId){
+                        $scope.visibleContactInfo = false;
+                        return;
+                    }else{
+                        $scope.visibleContactInfo = true;
+                        $scope.visibleComments = false;
+                    }
+
+
+                    contactCache.get(contactId, function(contact){
+                        var returnContact = angular.copy(contact);
+                        returnContact.phone_numbers = [];
+                        returnContact.email_addresses = [];
+
+                        angular.forEach(contact.people, function(i){
+                            var person = _.find(contact.people, { 'id': i.id });
+
+                            var phone = _.filter(contact.phone_numbers, function(i){
+                                return _.contains(person.phone_number_ids, i.id);
+                            });
+                            if(phone.length > 0){
+                                returnContact.phone_numbers = _.union(returnContact.phone_numbers, phone);
+                            }
+
+                            var email = _.filter(contact.email_addresses, function(i){
+                                return _.contains(person.email_address_ids, i.id);
+                            });
+                            if(email.length > 0){
+                                returnContact.email_addresses = _.union(returnContact.email_addresses, email);
+                            }
+                        });
+
+                        $scope.contactInfo = returnContact;
+                    });
+                };
             }
         };
     });

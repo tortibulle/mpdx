@@ -183,10 +183,6 @@ $ ->
     else
       $('.taskgroup .actions', table).hide()
 
-  $(document).on 'click', '.comment_status', ->
-    $('.comments', $(this).closest('tr')).toggle()
-    false
-
   $(document).on 'click', 'tr.task .fav', ->
     id = $(this).closest('tr').attr('data-id')
     form = $('#task_result_modal form')

@@ -772,6 +772,29 @@ tbody.tasks {
 
 /* ************************************************************** */
 
+
+.contact-info{
+  background: #e7f8ff;
+  padding:1px 6px;
+
+  .corner_close{
+    float:right;
+    margin:4px;
+  }
+
+  .column{
+    display: inline-block;
+    width:178px;
+    vertical-align: top;
+  }
+
+  .profile-pic{
+    display: inline-block;
+    width:126px;
+    vertical-align: top;
+  }
+}
+
 .profiletop {
   h1 {
     font-size: 2.5em;
