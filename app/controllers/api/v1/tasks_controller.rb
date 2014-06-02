@@ -46,7 +46,14 @@ class Api::V1::TasksController < Api::V1::BaseController
 
   # yields {"total": ##,"uncompleted": ##,"overdue": ##}
   def count
-    render json: {total: tasks.count, uncompleted: tasks.uncompleted.count, overdue: tasks.overdue.count}, callback: params[:callback]
+    render json: {
+        total: tasks.count,
+        uncompleted: tasks.uncompleted.count,
+        overdue: tasks.overdue.count,
+        starred: tasks.uncompleted.starred.count,
+        today: tasks.uncompleted.today.count,
+        activity_types: tasks.uncompleted.group(:activity_type).count
+      }, callback: params[:callback]
   end
 
   protected
