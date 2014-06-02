@@ -178,13 +178,25 @@ class Contact < ActiveRecord::Base
   end
 
   def greeting
-    self[:greeting].present? ?
+    result = self[:greeting].present? ?
       self[:greeting] :
       [first_name, spouse_name].compact.join(_(' and '))
+    if siebel_organization?
+      result = name
+    end
+    result
   end
 
   def envelope_greeting
-    greeting.include?(last_name.to_s) ? greeting : [greeting, last_name].compact.join(' ')
+    result = greeting.include?(last_name.to_s) ? greeting : [greeting, last_name].compact.join(' ')
+    if siebel_organization?
+      result = name
+    end
+    result
+  end
+
+  def siebel_organization?
+    last_name == "of the Ministry"
   end
 
   def update_donation_totals(donation)
