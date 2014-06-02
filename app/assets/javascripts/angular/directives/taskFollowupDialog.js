@@ -37,7 +37,7 @@ angular.module('mpdxApp')
                         };
                         $scope.followUpDialogResult = {
                             callTask: {
-                                subject: followUpTask.subject + ' call',
+                                subject: followUpTask.subject,
                                 date: dateTwoDaysFromToday
                             }
                         };
@@ -69,7 +69,7 @@ angular.module('mpdxApp')
                         };
                         $scope.followUpDialogResult = {
                             apptTask: {
-                                subject: followUpTask.subject + ' appointment',
+                                subject: 'Support',
                                 date: dateTwoDaysFromToday
                             }
                         };
@@ -103,11 +103,11 @@ angular.module('mpdxApp')
                         };
                         $scope.followUpDialogResult = {
                             thankTask: {
-                                subject: followUpTask.subject + ' thank you',
+                                subject: 'For Financial Partnership',
                                 date: dateTwoDaysFromToday
                             },
                             givingTask: {
-                                subject: followUpTask.subject + ' setup giving',
+                                subject: 'For First Gift',
                                 date: dateTwoDaysFromToday
                             }
                         };
@@ -162,11 +162,11 @@ angular.module('mpdxApp')
                         };
                         $scope.followUpDialogResult = {
                             thankTask: {
-                                subject: followUpTask.subject + ' thank you',
+                                subject: 'For Special Gift',
                                 date: dateTwoDaysFromToday
                             },
                             givingTask: {
-                                subject: followUpTask.subject + ' setup giving',
+                                subject: 'For Gift',
                                 date: dateTwoDaysFromToday
                             }
                         };
@@ -244,7 +244,7 @@ angular.module('mpdxApp')
                         };
                         $scope.followUpDialogResult = {
                             callTask: {
-                                subject: followUpTask.subject + ' call',
+                                subject: 'Ask again for financial partnership',
                                 date: dateTwoDaysFromToday
                             }
                         };
