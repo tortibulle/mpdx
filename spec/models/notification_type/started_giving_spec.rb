@@ -15,6 +15,14 @@ describe NotificationType::StartedGiving do
       notifications.length.should == 1
     end
 
+    it 'adds a notification if first gift came within past 2 weeks even if donor has given to another da' do
+      other_da = create(:designation_account_with_special_donor)
+      create(:donation, donor_account: contact.donor_accounts.first, designation_account: other_da, donation_date: 20.days.ago)
+      donation # create donation object from let above
+      notifications = started_giving.check(contact.account_list)
+      notifications.length.should == 1
+    end
+
     it "doesn't add a notification if not first gift" do
       2.times do |i|
         create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: (i * 30).days.ago)
