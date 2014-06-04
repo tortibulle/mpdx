@@ -397,6 +397,23 @@ h2.section {
 .set.phone {margin-bottom:2px;}
 .set.email {margin-bottom:3px;}
 
+.social {
+  float: right;
+  padding: 6px 6px 6px 0;
+  position: relative;
+  width: 20px;
+  & > * {
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+    text-indent: -9999px;
+    background: center center no-repeat;
+  }
+  .facebook { background-image: image-url('soc_facebook.gif'); }
+  .twitter { background-image: image-url('soc_twitter.gif'); }
+  .linkedin { background-image: image-url('soc_linkedin.gif'); }
+}
+
 .small-person {
   background-color: $gray_light;
   border: 1px solid $gray_mid;
@@ -419,23 +436,6 @@ h2.section {
   .name {
     font-size: 1.5em;
     line-height: 1em;
-  }
-
-  .social {
-    float: right;
-    padding: 6px 6px 6px 0;
-    position: relative;
-    width: 20px;
-    & > * {
-      display: inline-block;
-      height: 20px;
-      width: 20px;
-      text-indent: -9999px;
-      background: center center no-repeat;
-    }
-    .facebook { background-image: image-url('soc_facebook.gif'); }
-    .twitter { background-image: image-url('soc_twitter.gif'); }
-    .linkedin { background-image: image-url('soc_linkedin.gif'); }
   }
   &.merge-person-checked {
     box-shadow: 0 0 5px $blue;

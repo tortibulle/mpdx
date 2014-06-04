@@ -67,7 +67,7 @@ angular.module('mpdxApp')
                     dateTwoDaysFromToday.setDate(dateTwoDaysFromToday.getDate() + 2);
                     dateTwoDaysFromToday = dateTwoDaysFromToday.getFullYear() + '-' + ("0" + (dateTwoDaysFromToday.getMonth() + 1)).slice(-2) + '-' + ("0" + dateTwoDaysFromToday.getDate()).slice(-2);
 
-                    if(taskResult === 'Attempted - Left Message' || taskResult === 'Complete - Call Again' || taskResult === 'Attempted - Call Again') {
+                    if(strContains(taskResult, 'Attempted - Left Message') || strContains(taskResult, 'Complete - Call Again')|| strContains(taskResult, 'Attempted - Call Again')) {
 
                         $scope.followUpDialogData = {
                             message: 'Would you like to schedule another call for the future?',
@@ -99,7 +99,7 @@ angular.module('mpdxApp')
                             jQuery('#complete_task_followup_modal').dialog('close');
                         };
 
-                    }else if(taskResult === 'Appointment Scheduled' && followUpTask.contacts.length > 0){
+                    }else if(strContains(taskResult, 'Appointment Scheduled') && followUpTask.contacts.length > 0){
 
                         $scope.followUpDialogData = {
                             message: 'Contact\'s status will be updated to \'Appointment Scheduled\'.',
@@ -130,7 +130,7 @@ angular.module('mpdxApp')
                             jQuery('#complete_task_followup_modal').dialog('close');
                         };
 
-                    }else if(taskResult === 'Partner - Financial' && followUpTask.contacts.length > 0){
+                    }else if(strContains(taskResult, 'Partner - Financial') && followUpTask.contacts.length > 0){
 
                         $scope.followUpDialogData = {
                             message: 'Contact\'s status will be updated to \'Partner - Financial\'.',
@@ -189,7 +189,7 @@ angular.module('mpdxApp')
                             jQuery('#complete_task_followup_modal').dialog('close');
                         };
 
-                    }else if(taskResult === 'Partner - Special' && followUpTask.contacts.length > 0){
+                    }else if(strContains(taskResult, 'Partner - Special') && followUpTask.contacts.length > 0){
 
                         $scope.followUpDialogData = {
                             message: 'Contact\'s status will be updated to \'Partner - Special\'.',
@@ -241,7 +241,7 @@ angular.module('mpdxApp')
                             jQuery('#complete_task_followup_modal').dialog('close');
                         };
 
-                    }else if(taskResult === 'Partner - Pray' && followUpTask.contacts.length > 0){
+                    }else if(strContains(taskResult, 'Partner - Pray') && followUpTask.contacts.length > 0){
 
                         $scope.followUpDialogData = {
                             message: 'Contact\'s status will be updated to \'Partner - Pray\'.',
@@ -273,7 +273,7 @@ angular.module('mpdxApp')
                             jQuery('#complete_task_followup_modal').dialog('close');
                         };
 
-                    }else if(taskResult === 'Ask in Future' && followUpTask.contacts.length > 0){
+                    }else if(strContains(taskResult, 'Ask in Future') && followUpTask.contacts.length > 0){
 
                         $scope.followUpDialogData = {
                             message: 'Contact\'s status will be updated to \'Ask in Future\'.',
@@ -315,7 +315,7 @@ angular.module('mpdxApp')
                             jQuery('#complete_task_followup_modal').dialog('close');
                         };
 
-                    }else if(taskResult === 'Not Interested' && followUpTask.contacts.length > 0){
+                    }else if(strContains(taskResult, 'Not Interested') && followUpTask.contacts.length > 0){
 
                         $scope.followUpDialogData = {
                             message: 'Contact\'s status will be updated to \'Not Interested\'.',
@@ -425,6 +425,10 @@ angular.module('mpdxApp')
                         $scope.refreshVisibleTasks();
                     });
                 };
+
+                var strContains = function(h, n){
+                    return h.indexOf(n) > -1
+                }
             }
         };
     });

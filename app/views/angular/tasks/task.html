@@ -18,7 +18,7 @@
             <a class="tag" ng-repeat-start="tag in task.tag_list">{{tag}}</a>
             <span ng-repeat-end> </span>
         </div>
-        <span class="people" ng-show="task.contacts.length > 0">(<span ng-repeat="contact in task.contacts"><span ng-show="!$first">, </span><a ng-click="showContactInfo(contact)" ng-bind="contacts[contact]" href=""></a></span>)</span>
+        <span class="people" ng-show="task.contacts.length > 0">(<span ng-repeat="contact in task.contacts"><span ng-show="!$first">, </span><a ng-click="showContactInfo(contact)" ng-bind="contacts[contact]" href="" title="Click to view contact details"></a></span>)</span>
     </div>
 
     <div ng-show="visibleContactInfo" class="contact-info">
@@ -31,6 +31,12 @@
                 {{address.street}}<br>{{address.city}}, {{address.state}} {{address.postal_code}} {{address.country}}
             </p>
             <p ng-show="!contactInfo.addresses.length">No mailing address</p>
+
+
+            <p ng-repeat="referrer in contactInfo.contact.referrals_to_me_ids">
+                <strong>Referrer:</strong><br>
+                <a ng-href="/contacts/{{referrer.id}}">{{referrer.name}}</a>
+            </p>
         </div>
         <div class="column">
             <p ng-repeat="phone in contactInfo.phone_numbers">
@@ -49,6 +55,9 @@
 
         <div class="profile-pic">
             <img ng-src="{{contactInfo.contact.avatar}}" style="max-width:126px;">
+            <div class="social">
+                <a class="facebook" ng-href="http://facebook.com/profile.php?id={{account.remote_id}}" target="_blank" ng-repeat="account in contactInfo.facebook_accounts">f</a>
+            </div>
         </div>
     </div>
 

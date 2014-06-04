@@ -133,7 +133,8 @@ angular.module('mpdxApp').controller('tasksController', function ($scope, $timeo
                         }),
                         email_addresses: data.email_addresses,
                         contact: _.find(data.contacts, { 'id': contact.id }),
-                        phone_numbers: data.phone_numbers
+                        phone_numbers: data.phone_numbers,
+                        facebook_accounts: data.facebook_accounts
                     });
                 });
 

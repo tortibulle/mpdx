@@ -16,14 +16,14 @@
   <li>
     <%= _('Completed:') %>
     <%= current_account_list.tasks.of_type('Call')
-                            .with_result('Done')
+                            .with_result(['Done', 'Complete - Call Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'Received'])
                             .completed_between(@start_date, @end_date)
                             .count %>
   </li>
   <li>
     <%= _('Attempted:') %>
     <%= current_account_list.tasks.of_type('Call')
-                            .with_result('Attempted')
+                            .with_result(['Attempted - Left Message', 'Attempted - Call Again', 'Attempted'])
                             .completed_between(@start_date, @end_date)
                             .count %>
 
@@ -31,7 +31,7 @@
   <li>
     <%= _('Received:') %>
     <%= current_account_list.tasks.of_type('Call')
-                            .with_result('Received')
+                            .with_result(['Received', 'Received - Complete - Call Again', 'Received - Appointment Scheduled', 'Received - Partner - Financial', 'Received - Partner - Special', 'Received - Partner - Pray', 'Received - Ask in Future', 'Received - Not Interested'])
                             .completed_between(@start_date, @end_date)
                             .count %>
   </li>

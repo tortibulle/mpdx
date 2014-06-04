@@ -20,7 +20,7 @@ angular.module('mpdxApp')
 
                 //complete options
                 if($scope.task.activity_type === 'Call') {
-                    $scope.completeOptions = ['Done', 'Attempted - Left Message', 'Attempted - Call Again', 'Complete - Call Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested'];
+                    $scope.completeOptions = ['Done', 'Attempted - Left Message', 'Attempted - Call Again', 'Complete - Call Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'Received - Complete - Call Again', 'Received - Appointment Scheduled', 'Received - Partner - Financial', 'Received - Partner - Special', 'Received - Partner - Pray', 'Received - Ask in Future', 'Received - Not Interested'];
                 }else if($scope.task.activity_type === 'Appointment') {
                     $scope.completeOptions = ['Done', 'Decision Received', 'Call for Decision', 'Partner - Financial', 'Attempted - Reschedule'];
                 }else if(_.contains(['Email', 'Text Message', 'Facebook Message', 'Letter'], $scope.task.activity_type)){
@@ -85,6 +85,7 @@ angular.module('mpdxApp')
                         var returnContact = angular.copy(contact);
                         returnContact.phone_numbers = [];
                         returnContact.email_addresses = [];
+                        returnContact.facebook_accounts = [];
 
                         angular.forEach(contact.people, function(i){
                             var person = _.find(contact.people, { 'id': i.id });
@@ -102,9 +103,26 @@ angular.module('mpdxApp')
                             if(email.length > 0){
                                 returnContact.email_addresses = _.union(returnContact.email_addresses, email);
                             }
+
+                            var facebook_account = _.filter(contact.facebook_accounts, function(i){
+                                return _.contains(person.facebook_account_ids, i.id);
+                            });
+                            if(facebook_account.length > 0){
+                                returnContact.facebook_accounts = _.union(returnContact.facebook_accounts, facebook_account);
+                            }
+                        });
+
+                        angular.forEach(returnContact.contact.referrals_to_me_ids, function(i, key){
+                            contactCache.get(i, function(contact){
+                                returnContact.contact.referrals_to_me_ids[key] = {
+                                    name: contact.contact.name,
+                                    id: i
+                                };
+                            });
                         });
 
                         $scope.contactInfo = returnContact;
+                        console.log(returnContact);
                     });
                 };
             }
