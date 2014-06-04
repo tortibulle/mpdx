@@ -99,7 +99,8 @@ group :development, :test do
   gem 'guard-rspec'
   gem 'simplecov', :require => false
   #only used for mo/po file generation in development, !do not load(:require=>false)! since it will eat 7mb ram
-  gem 'gettext', '~> 2.3.2', :require => false
+  gem 'gettext', '>=3.0.2', :require => false, :group => :development
+  gem 'ruby_parser', :require => false, :group => :development
   gem 'mailcatcher'
   gem 'fuubar'
   gem 'unicorn'
