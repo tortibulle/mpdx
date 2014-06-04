@@ -44,6 +44,8 @@ $ ->
       else
         $('#modal_task_activity_type').val('Call')
 
+    logTask = $(this).attr("data-completed")
+
     $('#edit_task_modal').dialog
       resizable: false,
       modal:'true',
@@ -56,8 +58,13 @@ $ ->
             if $.trim($('#modal_task_subject', form).val()) == ''
               alert(__("Please enter a subject"))
               return false
-            $.rails.handleRemote(form)
-            $('.form_wrapper', this).html('<%= image_tag("spinner.gif") %>')
+
+            if logTask == 'true'
+              $(this).dialog('close')
+              angular.element('#task-followup-dialog').scope().logTask(form)
+            else
+              $.rails.handleRemote(form)
+              $('.form_wrapper', this).html('<%= image_tag("spinner.gif") %>')
             if $('#tasks_index')[0]?
               angular.element(jQuery("#contentbody")).scope().refreshVisibleTasks()
         },
@@ -250,7 +257,7 @@ $ ->
                 $('form', this).submit()
                 $('#task_' + id).fadeOut()
                 $(this).dialog("close")
-                angular.element('#tasksController').scope().followUpDialog(id, $('form', this).find('input[name="task[result]"]:checked').val() || $('form', this).find('select[name="task[result]"]').val())
+                angular.element('#task-followup-dialog').scope().followUpDialog(id, $('form', this).find('input[name="task[result]"]:checked').val() || $('form', this).find('select[name="task[result]"]').val())
             },
             {
               text: __('Cancel'),
@@ -263,12 +270,12 @@ $(document).on 'change', '[name="task[activity_type]"]', ->
   $.mpdx.setOptions($('[name="task[result]"]'), $.mpdx.getTaskResultOptions($(this).val()))
 
 $.mpdx.getTaskResultOptions = (activity_type) ->
-  CALL_RESULTS = [__('Attempted')]
+  CALL_RESULTS = ['Done', 'Attempted - Left Message', 'Attempted - Call Again', 'Complete - Call Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'Received']
   MESSAGE_RESULTS = [__('Received')]
   STANDARD_RESULTS = [__('Done')]
   switch activity_type
     when 'Call'
-      return CALL_RESULTS + ',' + STANDARD_RESULTS
+      return CALL_RESULTS + ''
     when 'Email', 'Text Message', 'Facebook Message', 'Letter'
       return STANDARD_RESULTS + ',' + MESSAGE_RESULTS
     else

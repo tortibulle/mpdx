@@ -4,18 +4,57 @@ angular.module('mpdxApp')
             restrict: 'E',
             templateUrl: '/templates/tasks/followupDialog.html',
             controller: function ($scope, api) {
-                $scope.followUpDialog = function(taskId, taskResult){
+                $scope.logTask = function(formData) {
+                    api.call('post', 'tasks/', {
+                        task: {
+                            subject: jQuery('#modal_task_subject', formData).val(),
+                            activity_type: jQuery('#modal_task_activity_type', formData).val(),
+                            completed: jQuery('#modal_task_completed', formData).val(),
+                            completed_at: jQuery('#modal_task_completed_at_1i', formData).val()
+                                + '-' + jQuery('#modal_task_completed_at_2i', formData).val()
+                                + '-' + jQuery('#modal_task_completed_at_3i', formData).val()
+                                + ' ' + jQuery('#modal_task_completed_at_4i', formData).val()
+                                + ':' + jQuery('#modal_task_completed_at_5i', formData).val()
+                                + ':00',
+                            result: jQuery('#modal_task_result', formData).val(),
+                            activity_contacts_attributes:
+                                [{
+                                    contact_id: parseInt(jQuery('#modal_task_activity_contacts_attributes_0_contact_id', formData).val())
+                                }]
+                            ,
+                            tag_list: jQuery('#modal_task_tag_list', formData).val(),
+                            activity_comments_attributes: {
+                                "0": {
+                                    body: jQuery('#modal_task_activity_comments_attributes_0_body', formData).val()
+                                }
+                            }
+                        }
+                    }, function (data) {
+                        $scope.followUpDialog(data.task.id, jQuery('#modal_task_result', formData).val());
+                    });
+                };
 
+                $scope.followUpDialog = function(taskId, taskResult){
                     ////////////  testing  ////////////
                     if(!window.current_account_list_tester){
                         //return;
                     }
                     ////////////  end testing  ////////////
 
-                    var mergedTasks = [];
-                    _($scope.tasks).forEach(function(i) { mergedTasks.push(i); });
-                    var followUpTask = _.find(_.flatten(mergedTasks), { 'id': parseInt(taskId) });
+                    if(angular.isDefined($scope.tasks)){
+                        var mergedTasks = [];
+                        _($scope.tasks).forEach(function(i) { mergedTasks.push(i); });
+                        var followUpTask = _.find(_.flatten(mergedTasks), { 'id': parseInt(taskId) });
+                        followUpDialogCallback(followUpTask, taskResult);
+                    }else{
+                        //fetch task data (not on tasks page)
+                        api.call('get', 'tasks/' + taskId, {}, function(tData){
+                            followUpDialogCallback(tData.task, taskResult);
+                        });
+                    }
+                };
 
+                var followUpDialogCallback = function(followUpTask, taskResult){
                     var contactsObject = [];
                     angular.forEach(followUpTask.contacts, function(c){
                         contactsObject.push(_.zipObject(['contact_id'], [c]));
@@ -31,7 +70,7 @@ angular.module('mpdxApp')
                     if(taskResult === 'Attempted - Left Message' || taskResult === 'Complete - Call Again' || taskResult === 'Attempted - Call Again') {
 
                         $scope.followUpDialogData = {
-                            message: 'Task marked completed.  Would you like to schedule another call for the future?',
+                            message: 'Would you like to schedule another call for the future?',
                             options: [],
                             callTask: true
                         };

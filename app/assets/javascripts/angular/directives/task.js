@@ -16,7 +16,7 @@ angular.module('mpdxApp')
                     contactCache.get(contactId, function(contact){
                         $scope.contacts[contactId] = contact.contact.name;
                     });
-                })
+                });
 
                 //complete options
                 if($scope.task.activity_type === 'Call') {
