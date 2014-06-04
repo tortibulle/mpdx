@@ -7,6 +7,7 @@ class Donation < ActiveRecord::Base
   # attr_accessible :donor_account_id, :motivation, :payment_method, :tendered_currency, :donation_date, :amount, :tendered_amount, :currency, :channel, :payment_type
 
   scope :for, -> (designation_account) { where(designation_account_id: designation_account.id) }
+  scope :for_accounts, -> (designation_accounts) { where(designation_account_id: designation_accounts.pluck(:id)) }
   scope :since, -> (date) { where("donation_date > ?", date) }
 
   default_scope -> { order("donation_date desc") }
