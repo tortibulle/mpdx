@@ -24,51 +24,55 @@
     <div ng-show="visibleContactInfo" class="contact-info">
         <a class="corner_close" href="" ng-click="visibleContactInfo=false">close</a>
         <h2><a ng-href="/contacts/{{contactInfo.contact.id}}">{{contactInfo.contact.name}}</a></h2>
-        <div class="column">
-            <p ng-repeat="address in contactInfo.addresses">
-                <strong>{{address.location}} Address</strong> <i class="fa fa-check green" ng-show="address.primary_mailing_address"></i>
-                <br>
-                {{address.street}}<br>{{address.city}}, {{address.state}} {{address.postal_code}} {{address.country}}
-            </p>
-            <p ng-show="!contactInfo.addresses.length">No mailing address</p>
+        <div style="width:100%; display: block;">
+            <div class="column">
+                <p ng-repeat="address in contactInfo.addresses">
+                    <strong>{{address.location}} Address</strong> <i class="fa fa-check green" ng-show="address.primary_mailing_address"></i>
+                    <br>
+                    {{address.street}}<br>{{address.city}}, {{address.state}} {{address.postal_code}} {{address.country}}
+                </p>
+                <p ng-show="!contactInfo.addresses.length">No mailing address</p>
 
-
-            <p ng-repeat="referrer in contactInfo.contact.referrals_to_me_ids">
-                <strong>Referrer:</strong><br>
-                <a ng-href="/contacts/{{referrer.id}}">{{referrer.name}}</a>
-            </p>
-        </div>
-        <div class="column-lg">
-            <div class="person"  ng-repeat="p in contactInfo.people">
-                <div class="social">
-                    <a class="facebook" ng-href="http://facebook.com/profile.php?id={{account.remote_id}}" target="_blank" ng-repeat="account in p.facebook_accounts">f</a>
-                </div>
-
-                <div class="avatar">
-                    <a ng-href="/people/{{p.id}}"><img alt="Avatar" class="person_avatar" ng-src="{{p.avatar}}"></a>
-                </div>
-
-                <div class="name">
-                    <a ng-href="/people/{{p.id}}">{{p.first_name}} {{p.last_name}}</a>
-                </div>
-
-                <div class="column-inner">
-                    <p ng-repeat="phone in p.phone_numbers">
-                        <strong>Phone ({{phone.location}})</strong><br>
-                        {{phone.number}} <i class="fa fa-check green" ng-show="phone.primary"></i>
-                    </p>
-                    <p ng-show="!p.phone_numbers.length">No phone number</p>
-                </div>
-
-                <div class="column-inner">
-                    <p ng-repeat="email in p.email_addresses">
-                        <strong>Email</strong><br>
-                        <a ng-href="mailto:{{email.email}}">{{email.email}}</a> <i class="fa fa-check green" ng-show="email.primary"></i>
-                    </p>
-                    <p ng-show="!p.email_addresses.length">No email address</p>
-                </div>
+            </div>
+            <div class="column">
+                <p ng-repeat="referrer in contactInfo.contact.referrals_to_me_ids">
+                    <strong>Referrer:</strong><br>
+                    <a ng-href="/contacts/{{referrer.id}}">{{referrer.name}}</a>
+                </p>
             </div>
         </div>
+        <div class="person"  ng-repeat="p in contactInfo.people">
+            <div class="social">
+                <a class="facebook" ng-href="http://facebook.com/profile.php?id={{account.remote_id}}" target="_blank" ng-repeat="account in p.facebook_accounts">f</a>
+            </div>
+
+            <div class="avatar">
+                <a ng-href="/people/{{p.id}}"><img alt="Avatar" class="person_avatar" ng-src="{{p.avatar}}"></a>
+            </div>
+
+            <div class="name">
+                <a ng-href="/people/{{p.id}}">{{p.first_name}} {{p.last_name}}</a>
+            </div>
+
+            <div class="column-inner">
+                <p ng-repeat="phone in p.phone_numbers">
+                    <strong>Phone ({{phone.location}})</strong><br>
+                    {{phone.number}} <i class="fa fa-check green" ng-show="phone.primary"></i>
+                </p>
+                <p ng-show="!p.phone_numbers.length">No phone number</p>
+
+                <p>
+                    <span ng-repeat="email in p.email_addresses">
+                        <a ng-href="mailto:{{email.email}}">{{email.email}}</a> <i class="fa fa-check green" ng-show="email.primary"></i><br>
+                    </span>
+
+                    <span ng-repeat="!p.email_addresses.length">
+                        No email address
+                    </span>
+                </p>
+            </div>
+        </div>
+
     </div>
 
     <div class="comments" ng-show="visibleComments">
