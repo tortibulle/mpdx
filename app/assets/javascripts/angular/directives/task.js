@@ -20,7 +20,7 @@ angular.module('mpdxApp')
 
                 //complete options
                 if($scope.task.activity_type === 'Call') {
-                    $scope.completeOptions = ['Done', 'Attempted - Left Message', 'Attempted - Call Again', 'Complete - Call Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'Received - Complete - Call Again', 'Received - Appointment Scheduled', 'Received - Partner - Financial', 'Received - Partner - Special', 'Received - Partner - Pray', 'Received - Ask in Future', 'Received - Not Interested'];
+                    $scope.completeOptions = ['Done', 'Attempted - Left Message', 'Attempted - Call Again', 'Complete - Call Again', 'Complete - Appointment Scheduled', 'Complete - Partner - Financial', 'Complete - Partner - Special', 'Complete - Partner - Pray', 'Complete - Ask in Future', 'Complete - Not Interested', 'Received - Call Again', 'Received - Appointment Scheduled', 'Received - Partner - Financial', 'Received - Partner - Special', 'Received - Partner - Pray', 'Received - Ask in Future', 'Received - Not Interested'];
                 }else if($scope.task.activity_type === 'Appointment') {
                     $scope.completeOptions = ['Done', 'Decision Received', 'Call for Decision', 'Partner - Financial', 'Attempted - Reschedule'];
                 }else if(_.contains(['Email', 'Text Message', 'Facebook Message', 'Letter'], $scope.task.activity_type)){
@@ -87,13 +87,14 @@ angular.module('mpdxApp')
                         returnContact.email_addresses = [];
                         returnContact.facebook_accounts = [];
 
-                        angular.forEach(contact.people, function(i){
+                        angular.forEach(contact.people, function(i, key){
                             var person = _.find(contact.people, { 'id': i.id });
 
                             var phone = _.filter(contact.phone_numbers, function(i){
                                 return _.contains(person.phone_number_ids, i.id);
                             });
                             if(phone.length > 0){
+                                returnContact.people[key].phone_numbers = phone;
                                 returnContact.phone_numbers = _.union(returnContact.phone_numbers, phone);
                             }
 
@@ -101,6 +102,7 @@ angular.module('mpdxApp')
                                 return _.contains(person.email_address_ids, i.id);
                             });
                             if(email.length > 0){
+                                returnContact.people[key].email_addresses = email;
                                 returnContact.email_addresses = _.union(returnContact.email_addresses, email);
                             }
 
@@ -108,6 +110,7 @@ angular.module('mpdxApp')
                                 return _.contains(person.facebook_account_ids, i.id);
                             });
                             if(facebook_account.length > 0){
+                                returnContact.people[key].facebook_accounts = facebook_account;
                                 returnContact.facebook_accounts = _.union(returnContact.facebook_accounts, facebook_account);
                             }
                         });
@@ -122,7 +125,6 @@ angular.module('mpdxApp')
                         });
 
                         $scope.contactInfo = returnContact;
-                        console.log(returnContact);
                     });
                 };
             }
