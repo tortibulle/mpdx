@@ -15,8 +15,6 @@ class User < Person
                                   :tasks_filter, :default_account_list, :contacts_view_options,
                                   :tab_orders]
 
-  accepts_nested_attributes_for :account_lists
-
   after_create :set_setup_mode
 
   # Queue data imports
@@ -61,14 +59,6 @@ class User < Person
 
   def designation_numbers(organization_id)
     designation_accounts.where(organization_id: organization_id).pluck('designation_number')
-  end
-
-  def account_lists_attributes=(account_lists_array)
-    account_lists_array = account_lists_array.values if account_lists_array.is_a?(Hash)
-    account_lists_array.each do |account_list_attributes|
-      account_list = account_lists.find(account_list_attributes['id'])
-      account_list.update_attributes(account_list_attributes)
-    end
   end
 
   def self.from_omniauth(provider, auth_hash)
