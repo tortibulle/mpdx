@@ -1,6 +1,6 @@
 <Database>
   <Application>TntMPD</Application>
-  <Version>2.1</Version>
+  <Version>3.0</Version>
   <Name>Z:\Users\josh\Desktop\starcher.mpddb</Name>
   <Tables>
     <Appeal>
@@ -15,20 +15,27 @@
         <LastEdit>2011-12-16 15:29:33</LastEdit>
         <CreatedDate>2004-07-30</CreatedDate>
         <FileAs>Smith, John and Jane</FileAs>
+        <FileAsIsCustom>false</FileAsIsCustom>
         <FullName>John and Jane Smith</FullName>
+        <FullNameIsCustom>false</FullNameIsCustom>
         <Greeting>John and Jane</Greeting>
+        <GreetingIsCustom>false</GreetingIsCustom>
+        <Salutation>Dear John and Jane,</Salutation>
+        <SalutationIsCustom>false</SalutationIsCustom>
         <ShortName>John and Jane Smith</ShortName>
+        <ShortNameIsCustom>false</ShortNameIsCustom>
         <MailingAddressBlock>John and Jane Smith
 1234 N St.
 Nowhere, CA  12345</MailingAddressBlock>
         <MailingAddressIsDeliverable>true</MailingAddressIsDeliverable>
         <Phone>(555) 555-1234</Phone>
-        <PhoneIsOperational>true</PhoneIsOperational>
-        <EmailIsOperational>false</EmailIsOperational>
+        <PhoneIsValid>true</PhoneIsValid>
+        <EmailIsValid>false</EmailIsValid>
         <IsOrganization>false</IsOrganization>
         <FirstName>John</FirstName>
         <LastName>Smith</LastName>
         <SpouseFirstName>Jane</SpouseFirstName>
+        <Deceased>false</Deceased>
         <MailingAddressType>1</MailingAddressType>
         <MailingStreetAddress>1234 N St.</MailingStreetAddress>
         <MailingCity>Nowhere</MailingCity>
@@ -44,40 +51,66 @@ Nowhere, CA  12345</MailingAddressBlock>
         <HomeAddressBlock>John and Jane Smith
 1234 N St.
 Nowhere, CA  12345</HomeAddressBlock>
-        <BusinessCountryID>840</BusinessCountryID>
-        <BusinessCountry>United States of America</BusinessCountry>
-        <BusinessAddressIsDeliverable>false</BusinessAddressIsDeliverable>
+        <HomeAddressBlockIsCustom>false</HomeAddressBlockIsCustom>
         <OtherCountryID>555</OtherCountryID>
         <OtherCountry>United States of America</OtherCountry>
         <OtherAddressIsDeliverable>false</OtherAddressIsDeliverable>
+        <OtherAddressBlockIsCustom>false</OtherAddressBlockIsCustom>
+        <BusinessCountryID>840</BusinessCountryID>
+        <BusinessCountry>United States of America</BusinessCountry>
+        <BusinessAddressIsDeliverable>false</BusinessAddressIsDeliverable>
+        <BusinessAddressBlockIsCustom>false</BusinessAddressBlockIsCustom>
+        <SpouseBusinessCountryID>840</SpouseBusinessCountryID>
+        <SpouseBusinessCountry>United States of America</SpouseBusinessCountry>
+        <SpouseBusinessAddressIsDeliverable>false</SpouseBusinessAddressIsDeliverable>
+        <SpouseBusinessAddressBlockIsCustom>false</SpouseBusinessAddressBlockIsCustom>
         <PreferredPhoneType>0</PreferredPhoneType>
+        <PhoneIsValidMask>1</PhoneIsValidMask>
+        <PhoneCountryIDs>0=840</PhoneCountryIDs>
         <HomePhone>(555) 555-1234</HomePhone>
+        <BusinessPhone>(555) 555-9771 ext. 301</BusinessPhone>
         <PreferredEmailTypes>0</PreferredEmailTypes>
-        <Email1IsOperational>false</Email1IsOperational>
-        <Email2IsOperational>false</Email2IsOperational>
-        <Email3IsOperational>false</Email3IsOperational>
+        <Email1IsValid>false</Email1IsValid>
+        <Email2IsValid>false</Email2IsValid>
+        <Email3IsValid>false</Email3IsValid>
+        <SpouseEmail1IsValid>false</SpouseEmail1IsValid>
+        <SpouseEmail2IsValid>false</SpouseEmail2IsValid>
+        <SpouseEmail3IsValid>false</SpouseEmail3IsValid>
+        <NotesAsRTF>{\rtf1\ansi\ansicpg1252\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}{\f1\fnil Tahoma;}}
+{\*\generator Msftedit 5.41.15.1507;}\viewkind4\uc1\pard\lang1033\f0\fs16 Principal\par
+Has run into issues with Campus Crusade in the past...  Was told couldn&apos;t be involved because hadn&apos;t been baptized as an adult.\f1\par
+}</NotesAsRTF>
+        <Notes>Principal
+Has run into issues with Campus Crusade in the past...  Was told couldn&apos;t be involved because hadn&apos;t been baptized as an adult.</Notes>
         <FamilyLevelID>0</FamilyLevelID>
         <FamilySideID>0</FamilySideID>
+        <MapAddressType>0</MapAddressType>
+        <MapLat>0</MapLat>
+        <MapLng>0</MapLng>
         <PledgeAmount>0</PledgeAmount>
         <PledgeFrequencyID>0</PledgeFrequencyID>
         <PledgeReceived>false</PledgeReceived>
         <PledgeStartDate>2004-08-26</PledgeStartDate>
-        <Deceased>false</Deceased>
+        <ReferredBy>Bob and Dawn Doe</ReferredBy>
+        <ReferredByList>Bob and Dawn Doe</ReferredByList>
         <MPDPhaseID>80</MPDPhaseID>
         <NextAsk>1899-12-30</NextAsk>
         <NeverAsk>false</NeverAsk>
         <LikelyToGiveID>0</LikelyToGiveID>
         <ChurchName>PLRBC</ChurchName>
-        <SendNewsletter>false</SendNewsletter>
+        <SendNewsletter>true</SendNewsletter>
+        <NewsletterMediaPref>+P-E</NewsletterMediaPref>
         <DirectDeposit>false</DirectDeposit>
         <Magazine>false</Magazine>
         <MonthlyPledge>0</MonthlyPledge>
         <FirstGiftDate>2004-09-01</FirstGiftDate>
         <LastGiftDate>2005-06-06</LastGiftDate>
         <LastGiftAmount>100</LastGiftAmount>
+        <LastGiftOrganizationID>0</LastGiftOrganizationID>
         <PrevYearTotal>0</PrevYearTotal>
         <YearTotal>0</YearTotal>
         <LifetimeTotal>260</LifetimeTotal>
+        <LifetimeNumberOfGifts>2</LifetimeNumberOfGifts>
         <LargestGift>100</LargestGift>
         <GoodUntil>1899-12-30</GoodUntil>
         <AveMonthlyGift>0</AveMonthlyGift>
@@ -85,42 +118,42 @@ Nowhere, CA  12345</HomeAddressBlock>
         <TwelveMonthTotal>0</TwelveMonthTotal>
         <LastActivity>2006-09-18</LastActivity>
         <LastAppointment>2004-08-26</LastAppointment>
-        <LastLetter>2006-08-31</LastLetter>
-        <LastPhoneCall>2006-09-18</LastPhoneCall>
+        <LastCall>2006-09-18</LastCall>
         <LastPreCall>2004-07-30</LastPreCall>
+        <LastLetter>2006-08-31</LastLetter>
+        <LastVisit>1899-12-30</LastVisit>
         <LastThank>2004-08-30</LastThank>
+        <LastChallenge>1899-12-30</LastChallenge>
         <AppealsSinceLastGift>0</AppealsSinceLastGift>
+        <ChallengesSinceLastGift>0</ChallengesSinceLastGift>
         <OrgDonorCodes>413518908</OrgDonorCodes>
-        <FileAsIsCustom>false</FileAsIsCustom>
-        <ShortNameIsCustom>false</ShortNameIsCustom>
-        <GreetingIsCustom>false</GreetingIsCustom>
-        <FullNameIsCustom>false</FullNameIsCustom>
-        <HomeAddressBlockIsCustom>false</HomeAddressBlockIsCustom>
-        <BusinessAddressBlockIsCustom>false</BusinessAddressBlockIsCustom>
-        <OtherAddressBlockIsCustom>false</OtherAddressBlockIsCustom>
-        <PhoneIsOperationalMask>1</PhoneIsOperationalMask>
-        <PhoneCountryIDs>0=840</PhoneCountryIDs>
-        <ReferredBy>Bob and Dawn Doe</ReferredBy>
       </row>
       <row id="-861693757">
         <LastEdit>2012-11-16 11:10:09</LastEdit>
         <CreatedDate>2005-09-14</CreatedDate>
         <FileAs>Doe, Bob and Dawn</FileAs>
+        <FileAsIsCustom>false</FileAsIsCustom>
         <FullName>Bob and Dawn Doe</FullName>
+        <FullNameIsCustom>false</FullNameIsCustom>
         <Greeting>Bob and Dawn</Greeting>
+        <GreetingIsCustom>false</GreetingIsCustom>
+        <Salutation>Dear John and Jane,</Salutation>
+        <SalutationIsCustom>false</SalutationIsCustom>
         <ShortName>Bob and Dawn Doe</ShortName>
+        <ShortNameIsCustom>false</ShortNameIsCustom>
         <MailingAddressBlock>Bob and Dawn Doe
 2345 Capa Dr.
 State, CA  12345</MailingAddressBlock>
         <MailingAddressIsDeliverable>true</MailingAddressIsDeliverable>
         <Phone>(555) 234-2345</Phone>
-        <PhoneIsOperational>true</PhoneIsOperational>
+        <PhoneIsValid>true</PhoneIsValid>
         <Email>fake@example.com</Email>
-        <EmailIsOperational>true</EmailIsOperational>
+        <EmailIsValid>true</EmailIsValid>
         <IsOrganization>true</IsOrganization>
         <FirstName>Bob</FirstName>
         <LastName>Doe</LastName>
         <SpouseFirstName>Dawn</SpouseFirstName>
+        <Deceased>false</Deceased>
         <MailingAddressType>1</MailingAddressType>
         <MailingStreetAddress>2345 Capa Dr.</MailingStreetAddress>
         <MailingCity>State</MailingCity>
@@ -136,46 +169,64 @@ State, CA  12345</MailingAddressBlock>
         <HomeAddressBlock>Bob and Dawn Doe
 2345 Capa Dr.
 State, CA  12345</HomeAddressBlock>
-        <BusinessCountryID>840</BusinessCountryID>
-        <BusinessCountry>United States of America</BusinessCountry>
-        <BusinessAddressIsDeliverable>false</BusinessAddressIsDeliverable>
+        <HomeAddressBlockIsCustom>false</HomeAddressBlockIsCustom>
         <OtherCountryID>840</OtherCountryID>
         <OtherCountry>United States of America</OtherCountry>
         <OtherAddressIsDeliverable>false</OtherAddressIsDeliverable>
+        <OtherAddressBlockIsCustom>false</OtherAddressBlockIsCustom>
+        <BusinessCountryID>840</BusinessCountryID>
+        <BusinessCountry>United States of America</BusinessCountry>
+        <BusinessAddressIsDeliverable>false</BusinessAddressIsDeliverable>
+        <BusinessAddressBlockIsCustom>false</BusinessAddressBlockIsCustom>
+        <SpouseBusinessCountryID>840</SpouseBusinessCountryID>
+        <SpouseBusinessCountry>United States of America</SpouseBusinessCountry>
+        <SpouseBusinessAddressIsDeliverable>false</SpouseBusinessAddressIsDeliverable>
+        <SpouseBusinessAddressBlockIsCustom>false</SpouseBusinessAddressBlockIsCustom>
         <PreferredPhoneType>0</PreferredPhoneType>
+        <PhoneIsValidMask>1</PhoneIsValidMask>
+        <PhoneCountryIDs>0=840</PhoneCountryIDs>
         <HomePhone>(555) 234-2345</HomePhone>
         <PreferredEmailTypes>0</PreferredEmailTypes>
         <Email1>fake@example.com</Email1>
         <Email2>fake@example.com</Email2>
-        <Email1IsOperational>true</Email1IsOperational>
-        <Email2IsOperational>true</Email2IsOperational>
-        <Email3IsOperational>false</Email3IsOperational>
-        <ReferredByList>Steve and Lisa Moss</ReferredByList>
-        <ReferredBy>Steve and Lisa Moss</ReferredBy>
-        <Notes>{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}{\f1\fnil Tahoma;}}
+        <Email1IsValid>true</Email1IsValid>
+        <Email2IsValid>true</Email2IsValid>
+        <Email3IsValid>false</Email3IsValid>
+        <SpouseEmail1IsValid>false</SpouseEmail1IsValid>
+        <SpouseEmail2IsValid>false</SpouseEmail2IsValid>
+        <SpouseEmail3IsValid>false</SpouseEmail3IsValid>
+        <NotesAsRTF>{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}{\f1\fnil Tahoma;}}
 {\*\generator Msftedit 5.41.15.1507;}\viewkind4\uc1\pard\lang1033\f0\fs16 call for amount\f1\par
-}</Notes>
+}</NotesAsRTF>
+	<Notes>call for amount</Notes>
         <FamilyLevelID>0</FamilyLevelID>
         <FamilySideID>0</FamilySideID>
+        <MapAddressType>0</MapAddressType>
+        <MapLat>0</MapLat>
+        <MapLng>0</MapLng>
         <PledgeAmount>50</PledgeAmount>
         <PledgeFrequencyID>1</PledgeFrequencyID>
         <PledgeReceived>true</PledgeReceived>
         <PledgeStartDate>2005-10-14</PledgeStartDate>
-        <Deceased>false</Deceased>
+        <ReferredBy>Steve and Lisa Moss</ReferredBy>
+        <ReferredByList>Steve and Lisa Moss</ReferredByList>
         <MPDPhaseID>60</MPDPhaseID>
         <NextAsk>1899-12-30</NextAsk>
         <NeverAsk>false</NeverAsk>
         <LikelyToGiveID>0</LikelyToGiveID>
         <SendNewsletter>true</SendNewsletter>
+        <NewsletterMediaPref>+P-E</NewsletterMediaPref>
         <DirectDeposit>false</DirectDeposit>
         <Magazine>false</Magazine>
         <MonthlyPledge>50</MonthlyPledge>
         <FirstGiftDate>2005-10-18</FirstGiftDate>
         <LastGiftDate>2012-10-20</LastGiftDate>
         <LastGiftAmount>50</LastGiftAmount>
+        <LastGiftOrganizationID>0</LastGiftOrganizationID>
         <PrevYearTotal>600</PrevYearTotal>
         <YearTotal>500</YearTotal>
         <LifetimeTotal>4250</LifetimeTotal>
+        <LifetimeNumberOfGifts>2</LifetimeNumberOfGifts>
         <LargestGift>50</LargestGift>
         <GoodUntil>2012-11-19</GoodUntil>
         <AveMonthlyGift>50</AveMonthlyGift>
@@ -183,21 +234,15 @@ State, CA  12345</HomeAddressBlock>
         <TwelveMonthTotal>600</TwelveMonthTotal>
         <LastActivity>2006-08-31</LastActivity>
         <LastAppointment>2005-10-06</LastAppointment>
-        <LastLetter>2006-08-31</LastLetter>
-        <LastPhoneCall>2005-10-10</LastPhoneCall>
+        <LastCall>2005-10-10</LastCall>
         <LastPreCall>2005-09-20</LastPreCall>
+        <LastLetter>2006-08-31</LastLetter>
+        <LastVisit>1899-12-30</LastVisit>
         <LastThank>1899-12-30</LastThank>
+        <LastChallenge>1899-12-30</LastChallenge>
         <AppealsSinceLastGift>0</AppealsSinceLastGift>
+        <ChallengesSinceLastGift>0</ChallengesSinceLastGift>
         <OrgDonorCodes>441189512</OrgDonorCodes>
-        <FileAsIsCustom>false</FileAsIsCustom>
-        <ShortNameIsCustom>false</ShortNameIsCustom>
-        <GreetingIsCustom>false</GreetingIsCustom>
-        <FullNameIsCustom>false</FullNameIsCustom>
-        <HomeAddressBlockIsCustom>false</HomeAddressBlockIsCustom>
-        <BusinessAddressBlockIsCustom>false</BusinessAddressBlockIsCustom>
-        <OtherAddressBlockIsCustom>false</OtherAddressBlockIsCustom>
-        <PhoneIsOperationalMask>1</PhoneIsOperationalMask>
-        <PhoneCountryIDs>0=840</PhoneCountryIDs>
       </row>
 
     </Contact>
@@ -217,9 +262,14 @@ State, CA  12345</HomeAddressBlock>
       <row id="620575700">
         <LastEdit>2004-08-26 20:28:17</LastEdit>
         <TaskTypeID>1</TaskTypeID>
+        <Description>History Description</Description>
         <HistoryDate>2004-08-26 19:00:00</HistoryDate>
-        <HistoryResultID>1</HistoryResultID>
         <Notes>History Notes</Notes>
+        <InMPDWeeklyUpdate>false</InMPDWeeklyUpdate>
+        <IsChallenge>false</IsChallenge>
+        <IsThank>false</IsThank>
+        <IsMassMailing>false</IsMassMailing>
+        <HistoryResultID>1</HistoryResultID>
       </row>
     </History>
     <HistoryContact>
@@ -243,36 +293,6 @@ State, CA  12345</HomeAddressBlock>
         <Description>Attempted</Description>
       </row>
     </HistoryResult>
-    <HistoryType>
-      <row id="1">
-        <LastEdit>2004-05-02 18:14:59</LastEdit>
-        <Description>Appointment</Description>
-      </row>
-      <row id="2">
-        <LastEdit>2004-05-02 18:14:59</LastEdit>
-        <Description>Phone</Description>
-      </row>
-      <row id="3">
-        <LastEdit>2004-05-02 18:14:59</LastEdit>
-        <Description>Mail</Description>
-      </row>
-      <row id="4">
-        <LastEdit>2004-05-02 18:14:59</LastEdit>
-        <Description>Thank</Description>
-      </row>
-      <row id="5">
-        <LastEdit>2004-05-02 18:14:59</LastEdit>
-        <Description>PreCall</Description>
-      </row>
-      <row id="6">
-        <LastEdit>2004-05-02 18:14:59</LastEdit>
-        <Description>Ignore (To Do)</Description>
-      </row>
-      <row id="7">
-        <LastEdit>2006-12-19 20:56:03</LastEdit>
-        <Description>Email</Description>
-      </row>
-    </HistoryType>
     <LikelyToGive>
       <row id="0">
         <LastEdit>2004-05-02 18:14:59</LastEdit>
@@ -305,7 +325,7 @@ State, CA  12345</HomeAddressBlock>
         <LoginID>506255555</LoginID>
         <OrgRoleDescription>Staff Account (0559555)</OrgRoleDescription>
         <GiftLastSyncDate>2012-11-12</GiftLastSyncDate>
-        <AddressLastSyncDate>2011-12-16</AddressLastSyncDate>
+        <DonorLastSyncDate>2011-12-16</DonorLastSyncDate>
       </row>
     </LoginProfile>
     <LoginProfileDesignation>

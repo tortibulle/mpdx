@@ -231,13 +231,7 @@ class TntImport
     contact.website = row['WebPage'] if @import.override? || contact.website.blank?
     contact.updated_at = parse_date(row['LastEdit']) if @import.override?
     contact.created_at = parse_date(row['CreatedDate']) if @import.override?
-    if @import.override? || contact.notes.blank?
-      contact.notes = begin
-                        Nokogiri::HTML(RubyRTF::Parser.new.parse(row['Notes'].to_s).sections.collect {|s| s[:text]}.join("\n").gsub(/\n+/, "\n")).text
-                      rescue RubyRTF::InvalidDocument, NoMethodError
-                        row['Notes']
-                      end.to_s.unpack("C*").pack("U*").force_encoding("UTF-8").encode!
-    end
+    contact.notes = row['Notes'] if (@import.override? || contact.notes.blank?)
     contact.pledge_amount = row['PledgeAmount'] if @import.override? || contact.pledge_amount.blank?
     contact.pledge_frequency = row['PledgeFrequencyID'] if (@import.override? || contact.pledge_frequency.blank?) && row['PledgeFrequencyID'].to_i != 0
     contact.pledge_start_date = parse_date(row['PledgeStartDate']) if (@import.override? || contact.pledge_start_date.blank?) && row['PledgeStartDate'].present?
@@ -249,9 +243,9 @@ class TntImport
     contact.church_name = row['ChurchName'] if @import.override? || contact.church_name.blank?
     if (@import.override? || contact.send_newsletter.blank?) && is_true?(row['SendNewsletter'])
       case row['NewsletterMediaPref']
-      when '+E'
+      when '+E', '+E-P'
         contact.send_newsletter = 'Email'
-      when '+P'
+      when '+P', '+P-E'
         contact.send_newsletter = 'Physical'
       else
         contact.send_newsletter = 'Both'
@@ -262,7 +256,7 @@ class TntImport
     contact.last_activity = parse_date(row['LastActivity']) if (@import.override? || contact.last_activity.blank?) && row['LastActivity'].present?
     contact.last_appointment = parse_date(row['LastAppointment']) if (@import.override? || contact.last_appointment.blank?) && row['LastAppointment'].present?
     contact.last_letter = parse_date(row['LastLetter']) if (@import.override? || contact.last_letter.blank?) && row['LastLetter'].present?
-    contact.last_phone_call = parse_date(row['LastPhoneCall']) if (@import.override? || contact.last_phone_call.blank?) && row['LastPhoneCall'].present?
+    contact.last_phone_call = parse_date(row['LastCall']) if (@import.override? || contact.last_phone_call.blank?) && row['LastCall'].present?
     contact.last_pre_call = parse_date(row['LastPreCall']) if (@import.override? || contact.last_pre_call.blank?) && row['LastPreCall'].present?
     contact.last_thank = parse_date(row['LastThank']) if (@import.override? || contact.last_thank.blank?) && row['LastThank'].present?
     contact.tag_list.add(@import.tags, parse: true) if @import.tags.present?
