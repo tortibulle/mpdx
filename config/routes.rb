@@ -45,6 +45,7 @@ Mpdx::Application.routes.draw do
           get :count
         end
       end
+      resources :donations, only: [:index]
       resources :preferences
       resources :users
     end
