@@ -10,6 +10,9 @@ class PreferenceSet
     attributes = args.first
     @user = attributes[:user]
     @account_list = attributes[:account_list]
+
+    attributes[:first_name] ||= @user.first_name
+    attributes[:email] ||= @user.email.try(:email)
     super
   end
 

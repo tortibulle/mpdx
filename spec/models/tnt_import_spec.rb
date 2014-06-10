@@ -74,12 +74,26 @@ describe TntImport do
     end
   end
 
+  context '#update_contact' do
+    it 'updates notes correctly' do
+      contact = Contact.new
+      import.send(:update_contact, contact, contact_rows.first)
+      expect(contact.notes).to eq("Principal\nHas run into issues with Campus Crusade in the past...  Was told couldn't be involved because hadn't been baptized as an adult.")
+    end
+
+    it 'updates newsletter preferences correctly' do
+      contact = Contact.new
+      import.send(:update_contact, contact, contact_rows.first)
+      expect(contact.send_newsletter).to eq("Physical")
+    end
+  end
+
   context '#update_person_attributes' do
     it "imports a phone number for a person" do
       person = Person.new
       expect {
         person = import.send(:update_person_attributes, person, contact_rows.first)
-      }.to change(person.phone_numbers, :length).by(1)
+      }.to change(person.phone_numbers, :length).by(2)
     end
   end
 
