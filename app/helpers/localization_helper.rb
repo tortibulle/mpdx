@@ -8,7 +8,6 @@ module LocalizationHelper
     rescue Errno::ENOENT
       value.to_f.localize(:es).to_currency.to_s(options)
     end
-    #number_to_currency(value, options)
   end
 
   def current_currency(account_list=nil, user=nil)
