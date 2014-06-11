@@ -13,7 +13,7 @@
     <% end %>
     <li>
       <span class="left_filters menu_item"><%= _('Filters') %></span>
-      <%= form_tag params.slice(:controller, :action), method: :get do %>
+      <form>
         <ul class="left_filters">
           <% if params[:action] == 'history' %>
             <li class="opened">
@@ -125,7 +125,7 @@
             <% end %>
           </li>
         </ul>
-      <% end %>
+      </form>
     </li>
   </ul>
 </aside>
