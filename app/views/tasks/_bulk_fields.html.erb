@@ -14,6 +14,11 @@
   <%= f.text_field :subject, autofocus: true, maxlength: 255, required: true %>
 </div>
 
+<div class="field">
+  <%= f.label :activity_type, _('Action') %>
+  <%= f.select :activity_type, f.object.assignable_activity_types.collect { |s| [_(s), s] }, include_blank: true %>
+</div>
+
 <% if task.completed? %>
   <%= f.hidden_field :completed %>
   <div class="field">
@@ -28,14 +33,10 @@
 <% else %>
   <div class="field due_date">
     <%= f.label :start_at, _('Due Date') %>
-    <%= f.datetime_select :start_at, ampm: true, default: 1.day.from_now, order: [:month, :day, :year] %>
+    <%= calendar_date_select_tag '' %>
+    <%= f.time_select :start_at, ampm: true, default: 1.day.from_now, order: [:month, :day, :year] %>
   </div>
 <% end %>
-
-<div class="field">
-  <%= f.label :activity_type, _('Action') %>
-  <%= f.select :activity_type, f.object.assignable_activity_types.collect { |s| [_(s), s] }, include_blank: true %>
-</div>
 
 <div class="field">
   <%= f.label :tag_list, _('Tags') %>
@@ -50,3 +51,5 @@
     <%= builder.text_area :body, rows: 3 %>
   <% end %>
 </div>
+
+

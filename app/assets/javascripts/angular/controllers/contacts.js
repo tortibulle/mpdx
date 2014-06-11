@@ -142,6 +142,14 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         }
         $scope.contactsLoading = true;
 
+        if(q.hidden !== oldq.hidden){
+            if(q.hidden){
+                q.status = _.uniq(_.union(q.status, ["Not Interested", "Unresponsive", "Never Ask", "Research Abandoned", "Expired Referral"]));
+            }else{
+                q.status = _.without(q.status, "Not Interested", "Unresponsive", "Never Ask", "Research Abandoned", "Expired Referral");
+            }
+        }
+
         api.call('get','contacts?account_list_id=' + (window.current_account_list_id || '') +
             '&per_page=' + q.limit +
             '&page=' + q.page +
