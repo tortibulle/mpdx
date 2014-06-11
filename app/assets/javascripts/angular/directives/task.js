@@ -20,18 +20,14 @@ angular.module('mpdxApp')
 
                 //complete options
                 if($scope.task.activity_type === 'Call') {
-                    $scope.completeOptions = ['Done', 'Attempted - Left Message', 'Attempted - Call Again', 'Complete - Call Again', 'Complete - Appointment Scheduled', 'Complete - Partner - Financial', 'Complete - Partner - Special', 'Complete - Partner - Pray', 'Complete - Ask in Future', 'Complete - Not Interested', 'Received - Call Again', 'Received - Appointment Scheduled', 'Received - Partner - Financial', 'Received - Partner - Special', 'Received - Partner - Pray', 'Received - Ask in Future', 'Received - Not Interested'];
-
                     $scope.completeResultOptions = ['Attempted - Left Message', 'Attempted', 'Completed', 'Received'];
                     $scope.completeActionOptions = ['Call Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'None'];
-
-
                 }else if($scope.task.activity_type === 'Appointment') {
-                    $scope.completeOptions = ['Done', 'Decision Received', 'Call for Decision', 'Partner - Financial', 'Attempted - Reschedule'];
+                    $scope.completeResultOptions = ['Done', 'Decision Received', 'Call for Decision', 'Partner - Financial', 'Attempted - Reschedule'];
                 }else if(_.contains(['Email', 'Text Message', 'Facebook Message', 'Letter'], $scope.task.activity_type)){
-                    $scope.completeOptions = ['Done', 'Received'];
+                    $scope.completeResultOptions = ['Done', 'Received'];
                 }else{
-                    $scope.completeOptions = ['Done'];
+                    $scope.completeResultOptions = ['Done'];
                 }
 
                 $scope.getComment = function(id){

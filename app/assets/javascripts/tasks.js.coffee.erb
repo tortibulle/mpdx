@@ -226,28 +226,28 @@ $ ->
           title = $(".taskaction", row).html()
           title += " - " + $(".tasktitle", row).html()
 
-        $("#task_result_task_result, #task_result_task_action").empty()
+        $("#task_result_select, #task_action_select").empty()
         ops = $(this).attr("data-results").split(",")
         actions = $(this).attr("data-actions").split(",")
-        $("<select></select>").appendTo "#task_result_task_result"  if ops.length > 3
+        $("<select></select>").appendTo "#task_result_select"
         $.each ops, (key, value) ->
-          if ops.length > 3
-            $("#task_result_task_result select").append $("<option></option>").attr("value", value).text(value)
-          else
-            $("<input type=\"radio\" name=\"task[result]\" value=\"" + value + "\" id=\"" + key + "\" /><label for=\"" + key + "\" style=\"display:inline-block;\">" + value + "</label>").appendTo "#task_result_task_result"
-          return
+          $("#task_result_select select").append $("<option></option>").attr("value", value).text(value)
 
-        $("<select></select>").appendTo "#task_result_task_action"
+        $("<select></select>").appendTo "#task_action_select"
         $.each actions, (key, value) ->
-          $("#task_result_task_action select").append $("<option></option>").attr("value", value).text(value)
-
-        #$("#task_result_task_result input").val ["Done"]
+          $("#task_action_select select").append $("<option></option>").attr("value", value).text(value)
 
         #hide result dropdown if only one option
-        if ops.length is 1
-          $("#task_result_task_result").parent().hide()
+        if ops.length <= 1
+          $("#task_result_select").parent().hide()
         else
-          $("#task_result_task_result").parent().show()
+          $("#task_result_select").parent().show()
+
+        if actions.length <= 1
+          $("#task_action_select").parent().hide()
+        else
+          $("#task_action_select").parent().show()
+
 
         # Marking a task off, open the result modal
         $('#task_result_modal').dialog
@@ -258,10 +258,9 @@ $ ->
             {
               text: __('Complete'),
               click: (e) ->
-                result = $("#task_result_task_result select").val()
-                result = result + " - " + $("#task_result_task_action select").val()  if $("#task_result_task_action select").val()
-
-                $('#task_result_task_result').val();
+                result = $("#task_result_select select").val()
+                result = result + " - " + $("#task_action_select select").val()  if $("#task_action_select select").val()
+                $('#task_result_task_result').val(result);
                 $('#task_result_task_completed').val(true)
                 $('form', this).submit()
                 $('#task_' + id).fadeOut()
