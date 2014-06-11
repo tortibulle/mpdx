@@ -13,8 +13,8 @@ $('[data-calendar]').datepicker({
     var month = dateText.substr(5,2);
     var day = dateText.substr(8,2);
 
-    $('[id$=start_at_1i]').val(year);
-    $('[id$=start_at_2i]').val(month);
-    $('[id$=start_at_3i]').val(day);
+    $('#task_modal_form [id$=_1i]').val(year);
+    $('#task_modal_form [id$=_2i]').val(month);
+    $('#task_modal_form [id$=_3i]').val(day);
   }
 });
