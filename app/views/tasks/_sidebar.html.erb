@@ -13,7 +13,12 @@
     <% end %>
     <li>
       <span class="left_filters menu_item"><%= _('Filters') %></span>
-      <form>
+      <% if params[:action] == 'history' %>
+        <form method="get" action="/tasks/history">
+      <% end %>
+      <% if params[:action] == 'index' %>
+        <form>
+      <% end %>
         <ul class="left_filters">
           <% if params[:action] == 'history' %>
             <li class="opened">
