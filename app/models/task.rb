@@ -25,7 +25,7 @@ class Task < Activity
 
   # validates :activity_type, :presence => { :message => _( '/ Action is required') }
 
-  CALL_RESULTS = ['Done', 'Attempted - Left Message', 'Attempted - Call Again', 'Complete - Call Again', 'Complete - Appointment Scheduled', 'Complete - Partner - Financial', 'Complete - Partner - Special', 'Complete - Partner - Pray', 'Complete - Ask in Future', 'Complete - Not Interested', 'Received - Call Again', 'Received - Appointment Scheduled', 'Received - Partner - Financial', 'Received - Partner - Special', 'Received - Partner - Pray', 'Received - Ask in Future', 'Received - Not Interested']
+  CALL_RESULTS = ['Done', 'Attempted - Left Message', 'Attempted - Call Again', 'Completed - Call Again', 'Completed - Appointment Scheduled', 'Completed - Partner - Financial', 'Completed - Partner - Special', 'Completed - Partner - Pray', 'Completed - Ask in Future', 'Completed - Not Interested', 'Received - Call Again', 'Received - Appointment Scheduled', 'Received - Partner - Financial', 'Received - Partner - Special', 'Received - Partner - Pray', 'Received - Ask in Future', 'Received - Not Interested']
   MESSAGE_RESULTS = [_('Received')]
   STANDARD_RESULTS = [_('Done')]
   APPOINTMENT_RESULTS = ['Done', 'Decision Received', 'Call for Decision', 'Partner - Financial', 'Attempted - Reschedule']
@@ -35,6 +35,17 @@ class Task < Activity
     ['Call', 'Appointment', 'Email', 'Text Message', 'Facebook Message',
      'Letter', 'Newsletter', 'Pre Call Letter', 'Reminder Letter',
      'Support Letter', 'Thank', 'To Do']
+  end
+
+  assignable_values_for :result, :allow_blank => true do
+    case activity_type
+      when 'Call'
+        CALL_RESULTS + STANDARD_RESULTS
+      when 'Email', 'Text Message', 'Facebook Message', 'Letter'
+        STANDARD_RESULTS + MESSAGE_RESULTS
+      else
+        STANDARD_RESULTS
+    end
   end
 
   def attempted?
