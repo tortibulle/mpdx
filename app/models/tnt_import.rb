@@ -380,7 +380,7 @@ class TntImport
 
     # email address
     3.times do |i|
-      person.email_address = {email: row["Email#{i}"], primary: row['PreferredEmailTypes'] == i} if row["Email#{i}"].present?
+      person.email_address = {email: row[prefix + "Email#{i}"], primary: row['PreferredEmailTypes'] == i} if row[prefix + "Email#{i}"].present?
     end
 
     person
