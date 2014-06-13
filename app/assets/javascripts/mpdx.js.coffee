@@ -91,7 +91,7 @@ $.mpdx = {}
 $.mpdx.activateTabs = ->
   $(".tabgroup").tabs({
     activate: (event, ui) ->
-      window.location.hash = ui.newPanel[0].id
+      #window.location.hash = ui.newPanel[0].id
   })
 
 $.mpdx.ajaxBefore = ->

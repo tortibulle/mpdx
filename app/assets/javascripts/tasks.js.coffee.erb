@@ -278,7 +278,7 @@ $(document).on 'change', '[name="task[activity_type]"]', ->
   $.mpdx.setOptions($('[name="task[result]"]'), $.mpdx.getTaskResultOptions($(this).val()))
 
 $.mpdx.getTaskResultOptions = (activity_type) ->
-  CALL_RESULTS = ['Done', 'Attempted - Left Message', 'Attempted - Call Again', 'Complete - Call Again', 'Complete - Appointment Scheduled', 'Complete - Partner - Financial', 'Complete - Partner - Special', 'Complete - Partner - Pray', 'Complete - Ask in Future', 'Complete - Not Interested', 'Received - Call Again', 'Received - Appointment Scheduled', 'Received - Partner - Financial', 'Received - Partner - Special', 'Received - Partner - Pray', 'Received - Ask in Future', 'Received - Not Interested']
+  CALL_RESULTS = ['Done', 'Attempted - Left Message', 'Attempted - Call Again', 'Completed - Call Again', 'Completed - Appointment Scheduled', 'Completed - Partner - Financial', 'Completed - Partner - Special', 'Completed - Partner - Pray', 'Completed - Ask in Future', 'Completed - Not Interested', 'Received - Call Again', 'Received - Appointment Scheduled', 'Received - Partner - Financial', 'Received - Partner - Special', 'Received - Partner - Pray', 'Received - Ask in Future', 'Received - Not Interested']
   MESSAGE_RESULTS = [__('Received')]
   STANDARD_RESULTS = [__('Done')]
   switch activity_type

@@ -16,7 +16,7 @@
   <li>
     <%= _('Completed:') %>
     <%= current_account_list.tasks.of_type('Call')
-                            .with_result(['Done', 'Complete - Call Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'Received'])
+                            .with_result(['Done', 'Completed - Call Again', 'Completed - Appointment Scheduled', 'Completed - Partner - Financial', 'Completed - Partner - Special', 'Completed - Partner - Pray', 'Ask in Future', 'Not Interested', 'Received'])
                             .completed_between(@start_date, @end_date)
                             .count %>
   </li>

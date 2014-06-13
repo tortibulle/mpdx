@@ -66,7 +66,7 @@
                         <a ng-href="mailto:{{email.email}}">{{email.email}}</a> <i class="fa fa-check green" ng-show="email.primary"></i><br>
                     </span>
 
-                    <span ng-repeat="!p.email_addresses.length">
+                    <span ng-show="!p.email_addresses.length">
                         No email address
                     </span>
                 </p>

@@ -29,7 +29,7 @@
 
   <div class="field">
     <%= f.label :result, _('Result') %>
-    <%= f.select :result, task.assignable_results.collect { |s| [_(s), s] } %>
+    <%= f.select :result, {} %>
   </div>
 <% else %>
   <div class="field due_date">

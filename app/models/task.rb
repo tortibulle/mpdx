@@ -37,6 +37,7 @@ class Task < Activity
      'Support Letter', 'Thank', 'To Do']
   end
 
+=begin
   assignable_values_for :result, :allow_blank => true do
     case activity_type
       when 'Call'
@@ -47,6 +48,7 @@ class Task < Activity
         STANDARD_RESULTS
     end
   end
+=end
 
   def attempted?
     'Attempted' == result
