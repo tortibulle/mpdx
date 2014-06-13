@@ -63,6 +63,7 @@ describe Contact do
   describe 'saving donor accounts' do
     it "links to an existing donor account if one matches" do
       donor_account = create(:donor_account)
+      account_list.designation_accounts << create(:designation_account, organization: donor_account.organization)
       contact.donor_accounts_attributes = {'0' => {account_number: donor_account.account_number, organization_id: donor_account.organization_id}}
       contact.save!
       contact.donor_accounts.should include(donor_account)
@@ -70,7 +71,7 @@ describe Contact do
 
     it "creates a new donor account" do
       expect {
-        contact.donor_accounts_attributes = {'0' => {account_number: 'asdf', organization_id: 1}}
+        contact.donor_accounts_attributes = {'0' => {account_number: 'asdf', organization_id: create(:organization).id}}
         contact.save!
       }.to change(DonorAccount, :count).by(1)
     end
