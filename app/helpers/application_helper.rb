@@ -1,5 +1,6 @@
 module ApplicationHelper
   include DisplayCase::ExhibitsHelper
+  include LocalizationHelper
 
   def auth_link(provider)
     if current_user.send("#{provider}_accounts".to_sym).length == 0
@@ -35,27 +36,6 @@ module ApplicationHelper
     id = options[:extra] ? "spinner_#{options[:extra]}" : 'spinner'
     style = options[:visible] ? '' : 'display:none'
     image_tag('spinner.gif', id: id, style: style, class: 'spinner')
-  end
-
-  def number_to_current_currency(value, options={})
-    options[:precision] ||= 0
-    options[:currency] ||= current_currency
-    begin
-      value.to_f.localize(locale).to_currency.to_s(options)
-    rescue Errno::ENOENT
-      value.to_f.localize(:es).to_currency.to_s(options)
-    end
-    #number_to_currency(value, options)
-  end
-
-  def current_currency
-    unless @current_currency
-      @current_currency = if designation_profile = current_account_list.designation_profile(current_user)
-        designation_profile.organization.default_currency_code
-      end
-      @current_currency ||= 'USD'
-    end
-    @current_currency
   end
 
   def l(date, options = {})
