@@ -9,25 +9,25 @@ class GoogleCalendarIntegrator
 
   def sync_tasks
     if @google_integration.calendar_integration?
-      tasks = @google_integration.account_list.tasks.future.uncompleted.of_type(@google_integration.calendar_integrations)
-      tasks.map { |task| sync_task(task.id) }
+#      tasks = @google_integration.account_list.tasks.future.uncompleted.of_type(@google_integration.calendar_integrations)
+#      tasks.map { |task| sync_task(task.id) }
     end
   end
 
   def sync_task(task_id)
-    return nil unless @google_integration.calendar_id
+#    return nil unless @google_integration.calendar_id
 
-    task = Task.find_by(id: task_id)
-    google_event = GoogleEvent.find_by(google_integration_id: @google_integration.id, activity_id: task_id)
+#    task = Task.find_by(id: task_id)
+#    google_event = GoogleEvent.find_by(google_integration_id: @google_integration.id, activity_id: task_id)
 
-    case
-    when !task, !@google_integration.calendar_integrations.include?(task.activity_type)
-      remove_google_event(google_event) if google_event
-    when google_event
-      update_task(task, google_event)
-    else
-      add_task(task)
-    end
+#    case
+#    when !task, !@google_integration.calendar_integrations.include?(task.activity_type)
+#      remove_google_event(google_event) if google_event
+#    when google_event
+#      update_task(task, google_event)
+#    else
+#      add_task(task)
+#    end
   end
 
   def remove_google_event(google_event)
