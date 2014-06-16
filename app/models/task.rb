@@ -25,7 +25,7 @@ class Task < Activity
 
   # validates :activity_type, :presence => { :message => _( '/ Action is required') }
 
-  CALL_RESULTS = ['Done', 'Attempted - Left Message', 'Attempted - Call Again', 'Completed - Call Again', 'Completed - Appointment Scheduled', 'Completed - Partner - Financial', 'Completed - Partner - Special', 'Completed - Partner - Pray', 'Completed - Ask in Future', 'Completed - Not Interested', 'Received - Call Again', 'Received - Appointment Scheduled', 'Received - Partner - Financial', 'Received - Partner - Special', 'Received - Partner - Pray', 'Received - Ask in Future', 'Received - Not Interested']
+  CALL_RESULTS = ['Done', 'Attempted - Left Message', 'Attempted - Call Again', 'Attempted - None', 'Completed - Call Again', 'Completed - Appointment Scheduled', 'Completed - Partner - Financial', 'Completed - Partner - Special', 'Completed - Partner - Pray', 'Completed - Ask in Future', 'Completed - Not Interested', 'Received - Call Again', 'Received - Appointment Scheduled', 'Received - Partner - Financial', 'Received - Partner - Special', 'Received - Partner - Pray', 'Received - Ask in Future', 'Received - Not Interested']
   MESSAGE_RESULTS = [_('Received')]
   STANDARD_RESULTS = [_('Done')]
   APPOINTMENT_RESULTS = ['Done', 'Decision Received', 'Call for Decision', 'Partner - Financial', 'Attempted - Reschedule']
