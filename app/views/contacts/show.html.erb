@@ -10,7 +10,7 @@
   </div>
   <ul class="contact_list">
     <% @filtered_contacts.each do |contact| %>
-      <li data-hook="contact"><%= link_to(truncate(contact.to_s, :length => 30), contact, data: {name: contact.to_s, id: contact.id}, class: contact.id == @contact.id ? 'active' : '', remote: true) %></li>
+      <li data-hook="contact"><%= link_to(truncate(contact.to_s, :length => 30), contact, data: {name: contact.to_s, id: contact.id}, class: contact.id == @contact.id ? 'active' : '', remote: false) %></li>
     <% end %>
   </ul>
 </div>
