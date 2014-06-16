@@ -370,10 +370,10 @@ class TntImport
                           profession: prefix.present? ? nil : row['Profession']}
     # Phone numbers
     {'HomePhone' => 'home', 'HomePhone2' => 'home', 'HomeFax' => 'fax',
-     'BusinessPhone' => 'work', 'BusinessPhone2' => 'work', 'BusinessFax' => 'fax',
-     'CompanyMainPhone' => 'work', 'AssistantPhone' => 'work', 'OtherPhone' => 'other',
-     'CarPhone' => 'mobile', 'MobilePhone' => 'mobile', 'PagerNumber' => 'other',
-     'CallbackPhone' => 'other', 'ISDNPhone' => 'other', 'PrimaryPhone' => 'other',
+     prefix + 'BusinessPhone' => 'work', prefix + 'BusinessPhone2' => 'work', prefix + 'BusinessFax' => 'fax',
+     prefix + 'CompanyMainPhone' => 'work', 'AssistantPhone' => 'work', 'OtherPhone' => 'other',
+     'CarPhone' => 'mobile', prefix + 'MobilePhone' => 'mobile', prefix + 'MobilePhone2' => 'mobile',
+     prefix + 'PagerNumber' => 'other', 'CallbackPhone' => 'other', 'ISDNPhone' => 'other', 'PrimaryPhone' => 'other',
      'RadioPhone' => 'other', 'TelexPhone' => 'other'}.each_with_index do |key, i|
        person.phone_number = {number: row[key[0]], location: key[1], primary: row['PreferredPhoneType'].to_i == i} if row[key[0]].present?
      end
