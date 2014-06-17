@@ -194,7 +194,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
                 city: q.city,
                 state: q.state,
                 newsletter: q.newsletter,
-                status: q.status,
+                status: statusApiArray,
                 likely: q.likely,
                 church: q.church,
                 referrer: q.referrer

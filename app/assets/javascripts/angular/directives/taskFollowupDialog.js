@@ -67,7 +67,7 @@ angular.module('mpdxApp')
                     dateTwoDaysFromToday.setDate(dateTwoDaysFromToday.getDate() + 2);
                     dateTwoDaysFromToday = dateTwoDaysFromToday.getFullYear() + '-' + ("0" + (dateTwoDaysFromToday.getMonth() + 1)).slice(-2) + '-' + ("0" + dateTwoDaysFromToday.getDate()).slice(-2);
 
-                    if(strContains(taskResult, 'Call Again')) {
+                    if(strContains(taskResult, 'Call Again') || strContains(taskResult, 'Left Message')) {
 
                         $scope.followUpDialogData = {
                             message: 'Schedule another call for the future?',
