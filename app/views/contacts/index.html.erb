@@ -61,9 +61,7 @@
           <li>
             <label id="filter_status"><%= _('Status') %></label>
             <div class="collapse" style="display:none;">
-              <%= select_tag 'filters[status]', options_for_select([[_('-- Any --'), ''], [_('-- None --'), 'null']] + contact_instance.assignable_statuses.collect { |s| [_(s), s] }), multiple: true, size: 5, :'ng-model' => 'contactQuery.status' %>
-              <br>
-              <input type="checkbox" ng-model="contactQuery.hidden"> Show hidden contacts
+              <%= select_tag 'filters[status]', options_for_select([[_('-- All Active --'), 'active'], [_('-- All Hidden --'), 'hidden'], [_('-- None --'), 'null']] + contact_instance.assignable_statuses.collect { |s| [_(s), s] }), multiple: true, size: 5, :'ng-model' => 'contactQuery.status' %>
             </div>
           </li>
 

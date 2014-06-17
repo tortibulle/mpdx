@@ -142,12 +142,12 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         }
         $scope.contactsLoading = true;
 
-        if(q.hidden !== oldq.hidden){
-            if(q.hidden){
-                q.status = _.uniq(_.union(q.status, ["Not Interested", "Unresponsive", "Never Ask", "Research Abandoned", "Expired Referral"]));
-            }else{
-                q.status = _.without(q.status, "Not Interested", "Unresponsive", "Never Ask", "Research Abandoned", "Expired Referral");
-            }
+        var statusApiArray = q.status;
+        if(_.contains(q.status, 'active')){
+            statusApiArray = _.uniq(_.union(statusApiArray, ['Never Contacted', 'Ask in Future', 'Contact for Appointment', 'Appointment Scheduled', 'Call for Decision', 'Partner - Financial', 'Partner - Special', 'Partner - Pray']));
+        }
+        if(_.contains(q.status, 'hidden')){
+            statusApiArray = _.uniq(_.union(statusApiArray, ["Not Interested", "Unresponsive", "Never Ask", "Research Abandoned", "Expired Referral"]));
         }
 
         api.call('get','contacts?account_list_id=' + (window.current_account_list_id || '') +
@@ -159,7 +159,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             '&filters[state][]=' + encodeURLarray(q.state).join('&filters[state][]=') +
             '&filters[newsletter]=' + encodeURIComponent(q.newsletter) +
             '&filters[tags][]=' + encodeURLarray(q.tags).join('&filters[tags][]=') +
-            '&filters[status][]=' + encodeURLarray(q.status).join('&filters[status][]=') +
+            '&filters[status][]=' + encodeURLarray(statusApiArray).join('&filters[status][]=') +
             '&filters[likely][]=' + encodeURLarray(q.likely).join('&filters[likely][]=') +
             '&filters[church][]=' + encodeURLarray(q.church).join('&filters[church][]=') +
             '&filters[referrer][]=' + encodeURLarray(q.referrer).join('&filters[referrer][]=')
