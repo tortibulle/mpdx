@@ -1,0 +1,4 @@
+fr:
+  date:
+    # Don't forget the nil at the beginning; there's no such thing as a 0th month
+    month_names: [~, janvier, février, mars, avril, mai, juin, juillet, août, septembre, octobre, novembre, décembre]
