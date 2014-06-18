@@ -35,12 +35,6 @@ angular.module('mpdxApp')
                 };
 
                 $scope.followUpDialog = function(taskId, taskResult){
-                    ////////////  testing  ////////////
-                    if(!window.current_account_list_tester){
-                        //return;
-                    }
-                    ////////////  end testing  ////////////
-
                     if(angular.isDefined($scope.tasks)){
                         var mergedTasks = [];
                         _($scope.tasks).forEach(function(i) { mergedTasks.push(i); });
