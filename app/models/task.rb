@@ -16,6 +16,7 @@ class Task < Activity
   PERMITTED_ATTRIBUTES = [
     :starred, :location, :subject, :start_at, :end_at, :activity_type, :result, :completed_at,
     :completed,
+    :next_action,
     :tag_list, {
       activity_comments_attributes: [:body],
       activity_comment: [:body],
@@ -25,11 +26,16 @@ class Task < Activity
 
   # validates :activity_type, :presence => { :message => _( '/ Action is required') }
 
-  CALL_RESULTS = ['Done', 'Attempted - Left Message', 'Attempted - Call Again', 'Attempted - None', 'Completed - Call Again', 'Completed - Appointment Scheduled', 'Completed - Partner - Financial', 'Completed - Partner - Special', 'Completed - Partner - Pray', 'Completed - Ask in Future', 'Completed - Not Interested', 'Received - Call Again', 'Received - Appointment Scheduled', 'Received - Partner - Financial', 'Received - Partner - Special', 'Received - Partner - Pray', 'Received - Ask in Future', 'Received - Not Interested']
-  MESSAGE_RESULTS = [_('Received')]
-  STANDARD_RESULTS = [_('Done')]
+  CALL_RESULTS = ['Attempted - Left Message', 'Attempted', 'Completed', 'Received']
+  CALL_NEXT_ACTIONS = ['Call Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'None']
+
   APPOINTMENT_RESULTS = ['Done', 'Decision Received', 'Call for Decision', 'Partner - Financial', 'Attempted - Reschedule']
-  ALL_RESULTS = STANDARD_RESULTS + CALL_RESULTS + MESSAGE_RESULTS
+
+  MESSAGE_RESULTS = [_('Done'), _('Received')]
+
+  STANDARD_RESULTS = [_('Done')]
+
+  ALL_RESULTS = STANDARD_RESULTS + APPOINTMENT_RESULTS + CALL_RESULTS + MESSAGE_RESULTS
 
   assignable_values_for :activity_type, :allow_blank => true do
     ['Call', 'Appointment', 'Email', 'Text Message', 'Facebook Message',

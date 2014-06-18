@@ -17,6 +17,7 @@ angular.module('mpdxApp')
                                 + ':' + jQuery('#modal_task_completed_at_5i', formData).val()
                                 + ':00',
                             result: jQuery('#modal_task_result', formData).val(),
+                            next_action: jQuery('#modal_task_next_action', formData).val(),
                             activity_contacts_attributes:
                                 [{
                                     contact_id: parseInt(jQuery('#modal_task_activity_contacts_attributes_0_contact_id', formData).val())
@@ -30,7 +31,7 @@ angular.module('mpdxApp')
                             }
                         }
                     }, function (data) {
-                        $scope.followUpDialog(data.task.id, jQuery('#modal_task_result', formData).val());
+                        $scope.followUpDialog(data.task.id, jQuery('#modal_task_next_action', formData).val());
                     });
                 };
 

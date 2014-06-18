@@ -144,10 +144,10 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
 
         var statusApiArray = q.status;
         if(_.contains(q.status, 'active')){
-            statusApiArray = _.uniq(_.union(statusApiArray, ['Never Contacted', 'Ask in Future', 'Contact for Appointment', 'Appointment Scheduled', 'Call for Decision', 'Partner - Financial', 'Partner - Special', 'Partner - Pray']));
+            statusApiArray = _.uniq(_.union(statusApiArray, <%= (Contact.new.assignable_statuses - Contact.inactive_statuses).inspect %>));
         }
         if(_.contains(q.status, 'hidden')){
-            statusApiArray = _.uniq(_.union(statusApiArray, ["Not Interested", "Unresponsive", "Never Ask", "Research Abandoned", "Expired Referral"]));
+            statusApiArray = _.uniq(_.union(statusApiArray, <%= Contact.inactive_statuses.inspect %>));
         }
 
         api.call('get','contacts?account_list_id=' + (window.current_account_list_id || '') +

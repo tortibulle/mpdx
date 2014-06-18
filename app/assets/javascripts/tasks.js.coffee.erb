@@ -258,14 +258,13 @@ $ ->
             {
               text: __('Complete'),
               click: (e) ->
-                result = $("#task_result_select select").val()
-                result = result + " - " + $("#task_action_select select").val()  if $("#task_action_select select").val()
-                $('#task_result_task_result').val(result);
+                $('#task_result_task_result').val($("#task_result_select select").val());
+                $('#task_result_task_next_action').val($("#task_action_select select").val());
                 $('#task_result_task_completed').val(true)
                 $('form', this).submit()
                 $('#task_' + id).fadeOut()
                 $(this).dialog("close")
-                angular.element('#task-followup-dialog').scope().followUpDialog(id, result)
+                angular.element('#task-followup-dialog').scope().followUpDialog(id, $("#task_action_select select").val())
             },
             {
               text: __('Cancel'),
@@ -276,18 +275,26 @@ $ ->
 
 $(document).on 'change', '[name="task[activity_type]"]', ->
   $.mpdx.setOptions($('[name="task[result]"]'), $.mpdx.getTaskResultOptions($(this).val()))
+  $.mpdx.setOptions($('[name="task[next_action]"]'), $.mpdx.getTaskNextActionOptions($(this).val()))
 
 $.mpdx.getTaskResultOptions = (activity_type) ->
-  CALL_RESULTS = ['Done', 'Attempted - Left Message', 'Attempted - Call Again', 'Completed - Call Again', 'Completed - Appointment Scheduled', 'Completed - Partner - Financial', 'Completed - Partner - Special', 'Completed - Partner - Pray', 'Completed - Ask in Future', 'Completed - Not Interested', 'Received - Call Again', 'Received - Appointment Scheduled', 'Received - Partner - Financial', 'Received - Partner - Special', 'Received - Partner - Pray', 'Received - Ask in Future', 'Received - Not Interested']
-  MESSAGE_RESULTS = [__('Received')]
-  STANDARD_RESULTS = [__('Done')]
   switch activity_type
     when 'Call'
-      return CALL_RESULTS + ''
+      return <%= Task::CALL_RESULTS %>.join()
+    when 'Appointment'
+      return <%= Task::APPOINTMENT_RESULTS %>.join()
     when 'Email', 'Text Message', 'Facebook Message', 'Letter'
-      return STANDARD_RESULTS + ',' + MESSAGE_RESULTS
+      return <%= Task::MESSAGE_RESULTS %>.join()
     else
-      return STANDARD_RESULTS[0]
+      return <%= Task::STANDARD_RESULTS %>.join()
+  end
+
+$.mpdx.getTaskNextActionOptions = (activity_type) ->
+  switch activity_type
+    when 'Call'
+      return <%= Task::CALL_NEXT_ACTIONS %>.join()
+    else
+      return 'None'
   end
 
 $.mpdx.getSelectedTaskIds = (scope) ->
