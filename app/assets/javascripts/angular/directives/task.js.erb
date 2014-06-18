@@ -20,12 +20,28 @@ angular.module('mpdxApp')
 
                 //complete options
                 if($scope.task.activity_type === 'Call') {
-                    $scope.completeResultOptions = <%= Task::CALL_RESULTS %>;
-                    $scope.completeActionOptions = <%= Task::CALL_NEXT_ACTIONS %>;
+                  $scope.completeResultOptions = <%= Task::CALL_RESULTS %>;
+                  $scope.completeActionOptions = <%= Task::CALL_NEXT_ACTIONS %>;
+
                 }else if($scope.task.activity_type === 'Appointment') {
-                    $scope.completeResultOptions = <%= Task::APPOINTMENT_RESULTS %>;
-                }else if(_.contains(['Email', 'Text Message', 'Facebook Message', 'Letter'], $scope.task.activity_type)){
+                  $scope.completeResultOptions = <%= Task::APPOINTMENT_RESULTS %>;
+                  $scope.completeActionOptions = <%= Task::APPOINTMENT_NEXT_ACTIONS %>;
+
+                }else if($scope.task.activity_type === 'Email') {
+                  $scope.completeResultOptions = <%= Task::EMAIL_RESULTS %>;
+                  $scope.completeActionOptions = <%= Task::EMAIL_NEXT_ACTIONS %>;
+
+                }else if($scope.task.activity_type === 'Facebook Message') {
+                  $scope.completeResultOptions = <%= Task::FACEBOOK_MESSAGE_RESULTS %>;
+                  $scope.completeActionOptions = <%= Task::FACEBOOK_MESSAGE_NEXT_ACTIONS %>;
+
+                }else if($scope.task.activity_type === 'Text Message') {
+                  $scope.completeResultOptions = <%= Task::TEXT_RESULTS %>;
+                  $scope.completeActionOptions = <%= Task::TEXT_NEXT_ACTIONS %>;
+
+                }else if($scope.task.activity_type === 'Letter') {
                     $scope.completeResultOptions = <%= Task::MESSAGE_RESULTS %>;
+
                 }else{
                     $scope.completeResultOptions = <%= Task::STANDARD_RESULTS %>;
                 }

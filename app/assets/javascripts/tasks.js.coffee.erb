@@ -283,7 +283,13 @@ $.mpdx.getTaskResultOptions = (activity_type) ->
       return <%= Task::CALL_RESULTS %>.join()
     when 'Appointment'
       return <%= Task::APPOINTMENT_RESULTS %>.join()
-    when 'Email', 'Text Message', 'Facebook Message', 'Letter'
+    when 'Email'
+      return <%= Task::EMAIL_RESULTS %>.join()
+    when 'Facebook Message'
+      return <%= Task::FACEBOOK_MESSAGE_RESULTS %>.join()
+    when 'Text Message'
+      return <%= Task::TEXT_RESULTS %>.join()
+    when 'Letter'
       return <%= Task::MESSAGE_RESULTS %>.join()
     else
       return <%= Task::STANDARD_RESULTS %>.join()
@@ -293,6 +299,14 @@ $.mpdx.getTaskNextActionOptions = (activity_type) ->
   switch activity_type
     when 'Call'
       return <%= Task::CALL_NEXT_ACTIONS %>.join()
+    when 'Appointment'
+      return <%= Task::APPOINTMENT_NEXT_ACTIONS %>.join()
+    when 'Email'
+      return <%= Task::EMAIL_NEXT_ACTIONS %>.join()
+    when 'Facebook Message'
+      return <%= Task::FACEBOOK_MESSAGE_NEXT_ACTIONS %>.join()
+    when 'Text Message'
+      return <%= Task::TEXT_NEXT_ACTIONS %>.join()
     else
       return 'None'
   end

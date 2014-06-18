@@ -29,10 +29,19 @@ class Task < Activity
   CALL_RESULTS = ['Attempted - Left Message', 'Attempted', 'Completed', 'Received']
   CALL_NEXT_ACTIONS = ['Call Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'None']
 
-  APPOINTMENT_RESULTS = ['Done', 'Decision Received', 'Call for Decision', 'Partner - Financial', 'Attempted - Reschedule']
+  APPOINTMENT_RESULTS = ['Completed', 'Attempted']
+  APPOINTMENT_NEXT_ACTIONS = ['Call for Decision', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'Reschedule', 'None']
+
+  EMAIL_RESULTS = ['Completed', 'Received']
+  EMAIL_NEXT_ACTIONS = ['Email Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'None']
+
+  FACEBOOK_MESSAGE_RESULTS = ['Completed', 'Received']
+  FACEBOOK_MESSAGE_NEXT_ACTIONS = ['Message Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'None']
+
+  TEXT_RESULTS = ['Completed', 'Received']
+  TEXT_NEXT_ACTIONS = ['Text Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'None']
 
   MESSAGE_RESULTS = [_('Done'), _('Received')]
-
   STANDARD_RESULTS = [_('Done')]
 
   ALL_RESULTS = STANDARD_RESULTS + APPOINTMENT_RESULTS + CALL_RESULTS + MESSAGE_RESULTS

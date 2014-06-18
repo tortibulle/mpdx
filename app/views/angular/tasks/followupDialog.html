@@ -284,7 +284,7 @@
 
         <div ng-show="followUpDialogData.callTask" style="padding-top:10px;">
             <hr>
-            <input type="checkbox" ng-model="followUpDialogResult.createCallTask"> Create "Call" task
+            <input type="checkbox" ng-model="followUpDialogResult.createCallTask"> Create "{{followUpDialogResult.callTask.type}}" task
         </div>
         <div ng-show="followUpDialogResult.createCallTask" style="padding-top:10px;">
             <label>Subject</label><br>
