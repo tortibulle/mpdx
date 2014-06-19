@@ -44,6 +44,8 @@ $ ->
       else
         $('#modal_task_activity_type').val('Call')
 
+    logTask = $(this).attr("data-completed")
+
     $('#edit_task_modal').dialog
       resizable: false,
       modal:'true',
@@ -56,8 +58,13 @@ $ ->
             if $.trim($('#modal_task_subject', form).val()) == ''
               alert(__("Please enter a subject"))
               return false
-            $.rails.handleRemote(form)
-            $('.form_wrapper', this).html('<%= image_tag("spinner.gif") %>')
+
+            if logTask == 'true'
+              $(this).dialog('close')
+              angular.element('#task-followup-dialog').scope().logTask(form)
+            else
+              $.rails.handleRemote(form)
+              $('.form_wrapper', this).html('<%= image_tag("spinner.gif") %>')
             if $('#tasks_index')[0]?
               angular.element(jQuery("#contentbody")).scope().refreshVisibleTasks()
         },
@@ -183,10 +190,6 @@ $ ->
     else
       $('.taskgroup .actions', table).hide()
 
-  $(document).on 'click', '.comment_status', ->
-    $('.comments', $(this).closest('tr')).toggle()
-    false
-
   $(document).on 'click', 'tr.task .fav', ->
     id = $(this).closest('tr').attr('data-id')
     form = $('#task_result_modal form')
@@ -223,18 +226,28 @@ $ ->
           title = $(".taskaction", row).html()
           title += " - " + $(".tasktitle", row).html()
 
-        $("#task_result_task_result").empty()
+        $("#task_result_select, #task_action_select").empty()
         ops = $(this).attr("data-results").split(",")
+        actions = $(this).attr("data-actions").split(",")
+        $("<select></select>").appendTo "#task_result_select"
         $.each ops, (key, value) ->
-          $("<input type=\"radio\" name=\"task[result]\" value=\""+value+"\" id=\""+key+"\" /><label for=\""+key+"\" style=\"display:inline-block;\">"+value+"</label>").appendTo "#task_result_task_result"
-          return
-        $('#task_result_task_result input').val(['Done']);
+          $("#task_result_select select").append $("<option></option>").attr("value", value).text(value)
+
+        $("<select></select>").appendTo "#task_action_select"
+        $.each actions, (key, value) ->
+          $("#task_action_select select").append $("<option></option>").attr("value", value).text(value)
 
         #hide result dropdown if only one option
-        if ops.length is 1
-          $("#task_result_task_result").parent().hide()
+        if ops.length <= 1
+          $("#task_result_select").parent().hide()
         else
-          $("#task_result_task_result").parent().show()
+          $("#task_result_select").parent().show()
+
+        if actions.length <= 1
+          $("#task_action_select").parent().hide()
+        else
+          $("#task_action_select").parent().show()
+
 
         # Marking a task off, open the result modal
         $('#task_result_modal').dialog
@@ -245,10 +258,13 @@ $ ->
             {
               text: __('Complete'),
               click: (e) ->
+                $('#task_result_task_result').val($("#task_result_select select").val());
+                $('#task_result_task_next_action').val($("#task_action_select select").val());
                 $('#task_result_task_completed').val(true)
                 $('form', this).submit()
                 $('#task_' + id).fadeOut()
                 $(this).dialog("close")
+                angular.element('#task-followup-dialog').scope().followUpDialog(id, $("#task_action_select select").val())
             },
             {
               text: __('Cancel'),
@@ -259,18 +275,40 @@ $ ->
 
 $(document).on 'change', '[name="task[activity_type]"]', ->
   $.mpdx.setOptions($('[name="task[result]"]'), $.mpdx.getTaskResultOptions($(this).val()))
+  $.mpdx.setOptions($('[name="task[next_action]"]'), $.mpdx.getTaskNextActionOptions($(this).val()))
 
 $.mpdx.getTaskResultOptions = (activity_type) ->
-  CALL_RESULTS = [__('Attempted')]
-  MESSAGE_RESULTS = [__('Received')]
-  STANDARD_RESULTS = [__('Done')]
   switch activity_type
     when 'Call'
-      return CALL_RESULTS + ',' + STANDARD_RESULTS
-    when 'Email', 'Text Message', 'Facebook Message', 'Letter'
-      return STANDARD_RESULTS + ',' + MESSAGE_RESULTS
+      return <%= Task::CALL_RESULTS %>.join()
+    when 'Appointment'
+      return <%= Task::APPOINTMENT_RESULTS %>.join()
+    when 'Email'
+      return <%= Task::EMAIL_RESULTS %>.join()
+    when 'Facebook Message'
+      return <%= Task::FACEBOOK_MESSAGE_RESULTS %>.join()
+    when 'Text Message'
+      return <%= Task::TEXT_RESULTS %>.join()
+    when 'Letter'
+      return <%= Task::MESSAGE_RESULTS %>.join()
     else
-      return STANDARD_RESULTS[0]
+      return <%= Task::STANDARD_RESULTS %>.join()
+  end
+
+$.mpdx.getTaskNextActionOptions = (activity_type) ->
+  switch activity_type
+    when 'Call'
+      return <%= Task::CALL_NEXT_ACTIONS %>.join()
+    when 'Appointment'
+      return <%= Task::APPOINTMENT_NEXT_ACTIONS %>.join()
+    when 'Email'
+      return <%= Task::EMAIL_NEXT_ACTIONS %>.join()
+    when 'Facebook Message'
+      return <%= Task::FACEBOOK_MESSAGE_NEXT_ACTIONS %>.join()
+    when 'Text Message'
+      return <%= Task::TEXT_NEXT_ACTIONS %>.join()
+    else
+      return 'None'
   end
 
 $.mpdx.getSelectedTaskIds = (scope) ->

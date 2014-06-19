@@ -8,7 +8,7 @@ class PersonSerializer < ActiveModel::Serializer
 
   attributes *ATTRIBUTES
 
-  INCLUDES = [:phone_numbers, :email_addresses]
+  INCLUDES = [:phone_numbers, :email_addresses, :facebook_accounts]
   INCLUDES.each do |i|
     has_many i
   end

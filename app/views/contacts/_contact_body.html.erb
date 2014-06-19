@@ -146,14 +146,17 @@
         </ul>
         <div class="clr"></div>
 
+
         <div id="details-tab">
           <%= spinner(extra: 'details', visible: true) %>
           <div id="details"></div>
         </div>
 
-        <div id="tasks-tab">
-          <%= spinner(extra: 'tasks', visible: true) %>
-          <div id="tasks"></div>
+        <div id="tasks-tab" ng-controller="taskShortListController" ng-init="init('contact','<%= contact.id %>')">
+          <table class="list tasklist">
+            <tr task="task" ng-repeat="task in tasks" id="task_{{task.id}}"></tr>
+          </table>
+          <p ng-hide="tasks.length">No tasks found for this contact.</p>
         </div>
         <div id="history-tab">
           <%= spinner(extra: 'history', visible: true) %>

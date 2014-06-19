@@ -27,7 +27,14 @@
         <li class="killround"><a href="#dash-progress"><%= _('Progress') %></a></li>
       </ul>
 
-      <div id="dash-connect"></div>
+      <div id="dash-connect" ng-controller="taskShortListController" ng-init="init('top5','')">
+        <table class="list tasklist">
+          <tr task="task" ng-repeat="task in tasks" id="task_{{task.id}}"></tr>
+        </table>
+        <div class="seemore">
+          <%= link_to(_('See All'), tasks_path) %>
+        </div>
+      </div>
       <div id="dash-care"></div>
       <div id="dash-cultivate"></div>
       <div id="dash-progress"></div>

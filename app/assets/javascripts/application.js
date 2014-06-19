@@ -12,6 +12,7 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require jquery.ui.datepicker
 //= require jquery.ui.dialog
 //= require jquery.ui.tabs
 //= require jquery.ui.autocomplete
@@ -46,3 +47,4 @@
 //= require_tree ./angular/controllers
 //= require_tree ./angular/directives
 //= require_tree ./angular/services
+//= require_tree ./angular/filters

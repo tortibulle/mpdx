@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140325143531) do
+ActiveRecord::Schema.define(version: 20140618153152) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -79,6 +79,7 @@ ActiveRecord::Schema.define(version: 20140325143531) do
     t.integer  "notification_id"
     t.string   "remote_id"
     t.string   "source"
+    t.string   "next_action"
   end
 
   add_index "activities", ["account_list_id"], name: "index_activities_on_account_list_id", using: :btree

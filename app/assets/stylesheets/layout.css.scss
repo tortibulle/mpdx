@@ -397,6 +397,23 @@ h2.section {
 .set.phone {margin-bottom:2px;}
 .set.email {margin-bottom:3px;}
 
+.social {
+  float: right;
+  padding: 6px 6px 6px 0;
+  position: relative;
+  width: 20px;
+  & > * {
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+    text-indent: -9999px;
+    background: center center no-repeat;
+  }
+  .facebook { background-image: image-url('soc_facebook.gif'); }
+  .twitter { background-image: image-url('soc_twitter.gif'); }
+  .linkedin { background-image: image-url('soc_linkedin.gif'); }
+}
+
 .small-person {
   background-color: $gray_light;
   border: 1px solid $gray_mid;
@@ -419,23 +436,6 @@ h2.section {
   .name {
     font-size: 1.5em;
     line-height: 1em;
-  }
-
-  .social {
-    float: right;
-    padding: 6px 6px 6px 0;
-    position: relative;
-    width: 20px;
-    & > * {
-      display: inline-block;
-      height: 20px;
-      width: 20px;
-      text-indent: -9999px;
-      background: center center no-repeat;
-    }
-    .facebook { background-image: image-url('soc_facebook.gif'); }
-    .twitter { background-image: image-url('soc_twitter.gif'); }
-    .linkedin { background-image: image-url('soc_linkedin.gif'); }
   }
   &.merge-person-checked {
     box-shadow: 0 0 5px $blue;
@@ -771,6 +771,65 @@ tbody.tasks {
 }
 
 /* ************************************************************** */
+
+
+.contact-info{
+  background: #e7f8ff;
+  padding:1px 6px;
+
+  .corner_close{
+    float:right;
+    margin:4px;
+  }
+
+  .column{
+    display: inline-block;
+    width: 328px;
+    margin: 3px;
+    vertical-align: top;
+  }
+
+  .person{
+    background-color: #e6e7e8;
+    border: 1px solid #bbbdbf;
+    vertical-align: top;
+    margin: 3px;
+    height: 100px;
+    width: 328px;
+    display: inline-block;
+
+    .name{
+      display: inline-block;
+      width: 190px;
+      vertical-align: top;
+      padding: 4px 0 0 0;
+    }
+
+    .column-inner{
+      display: inline-block;
+      width:219px;
+      vertical-align: top;
+      height: 72px;
+      overflow-y: auto;
+      margin: 0 2px 0 0;
+    }
+    .avatar{
+      display:inline-block;
+      width:106px;
+      float:left;
+
+      .person_avatar{
+        max-width: 100px;
+        max-height: 100px;
+      }
+    }
+
+    .social{
+      padding:0;
+    }
+
+  }
+}
 
 .profiletop {
   h1 {

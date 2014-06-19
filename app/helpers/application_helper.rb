@@ -94,4 +94,20 @@ module ApplicationHelper
     end.html_safe
   end
 
+  def calendar_date_select_tag(name, value = nil, options = {})
+    options.merge!({'data-calendar' => true})
+    options.merge!({'id' => ''})
+    options.merge!({'style' => 'width:100px;'})
+    options.merge!({'readonly' => ''})
+    value = case
+              when value.is_a?(Time) || value.is_a?(DateTime)
+                l(value.to_date)
+              when value.is_a?(Date)
+                l(value)
+              else
+                value
+            end
+    text_field_tag(name, value, options)
+  end
+
 end

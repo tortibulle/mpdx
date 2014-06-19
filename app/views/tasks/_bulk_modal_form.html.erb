@@ -3,4 +3,18 @@
   <%= hidden_field_tag 'bulk_task_update_ids', params[:bulk_task_update_ids] %>
   <%= render 'tasks/bulk_fields', task: f.object, f: f %>
 <% end %>
+<script>
+  $('[data-calendar]').datepicker({
+    changeYear:true,
+    dateFormat: 'yy-mm-dd',
+    onSelect: function(dateText) {
+      var year = dateText.substr(0,4);
+      var month = dateText.substr(5,2);
+      var day = dateText.substr(8,2);
 
+      $('.due_date [id$=_1i]').val(year);
+      $('.due_date [id$=_2i]').val(month);
+      $('.due_date [id$=_3i]').val(day);
+    }
+  });
+</script>

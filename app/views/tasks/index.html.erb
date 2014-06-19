@@ -1,4 +1,4 @@
-<div ng-controller="tasksController">
+<div ng-controller="tasksController" id="tasksController">
   <%= render 'sidebar' %>
   <div id="contentbody" class="withleft">
     <div class="wpp">
@@ -60,4 +60,6 @@
       <%= render 'tasks/bulk_modal_form' %>
     </div>
   </div>
+
+  <task-followup-dialog id="task-followup-dialog"></task-followup-dialog>
 </div>

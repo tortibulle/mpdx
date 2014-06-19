@@ -91,7 +91,7 @@ $.mpdx = {}
 $.mpdx.activateTabs = ->
   $(".tabgroup").tabs({
     activate: (event, ui) ->
-      window.location.hash = ui.newPanel[0].id
+      #window.location.hash = ui.newPanel[0].id
   })
 
 $.mpdx.ajaxBefore = ->
@@ -188,10 +188,7 @@ $.deparam = (param_string) ->
 $.mpdx.setOptions = (select_tag, options) ->
   select_tag.empty()
   $.each options.split(','), (key, value) ->
-    select_tag.append($("<option value=" + value + ">" + value + "</option>"), {
-      value: value,
-      text: value
-    })
+    select_tag.append $("<option></option>").attr("value", value).text(value)
 
 $.set_param = (key, value, params) ->
   params = '?' + params if params

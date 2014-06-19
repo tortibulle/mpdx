@@ -16,6 +16,7 @@ class Task < Activity
   PERMITTED_ATTRIBUTES = [
     :starred, :location, :subject, :start_at, :end_at, :activity_type, :result, :completed_at,
     :completed,
+    :next_action,
     :tag_list, {
       activity_comments_attributes: [:body],
       activity_comment: [:body],
@@ -25,10 +26,25 @@ class Task < Activity
 
   # validates :activity_type, :presence => { :message => _( '/ Action is required') }
 
-  CALL_RESULTS = [_('Attempted')]
-  MESSAGE_RESULTS = [_('Received')]
+  CALL_RESULTS = ['Attempted - Left Message', 'Attempted', 'Completed', 'Received']
+  CALL_NEXT_ACTIONS = ['Call Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'None']
+
+  APPOINTMENT_RESULTS = ['Completed', 'Attempted']
+  APPOINTMENT_NEXT_ACTIONS = ['Call for Decision', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'Reschedule', 'None']
+
+  EMAIL_RESULTS = ['Completed', 'Received']
+  EMAIL_NEXT_ACTIONS = ['Email Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'None']
+
+  FACEBOOK_MESSAGE_RESULTS = ['Completed', 'Received']
+  FACEBOOK_MESSAGE_NEXT_ACTIONS = ['Message Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'None']
+
+  TEXT_RESULTS = ['Completed', 'Received']
+  TEXT_NEXT_ACTIONS = ['Text Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'None']
+
+  MESSAGE_RESULTS = [_('Done'), _('Received')]
   STANDARD_RESULTS = [_('Done')]
-  ALL_RESULTS = STANDARD_RESULTS + CALL_RESULTS + MESSAGE_RESULTS
+
+  ALL_RESULTS = STANDARD_RESULTS + APPOINTMENT_RESULTS + CALL_RESULTS + MESSAGE_RESULTS
 
   assignable_values_for :activity_type, :allow_blank => true do
     ['Call', 'Appointment', 'Email', 'Text Message', 'Facebook Message',
@@ -36,6 +52,7 @@ class Task < Activity
      'Support Letter', 'Thank', 'To Do']
   end
 
+=begin
   assignable_values_for :result, :allow_blank => true do
     case activity_type
       when 'Call'
@@ -46,6 +63,7 @@ class Task < Activity
         STANDARD_RESULTS
     end
   end
+=end
 
   def attempted?
     'Attempted' == result
@@ -79,7 +97,7 @@ class Task < Activity
   private
   def update_completed_at
     if changed.include?('completed')
-      self.completed_at ||= completed? ? Time.now : nil
+      self.completed_at = Time.now
       self.start_at ||= completed_at
       self.result = 'Done' if result.blank?
     end

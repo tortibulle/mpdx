@@ -16,14 +16,14 @@
   <li>
     <%= _('Completed:') %>
     <%= current_account_list.tasks.of_type('Call')
-                            .with_result('Done')
+                            .with_result(['Completed'])
                             .completed_between(@start_date, @end_date)
                             .count %>
   </li>
   <li>
     <%= _('Attempted:') %>
     <%= current_account_list.tasks.of_type('Call')
-                            .with_result('Attempted')
+                            .with_result(['Attempted - Left Message', 'Attempted'])
                             .completed_between(@start_date, @end_date)
                             .count %>
 
@@ -31,7 +31,7 @@
   <li>
     <%= _('Received:') %>
     <%= current_account_list.tasks.of_type('Call')
-                            .with_result('Received')
+                            .with_result(['Received', 'Received - Complete - Call Again', 'Received - Appointment Scheduled', 'Received - Partner - Financial', 'Received - Partner - Special', 'Received - Partner - Pray', 'Received - Ask in Future', 'Received - Not Interested'])
                             .completed_between(@start_date, @end_date)
                             .count %>
   </li>
@@ -42,7 +42,7 @@
   <li>
     <%= _('Completed:') %>
     <%= current_account_list.tasks.of_type('Appointment')
-                            .with_result('Done')
+                            .with_result('Completed')
                             .completed_between(@start_date, @end_date)
                             .count %>
   </li>
@@ -61,7 +61,7 @@
   <li>
     <%= _('Sent:') %>
     <%= current_account_list.tasks.of_type('Email')
-                            .with_result('Done')
+                            .with_result('Completed')
                             .completed_between(@start_date, @end_date)
                             .count %>
   </li>
@@ -79,7 +79,7 @@
   <li>
     <%= _('Sent:') %>
     <%= current_account_list.tasks.of_type('Facebook Message')
-                            .with_result('Done')
+                            .with_result('Completed')
                             .completed_between(@start_date, @end_date)
                             .count %>
   </li>

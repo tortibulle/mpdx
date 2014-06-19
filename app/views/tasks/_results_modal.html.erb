@@ -3,13 +3,19 @@
     <%= hidden_field_tag :bulk_task_update_ids %>
     <div>
       <%= _('Result') %>
-      <div id="task_result_task_result"></div>
+      <div id="task_result_select"></div>
+    </div>
+    <div style="padding-top:6px;">
+      <%= _('Next Action') %>
+      <div id="task_action_select"></div>
     </div>
     <div class="comment_form">
       <%= f.fields_for f.object.activity_comments.new do |cf| %>
         <%= cf.text_area :body, placeholder: _('Add Note'), rows: 4 %>
       <% end %>
     </div>
+    <%= f.hidden_field :result %>
+    <%= f.hidden_field :next_action %>
     <%= f.hidden_field :starred %>
     <%= f.hidden_field :completed, value: false%>
   <% end %>

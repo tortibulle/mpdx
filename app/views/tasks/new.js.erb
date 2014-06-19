@@ -5,3 +5,16 @@
   $('#edit_task_modal .form_wrapper').html('<%= j(render('tasks/modal_form')) %>')
   $('#edit_task_modal').dialog({position:"center"})
 <% end %>
+$('[data-calendar]').datepicker({
+  changeYear:true,
+  dateFormat: 'yy-mm-dd',
+  onSelect: function(dateText) {
+    var year = dateText.substr(0,4);
+    var month = dateText.substr(5,2);
+    var day = dateText.substr(8,2);
+
+    $('#task_modal_form [id$=_1i]').val(year);
+    $('#task_modal_form [id$=_2i]').val(month);
+    $('#task_modal_form [id$=_3i]').val(day);
+  }
+});

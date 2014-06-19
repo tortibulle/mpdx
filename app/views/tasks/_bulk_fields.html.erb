@@ -14,28 +14,35 @@
   <%= f.text_field :subject, autofocus: true, maxlength: 255, required: true %>
 </div>
 
-<% if task.completed? %>
-  <%= f.hidden_field :completed %>
-  <div class="field">
-    <%= f.label :start_at, _('Completed On') %>
-    <%= f.datetime_select :completed_at, ampm: true, default: Time.zone.now, order: [:month, :day, :year] %>
-  </div>
-
-  <div class="field">
-    <%= f.label :result, _('Result') %>
-    <%= f.select :result, task.assignable_results.collect { |s| [_(s), s] } %>
-  </div>
-<% else %>
-  <div class="field due_date">
-    <%= f.label :start_at, _('Due Date') %>
-    <%= f.datetime_select :start_at, ampm: true, default: 1.day.from_now, order: [:month, :day, :year] %>
-  </div>
-<% end %>
-
 <div class="field">
   <%= f.label :activity_type, _('Action') %>
   <%= f.select :activity_type, f.object.assignable_activity_types.collect { |s| [_(s), s] }, include_blank: true %>
 </div>
+
+<% if task.completed? %>
+  <%= f.hidden_field :completed %>
+  <div class="field">
+    <%= f.label :start_at, _('Completed On') %>
+    <%= calendar_date_select_tag '' %>
+    <%= f.time_select :completed_at, ampm: true, default: 1.day.from_now, order: [:month, :day, :year] %>
+  </div>
+
+  <div class="field">
+    <%= f.label :result, _('Result') %>
+    <%= f.select :result, {} %>
+  </div>
+
+  <div class="field">
+    <%= f.label :next_action, _('Next Action') %>
+    <%= f.select :next_action, {} %>
+  </div>
+<% else %>
+  <div class="field due_date">
+    <%= f.label :start_at, _('Due Date') %>
+    <%= calendar_date_select_tag '' %>
+    <%= f.time_select :start_at, ampm: true, default: 1.day.from_now, order: [:month, :day, :year] %>
+  </div>
+<% end %>
 
 <div class="field">
   <%= f.label :tag_list, _('Tags') %>
@@ -50,3 +57,5 @@
     <%= builder.text_area :body, rows: 3 %>
   <% end %>
 </div>
+
+

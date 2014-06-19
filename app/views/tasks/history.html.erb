@@ -12,6 +12,7 @@
           <th><%= _('Completed') %></th>
           <th><%= _('Type') %></th>
           <th><%= _('Result') %></th>
+          <th><%= _('Action') %></th>
           <th><%= _('Tags') %></th>
           <th><%= _('Subject') %></th>
           <th><%= _('Comments') %></th>
@@ -39,6 +40,7 @@
                 <%= _(task_exhibit.result) %>
               <% end %>
             </td>
+            <td><%= task_exhibit.next_action %></td>
             <td><%= task_exhibit.tag_list %></td>
             <td><%= task_exhibit %></td>
             <td><%== task.activity_comments.collect(&:body).join('<br />') %></td>
