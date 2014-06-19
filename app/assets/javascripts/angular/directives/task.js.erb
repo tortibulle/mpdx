@@ -52,8 +52,12 @@ angular.module('mpdxApp')
 
                 $scope.getPerson = function(id){
                     var person = _.find($scope.$parent.people, { 'id': id });
-                    person.name = person.first_name + ' ' + person.last_name;
-                    return person;
+                    if(angular.isDefined(person)){
+                      person.name = person.first_name + ' ' + person.last_name;
+                      return person;
+                    }else{
+                      return '';
+                    }
                 };
 
                 $scope.starTask = function(){

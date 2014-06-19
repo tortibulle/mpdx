@@ -4,9 +4,15 @@ angular.module('mpdxApp').controller('taskShortListController', function ($scope
         $scope.comments = {};
         $scope.people = {};
 
-        if(page === 'contact'){
+        if(page === 'contact') {
             var taskUrl = 'tasks?account_list_id=' + window.current_account_list_id +
                 '&filters[completed]=false' +
+                '&filters[contact_ids][]=' + contactId +
+                '&per_page=' + 5 +
+                '&page=' + 1;
+        }else if(page === 'contactHistory'){
+            var taskUrl = 'tasks?account_list_id=' + window.current_account_list_id +
+                '&filters[completed]=true' +
                 '&filters[contact_ids][]=' + contactId +
                 '&per_page=' + 5 +
                 '&page=' + 1;

@@ -158,9 +158,11 @@
           </table>
           <p ng-hide="tasks.length">No tasks found for this contact.</p>
         </div>
-        <div id="history-tab">
-          <%= spinner(extra: 'history', visible: true) %>
-          <div id="history"></div>
+        <div id="history-tab" ng-controller="taskShortListController" ng-init="init('contactHistory','<%= contact.id %>')">
+          <table class="list tasklist">
+            <tr task="task" ng-repeat="task in tasks" id="task_{{task.id}}"></tr>
+          </table>
+          <p ng-hide="tasks.length">No completed tasks found for this contact.</p>
         </div>
         <div id="referrals-tab">
           <%= spinner(extra: 'referrals', visible: true) %>

@@ -1,4 +1,4 @@
-<td class="check">
+<td class="check" ng-show="!task.completed">
     <a name="task_{{task.id}}"/>
     <input type="checkbox" name="task_ids[]" value="{{task.id}}" data-behavior="complete_task" data-results="{{completeResultOptions.join()}}"  data-actions="{{completeActionOptions.join()}}" data-id="{{task.id}}" data-title="{{task.activity_type + ' ' + task.subject}}" />
 </td>
@@ -82,7 +82,7 @@
                 <i class="fa fa-comments-o fa-lg pull-left"></i>
 
                 <div class="body">
-                    <a ng-href="/people/{{getComment(comment).person_id}}">{{getPerson(getComment(comment).person_id).name}}</a>
+                    <strong>{{getPerson(getComment(comment).person_id).name}}</strong>
                     <p ng-bind="getComment(comment).body"></p>
                 </div>
                 <span class="time">{{getComment(comment).created_at | date:'MM/dd/yyyy, h:mma'}}</span>
