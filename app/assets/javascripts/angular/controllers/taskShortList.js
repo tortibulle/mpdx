@@ -8,14 +8,16 @@ angular.module('mpdxApp').controller('taskShortListController', function ($scope
             var taskUrl = 'tasks?account_list_id=' + window.current_account_list_id +
                 '&filters[completed]=false' +
                 '&filters[contact_ids][]=' + contactId +
-                '&per_page=' + 5 +
-                '&page=' + 1;
+                '&per_page=' + 500 +
+                '&page=' + 1 +
+                '&order=start_at';
         }else if(page === 'contactHistory'){
             var taskUrl = 'tasks?account_list_id=' + window.current_account_list_id +
                 '&filters[completed]=true' +
                 '&filters[contact_ids][]=' + contactId +
-                '&per_page=' + 5 +
-                '&page=' + 1;
+                '&per_page=' + 500 +
+                '&page=' + 1 +
+                '&order=completed_at desc';
         }else{
             var taskUrl = 'tasks?account_list_id=' + window.current_account_list_id +
                 '&filters[completed]=false' +
