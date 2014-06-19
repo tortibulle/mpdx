@@ -351,7 +351,9 @@ angular.module('mpdxApp')
 
                     if(angular.isDefined($scope.followUpDialogData)){
                         $scope.followUpDialogResult.select = $scope.followUpDialogData.options[0];
-                        $scope.$apply();
+                        if(!$scope.$$phase) {
+                            $scope.$apply();
+                        }
                         jQuery("#complete_task_followup_modal").dialog({
                             autoOpen: true,
                             modal: true
@@ -376,7 +378,9 @@ angular.module('mpdxApp')
                             }
                         }
                     }, function () {
-                        $scope.refreshVisibleTasks();
+                        if(angular.isDefined($scope.refreshVisibleTasks)){
+                            $scope.refreshVisibleTasks();
+                        }
                     });
                 };
 
@@ -394,7 +398,9 @@ angular.module('mpdxApp')
                             }
                         }
                     }, function () {
-                        $scope.refreshVisibleTasks();
+                        if(angular.isDefined($scope.refreshVisibleTasks)){
+                            $scope.refreshVisibleTasks();
+                        }
                     });
                 };
 
@@ -412,7 +418,9 @@ angular.module('mpdxApp')
                             }
                         }
                     }, function () {
-                        $scope.refreshVisibleTasks();
+                        if(angular.isDefined($scope.refreshVisibleTasks)){
+                            $scope.refreshVisibleTasks();
+                        }
                     });
                 };
 
@@ -431,7 +439,9 @@ angular.module('mpdxApp')
                             }
                         }
                     }, function () {
-                        $scope.refreshVisibleTasks();
+                        if(angular.isDefined($scope.refreshVisibleTasks)){
+                            $scope.refreshVisibleTasks();
+                        }
                     });
                 };
 
