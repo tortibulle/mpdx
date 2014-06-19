@@ -62,11 +62,11 @@ angular.module('mpdxApp')
                     dateTwoDaysFromToday.setDate(dateTwoDaysFromToday.getDate() + 2);
                     dateTwoDaysFromToday = dateTwoDaysFromToday.getFullYear() + '-' + ("0" + (dateTwoDaysFromToday.getMonth() + 1)).slice(-2) + '-' + ("0" + dateTwoDaysFromToday.getDate()).slice(-2);
 
-                    if(strContains(taskResult, 'Call Again') || strContains(taskResult, 'Left Message') || strContains(taskResult, 'Email Again') || strContains(taskResult, 'Message Again') || strContains(taskResult, 'Text Again')) {
+                    if(strContains(taskResult, 'Call Again') || strContains(taskResult, 'Left Message') || strContains(taskResult, 'Call for Decision') || strContains(taskResult, 'Email Again') || strContains(taskResult, 'Message Again') || strContains(taskResult, 'Text Again')) {
 
                         //generic followup task type
                         var taskType;
-                        if(strContains(taskResult, 'Call Again') || strContains(taskResult, 'Left Message')){
+                        if(strContains(taskResult, 'Call Again') || strContains(taskResult, 'Left Message') || strContains(taskResult, 'Call for Decision')){
                             taskType = 'Call';
                         }else if(strContains(taskResult, 'Email Again')){
                             taskType = 'Email';
@@ -107,7 +107,7 @@ angular.module('mpdxApp')
                             jQuery('#complete_task_followup_modal').dialog('close');
                         };
 
-                    }else if(strContains(taskResult, 'Appointment Scheduled') && followUpTask.contacts.length > 0){
+                    }else if((strContains(taskResult, 'Appointment Scheduled') || strContains(taskResult, 'Reschedule')) && followUpTask.contacts.length > 0){
 
                         $scope.followUpDialogData = {
                             message: 'Contact\'s status will be updated to \'Appointment Scheduled\'.',

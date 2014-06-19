@@ -42,7 +42,7 @@
   <li>
     <%= _('Completed:') %>
     <%= current_account_list.tasks.of_type('Appointment')
-                            .with_result('Done')
+                            .with_result('Completed')
                             .completed_between(@start_date, @end_date)
                             .count %>
   </li>
@@ -61,7 +61,7 @@
   <li>
     <%= _('Sent:') %>
     <%= current_account_list.tasks.of_type('Email')
-                            .with_result('Done')
+                            .with_result('Completed')
                             .completed_between(@start_date, @end_date)
                             .count %>
   </li>
@@ -79,7 +79,7 @@
   <li>
     <%= _('Sent:') %>
     <%= current_account_list.tasks.of_type('Facebook Message')
-                            .with_result('Done')
+                            .with_result('Completed')
                             .completed_between(@start_date, @end_date)
                             .count %>
   </li>
