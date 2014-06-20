@@ -16,7 +16,8 @@ module.exports = function(config) {
 
         // list of files to exclude
         exclude: [
-            'app/assets/javascripts/**/*.js.coffee*'
+            'app/assets/javascripts/**/*.js.coffee*',
+            'app/assets/javascripts/**/*.js.erb*'
         ],
 
 

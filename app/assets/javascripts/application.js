@@ -44,6 +44,7 @@
 //= require angular
 //= require lodash
 //= require angular/mpdxApp
+//= require angular/railsConstants
 //= require_tree ./angular/controllers
 //= require_tree ./angular/directives
 //= require_tree ./angular/services
