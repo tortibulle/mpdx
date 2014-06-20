@@ -1,4 +1,4 @@
-angular.module('mpdxApp').controller('contactsController', function ($scope, $filter, $location, api, urlParameter, contactCache) {
+angular.module('mpdxApp').controller('contactsController', function ($scope, $filter, $location, api, contactCache) {
     var viewPrefs;
 
     $scope.contactsLoading = true;
@@ -92,7 +92,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         }
         if(angular.isDefined(prefs.status)){
             $scope.contactQuery.status = prefs.status;
-            if(prefs.status[0]){
+            if(prefs.status[0] !== 'active'){
                 jQuery("#leftmenu #filter_status").trigger("click");
             }
         }
@@ -114,20 +114,26 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
                 jQuery("#leftmenu #filter_referrer").trigger("click");
             }
         }
+        if(angular.isDefined(prefs.relatedTaskAction)){
+            $scope.contactQuery.relatedTaskAction = prefs.relatedTaskAction;
+            if(prefs.relatedTaskAction[0]){
+                jQuery("#leftmenu #filter_relatedTaskAction").trigger("click");
+            }
+        }
     });
 
     var taskFilterExists = function(){
       return ($scope.contactQuery.relatedTaskAction[0] !== '');
     };
 
-    var getTaskFilterIds = function(group){
-      api.call('get','tasks?account_list_id=' + window.current_account_list_id +
-              '&filters[completed]=false' +
-              '&filters[activity_type][]=' + encodeURLarray($scope.contactQuery.relatedTaskAction).join('&filters[activity_type][]=') +
+    var getTaskFilterIds = function (group) {
+        api.call('get', 'tasks?account_list_id=' + window.current_account_list_id +
+                '&filters[completed]=false' +
+                '&filters[activity_type][]=' + encodeURLarray($scope.contactQuery.relatedTaskAction).join('&filters[activity_type][]=') +
                 '&include=&per_page=10000'
-        , {}, function(data) {
-          console.log(data);
-        }, null, true);
+            , {}, function (tData) {
+                refreshContacts(_.uniq(_.flatten(tData.tasks, 'contacts')));
+            }, null, true);
     };
 
     $scope.tagIsActive = function(tag){
@@ -164,71 +170,76 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         }
     }, true);
 
-    var refreshContacts = function(taskIds){
-      var q = $scope.contactQuery;
+    var refreshContacts = function (taskContactIds) {
+        var q = $scope.contactQuery;
 
-      $scope.contactsLoading = true;
+        $scope.contactsLoading = true;
 
-      var statusApiArray = q.status;
-      if(_.contains(q.status, 'active')){
-        statusApiArray = _.uniq(_.union(statusApiArray, <%= (Contact.new.assignable_statuses - Contact.inactive_statuses).inspect %>));
-      }
-      if(_.contains(q.status, 'hidden')){
-        statusApiArray = _.uniq(_.union(statusApiArray, <%= Contact.inactive_statuses.inspect %>));
-      }
+        var statusApiArray = q.status;
+        if (_.contains(q.status, 'active')) {
+            statusApiArray = _.uniq(_.union(statusApiArray, railsConstants.contact.ACTIVE_STATUSES));
+        }
+        if (_.contains(q.status, 'hidden')) {
+            statusApiArray = _.uniq(_.union(statusApiArray, railsConstants.contact.INACTIVE_STATUSES));
+        }
 
-      api.call('get','contacts?account_list_id=' + (window.current_account_list_id || '') +
-                '&per_page=' + q.limit +
-                '&page=' + q.page +
-                '&filters[name]=' + encodeURIComponent(q.name) +
-                '&filters[contact_type]=' + encodeURIComponent(q.type) +
-                '&filters[city][]=' + encodeURLarray(q.city).join('&filters[city][]=') +
-                '&filters[state][]=' + encodeURLarray(q.state).join('&filters[state][]=') +
-                '&filters[newsletter]=' + encodeURIComponent(q.newsletter) +
-                '&filters[tags][]=' + encodeURLarray(q.tags).join('&filters[tags][]=') +
-                '&filters[status][]=' + encodeURLarray(statusApiArray).join('&filters[status][]=') +
-                '&filters[likely][]=' + encodeURLarray(q.likely).join('&filters[likely][]=') +
-                '&filters[church][]=' + encodeURLarray(q.church).join('&filters[church][]=') +
-                '&filters[referrer][]=' + encodeURLarray(q.referrer).join('&filters[referrer][]=') +
-                '&filters[ids][]=' + encodeURLarray(['1']).join('&filters[ids][]=')
-        , {}, function(data) {
-          angular.forEach(data.contacts, function (contact) {
-            contactCache.update(contact.id, {
-              addresses: _.filter(data.addresses, function (addr) {
-                return _.contains(contact.address_ids, addr.id);
-              }),
-              people: _.filter(data.people, function (i) {
-                return _.contains(contact.person_ids, i.id);
-              }),
-              email_addresses: data.email_addresses,
-              contact: _.find(data.contacts, { 'id': contact.id }),
-              phone_numbers: data.phone_numbers
-            });
-          });
-          $scope.contacts = data.contacts;
+        var requestUrl = 'contacts?account_list_id=' + (window.current_account_list_id || '') +
+            '&per_page=' + q.limit +
+            '&page=' + q.page +
+            '&filters[name]=' + encodeURIComponent(q.name) +
+            '&filters[contact_type]=' + encodeURIComponent(q.type) +
+            '&filters[city][]=' + encodeURLarray(q.city).join('&filters[city][]=') +
+            '&filters[state][]=' + encodeURLarray(q.state).join('&filters[state][]=') +
+            '&filters[newsletter]=' + encodeURIComponent(q.newsletter) +
+            '&filters[tags][]=' + encodeURLarray(q.tags).join('&filters[tags][]=') +
+            '&filters[status][]=' + encodeURLarray(statusApiArray).join('&filters[status][]=') +
+            '&filters[likely][]=' + encodeURLarray(q.likely).join('&filters[likely][]=') +
+            '&filters[church][]=' + encodeURLarray(q.church).join('&filters[church][]=') +
+            '&filters[referrer][]=' + encodeURLarray(q.referrer).join('&filters[referrer][]=');
+        if (angular.isDefined(taskContactIds)) {
+            requestUrl = requestUrl + '&filters[ids][]=' + encodeURLarray(taskContactIds).join('&filters[ids][]=');
+        }
 
-          $scope.totalContacts = data.meta.total;
-          $scope.page.total = data.meta.total_pages;
-          $scope.page.from = data.meta.from;
-          $scope.page.to = data.meta.to;
+        api.call('get', requestUrl
+            , {}, function (data) {
+                angular.forEach(data.contacts, function (contact) {
+                    contactCache.update(contact.id, {
+                        addresses: _.filter(data.addresses, function (addr) {
+                            return _.contains(contact.address_ids, addr.id);
+                        }),
+                        people: _.filter(data.people, function (i) {
+                            return _.contains(contact.person_ids, i.id);
+                        }),
+                        email_addresses: data.email_addresses,
+                        contact: _.find(data.contacts, { 'id': contact.id }),
+                        phone_numbers: data.phone_numbers
+                    });
+                });
+                $scope.contacts = data.contacts;
 
-          $scope.contactsLoading = false;
+                $scope.totalContacts = data.meta.total;
+                $scope.page.total = data.meta.total_pages;
+                $scope.page.from = data.meta.from;
+                $scope.page.to = data.meta.to;
 
-          //Save View Prefs
-          viewPrefs['user']['preferences']['contacts_filter'][window.current_account_list_id] = {
-            tags: q.tags.join(),
-            name: q.name,
-            type: q.type,
-            city: q.city,
-            state: q.state,
-            newsletter: q.newsletter,
-            status: statusApiArray,
-            likely: q.likely,
-            church: q.church,
-            referrer: q.referrer
-          };
-          api.call('put','users/me', viewPrefs);
-        }, null, true);
+                $scope.contactsLoading = false;
+
+                //Save View Prefs
+                viewPrefs['user']['preferences']['contacts_filter'][window.current_account_list_id] = {
+                    tags: q.tags.join(),
+                    name: q.name,
+                    type: q.type,
+                    city: q.city,
+                    state: q.state,
+                    newsletter: q.newsletter,
+                    status: statusApiArray,
+                    likely: q.likely,
+                    church: q.church,
+                    referrer: q.referrer,
+                    relatedTaskAction: q.relatedTaskAction
+                };
+                api.call('put', 'users/me', viewPrefs);
+            }, null, true);
     };
 
     $scope.$watch('page', function (p) {
