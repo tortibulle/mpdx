@@ -91,15 +91,15 @@ angular.module('mpdxApp')
 
                         $scope.followUpSaveFunc = function () {
                             //Contact Updates
-                            angular.forEach(followUpTask.contacts, function (c) {
+                            /*angular.forEach(followUpTask.contacts, function (c) {
                                 api.call('put', 'contacts/' + c, {
                                     contact: {
                                         status: 'Ask in Future'
                                     }
                                 });
-                            });
+                            });*/
 
-                            //Create Call Task
+                            //Create Call, Message, Email or Text Task
                             if ($scope.followUpDialogResult.createCallTask) {
                                 createGenericTask(contactsObject, taskType);
                             }
