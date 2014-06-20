@@ -1,4 +1,4 @@
-angular.module('mpdxApp').controller('contactsController', function ($scope, $filter, $location, api, urlParameter, contactCache) {
+angular.module('mpdxApp').controller('contactsController', function ($scope, $filter, $location, api, contactCache) {
     var viewPrefs;
 
     $scope.contactsLoading = true;
@@ -144,10 +144,10 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
 
         var statusApiArray = q.status;
         if(_.contains(q.status, 'active')){
-            statusApiArray = _.uniq(_.union(statusApiArray, <%= (Contact.new.assignable_statuses - Contact.inactive_statuses).inspect %>));
+            statusApiArray = _.uniq(_.union(statusApiArray, railsConstants.contact.ACTIVE_STATUSES));
         }
         if(_.contains(q.status, 'hidden')){
-            statusApiArray = _.uniq(_.union(statusApiArray, <%= Contact.inactive_statuses.inspect %>));
+            statusApiArray = _.uniq(_.union(statusApiArray, railsConstants.contact.INACTIVE_STATUSES));
         }
 
         api.call('get','contacts?account_list_id=' + (window.current_account_list_id || '') +

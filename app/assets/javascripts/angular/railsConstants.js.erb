@@ -1,0 +1,20 @@
+window.railsConstants = {
+  contact: {
+    ACTIVE_STATUSES: <%= (Contact.new.assignable_statuses - Contact.inactive_statuses).inspect %>,
+    INACTIVE_STATUSES: <%= Contact.inactive_statuses.inspect %>
+  },
+    task: {
+      CALL_RESULTS: <%= Task::CALL_RESULTS %>,
+      CALL_NEXT_ACTIONS: <%= Task::CALL_NEXT_ACTIONS %>,
+      APPOINTMENT_RESULTS: <%= Task::APPOINTMENT_RESULTS %>,
+      APPOINTMENT_NEXT_ACTIONS: <%= Task::APPOINTMENT_NEXT_ACTIONS %>,
+      EMAIL_RESULTS: <%= Task::EMAIL_RESULTS %>,
+      EMAIL_NEXT_ACTIONS: <%= Task::EMAIL_NEXT_ACTIONS %>,
+      FACEBOOK_MESSAGE_RESULTS: <%= Task::FACEBOOK_MESSAGE_RESULTS %>,
+      FACEBOOK_MESSAGE_NEXT_ACTIONS: <%= Task::FACEBOOK_MESSAGE_NEXT_ACTIONS %>,
+      TEXT_RESULTS: <%= Task::TEXT_RESULTS %>,
+      TEXT_NEXT_ACTIONS: <%= Task::TEXT_NEXT_ACTIONS %>,
+      MESSAGE_RESULTS: <%= Task::MESSAGE_RESULTS %>,
+      STANDARD_RESULTS: <%= Task::STANDARD_RESULTS %>
+    }
+};

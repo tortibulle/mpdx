@@ -20,30 +20,30 @@ angular.module('mpdxApp')
 
                 //complete options
                 if($scope.task.activity_type === 'Call') {
-                  $scope.completeResultOptions = <%= Task::CALL_RESULTS %>;
-                  $scope.completeActionOptions = <%= Task::CALL_NEXT_ACTIONS %>;
+                  $scope.completeResultOptions = railsConstants.task.CALL_RESULTS;
+                  $scope.completeActionOptions = railsConstants.task.CALL_NEXT_ACTIONS;
 
                 }else if($scope.task.activity_type === 'Appointment') {
-                  $scope.completeResultOptions = <%= Task::APPOINTMENT_RESULTS %>;
-                  $scope.completeActionOptions = <%= Task::APPOINTMENT_NEXT_ACTIONS %>;
+                  $scope.completeResultOptions = railsConstants.task.APPOINTMENT_RESULTS;
+                  $scope.completeActionOptions = railsConstants.task.APPOINTMENT_NEXT_ACTIONS;
 
                 }else if($scope.task.activity_type === 'Email') {
-                  $scope.completeResultOptions = <%= Task::EMAIL_RESULTS %>;
-                  $scope.completeActionOptions = <%= Task::EMAIL_NEXT_ACTIONS %>;
+                  $scope.completeResultOptions = railsConstants.task.EMAIL_RESULTS;
+                  $scope.completeActionOptions = railsConstants.task.EMAIL_NEXT_ACTIONS;
 
                 }else if($scope.task.activity_type === 'Facebook Message') {
-                  $scope.completeResultOptions = <%= Task::FACEBOOK_MESSAGE_RESULTS %>;
-                  $scope.completeActionOptions = <%= Task::FACEBOOK_MESSAGE_NEXT_ACTIONS %>;
+                  $scope.completeResultOptions = railsConstants.task.FACEBOOK_MESSAGE_RESULTS;
+                  $scope.completeActionOptions = railsConstants.task.FACEBOOK_MESSAGE_NEXT_ACTIONS;
 
                 }else if($scope.task.activity_type === 'Text Message') {
-                  $scope.completeResultOptions = <%= Task::TEXT_RESULTS %>;
-                  $scope.completeActionOptions = <%= Task::TEXT_NEXT_ACTIONS %>;
+                  $scope.completeResultOptions = railsConstants.task.TEXT_RESULTS;
+                  $scope.completeActionOptions = railsConstants.task.TEXT_NEXT_ACTIONS;
 
                 }else if($scope.task.activity_type === 'Letter') {
-                    $scope.completeResultOptions = <%= Task::MESSAGE_RESULTS %>;
+                    $scope.completeResultOptions = railsConstants.task.MESSAGE_RESULTS;
 
                 }else{
-                    $scope.completeResultOptions = <%= Task::STANDARD_RESULTS %>;
+                    $scope.completeResultOptions = railsConstants.task.STANDARD_RESULTS;
                 }
 
                 $scope.getComment = function(id){
