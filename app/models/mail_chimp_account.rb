@@ -13,7 +13,7 @@ class MailChimpAccount < ActiveRecord::Base
   attr :validation_error
 
   validates :account_list_id, :api_key, presence: true
-  validates :api_key, format: /\w+-us\d/
+  validates :api_key, format: /\A\w+-us\d\z/
 
   before_create :set_active
   after_save :queue_import_if_list_changed
