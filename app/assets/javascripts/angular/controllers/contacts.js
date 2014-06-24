@@ -13,7 +13,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         city: [''],
         state: [''],
         newsletter: '',
-        status: [''],
+        status: ['active'],
         likely: [''],
         church: [''],
         referrer: [''],
@@ -34,7 +34,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         $scope.contactQuery.city = [''];
         $scope.contactQuery.state = [''];
         $scope.contactQuery.newsletter = '';
-        $scope.contactQuery.status = [''];
+        $scope.contactQuery.status = ['active'];
         $scope.contactQuery.likely = [''];
         $scope.contactQuery.church = [''];
         $scope.contactQuery.referrer = [''];
@@ -90,7 +90,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         }
         if(angular.isDefined(prefs.status)){
             $scope.contactQuery.status = prefs.status;
-            if(prefs.status[0]){
+            if(prefs.status[0] !== 'active'){
                 jQuery("#leftmenu #filter_status").trigger("click");
             }
         }
@@ -186,8 +186,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
 
             $scope.contactsLoading = false;
 
-            //Save View Prefs
-            viewPrefs['user']['preferences']['contacts_filter'][window.current_account_list_id] = {
+              //Save View Prefs
+              var prefsToSave = {
                 tags: q.tags.join(),
                 name: q.name,
                 type: q.type,
@@ -198,14 +198,31 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
                 likely: q.likely,
                 church: q.church,
                 referrer: q.referrer
-            };
-            api.call('put','users/me', viewPrefs);
+              };
+              if (!isEmptyFilter(prefsToSave)) {
+                viewPrefs['user']['preferences']['contacts_filter'][window.current_account_list_id] = prefsToSave;
+              } else {
+                viewPrefs['user']['preferences']['contacts_filter'][window.current_account_list_id] = null;
+              }
+              api.call('put', 'users/me', viewPrefs);
         }, null, true);
     }, true);
 
     $scope.$watch('page', function (p) {
         $scope.contactQuery.page = p.current;
     }, true);
+
+  var isEmptyFilter = function (q) {
+    if (!_.isEmpty(q.tags) || !_.isEmpty(q.name) || !_.isEmpty(q.type) || !_.isEmpty(_.without(q.city, '')) || !_.isEmpty(_.without(q.state, '')) || !_.isEmpty(q.newsletter) || !_.isEmpty(_.without(q.likely, '')) || !_.isEmpty(_.without(q.church, '')) || !_.isEmpty(_.without(q.referrer, ''))) {
+      return false;
+    }
+
+    if (!_.contains(q.status, 'active')) {
+      return false;
+    }
+
+    return true;
+  };
 });
 
 
