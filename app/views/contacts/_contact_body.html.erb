@@ -5,11 +5,11 @@
         <% if current_index %>
           <div id="contact_paging">
             <% if current_index > 0 %>
-              <%= link_to('&lt;'.html_safe, contacts[current_index - 1], class: 'flatbtn', remote: true) %>
+              <%= link_to('&lt;'.html_safe, contacts[current_index - 1], class: 'flatbtn', remote: false) %>
             <% end %>
             <span><%== _('Navigate contacts: <strong>%{index} of %{total}</strong>').localize % {index: current_index + 1, total: contacts.length} %></span>
             <% if current_index < contacts.length - 1 %>
-              <%= link_to('&gt;'.html_safe, contacts[current_index + 1], class: 'flatbtn', remote: true) %>
+              <%= link_to('&gt;'.html_safe, contacts[current_index + 1], class: 'flatbtn', remote: false) %>
             <% end %>
           </div>
         <% end %>
