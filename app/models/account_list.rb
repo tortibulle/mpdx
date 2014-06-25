@@ -99,6 +99,13 @@ class AccountList < ActiveRecord::Base
                                                        order by c.church_name")
   end
 
+  def timezones
+    @timezones ||= ActiveRecord::Base.connection.select_values("select distinct(c.timezone) from account_lists al inner join contacts c on c.account_list_id = al.id
+                                                       where al.id = #{id}
+                                                       AND (#{Contact.active_conditions})
+                                                       order by c.timezone")
+  end
+
   def valid_mail_chimp_account
     mail_chimp_account.try(:active?) && mail_chimp_account.primary_list.present?
   end

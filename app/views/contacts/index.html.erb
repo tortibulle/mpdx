@@ -85,6 +85,12 @@
               <%= select_tag 'filters[referrer]', options_for_select([[_('-- Any --'), ''], [_('-- Someone --'), '*']] + current_account_list.contacts.with_referrals.order("name").collect { |c| [c.name, c.id] }), multiple: true, size: 5, :'ng-model' => 'contactQuery.referrer' %>
             </div>
           </li>
+          <li>
+            <label id="filter_timezone"><%= _('Timezone') %></label>
+            <div class="collapse" style="display:none;">
+              <%= select_tag 'filters[timezone]', options_for_select([[_('-- Any --'), '']] + current_account_list.timezones.select(&:present?)), multiple: true, size: 5, :'ng-model' => 'contactQuery.timezone' %>
+            </div>
+          </li>
           <li class="controls">
             <a href="#" ng-click="resetFilters()" style="font-size: 11px;">Reset Filters</a>
           </li>

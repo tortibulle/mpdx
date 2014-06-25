@@ -99,6 +99,10 @@ class ContactFilter
         filtered_contacts = filtered_contacts.where("lower(contacts.name) like ?", "%#{@filters[:name].downcase}%")
       end
 
+      if @filters[:timezone].present? && @filters[:timezone].first != ''
+        filtered_contacts = filtered_contacts.where('contacts.timezone' => @filters[:timezone])
+      end
+
       case @filters[:contact_type]
       when 'person'
         filtered_contacts = filtered_contacts.people

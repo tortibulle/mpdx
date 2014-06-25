@@ -33,6 +33,7 @@ class Contact < ActiveRecord::Base
   scope :for_donor_account, -> (donor_account) { where('donor_accounts.id' => donor_account.id).includes(:donor_accounts).references('donor_accounts') }
   scope :financial_partners, -> { where(status: 'Partner - Financial') }
   scope :non_financial_partners, -> { where("status <> 'Partner - Financial' OR status is NULL") }
+
   scope :with_referrals, -> { joins(:contact_referrals_by_me).uniq }
   scope :active, -> { where(active_conditions) }
   scope :inactive, -> { where(inactive_conditions) }
@@ -41,7 +42,7 @@ class Contact < ActiveRecord::Base
   PERMITTED_ATTRIBUTES = [
     :name, :pledge_amount, :status, :notes, :full_name, :greeting, :website, :pledge_frequency,
     :pledge_start_date, :next_ask, :never_ask, :likely_to_give, :church_name, :send_newsletter,
-    :direct_deposit, :magazine, :pledge_received, :not_duplicated_with, :tag_list, :primary_person_id,
+    :direct_deposit, :magazine, :pledge_received, :not_duplicated_with, :tag_list, :primary_person_id, :timezone,
     {
       contact_referrals_to_me_attributes: [:referred_by_id, :_destroy, :id],
       donor_accounts_attributes: [:account_number, :organization_id, :_destroy, :id],
@@ -57,7 +58,7 @@ class Contact < ActiveRecord::Base
   accepts_nested_attributes_for :contact_people, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :contact_referrals_to_me, reject_if: :all_blank, allow_destroy: true
 
-  before_save     :set_notes_saved_at
+  before_save     :set_notes_saved_at, :set_timezone
   after_commit    :sync_with_mail_chimp, :sync_with_prayer_letters
   before_destroy  :delete_from_prayer_letters, :delete_people
 
@@ -430,6 +431,18 @@ class Contact < ActiveRecord::Base
        account_list.valid_prayer_letters_account &&
        !account_list.contacts.where("prayer_letters_id = '#{prayer_letters_id}' AND id <> #{id}").present?
       account_list.prayer_letters_account.delete_contact(self)
+    end
+  end
+
+  def set_timezone
+    primary_address = addresses.detect(&:primary_mailing_address?) || addresses.first
+
+    begin
+      latitude, longitude = Geocoder.coordinates([primary_address.street, primary_address.city, primary_address.state, primary_address.country].join(','))
+      timezone = GoogleTimezone.fetch(latitude, longitude).time_zone_name
+      self.timezone = timezone
+    rescue
+      self.timezone = ''
     end
   end
 
