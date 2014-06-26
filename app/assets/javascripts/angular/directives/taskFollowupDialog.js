@@ -77,7 +77,7 @@ angular.module('mpdxApp')
                         }
 
                         $scope.followUpDialogData = {
-                            message: 'Schedule another call for the future?',
+                            message: 'Schedule future task?',
                             options: [],
                             callTask: true
                         };

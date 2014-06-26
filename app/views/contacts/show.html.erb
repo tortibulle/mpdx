@@ -1,6 +1,6 @@
 <div id="contact_drawer">
   <div class="filters">
-    <% if current_user.contacts_filter[current_account_list.id].present? %>
+    <% if current_user.contacts_filter[current_account_list.id.to_s].present? %>
       <span class="filtered_message">
         <%= _('Contacts List Filtered') %>
         <%= link_to(_('Reset Filters'), contact_path(@contact, clear_filter: true))  %>
