@@ -11,8 +11,10 @@
             <a class="ico ico_edit edit_task" data-id="{{task.id}}" data-remote="true" ng-href="/tasks/{{task.id}}/edit">Edit</a>
             <a class="ico ico_trash" data-confirm="Are you sure you want to delete this task instead of marking it as completed?" data-method="delete" data-remote="true" ng-href="/tasks/{{task.id}}" rel="nofollow">Delete</a>
         </div>
-        <span ng-hide="task.activity_type === ''">{{task.activity_type}} -</span>
-        <strong><span class="tasktitle">{{task.subject}}</span></strong> - {{task.due_date | ignoreTimezone | date:'MM/dd/yyyy, h:mma'}}
+        <span ng-hide="task.activity_type === ''">{{task.activity_type}}</span>
+        <strong><span class="tasktitle">{{task.subject}}</span></strong>
+        <span ng-show="task.completed">- {{task.result}} {{task.next_action}} - {{task.created_at | ignoreTimezone | date:'MM/dd/yyyy, h:mma'}}</span>
+        <span ng-show="!task.completed">- {{task.due_date | ignoreTimezone | date:'MM/dd/yyyy, h:mma'}}</span>
 
         <div style="display:inline" class="tags">
             <a class="tag" ng-repeat-start="tag in task.tag_list">{{tag}}</a>
