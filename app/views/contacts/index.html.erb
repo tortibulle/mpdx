@@ -86,15 +86,15 @@
             </div>
           </li>
           <li>
-            <label id="filter_relatedTaskAction"><%= _('Related task action') %></label>
-            <div class="collapse" style="display:none;">
-              <%= select_tag 'filters[activity_type]', options_for_select([[_('-- Any --'), '']] + (Task.new.assignable_activity_types & current_account_list.tasks.select(:activity_type).uniq.collect(&:activity_type)).collect { |a| [_(a), a] }, filters_params[:activity_type]), multiple: true, size: 5, :'ng-model' => 'contactQuery.relatedTaskAction' %>
-            </div>
-          </li>
-          <li>
             <label id="filter_timezone"><%= _('Timezone') %></label>
             <div class="collapse" style="display:none;">
               <%= select_tag 'filters[timezone]', options_for_select([[_('-- Any --'), '']] + current_account_list.timezones.select(&:present?)), multiple: true, size: 5, :'ng-model' => 'contactQuery.timezone' %>
+            </div>
+          </li>
+          <li>
+            <label id="filter_relatedTaskAction"><%= _('Related task action') %></label>
+            <div class="collapse" style="display:none;">
+              <%= select_tag 'filters[activity_type]', options_for_select([[_('-- Any --'), '']] + (Task.new.assignable_activity_types & current_account_list.tasks.select(:activity_type).uniq.collect(&:activity_type)).collect { |a| [_(a), a] }, filters_params[:activity_type]), multiple: true, size: 5, :'ng-model' => 'contactQuery.relatedTaskAction' %>
             </div>
           </li>
           <li class="controls">
