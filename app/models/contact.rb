@@ -58,7 +58,7 @@ class Contact < ActiveRecord::Base
   accepts_nested_attributes_for :contact_people, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :contact_referrals_to_me, reject_if: :all_blank, allow_destroy: true
 
-  before_save     :set_notes_saved_at #, :set_timezone
+  before_save     :set_notes_saved_at, :set_timezone
   after_commit    :sync_with_mail_chimp, :sync_with_prayer_letters
   before_destroy  :delete_from_prayer_letters, :delete_people
 
@@ -439,7 +439,8 @@ class Contact < ActiveRecord::Base
 
     begin
       latitude, longitude = Geocoder.coordinates([primary_address.street, primary_address.city, primary_address.state, primary_address.country].join(','))
-      timezone = GoogleTimezone.fetch(latitude, longitude).time_zone_name
+      timezone = GoogleTimezone.fetch(latitude, longitude).time_zone_id
+      timezone = ActiveSupport::TimeZone::MAPPING.invert[timezone]
       self.timezone = timezone
     rescue
       self.timezone = ''
