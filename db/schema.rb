@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140618153152) do
+ActiveRecord::Schema.define(version: 20140625153152) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -254,6 +254,7 @@ ActiveRecord::Schema.define(version: 20140618153152) do
     t.string   "not_duplicated_with",     limit: 2000
     t.integer  "uncompleted_tasks_count",                                       default: 0,     null: false
     t.string   "prayer_letters_id",       limit: 100
+    t.string   "timezone"
   end
 
   add_index "contacts", ["account_list_id"], name: "index_contacts_on_account_list_id", using: :btree
