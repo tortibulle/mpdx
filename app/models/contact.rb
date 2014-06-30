@@ -443,7 +443,7 @@ class Contact < ActiveRecord::Base
       timezone = ActiveSupport::TimeZone::MAPPING.invert[timezone]
       self.timezone = timezone
     rescue
-      self.timezone = ''
+      self.timezone = nil
     end
   end
 
