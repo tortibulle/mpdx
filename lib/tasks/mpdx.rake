@@ -83,10 +83,12 @@ namespace :mpdx do
        addresses.country = '' or addresses.country = 'United States of America')"
     ).find_each do |c|
 
+      addresses = c.addresses
+
       # Find the contact's home address, or grab primary/first address
-      address = c.addresses.detect { |a| a.location == 'Home' } ||
-        c.addresses.detect { |a| a.primary_mailing_address? } ||
-        c.addresses.first
+      address = addresses.detect { |a| a.location == 'Home' } ||
+        addresses.detect { |a| a.primary_mailing_address? } ||
+        addresses.first
 
       # Make sure we have a smarty streets response on file
       next unless address && address.master_address && address.master_address.smarty_response.present?
@@ -101,8 +103,7 @@ namespace :mpdx do
 
       # The result of the join above was a read-only record
       contact = Contact.find(c.id)
-      contact.name = zone.name
-      contact.save(validate: false)
+      contact.update_column(:timezone, zone.name)
     end
   end
 end
