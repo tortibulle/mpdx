@@ -112,12 +112,18 @@ angular.module('mpdxApp')
                         $scope.followUpDialogData = {
                             message: 'Contact\'s status will be updated to \'Appointment Scheduled\'.',
                             options: [],
-                            apptTask: true
+                            apptTask: true,
+                            callTask: true
                         };
                         $scope.followUpDialogResult = {
                             apptTask: {
                                 subject: 'Support',
                                 date: dateTwoDaysFromToday
+                            },
+                            callTask: {
+                              type: 'Call',
+                              subject: followUpTask.subject,
+                              date: dateTwoDaysFromToday
                             }
                         };
 
