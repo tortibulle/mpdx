@@ -18,6 +18,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         church: [''],
         referrer: [''],
         relatedTaskAction: [''],
+        wildcardSearch: urlParameter.get('q'),
         viewPrefsLoaded: false
     };
 
@@ -40,6 +41,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         $scope.contactQuery.church = [''];
         $scope.contactQuery.referrer = [''];
         $scope.contactQuery.relatedTaskAction = [''];
+        $scope.contactQuery.wildcardSearch = null;
     };
 
     //view preferences
@@ -54,11 +56,9 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             var prefs = viewPrefs.user.preferences.contacts_filter[window.current_account_list_id];
         }
 
-        if(!_.isNull(urlParameter.get('q'))){
+        if(!_.isNull($scope.contactQuery.wildcardSearch)){
           var prefs = null;
           viewPrefs.user.preferences.contacts_filter = {};
-          $scope.contactQuery.name = urlParameter.get('q');
-          jQuery("#leftmenu #filter_name").trigger("click");
         }
 
         if(_.isNull(prefs)){
@@ -202,7 +202,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
           '&filters[status][]=' + encodeURLarray(statusApiArray).join('&filters[status][]=') +
           '&filters[likely][]=' + encodeURLarray(q.likely).join('&filters[likely][]=') +
           '&filters[church][]=' + encodeURLarray(q.church).join('&filters[church][]=') +
-          '&filters[referrer][]=' + encodeURLarray(q.referrer).join('&filters[referrer][]=');
+          '&filters[referrer][]=' + encodeURLarray(q.referrer).join('&filters[referrer][]=') +
+          '&filters[wildcard_search]=' + encodeURIComponent(q.wildcardSearch);
       if (angular.isDefined(taskContactIds)) {
         requestUrl = requestUrl + '&filters[ids][]=' + encodeURLarray(taskContactIds).join('&filters[ids][]=');
       }
