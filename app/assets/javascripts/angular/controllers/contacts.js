@@ -1,4 +1,4 @@
-angular.module('mpdxApp').controller('contactsController', function ($scope, $filter, $location, api, contactCache) {
+angular.module('mpdxApp').controller('contactsController', function ($scope, $filter, $location, api, contactCache, urlParameter) {
     var viewPrefs;
 
     $scope.contactsLoading = true;
@@ -52,6 +52,13 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             viewPrefs.user.preferences.contacts_filter = {};
         }else{
             var prefs = viewPrefs.user.preferences.contacts_filter[window.current_account_list_id];
+        }
+
+        if(!_.isNull(urlParameter.get('q'))){
+          var prefs = null;
+          viewPrefs.user.preferences.contacts_filter = {};
+          $scope.contactQuery.name = urlParameter.get('q');
+          jQuery("#leftmenu #filter_name").trigger("click");
         }
 
         if(_.isNull(prefs)){

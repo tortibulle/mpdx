@@ -56,17 +56,17 @@
         <% end %>
         <div class="item last"><%= link_to(_('Help'), new_help_request_path, target: '_blank') %></div>
         <!-- <div class="item last <%= request.path =~ /\/social/ ? 'active' : '' %>"><%= link_to(_('Social'), "") %></div> -->
-        <%#<div class="items search">%>
-          <%#<div id="searchform">%>
-            <%#<form>%>
-              <%#<div class="wrap">%>
-                <!-- <input type="text" class="searchfield" placeholder="<%= _('Search for...') %>"/> -->
-                <%#<button type="submit">Search</button>%>
-              <%#</div>%>
-            <%#</form>%>
-          <%#</div>%>
-        <%#</div>%>
-        <div class="right">
+        <div class="items search">
+          <div id="searchform">
+            <form method="get" action="/contacts">
+              <div class="wrap">
+                <input type="text" class="searchfield" name="q" autocomplete="off" placeholder="<%= _('Search contacts...') %>"/>
+                <button type="submit">Search</button>
+              </div>
+            </form>
+          </div>
+       </div>
+        <div class="right" style="width:100px;">
           <%= @account_list_exhibit.balances(current_user) %>
         </div>
       </div>
