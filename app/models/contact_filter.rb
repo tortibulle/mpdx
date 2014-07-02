@@ -107,11 +107,13 @@ class ContactFilter
       end
 
       if @filters[:wildcard_search].present? && @filters[:wildcard_search] != 'null'
-        filtered_contacts = filtered_contacts.where('lower(email_addresses.email) like :search OR lower(contacts.name) like :search OR lower(donor_accounts.account_number) like :search', search: "%#{@filters[:wildcard_search].downcase}%")
+        filtered_contacts = filtered_contacts.where('lower(email_addresses.email) like :search OR lower(contacts.name) like :search OR lower(donor_accounts.account_number) like :search OR lower(phone_numbers.number) like :search', search: "%#{@filters[:wildcard_search].downcase}%")
         .includes(people: :email_addresses)
         .references('email_addresses')
         .includes(:donor_accounts)
         .references('donor_accounts')
+        .includes(people: :phone_numbers)
+        .references('phone_numbers')
       end
     end
 
