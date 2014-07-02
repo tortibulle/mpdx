@@ -385,6 +385,19 @@ class Contact < ActiveRecord::Base
     save(validate: false)
   end
 
+  def get_timezone
+    primary_address = addresses.detect(&:primary_mailing_address?) || addresses.first
+
+    return unless primary_address
+
+    begin
+      latitude, longitude = Geocoder.coordinates([primary_address.street, primary_address.city, primary_address.state, primary_address.country].join(','))
+      timezone = GoogleTimezone.fetch(latitude, longitude).time_zone_id
+      ActiveSupport::TimeZone::MAPPING.invert[timezone]
+    rescue
+    end
+  end
+
   private
   def delete_people
     people.each do |person|
@@ -435,16 +448,7 @@ class Contact < ActiveRecord::Base
   end
 
   def set_timezone
-    primary_address = addresses.detect(&:primary_mailing_address?) || addresses.first
-
-    begin
-      latitude, longitude = Geocoder.coordinates([primary_address.street, primary_address.city, primary_address.state, primary_address.country].join(','))
-      timezone = GoogleTimezone.fetch(latitude, longitude).time_zone_id
-      timezone = ActiveSupport::TimeZone::MAPPING.invert[timezone]
-      self.timezone = timezone
-    rescue
-      self.timezone = nil
-    end
+    self.timezone = get_timezone
   end
 
 end

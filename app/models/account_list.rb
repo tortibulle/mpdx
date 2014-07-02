@@ -330,6 +330,16 @@ class AccountList < ActiveRecord::Base
     super + total_pledges.to_s
   end
 
+  def update_geocodes
+    return if Redis.current.get("geocodes:#{id}")
+    Redis.current.set("geocodes:#{id}", true)
+
+    contacts.where(timezone: nil).find_each do |contact|
+      timezone = contact.get_timezone
+      contact.update_column(:timezone, timezone) if timezone
+    end
+  end
+
   private
 
   def import_data
