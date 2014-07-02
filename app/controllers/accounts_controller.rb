@@ -27,6 +27,7 @@ class AccountsController < ApplicationController
 
         # queue up data imports
         current_user.queue_imports
+        current_account_list.async(:update_geocodes)
       end
 
       # Connect this account to the user

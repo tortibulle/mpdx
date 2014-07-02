@@ -76,6 +76,36 @@ namespace :mpdx do
     Person::OrganizationAccount.where("locked_at is not null and locked_at < ?", 2.days.ago).update_all(downloading: false, locked_at: nil)
   end
 
+
+  task timezones: :environment do
+    Contact.joins(addresses: :master_address).preload(addresses: :master_address).where(
+      "master_addresses.id is not null AND (addresses.country is null or addresses.country = 'United States' or
+       addresses.country = '' or addresses.country = 'United States of America')"
+    ).find_each do |c|
+
+      addresses = c.addresses
+
+      # Find the contact's home address, or grab primary/first address
+      address = addresses.detect { |a| a.location == 'Home' } ||
+        addresses.detect { |a| a.primary_mailing_address? } ||
+        addresses.first
+
+      # Make sure we have a smarty streets response on file
+      next unless address && address.master_address && address.master_address.smarty_response.present?
+
+      smarty = address.master_address.smarty_response
+      meta = smarty.first['metadata']
+
+      # Convert the smarty time zone to a rails time zone
+      zone = ActiveSupport::TimeZone.us_zones.detect { |tz| tz.tzinfo.current_period.offset.utc_offset / 3600 == meta['utc_offset'] }
+
+      next unless zone
+
+      # The result of the join above was a read-only record
+      contact = Contact.find(c.id)
+      contact.update_column(:timezone, zone.name)
+    end
+  end
 end
 
 
