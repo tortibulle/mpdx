@@ -58,8 +58,8 @@ class Contact < ActiveRecord::Base
   accepts_nested_attributes_for :contact_people, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :contact_referrals_to_me, reject_if: :all_blank, allow_destroy: true
 
-  before_save     :set_notes_saved_at, :set_timezone
-  after_commit    :sync_with_mail_chimp, :sync_with_prayer_letters
+  before_save     :set_notes_saved_at
+  after_commit    :sync_with_mail_chimp, :sync_with_prayer_letters, :set_timezone
   before_destroy  :delete_from_prayer_letters, :delete_people
 
   assignable_values_for :status, allow_blank: true do
@@ -448,7 +448,7 @@ class Contact < ActiveRecord::Base
   end
 
   def set_timezone
-    self.timezone = get_timezone
+    self.update_column(:timezone, get_timezone)
   end
 
 end
