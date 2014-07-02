@@ -17,29 +17,31 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         likely: [''],
         church: [''],
         referrer: [''],
+        timezone: [''],
         relatedTaskAction: [''],
         viewPrefsLoaded: false
     };
 
     $scope.page = {
-        current: 1,
-        total: 1,
-        from: 0,
-        to: 0
+      current: 1,
+      total: 1,
+      from: 0,
+      to: 0
     };
 
     $scope.resetFilters = function(){
-        $scope.contactQuery.tags = [''];
-        $scope.contactQuery.name = '';
-        $scope.contactQuery.type = '';
-        $scope.contactQuery.city = [''];
-        $scope.contactQuery.state = [''];
-        $scope.contactQuery.newsletter = '';
-        $scope.contactQuery.status = ['active', 'null'];
-        $scope.contactQuery.likely = [''];
-        $scope.contactQuery.church = [''];
-        $scope.contactQuery.referrer = [''];
-        $scope.contactQuery.relatedTaskAction = [''];
+      $scope.contactQuery.tags = [''];
+      $scope.contactQuery.name = '';
+      $scope.contactQuery.type = '';
+      $scope.contactQuery.city = [''];
+      $scope.contactQuery.state = [''];
+      $scope.contactQuery.newsletter = '';
+      $scope.contactQuery.status = ['active', 'null'];
+      $scope.contactQuery.likely = [''];
+      $scope.contactQuery.church = [''];
+      $scope.contactQuery.referrer = [''];
+      $scope.contactQuery.timezone = [''];
+      $scope.contactQuery.relatedTaskAction = [''];
     };
 
     //view preferences
@@ -114,6 +116,12 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
                 jQuery("#leftmenu #filter_referrer").trigger("click");
             }
         }
+        if(angular.isDefined(prefs.timezone)){
+          $scope.contactQuery.timezone = prefs.timezone;
+          if(prefs.timezone[0]){
+            jQuery("#leftmenu #filter_timezone").trigger("click");
+          }
+        }
         if(angular.isDefined(prefs.relatedTaskAction)){
             $scope.contactQuery.relatedTaskAction = prefs.relatedTaskAction;
             if(prefs.relatedTaskAction[0]){
@@ -127,13 +135,13 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
     };
 
     var getTaskFilterIds = function (group) {
-        api.call('get', 'tasks?account_list_id=' + window.current_account_list_id +
-                '&filters[completed]=false' +
-                '&filters[activity_type][]=' + encodeURLarray($scope.contactQuery.relatedTaskAction).join('&filters[activity_type][]=') +
-                '&include=&per_page=10000'
-            , {}, function (tData) {
-                refreshContacts(_.uniq(_.flatten(tData.tasks, 'contacts')));
-            }, null, true);
+      api.call('get', 'tasks?account_list_id=' + window.current_account_list_id +
+              '&filters[completed]=false' +
+              '&filters[activity_type][]=' + encodeURLarray($scope.contactQuery.relatedTaskAction).join('&filters[activity_type][]=') +
+              '&include=&per_page=10000'
+          , {}, function (tData) {
+            refreshContacts(_.uniq(_.flatten(tData.tasks, 'contacts')));
+          }, null, true);
     };
 
     $scope.tagIsActive = function(tag){
@@ -195,7 +203,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
           '&filters[status][]=' + encodeURLarray(statusApiArray).join('&filters[status][]=') +
           '&filters[likely][]=' + encodeURLarray(q.likely).join('&filters[likely][]=') +
           '&filters[church][]=' + encodeURLarray(q.church).join('&filters[church][]=') +
-          '&filters[referrer][]=' + encodeURLarray(q.referrer).join('&filters[referrer][]=');
+          '&filters[referrer][]=' + encodeURLarray(q.referrer).join('&filters[referrer][]=') +
+          '&filters[timezone][]=' + encodeURLarray(q.timezone).join('&filters[timezone][]=');
       if (angular.isDefined(taskContactIds)) {
         requestUrl = requestUrl + '&filters[ids][]=' + encodeURLarray(taskContactIds).join('&filters[ids][]=');
       }
@@ -235,6 +244,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
           likely: q.likely,
           church: q.church,
           referrer: q.referrer,
+          timezone: q.timezone,
           relatedTaskAction: q.relatedTaskAction
         };
         if (!isEmptyFilter(prefsToSave)) {
@@ -250,17 +260,17 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         $scope.contactQuery.page = p.current;
     }, true);
 
-  var isEmptyFilter = function (q) {
-    if (!_.isEmpty(q.tags) || !_.isEmpty(q.name) || !_.isEmpty(q.type) || !_.isEmpty(_.without(q.city, '')) || !_.isEmpty(_.without(q.state, '')) || !_.isEmpty(q.newsletter) || !_.isEmpty(_.without(q.likely, '')) || !_.isEmpty(_.without(q.church, '')) || !_.isEmpty(_.without(q.referrer, '')) || !_.isEmpty(_.without(q.relatedTaskAction, ''))) {
-      return false;
-    }
+    var isEmptyFilter = function (q) {
+      if (!_.isEmpty(q.tags) || !_.isEmpty(q.name) || !_.isEmpty(q.type) || !_.isEmpty(_.without(q.city, '')) || !_.isEmpty(_.without(q.state, '')) || !_.isEmpty(q.newsletter) || !_.isEmpty(_.without(q.likely, '')) || !_.isEmpty(_.without(q.church, '')) || !_.isEmpty(_.without(q.referrer, '')) || !_.isEmpty(_.without(q.relatedTaskAction, '')) || !_.isEmpty(_.without(q.timezone, ''))) {
+        return false;
+      }
 
-    if (!_.contains(q.status, 'active') || !_.contains(q.status, 'null')) {
-      return false;
-    }
+      if (!_.contains(q.status, 'active') || !_.contains(q.status, 'null')) {
+        return false;
+      }
 
-    return true;
-  };
+      return true;
+    };
 });
 
 

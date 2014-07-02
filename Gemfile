@@ -82,6 +82,8 @@ gem 'will_paginate', '~> 3.0.3'
 gem 'global_phone', git: 'https://github.com/sstephenson/global_phone.git'
 gem 'global_phone_dbgen'
 #gem 'font_assets'
+gem 'geocoder'
+gem 'google_timezone'
 
 group :development do
   gem 'railroady'
