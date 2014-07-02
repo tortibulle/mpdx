@@ -42,6 +42,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         $scope.contactQuery.referrer = [''];
         $scope.contactQuery.relatedTaskAction = [''];
         $scope.contactQuery.wildcardSearch = null;
+        document.getElementById('globalContactSearch').value = '';
     };
 
     //view preferences
