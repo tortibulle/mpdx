@@ -1,4 +1,4 @@
-angular.module('mpdxApp').controller('contactsController', function ($scope, $filter, $location, api, contactCache) {
+angular.module('mpdxApp').controller('contactsController', function ($scope, $filter, $location, api, contactCache, urlParameter) {
     var viewPrefs;
 
     $scope.contactsLoading = true;
@@ -41,6 +41,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         $scope.contactQuery.likely = [''];
         $scope.contactQuery.church = [''];
         $scope.contactQuery.referrer = [''];
+        $scope.contactQuery.timezone = [''];
         $scope.contactQuery.relatedTaskAction = [''];
         $scope.contactQuery.wildcardSearch = null;
         document.getElementById('globalContactSearch').value = '';
@@ -211,9 +212,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
           '&filters[likely][]=' + encodeURLarray(q.likely).join('&filters[likely][]=') +
           '&filters[church][]=' + encodeURLarray(q.church).join('&filters[church][]=') +
           '&filters[referrer][]=' + encodeURLarray(q.referrer).join('&filters[referrer][]=') +
+          '&filters[timezone][]=' + encodeURLarray(q.timezone).join('&filters[timezone][]=') +
           '&filters[wildcard_search]=' + encodeURIComponent(q.wildcardSearch);
-          '&filters[referrer][]=' + encodeURLarray(q.referrer).join('&filters[referrer][]=') +
-          '&filters[timezone][]=' + encodeURLarray(q.timezone).join('&filters[timezone][]=');
       if (angular.isDefined(taskContactIds)) {
         requestUrl = requestUrl + '&filters[ids][]=' + encodeURLarray(taskContactIds).join('&filters[ids][]=');
       }
