@@ -179,9 +179,11 @@ class Contact < ActiveRecord::Base
   end
 
   def spouse_phone
+    spouse.try(:phone)
   end
 
   def spouse_email
+    spouse.try(:email)
   end
 
   def greeting
