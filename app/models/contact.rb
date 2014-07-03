@@ -178,6 +178,12 @@ class Contact < ActiveRecord::Base
     spouse.try(:first_name)
   end
 
+  def spouse_phone
+  end
+
+  def spouse_email
+  end
+
   def greeting
     result = self[:greeting].present? ?
       self[:greeting] :
