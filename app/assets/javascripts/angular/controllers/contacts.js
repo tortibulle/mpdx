@@ -1,4 +1,4 @@
-angular.module('mpdxApp').controller('contactsController', function ($scope, $filter, $location, api, contactCache) {
+angular.module('mpdxApp').controller('contactsController', function ($scope, $filter, $location, api, contactCache, urlParameter) {
     var viewPrefs;
 
     $scope.contactsLoading = true;
@@ -19,29 +19,32 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         referrer: [''],
         timezone: [''],
         relatedTaskAction: [''],
+        wildcardSearch: urlParameter.get('q'),
         viewPrefsLoaded: false
     };
 
     $scope.page = {
-      current: 1,
-      total: 1,
-      from: 0,
-      to: 0
+        current: 1,
+        total: 1,
+        from: 0,
+        to: 0
     };
 
     $scope.resetFilters = function(){
-      $scope.contactQuery.tags = [''];
-      $scope.contactQuery.name = '';
-      $scope.contactQuery.type = '';
-      $scope.contactQuery.city = [''];
-      $scope.contactQuery.state = [''];
-      $scope.contactQuery.newsletter = '';
-      $scope.contactQuery.status = ['active', 'null'];
-      $scope.contactQuery.likely = [''];
-      $scope.contactQuery.church = [''];
-      $scope.contactQuery.referrer = [''];
-      $scope.contactQuery.timezone = [''];
-      $scope.contactQuery.relatedTaskAction = [''];
+        $scope.contactQuery.tags = [''];
+        $scope.contactQuery.name = '';
+        $scope.contactQuery.type = '';
+        $scope.contactQuery.city = [''];
+        $scope.contactQuery.state = [''];
+        $scope.contactQuery.newsletter = '';
+        $scope.contactQuery.status = ['active', 'null'];
+        $scope.contactQuery.likely = [''];
+        $scope.contactQuery.church = [''];
+        $scope.contactQuery.referrer = [''];
+        $scope.contactQuery.timezone = [''];
+        $scope.contactQuery.relatedTaskAction = [''];
+        $scope.contactQuery.wildcardSearch = null;
+        document.getElementById('globalContactSearch').value = '';
     };
 
     //view preferences
@@ -54,6 +57,11 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             viewPrefs.user.preferences.contacts_filter = {};
         }else{
             var prefs = viewPrefs.user.preferences.contacts_filter[window.current_account_list_id];
+        }
+
+        if(!_.isNull($scope.contactQuery.wildcardSearch)){
+          var prefs = null;
+          viewPrefs.user.preferences.contacts_filter = {};
         }
 
         if(_.isNull(prefs)){
@@ -135,13 +143,13 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
     };
 
     var getTaskFilterIds = function (group) {
-      api.call('get', 'tasks?account_list_id=' + window.current_account_list_id +
-              '&filters[completed]=false' +
-              '&filters[activity_type][]=' + encodeURLarray($scope.contactQuery.relatedTaskAction).join('&filters[activity_type][]=') +
-              '&include=&per_page=10000'
-          , {}, function (tData) {
-            refreshContacts(_.uniq(_.flatten(tData.tasks, 'contacts')));
-          }, null, true);
+        api.call('get', 'tasks?account_list_id=' + window.current_account_list_id +
+                '&filters[completed]=false' +
+                '&filters[activity_type][]=' + encodeURLarray($scope.contactQuery.relatedTaskAction).join('&filters[activity_type][]=') +
+                '&include=&per_page=10000'
+            , {}, function (tData) {
+                refreshContacts(_.uniq(_.flatten(tData.tasks, 'contacts')));
+            }, null, true);
     };
 
     $scope.tagIsActive = function(tag){
@@ -204,7 +212,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
           '&filters[likely][]=' + encodeURLarray(q.likely).join('&filters[likely][]=') +
           '&filters[church][]=' + encodeURLarray(q.church).join('&filters[church][]=') +
           '&filters[referrer][]=' + encodeURLarray(q.referrer).join('&filters[referrer][]=') +
-          '&filters[timezone][]=' + encodeURLarray(q.timezone).join('&filters[timezone][]=');
+          '&filters[timezone][]=' + encodeURLarray(q.timezone).join('&filters[timezone][]=') +
+          '&filters[wildcard_search]=' + encodeURIComponent(q.wildcardSearch);
       if (angular.isDefined(taskContactIds)) {
         requestUrl = requestUrl + '&filters[ids][]=' + encodeURLarray(taskContactIds).join('&filters[ids][]=');
       }
