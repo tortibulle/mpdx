@@ -107,6 +107,7 @@ class ApplicationController < ActionController::Base
           current_user.account_lists.first
       else
         @default_account_list = current_user.account_lists.first
+        return unless @default_account_list
         current_user.default_account_list = @default_account_list.id
         current_user.save
       end
