@@ -14,7 +14,7 @@ describe AccountListExhibit do
   end
 
   it 'returns a designation account names for to_s' do
-    subject.to_s.should == account_list.designation_accounts.collect(&:name).join(', ')
+    subject.to_s.should == account_list.designation_accounts.map(&:name).join(', ')
   end
 
   it 'returns names with balances' do
@@ -37,5 +37,3 @@ describe AccountListExhibit do
   end
 
 end
-
-

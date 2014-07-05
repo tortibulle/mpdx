@@ -27,7 +27,7 @@ describe Person::FacebookAccount do
 
     it 'should use uid to find an authenticated user' do
       user = create(:user)
-      account = Person::FacebookAccount.find_or_create_from_auth(@auth_hash, user)
+      Person::FacebookAccount.find_or_create_from_auth(@auth_hash, user)
       Person::FacebookAccount.find_authenticated_user(@auth_hash).should == user
     end
 
@@ -72,14 +72,14 @@ describe Person::FacebookAccount do
     end
 
     it 'when url contains permalink' do
-      stub_request(:get, /https:\/\/graph.facebook.com\/.*/).
-         with(headers: { 'Accept' => 'application/json' }).to_return(status: 200, body: '{"id": 1}')
+      stub_request(:get, /https:\/\/graph.facebook.com\/.*/)
+        .with(headers: { 'Accept' => 'application/json' }).to_return(status: 200, body: '{"id": 1}')
       @account.get_id_from_url('https://www.facebook.com/john.doe').should == 1
     end
 
     it 'should raise an exception if the url is bad' do
-      stub_request(:get, /https:\/\/graph.facebook.com\/.*/).
-         with(headers: { 'Accept' => 'application/json' }).to_return(status: 400)
+      stub_request(:get, /https:\/\/graph.facebook.com\/.*/)
+        .with(headers: { 'Accept' => 'application/json' }).to_return(status: 400)
       lambda { @account.get_id_from_url('https://www.facebook.com/john.doe') }.should raise_error(Errors::FacebookLink)
     end
 

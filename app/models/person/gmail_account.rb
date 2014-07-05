@@ -34,20 +34,20 @@ class Person::GmailAccount
       email_addresses = []
       account_list.contacts.active.includes(people: :email_addresses).each do |contact|
         contact.people.each do |person|
-          person.email_addresses.collect(&:email).uniq.each do |email|
+          person.email_addresses.map(&:email).uniq.each do |email|
             unless email_addresses.include?(email)
               email_addresses << email
 
               # sent emails
               sent = g.mailbox('[Gmail]/Sent Mail')
               sent.emails(to: email, after: since).each do |gmail_message|
-                log_email(gmail_message, account_list, contact, from = @google_account.person_id, to = person.id, 'Done')
+                log_email(gmail_message, account_list, contact, @google_account.person_id, person.id, 'Done')
               end
 
               # received emails
               all = g.mailbox('[Gmail]/All Mail')
               all.emails(from: email, after: since).each do |gmail_message|
-                log_email(gmail_message, account_list, contact, from = person.id, to = @google_account.person_id, 'Received')
+                log_email(gmail_message, account_list, contact, person.id, @google_account.person_id, 'Received')
               end
             end
           end
@@ -71,14 +71,14 @@ class Person::GmailAccount
         task.contacts << contact unless task.contacts.include?(contact)
       else
         task = contact.tasks.create!(subject: gmail_message.subject,
-                                      start_at: gmail_message.envelope.date,
-                                      completed: true,
-                                      completed_at: gmail_message.envelope.date,
-                                      account_list_id: account_list.id,
-                                      activity_type: 'Email',
-                                      result: result,
-                                      remote_id: gmail_message.envelope.message_id,
-                                      source: 'gmail')
+                                     start_at: gmail_message.envelope.date,
+                                     completed: true,
+                                     completed_at: gmail_message.envelope.date,
+                                     account_list_id: account_list.id,
+                                     activity_type: 'Email',
+                                     result: result,
+                                     remote_id: gmail_message.envelope.message_id,
+                                     source: 'gmail')
 
         task.activity_comments.create!(body: message, person_id: from_id)
       end

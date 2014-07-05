@@ -1,7 +1,7 @@
 class ActivityContact < ActiveRecord::Base
   has_paper_trail on: [:destroy],
                   meta: { related_object_type: 'Activity',
-                             related_object_id: :activity_id }
+                          related_object_id: :activity_id }
 
   belongs_to :activity
   belongs_to :task, foreign_key: 'activity_id'
@@ -12,6 +12,7 @@ class ActivityContact < ActiveRecord::Base
   # attr_accessible :contact_id, :activity_id
 
   private
+
   def update_contact_uncompleted_tasks_count
     contact.try(:update_uncompleted_tasks_count)
   end

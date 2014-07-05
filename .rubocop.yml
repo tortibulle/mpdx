@@ -6,12 +6,6 @@ AllCops:
     - 'config/**/*'
     - 'vendor/**/*'
 
-Style/LineLength:
-  Enabled: false
-
-LeadingCommentSpace:
-  Enabled: false
-
 Blocks:
   Enabled: false
 
@@ -25,3 +19,29 @@ Style/MethodLength:
 
 CommentIndentation:
   Enabled: false
+
+AssignmentInCondition:
+  Enabled: false
+
+# Hope to soon enable
+CyclomaticComplexity:
+  Enabled: false
+
+GuardClause:
+  Enabled: false
+
+LeadingCommentSpace:
+  Enabled: false
+
+Lambda:
+  Enabled: false
+
+Style/LineLength:
+  Enabled: false
+
+Style/Next:
+  Enabled: false
+
+Void:
+  Exclude:
+    - 'spec/**/*'

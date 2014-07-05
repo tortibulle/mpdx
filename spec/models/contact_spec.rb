@@ -23,9 +23,9 @@ describe Contact do
     end
 
     it 'should update an address' do
-      stub_request(:get, /http:\/\/api\.smartystreets\.com\/street-address/).
-         with(headers: { 'Accept' => 'application/json', 'Accept-Encoding' => 'gzip, deflate', 'Content-Type' => 'application/json', 'User-Agent' => 'Ruby' }).
-         to_return(status: 200, body: '[]', headers: {})
+      stub_request(:get, /http:\/\/api\.smartystreets\.com\/street-address/)
+         .with(headers: { 'Accept' => 'application/json', 'Accept-Encoding' => 'gzip, deflate', 'Content-Type' => 'application/json', 'User-Agent' => 'Ruby' })
+         .to_return(status: 200, body: '[]', headers: {})
 
       address = create(:address, addressable: contact)
       contact.addresses_attributes = [address.attributes.merge!(street: address.street + 'boo').with_indifferent_access.except(:addressable_id, :addressable_type, :updated_at, :created_at)]
@@ -42,13 +42,16 @@ describe Contact do
       email2 = create(:email_address, primary: false, person: person)
 
       people_attributes =
-        { 'people_attributes' =>          { '0' =>           { 'email_addresses_attributes' =>             {
-              '0' => { 'email' => email1.email, 'primary' => '0', '_destroy' => 'false', 'id' => email1.id },
-              '1' => { 'email' => email2.email, 'primary' => '1', '_destroy' => 'false', 'id' => email2.id }
-            },
-           'id' => person.id
+        { 'people_attributes' =>
+          { '0' =>
+            { 'email_addresses_attributes' =>
+              {
+                '0' => { 'email' => email1.email, 'primary' => '0', '_destroy' => 'false', 'id' => email1.id },
+                '1' => { 'email' => email2.email, 'primary' => '1', '_destroy' => 'false', 'id' => email2.id }
+              },
+              'id' => person.id
+            }
           }
-         }
         }
       contact.update_attributes(people_attributes)
       expect(email1.reload.primary?).to be_false
@@ -286,8 +289,8 @@ describe Contact do
     end
 
     it 'deletes this person from prayerletters.com if no other contact has the prayer_letters_id' do
-      stub_request(:delete, /www.prayerletters.com\/.*/).
-         to_return(status: 200, body: '', headers: {})
+      stub_request(:delete, /www.prayerletters.com\/.*/)
+        .to_return(status: 200, body: '', headers: {})
 
       prayer_letters_id  = 'foo'
       contact.prayer_letters_id = prayer_letters_id

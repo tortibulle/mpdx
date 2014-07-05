@@ -7,7 +7,7 @@ FactoryGirl.define do
   end
 
   factory :designation_account_with_donor, parent: :designation_account do
-    after(:create) do |designation_account, evaluator|
+    after(:create) do |designation_account, _evaluator|
       list = create(:account_list)
       create(:account_list_entry, account_list: list, designation_account: designation_account)
       contact = create(:contact, account_list: list)
@@ -17,7 +17,7 @@ FactoryGirl.define do
   end
 
   factory :designation_account_with_special_donor, parent: :designation_account do
-    after(:create) do |designation_account, evaluator|
+    after(:create) do |designation_account, _evaluator|
       list = create(:account_list)
       create(:account_list_entry, account_list: list, designation_account: designation_account)
       contact = create(:contact, account_list: list, status: 'Partner - Special', pledge_frequency: nil, pledge_amount: nil)

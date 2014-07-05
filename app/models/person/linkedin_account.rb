@@ -11,14 +11,14 @@ class Person::LinkedinAccount < ActiveRecord::Base
     params = auth_hash.extra.access_token.params
     expires_in = params[:oauth_expires_in].to_i > params[:oauth_authorization_expires_in].to_i ? params[:oauth_authorization_expires_in].to_i : params[:oauth_expires_in].to_i
     @attributes = {
-                    remote_id: @remote_id,
-                    token: auth_hash.credentials.token,
-                    secret: auth_hash.credentials.secret,
-                    token_expires_at: expires_in > 0 ? expires_in.seconds.from_now : nil,
-                    first_name: auth_hash.info.first_name,
-                    last_name: auth_hash.info.last_name,
-                    valid_token: true
-                  }
+      remote_id: @remote_id,
+      token: auth_hash.credentials.token,
+      secret: auth_hash.credentials.secret,
+      token_expires_at: expires_in > 0 ? expires_in.seconds.from_now : nil,
+      first_name: auth_hash.info.first_name,
+      last_name: auth_hash.info.last_name,
+      valid_token: true
+    }
     super
   end
 

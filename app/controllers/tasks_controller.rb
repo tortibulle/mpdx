@@ -1,5 +1,5 @@
 class TasksController < ApplicationController
-  before_filter :setup_filters, only: :index
+  before_action :setup_filters, only: :index
 
   respond_to :html, :js
 
@@ -54,7 +54,7 @@ class TasksController < ApplicationController
     @task = current_account_list.tasks.new(activity_type: params[:activity_type])
     @old_task = current_account_list.tasks.find_by_id(params[:from]) if params[:from]
     if @old_task
-      @task.attributes = @old_task.attributes.select { |k, v| [:starred, :location, :subject].include?(k.to_sym) }
+      @task.attributes = @old_task.attributes.select { |k, _v| [:starred, :location, :subject].include?(k.to_sym) }
       @task.tag_list = @old_task.tag_list
       @old_task.activity_contacts.each do |ac|
         @task.activity_contacts.build(contact_id: ac.contact_id)

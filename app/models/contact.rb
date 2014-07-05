@@ -3,8 +3,8 @@ class Contact < ActiveRecord::Base
   acts_as_taggable
 
   has_paper_trail on: [:destroy, :update],
-    meta: { related_object_type: 'AccountList',
-               related_object_id: :account_list_id }
+                  meta: { related_object_type: 'AccountList',
+                          related_object_id: :account_list_id }
 
   has_many :contact_donor_accounts, dependent: :destroy, inverse_of: :contact
   has_many :donor_accounts, through: :contact_donor_accounts, inverse_of: :contacts
@@ -72,12 +72,12 @@ class Contact < ActiveRecord::Base
   IN_PROGRESS_STATUSES = [_('Never Contacted'), _('Ask in Future'), _('Contact for Appointment'), _('Appointment Scheduled'), _('Call for Decision')]
 
   TABS = {
-      'details' => _('Details'),
-      'tasks' => _('Tasks'),
-      'history' => _('History'),
-      'referrals' => _('Referrals'),
-      'notes' => _('Notes'),
-      'social' => _('Social')
+    'details' => _('Details'),
+    'tasks' => _('Tasks'),
+    'history' => _('History'),
+    'referrals' => _('Referrals'),
+    'notes' => _('Notes'),
+    'social' => _('Social')
   }
 
   def status=(val)
@@ -249,7 +249,7 @@ class Contact < ActiveRecord::Base
       end
 
       other.contact_donor_accounts.each do |other_contact_donor_account|
-        unless donor_accounts.collect(&:account_number).include?(other_contact_donor_account.donor_account.account_number)
+        unless donor_accounts.map(&:account_number).include?(other_contact_donor_account.donor_account.account_number)
           other_contact_donor_account.update_column(:contact_id, id)
         end
       end
@@ -262,7 +262,7 @@ class Contact < ActiveRecord::Base
       update_uncompleted_tasks_count
 
       other.addresses.each do |other_address|
-        unless addresses.detect { |address| address.equal_to? other_address }
+        unless addresses.find { |address| address.equal_to? other_address }
           other_address.update_column(:addressable_id, id)
         end
       end
@@ -272,7 +272,7 @@ class Contact < ActiveRecord::Base
       merge_addresses
 
       ContactReferral.where(referred_to_id: other.id).each do |contact_referral|
-        contact_referral.update_column(:referred_to_id, id) unless contact_referrals_to_me.detect { |crtm| crtm.referred_by_id == contact_referral.referred_by_id }
+        contact_referral.update_column(:referred_to_id, id) unless contact_referrals_to_me.find { |crtm| crtm.referred_by_id == contact_referral.referred_by_id }
       end
 
       ContactReferral.where(referred_by_id: other.id).update_all(referred_by_id: id)
@@ -288,16 +288,15 @@ class Contact < ActiveRecord::Base
        end
 
        # If one of these is marked as a finanical partner, we want that status
-       if status != 'Partner - Financial' && other.status == 'Partner - Financial'
-         self.status = 'Partner - Financial'
-       end
+      if status != 'Partner - Financial' && other.status == 'Partner - Financial'
+        self.status = 'Partner - Financial'
+      end
 
-       self.notes = [notes, other.notes].compact.join("\n").strip if other.notes.present?
+      self.notes = [notes, other.notes].compact.join("\n").strip if other.notes.present?
 
-       self.tag_list += other.tag_list
+      self.tag_list += other.tag_list
 
-       save(validate: false)
-
+      save(validate: false)
     end
 
     # Delete the losing record
@@ -337,7 +336,7 @@ class Contact < ActiveRecord::Base
     ordered_addresses = addresses.order('created_at desc')
     ordered_addresses.reload
     ordered_addresses.each do |address|
-      other_address = ordered_addresses.detect { |a| a.id != address.id && a.equal_to?(address) }
+      other_address = ordered_addresses.find { |a| a.id != address.id && a.equal_to?(address) }
       if other_address
         address.merge(other_address)
         merge_addresses
@@ -353,7 +352,7 @@ class Contact < ActiveRecord::Base
     people.reload.each do |person|
       next if merged_people.include?(person)
 
-      if other_people = people.find_all { |p| p.first_name == person.first_name &&
+      if other_people = people.select { |p| p.first_name == person.first_name &&
                                               p.last_name == person.last_name &&
                                               p.id != person.id }
         other_people.each do |other_person|
@@ -369,7 +368,7 @@ class Contact < ActiveRecord::Base
   def merge_donor_accounts
     # Merge donor accounts that have the same number
     donor_accounts.reload.each do |account|
-      if other = donor_accounts.detect { |da| da.id != account.id &&
+      if other = donor_accounts.find { |da| da.id != account.id &&
                                               da.account_number == account.account_number}
         account.merge(other)
         merge_donor_accounts
@@ -384,7 +383,7 @@ class Contact < ActiveRecord::Base
   end
 
   def get_timezone
-    primary_address = addresses.detect(&:primary_mailing_address?) || addresses.first
+    primary_address = addresses.find(&:primary_mailing_address?) || addresses.first
 
     return unless primary_address
 
@@ -397,6 +396,7 @@ class Contact < ActiveRecord::Base
   end
 
   private
+
   def delete_people
     people.each do |person|
       # If this person isn't linked to any other contact, delete them
@@ -449,4 +449,3 @@ class Contact < ActiveRecord::Base
     update_column(:timezone, get_timezone)
   end
 end
-

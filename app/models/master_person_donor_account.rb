@@ -8,12 +8,13 @@ class MasterPersonDonorAccount < ActiveRecord::Base
   after_save :ensure_only_one_primary
 
   private
-    def make_first_donor_primary
-      self.primary ||= true if donor_account.master_person_donor_accounts.where(primary: true).blank?
-    end
 
-    def ensure_only_one_primary
-      primary_donors = donor_account.master_person_donor_accounts.where(primary: true)
-      primary_donors[0..-2].map { |e| e.update_column(:primary, false) } if primary_donors.length > 1
-    end
+  def make_first_donor_primary
+    self.primary ||= true if donor_account.master_person_donor_accounts.where(primary: true).blank?
+  end
+
+  def ensure_only_one_primary
+    primary_donors = donor_account.master_person_donor_accounts.where(primary: true)
+    primary_donors[0..-2].map { |e| e.update_column(:primary, false) } if primary_donors.length > 1
+  end
 end

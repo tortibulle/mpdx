@@ -5,7 +5,7 @@ class TaskFilter
     @filters = filters || {}
 
     # strip extra spaces from filters
-    @filters.collect { |k, v| @filters[k] = v.strip if v.is_a?(String) }
+    @filters.map { |k, v| @filters[k] = v.strip if v.is_a?(String) }
   end
 
   def filter(tasks)
@@ -63,4 +63,3 @@ class TaskFilter
     filtered_tasks
   end
 end
-

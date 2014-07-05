@@ -67,12 +67,12 @@ class Person::GoogleAccount < ActiveRecord::Base
 
     # Refresh auth token from google_oauth2.
     params = {
-        client_id: APP_CONFIG['google_key'],
-        client_secret: APP_CONFIG['google_secret'],
-        refresh_token: refresh_token,
-        grant_type: 'refresh_token'
+      client_id: APP_CONFIG['google_key'],
+      client_secret: APP_CONFIG['google_secret'],
+      refresh_token: refresh_token,
+      grant_type: 'refresh_token'
     }
-    RestClient.post('https://accounts.google.com/o/oauth2/token', params, content_type: 'application/x-www-form-urlencoded') {|response, request, result, &block|
+    RestClient.post('https://accounts.google.com/o/oauth2/token', params, content_type: 'application/x-www-form-urlencoded') {|response, _request, _result, &_block|
       json = JSON.parse(response)
       if response.code == 200
         self.token = json['access_token']

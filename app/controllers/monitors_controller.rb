@@ -1,6 +1,6 @@
 class MonitorsController < ApplicationController
-  skip_before_filter :ensure_login
-  skip_before_filter :ensure_setup_finished
+  skip_before_action :ensure_login
+  skip_before_action :ensure_setup_finished
   layout nil
   newrelic_ignore
 
@@ -9,4 +9,3 @@ class MonitorsController < ApplicationController
     render text: File.read(Rails.public_path.join('lb.txt'))
   end
 end
-

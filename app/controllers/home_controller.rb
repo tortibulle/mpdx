@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
-  skip_before_filter :ensure_login, only: [:login, :privacy]
+  skip_before_action :ensure_login, only: [:login, :privacy]
 
   def index
     @page_title = _('Dashboard')

@@ -29,16 +29,16 @@ class Task < Activity
   CALL_RESULTS = ['Attempted - Left Message', 'Attempted', 'Completed', 'Received']
   CALL_NEXT_ACTIONS = ['Call Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'None']
 
-  APPOINTMENT_RESULTS = ['Completed', 'Attempted']
+  APPOINTMENT_RESULTS = %w(Completed Attempted)
   APPOINTMENT_NEXT_ACTIONS = ['Call for Decision', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'Reschedule', 'None']
 
-  EMAIL_RESULTS = ['Completed', 'Received']
+  EMAIL_RESULTS = %w(Completed Received)
   EMAIL_NEXT_ACTIONS = ['Email Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'None']
 
-  FACEBOOK_MESSAGE_RESULTS = ['Completed', 'Received']
+  FACEBOOK_MESSAGE_RESULTS = %w(Completed Received)
   FACEBOOK_MESSAGE_NEXT_ACTIONS = ['Message Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'None']
 
-  TEXT_RESULTS = ['Completed', 'Received']
+  TEXT_RESULTS = %w(Completed Received)
   TEXT_NEXT_ACTIONS = ['Text Again', 'Appointment Scheduled', 'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Ask in Future', 'Not Interested', 'None']
 
   MESSAGE_RESULTS = [_('Done'), _('Received')]
@@ -83,7 +83,7 @@ class Task < Activity
 
     case activity_type
     when 'Call'
-      numbers = contacts.collect(&:people).flatten.collect do |person|
+      numbers = contacts.map(&:people).flatten.map do |person|
         if person.phone_number && person.phone_number.present?
           "#{person} #{PhoneNumberExhibit.new(person.phone_number, nil)}"
         end
@@ -95,6 +95,7 @@ class Task < Activity
   end
 
   private
+
   def update_completed_at
     if changed.include?('completed')
       self.completed_at ||= completed? ? Time.now : nil

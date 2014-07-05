@@ -10,22 +10,23 @@ class CredentialValidator < ActiveModel::Validator
   end
 
   private
-    def valid_credentials?(record)
-      return false unless record.organization
-      if record.requires_username_and_password?
-        begin
-          return record.username.present? && record.password.present? && record.organization.api(record).validate_username_and_password
-        rescue OrgAccountInvalidCredentialsError => e
+
+  def valid_credentials?(record)
+    return false unless record.organization
+    if record.requires_username_and_password?
+      begin
+        return record.username.present? && record.password.present? && record.organization.api(record).validate_username_and_password
+      rescue OrgAccountInvalidCredentialsError
+        return false
+      rescue DataServerError => e
+        if e.message.include?('user')
           return false
-        rescue DataServerError => e
-          if e.message.include?('user')
-            return false
-          else
-            raise
-          end
+        else
+          raise
         end
-      else
-        true
       end
+    else
+      true
     end
+  end
 end

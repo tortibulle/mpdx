@@ -7,7 +7,7 @@ describe ContactExhibit do
 
   it 'returns referrers as a list of links' do
     context.stub(:link_to).and_return('foo')
-    exhib.stub(:referrals_to_me).and_return(['foo','foo'])
+    exhib.stub(:referrals_to_me).and_return(%w(foo foo))
     exhib.referrer_links.should == 'foo, foo'
   end
 

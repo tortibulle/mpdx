@@ -49,7 +49,7 @@ describe DonorAccount do
     end
 
     it 'should not match to a contact with no addresses' do
-      contact = create(:contact, account_list: @account_list)
+      create(:contact, account_list: @account_list)
       create(:address, addressable: @donor_account)
       -> {
         @donor_account.link_to_contact_for(@account_list)

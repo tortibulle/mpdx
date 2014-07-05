@@ -3,7 +3,7 @@ require 'smarty_streets'
 class Address < ActiveRecord::Base
   has_paper_trail on: [:destroy],
                   meta: { related_object_type: :addressable_type,
-                             related_object_id: :addressable_id }
+                          related_object_id: :addressable_id }
 
   belongs_to :addressable, polymorphic: true, touch: true
   belongs_to :master_address
@@ -58,7 +58,7 @@ class Address < ActiveRecord::Base
     end
 
     countries = CountrySelect::COUNTRIES
-    if country = countries.detect { |c| c[:name].downcase == val.downcase }
+    if country = countries.find { |c| c[:name].downcase == val.downcase }
       self[:country] = country[:name]
     else
       countries.each do |c|
@@ -94,7 +94,7 @@ class Address < ActiveRecord::Base
   end
 
   def update_or_create_master_address
-    if (changed & ['street', 'city', 'state', 'country', 'postal_code']).present?
+    if (changed & %w(street city state country postal_code)).present?
       new_master_address_match = find_master_address
 
       if master_address.nil? || master_address != new_master_address_match
@@ -122,7 +122,7 @@ class Address < ActiveRecord::Base
     # See if another address in the database matches this one and has a master address
     where_clause = attributes_for_master_address.symbolize_keys
                                                 .slice(:street, :city, :state, :country, :postal_code)
-                                                .collect { |k, v| "lower(#{k}) = :#{k}" }.join(' AND ')
+                                                .map { |k, _v| "lower(#{k}) = :#{k}" }.join(' AND ')
 
     master_address ||= Address.where(where_clause, attributes_for_master_address)
                               .where('master_address_id is not null')
@@ -162,62 +162,62 @@ class Address < ActiveRecord::Base
   def attributes_for_master_address
     @attributes_for_master_address ||= Hash[attributes.symbolize_keys
                                                       .slice(:street, :city, :state, :country, :postal_code)
-                                                      .select { |k, v| v.present? }
+                                                      .select { |_k, v| v.present? }
                                                       .map { |k, v| [k, v.downcase] }]
   end
 
   US_STATES =  [
-      ['Alabama', 'AL'],
-      ['Alaska', 'AK'],
-      ['Arizona', 'AZ'],
-      ['Arkansas', 'AR'],
-      ['California', 'CA'],
-      ['Colorado', 'CO'],
-      ['Connecticut', 'CT'],
-      ['Delaware', 'DE'],
+      %w(Alabama AL),
+      %w(Alaska AK),
+      %w(Arizona AZ),
+      %w(Arkansas AR),
+      %w(California CA),
+      %w(Colorado CO),
+      %w(Connecticut CT),
+      %w(Delaware DE),
       ['District of Columbia', 'DC'],
-      ['Florida', 'FL'],
-      ['Georgia', 'GA'],
-      ['Hawaii', 'HI'],
-      ['Idaho', 'ID'],
-      ['Illinois', 'IL'],
-      ['Indiana', 'IN'],
-      ['Iowa', 'IA'],
-      ['Kansas', 'KS'],
-      ['Kentucky', 'KY'],
-      ['Louisiana', 'LA'],
-      ['Maine', 'ME'],
-      ['Maryland', 'MD'],
-      ['Massachusetts', 'MA'],
-      ['Michigan', 'MI'],
-      ['Minnesota', 'MN'],
-      ['Mississippi', 'MS'],
-      ['Missouri', 'MO'],
-      ['Montana', 'MT'],
-      ['Nebraska', 'NE'],
-      ['Nevada', 'NV'],
+      %w(Florida FL),
+      %w(Georgia GA),
+      %w(Hawaii HI),
+      %w(Idaho ID),
+      %w(Illinois IL),
+      %w(Indiana IN),
+      %w(Iowa IA),
+      %w(Kansas KS),
+      %w(Kentucky KY),
+      %w(Louisiana LA),
+      %w(Maine ME),
+      %w(Maryland MD),
+      %w(Massachusetts MA),
+      %w(Michigan MI),
+      %w(Minnesota MN),
+      %w(Mississippi MS),
+      %w(Missouri MO),
+      %w(Montana MT),
+      %w(Nebraska NE),
+      %w(Nevada NV),
       ['New Hampshire', 'NH'],
       ['New Jersey', 'NJ'],
       ['New Mexico', 'NM'],
       ['New York', 'NY'],
       ['North Carolina', 'NC'],
       ['North Dakota', 'ND'],
-      ['Ohio', 'OH'],
-      ['Oklahoma', 'OK'],
-      ['Oregon', 'OR'],
-      ['Pennsylvania', 'PA'],
+      %w(Ohio OH),
+      %w(Oklahoma OK),
+      %w(Oregon OR),
+      %w(Pennsylvania PA),
       ['Puerto Rico', 'PR'],
       ['Rhode Island', 'RI'],
       ['South Carolina', 'SC'],
       ['South Dakota', 'SD'],
-      ['Tennessee', 'TN'],
-      ['Texas', 'TX'],
-      ['Utah', 'UT'],
-      ['Vermont', 'VT'],
-      ['Virginia', 'VA'],
-      ['Washington', 'WA'],
+      %w(Tennessee TN),
+      %w(Texas TX),
+      %w(Utah UT),
+      %w(Vermont VT),
+      %w(Virginia VA),
+      %w(Washington WA),
       ['West Virginia', 'WV'],
-      ['Wisconsin', 'WI'],
-      ['Wyoming', 'WY']
+      %w(Wisconsin WI),
+      %w(Wyoming WY)
     ]
 end

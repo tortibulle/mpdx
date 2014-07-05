@@ -21,7 +21,7 @@ describe User do
     before(:each) do
       @org = FactoryGirl.create(:organization)
       @user = FactoryGirl.create(:user)
-      profile = FactoryGirl.create(:designation_profile, organization: @org, user: @user)
+      FactoryGirl.create(:designation_profile, organization: @org, user: @user)
       @account = FactoryGirl.create(:designation_account, organization: @org)
       @account_list = FactoryGirl.create(:account_list)
       FactoryGirl.create(:account_list_entry, account_list: @account_list, designation_account: @account)

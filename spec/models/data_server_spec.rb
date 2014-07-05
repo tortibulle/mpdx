@@ -191,7 +191,7 @@ describe DataServer do
         @donor_account.people << person
         @donor_account.organization.master_person_sources.create(master_person_id: person.master_person_id, remote_id: 1)
         -> {
-          new_contact, other = @data_server.send(:add_or_update_person, @account_list, @user, line, @donor_account, 1)
+          new_contact, _other = @data_server.send(:add_or_update_person, @account_list, @user, line, @donor_account, 1)
           new_contact.should == person
         }.should_not change(MasterPerson, :count)
       end

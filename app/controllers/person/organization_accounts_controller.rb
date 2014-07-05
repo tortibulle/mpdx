@@ -1,5 +1,5 @@
 class Person::OrganizationAccountsController < ApplicationController
-  skip_before_filter :ensure_setup_finished, only: [:new, :create]
+  skip_before_action :ensure_setup_finished, only: [:new, :create]
 
   respond_to :js, :html
 
@@ -51,6 +51,7 @@ class Person::OrganizationAccountsController < ApplicationController
   end
 
   private
+
   def person_organization_account_params
     params.require(:person_organization_account).permit(:username, :password, :organization_id)
   end

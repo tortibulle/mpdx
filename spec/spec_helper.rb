@@ -147,4 +147,3 @@ class FakeApi
     true
   end
 end
-

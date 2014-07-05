@@ -23,8 +23,8 @@ describe Person::LinkedinAccount do
   it 'adds http:// to url if necessary' do
     account = build(:linkedin_account)
     Person::LinkedinAccount.should_receive(:valid_token).and_return([account])
-    stub_request(:get, 'https://api.linkedin.com/v1/people/url=http:%2F%2Fwww.linkedin.com%2Fpub%2Fchris-cardiff%2F6%2Fa2%2F62a:(id,first-name,last-name,public-profile-url)').
-      to_return(status: 200, body: '{"first_name":"Chris","id":"F_ZUsSGtL7","last_name":"Cardiff","public_profile_url":"http://www.linkedin.com/pub/chris-cardiff/6/a2/62a"}', headers: {})
+    stub_request(:get, 'https://api.linkedin.com/v1/people/url=http:%2F%2Fwww.linkedin.com%2Fpub%2Fchris-cardiff%2F6%2Fa2%2F62a:(id,first-name,last-name,public-profile-url)')
+      .to_return(status: 200, body: '{"first_name":"Chris","id":"F_ZUsSGtL7","last_name":"Cardiff","public_profile_url":"http://www.linkedin.com/pub/chris-cardiff/6/a2/62a"}', headers: {})
 
     url = 'www.linkedin.com/pub/chris-cardiff/6/a2/62a'
     l = Person::LinkedinAccount.new(url: url)
@@ -55,8 +55,8 @@ describe Person::LinkedinAccount do
 
       LINKEDIN.should_receive(:authorize_from_access).once.and_raise(LinkedIn::Errors::UnauthorizedError, 'asdf')
       LINKEDIN.should_receive(:authorize_from_access).once.and_return(true)
-      stub_request(:get, 'https://api.linkedin.com/v1/people/url=http:%2F%2Fwww.linkedin.com%2Fpub%2Fchris-cardiff%2F6%2Fa2%2F62a:(id,first-name,last-name,public-profile-url)').
-        to_return(status: 200, body: '{"first_name":"Chris","id":"F_ZUsSGtL7","last_name":"Cardiff","public_profile_url":"http://www.linkedin.com/pub/chris-cardiff/6/a2/62a"}', headers: {})
+      stub_request(:get, 'https://api.linkedin.com/v1/people/url=http:%2F%2Fwww.linkedin.com%2Fpub%2Fchris-cardiff%2F6%2Fa2%2F62a:(id,first-name,last-name,public-profile-url)')
+        .to_return(status: 200, body: '{"first_name":"Chris","id":"F_ZUsSGtL7","last_name":"Cardiff","public_profile_url":"http://www.linkedin.com/pub/chris-cardiff/6/a2/62a"}', headers: {})
 
       expect {
         account2.update_attributes(url: 'www.linkedin.com/pub/chris-cardiff/6/a2/62a')

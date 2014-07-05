@@ -1,5 +1,7 @@
 class DataServerNavigators < DataServer
+
   protected
+
   def profile_balance(profile_code)
     balance = {}
     response = Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:account_balance_url) do

@@ -34,7 +34,7 @@ class GoogleCalendarIntegrator
     result = @client.execute(
       api_method: @google_integration.calendar_api.events.delete,
       parameters: { 'calendarId' => @google_integration.calendar_id,
-                      'eventId' => google_event.google_event_id }
+                    'eventId' => google_event.google_event_id }
     )
     handle_error(result, google_event)
   rescue GoogleCalendarIntegrator::Deleted
@@ -47,7 +47,7 @@ class GoogleCalendarIntegrator
     result = @client.execute(
       api_method: @google_integration.calendar_api.events.patch,
       parameters: { 'calendarId' => @google_integration.calendar_id,
-                      'eventId' => google_event.google_event_id },
+                    'eventId' => google_event.google_event_id },
       body_object: event_attributes(task)
     )
     handle_error(result, task)
@@ -77,7 +77,7 @@ class GoogleCalendarIntegrator
     attributes = {
       summary: task.subject_with_contacts,
       location: task.calculated_location.to_s,
-      description: task.activity_comments.collect(&:body).join("\n\n"),
+      description: task.activity_comments.map(&:body).join("\n\n"),
       source: { title: 'MPDX', url: 'https://mpdx.org/tasks' }
     }
 

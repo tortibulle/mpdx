@@ -5,8 +5,8 @@ class Api::V1::TasksController < Api::V1::BaseController
         {}
 
     meta.merge!(total: tasks.total_entries, from: correct_from(tasks),
-                  to: correct_to(tasks), page: page,
-                  total_pages: total_pages(tasks)) if tasks.respond_to?(:total_entries)
+                to: correct_to(tasks), page: page,
+                total_pages: total_pages(tasks)) if tasks.respond_to?(:total_entries)
 
     render json: tasks,
            scope: { since: params[:since] },
@@ -45,13 +45,14 @@ class Api::V1::TasksController < Api::V1::BaseController
   # yields {"total": ##,"uncompleted": ##,"overdue": ##}
   def count
     render json: {
-        total: tasks.count,
-        uncompleted: tasks.uncompleted.count,
-        overdue: tasks.overdue.count,
-        starred: tasks.uncompleted.starred.count,
-        today: tasks.uncompleted.today.count,
-        activity_types: tasks.uncompleted.group(:activity_type).count
-      }, callback: params[:callback]
+      total: tasks.count,
+      uncompleted: tasks.uncompleted.count,
+      overdue: tasks.overdue.count,
+      starred: tasks.uncompleted.starred.count,
+      today: tasks.uncompleted.today.count,
+      activity_types: tasks.uncompleted.group(:activity_type).count
+    },
+           callback: params[:callback]
   end
 
   protected

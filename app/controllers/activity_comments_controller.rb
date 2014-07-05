@@ -16,9 +16,8 @@ class ActivityCommentsController < ApplicationController
   protected
 
   def get_activity
-    if params[:activity_id]
-      @activity = current_account_list.activities.find(params[:activity_id])
-    end
+    return unless params[:activity_id]
+    @activity = current_account_list.activities.find(params[:activity_id])
   end
 
   def activity_comment_params

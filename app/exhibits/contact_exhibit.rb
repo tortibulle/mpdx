@@ -7,7 +7,7 @@ class ContactExhibit < DisplayCase::Exhibit
   end
 
   def referrer_links
-    referrals_to_me.collect { |r| @context.link_to(exhibit(r, @context), r, remote: true) }.join(', ').html_safe
+    referrals_to_me.map { |r| @context.link_to(exhibit(r, @context), r, remote: true) }.join(', ').html_safe
   end
 
   def location
@@ -24,7 +24,7 @@ class ContactExhibit < DisplayCase::Exhibit
   end
 
   def contact_info
-    people.collect {|p|
+    people.map {|p|
       person_exhibit = exhibit(p, @context)
       [@context.link_to(person_exhibit, @context.contact_person_path(to_model, p)), [person_exhibit.phone_number, person_exhibit.email].compact.map { |e| exhibit(e, @context) }.join('<br />')].select(&:present?).join(':<br />')
     }.join('<br />').html_safe
@@ -73,13 +73,13 @@ class ContactExhibit < DisplayCase::Exhibit
   end
 
   def tag_links
-    tags.collect do |tag|
+    tags.map do |tag|
       @context.link_to(tag, @context.params.except(:action, :controller, :id).merge(action: :index, filters: { tags: tag.name }), class: 'tag')
     end.join(' ').html_safe
   end
 
   def donor_ids
-    donor_accounts.collect(&:account_number).join(', ')
+    donor_accounts.map(&:account_number).join(', ')
   end
 
   def to_s

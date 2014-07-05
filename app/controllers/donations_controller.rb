@@ -1,7 +1,7 @@
 class DonationsController < ApplicationController
-  before_filter :get_donation, only: [:edit, :destroy, :update]
-  before_filter :get_contact
-  before_filter :get_donor_accounts, only: [:edit, :new]
+  before_action :get_donation, only: [:edit, :destroy, :update]
+  before_action :get_contact
+  before_action :get_donor_accounts, only: [:edit, :new]
 
   def index
     if @contact
@@ -63,9 +63,9 @@ class DonationsController < ApplicationController
 
   def setup_chart
     @by_month = @all_donations.where('donation_date >= ?', 12.months.ago.beginning_of_month).group_by { |r| r.donation_date.beginning_of_month }
-    @by_month_index = 12.downto(0).collect { |i| i.months.ago.to_date.beginning_of_month }
+    @by_month_index = 12.downto(0).map { |i| i.months.ago.to_date.beginning_of_month }
     @prior_year = @all_donations.where('donation_date >= ? AND donation_date < ?', 24.months.ago.beginning_of_month, 11.months.ago.beginning_of_month).group_by { |r| r.donation_date.beginning_of_month }
-    @prior_year_index = 24.downto(12).collect { |i| i.months.ago.to_date.beginning_of_month }
+    @prior_year_index = 24.downto(12).map { |i| i.months.ago.to_date.beginning_of_month }
   end
 
   def get_donation

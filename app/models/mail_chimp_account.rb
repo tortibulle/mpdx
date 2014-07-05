@@ -23,14 +23,14 @@ class MailChimpAccount < ActiveRecord::Base
       return [] unless api_key.present?
       @list_response ||= gb.lists
       return [] unless @list_response['data']
-      @lists ||= @list_response['data'].collect { |l| List.new(l['id'], l['name']) }
+      @lists ||= @list_response['data'].map { |l| List.new(l['id'], l['name']) }
     rescue Gibbon::MailChimpError
       []
     end
   end
 
   def list(list_id)
-    lists.detect { |l| l.id == list_id }
+    lists.find { |l| l.id == list_id }
   end
 
   def primary_list
@@ -192,11 +192,11 @@ class MailChimpAccount < ActiveRecord::Base
       contacts = contacts.where(id: contact_ids)
     end
 
-    contacts = contacts.
-      includes(people: :primary_email_address).
-      where(send_newsletter: ['Email', 'Both']).
-      where('email_addresses.email is not null').
-      references('email_addresses')
+    contacts = contacts
+      .includes(people: :primary_email_address)
+      .where(send_newsletter: %w(Email Both))
+      .where('email_addresses.email is not null')
+      .references('email_addresses')
 
     export_to_list(primary_list_id, contacts.to_set)
   end
@@ -204,7 +204,7 @@ class MailChimpAccount < ActiveRecord::Base
   def export_to_list(list_id, contacts)
     # Make sure we have an interest group for each status of partner set
     # to receive the newsletter
-    statuses = contacts.collect(&:status).compact.uniq
+    statuses = contacts.map(&:status).compact.uniq
 
     add_status_groups(list_id, statuses)
 
@@ -254,13 +254,13 @@ class MailChimpAccount < ActiveRecord::Base
     # create a new grouping
     unless grouping
       gb.list_interest_grouping_add(id: list_id, name: _('Partner Status'), type: 'hidden',
-                                                         groups: statuses.map { |s| _(s) })
+                                    groups: statuses.map { |s| _(s) })
       grouping = find_grouping(list_id)
       self.grouping_id = grouping['id']
     end
 
     # Add any new groups
-    groups = grouping['groups'].collect { |g| g['name'] }
+    groups = grouping['groups'].map { |g| g['name'] }
 
     (statuses - groups).each do |group|
       gb.list_interest_group_add(id: list_id, group_name: group, grouping_id: grouping_id)
@@ -271,8 +271,8 @@ class MailChimpAccount < ActiveRecord::Base
 
   def find_grouping(list_id)
     groupings = gb.list_interest_groupings(id: list_id)
-    groupings.detect { |g| g['id'] == grouping_id } ||
-                           groupings.detect { |g| g['name'] == _('Partner Status') }
+    groupings.find { |g| g['id'] == grouping_id } ||
+                           groupings.find { |g| g['name'] == _('Partner Status') }
   end
 
   def queue_import_if_list_changed
@@ -291,5 +291,3 @@ class MailChimpAccount < ActiveRecord::Base
     @gb
   end
 end
-
-

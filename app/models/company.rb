@@ -11,6 +11,7 @@ class Company < ActiveRecord::Base
   def to_s() name; end
 
   private
+
   def find_master_company
     unless master_company_id
       self.master_company_id = MasterCompany.find_or_create_for_company(self).id

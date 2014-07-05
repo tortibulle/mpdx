@@ -5,7 +5,7 @@ class ContactFilter
     @filters = filters || {}
 
     # strip extra spaces from filters
-    @filters.collect { |k, v| @filters[k] = v.strip if v.is_a?(String) }
+    @filters.map { |k, v| @filters[k] = v.strip if v.is_a?(String) }
   end
 
   def filter(contacts)
@@ -83,9 +83,9 @@ class ContactFilter
         when 'none'
           filtered_contacts = filtered_contacts.where("send_newsletter is null OR send_newsletter = ''")
         when 'address'
-          filtered_contacts = filtered_contacts.joins(:addresses).where(send_newsletter: ['Physical', 'Both'])
+          filtered_contacts = filtered_contacts.joins(:addresses).where(send_newsletter: %w(Physical Both))
         when 'email'
-          filtered_contacts = filtered_contacts.where(send_newsletter: ['Email', 'Both'])
+          filtered_contacts = filtered_contacts.where(send_newsletter: %w(Email Both))
                                                .where('email_addresses.email is not null')
                                                .includes(people: :email_addresses)
                                                .references('email_addresses')

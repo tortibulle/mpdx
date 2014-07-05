@@ -4,7 +4,7 @@ class EmailAddress < ActiveRecord::Base
 
   has_paper_trail on: [:destroy],
                   meta: { related_object_type: 'Person',
-                             related_object_id: :person_id }
+                          related_object_id: :person_id }
 
   belongs_to :person, touch: true
   validates :email, presence: true, email: true
@@ -18,7 +18,7 @@ class EmailAddress < ActiveRecord::Base
 
   def self.add_for_person(person, attributes)
     attributes = attributes.with_indifferent_access.except(:_destroy)
-    then_cb = Proc.new do |exception, handler, attempts, retries, times|
+    then_cb = Proc.new do |_exception, _handler, _attempts, _retries, _times|
       person.email_addresses.reload
     end
 
@@ -28,7 +28,7 @@ class EmailAddress < ActiveRecord::Base
       if attributes['id']
         existing_email = person.email_addresses.find(attributes['id'])
         # make sure we're not updating this record to another email that already exists
-        if email = person.email_addresses.detect { |e| e.email == attributes['email'].to_s.strip && e.id != attributes['id'].to_i }
+        if email = person.email_addresses.find { |e| e.email == attributes['email'].to_s.strip && e.id != attributes['id'].to_i }
           email.attributes = attributes
           existing_email.destroy
           email
@@ -37,7 +37,7 @@ class EmailAddress < ActiveRecord::Base
           existing_email
         end
       else
-        if email = person.email_addresses.detect { |e| e.email == attributes['email'].to_s.strip }
+        if email = person.email_addresses.find { |e| e.email == attributes['email'].to_s.strip }
           email.attributes = attributes
         else
           attributes['primary'] = (person.email_addresses.present? ? false : true) if attributes['primary'].nil?

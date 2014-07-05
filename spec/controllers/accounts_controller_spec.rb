@@ -5,7 +5,7 @@ describe AccountsController do
     before do
       @user = create(:user_with_account)
       auth_hash = Hashie::Mash.new(uid: '5', credentials: { token: 'a', expires_at: 5 }, info: { first_name: 'John', last_name: 'Doe' })
-      account = Person::FacebookAccount.find_or_create_from_auth(auth_hash, @user)
+      Person::FacebookAccount.find_or_create_from_auth(auth_hash, @user)
       request.env['omniauth.auth'] = auth_hash
     end
     it 'should sign a user in' do

@@ -17,12 +17,12 @@ class PreferenceSet
   end
 
   # User preferences
-  attribute :first_name, String, default: lambda { |preference_set, attribute| preference_set.user.first_name }
-  attribute :email, String, default: lambda { |preference_set, attribute| preference_set.user.email }
-  attribute :time_zone, String, default: lambda { |preference_set, attribute| preference_set.user.time_zone }
-  attribute :locale, String, default: lambda { |preference_set, attribute| preference_set.user.locale }
-  attribute :monthly_goal, String, default: lambda { |preference_set, attribute| preference_set.account_list.monthly_goal }
-  attribute :default_account_list, Integer, default: lambda { |preference_set, attribute| preference_set.user.default_account_list }
+  attribute :first_name, String, default: lambda { |preference_set, _attribute| preference_set.user.first_name }
+  attribute :email, String, default: lambda { |preference_set, _attribute| preference_set.user.email }
+  attribute :time_zone, String, default: lambda { |preference_set, _attribute| preference_set.user.time_zone }
+  attribute :locale, String, default: lambda { |preference_set, _attribute| preference_set.user.locale }
+  attribute :monthly_goal, String, default: lambda { |preference_set, _attribute| preference_set.account_list.monthly_goal }
+  attribute :default_account_list, Integer, default: lambda { |preference_set, _attribute| preference_set.user.default_account_list }
 
   # AccountList preferences
   # - Notification Preferences
@@ -56,7 +56,7 @@ class PreferenceSet
     class_name = 'NotificationType::' + method.to_s.camelize
     if NotificationType.types.include?(class_name)
       type = class_name.constantize.first
-      account_list.notification_preferences.detect { |p| p.notification_type_id == type.id }.try(:actions) ||
+      account_list.notification_preferences.find { |p| p.notification_type_id == type.id }.try(:actions) ||
         NotificationPreference.default_actions
     else
       super
@@ -72,7 +72,7 @@ class PreferenceSet
 
   def set_preference(klass, val)
     type = klass.constantize.first
-    preference = account_list.notification_preferences.detect { |p| p.notification_type_id == type.id } ||
+    preference = account_list.notification_preferences.find { |p| p.notification_type_id == type.id } ||
                  account_list.notification_preferences.new(notification_type_id: type.id)
     preference.actions = val['actions']
     preference.save

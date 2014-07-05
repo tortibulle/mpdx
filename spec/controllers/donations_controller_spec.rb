@@ -16,7 +16,7 @@ describe DonationsController do
 
     it 'should scope donations to the current contact when a contact_id is present' do
       contact.donor_accounts << @donor_account
-      donation = create(:donation, donor_account: @donor_account, designation_account: @designation_account)
+      create(:donation, donor_account: @donor_account, designation_account: @designation_account)
       get :index, contact_id: contact.id
       assigns(:contact).should == contact
       assigns(:donations).total_entries.should == 1

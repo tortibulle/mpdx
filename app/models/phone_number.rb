@@ -6,7 +6,7 @@ class PhoneNumber < ActiveRecord::Base
 
   has_paper_trail on: [:destroy],
                   meta: { related_object_type: 'Person',
-                             related_object_id: :person_id }
+                          related_object_id: :person_id }
 
   LOCATIONS = [_('Mobile'), _('Home'), _('Work')]
 

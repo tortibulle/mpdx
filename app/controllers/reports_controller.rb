@@ -37,8 +37,8 @@ class ReportsController < ApplicationController
                                                   total: 0 }
 
       @donations[donation.donor_account_id][:amounts][donation.date_trunc.strftime '%b %y'] = {
-          value: donation.tendered_amount,
-          currency: donation.tendered_currency
+        value: donation.tendered_amount,
+        currency: donation.tendered_currency
       }
 
       @donations[donation.donor_account_id][:total] += donation.tendered_amount

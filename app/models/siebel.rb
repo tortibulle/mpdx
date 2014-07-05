@@ -101,10 +101,10 @@ class Siebel < DataServer
 
   def profiles_with_designation_numbers
     unless @profiles_with_designation_numbers
-      @profiles_with_designation_numbers = profiles.collect do |profile|
-        { designation_numbers: profile.designations.collect(&:number),
-         name: profile.name,
-         code: profile.id }
+      @profiles_with_designation_numbers = profiles.map do |profile|
+        { designation_numbers: profile.designations.map(&:number),
+          name: profile.name,
+          code: profile.id }
       end
     end
     @profiles_with_designation_numbers
@@ -156,7 +156,7 @@ class Siebel < DataServer
     end
 
     unless donor_account
-       Airbrake.raise_or_notify(Exception.new("Can't find donor account for #{siebel_donation.inspect}"))
+      Airbrake.raise_or_notify(Exception.new("Can't find donor account for #{siebel_donation.inspect}"))
       return
     end
 
@@ -208,7 +208,7 @@ class Siebel < DataServer
     Retryable.retryable do
       donor_account = @org.donor_accounts.where(account_number: donor.id).first_or_initialize
       donor_account.attributes = { name: donor.account_name,
-                                  donor_type: donor.type }
+                                   donor_type: donor.type }
       donor_account.save!
 
       contact = donor_account.link_to_contact_for(account_list)
@@ -332,7 +332,7 @@ class Siebel < DataServer
     # If we can match it to an existing address, update that address
     object.addresses_including_deleted.each do |a|
       if a.remote_id == new_address.remote_id || a.equal_to?(new_address)
-        a.update_attributes(new_address.attributes.select { |k,v| v.present? })
+        a.update_attributes(new_address.attributes.select { |_k,v| v.present? })
         return a
       end
     end
@@ -348,12 +348,12 @@ class Siebel < DataServer
 
   def add_or_update_phone_number(phone_number, person)
     attributes = {
-                    number: phone_number.phone,
-                    location: phone_number.type.downcase,
-                    primary: phone_number.primary,
-                    remote_id: phone_number.id
-                 }
-    if existing_phone = person.phone_numbers.detect { |pn| pn.remote_id == phone_number.id }
+      number: phone_number.phone,
+      location: phone_number.type.downcase,
+      primary: phone_number.primary,
+      remote_id: phone_number.id
+    }
+    if existing_phone = person.phone_numbers.find { |pn| pn.remote_id == phone_number.id }
       existing_phone.update_attributes(attributes)
     else
       PhoneNumber.add_for_person(person, attributes)
@@ -362,13 +362,13 @@ class Siebel < DataServer
 
   def add_or_update_email_address(email, person)
     attributes = {
-                   email: email.email,
-                   primary: email.primary,
-                   location: email.type,
-                   remote_id: email.id
-                 }
+      email: email.email,
+      primary: email.primary,
+      location: email.type,
+      remote_id: email.id
+    }
     Retryable.retryable do
-      if existing_email = person.email_addresses.detect { |e| e.remote_id == email.id }
+      if existing_email = person.email_addresses.find { |e| e.remote_id == email.id }
         begin
           existing_email.update_attributes(attributes)
         rescue ActiveRecord::RecordNotUnique

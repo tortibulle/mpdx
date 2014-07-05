@@ -1,8 +1,8 @@
 class SetupController < ApplicationController
   include Wicked::Wizard
 
-  skip_before_filter :ensure_setup_finished
-  before_filter :ensure_org_account, only: :show
+  skip_before_action :ensure_setup_finished
+  before_action :ensure_org_account, only: :show
 
   steps :org_accounts, :social_accounts, :finish
 
@@ -19,11 +19,12 @@ class SetupController < ApplicationController
   end
 
   protected
-    def ensure_org_account
-      return if step == :org_accounts
-      unless current_user.organization_accounts.present?
-        redirect_to wizard_path(:org_accounts), alert: _('You need to be connected to an organization to use MPDX.')
-        return false
-      end
+
+  def ensure_org_account
+    return if step == :org_accounts
+    unless current_user.organization_accounts.present?
+      redirect_to wizard_path(:org_accounts), alert: _('You need to be connected to an organization to use MPDX.')
+      return false
     end
+  end
 end

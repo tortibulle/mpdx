@@ -20,8 +20,8 @@ class TntImport
           # to unescape a unicode character.
           begin
             bad_char = e.message.match(/"([^"]*)"/)[1]
-            subbed = @contents.gsub!(eval(%Q{"#{bad_char}"}), ' ')
-          rescue => new_error
+            @contents.gsub!(eval(%Q{"#{bad_char}"}), ' ')
+          rescue
             raise e
           end
           retry
@@ -38,11 +38,11 @@ class TntImport
   def xml
     unless @xml
       @xml = read_xml(@import.file.file.file)
-       if @xml.present? && @xml['Database']
-         @xml = @xml['Database']['Tables']
-       else
-         @xml = nil
-       end
+      if @xml.present? && @xml['Database']
+        @xml = @xml['Database']['Tables']
+      else
+        @xml = nil
+      end
     end
     @xml
   end
@@ -68,7 +68,7 @@ class TntImport
 
     rows = Array.wrap(xml['Contact']['row'])
 
-    rows.each_with_index do |row, i|
+    rows.each_with_index do |row, _i|
 
       contact = Retryable.retryable do
         @account_list.contacts.where(tnt_id: row['id']).first
@@ -112,12 +112,12 @@ class TntImport
     # set referrals
     # Loop over the whole list again now that we've added everyone and try to link up referrals
     rows.each do |row|
-      if referred_by = @tnt_contacts.detect {|tnt_id, c| c.name == row['ReferredBy'] ||
-                                                         c.full_name == row['ReferredBy'] ||
-                                                         c.greeting == row['ReferredBy'] }
-        contact = @tnt_contacts[row['id']]
-        contact.referrals_to_me << referred_by[1] unless contact.referrals_to_me.include?(referred_by[1])
-      end
+      referred_by = @tnt_contacts.find {|_tnt_id, c| c.name == row['ReferredBy'] ||
+                                                     c.full_name == row['ReferredBy'] ||
+                                                     c.greeting == row['ReferredBy'] }
+      next unless referred_by
+      contact = @tnt_contacts[row['id']]
+      contact.referrals_to_me << referred_by[1] unless contact.referrals_to_me.include?(referred_by[1])
     end
 
     @tnt_contacts
@@ -132,10 +132,10 @@ class TntImport
       end
 
       task.attributes = {
-                         activity_type: lookup_task_type(row['TaskTypeID']),
-                         subject: row['Description'],
-                         start_at: DateTime.parse(row['TaskDate'] + ' ' + DateTime.parse(row['TaskTime']).strftime('%I:%M%p'))
-                        }
+        activity_type: lookup_task_type(row['TaskTypeID']),
+        subject: row['Description'],
+        start_at: DateTime.parse(row['TaskDate'] + ' ' + DateTime.parse(row['TaskTime']).strftime('%I:%M%p'))
+      }
       if task.save
         # Add any notes as a comment
         if row['Notes'].present?
@@ -165,13 +165,13 @@ class TntImport
       end
 
       task.attributes = {
-                         activity_type: lookup_task_type(row['TaskTypeID']),
-                         subject: row['Description'] || lookup_task_type(row['TaskTypeID']),
-                         start_at: DateTime.parse(row['HistoryDate']),
-                         completed_at: DateTime.parse(row['HistoryDate']),
-                         completed: true,
-                         result: lookup_history_result(row['HistoryResultID'])
-                        }
+        activity_type: lookup_task_type(row['TaskTypeID']),
+        subject: row['Description'] || lookup_task_type(row['TaskTypeID']),
+        start_at: DateTime.parse(row['HistoryDate']),
+        completed_at: DateTime.parse(row['HistoryDate']),
+        completed: true,
+        result: lookup_history_result(row['HistoryResultID'])
+      }
       if task.save
         # Add any notes as a comment
         if row['Notes'].present?
@@ -320,12 +320,12 @@ class TntImport
 
     company ||= @account_list.companies.new(master_company: master_company)
     company.assign_attributes(name: row['OrganizationName'],
-                               phone_number: row['Phone'],
-                               street: row['MailingStreetAddress'],
-                               city: row['MailingCity'],
-                               state: row['MailingState'],
-                               postal_code: row['MailingPostalCode'],
-                               country: row['MailingCountry'])
+                              phone_number: row['Phone'],
+                              street: row['MailingStreetAddress'],
+                              city: row['MailingCity'],
+                              state: row['MailingState'],
+                              postal_code: row['MailingPostalCode'],
+                              country: row['MailingCountry'])
     company.save!
     donor_account.update_attribute(:master_company_id, company.master_company_id) unless donor_account.master_company_id == company.master_company.id
     company
@@ -367,11 +367,11 @@ class TntImport
                           profession: prefix.present? ? nil : row['Profession'] }
     # Phone numbers
     { 'HomePhone' => 'home', 'HomePhone2' => 'home', 'HomeFax' => 'fax',
-     prefix + 'BusinessPhone' => 'work', prefix + 'BusinessPhone2' => 'work', prefix + 'BusinessFax' => 'fax',
-     prefix + 'CompanyMainPhone' => 'work', 'AssistantPhone' => 'work', 'OtherPhone' => 'other',
-     'CarPhone' => 'mobile', prefix + 'MobilePhone' => 'mobile', prefix + 'MobilePhone2' => 'mobile',
-     prefix + 'PagerNumber' => 'other', 'CallbackPhone' => 'other', 'ISDNPhone' => 'other', 'PrimaryPhone' => 'other',
-     'RadioPhone' => 'other', 'TelexPhone' => 'other' }.each_with_index do |key, i|
+      prefix + 'BusinessPhone' => 'work', prefix + 'BusinessPhone2' => 'work', prefix + 'BusinessFax' => 'fax',
+      prefix + 'CompanyMainPhone' => 'work', 'AssistantPhone' => 'work', 'OtherPhone' => 'other',
+      'CarPhone' => 'mobile', prefix + 'MobilePhone' => 'mobile', prefix + 'MobilePhone2' => 'mobile',
+      prefix + 'PagerNumber' => 'other', 'CallbackPhone' => 'other', 'ISDNPhone' => 'other', 'PrimaryPhone' => 'other',
+      'RadioPhone' => 'other', 'TelexPhone' => 'other' }.each_with_index do |key, i|
        person.phone_number = { number: row[key[0]], location: key[1], primary: row['PreferredPhoneType'].to_i == i } if row[key[0]].present?
      end
 
@@ -388,7 +388,7 @@ class TntImport
     donor_accounts = []
 
     if designation_profile
-      donor_accounts = row['OrgDonorCodes'].to_s.split(',').collect do |account_number|
+      donor_accounts = row['OrgDonorCodes'].to_s.split(',').map do |account_number|
         donor_account = Retryable.retryable do
           da = designation_profile.organization.donor_accounts.where(account_number: account_number).first
           unless da
@@ -425,14 +425,14 @@ class TntImport
           end
         end
         addresses << {
-                        street: street,
-                        city: city,
-                        state: state,
-                        postal_code: postal_code,
-                        country: country,
-                        location: location,
-                        primary_mailing_address: primary_address
-                      }
+          street: street,
+          city: city,
+          state: state,
+          postal_code: postal_code,
+          country: country,
+          location: location,
+          primary_mailing_address: primary_address
+        }
       end
     end
 

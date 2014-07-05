@@ -1,9 +1,9 @@
 class ContactsController < ApplicationController
   respond_to :html, :js
-  before_filter :get_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals, :details, :referrals]
-  before_filter :setup_view_options, only: [:index]
-  before_filter :setup_filters, only: [:index, :show]
-  before_filter :clear_annoying_redirect_locations
+  before_action :get_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals, :details, :referrals]
+  before_action :setup_view_options, only: [:index]
+  before_action :setup_filters, only: [:index, :show]
+  before_action :clear_annoying_redirect_locations
 
   def index
     if params[:filters] && params[:filters][:name].present?
@@ -142,22 +142,20 @@ class ContactsController < ApplicationController
   def merge
     @page_title = _('Merge Contacts')
 
-    if params[:merge_contact_ids]
-      params[:merge_sets] = [params[:merge_contact_ids]]
-    end
+    params[:merge_sets] = [params[:merge_contact_ids]] if params[:merge_contact_ids]
 
     merged_contacts_count = 0
 
     params[:merge_sets].each do |ids|
       # When performing a merge we want to keep the contact with the most people
       contacts = current_account_list.contacts.includes(:people).where(id: ids.split(','))
-      if contacts.length > 1
-        merged_contacts_count += contacts.length
-        winner = contacts.max_by { |c| c.people.length }
-        Contact.transaction do
-          (contacts - [winner]).each do |loser|
-            winner.merge(loser)
-          end
+      next if contacts <= 1
+
+      merged_contacts_count += contacts.length
+      winner = contacts.max_by { |c| c.people.length }
+      Contact.transaction do
+        (contacts - [winner]).each do |loser|
+          winner.merge(loser)
         end
       end
     end if params[:merge_sets].present?

@@ -26,7 +26,7 @@ describe Person::KeyAccount do
 
   it 'should use guid to find an authenticated user' do
     user = FactoryGirl.create(:user)
-    account = Person::KeyAccount.find_or_create_from_auth(@auth_hash, user)
+    Person::KeyAccount.find_or_create_from_auth(@auth_hash, user)
     Person::KeyAccount.find_authenticated_user(@auth_hash).should == user
   end
 

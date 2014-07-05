@@ -6,7 +6,7 @@ class Person < ActiveRecord::Base
   MARITAL_STATUSES = [_('Single'), _('Engaged'), _('Married'), _('Separated'), _('Divorced'), _('Widowed')]
   has_paper_trail on: [:destroy],
                   meta: { related_object_type: 'Contact',
-                             related_object_id: :contact_id }
+                          related_object_id: :contact_id }
 
   belongs_to :master_person
   has_many :email_addresses, -> { order('email_addresses.primary::int desc') }, dependent: :destroy, autosave: true
@@ -100,7 +100,7 @@ class Person < ActiveRecord::Base
   end
 
   def spouse
-    family_relationships.where(relationship: ['Husband','Wife']).first.try(:related_person)
+    family_relationships.where(relationship: %w(Husband Wife)).first.try(:related_person)
   end
 
   def to_user
@@ -213,7 +213,7 @@ class Person < ActiveRecord::Base
 
   def merge_phone_numbers
     phone_numbers.reload.each do |phone_number|
-      other_phone = phone_numbers.detect { |pn| pn.id != phone_number.id &&
+      other_phone = phone_numbers.find { |pn| pn.id != phone_number.id &&
                                                    pn == phone_number }
       if other_phone
         phone_number.merge(other_phone)
@@ -230,7 +230,7 @@ class Person < ActiveRecord::Base
 
       %w[phone_numbers company_positions].each do |relationship|
         other.send(relationship.to_sym).each do |other_rel|
-          unless send(relationship.to_sym).detect { |rel| rel == other_rel }
+          unless send(relationship.to_sym).find { |rel| rel == other_rel }
             other_rel.update_column(:person_id, id)
           end
         end
@@ -316,6 +316,7 @@ class Person < ActiveRecord::Base
   end
 
   private
+
   def find_master_person
     unless master_person_id
       self.master_person_id = MasterPerson.find_or_create_for_person(self).id

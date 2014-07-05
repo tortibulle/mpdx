@@ -1,5 +1,5 @@
 class MailChimpAccountsController < ApplicationController
-  before_filter :get_mail_chimp_account
+  before_action :get_mail_chimp_account
 
   def index
     @mail_chimp_account.validate_key if current_account_list.mail_chimp_account

@@ -7,19 +7,19 @@ class Person::KeyAccount < ActiveRecord::Base
     @rel = person.key_accounts
     @remote_id = auth_hash.extra.attributes.first.ssoGuid
     @attributes = {
-                    remote_id: @remote_id,
-                    first_name: auth_hash.extra.attributes.first.firstName,
-                    last_name: auth_hash.extra.attributes.first.lastName,
-                    email: auth_hash.extra.attributes.first.email
-                  }
+      remote_id: @remote_id,
+      first_name: auth_hash.extra.attributes.first.firstName,
+      last_name: auth_hash.extra.attributes.first.lastName,
+      email: auth_hash.extra.attributes.first.email
+    }
     super
   end
 
   def self.create_user_from_auth(auth_hash)
     @attributes = {
-                    first_name: auth_hash.extra.attributes.first.firstName,
-                    last_name: auth_hash.extra.attributes.first.lastName
-                  }
+      first_name: auth_hash.extra.attributes.first.firstName,
+      last_name: auth_hash.extra.attributes.first.lastName
+    }
 
     super
   end

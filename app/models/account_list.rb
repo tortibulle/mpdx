@@ -205,10 +205,10 @@ class AccountList < ActiveRecord::Base
     ordered_contacts.each do |contact|
       next if merged_contacts.include?(contact)
 
-      other_contacts = ordered_contacts.find_all {|c| c.name == contact.name &&
+      other_contacts = ordered_contacts.select {|c| c.name == contact.name &&
                                                            c.id != contact.id &&
                                                            (c.donor_accounts.first == contact.donor_accounts.first ||
-                                                            c.addresses.detect { |a| contact.addresses.detect { |ca| ca.equal_to? a } }) }
+                                                            c.addresses.find { |a| contact.addresses.find { |ca| ca.equal_to? a } }) }
       if other_contacts.present?
         other_contacts.each do |other_contact|
           contact.merge(other_contact)
@@ -234,7 +234,7 @@ class AccountList < ActiveRecord::Base
   def self.find_or_create_from_profile(profile, org_account)
     user = org_account.user
     organization = org_account.organization
-    designation_numbers = profile.designation_accounts.collect(&:designation_number)
+    designation_numbers = profile.designation_accounts.map(&:designation_number)
     # look for an existing account list with the same designation numbers in it
     unless account_list = AccountList.find_with_designation_numbers(designation_numbers, organization)
       # create a new list for this profile
@@ -293,8 +293,8 @@ class AccountList < ActiveRecord::Base
       # If they have given the same amount for the past 3 months, we'll assume they are
       # a monthly donor.
       gifts = donations.where(donor_account_id: contact.donor_account_ids,
-                              designation_account_id: designation_account_ids).
-                        order('donation_date desc')
+                              designation_account_id: designation_account_ids)
+                       .order('donation_date desc')
       latest_donation = gifts[0]
 
       next unless latest_donation
@@ -341,7 +341,7 @@ class AccountList < ActiveRecord::Base
   private
 
   def import_data
-    users.collect(&:organization_accounts).flatten.uniq.map(&:import_all_data)
+    users.map(&:organization_accounts).flatten.uniq.map(&:import_all_data)
     send_account_notifications
   end
 

@@ -7,6 +7,6 @@ class NotificationPreference < ActiveRecord::Base
   validates_presence_of :actions, :notification_type_id, presence: true
 
   def self.default_actions
-    ['email','task']
+    %w(email task)
   end
 end

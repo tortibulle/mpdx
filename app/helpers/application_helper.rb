@@ -78,9 +78,10 @@ module ApplicationHelper
     if options.fetch(:html, true)
       b, eb = '<b>', '</b>'
       sp = '&nbsp;'
-      html_key = '_html'
+      # html_key = '_html'
     else
-      b = eb = html_key = ''
+      b = eb = ''
+      # html_key = b
       sp = ' '
     end
 
@@ -88,9 +89,9 @@ module ApplicationHelper
     when 0, 1; ''
     else
        _("Displaying #{b}%{from}#{sp}-#{sp}%{to}#{eb} of #{b}%{count}#{eb}").localize % {
-        count: collection.total_entries,
-        from: collection.offset + 1, to: collection.offset + collection.length
-      }
+         count: collection.total_entries,
+         from: collection.offset + 1, to: collection.offset + collection.length
+       }
     end.html_safe
   end
 

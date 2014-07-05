@@ -11,4 +11,3 @@ describe DonationExhibit do
   end
 
 end
-

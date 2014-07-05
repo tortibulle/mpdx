@@ -27,11 +27,11 @@ class DataServer
       check_credentials!
 
       # Remove any profiles this user no longer has access to
-      designation_profiles.each do |designation_profile|
-        #unless profiles.detect { |profile| profile[:name] == designation_profile.name && profile[:code] == designation_profile.code}
-          #designation_profile.destroy
-        #end
-      end
+      # designation_profiles.each do |_designation_profile|
+        # unless profiles.detect { |profile| profile[:name] == designation_profile.name && profile[:code] == designation_profile.code}
+          # designation_profile.destroy
+        # end
+      # end
 
       profiles.each do |profile|
         Retryable.retryable do
@@ -147,7 +147,7 @@ class DataServer
 
     if balance[:designation_numbers]
       attributes.merge!(name: balance[:account_names].first) if balance[:designation_numbers].length == 1
-      balance[:designation_numbers].each_with_index do |number, i|
+      balance[:designation_numbers].each_with_index do |number, _i|
         find_or_create_designation_account(number, profile, attributes)
       end
     end
@@ -161,11 +161,11 @@ class DataServer
   def validate_username_and_password
     begin
       if @org.profiles_url.present?
-        response = Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:profiles_url) do
+        Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:profiles_url) do
           get_response(@org.profiles_url, get_params(@org.profiles_params))
         end
       else
-        response = Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:account_balances_url) do
+        Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:account_balances_url) do
           get_response(@org.account_balance_url, get_params(@org.account_balance_params))
         end
       end
@@ -183,7 +183,7 @@ class DataServer
 
   def profiles_with_designation_numbers
     unless @profiles_with_designation_numbers
-      @profiles_with_designation_numbers = profiles.collect do |profile|
+      @profiles_with_designation_numbers = profiles.map do |profile|
         { designation_numbers: designation_numbers(profile[:code]) }
          .merge(profile.slice(:name, :code, :balance, :balance_udated_at))
       end
@@ -192,6 +192,7 @@ class DataServer
   end
 
   protected
+
   def profile_balance(profile_code)
     balance = {}
     response = Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:account_balance_url) do
@@ -202,7 +203,7 @@ class DataServer
     # This csv should always only have one line (besides the headers)
     begin
       CSV.new(response, headers: :first_row).each do |line|
-        balance[:designation_numbers] = line['EMPLID'].split(',').collect { |e| e.gsub('"','') } if line['EMPLID']
+        balance[:designation_numbers] = line['EMPLID'].split(',').map { |e| e.gsub('"','') } if line['EMPLID']
         balance[:account_names] = line['ACCT_NAME'].split('\n') if line['ACCT_NAME']
         balance_match = line['BALANCE'].gsub(',','').match(/([-]?\d+\.?\d*)/)
         balance[:balance] = balance_match[0] if balance_match
@@ -249,13 +250,13 @@ class DataServer
     params_string.sub!('$DATEFROM$', options[:datefrom]) if options[:datefrom]
     params_string.sub!('$DATETO$', options[:dateto]) if options[:dateto].present?
     params_string.sub!('$PERSONIDS$', options[:personid].to_s) if options[:personid].present?
-    params = Hash[params_string.split('&').collect { |p| p.split('=') }]
+    params = Hash[params_string.split('&').map { |p| p.split('=') }]
     params
   end
 
   def get_response(url, params)
     RestClient::Request.execute(method: :post, url: url, payload: params, timeout: -1, user: 'foo',
-        password: 'bar') { |response, request, result, &block|
+                                password: 'bar') { |response, _request, _result, &_block|
       # check for error response
       lines = response.split("\n")
       first_line = lines.first.to_s.upcase
@@ -330,12 +331,12 @@ class DataServer
 
     company ||= account_list.companies.new(master_company: master_company)
     company.assign_attributes(name: line['LAST_NAME_ORG'],
-                                phone_number: line['PHONE'],
-                                street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select { |a| a.present? }.join("\n"),
-                                city: line['CITY'],
-                                state: line['STATE'],
-                                postal_code: line['ZIP'],
-                                country: line['CNTRY_DESCR'])
+                              phone_number: line['PHONE'],
+                              street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select { |a| a.present? }.join("\n"),
+                              city: line['CITY'],
+                              state: line['STATE'],
+                              postal_code: line['ZIP'],
+                              country: line['CNTRY_DESCR'])
     company.save!
     donor_account.update_attributes(master_company_id: company.master_company_id) unless donor_account.master_company_id == company.master_company.id
     company
@@ -346,16 +347,16 @@ class DataServer
     donor_account = Retryable.retryable do
       donor_account = @org.donor_accounts.where(account_number: line['PEOPLE_ID']).first_or_initialize
       donor_account.attributes = { name: line['ACCT_NAME'],
-                                  donor_type: line['PERSON_TYPE'] == 'P' ? 'Household' : 'Organization' } # if the acccount already existed, update the name
+                                   donor_type: line['PERSON_TYPE'] == 'P' ? 'Household' : 'Organization' } # if the acccount already existed, update the name
       # physical address
       if [line['ADDR1'],line['ADDR2'],line['ADDR3'],line['ADDR4'],line['CITY'],line['STATE'],line['ZIP'],line['CNTRY_DESCR']].any?(&:present?)
         donor_account.addresses_attributes = [{
-                                                street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select { |a| a.present? }.join("\n"),
-                                                city: line['CITY'],
-                                                state: line['STATE'],
-                                                postal_code: line['ZIP'],
-                                                country: line['CNTRY_DESCR']
-                                              }]
+          street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select { |a| a.present? }.join("\n"),
+          city: line['CITY'],
+          state: line['STATE'],
+          postal_code: line['ZIP'],
+          country: line['CNTRY_DESCR']
+        }]
       end
       donor_account.save!
       donor_account
@@ -402,7 +403,7 @@ class DataServer
   end
 
   def update_url(url)
-    Proc.new { |exception, handler, attempts, retries, times|
+    Proc.new { |exception, _handler, _attempts, _retries, _times|
       @org.update_attributes(url => exception.message)
     }
   end

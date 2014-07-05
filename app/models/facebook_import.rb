@@ -121,7 +121,7 @@ class FacebookImport
       else
         begin
           fb_person = Person.create!(person_attributes)
-        rescue ActiveRecord::RecordInvalid => e
+        rescue ActiveRecord::RecordInvalid
           raise person_attributes.inspect
         end
       end

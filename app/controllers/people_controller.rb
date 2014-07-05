@@ -1,7 +1,7 @@
 class PeopleController < ApplicationController
   respond_to :html, :js
-  before_filter :get_contact
-  before_filter :get_person, only: [:show, :edit, :update, :social_search]
+  before_action :get_contact
+  before_action :get_person, only: [:show, :edit, :update, :social_search]
 
   def show
     @person = current_account_list.people.find(params[:id])

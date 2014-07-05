@@ -81,7 +81,7 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def contacts(params = {})
-    JSON.parse(get_response(:get, '/api/v1/contacts?' + params.collect { |k,v| "#{k}=#{v}" }.join('&')))['contacts']
+    JSON.parse(get_response(:get, '/api/v1/contacts?' + params.map { |k,v| "#{k}=#{v}" }.join('&')))['contacts']
   end
 
   def add_or_update_contact(contact)
@@ -143,15 +143,15 @@ class PrayerLettersAccount < ActiveRecord::Base
 
   def contact_params(contact)
     params = {
-              name: contact.envelope_greeting,
-              greeting: contact.greeting,
-              file_as: contact.name,
-              street: contact.mailing_address.street,
-              city: contact.mailing_address.city,
-              state: contact.mailing_address.state,
-              postal_code: contact.mailing_address.postal_code,
-              external_id: contact.id
-             }
+      name: contact.envelope_greeting,
+      greeting: contact.greeting,
+      file_as: contact.name,
+      street: contact.mailing_address.street,
+      city: contact.mailing_address.city,
+      state: contact.mailing_address.state,
+      postal_code: contact.mailing_address.postal_code,
+      external_id: contact.id
+    }
     params[:country] = contact.mailing_address.country unless contact.mailing_address.country == 'United States'
     if contact.siebel_organization?
       params[:name] = nil
@@ -185,5 +185,3 @@ class PrayerLettersAccount < ActiveRecord::Base
   class AccessError < StandardError
   end
 end
-
-

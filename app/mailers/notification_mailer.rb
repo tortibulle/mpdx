@@ -4,7 +4,7 @@ class NotificationMailer < ActionMailer::Base
   def notify(account_list, notifications_by_type)
     @notifications_by_type = notifications_by_type
 
-    mail to: account_list.users.collect(&:email).compact.collect(&:email),
+    mail to: account_list.users.map(&:email).compact.map(&:email),
          subject: _('Giving Notifications from MPDX')
   end
 end

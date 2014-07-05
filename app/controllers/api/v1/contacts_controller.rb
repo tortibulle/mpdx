@@ -18,8 +18,8 @@ class Api::V1::ContactsController < Api::V1::BaseController
       } : {}
 
     meta.merge!(total: filtered_contacts.total_entries, from: correct_from(filtered_contacts),
-                  to: correct_to(filtered_contacts), page: page,
-                  total_pages: total_pages(filtered_contacts)) if filtered_contacts.respond_to?(:total_entries)
+                to: correct_to(filtered_contacts), page: page,
+                total_pages: total_pages(filtered_contacts)) if filtered_contacts.respond_to?(:total_entries)
 
     render json: filtered_contacts,
            serializer: ContactArraySerializer,

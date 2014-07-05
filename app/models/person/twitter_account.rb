@@ -10,13 +10,13 @@ class Person::TwitterAccount < ActiveRecord::Base
     primary = person.twitter_accounts.present? ? false : true
     @remote_id = params[:screen_name]
     @attributes = {
-                    remote_id: params[:screen_name],
-                    screen_name: params[:screen_name],
-                    token: params[:oauth_token],
-                    secret: params[:oauth_token_secret],
-                    valid_token: true,
-                    primary: primary
-                  }
+      remote_id: params[:screen_name],
+      screen_name: params[:screen_name],
+      token: params[:oauth_token],
+      secret: params[:oauth_token_secret],
+      valid_token: true,
+      primary: primary
+    }
     super
   end
 
@@ -44,8 +44,9 @@ class Person::TwitterAccount < ActiveRecord::Base
   end
 
   private
-    def ensure_only_one_primary
-      primaries = person.twitter_accounts.where(primary: true)
-      primaries[0..-2].map { |p| p.update_column(:primary, false) } if primaries.length > 1
-    end
+
+  def ensure_only_one_primary
+    primaries = person.twitter_accounts.where(primary: true)
+    primaries[0..-2].map { |p| p.update_column(:primary, false) } if primaries.length > 1
+  end
 end

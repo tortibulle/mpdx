@@ -16,9 +16,9 @@ describe Siebel do
   before do
     account_list.users << person.to_user
 
-    stub_request(:get, /api\.smartystreets\.com\/.*/).
-         with(headers: { 'Accept' => 'application/json', 'Accept-Encoding' => 'gzip, deflate', 'Content-Type' => 'application/json', 'User-Agent' => 'Ruby' }).
-         to_return(status: 200, body: '{}', headers: {})
+    stub_request(:get, /api\.smartystreets\.com\/.*/)
+      .with(headers: { 'Accept' => 'application/json', 'Accept-Encoding' => 'gzip, deflate', 'Content-Type' => 'application/json', 'User-Agent' => 'Ruby' })
+      .to_return(status: 200, body: '{}', headers: {})
 
   end
 
@@ -26,8 +26,8 @@ describe Siebel do
     let(:relay) { create(:relay_account, person: person) }
 
     it 'imports profiles for a relay guid' do
-      stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/profiles?response_timeout=60000&ssoGuid=#{relay.remote_id}").
-        to_return(status: 200, body: '[ { "name": "Staff Account (0559826)", "designations": [ { "number": "0559826", "description": "Joshua and Amanda Starcher (0559826)", "staffAccountId": "000559826" } ] }]')
+      stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/profiles?response_timeout=60000&ssoGuid=#{relay.remote_id}")
+        .to_return(status: 200, body: '[ { "name": "Staff Account (0559826)", "designations": [ { "number": "0559826", "description": "Joshua and Amanda Starcher (0559826)", "staffAccountId": "000559826" } ] }]')
 
       siebel.should_receive(:find_or_create_designation_account)
 
@@ -37,8 +37,8 @@ describe Siebel do
     end
 
     #it 'removes profiles that a user no longer has access to' do
-      #stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/profiles?response_timeout=60000&ssoGuid=#{relay.remote_id}").
-        #to_return(:status => 200, :body => '[ ]')
+      #stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/profiles?response_timeout=60000&ssoGuid=#{relay.remote_id}")
+        #.to_return(:status => 200, :body => '[ ]')
 
       #designation_profile = create(:designation_profile, user: person.to_user, organization: org)
 
@@ -52,10 +52,10 @@ describe Siebel do
   context '#import_profile_balance' do
 
     it 'sets the profile balance to the sum of designation account balances in this profile' do
-      stub_request(:get, 'https://wsapi.ccci.org/wsapi/rest/staffAccount/balances?employee_ids=1&response_timeout=60000').
-        to_return(status: 200, body: '{ "1": { "primary": 1 }}')
-      stub_request(:get, 'https://wsapi.ccci.org/wsapi/rest/staffAccount/balances?employee_ids=2&response_timeout=60000').
-        to_return(status: 200, body: '{ "2": { "primary": 2 }}')
+      stub_request(:get, 'https://wsapi.ccci.org/wsapi/rest/staffAccount/balances?employee_ids=1&response_timeout=60000')
+        .to_return(status: 200, body: '{ "1": { "primary": 1 }}')
+      stub_request(:get, 'https://wsapi.ccci.org/wsapi/rest/staffAccount/balances?employee_ids=2&response_timeout=60000')
+        .to_return(status: 200, body: '{ "2": { "primary": 2 }}')
 
       designation_profile.designation_accounts << da1
       designation_profile.designation_accounts << da2
@@ -66,8 +66,8 @@ describe Siebel do
     end
 
     it 'updates the balance of a designation account on that profile' do
-      stub_request(:get, 'https://wsapi.ccci.org/wsapi/rest/staffAccount/balances?employee_ids=1&response_timeout=60000').
-        to_return(status: 200, body: '{ "1": { "primary": 1 }}')
+      stub_request(:get, 'https://wsapi.ccci.org/wsapi/rest/staffAccount/balances?employee_ids=1&response_timeout=60000')
+        .to_return(status: 200, body: '{ "1": { "primary": 1 }}')
 
       designation_profile.designation_accounts << da1
 
@@ -80,8 +80,8 @@ describe Siebel do
 
   context '#import_donations' do
     it 'imports a new donation from the donor system' do
-      stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/donations?designations=#{da1.designation_number}&posted_date_end=#{Date.today.strftime('%Y-%m-%d')}&response_timeout=60000&posted_date_start=2004-01-01").
-        to_return(status: 200, body: '[ { "id": "1-IGQAM", "amount": "100.00", "designation": "' + da1.designation_number + '", "donorId": "439362786", "donationDate": "2012-12-18", "postedDate": "2012-12-21", "paymentMethod": "Check", "channel": "Mail", "campaignCode": "000000" } ]')
+      stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/donations?designations=#{da1.designation_number}&posted_date_end=#{Date.today.strftime('%Y-%m-%d')}&response_timeout=60000&posted_date_start=2004-01-01")
+        .to_return(status: 200, body: '[ { "id": "1-IGQAM", "amount": "100.00", "designation": "' + da1.designation_number + '", "donorId": "439362786", "donationDate": "2012-12-18", "postedDate": "2012-12-21", "paymentMethod": "Check", "channel": "Mail", "campaignCode": "000000" } ]')
 
       designation_profile.designation_accounts << da1
 
@@ -136,8 +136,8 @@ describe Siebel do
 
     it "fetches the donor from siebel if the donor isn't already on this account list" do
       donor_account.destroy
-      stub_request(:get, 'https://wsapi.ccci.org/wsapi/rest/donors?ids=MyString&response_timeout=60000').
-        to_return(status: 200, body: '[{ "id": "602506447", "accountName": "Hillside Evangelical Free Church"}]', headers: {})
+      stub_request(:get, 'https://wsapi.ccci.org/wsapi/rest/donors?ids=MyString&response_timeout=60000')
+        .to_return(status: 200, body: '[{ "id": "602506447", "accountName": "Hillside Evangelical Free Church"}]', headers: {})
 
       expect {
         siebel.send(:add_or_update_donation, siebel_donation, da1, designation_profile)
@@ -149,8 +149,8 @@ describe Siebel do
     it 'imports a new donor from the donor system' do
       designation_profile.designation_accounts << da1
 
-      stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/donors?account_address_filter=primary&contact_email_filter=all&contact_filter=all&contact_phone_filter=all&having_given_to_designations=#{da1.designation_number}&response_timeout=60000").
-        to_return(status: 200, body: '[{"id":"602506447","accountName":"HillsideEvangelicalFreeChurch","type":"Business","updatedAt":"' + Date.today.to_s(:db) + '"}]')
+      stub_request(:get, "https://wsapi.ccci.org/wsapi/rest/donors?account_address_filter=primary&contact_email_filter=all&contact_filter=all&contact_phone_filter=all&having_given_to_designations=#{da1.designation_number}&response_timeout=60000")
+        .to_return(status: 200, body: '[{"id":"602506447","accountName":"HillsideEvangelicalFreeChurch","type":"Business","updatedAt":"' + Date.today.to_s(:db) + '"}]')
 
       siebel.should_receive(:add_or_update_donor_account)
       siebel.should_receive(:add_or_update_company)
@@ -325,7 +325,7 @@ describe Siebel do
 
     it "doesn't add a new address when there is a matching deleted address" do
       create(:address, addressable: contact, street: siebel_address.address1, city: siebel_address.city,
-                                 state: siebel_address.state, postal_code: siebel_address.zip, deleted: true)
+                       state: siebel_address.state, postal_code: siebel_address.zip, deleted: true)
       expect {
         siebel.send(:add_or_update_address, siebel_address, contact)
       }.not_to change { Address.count }
@@ -400,4 +400,3 @@ describe Siebel do
     end
   end
 end
-

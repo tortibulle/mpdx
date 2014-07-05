@@ -34,30 +34,30 @@ describe Person do
     it 'gracefully handles having the same FB account assigned twice' do
       fb_account = create(:facebook_account, person: person)
       person.update_attributes('facebook_accounts_attributes' => {
-          '0' => {
-            '_destroy' => 'false',
-            'url' => 'http://facebook.com/profile.php?id=500015648'
-          },
-          '1' => {
-            '_destroy' => 'false',
-            'url' => 'http://facebook.com/profile.php?id=500015648'
-          },
-          '1354203866590' => {
-            '_destroy' => 'false',
-            'id' => fb_account.id,
-            'url' => fb_account.url
-          }
-        })
+                                 '0' => {
+                                   '_destroy' => 'false',
+                                   'url' => 'http://facebook.com/profile.php?id=500015648'
+                                 },
+                                 '1' => {
+                                   '_destroy' => 'false',
+                                   'url' => 'http://facebook.com/profile.php?id=500015648'
+                                 },
+                                 '1354203866590' => {
+                                   '_destroy' => 'false',
+                                   'id' => fb_account.id,
+                                   'url' => fb_account.url
+                                 }
+                               })
       person.facebook_accounts.length.should == 2
     end
 
     it 'gracefully handles having an fb account with a blank url' do
       person.update_attributes('facebook_accounts_attributes' => {
-          '0' => {
-            '_destroy' => 'false',
-            'url' => ''
-          }
-        })
+                                 '0' => {
+                                   '_destroy' => 'false',
+                                   'url' => ''
+                                 }
+                               })
       person.facebook_accounts.length.should == 0
     end
   end

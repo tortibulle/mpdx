@@ -4,13 +4,13 @@ class AccountListExhibit < DisplayCase::Exhibit
   end
 
   def to_s
-    designation_accounts.collect(&:name).join(', ')
+    designation_accounts.map(&:name).join(', ')
   end
 
   def balances(user)
     return '' if designation_accounts.length == 0
     if designation_accounts.length > 1
-      balance = designation_profile(user).try(:balance) ? designation_profile(user).balance.to_i : designation_accounts.collect { |da| da.balance.to_i }.reduce(&:+)
+      balance = designation_profile(user).try(:balance) ? designation_profile(user).balance.to_i : designation_accounts.map { |da| da.balance.to_i }.reduce(&:+)
     else
       balance = designation_accounts.first.balance.to_i
     end
@@ -18,4 +18,3 @@ class AccountListExhibit < DisplayCase::Exhibit
     # <a href=\"#show\" class=\"plain\">Details</a></div>
   end
 end
-

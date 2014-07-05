@@ -3,8 +3,8 @@ require 'spec_helper'
 describe PrayerLettersAccount do
   context '#get_response' do
     it 'marks token as invalid if response is a 401' do
-      stub_request(:get, /https:\/\/www\.prayerletters\.com\/*/).
-        to_return(status: 401)
+      stub_request(:get, /https:\/\/www\.prayerletters\.com\/*/)
+        .to_return(status: 401)
 
       pla = create(:prayer_letters_account)
 

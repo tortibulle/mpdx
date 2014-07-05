@@ -22,7 +22,7 @@ class DonorAccount < ActiveRecord::Base
     contact ||= account_list.contacts.where('donor_accounts.id' => id).includes(:donor_accounts).first # already linked
 
     # Try to find a contact for this user that matches based on name
-    contact ||= account_list.contacts.detect { |c| c.name == name }
+    contact ||= account_list.contacts.find { |c| c.name == name }
 
     contact ||= Contact.create_from_donor_account(self, account_list)
     contact.donor_accounts << self unless contact.donor_accounts.include?(self)
@@ -43,14 +43,13 @@ class DonorAccount < ActiveRecord::Base
                              total_donations + other.total_donations
                            when total_donations
                              total_donations
-                           else other.total_donations
+                           else
                              other.total_donations
                            end
 
     self.last_donation_date = case
                               when last_donation_date && other.last_donation_date
-                                last_donation_date > other.last_donation_date ?
-                                  last_donation_date : other.last_donation_date
+                                last_donation_date > other.last_donation_date ? last_donation_date : other.last_donation_date
                               when last_donation_date
                                 last_donation_date
                               else
@@ -59,8 +58,7 @@ class DonorAccount < ActiveRecord::Base
 
     self.first_donation_date = case
                                when first_donation_date && other.first_donation_date
-                                 first_donation_date > other.first_donation_date ?
-                                   first_donation_date : other.first_donation_date
+                                 first_donation_date > other.first_donation_date ? first_donation_date : other.first_donation_date
                                when first_donation_date
                                  first_donation_date
                                else
@@ -72,11 +70,11 @@ class DonorAccount < ActiveRecord::Base
     self.name = other.name if name.blank?
 
     other.master_person_donor_accounts.each do |mpda|
-      mpda.update_column(:donor_account_id, id) unless master_person_donor_accounts.detect { |master_person_donor_account| master_person_donor_account.master_person_id == mpda.master_person_id }
+      mpda.update_column(:donor_account_id, id) unless master_person_donor_accounts.find { |master_person_donor_account| master_person_donor_account.master_person_id == mpda.master_person_id }
     end
     other.donations.update_all(donor_account_id: id)
     other.contact_donor_accounts.each do |cda|
-      cda.update_column(:donor_account_id, id) unless contact_donor_accounts.detect { |contact_donor_account| contact_donor_account.contact_id == cda.contact_id }
+      cda.update_column(:donor_account_id, id) unless contact_donor_accounts.find { |contact_donor_account| contact_donor_account.contact_id == cda.contact_id }
     end
 
     other.reload

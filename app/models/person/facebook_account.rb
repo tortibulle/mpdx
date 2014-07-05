@@ -62,7 +62,7 @@ class Person::FacebookAccount < ActiveRecord::Base
         # e.g. https://www.facebook.com/username)
         if url.include?('id=')
           id = url.split('id=').last
-          id = id.split('&').first
+          id.split('&').first
         else
           name = url.split('/').last
           name = name.split('?').first

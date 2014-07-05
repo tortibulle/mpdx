@@ -13,9 +13,9 @@ describe TntImport do
   let(:property_rows) { Array.wrap(xml['Database']['Tables']['Property']['row']) }
 
   before do
-    stub_request(:get, /api\.smartystreets\.com\/.*/).
-        with(headers: { 'Accept' => 'application/json', 'Accept-Encoding' => 'gzip, deflate', 'Content-Type' => 'application/json', 'User-Agent' => 'Ruby' }).
-        to_return(status: 200, body: '{}', headers: {})
+    stub_request(:get, /api\.smartystreets\.com\/.*/)
+      .with(headers: { 'Accept' => 'application/json', 'Accept-Encoding' => 'gzip, deflate', 'Content-Type' => 'application/json', 'User-Agent' => 'Ruby' })
+      .to_return(status: 200, body: '{}', headers: {})
   end
 
   context '#import_contacts' do
@@ -32,7 +32,7 @@ describe TntImport do
         account_list = create(:account_list)
         tnt_import.account_list = account_list
         tnt_import.save
-        import = TntImport.new(tnt_import)
+        TntImport.new(tnt_import)
         contact.tnt_id = 1620699916
         contact.status = 'Ask in Future'
         contact.account_list = account_list

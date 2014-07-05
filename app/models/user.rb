@@ -32,11 +32,11 @@ class User < Person
   def merge(other)
     User.transaction do
       other.account_list_users.each do |other_alu|
-        other_alu.update_column(:user_id, id) unless account_list_users.detect { |alu| alu.account_list_id == other_alu.account_list_id }
+        other_alu.update_column(:user_id, id) unless account_list_users.find { |alu| alu.account_list_id == other_alu.account_list_id }
       end
 
       other.designation_profiles.each do |other_dp|
-        other_dp.update_column(:user_id, id) unless designation_profiles.detect { |dp| dp.code == other_dp.code }
+        other_dp.update_column(:user_id, id) unless designation_profiles.find { |dp| dp.code == other_dp.code }
       end
 
       imports.update_all(user_id: id)
@@ -102,10 +102,11 @@ class User < Person
   end
 
   private
-    def set_setup_mode
-      if preferences[:setup].nil?
-        preferences[:setup] = true
-        save(validate: false)
-      end
+
+  def set_setup_mode
+    if preferences[:setup].nil?
+      preferences[:setup] = true
+      save(validate: false)
     end
+  end
 end

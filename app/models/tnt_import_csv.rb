@@ -140,12 +140,12 @@ class TntImportCsv < TntImport
 
     company ||= @account_list.companies.new(master_company: master_company)
     company.assign_attributes(name: line['Organization Name'],
-                                phone_number: line['Phone'],
-                                street: line['Mailing Street Address'],
-                                city: line['Mailing City'],
-                                state: line['Mailing State'],
-                                postal_code: line['Mailing Postal Code'],
-                                country: line['Mailing Country'])
+                              phone_number: line['Phone'],
+                              street: line['Mailing Street Address'],
+                              city: line['Mailing City'],
+                              state: line['Mailing State'],
+                              postal_code: line['Mailing Postal Code'],
+                              country: line['Mailing Country'])
     company.save!
     donor_account.update_attribute(:master_company_id, company.master_company_id) unless donor_account.master_company_id == company.master_company.id
     company
@@ -199,11 +199,11 @@ class TntImportCsv < TntImport
                           title: line[prefix + 'Title'], suffix: line[prefix + 'Suffix'], gender: prefix.present? ? 'female' : 'male' }
     # Phone numbers
     { 'Home Phone' => 'home', 'Home Phone 2' => 'home', 'Home Fax' => 'fax',
-     'Business Phone' => 'work', 'Business Phone 2' => 'work', 'Business Fax' => 'fax',
-     'Company Main Phone' => 'work', 'Assistant Phone' => 'work', 'Other Phone' => 'other',
-     'Car Phone' => 'mobile', 'Mobile Phone' => 'mobile', 'Pager Number' => 'other',
-     'Callback Phone' => 'other', 'ISDN Phone' => 'other', 'Primary Phone' => 'other',
-     'Radio Phone' => 'other', 'Telex Phone' => 'other' }.each_with_index do |key, i|
+      'Business Phone' => 'work', 'Business Phone 2' => 'work', 'Business Fax' => 'fax',
+      'Company Main Phone' => 'work', 'Assistant Phone' => 'work', 'Other Phone' => 'other',
+      'Car Phone' => 'mobile', 'Mobile Phone' => 'mobile', 'Pager Number' => 'other',
+      'Callback Phone' => 'other', 'ISDN Phone' => 'other', 'Primary Phone' => 'other',
+      'Radio Phone' => 'other', 'Telex Phone' => 'other' }.each_with_index do |key, i|
        person.phone_number = { number: line[key[0]], location: key[1], primary: line['Preferred Phone Type'].to_i == i } if line[key[0]].present?
      end
 
@@ -218,7 +218,7 @@ class TntImportCsv < TntImport
   def add_or_update_donor_accounts(line)
     contact = nil # create the contact variable outside the block scop
     if @designation_profile
-      donor_accounts = line['Organization Account IDs'].to_s.split(',').collect do |account_number|
+      donor_accounts = line['Organization Account IDs'].to_s.split(',').map do |account_number|
         donor_account = @designation_profile.organization.donor_accounts.where(account_number: account_number).first_or_create(name: line['File As'])
         donor_account.name = line['File As'] # if the acccount already existed, update the name
 

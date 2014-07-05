@@ -70,7 +70,7 @@ class Person::OrganizationAccount < ActiveRecord::Base
         # Set the last download date to whenever the last donation was received
         update_column(:last_download, user.donations.order('donation_date desc').first.donation_date)
       end
-    rescue OrgAccountInvalidCredentialsError => e
+    rescue OrgAccountInvalidCredentialsError
       update_column(:valid_credentials, false)
       ImportMailer.credentials_error(self).deliver
     ensure
