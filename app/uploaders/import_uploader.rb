@@ -16,5 +16,4 @@ class ImportUploader < CarrierWave::Uploader::Base
   def extension_white_list
     %w(xml)
   end
-
 end

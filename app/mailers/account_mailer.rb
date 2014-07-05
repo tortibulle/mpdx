@@ -1,5 +1,5 @@
 class AccountMailer < ActionMailer::Base
-  default from: "support@mpdx.org"
+  default from: 'support@mpdx.org'
 
   def invalid_mailchimp_key(account_list)
     mail to: account_list.users.collect(&:email).compact.collect(&:email),
@@ -15,6 +15,5 @@ class AccountMailer < ActionMailer::Base
     mail to: account_list.users.collect(&:email).compact.collect(&:email),
          subject: _('prayerletters.com account needs to be refreshed')
   end
-
 end
 

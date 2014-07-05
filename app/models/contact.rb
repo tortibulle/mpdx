@@ -2,8 +2,8 @@ class Contact < ActiveRecord::Base
   include AddressMethods
   acts_as_taggable
 
-  has_paper_trail :on => [:destroy, :update],
-    :meta => { related_object_type: 'AccountList',
+  has_paper_trail on: [:destroy, :update],
+    meta: { related_object_type: 'AccountList',
                related_object_id: :account_list_id }
 
   has_many :contact_donor_accounts, dependent: :destroy, inverse_of: :contact
@@ -26,7 +26,6 @@ class Contact < ActiveRecord::Base
   has_many :notifications, inverse_of: :contact, dependent: :destroy
   has_many :messages
 
-
   scope :people, -> { where('donor_accounts.master_company_id is null').includes(:donor_accounts).references('donor_accounts') }
   scope :companies, -> { where('donor_accounts.master_company_id is not null').includes(:donor_accounts).references('donor_accounts') }
   scope :with_person, -> (person) { includes(:people).where('people.id' => person.id) }
@@ -37,7 +36,7 @@ class Contact < ActiveRecord::Base
   scope :with_referrals, -> { joins(:contact_referrals_by_me).uniq }
   scope :active, -> { where(active_conditions) }
   scope :inactive, -> { where(inactive_conditions) }
-  scope :late_by, -> (min_days, max_days=nil) { financial_partners.where("last_donation_date BETWEEN ? AND ?", max_days ? Date.today - max_days : Date.new(1951, 1, 1), Date.today - min_days) }
+  scope :late_by, -> (min_days, max_days=nil) { financial_partners.where('last_donation_date BETWEEN ? AND ?', max_days ? Date.today - max_days : Date.new(1951, 1, 1), Date.today - min_days) }
 
   PERMITTED_ATTRIBUTES = [
     :name, :pledge_amount, :status, :notes, :full_name, :greeting, :website, :pledge_frequency,
@@ -99,7 +98,6 @@ class Contact < ActiveRecord::Base
     [_('Physical'), _('Email'), _('Both')]
   end
 
-
   delegate :first_name, :last_name, :phone, :email, to: :primary_or_first_person
   delegate :street, :city, :state, :postal_code, to: :mailing_address
 
@@ -142,7 +140,7 @@ class Contact < ActiveRecord::Base
   end
 
   def self.create_from_donor_account(donor_account, account_list)
-    contact = account_list.contacts.new({name: donor_account.name})
+    contact = account_list.contacts.new(name: donor_account.name)
     contact.addresses_attributes = Hash[donor_account.addresses.collect.with_index { |address, i| [i, address.attributes.slice(*%w{street city state country postal_code})] }]
     contact.save!
     contact.donor_accounts << donor_account
@@ -197,13 +195,13 @@ class Contact < ActiveRecord::Base
   end
 
   def siebel_organization?
-    last_name == "of the Ministry"
+    last_name == 'of the Ministry'
   end
 
   def update_donation_totals(donation)
     self.first_donation_date = donation.donation_date if first_donation_date.nil? || donation.donation_date < first_donation_date
     self.last_donation_date = donation.donation_date if last_donation_date.nil? || donation.donation_date > last_donation_date
-    self.total_donations = self.total_donations.to_f + donation.amount
+    self.total_donations = total_donations.to_f + donation.amount
     save(validate: false)
   end
 
@@ -228,11 +226,11 @@ class Contact < ActiveRecord::Base
     attribute_collection.each do |attrs|
       case
       when attrs[:id].present? && (attrs[:account_number].blank? || attrs[:_destroy] == '1')
-        ContactDonorAccount.where(donor_account_id: attrs[:id], contact_id: self.id).destroy_all
+        ContactDonorAccount.where(donor_account_id: attrs[:id], contact_id: id).destroy_all
       when attrs[:account_number].blank?
         next
       when donor_account = DonorAccount.where(account_number: attrs[:account_number], organization_id: attrs[:organization_id]).first
-        self.contact_donor_accounts.new(donor_account: donor_account) unless donor_account.contacts.include?(self)
+        contact_donor_accounts.new(donor_account: donor_account) unless donor_account.contacts.include?(self)
       else
         assign_nested_attributes_for_collection_association(:donor_accounts, [attrs])
       end
@@ -246,7 +244,7 @@ class Contact < ActiveRecord::Base
 
       other.contact_people.each do |r|
         unless contact_people.where(person_id: r.person_id).first
-          r.update_attributes({contact_id: id})
+          r.update_attributes(contact_id: id)
         end
       end
 
@@ -274,7 +272,7 @@ class Contact < ActiveRecord::Base
       merge_addresses
 
       ContactReferral.where(referred_to_id: other.id).each do |contact_referral|
-        contact_referral.update_column(:referred_to_id, id) unless contact_referrals_to_me.detect {|crtm| crtm.referred_by_id == contact_referral.referred_by_id }
+        contact_referral.update_column(:referred_to_id, id) unless contact_referrals_to_me.detect { |crtm| crtm.referred_by_id == contact_referral.referred_by_id }
       end
 
       ContactReferral.where(referred_by_id: other.id).update_all(referred_by_id: id)
@@ -448,8 +446,7 @@ class Contact < ActiveRecord::Base
   end
 
   def set_timezone
-    self.update_column(:timezone, get_timezone)
+    update_column(:timezone, get_timezone)
   end
-
 end
 

@@ -3,7 +3,7 @@ class Person::RelayAccount < ActiveRecord::Base
 
   after_commit :delete_corresponding_org_account, on: :destroy
 
-  #attr_accessible :username, :remote_id
+  # attr_accessible :username, :remote_id
 
   def self.find_or_create_from_auth(auth_hash, user)
     @rel = user.relay_accounts
@@ -51,10 +51,10 @@ class Person::RelayAccount < ActiveRecord::Base
       emplid = auth_hash.extra.attributes.first.emplid || 'NO-EMPLID'
       designation = auth_hash.extra.attributes.first.designation || 'NO-DESIG'
 
-      account.assign_attributes({ remote_id: remote_id,
+      account.assign_attributes(remote_id: remote_id,
                                   token: "#{APP_CONFIG['itg_auth_key']}_#{designation}_#{emplid}",
                                   authenticated: true,
-                                  valid_credentials: true})
+                                  valid_credentials: true)
 
       account.save(validate: false)
     end
@@ -67,5 +67,4 @@ class Person::RelayAccount < ActiveRecord::Base
       person.organization_accounts.where(remote_id: employee_id).destroy_all
     end
   end
-
 end

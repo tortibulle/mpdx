@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe PersonSerializer do
-  let(:person) { 
+  let(:person) {
     p = build(:person)
     p.email_addresses << build(:email_address)
     p.phone_numbers << build(:phone_number)

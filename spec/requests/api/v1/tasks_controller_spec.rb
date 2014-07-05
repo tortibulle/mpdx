@@ -13,14 +13,14 @@ describe Api::V1::TasksController do
       stub_auth
     end
 
-    it "all tasks should return all tasks" do
-      get "/api/v1/tasks?access_token=" + user.access_token
+    it 'all tasks should return all tasks' do
+      get '/api/v1/tasks?access_token=' + user.access_token
       response.should be_success
       JSON.parse(response.body)['tasks'].length.should == 2
     end
 
-    it "contact tasks should return one task" do
-      get "/api/v1/tasks?filters[contact_ids]="+contact.id.to_s+"&access_token=" + user.access_token
+    it 'contact tasks should return one task' do
+      get '/api/v1/tasks?filters[contact_ids]=' + contact.id.to_s + '&access_token=' + user.access_token
       response.should be_success
       JSON.parse(response.body)['tasks'].length.should == 1
     end
@@ -29,7 +29,7 @@ describe Api::V1::TasksController do
     it "doesn't require activity type on create" do
       task_attributes = task1.attributes.except('id', 'activity_type')
       expect {
-        post '/api/v1/tasks?access_token=' + user.access_token, {:task => task_attributes}
+        post '/api/v1/tasks?access_token=' + user.access_token,  task: task_attributes
       }.to change(user.account_lists.first.tasks, :count).by(1)
     end
   end

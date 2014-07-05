@@ -26,5 +26,4 @@ class SetupController < ApplicationController
         return false
       end
     end
-
 end

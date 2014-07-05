@@ -1,5 +1,4 @@
 class Api::V1::PeopleController < Api::V1::BaseController
-
   def index
     render json: people, callback: params[:callback]
   end
@@ -15,5 +14,4 @@ class Api::V1::PeopleController < Api::V1::BaseController
     Person.where(id: current_account_list.people.pluck('people.id') + current_account_list.users.pluck('people.id'))
           .includes(:phone_numbers, :email_addresses)
   end
-
 end

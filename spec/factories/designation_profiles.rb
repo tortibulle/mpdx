@@ -6,6 +6,6 @@ FactoryGirl.define do
     name 'foo'
     association :organization
     association :user
-    #association :account_list
+    # association :account_list
   end
 end

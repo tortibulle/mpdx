@@ -44,7 +44,7 @@ describe GoogleCalendarIntegrator do
   context '#add_task' do
     it 'creates a google_event' do
       google_integration.stub_chain(:calendar_api, :events, :insert).and_return('')
-      integrator.client.should_receive(:execute).and_return(double(data: {'id' => 'foo'}, status: 200))
+      integrator.client.should_receive(:execute).and_return(double(data: { 'id' => 'foo' }, status: 200))
       integrator.should_receive(:event_attributes).and_return({})
 
       expect {
@@ -54,7 +54,7 @@ describe GoogleCalendarIntegrator do
 
     it 'removes the calendar integration if the calendar no longer exists on google' do
       google_integration.stub_chain(:calendar_api, :events, :insert).and_return('')
-      integrator.client.should_receive(:execute).and_return(double(data: {"error"=>{"errors"=>[{"domain"=>"global", "reason"=>"notFound", "message"=>"Not Found"}], "code"=>404, "message"=>"Not Found"}}, status: 404))
+      integrator.client.should_receive(:execute).and_return(double(data: { 'error' => { 'errors' => [{ 'domain' => 'global', 'reason' => 'notFound', 'message' => 'Not Found' }], 'code' => 404, 'message' => 'Not Found' } }, status: 404))
       integrator.should_receive(:event_attributes).and_return({})
 
       integrator.add_task(task)
@@ -68,7 +68,7 @@ describe GoogleCalendarIntegrator do
   context '#update_task' do
     it 'updates a google_event' do
       google_integration.stub_chain(:calendar_api, :events, :patch).and_return('')
-      integrator.client.should_receive(:execute).and_return(double(data: {'id' => 'foo'}, status: 200))
+      integrator.client.should_receive(:execute).and_return(double(data: { 'id' => 'foo' }, status: 200))
       integrator.should_receive(:event_attributes).and_return({})
       integrator.should_not_receive(:add_task)
 
@@ -80,7 +80,7 @@ describe GoogleCalendarIntegrator do
 
     it 'adds the google event if it is missing from google' do
       google_integration.stub_chain(:calendar_api, :events, :patch).and_return('')
-      integrator.client.should_receive(:execute).and_return(double(data: {"error"=>{"errors"=>[{"domain"=>"global", "reason"=>"notFound", "message"=>"Not Found"}], "code"=>404, "message"=>"Not Found"}}, status: 404))
+      integrator.client.should_receive(:execute).and_return(double(data: { 'error' => { 'errors' => [{ 'domain' => 'global', 'reason' => 'notFound', 'message' => 'Not Found' }], 'code' => 404, 'message' => 'Not Found' } }, status: 404))
       integrator.should_receive(:event_attributes).and_return({})
       integrator.should_receive(:add_task)
 

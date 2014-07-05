@@ -10,8 +10,8 @@ class Task < Activity
 
   scope :of_type, ->(activity_type) { where(activity_type: activity_type) }
   scope :with_result, ->(result) { where(result: result) }
-  scope :completed_between, -> (start_date, end_date) { where("completed_at BETWEEN ? and ?", start_date.in_time_zone, (end_date + 1.day).in_time_zone) }
-  scope :created_between, -> (start_date, end_date) { where("created_at BETWEEN ? and ?", start_date.in_time_zone, (end_date + 1.day).in_time_zone) }
+  scope :completed_between, -> (start_date, end_date) { where('completed_at BETWEEN ? and ?', start_date.in_time_zone, (end_date + 1.day).in_time_zone) }
+  scope :created_between, -> (start_date, end_date) { where('created_at BETWEEN ? and ?', start_date.in_time_zone, (end_date + 1.day).in_time_zone) }
 
   PERMITTED_ATTRIBUTES = [
     :starred, :location, :subject, :start_at, :end_at, :activity_type, :result, :completed_at,
@@ -46,7 +46,7 @@ class Task < Activity
 
   ALL_RESULTS = STANDARD_RESULTS + APPOINTMENT_RESULTS + CALL_RESULTS + MESSAGE_RESULTS
 
-  assignable_values_for :activity_type, :allow_blank => true do
+  assignable_values_for :activity_type, allow_blank: true do
     ['Call', 'Appointment', 'Email', 'Text Message', 'Facebook Message',
      'Letter', 'Newsletter', 'Pre Call Letter', 'Reminder Letter',
      'Support Letter', 'Thank', 'To Do']

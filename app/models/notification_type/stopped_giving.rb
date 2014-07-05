@@ -1,5 +1,4 @@
 class NotificationType::StoppedGiving < NotificationType
-
   # If the donor uses direct deposit, notify if it's been more than 31 + 14 days
   # (the extra 2 weeks is to allow for a delay in the donation system)
   # If a donor gives via check, notify when their gift is 30 days past due
@@ -40,8 +39,7 @@ class NotificationType::StoppedGiving < NotificationType
   end
 
   def task_description(notification)
-    _("%{contact_name} seems to have missed a gift. Call to follow up.").localize %
+    _('%{contact_name} seems to have missed a gift. Call to follow up.').localize %
       { contact_name: notification.contact.name }
   end
-
 end

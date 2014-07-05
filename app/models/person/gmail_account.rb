@@ -1,5 +1,4 @@
 class Person::GmailAccount
-
   def initialize(google_account)
     @google_account = google_account
   end
@@ -40,13 +39,13 @@ class Person::GmailAccount
               email_addresses << email
 
               # sent emails
-              sent = g.mailbox("[Gmail]/Sent Mail")
+              sent = g.mailbox('[Gmail]/Sent Mail')
               sent.emails(to: email, after: since).each do |gmail_message|
                 log_email(gmail_message, account_list, contact, from = @google_account.person_id, to = person.id, 'Done')
               end
 
               # received emails
-              all = g.mailbox("[Gmail]/All Mail")
+              all = g.mailbox('[Gmail]/All Mail')
               all.emails(from: email, after: since).each do |gmail_message|
                 log_email(gmail_message, account_list, contact, from = person.id, to = @google_account.person_id, 'Received')
               end
@@ -64,7 +63,7 @@ class Person::GmailAccount
     else
       message = gmail_message.message.body.decoded
     end
-    message = message.to_s.unpack("C*").pack("U*").force_encoding("UTF-8").encode!
+    message = message.to_s.unpack('C*').pack('U*').force_encoding('UTF-8').encode!
     if message.strip.present?
       task = account_list.tasks.where(remote_id: gmail_message.envelope.message_id, source: 'gmail').first
 
@@ -90,5 +89,4 @@ class Person::GmailAccount
                                            subject: gmail_message.subject, sent_at: gmail_message.envelope.date,
                                            body: message)
   end
-
 end

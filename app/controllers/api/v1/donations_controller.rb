@@ -1,5 +1,4 @@
 class Api::V1::DonationsController < Api::V1::BaseController
-
   def index
     order = params[:order] || 'donations.id'
 
@@ -8,7 +7,7 @@ class Api::V1::DonationsController < Api::V1::BaseController
 
     filtered_donations = add_includes_and_order(filtered_donations, per_page: params[:limit])
     render json: filtered_donations,
-           scope: {user: current_user, account_list: current_account_list, locale: locale},
+           scope: { user: current_user, account_list: current_account_list, locale: locale },
            callback: params[:callback]
   end
 
@@ -21,5 +20,4 @@ class Api::V1::DonationsController < Api::V1::BaseController
   def available_includes
     [:donor_account]
   end
-
 end

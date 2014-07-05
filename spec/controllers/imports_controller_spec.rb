@@ -4,7 +4,7 @@ describe ImportsController do
   before(:each) do
     @user = create(:user_with_account)
     sign_in(:user, @user)
-    request.env["HTTP_REFERER"] = '/'
+    request.env['HTTP_REFERER'] = '/'
   end
 
   describe 'create' do

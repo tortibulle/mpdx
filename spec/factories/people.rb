@@ -2,7 +2,7 @@
 
 FactoryGirl.define do
   factory :person do
-    first_name "John"
+    first_name 'John'
     association :master_person
   end
 end

@@ -4,7 +4,7 @@ describe DonorAccount do
   before(:each) do
     @donor_account = create(:donor_account)
   end
-  it "should have one primary_master_person" do
+  it 'should have one primary_master_person' do
     @mp1 = create(:master_person)
     @donor_account.master_people << @mp1
     @donor_account.primary_master_person.should == @mp1
@@ -14,12 +14,12 @@ describe DonorAccount do
       @donor_account.primary_master_person.should == @mp1
     }.should_not change(MasterPersonDonorAccount.primary, :count)
   end
-  
+
   describe 'link_to_contact_for' do
     before do
       @account_list = create(:account_list)
     end
-    it "should return an alreay linked contact" do
+    it 'should return an alreay linked contact' do
       contact = create(:contact, account_list: @account_list)
       contact.donor_accounts << @donor_account
       @donor_account.link_to_contact_for(@account_list).should == contact
@@ -42,13 +42,13 @@ describe DonorAccount do
       #new_contact.donor_account_ids.should include(@donor_account.id)
     #end
 
-    it "should create a new contact if no match is found" do
+    it 'should create a new contact if no match is found' do
       -> {
         @donor_account.link_to_contact_for(@account_list)
       }.should change(Contact, :count)
     end
 
-    it "should not match to a contact with no addresses" do
+    it 'should not match to a contact with no addresses' do
       contact = create(:contact, account_list: @account_list)
       create(:address, addressable: @donor_account)
       -> {

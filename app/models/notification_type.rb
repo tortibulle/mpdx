@@ -35,5 +35,4 @@ class NotificationType < ActiveRecord::Base
     @notifications[notification_type] ||= []
     @notifications[notification_type] << contact
   end
-
 end

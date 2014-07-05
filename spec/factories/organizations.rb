@@ -5,8 +5,8 @@ FactoryGirl.define do
     n
   end
   factory :organization do
-    name "MyString"
-    query_ini_url {FactoryGirl.generate(:query_ini_url)}
+    name 'MyString'
+    query_ini_url { FactoryGirl.generate(:query_ini_url) }
     api_class 'DataServer'
     profiles_url 'http://example.com/profiles'
     profiles_params 'UserName=test@test.com&Password=Test1234&Action=Profiles'
@@ -19,9 +19,8 @@ FactoryGirl.define do
 
   end
 
-
   factory :ccc, parent: :organization do
-    name "Cru - USA"
+    name 'Cru - USA'
     code 'CCC-USA'
     api_class 'Siebel'
     profiles_params 'Action=Profiles'

@@ -5,8 +5,8 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery
   before_filter :redirect_to_mobile
-  before_filter :ensure_login, :except => [:error_404, :error_500]
-  before_filter :ensure_setup_finished, :except => [:error_404, :error_500]
+  before_filter :ensure_login, except: [:error_404, :error_500]
+  before_filter :ensure_setup_finished, except: [:error_404, :error_500]
   around_filter :do_with_current_user, :set_user_time_zone, :set_locale
 
   private
@@ -16,8 +16,8 @@ class ApplicationController < ActionController::Base
   end
 
   def redirect_to_mobile
-    session[:fullsite] = true if params[:fullsite] == "true"
-    session[:fullsite] = false if params[:fullsite] == "false"
+    session[:fullsite] = true if params[:fullsite] == 'true'
+    session[:fullsite] = false if params[:fullsite] == 'false'
 
     if !session[:fullsite] && mobile_agent
       url = 'http://m.mpdx.org/#' + request.fullpath[1..-1]
@@ -147,7 +147,7 @@ class ApplicationController < ActionController::Base
       headers['Content-Disposition'] = "attachment; filename=\"#{filename}\""
     end
 
-    render :layout => false
+    render layout: false
   end
 
   def filters_params

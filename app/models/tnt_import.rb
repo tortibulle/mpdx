@@ -1,5 +1,4 @@
 class TntImport
-
   def initialize(import)
     @import = import
     @account_list = @import.account_list
@@ -10,7 +9,7 @@ class TntImport
   def read_xml(import_file)
     xml = {}
     begin
-      File.open(import_file, "r:utf-8") do |file|
+      File.open(import_file, 'r:utf-8') do |file|
         @contents = file.read
         begin
           xml = Hash.from_xml(@contents)
@@ -21,7 +20,7 @@ class TntImport
           # to unescape a unicode character.
           begin
             bad_char = e.message.match(/"([^"]*)"/)[1]
-            subbed = @contents.gsub!(eval(%Q{"#{bad_char}"}), " ")
+            subbed = @contents.gsub!(eval(%Q{"#{bad_char}"}), ' ')
           rescue => new_error
             raise e
           end
@@ -29,7 +28,7 @@ class TntImport
         end
       end
     rescue ArgumentError
-      File.open(import_file, "r:windows-1251:utf-8") do |file|
+      File.open(import_file, 'r:windows-1251:utf-8') do |file|
         xml = Hash.from_xml(file.read)
       end
     end
@@ -65,7 +64,6 @@ class TntImport
   private
 
   def import_contacts
-
     @tnt_contacts = {}
 
     rows = Array.wrap(xml['Contact']['row'])
@@ -136,7 +134,7 @@ class TntImport
       task.attributes = {
                          activity_type: lookup_task_type(row['TaskTypeID']),
                          subject: row['Description'],
-                         start_at: DateTime.parse(row['TaskDate'] + ' ' + DateTime.parse(row['TaskTime']).strftime("%I:%M%p"))
+                         start_at: DateTime.parse(row['TaskDate'] + ' ' + DateTime.parse(row['TaskTime']).strftime('%I:%M%p'))
                         }
       if task.save
         # Add any notes as a comment
@@ -187,7 +185,7 @@ class TntImport
     # Add contacts to tasks
     Array.wrap(xml['HistoryContact']['row']).each do |row|
       if tnt_contacts[row['ContactID']] && tnt_history[row['HistoryID']]
-        Retryable.retryable :times => 3, :sleep => 1 do
+        Retryable.retryable times: 3, sleep: 1 do
           tnt_history[row['HistoryID']].contacts << tnt_contacts[row['ContactID']] unless tnt_history[row['HistoryID']].contacts.include? tnt_contacts[row['ContactID']]
         end
       end
@@ -321,13 +319,13 @@ class TntImport
     company = @user.partner_companies.where(master_company_id: master_company.id).first if master_company
 
     company ||= @account_list.companies.new(master_company: master_company)
-    company.assign_attributes( name: row['OrganizationName'],
+    company.assign_attributes(name: row['OrganizationName'],
                                phone_number: row['Phone'],
                                street: row['MailingStreetAddress'],
                                city: row['MailingCity'],
                                state: row['MailingState'],
                                postal_code: row['MailingPostalCode'],
-                               country: row['MailingCountry'] )
+                               country: row['MailingCountry'])
     company.save!
     donor_account.update_attribute(:master_company_id, company.master_company_id) unless donor_account.master_company_id == company.master_company.id
     company
@@ -363,24 +361,23 @@ class TntImport
     person
   end
 
-
   def update_person_attributes(person, row, prefix = '')
-    person.attributes = {first_name: row[prefix + 'FirstName'], last_name: row[prefix + 'LastName'], middle_name: row[prefix + 'MiddleName'],
+    person.attributes = { first_name: row[prefix + 'FirstName'], last_name: row[prefix + 'LastName'], middle_name: row[prefix + 'MiddleName'],
                           title: row[prefix + 'Title'], suffix: row[prefix + 'Suffix'], gender: prefix.present? ? 'female' : 'male',
-                          profession: prefix.present? ? nil : row['Profession']}
+                          profession: prefix.present? ? nil : row['Profession'] }
     # Phone numbers
-    {'HomePhone' => 'home', 'HomePhone2' => 'home', 'HomeFax' => 'fax',
+    { 'HomePhone' => 'home', 'HomePhone2' => 'home', 'HomeFax' => 'fax',
      prefix + 'BusinessPhone' => 'work', prefix + 'BusinessPhone2' => 'work', prefix + 'BusinessFax' => 'fax',
      prefix + 'CompanyMainPhone' => 'work', 'AssistantPhone' => 'work', 'OtherPhone' => 'other',
      'CarPhone' => 'mobile', prefix + 'MobilePhone' => 'mobile', prefix + 'MobilePhone2' => 'mobile',
      prefix + 'PagerNumber' => 'other', 'CallbackPhone' => 'other', 'ISDNPhone' => 'other', 'PrimaryPhone' => 'other',
-     'RadioPhone' => 'other', 'TelexPhone' => 'other'}.each_with_index do |key, i|
-       person.phone_number = {number: row[key[0]], location: key[1], primary: row['PreferredPhoneType'].to_i == i} if row[key[0]].present?
+     'RadioPhone' => 'other', 'TelexPhone' => 'other' }.each_with_index do |key, i|
+       person.phone_number = { number: row[key[0]], location: key[1], primary: row['PreferredPhoneType'].to_i == i } if row[key[0]].present?
      end
 
     # email address
     3.times do |i|
-      person.email_address = {email: row[prefix + "Email#{i}"], primary: row['PreferredEmailTypes'] == i} if row[prefix + "Email#{i}"].present?
+      person.email_address = { email: row[prefix + "Email#{i}"], primary: row['PreferredEmailTypes'] == i } if row[prefix + "Email#{i}"].present?
     end
 
     person
@@ -415,7 +412,7 @@ class TntImport
       city = row["#{location}City"]
       state = row["#{location}State"]
       postal_code = row["#{location}PostalCode"]
-      country = row["#{location}Country"] == "United States of America" ? "United States" : row["#{location}Country"]
+      country = row["#{location}Country"] == 'United States of America' ? 'United States' : row["#{location}Country"]
       if [street, city, state, postal_code].any?(&:present?)
         primary_address = false
         primary_address = row['MailingAddressType'].to_i == (i + 1) if override
@@ -441,5 +438,4 @@ class TntImport
 
     addresses
   end
-
 end

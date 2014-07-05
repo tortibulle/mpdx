@@ -7,9 +7,9 @@ class ContactsController < ApplicationController
 
   def index
     if params[:filters] && params[:filters][:name].present?
-      contacts_with_name = ContactFilter.new({name: filters_params[:name], status: ['*']}).filter(current_account_list.contacts)
+      contacts_with_name = ContactFilter.new(name: filters_params[:name], status: ['*']).filter(current_account_list.contacts)
       if contacts_with_name.count == 1
-        current_user.contacts_filter[current_account_list.id.to_s].delete("name")
+        current_user.contacts_filter[current_account_list.id.to_s].delete('name')
         current_user.save
         redirect_to contacts_with_name.first
         return
@@ -23,20 +23,20 @@ class ContactsController < ApplicationController
     respond_to do |wants|
 
       wants.html do
-        @contacts = @filtered_contacts.includes([{primary_person: [:facebook_account, :primary_picture]},
+        @contacts = @filtered_contacts.includes([{ primary_person: [:facebook_account, :primary_picture] },
                                                  :tags, :primary_address,
-                                                 {people: :primary_phone_number}])
+                                                 { people: :primary_phone_number }])
 
         @contacts = @contacts.page(@view_options[:page].to_i > 0 ? @view_options[:page].to_i : 1).per_page(@view_options[:per_page].to_i > 0 ? @view_options[:per_page].to_i : 25)
       end
 
       wants.csv do
-        @contacts = @filtered_contacts.includes(:primary_person, :primary_address, {people: :email_addresses})
+        @contacts = @filtered_contacts.includes(:primary_person, :primary_address,  people: :email_addresses)
         @headers = ['Contact Name', 'First Name', 'Last Name', 'Spouse First Name', 'Greeting',
                     'Mailing Street Address','Mailing City', 'Mailing State','Mailing Postal Code',
                     'Mailing Country', 'Email 1','Email 2','Email 3','Email 4']
 
-        render_csv("contacts-#{Time.now.strftime("%Y%m%d")}")
+        render_csv("contacts-#{Time.now.strftime('%Y%m%d')}")
       end
 
     end
@@ -72,7 +72,7 @@ class ContactsController < ApplicationController
   def edit
     session[:contact_return_to] = request.referrer if request.referrer.present?
 
-    @page_title = _('Edit - %{contact}').localize % {contact: @contact.name}
+    @page_title = _('Edit - %{contact}').localize % { contact: @contact.name }
   end
 
   def create
@@ -85,12 +85,12 @@ class ContactsController < ApplicationController
           if @contact.save
             format.html { redirect_to(session[:contact_return_to] || @contact) }
           else
-            format.html { render action: "new" }
+            format.html { render action: 'new' }
           end
         rescue Errors::FacebookLink, LinkedIn::Errors::UnauthorizedError => e
           @contact ||= current_account_list.contacts.new(contact_params.except(:people_attributes))
           flash.now[:alert] = e.message
-          format.html { render action: "new" }
+          format.html { render action: 'new' }
         end
       end
     end
@@ -103,12 +103,12 @@ class ContactsController < ApplicationController
           format.html { redirect_to(session[:contact_return_to] || @contact) }
           format.js
         else
-          format.html { render action: "edit" }
+          format.html { render action: 'edit' }
           format.js { render nothing: true }
         end
       rescue Errors::FacebookLink, LinkedIn::Errors::UnauthorizedError => e
         flash.now[:alert] = e.message
-        format.html { render action: "edit" }
+        format.html { render action: 'edit' }
         format.js { render nothing: true }
       end
     end
@@ -153,7 +153,7 @@ class ContactsController < ApplicationController
       contacts = current_account_list.contacts.includes(:people).where(id: ids.split(','))
       if contacts.length > 1
         merged_contacts_count += contacts.length
-        winner = contacts.max_by {|c| c.people.length}
+        winner = contacts.max_by { |c| c.people.length }
         Contact.transaction do
           (contacts - [winner]).each do |loser|
             winner.merge(loser)
@@ -161,7 +161,7 @@ class ContactsController < ApplicationController
         end
       end
     end if params[:merge_sets].present?
-    redirect_to :back, notice: _('You just merged %{count} contacts').localize % {count: merged_contacts_count}
+    redirect_to :back, notice: _('You just merged %{count} contacts').localize % { count: merged_contacts_count }
   end
 
   def destroy
@@ -236,7 +236,7 @@ class ContactsController < ApplicationController
       end
 
       if @contacts.length > 0
-        flash[:notice] = _("You have successfully added %{contacts_count:referrals}.").to_str.localize %
+        flash[:notice] = _('You have successfully added %{contacts_count:referrals}.').to_str.localize %
           { contacts_count: @contacts.length, referrals: { one: _('1 referral'), other: _('%{contacts_count} referrals') } }
       end
 
@@ -252,7 +252,7 @@ class ContactsController < ApplicationController
     @page_title = _('Find Duplicates')
 
     respond_to do |wants|
-      wants.html {  }
+      wants.html {}
       wants.js do
         # Find sets of people with the same name
         sql = "SELECT array_to_string(array_agg(people.id), ',')
@@ -299,11 +299,10 @@ class ContactsController < ApplicationController
     end
   end
 
-
   private
 
   def get_contact
-    @contact = current_account_list.contacts.includes({people: [:primary_email_address, :primary_phone_number, :email_addresses, :phone_numbers, :family_relationships]}).find(params[:id])
+    @contact = current_account_list.contacts.includes(people: [:primary_email_address, :primary_phone_number, :email_addresses, :phone_numbers, :family_relationships]).find(params[:id])
   end
 
   def setup_filters

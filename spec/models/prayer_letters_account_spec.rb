@@ -4,11 +4,11 @@ describe PrayerLettersAccount do
   context '#get_response' do
     it 'marks token as invalid if response is a 401' do
       stub_request(:get, /https:\/\/www\.prayerletters\.com\/*/).
-        to_return(:status => 401)
+        to_return(status: 401)
 
       pla = create(:prayer_letters_account)
 
-      pla.should_receive(:handle_bad_token).and_return("{}")
+      pla.should_receive(:handle_bad_token).and_return('{}')
 
       pla.contacts
     end

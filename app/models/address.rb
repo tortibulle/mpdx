@@ -1,9 +1,8 @@
 require 'smarty_streets'
 
 class Address < ActiveRecord::Base
-
-  has_paper_trail :on => [:destroy],
-                  :meta => { related_object_type: :addressable_type,
+  has_paper_trail on: [:destroy],
+                  meta: { related_object_type: :addressable_type,
                              related_object_id: :addressable_id }
 
   belongs_to :addressable, polymorphic: true, touch: true
@@ -17,14 +16,13 @@ class Address < ActiveRecord::Base
 
   alias_method :destroy!, :destroy
 
-
-  assignable_values_for :location, :allow_blank => true do
+  assignable_values_for :location, allow_blank: true do
     [_('Home'), _('Business'), _('Mailing'), _('Other')]
   end
 
   def equal_to?(other)
     if other
-      return true if other.master_address_id && other.master_address_id == self.master_address_id
+      return true if other.master_address_id && other.master_address_id == master_address_id
 
       return true if other.street.to_s.downcase == street.to_s.downcase &&
                      other.city.to_s.downcase == city.to_s.downcase &&
@@ -49,7 +47,7 @@ class Address < ActiveRecord::Base
     self.seasonal = (seasonal? || other_address.seasonal?)
     self.location = other_address.location if location.blank?
     self.remote_id = other_address.remote_id if remote_id.blank?
-    self.save(validate: false)
+    save(validate: false)
     other_address.destroy!
   end
 
@@ -60,7 +58,7 @@ class Address < ActiveRecord::Base
     end
 
     countries = CountrySelect::COUNTRIES
-    if country = countries.detect {|c| c[:name].downcase == val.downcase}
+    if country = countries.detect { |c| c[:name].downcase == val.downcase }
       self[:country] = country[:name]
     else
       countries.each do |c|
@@ -77,7 +75,6 @@ class Address < ActiveRecord::Base
   def valid_mailing_address?
     city.present? && street.present?
   end
-
 
   private
 
@@ -100,7 +97,7 @@ class Address < ActiveRecord::Base
     if (changed & ['street', 'city', 'state', 'country', 'postal_code']).present?
       new_master_address_match = find_master_address
 
-      if self.master_address.nil? || self.master_address != new_master_address_match
+      if master_address.nil? || master_address != new_master_address_match
         unless new_master_address_match
           new_master_address_match = MasterAddress.create(attributes_for_master_address)
         end
@@ -114,7 +111,6 @@ class Address < ActiveRecord::Base
   end
 
   def clean_up_master_address
-
     master_address.destroy if master_address && (master_address.addresses - [self]).blank?
 
     true
@@ -126,10 +122,10 @@ class Address < ActiveRecord::Base
     # See if another address in the database matches this one and has a master address
     where_clause = attributes_for_master_address.symbolize_keys
                                                 .slice(:street, :city, :state, :country, :postal_code)
-                                                .collect {|k, v| "lower(#{k}) = :#{k}" }.join(' AND ')
+                                                .collect { |k, v| "lower(#{k}) = :#{k}" }.join(' AND ')
 
     master_address ||= Address.where(where_clause, attributes_for_master_address)
-                              .where("master_address_id is not null")
+                              .where('master_address_id is not null')
                               .first.try(:master_address)
 
     if !master_address &&
@@ -160,15 +156,14 @@ class Address < ActiveRecord::Base
       end
     end
 
-
     master_address
   end
 
   def attributes_for_master_address
     @attributes_for_master_address ||= Hash[attributes.symbolize_keys
                                                       .slice(:street, :city, :state, :country, :postal_code)
-                                                      .select {|k, v| v.present?}
-                                                      .map {|k, v| [k, v.downcase] }]
+                                                      .select { |k, v| v.present? }
+                                                      .map { |k, v| [k, v.downcase] }]
   end
 
   US_STATES =  [

@@ -7,9 +7,8 @@ class ContactExhibit < DisplayCase::Exhibit
   end
 
   def referrer_links
-    referrals_to_me.collect {|r| @context.link_to(exhibit(r, @context), r, remote: true)}.join(', ').html_safe
+    referrals_to_me.collect { |r| @context.link_to(exhibit(r, @context), r, remote: true) }.join(', ').html_safe
   end
-
 
   def location
     [address.city, address.state, address.country].select(&:present?).join(', ') if address
@@ -27,7 +26,7 @@ class ContactExhibit < DisplayCase::Exhibit
   def contact_info
     people.collect {|p|
       person_exhibit = exhibit(p, @context)
-      [@context.link_to(person_exhibit, @context.contact_person_path(to_model, p)), [person_exhibit.phone_number, person_exhibit.email].compact.map {|e| exhibit(e, @context)}.join('<br />')].select(&:present?).join(':<br />')
+      [@context.link_to(person_exhibit, @context.contact_person_path(to_model, p)), [person_exhibit.phone_number, person_exhibit.email].compact.map { |e| exhibit(e, @context) }.join('<br />')].select(&:present?).join(':<br />')
     }.join('<br />').html_safe
   end
 
@@ -41,7 +40,7 @@ class ContactExhibit < DisplayCase::Exhibit
     else
       fb = primary_or_first_person.facebook_account
       return "https://graph.facebook.com/#{fb.remote_id}/picture?type=#{size}" if fb
-      
+
       if primary_or_first_person.gender == 'female'
         url = ActionController::Base.helpers.image_url('avatar_f.png')
       else
@@ -75,7 +74,7 @@ class ContactExhibit < DisplayCase::Exhibit
 
   def tag_links
     tags.collect do |tag|
-      @context.link_to(tag, @context.params.except(:action, :controller, :id).merge(action: :index, filters: {tags: tag.name}), class: "tag")
+      @context.link_to(tag, @context.params.except(:action, :controller, :id).merge(action: :index, filters: { tags: tag.name }), class: 'tag')
     end.join(' ').html_safe
   end
 

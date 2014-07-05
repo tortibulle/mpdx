@@ -15,5 +15,4 @@ class DonationSerializer < ActiveModel::Serializer
   def contact_id
     object.donor_account.contacts.where(account_list_id: scope[:account_list].id).first.id
   end
-
 end

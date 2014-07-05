@@ -22,8 +22,8 @@ class DonationsController < ApplicationController
         @start_date = Date.today.beginning_of_month
       end
       @end_date = @start_date.end_of_month
-      @donations = current_account_list.donations.where("donation_date BETWEEN ? AND ?", @start_date, @end_date)
-                                                 .where("contacts.account_list_id" => current_account_list.id)
+      @donations = current_account_list.donations.where('donation_date BETWEEN ? AND ?', @start_date, @end_date)
+                                                 .where('contacts.account_list_id' => current_account_list.id)
                                                  .includes(donor_account: :contacts)
     end
   end
@@ -62,10 +62,10 @@ class DonationsController < ApplicationController
   private
 
   def setup_chart
-    @by_month = @all_donations.where("donation_date >= ?", 12.months.ago.beginning_of_month).group_by {|r| r.donation_date.beginning_of_month}
-    @by_month_index = 12.downto(0).collect {|i| i.months.ago.to_date.beginning_of_month}
-    @prior_year = @all_donations.where("donation_date >= ? AND donation_date < ?", 24.months.ago.beginning_of_month, 11.months.ago.beginning_of_month).group_by {|r| r.donation_date.beginning_of_month}
-    @prior_year_index = 24.downto(12).collect {|i| i.months.ago.to_date.beginning_of_month}
+    @by_month = @all_donations.where('donation_date >= ?', 12.months.ago.beginning_of_month).group_by { |r| r.donation_date.beginning_of_month }
+    @by_month_index = 12.downto(0).collect { |i| i.months.ago.to_date.beginning_of_month }
+    @prior_year = @all_donations.where('donation_date >= ? AND donation_date < ?', 24.months.ago.beginning_of_month, 11.months.ago.beginning_of_month).group_by { |r| r.donation_date.beginning_of_month }
+    @prior_year_index = 24.downto(12).collect { |i| i.months.ago.to_date.beginning_of_month }
   end
 
   def get_donation
@@ -73,7 +73,7 @@ class DonationsController < ApplicationController
   end
 
   def donation_params
-    params.require(:donation).permit("donation_date(1i)", "donation_date(2i)", "donation_date(3i)", "tendered_amount", "donor_account_id", "designation_account_id")
+    params.require(:donation).permit('donation_date(1i)', 'donation_date(2i)', 'donation_date(3i)', 'tendered_amount', 'donor_account_id', 'designation_account_id')
   end
 
   def get_contact

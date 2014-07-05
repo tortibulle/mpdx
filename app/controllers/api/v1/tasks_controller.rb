@@ -1,17 +1,15 @@
 class Api::V1::TasksController < Api::V1::BaseController
-
   def index
-
     meta = params[:since] ?
-        {deleted: Version.where(item_type: 'Activity', event: 'destroy', related_object_type: 'AccountList', related_object_id: current_account_list.id).where("created_at > ?", Time.at(params[:since].to_i)).pluck(:item_id)} :
+        { deleted: Version.where(item_type: 'Activity', event: 'destroy', related_object_type: 'AccountList', related_object_id: current_account_list.id).where('created_at > ?', Time.at(params[:since].to_i)).pluck(:item_id) } :
         {}
 
-    meta.merge!({ total: tasks.total_entries, from: correct_from(tasks),
+    meta.merge!(total: tasks.total_entries, from: correct_from(tasks),
                   to: correct_to(tasks), page: page,
-                  total_pages: total_pages(tasks) }) if tasks.respond_to?(:total_entries)
+                  total_pages: total_pages(tasks)) if tasks.respond_to?(:total_entries)
 
     render json: tasks,
-           scope: {since: params[:since]},
+           scope: { since: params[:since] },
            meta:  meta,
            callback: params[:callback]
   end
@@ -25,7 +23,7 @@ class Api::V1::TasksController < Api::V1::BaseController
     if task.update_attributes(task_params)
       render json: task, callback: params[:callback]
     else
-      render json: {errors: task.errors.full_messages}, callback: params[:callback], status: :bad_request
+      render json: { errors: task.errors.full_messages }, callback: params[:callback], status: :bad_request
     end
   end
 
@@ -34,7 +32,7 @@ class Api::V1::TasksController < Api::V1::BaseController
     if task.save
       render json: task, callback: params[:callback], status: :created
     else
-      render json: {errors: task.errors.full_messages}, callback: params[:callback], status: :bad_request
+      render json: { errors: task.errors.full_messages }, callback: params[:callback], status: :bad_request
     end
   end
 

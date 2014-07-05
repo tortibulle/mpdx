@@ -17,5 +17,4 @@ class PersonSerializer < ActiveModel::Serializer
     person_exhibit = exhibit(object)
     person_exhibit.avatar(:large)
   end
-
 end

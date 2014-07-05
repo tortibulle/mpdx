@@ -10,7 +10,7 @@ describe TagsController do
   end
 
   describe "GET 'create'" do
-    it "returns http success" do
+    it 'returns http success' do
       xhr :get, 'create', add_tag_name: 'foo', add_tag_contact_ids: "#{@contact1.id},#{@contact2.id}"
       response.should be_success
       @contact1.tag_list.should include('foo')
@@ -19,7 +19,7 @@ describe TagsController do
   end
 
   describe "GET 'destroy'" do
-    it "returns http success" do
+    it 'returns http success' do
       @contact1.tag_list << 'foo'
       @contact2.tag_list << 'foo'
       @contact1.save

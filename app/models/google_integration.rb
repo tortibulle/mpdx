@@ -42,11 +42,11 @@ class GoogleIntegration < ActiveRecord::Base
   def calendars
     unless @calendars
       result = google_account.client.execute(
-        :api_method => calendar_api.calendar_list.list,
-        :parameters => {'userId' => 'me'}
+        api_method: calendar_api.calendar_list.list,
+        parameters: { 'userId' => 'me' }
       )
       calendar_list = result.data
-      @calendars = calendar_list.items.select {|c| c.accessRole == 'owner'}
+      @calendars = calendar_list.items.select { |c| c.accessRole == 'owner' }
     end
     @calendars
   end
@@ -69,8 +69,8 @@ class GoogleIntegration < ActiveRecord::Base
 
   def create_new_calendar
     result = google_account.client.execute(
-      :api_method => calendar_api.calendars.insert,
-      :body_object => {'summary' => new_calendar}
+      api_method: calendar_api.calendars.insert,
+      body_object: { 'summary' => new_calendar }
     )
     self.calendar_id = result.data['id']
     self.calendar_name = new_calendar

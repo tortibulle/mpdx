@@ -1,5 +1,4 @@
 class User < Person
-
   has_many :account_list_users, dependent: :destroy
   has_many :account_lists, through: :account_list_users
   has_many :contacts, through: :account_lists
@@ -21,7 +20,7 @@ class User < Person
   def queue_imports
     organization_accounts.each do |oa|
       oa.queue_import_data unless oa.last_download
-      #oa.queue_import_data unless oa.downloading? || (oa.last_download && oa.last_download > 1.day.ago)
+      # oa.queue_import_data unless oa.downloading? || (oa.last_download && oa.last_download > 1.day.ago)
     end
   end
 
@@ -33,11 +32,11 @@ class User < Person
   def merge(other)
     User.transaction do
       other.account_list_users.each do |other_alu|
-        other_alu.update_column(:user_id, id) unless account_list_users.detect {|alu| alu.account_list_id == other_alu.account_list_id }
+        other_alu.update_column(:user_id, id) unless account_list_users.detect { |alu| alu.account_list_id == other_alu.account_list_id }
       end
 
       other.designation_profiles.each do |other_dp|
-        other_dp.update_column(:user_id, id) unless designation_profiles.detect {|dp| dp.code == other_dp.code}
+        other_dp.update_column(:user_id, id) unless designation_profiles.detect { |dp| dp.code == other_dp.code }
       end
 
       imports.update_all(user_id: id)
@@ -99,15 +98,14 @@ class User < Person
   end
 
   def to_person
-    Person.find(self.id)
+    Person.find(id)
   end
 
   private
     def set_setup_mode
       if preferences[:setup].nil?
-        self.preferences[:setup] = true
+        preferences[:setup] = true
         save(validate: false)
       end
     end
-
 end

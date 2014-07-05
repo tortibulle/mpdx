@@ -4,7 +4,7 @@ describe PhoneNumber do
   describe 'adding a phone number to a person' do
     before(:each) do
       @person = FactoryGirl.create(:person)
-      @attributes = {'number' => '123-345-2313'}
+      @attributes = { 'number' => '123-345-2313' }
     end
     it "creates a phone number if it's new" do
       ->{
@@ -22,18 +22,18 @@ describe PhoneNumber do
       }.should_not change(PhoneNumber, :count)
     end
 
-    it "sets only the first phone number to primary" do
+    it 'sets only the first phone number to primary' do
       PhoneNumber.add_for_person(@person, @attributes)
       @person.phone_numbers.first.primary?.should == true
       PhoneNumber.add_for_person(@person, @attributes.merge('number' => '313-313-3142'))
       @person.phone_numbers.last.primary?.should == false
     end
 
-    it "sets a prior phone number to not-primary if the new one is primary" do
+    it 'sets a prior phone number to not-primary if the new one is primary' do
       phone1 = PhoneNumber.add_for_person(@person, @attributes)
       phone1.primary?.should == true
 
-      phone2 = PhoneNumber.add_for_person(@person, {number: '313-313-3142', primary: true})
+      phone2 = PhoneNumber.add_for_person(@person,  number: '313-313-3142', primary: true)
       phone2.primary?.should == true
       phone2.send(:ensure_only_one_primary)
       phone1.reload.primary?.should == false
@@ -42,7 +42,7 @@ describe PhoneNumber do
   end
 
   describe 'clean_up_number' do
-    it "should parse out the country code" do
+    it 'should parse out the country code' do
       pn = PhoneNumber.new(number: '+44 12345532')
       pn.clean_up_number
       pn.country_code.should == '44'

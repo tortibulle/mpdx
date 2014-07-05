@@ -1,5 +1,4 @@
 module Async
-
   # This will be called by a worker when a job needs to be processed
   def perform(id, method, *args)
     if id
@@ -18,5 +17,4 @@ module Async
   def async(method, *args)
     Sidekiq::Client.enqueue(self.class, id, method, *args)
   end
-
 end

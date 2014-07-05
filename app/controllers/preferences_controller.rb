@@ -11,7 +11,7 @@ class PreferencesController < ApplicationController
       redirect_to preferences_path, notice: _('Preferences saved')
     else
       flash.now[:alert] = @preference_set.errors.full_messages.join('<br />').html_safe
-      render "index"
+      render 'index'
     end
   end
 

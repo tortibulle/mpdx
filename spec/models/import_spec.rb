@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Import do
   before(:each) do
-    @tnt_import = double('tnt_import', import: true, xml: {'Database' => {'Tables' => []}})
+    @tnt_import = double('tnt_import', import: true, xml: { 'Database' => { 'Tables' => [] } })
     TntImport.stub(:new).and_return(@tnt_import)
   end
 
@@ -12,7 +12,7 @@ describe Import do
     import.importing.should == false
   end
 
-  it "should send an success email when importing completes" do
+  it 'should send an success email when importing completes' do
     ImportMailer.should_receive(:complete).and_return(OpenStruct.new)
     import = create(:tnt_import)
     import.send(:import)

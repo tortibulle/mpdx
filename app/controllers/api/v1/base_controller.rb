@@ -17,7 +17,7 @@ class Api::V1::BaseController < ApplicationController
     headers['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS, PATCH'
     headers['Access-Control-Allow-Headers'] = 'X-Requested-With, X-Prototype-Version, API-VERSION, Authorization, Content-Type'
     headers['Access-Control-Max-Age'] = '1728000'
-    head(:ok) if request.request_method == "OPTIONS"
+    head(:ok) if request.request_method == 'OPTIONS'
   end
 
   protected
@@ -26,34 +26,34 @@ class Api::V1::BaseController < ApplicationController
       headers['Access-Control-Allow-Origin'] = '*'
       headers['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS, PATCH'
       headers['Access-Control-Allow-Headers'] = 'API-VERSION, Authorization, Content-Type'
-      headers['Access-Control-Max-Age'] = "1728000"
+      headers['Access-Control-Max-Age'] = '1728000'
     end
 
     def ensure_login
-      return if request.request_method == "OPTIONS"
+      return if request.request_method == 'OPTIONS'
       unless super
         unless oauth_access_token
-          render json: {errors: ['Missing access token']}, status: :unauthorized, callback: params[:callback]
+          render json: { errors: ['Missing access token'] }, status: :unauthorized, callback: params[:callback]
           return false
         end
         begin
           unless current_user
-            render json: {errors: ['Please go to https://mpdx.org and log in using Relay before trying to use the mobile app.']},
+            render json: { errors: ['Please go to https://mpdx.org and log in using Relay before trying to use the mobile app.'] },
                    status: :unauthorized,
                    callback: params[:callback]
             return false
           end
         rescue RestClient::Unauthorized
-          render json: {errors: ['Invalid access token']}, status: :unauthorized, callback: params[:callback]
+          render json: { errors: ['Invalid access token'] }, status: :unauthorized, callback: params[:callback]
           return false
         end
       end
     end
 
     def ensure_setup_finished
-      return if request.request_method == "OPTIONS"
+      return if request.request_method == 'OPTIONS'
       unless current_account_list
-        render json: {errors: _('You need to go to https://mpdx.org and set up your account before using the mobile app.')},
+        render json: { errors: _('You need to go to https://mpdx.org and set up your account before using the mobile app.') },
                callback: params[:callback],
                status: :unauthorized
         return false
@@ -75,10 +75,9 @@ class Api::V1::BaseController < ApplicationController
       @oauth_access_token ||= (params[:access_token] || oauth_access_token_from_header)
     end
 
-
     # grabs access_token from header if one is present
     def oauth_access_token_from_header
-      auth_header = request.env["HTTP_AUTHORIZATION"]||""
+      auth_header = request.env['HTTP_AUTHORIZATION'] || ''
       match       = auth_header.match(/^token\s(.*)/) || auth_header.match(/^Bearer\s(.*)/)
       return match[1] if match.present?
       false

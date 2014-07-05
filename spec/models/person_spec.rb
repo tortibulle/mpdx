@@ -14,48 +14,48 @@ describe Person do
     it 'should create a family relationship' do
       family_relationship = build(:family_relationship, person: nil, related_person: create(:person))
       -> {
-        person.family_relationships_attributes = {'0' => family_relationship.attributes.with_indifferent_access.except(:id, :person_id, :created_at, :updated_at)}
+        person.family_relationships_attributes = { '0' => family_relationship.attributes.with_indifferent_access.except(:id, :person_id, :created_at, :updated_at) }
       }.should change(FamilyRelationship, :count).by(1)
     end
     it 'should destroy a family relationship' do
       family_relationship = create(:family_relationship, person: person, related_person: create(:person))
       -> {
-        person.family_relationships_attributes = {'0' => family_relationship.attributes.merge(_destroy: '1').with_indifferent_access}
+        person.family_relationships_attributes = { '0' => family_relationship.attributes.merge(_destroy: '1').with_indifferent_access }
       }.should change(FamilyRelationship, :count).from(1).to(0)
     end
     it 'should update a family relationship' do
       family_relationship = create(:family_relationship, person: person)
-      person.family_relationships_attributes = {'0' => family_relationship.attributes.merge!(relationship: family_relationship.relationship + 'boo').with_indifferent_access.except(:person_id, :updated_at, :created_at)}
+      person.family_relationships_attributes = { '0' => family_relationship.attributes.merge!(relationship: family_relationship.relationship + 'boo').with_indifferent_access.except(:person_id, :updated_at, :created_at) }
       person.family_relationships.first.relationship.should == family_relationship.relationship + 'boo'
     end
   end
 
   describe '.save' do
-    it "gracefully handles having the same FB account assigned twice" do
+    it 'gracefully handles having the same FB account assigned twice' do
       fb_account = create(:facebook_account, person: person)
-      person.update_attributes("facebook_accounts_attributes" => {
-          "0" => {
-            "_destroy" => "false",
-            "url" => "http://facebook.com/profile.php?id=500015648"
+      person.update_attributes('facebook_accounts_attributes' => {
+          '0' => {
+            '_destroy' => 'false',
+            'url' => 'http://facebook.com/profile.php?id=500015648'
           },
-          "1" => {
-            "_destroy" => "false",
-            "url" => "http://facebook.com/profile.php?id=500015648"
+          '1' => {
+            '_destroy' => 'false',
+            'url' => 'http://facebook.com/profile.php?id=500015648'
           },
-          "1354203866590" => {
-            "_destroy" => "false",
-            "id" => fb_account.id,
-            "url" => fb_account.url
+          '1354203866590' => {
+            '_destroy' => 'false',
+            'id' => fb_account.id,
+            'url' => fb_account.url
           }
         })
       person.facebook_accounts.length.should == 2
     end
 
-    it "gracefully handles having an fb account with a blank url" do
-      person.update_attributes("facebook_accounts_attributes" => {
-          "0" => {
-            "_destroy" => "false",
-            "url" => ""
+    it 'gracefully handles having an fb account with a blank url' do
+      person.update_attributes('facebook_accounts_attributes' => {
+          '0' => {
+            '_destroy' => 'false',
+            'url' => ''
           }
         })
       person.facebook_accounts.length.should == 0
@@ -78,15 +78,15 @@ describe Person do
       person = build(:person)
 
       email_addresses_attributes = {
-        "1378494030167" => {
-          "_destroy" => "false",
-          "email" => "monfortcody@yahoo.com",
-          "primary" => "0"
+        '1378494030167' => {
+          '_destroy' => 'false',
+          'email' => 'monfortcody@yahoo.com',
+          'primary' => '0'
         },
-        "1378494031857" => {
-          "_destroy" => "false",
-          "email" => "monfortcody@yahoo.com",
-          "primary" => "0"
+        '1378494031857' => {
+          '_destroy' => 'false',
+          'email' => 'monfortcody@yahoo.com',
+          'primary' => '0'
         }
       }
 
@@ -100,13 +100,13 @@ describe Person do
     let(:person) { create(:person) }
     let(:email) { create(:email_address, person: person) }
 
-    it "deletes nested email address" do
+    it 'deletes nested email address' do
       email_addresses_attributes = {
-        "0" => {
-          "_destroy" => "1",
-          "email" => "monfortcody@yahoo.com",
-          "primary" => "0",
-          "id" => email.id.to_s
+        '0' => {
+          '_destroy' => '1',
+          'email' => 'monfortcody@yahoo.com',
+          'primary' => '0',
+          'id' => email.id.to_s
         }
       }
 
@@ -119,11 +119,11 @@ describe Person do
 
     it 'updates an existing email address' do
       email_addresses_attributes = {
-        "0" => {
-          "_destroy" => "0",
-          "email" => 'asdf' + email.email,
-          "primary" => "1",
-          "id" => email.id.to_s
+        '0' => {
+          '_destroy' => '0',
+          'email' => 'asdf' + email.email,
+          'primary' => '1',
+          'id' => email.id.to_s
         }
       }
 
@@ -138,11 +138,11 @@ describe Person do
       email2 = create(:email_address, person: person)
 
       email_addresses_attributes = {
-        "0" => {
-          "_destroy" => "0",
-          "email" => email.email,
-          "primary" => "0",
-          "id" => email2.id.to_s
+        '0' => {
+          '_destroy' => '0',
+          'email' => email.email,
+          'primary' => '0',
+          'id' => email2.id.to_s
         }
       }
 
@@ -184,20 +184,20 @@ describe Person do
       winner.twitter_accounts.should_not be_empty
     end
 
-    it "moves pictures over" do
+    it 'moves pictures over' do
       picture = create(:picture, picture_of: loser)
       winner.merge(loser)
       winner.pictures.should include(picture)
     end
 
-    it "copies over master person sources" do
+    it 'copies over master person sources' do
       loser.master_person.master_person_sources.create(organization_id: 1, remote_id: 2)
 
       winner.merge(loser)
       expect(winner.master_person.master_person_sources.where(organization_id: 1, remote_id: 2)).to_not be_nil
     end
 
-    it 'creates a Version with a related_object_id', :versioning => true do
+    it 'creates a Version with a related_object_id', versioning: true do
       p1 = create(:person)
       p2 = create(:person)
       c = create(:contact)

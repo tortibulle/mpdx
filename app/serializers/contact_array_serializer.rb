@@ -1,7 +1,7 @@
 require 'digest/sha1'
 
 class ContactArraySerializer < ActiveModel::ArraySerializer
-  #cache
+  # cache
 
   # def cache_key
   #   scope = options[:scope] || {}

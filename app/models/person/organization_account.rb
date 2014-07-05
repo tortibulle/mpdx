@@ -12,7 +12,7 @@ class Person::OrganizationAccount < ActiveRecord::Base
 
   after_create :set_up_account_list, :queue_import_data
   validates :organization_id, :person_id, presence: true
-  validates :username, :password, :presence => {if: :requires_username_and_password?}
+  validates :username, :password, presence: { if: :requires_username_and_password? }
   validates_with CredentialValidator
   after_validation :set_valid_credentials
   after_destroy :destroy_designation_profiles
@@ -57,7 +57,7 @@ class Person::OrganizationAccount < ActiveRecord::Base
       # we only want to set the last_download date if at least one donation was downloaded
       starting_donation_count = user.donations.count
 
-      update_attributes({downloading: true, locked_at: Time.now})
+      update_attributes(downloading: true, locked_at: Time.now)
       date_from = last_download ? (last_download - 2.week) : ''
       organization.api(self).import_all(date_from)
 
@@ -99,8 +99,8 @@ class Person::OrganizationAccount < ActiveRecord::Base
     end
     # If this org account doesn't have any profiles, create a default account list and profile for them
     if user.account_lists.reload.empty? || organization.designation_profiles.where(user_id: person_id).blank?
-      account_list = user.account_lists.create!({name: user.to_s, creator_id: user.id})
-      organization.designation_profiles.create!({name: user.to_s, user_id: user.id, account_list_id: account_list.id})
+      account_list = user.account_lists.create!(name: user.to_s, creator_id: user.id)
+      organization.designation_profiles.create!(name: user.to_s, user_id: user.id, account_list_id: account_list.id)
     end
   end
 

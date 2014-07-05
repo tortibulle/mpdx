@@ -10,11 +10,9 @@ class Admin::SessionsController < ApplicationController
   end
 
   def failure
-    redirect_to "/auth/admin"
+    redirect_to '/auth/admin'
   end
 
   def no_access
-
   end
 end
-

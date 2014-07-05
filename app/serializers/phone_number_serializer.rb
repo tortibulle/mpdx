@@ -9,5 +9,4 @@ class PhoneNumberSerializer < ActiveModel::Serializer
     phone_number_exhibit = exhibit(object)
     phone_number_exhibit.number
   end
-
 end

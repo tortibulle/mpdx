@@ -11,12 +11,12 @@ describe Person::FacebookAccount do
 
   describe 'when importing contacts' do
     before do
-      stub_request(:get, "https://graph.facebook.com/#{@account.remote_id}/friends?access_token=#{@account.token}" ).
-         to_return(:body => '{"data": [{"name": "David Hylden","id": "120581"}]}')
+      stub_request(:get, "https://graph.facebook.com/#{@account.remote_id}/friends?access_token=#{@account.token}").
+         to_return(body: '{"data": [{"name": "David Hylden","id": "120581"}]}')
       stub_request(:get, "https://graph.facebook.com/120581?access_token=#{@account.token}").
-         to_return(:body => '{"id": "120581", "first_name": "John", "last_name": "Doe", "relationship_status": "Married", "significant_other":{"id":"120582"}}')
+         to_return(body: '{"id": "120581", "first_name": "John", "last_name": "Doe", "relationship_status": "Married", "significant_other":{"id":"120582"}}')
       stub_request(:get, "https://graph.facebook.com/120582?access_token=#{@account.token}").
-        to_return(:body => '{"id": "120582", "first_name": "Jane", "last_name": "Doe"}')
+        to_return(body: '{"id": "120582", "first_name": "Jane", "last_name": "Doe"}')
     end
 
     it 'should match an existing person on my list' do
@@ -56,7 +56,7 @@ describe Person::FacebookAccount do
       }.should_not change(Contact, :count)
     end
 
-    it "should add tags from the import" do
+    it 'should add tags from the import' do
       @import.update_column(:tags, 'hi, mom')
       @facebook_import.send(:import_contacts)
       Contact.last.tag_list.sort.should == ['hi', 'mom']
@@ -67,9 +67,9 @@ describe Person::FacebookAccount do
     before do
       @friend = OpenStruct.new(first_name: 'John',
                                identifier: Time.now.to_i.to_s,
-                               raw_attributes: {'birthday' => '01/02'})
+                               raw_attributes: { 'birthday' => '01/02' })
     end
-    it "should update the person if they already exist" do
+    it 'should update the person if they already exist' do
       contact = create(:contact, account_list: @account_list)
       person = create(:person, first_name: 'Not-John')
       account = create(:facebook_account, person: person, remote_id: @friend.identifier)
@@ -80,7 +80,7 @@ describe Person::FacebookAccount do
       }.should_not change(Person, :count)
     end
 
-    it "should create a person with an existing Master Person if a person with this FB accoun already exists" do
+    it 'should create a person with an existing Master Person if a person with this FB accoun already exists' do
       person = create(:person)
       account = create(:facebook_account, person: person, remote_id: @friend.identifier, authenticated: true)
       -> {

@@ -31,7 +31,6 @@ class PreferenceSet
   validates :first_name, presence: true
   validates :email, presence: true, email: true
 
-
   def persisted?
     false
   end

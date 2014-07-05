@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe DonationsController do
 
-  before(:each) do 
+  before(:each) do
     @user = create(:user_with_account)
     sign_in(:user, @user)
     @account_list = @user.account_lists.first
@@ -14,7 +14,7 @@ describe DonationsController do
   describe 'index' do
     let(:contact) { create(:contact, account_list_id: @account_list.id) }
 
-    it "should scope donations to the current contact when a contact_id is present" do
+    it 'should scope donations to the current contact when a contact_id is present' do
       contact.donor_accounts << @donor_account
       donation = create(:donation, donor_account: @donor_account, designation_account: @designation_account)
       get :index, contact_id: contact.id
@@ -22,12 +22,12 @@ describe DonationsController do
       assigns(:donations).total_entries.should == 1
     end
 
-    it "should not find any donations for a contact without a donor account" do
+    it 'should not find any donations for a contact without a donor account' do
       get :index, contact_id: contact.id
       assigns(:donations).total_entries.should == 0
     end
 
-    it "should set up chart variables if page parameter is not present" do
+    it 'should set up chart variables if page parameter is not present' do
       get :index, contact_id: contact.id
       assigns(:by_month).should_not be_nil
     end

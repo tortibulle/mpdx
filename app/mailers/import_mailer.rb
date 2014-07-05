@@ -1,5 +1,5 @@
 class ImportMailer < ActionMailer::Base
-  default from: "support@mpdx.org"
+  default from: 'support@mpdx.org'
 
   def complete(import)
     user = import.user

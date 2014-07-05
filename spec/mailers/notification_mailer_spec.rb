@@ -1,7 +1,7 @@
-require "spec_helper"
+require 'spec_helper'
 
 describe NotificationMailer do
-  describe "notify" do
+  describe 'notify' do
     #let(:mail) { NotificationMailer.notify }
 
     #it "renders the headers" do

@@ -1,5 +1,4 @@
 class TaskExhibit < DisplayCase::Exhibit
-
   def self.applicable_to?(object)
     object.class.name == 'Task'
   end
@@ -28,7 +27,7 @@ class TaskExhibit < DisplayCase::Exhibit
 
   def tag_links
     tags.collect do |tag|
-      @context.link_to(tag, @context.params.except(:action, :controller, :id).merge(action: :index, tags: tag.name), class: "tag")
+      @context.link_to(tag, @context.params.except(:action, :controller, :id).merge(action: :index, tags: tag.name), class: 'tag')
     end.join(' ').html_safe
   end
 
@@ -39,5 +38,4 @@ class TaskExhibit < DisplayCase::Exhibit
   def start_at
     to_model.start_at ? @context.l(to_model.start_at.to_datetime) : ''
   end
-
 end

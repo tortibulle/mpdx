@@ -8,7 +8,6 @@ class Person::FacebookAccount < ActiveRecord::Base
   include Sidekiq::Worker
   sidekiq_options queue: :facebook, unique: true
 
-
   set :friends
   # attr_accessible :remote_id, :token, :token_expires_at, :first_name, :last_name, :valid_token, :authenticated, :url
 
@@ -59,15 +58,15 @@ class Person::FacebookAccount < ActiveRecord::Base
     return nil unless url.present?
 
     begin
-      Retryable.retryable :on => [RestClient::Forbidden, Timeout::Error, Errno::ECONNRESET], :times => 6, :sleep => 0.5 do
+      Retryable.retryable on: [RestClient::Forbidden, Timeout::Error, Errno::ECONNRESET], times: 6, sleep: 0.5 do
         # e.g. https://www.facebook.com/username)
-        if url.include?("id=")
+        if url.include?('id=')
           id = url.split('id=').last
           id = id.split('&').first
         else
           name = url.split('/').last
           name = name.split('?').first
-          response = RestClient.get("https://graph.facebook.com/#{name}", { accept: :json })
+          response = RestClient.get("https://graph.facebook.com/#{name}",  accept: :json)
           json = JSON.parse(response)
           raise RestClient::ResourceNotFound unless json['id'].to_i > 0
           json['id']
@@ -101,14 +100,14 @@ class Person::FacebookAccount < ActiveRecord::Base
     begin
       self.token_expires_at = Time.at(info['expires'].to_i)
     rescue => e
-      raise e.message + ": " + info.inspect
+      raise e.message + ': ' + info.inspect
     end
     save
   end
 
   # Refresh any tokens that will be expiring soon
   def self.refresh_tokens
-    Person::FacebookAccount.where("token_expires_at < ? AND token_expires_at > ?", 2.days.from_now, Time.now).each do |fa|
+    Person::FacebookAccount.where('token_expires_at < ? AND token_expires_at > ?', 2.days.from_now, Time.now).each do |fa|
       fa.refresh_token
     end
   end
@@ -129,7 +128,4 @@ class Person::FacebookAccount < ActiveRecord::Base
       []
     end
   end
-
-
-
 end

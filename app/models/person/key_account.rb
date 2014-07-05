@@ -1,7 +1,7 @@
 class Person::KeyAccount < ActiveRecord::Base
   include Person::Account
 
-  #attr_accessible :email
+  # attr_accessible :email
 
   def self.find_or_create_from_auth(auth_hash, person)
     @rel = person.key_accounts
@@ -28,12 +28,10 @@ class Person::KeyAccount < ActiveRecord::Base
     User.find_by_id(authenticated.where(remote_id: auth_hash.extra.attributes.first.ssoGuid).pluck(:person_id).first)
   end
 
-
   def to_s
     email
   end
 
   def queue_import_data
-
   end
 end

@@ -14,7 +14,6 @@ class MasterPersonDonorAccount < ActiveRecord::Base
 
     def ensure_only_one_primary
       primary_donors = donor_account.master_person_donor_accounts.where(primary: true)
-      primary_donors[0..-2].map {|e| e.update_column(:primary, false)} if primary_donors.length > 1
+      primary_donors[0..-2].map { |e| e.update_column(:primary, false) } if primary_donors.length > 1
     end
-
 end

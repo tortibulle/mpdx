@@ -58,7 +58,6 @@ class MailChimpAccount < ActiveRecord::Base
     async(:call_mailchimp, :subscribe_contacts)
   end
 
-
   def queue_subscribe_contact(contact)
     async(:call_mailchimp, :subscribe_contacts, contact.id)
   end
@@ -74,7 +73,6 @@ class MailChimpAccount < ActiveRecord::Base
   def queue_update_email(old_email, new_email)
     async(:call_mailchimp, :update_email, old_email, new_email)
   end
-
 
   def queue_unsubscribe_contact(contact)
     contact.people.each do |person|
@@ -154,7 +152,6 @@ class MailChimpAccount < ActiveRecord::Base
         raise e
       end
     end
-
   end
 
   def subscribe_person(person_id)
@@ -166,8 +163,8 @@ class MailChimpAccount < ActiveRecord::Base
     end
 
     if person.primary_email_address
-      vars = { :EMAIL => person.primary_email_address.email, :FNAME => person.first_name,
-               :LNAME => person.last_name}
+      vars = { EMAIL: person.primary_email_address.email, FNAME: person.first_name,
+               LNAME: person.last_name }
       begin
         gb.list_subscribe(id: primary_list_id, email_address: vars[:EMAIL], update_existing: true,
                           double_optin: false, merge_vars: vars, send_welcome: false, replace_interests: true)
@@ -204,7 +201,6 @@ class MailChimpAccount < ActiveRecord::Base
     export_to_list(primary_list_id, contacts.to_set)
   end
 
-
   def export_to_list(list_id, contacts)
     # Make sure we have an interest group for each status of partner set
     # to receive the newsletter
@@ -221,16 +217,15 @@ class MailChimpAccount < ActiveRecord::Base
 
       contact.people.each do |person|
         if person.primary_email_address
-          batch << { :EMAIL => person.primary_email_address.email, :FNAME => person.first_name,
-                     :LNAME => person.last_name }
+          batch << { EMAIL: person.primary_email_address.email, FNAME: person.first_name,
+                     LNAME: person.last_name }
         end
       end
 
       # if we have a grouping_id, add them to that group
       if grouping_id.present?
-        batch.each { |p| p[:GROUPINGS] ||= [{id: grouping_id, groups: _(contact.status)}] }
+        batch.each { |p| p[:GROUPINGS] ||= [{ id: grouping_id, groups: _(contact.status) }] }
       end
-
 
     end
 
@@ -240,7 +235,6 @@ class MailChimpAccount < ActiveRecord::Base
     rescue Gibbon::MailChimpError => e
       raise e
     end
-
   end
 
   def add_status_groups(list_id, statuses)
@@ -265,7 +259,6 @@ class MailChimpAccount < ActiveRecord::Base
       self.grouping_id = grouping['id']
     end
 
-
     # Add any new groups
     groups = grouping['groups'].collect { |g| g['name'] }
 
@@ -274,7 +267,6 @@ class MailChimpAccount < ActiveRecord::Base
     end
 
     save
-
   end
 
   def find_grouping(list_id)
@@ -298,7 +290,6 @@ class MailChimpAccount < ActiveRecord::Base
     @gb.timeout = 600
     @gb
   end
-
 end
 
 

@@ -40,13 +40,13 @@ describe GoogleIntegration do
       google_integration.google_account.stub(:client).and_return(client)
       google_integration.stub_chain(:calendar_api, :calendar_list, :list).and_return(calendar_list_api)
 
-      client.should_receive(:execute).with(:api_method => calendar_list_api,
-                                           :parameters => {'userId' => 'me'})
+      client.should_receive(:execute).with(api_method: calendar_list_api,
+                                           parameters: { 'userId' => 'me' })
 
       google_integration.calendars.should == [calendar_data.items.first]
     end
   end
-  
+
   context '#toggle_calendar_integration_for_appointments' do
     before do
       google_integration.calendar_integrations = []
@@ -90,8 +90,8 @@ describe GoogleIntegration do
       google_integration.google_account.stub(:client).and_return(client)
       google_integration.stub_chain(:calendar_api, :calendars, :insert).and_return(calendar_insert_api)
 
-      client.should_receive(:execute).with(:api_method => calendar_insert_api,
-                                           :body_object => {'summary' => google_integration.new_calendar})
+      client.should_receive(:execute).with(api_method: calendar_insert_api,
+                                           body_object: { 'summary' => google_integration.new_calendar })
 
       first_calendar = calendar_data.items.first
 

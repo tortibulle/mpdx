@@ -6,7 +6,7 @@ describe FamilyRelationship do
       @person = FactoryGirl.create(:person)
       @wife = FactoryGirl.create(:person)
       @relationship =  'wife'
-      @attributes = {related_person_id: @wife.id, relationship: @relationship}
+      @attributes = { related_person_id: @wife.id, relationship: @relationship }
     end
     it "should create a family relationship if it's new" do
       ->{
@@ -15,7 +15,7 @@ describe FamilyRelationship do
       }.should change(FamilyRelationship, :count).from(0).to(1)
     end
 
-    it "should not create a family relationship if it exists" do
+    it 'should not create a family relationship if it exists' do
       FamilyRelationship.add_for_person(@person, @attributes)
       ->{
         FamilyRelationship.add_for_person(@person, @attributes)

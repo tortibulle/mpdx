@@ -2,7 +2,6 @@ class MailChimpAccountsController < ApplicationController
   before_filter :get_mail_chimp_account
 
   def index
-
     @mail_chimp_account.validate_key if current_account_list.mail_chimp_account
 
     unless @mail_chimp_account.active?
@@ -36,11 +35,10 @@ class MailChimpAccountsController < ApplicationController
   end
 
   def sync
-    flash[:notice] = _("MPDX is now uploading your newsletter recipients to MailChimp.") # We'll send you an email to let you know when we're done.
+    flash[:notice] = _('MPDX is now uploading your newsletter recipients to MailChimp.') # We'll send you an email to let you know when we're done.
     @mail_chimp_account.queue_export_to_primary_list
     redirect_to :back
   end
-
 
   private
 
@@ -63,11 +61,9 @@ class MailChimpAccountsController < ApplicationController
     end
   end
 
-
   def get_mail_chimp_account
     @mail_chimp_account = current_account_list.mail_chimp_account ||
                           current_account_list.build_mail_chimp_account
-
   end
 
   def mail_chimp_account_params

@@ -21,7 +21,7 @@ class PersonExhibit < DisplayCase::Exhibit
   #end
 
   def contact_info
-    [phone_number, email].compact.map {|e| exhibit(e, @context)}.join('<br />').html_safe
+    [phone_number, email].compact.map { |e| exhibit(e, @context) }.join('<br />').html_safe
   end
 
   def avatar(size = :square)
@@ -33,7 +33,7 @@ class PersonExhibit < DisplayCase::Exhibit
     else
       url = ActionController::Base.helpers.image_url('avatar.png')
     end
-    
+
     if url.start_with?('/')
       root_url = (@context) ? @context.root_url : 'https://mpdx.org'
       url = URI.join(root_url, url).to_s
@@ -42,7 +42,7 @@ class PersonExhibit < DisplayCase::Exhibit
   end
 
   def twitter_handles
-    twitter_accounts.collect {|t| @context.link_to("@#{t.screen_name}", "http://twitter.com/#{t.screen_name}", target: '_blank') }.join(', ').html_safe
+    twitter_accounts.collect { |t| @context.link_to("@#{t.screen_name}", "http://twitter.com/#{t.screen_name}", target: '_blank') }.join(', ').html_safe
   end
 
   def to_s
@@ -56,5 +56,4 @@ class PersonExhibit < DisplayCase::Exhibit
   def has_social?
     facebook_account || twitter_account || linkedin_account
   end
-
 end

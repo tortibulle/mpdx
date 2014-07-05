@@ -8,7 +8,6 @@ class GoogleIntegrationsController < ApplicationController
   def update
     google_integration.update_attributes(google_integration_params)
 
-
     respond_to do |format|
       format.html { redirect_to google_integration }
       format.js { render nothing: true }
@@ -38,7 +37,7 @@ class GoogleIntegrationsController < ApplicationController
   end
 
   def google_integration_params
-    params.require(:google_integration).permit([:calendar_integration, {calendar_integrations: []}, :calendar_id, :calendar_name, :new_calendar])
+    params.require(:google_integration).permit([:calendar_integration, { calendar_integrations: [] }, :calendar_id, :calendar_name, :new_calendar])
   end
 
   def missing_refresh_token

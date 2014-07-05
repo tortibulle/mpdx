@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Person::OrganizationAccountsController do
 
-  before(:each) do 
+  before(:each) do
     @user = FactoryGirl.create(:user)
     sign_in(:user, @user)
     @org = FactoryGirl.create(:fake_org)
@@ -12,7 +12,6 @@ describe Person::OrganizationAccountsController do
   def valid_attributes
     @valid_attributes ||= { username: 'foo@example.com', password: 'foobar1', organization_id: @org.id }
   end
-  
 
 
   #describe "GET index" do
@@ -31,8 +30,8 @@ describe Person::OrganizationAccountsController do
     #end
   #end
 
-  describe "GET new" do
-    it "assigns a new organization_account as @organization_account" do
+  describe 'GET new' do
+    it 'assigns a new organization_account as @organization_account' do
       org = FactoryGirl.create(:fake_org)
       xhr :get, :new, id: org.id
       assigns(:organization_account).should be_a_new(Person::OrganizationAccount)
@@ -48,36 +47,36 @@ describe Person::OrganizationAccountsController do
     #end
   #end
 
-  describe "POST create" do
+  describe 'POST create' do
     before(:each) do
       #@org.stub(:api).and_return(FakeApi.new)
     end
-    describe "with valid params" do
-      it "creates a new Person::OrganizationAccount" do
+    describe 'with valid params' do
+      it 'creates a new Person::OrganizationAccount' do
         expect {
-          xhr :post, :create, {:person_organization_account => valid_attributes}
+          xhr :post, :create,  person_organization_account: valid_attributes
         }.to change(Person::OrganizationAccount, :count).by(1)
       end
 
-      it "assigns a newly created organization_account as @organization_account" do
-        xhr :post, :create, {:person_organization_account => valid_attributes}
+      it 'assigns a newly created organization_account as @organization_account' do
+        xhr :post, :create,  person_organization_account: valid_attributes
         assigns(:organization_account).should be_a(Person::OrganizationAccount)
         assigns(:organization_account).should be_persisted
       end
 
-      it "redirects to the created organization_account" do
-        xhr :post, :create, {:person_organization_account => valid_attributes}
+      it 'redirects to the created organization_account' do
+        xhr :post, :create,  person_organization_account: valid_attributes
         response.should render_template('create')
       end
     end
 
-    describe "with invalid params" do
-      it "assigns a newly created but unsaved organization_account as @organization_account" do
+    describe 'with invalid params' do
+      it 'assigns a newly created but unsaved organization_account as @organization_account' do
         # Trigger the behavior that occurs when invalid params are submitted
         Person::OrganizationAccount.any_instance.stub(:save).and_return(false)
-        xhr :post, :create, {:person_organization_account => {username: ''}}
+        xhr :post, :create,  person_organization_account: { username: '' }
         assigns(:organization_account).should be_a_new(Person::OrganizationAccount)
-        response.should render_template("new")
+        response.should render_template('new')
       end
     end
   end

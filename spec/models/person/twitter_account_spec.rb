@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Person::TwitterAccount do
   describe 'create from auth' do
     it 'should create an account linked to a person' do
-      auth_hash = Hashie::Mash.new(extra: {access_token: {params: {user_id: 5, screen_name: 'foo', oauth_token: 'a', oauth_token_secret: 'b'}}})
+      auth_hash = Hashie::Mash.new(extra: { access_token: { params: { user_id: 5, screen_name: 'foo', oauth_token: 'a', oauth_token_secret: 'b' } } })
       person = FactoryGirl.create(:person)
       -> {
         @account = Person::TwitterAccount.find_or_create_from_auth(auth_hash, person)
@@ -13,7 +13,7 @@ describe Person::TwitterAccount do
   end
   describe 'update from auth' do
     it 'should update an account that already exists' do
-      auth_hash = Hashie::Mash.new(extra: {access_token: {params: {user_id: 5, screen_name: 'foo', oauth_token: 'a', oauth_token_secret: 'b'}}})
+      auth_hash = Hashie::Mash.new(extra: { access_token: { params: { user_id: 5, screen_name: 'foo', oauth_token: 'a', oauth_token_secret: 'b' } } })
       person = FactoryGirl.create(:person)
       Person::TwitterAccount.find_or_create_from_auth(auth_hash, person)
       -> {

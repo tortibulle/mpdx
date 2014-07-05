@@ -1,5 +1,4 @@
 class AddressExhibit < DisplayCase::Exhibit
-
   def self.applicable_to?(object)
     object.class.name == 'Address'
   end

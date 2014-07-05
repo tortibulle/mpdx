@@ -8,9 +8,9 @@ class Donation < ActiveRecord::Base
 
   scope :for, -> (designation_account) { where(designation_account_id: designation_account.id) }
   scope :for_accounts, -> (designation_accounts) { where(designation_account_id: designation_accounts.pluck(:id)) }
-  scope :since, -> (date) { where("donation_date > ?", date) }
+  scope :since, -> (date) { where('donation_date > ?', date) }
 
-  default_scope -> { order("donation_date desc") }
+  default_scope -> { order('donation_date desc') }
 
   after_create :update_totals
   before_validation :set_amount_from_tendered_amount

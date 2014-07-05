@@ -32,7 +32,7 @@ class DonorAccount < ActiveRecord::Base
   def update_donation_totals(donation)
     self.first_donation_date = donation.donation_date if first_donation_date.nil? || donation.donation_date < first_donation_date
     self.last_donation_date = donation.donation_date if last_donation_date.nil? || donation.donation_date > last_donation_date
-    self.total_donations = self.total_donations.to_f + donation.amount
+    self.total_donations = total_donations.to_f + donation.amount
     save(validate: false)
   end
 
@@ -84,5 +84,4 @@ class DonorAccount < ActiveRecord::Base
 
     true
   end
-
 end

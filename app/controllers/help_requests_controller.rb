@@ -1,5 +1,4 @@
 class HelpRequestsController < ApplicationController
-
   def new
     @help_request = HelpRequest.new(name: current_user.to_s,
                                     email: current_user.email)
@@ -26,5 +25,4 @@ class HelpRequestsController < ApplicationController
   def help_request_params
     params.require(:help_request).permit(:name, :browser, :problem, :email, :file, :request_type)
   end
-
 end

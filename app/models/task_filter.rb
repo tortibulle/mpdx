@@ -1,5 +1,4 @@
 class TaskFilter
-
   attr_accessor :tasks, :filters
 
   def initialize(filters)

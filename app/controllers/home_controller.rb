@@ -52,5 +52,4 @@ class HomeController < ApplicationController
   def download_data_check
     render text: current_user.organization_accounts.any?(&:downloading?)
   end
-
 end

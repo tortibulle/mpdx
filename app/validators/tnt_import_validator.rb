@@ -9,11 +9,10 @@ class TntImportValidator < ActiveModel::Validator
       # Make sure required columns are present
       unless xml
         import.errors[:base] << _('The file you uploaded is not a valid Tnt export. %{link}') %
-          { link: link_to(_('Please watch this video to see how to properly export from TntMPD.'), 'http://screencast.com/t/CU4y51KbRMkr', target: '_blank')}
+          { link: link_to(_('Please watch this video to see how to properly export from TntMPD.'), 'http://screencast.com/t/CU4y51KbRMkr', target: '_blank') }
       end
     else
       import.errors[:base] << _('Please choose a file that ends with .xml')
     end
   end
-
 end

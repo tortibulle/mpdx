@@ -4,8 +4,8 @@ class Person < ActiveRecord::Base
   TITLES = [_('Mr.'), _('Mrs.'), _('Ms.'), _('Rev.'), _('Hon.'), _('Dr.')]
   SUFFIXES = [_('Jr.'), _('Sr.')]
   MARITAL_STATUSES = [_('Single'), _('Engaged'), _('Married'), _('Separated'), _('Divorced'), _('Widowed')]
-  has_paper_trail :on => [:destroy],
-                  :meta => { related_object_type: 'Contact',
+  has_paper_trail on: [:destroy],
+                  meta: { related_object_type: 'Contact',
                              related_object_id: :contact_id }
 
   belongs_to :master_person
@@ -15,7 +15,7 @@ class Person < ActiveRecord::Base
   has_one :primary_phone_number, -> { where('phone_numbers.primary' => true) }, class_name: 'PhoneNumber', foreign_key: :person_id
   has_many :family_relationships, dependent: :destroy
   has_many :related_people, through: :family_relationships
-  has_one :company_position, -> { where("company_positions.end_date is null").order("company_positions.start_date desc") }, class_name: 'CompanyPosition', foreign_key: :person_id
+  has_one :company_position, -> { where('company_positions.end_date is null').order('company_positions.start_date desc') }, class_name: 'CompanyPosition', foreign_key: :person_id
   has_many :company_positions, dependent: :destroy
   has_many :twitter_accounts, class_name: 'Person::TwitterAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
   has_one :twitter_account, -> { where('person_twitter_accounts.primary' => true) }, class_name: 'Person::TwitterAccount', foreign_key: :person_id
@@ -38,13 +38,13 @@ class Person < ActiveRecord::Base
   has_many :messages_sent, class_name: 'Message', foreign_key: :from_id, dependent: :destroy
   has_many :messages_received, class_name: 'Message', foreign_key: :to_id, dependent: :destroy
 
-  accepts_nested_attributes_for :email_addresses, :reject_if => lambda { |e| e[:email].blank? }, :allow_destroy => true
-  accepts_nested_attributes_for :phone_numbers, :reject_if => lambda { |p| p[:number].blank? }, :allow_destroy => true
-  accepts_nested_attributes_for :family_relationships, :reject_if => lambda { |p| p[:related_contact_id].blank? }, :allow_destroy => true
-  accepts_nested_attributes_for :facebook_accounts, :reject_if => lambda { |p| p[:url].blank? }, :allow_destroy => true
-  accepts_nested_attributes_for :twitter_accounts, :reject_if => lambda { |p| p[:screen_name].blank? }, :allow_destroy => true
-  accepts_nested_attributes_for :linkedin_accounts, :reject_if => lambda { |p| p[:url].blank? }, :allow_destroy => true
-  accepts_nested_attributes_for :pictures, :reject_if => lambda { |p| p[:image].blank? && p[:image_cache].blank? }, :allow_destroy => true
+  accepts_nested_attributes_for :email_addresses, reject_if: lambda { |e| e[:email].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :phone_numbers, reject_if: lambda { |p| p[:number].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :family_relationships, reject_if: lambda { |p| p[:related_contact_id].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :facebook_accounts, reject_if: lambda { |p| p[:url].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :twitter_accounts, reject_if: lambda { |p| p[:screen_name].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :linkedin_accounts, reject_if: lambda { |p| p[:url].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :pictures, reject_if: lambda { |p| p[:image].blank? && p[:image_cache].blank? }, allow_destroy: true
 
   PERMITTED_ATTRIBUTES = [
     :first_name, :legal_first_name, :last_name, :birthday_month, :birthday_year, :birthday_day,
@@ -108,7 +108,7 @@ class Person < ActiveRecord::Base
   end
 
   def email=(val)
-    self.email_address = {email: val, primary: true}
+    self.email_address = { email: val, primary: true }
   end
 
   def email
@@ -208,7 +208,7 @@ class Person < ActiveRecord::Base
   end
 
   def phone=(number)
-    self.phone_number = {number: number}
+    self.phone_number = { number: number }
   end
 
   def merge_phone_numbers
@@ -224,7 +224,7 @@ class Person < ActiveRecord::Base
   end
 
   def merge(other)
-    Person.transaction(:requires_new => true) do
+    Person.transaction(requires_new: true) do
       other.messages_sent.update_all(from_id: id)
       other.messages_received.update_all(to_id: id)
 
@@ -250,7 +250,7 @@ class Person < ActiveRecord::Base
 
       other.email_addresses.each do |email_address|
         unless email_addresses.find_by_email(email_address.email)
-          email_address.update_attributes({person_id: id})
+          email_address.update_attributes(person_id: id)
         end
       end
 
@@ -263,13 +263,13 @@ class Person < ActiveRecord::Base
       # we don't create duplicates on the next part
       FamilyRelationship.where(related_person_id: other.id).each do |fr|
         unless FamilyRelationship.where(person_id: fr.person_id, related_person_id: id).first
-          fr.update_attributes({related_person_id: id})
+          fr.update_attributes(related_person_id: id)
         end
       end
 
       FamilyRelationship.where(person_id: other.id).each do |fr|
         unless FamilyRelationship.where(related_person_id: fr.person_id, person_id: id)
-          fr.update_attributes({person_id: id})
+          fr.update_attributes(person_id: id)
         end
       end
 
@@ -315,7 +315,6 @@ class Person < ActiveRecord::Base
     self
   end
 
-
   private
   def find_master_person
     unless master_person_id
@@ -324,7 +323,7 @@ class Person < ActiveRecord::Base
   end
 
   def clean_up_master_person
-    self.master_person.destroy if self.master_person && (self.master_person.people - [self]).blank?
+    master_person.destroy if master_person && (master_person.people - [self]).blank?
   end
 
   def clean_up_contact_people
@@ -344,5 +343,4 @@ class Person < ActiveRecord::Base
   def touch_contacts
     contacts.map(&:touch) if sign_in_count == 0
   end
-
 end

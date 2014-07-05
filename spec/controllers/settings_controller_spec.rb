@@ -9,7 +9,7 @@ describe SettingsController do
   end
 
   describe "GET 'integrations'" do
-    it "returns http success" do
+    it 'returns http success' do
       get 'integrations'
       response.should be_success
     end

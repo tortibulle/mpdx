@@ -1,11 +1,10 @@
 class CredentialValidator < ActiveModel::Validator
   def validate(record)
-
     # we don't want this error to show up if there is already an error
     # on username or password or organization
     unless record.errors[:username].present? || record.errors[:password].present? || record.errors[:organization_id].present?
       unless valid_credentials?(record)
-        record.errors[:base] << _('Your username and password for %{org} are invalid.').localize % {org: record.organization}
+        record.errors[:base] << _('Your username and password for %{org} are invalid.').localize % { org: record.organization }
       end
     end
   end

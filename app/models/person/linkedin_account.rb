@@ -45,7 +45,7 @@ class Person::LinkedinAccount < ActiveRecord::Base
       json = LINKEDIN.profile(url: value, fields: %w[id first_name last_name public-profile-url])
       update_attributes_from_json(json)
     rescue RestClient::ResourceNotFound
-      self.destroy
+      destroy
     rescue LinkedIn::Errors::UnauthorizedError
       # Apparently this account wasn't valid after all
       l.update_column(:valid_token, false)
@@ -61,8 +61,5 @@ class Person::LinkedinAccount < ActiveRecord::Base
   end
 
   def queue_import_data
-
   end
-
-
 end

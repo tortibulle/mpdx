@@ -1,5 +1,4 @@
 class ImportsController < ApplicationController
-
   def create
     if import_params
       import = current_account_list.imports.new(import_params)

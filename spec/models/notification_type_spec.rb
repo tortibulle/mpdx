@@ -7,7 +7,7 @@ describe NotificationType do
     let(:designation_account) { create(:designation_account) }
     let!(:special_gift) { NotificationType::SpecialGift.create! }
 
-    it "checks for notifications of each type" do
+    it 'checks for notifications of each type' do
       create(:notification_preference, account_list: account_list, notification_type: special_gift)
       NotificationType.should_receive(:types).and_return(['NotificationType::SpecialGift'])
       NotificationType::SpecialGift.should_receive(:first).and_return(special_gift)

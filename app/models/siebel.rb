@@ -1,6 +1,5 @@
 require_dependency 'data_server'
 class Siebel < DataServer
-
   def self.requires_username_and_password?() false; end
 
   def import_profiles
@@ -28,14 +27,13 @@ class Siebel < DataServer
 
       import_profile_balance(designation_profile)
 
-
       designation_profiles << designation_profile
 
       # Add included designation accounts
       profile.designations.each do |designation|
-        find_or_create_designation_account(designation.number, designation_profile, {name: designation.description,
+        find_or_create_designation_account(designation.number, designation_profile,  name: designation.description,
                                                                                      staff_account_id: designation.staff_account_id,
-                                                                                     chartfield: designation.chartfield})
+                                                                                     chartfield: designation.chartfield)
       end
 
       unless designation_profile.account_list
@@ -86,12 +84,12 @@ class Siebel < DataServer
     # if no date_from was passed in, use min date from query_ini
     if start_date.blank?
       start_date = @org.minimum_gift_date ? @org.minimum_gift_date : '01/01/2004'
-      start_date = Date.strptime(start_date, '%m/%d/%Y').strftime("%Y-%m-%d")
+      start_date = Date.strptime(start_date, '%m/%d/%Y').strftime('%Y-%m-%d')
     else
-      start_date = start_date.strftime("%Y-%m-%d")
+      start_date = start_date.strftime('%Y-%m-%d')
     end
 
-    end_date = end_date ? Date.strptime(end_date, '%m/%d/%Y').strftime("%Y-%m-%d") : Time.now.strftime("%Y-%m-%d")
+    end_date = end_date ? Date.strptime(end_date, '%m/%d/%Y').strftime('%Y-%m-%d') : Time.now.strftime('%Y-%m-%d')
 
     profile.designation_accounts.each do |da|
       SiebelDonations::Donation.find(designations: da.designation_number, posted_date_start: start_date,
@@ -101,13 +99,12 @@ class Siebel < DataServer
     end
   end
 
-
   def profiles_with_designation_numbers
     unless @profiles_with_designation_numbers
       @profiles_with_designation_numbers = profiles.collect do |profile|
-        {designation_numbers: profile.designations.collect(&:number),
+        { designation_numbers: profile.designations.collect(&:number),
          name: profile.name,
-         code: profile.id}
+         code: profile.id }
       end
     end
     @profiles_with_designation_numbers
@@ -210,8 +207,8 @@ class Siebel < DataServer
   def add_or_update_donor_account(account_list, donor, profile, date_from = nil)
     Retryable.retryable do
       donor_account = @org.donor_accounts.where(account_number: donor.id).first_or_initialize
-      donor_account.attributes = {name: donor.account_name,
-                                  donor_type: donor.type}
+      donor_account.attributes = { name: donor.account_name,
+                                  donor_type: donor.type }
       donor_account.save!
 
       contact = donor_account.link_to_contact_for(account_list)
@@ -335,7 +332,7 @@ class Siebel < DataServer
     # If we can match it to an existing address, update that address
     object.addresses_including_deleted.each do |a|
       if a.remote_id == new_address.remote_id || a.equal_to?(new_address)
-        a.update_attributes(new_address.attributes.select {|k,v| v.present?})
+        a.update_attributes(new_address.attributes.select { |k,v| v.present? })
         return a
       end
     end
@@ -384,9 +381,7 @@ class Siebel < DataServer
     end
   end
 
-
   def check_credentials!() end
-
 end
 
 class SiebelError < StandardError

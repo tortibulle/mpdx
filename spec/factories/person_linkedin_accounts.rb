@@ -6,8 +6,8 @@ FactoryGirl.define do
     remote_id 1
     public_url 'http://example.com/foo'
     valid_token true
-    token "MyString"
-    secret "MyString"
+    token 'MyString'
+    secret 'MyString'
     token_expires_at { 1.day.from_now }
   end
 end

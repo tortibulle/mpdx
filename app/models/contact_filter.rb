@@ -25,8 +25,8 @@ class ContactFilter
         if @filters[:name_like].split(/\s+/).length > 1
           filtered_contacts = filtered_contacts.where("concat(first_name,' ',last_name) like ? ", "%#{@filters[:name_like]}%")
         else
-          filtered_contacts = filtered_contacts.where("first_name like :search OR last_name like :search",
-                                                   {search: "#{@filters[:name_like]}%"})
+          filtered_contacts = filtered_contacts.where('first_name like :search OR last_name like :search',
+                                                    search: "#{@filters[:name_like]}%")
         end
       end
 
@@ -61,7 +61,7 @@ class ContactFilter
           end
 
           if @filters[:status].include? 'null'
-            filtered_contacts = filtered_contacts.where("status is null OR status in (?)", @filters[:status])
+            filtered_contacts = filtered_contacts.where('status is null OR status in (?)', @filters[:status])
           else
             filtered_contacts = filtered_contacts.where(status: @filters[:status])
           end
@@ -96,7 +96,7 @@ class ContactFilter
       end
 
       if @filters[:name].present?
-        filtered_contacts = filtered_contacts.where("lower(contacts.name) like ?", "%#{@filters[:name].downcase}%")
+        filtered_contacts = filtered_contacts.where('lower(contacts.name) like ?', "%#{@filters[:name].downcase}%")
       end
 
       if @filters[:timezone].present? && @filters[:timezone].first != ''

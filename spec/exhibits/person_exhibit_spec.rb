@@ -2,7 +2,7 @@ require 'spec_helper'
 describe PersonExhibit do
 
   let(:exhib) { PersonExhibit.new(person, context) }
-  let(:person) { build(:person)}
+  let(:person) { build(:person) }
   let(:context) { double(root_url: 'https://mpdx.org') }
 
   context '#avatar' do

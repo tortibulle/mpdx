@@ -12,7 +12,7 @@ class TasksController < ApplicationController
     @tasks = @tasks.includes(contacts:
       [
         :referrals_to_me,
-        {people: [:phone_numbers, :email_addresses]}
+        { people: [:phone_numbers, :email_addresses] }
       ]
     )
 
@@ -42,7 +42,6 @@ class TasksController < ApplicationController
     filters[:date_range] ||= 'last_week'
     @view_options = params.slice(:per_page, :page)
     @tasks = TaskFilter.new(filters).filter(@tasks)
-
   end
 
   # def show
@@ -65,7 +64,7 @@ class TasksController < ApplicationController
       @task.activity_contacts.build(contact_id: params[:contact_id])
       session[:contact_redirect_to] = contact_path(params[:contact_id], anchor: 'tasks-tab')
 
-      @page_title += _(' For %{contact}').localize % {contact: @task.activity_contacts.first.contact.name} if @task.activity_contacts.length == 1
+      @page_title += _(' For %{contact}').localize % { contact: @task.activity_contacts.first.contact.name } if @task.activity_contacts.length == 1
     end
     if params[:completed]
       @task.completed = true
@@ -76,7 +75,7 @@ class TasksController < ApplicationController
   def edit
     @task = current_account_list.tasks.find(params[:id])
 
-    @page_title = _('Edit Task - %{task}').localize % {task: @task.subject}
+    @page_title = _('Edit Task - %{task}').localize % { task: @task.subject }
 
     respond_to do |wants|
       wants.html
@@ -98,8 +97,8 @@ class TasksController < ApplicationController
         end
       else
         respond_to do |format|
-          format.html { render action: "new" }
-          format.js { render action: "new" }
+          format.html { render action: 'new' }
+          format.js { render action: 'new' }
         end
       end
     else
@@ -111,8 +110,8 @@ class TasksController < ApplicationController
           }
           format.js
         else
-          format.html { render action: "new" }
-          format.js { render action: "new" }
+          format.html { render action: 'new' }
+          format.js { render action: 'new' }
         end
       end
     end
@@ -137,19 +136,19 @@ class TasksController < ApplicationController
     attributes_to_update = task_params.select { |_, v| v.present? }
 
     # Set default date values for parts of date that aren't set
-    if attributes_to_update["start_at(1i)"] || attributes_to_update["start_at(2i)"] || attributes_to_update["start_at(3i)"]
+    if attributes_to_update['start_at(1i)'] || attributes_to_update['start_at(2i)'] || attributes_to_update['start_at(3i)']
       today = Date.today
-      attributes_to_update["start_at(1i)"] ||= today.year.to_s
-      attributes_to_update["start_at(2i)"] ||= today.month.to_s
-      attributes_to_update["start_at(3i)"] ||= today.day.to_s
+      attributes_to_update['start_at(1i)'] ||= today.year.to_s
+      attributes_to_update['start_at(2i)'] ||= today.month.to_s
+      attributes_to_update['start_at(3i)'] ||= today.day.to_s
     end
 
     if attributes_to_update.present?
       tasks.map do |t|
-        if attributes_to_update["start_at(1i)"] || attributes_to_update["start_at(2i)"] || attributes_to_update["start_at(3i)"]
+        if attributes_to_update['start_at(1i)'] || attributes_to_update['start_at(2i)'] || attributes_to_update['start_at(3i)']
           attributes_with_date = attributes_to_update.dup
-          attributes_with_date["start_at(4i)"] ||= t.start_at.hour.to_s
-          attributes_with_date["start_at(5i)"] ||= t.start_at.min.to_s
+          attributes_with_date['start_at(4i)'] ||= t.start_at.hour.to_s
+          attributes_with_date['start_at(5i)'] ||= t.start_at.min.to_s
           t.update_attributes(attributes_with_date)
         else
           t.update_attributes(attributes_to_update)

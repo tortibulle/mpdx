@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe DesignationAccount do
-  it "should return designation_number for to_s" do
+  it 'should return designation_number for to_s' do
     DesignationAccount.new(designation_number: 'foo').to_s.should == 'foo'
   end
 

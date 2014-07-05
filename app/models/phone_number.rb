@@ -4,8 +4,8 @@ class PhoneNumber < ActiveRecord::Base
   include HasPrimary
   @@primary_scope = :person
 
-  has_paper_trail :on => [:destroy],
-                  :meta => { related_object_type: 'Person',
+  has_paper_trail on: [:destroy],
+                  meta: { related_object_type: 'Person',
                              related_object_id: :person_id }
 
   LOCATIONS = [_('Mobile'), _('Home'), _('Work')]
@@ -52,8 +52,7 @@ class PhoneNumber < ActiveRecord::Base
     self.country_code = other.country_code if country_code.blank?
     self.location = other.location if location.blank?
     self.remote_id = other.remote_id if remote_id.blank?
-    self.save(validate: false)
+    save(validate: false)
     other.destroy
   end
-
 end

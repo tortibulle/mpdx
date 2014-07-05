@@ -1,10 +1,9 @@
 class NotificationType::SpecialGift < NotificationType
-
   def check(account_list)
     notifications = []
     account_list.contacts.where(account_list_id: account_list.id).non_financial_partners.each do |contact|
       if donation = contact.donations.
-          where("donation_date > ?", 2.weeks.ago).
+          where('donation_date > ?', 2.weeks.ago).
           where(designation_account_id: account_list.designation_accounts.pluck(:id)).
           order('donations.donation_date desc').
           last
@@ -27,11 +26,10 @@ class NotificationType::SpecialGift < NotificationType
   end
 
   def task_description(notification)
-    _("%{contact_name} gave a Special Gift of %{amount} on %{date}. Send them a Thank You.").localize %
+    _('%{contact_name} gave a Special Gift of %{amount} on %{date}. Send them a Thank You.').localize %
       { contact_name: notification.contact.name,
         amount: notification.donation.amount.to_f.localize.to_currency.to_s(currency: notification.donation.currency),
         date: notification.donation.donation_date.to_datetime.localize.to_s }
   end
-
 end
 

@@ -21,8 +21,8 @@ class ContactSerializer < ActiveModel::Serializer
     hash = super
 
     if scope.is_a?(Hash) && scope[:since]
-      hash[:deleted_people] = Version.where(item_type: 'Person', event: 'destroy', related_object_type: 'Contact', related_object_id: id).where("created_at > ?", Time.at(scope[:since].to_i)).pluck(:item_id)
-      hash[:deleted_addresses] = Version.where(item_type: 'Address', event: 'destroy', related_object_type: 'Contact', related_object_id: id).where("created_at > ?", Time.at(scope[:since].to_i)).pluck(:item_id)
+      hash[:deleted_people] = Version.where(item_type: 'Person', event: 'destroy', related_object_type: 'Contact', related_object_id: id).where('created_at > ?', Time.at(scope[:since].to_i)).pluck(:item_id)
+      hash[:deleted_addresses] = Version.where(item_type: 'Address', event: 'destroy', related_object_type: 'Contact', related_object_id: id).where('created_at > ?', Time.at(scope[:since].to_i)).pluck(:item_id)
     end
 
     hash
@@ -49,7 +49,7 @@ class ContactSerializer < ActiveModel::Serializer
 
   INCLUDES.each do |relationship|
     define_method(relationship) do
-      #add_since(object.send(relationship))
+      # add_since(object.send(relationship))
       object.send(relationship)
     end
   end

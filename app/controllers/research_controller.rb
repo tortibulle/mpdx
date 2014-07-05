@@ -1,7 +1,5 @@
 class ResearchController < ApplicationController
-
   def index
-
   end
 
   def search

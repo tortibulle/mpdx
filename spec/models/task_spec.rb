@@ -23,7 +23,7 @@ describe Task do
   end
 
   context 'google calendar integration' do
-    let(:google_integration) { double('GoogleIntegration', async: true)}
+    let(:google_integration) { double('GoogleIntegration', async: true) }
 
     before do
       AccountList.any_instance.stub(:google_integrations) { [google_integration] }

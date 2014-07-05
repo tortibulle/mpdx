@@ -18,6 +18,6 @@ class Company < ActiveRecord::Base
   end
 
   def clean_up_master_company
-    self.master_company.destroy if self.master_company.companies.blank?
+    master_company.destroy if master_company.companies.blank?
   end
 end

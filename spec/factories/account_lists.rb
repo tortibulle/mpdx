@@ -2,8 +2,8 @@
 
 FactoryGirl.define do
   factory :account_list do
-    name "MyString"
-    #association :creator, factory: :user
-    #association :designation_profile
+    name 'MyString'
+    # association :creator, factory: :user
+    # association :designation_profile
   end
 end

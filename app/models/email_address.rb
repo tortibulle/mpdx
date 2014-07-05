@@ -2,10 +2,9 @@ class EmailAddress < ActiveRecord::Base
   include HasPrimary
   @@primary_scope = :person
 
-  has_paper_trail :on => [:destroy],
-                  :meta => { related_object_type: 'Person',
+  has_paper_trail on: [:destroy],
+                  meta: { related_object_type: 'Person',
                              related_object_id: :person_id }
-
 
   belongs_to :person, touch: true
   validates :email, presence: true, email: true
@@ -29,7 +28,7 @@ class EmailAddress < ActiveRecord::Base
       if attributes['id']
         existing_email = person.email_addresses.find(attributes['id'])
         # make sure we're not updating this record to another email that already exists
-        if email = person.email_addresses.detect {|e| e.email == attributes['email'].to_s.strip && e.id != attributes['id'].to_i}
+        if email = person.email_addresses.detect { |e| e.email == attributes['email'].to_s.strip && e.id != attributes['id'].to_i }
           email.attributes = attributes
           existing_email.destroy
           email
@@ -38,7 +37,7 @@ class EmailAddress < ActiveRecord::Base
           existing_email
         end
       else
-        if email = person.email_addresses.detect {|e| e.email == attributes['email'].to_s.strip}
+        if email = person.email_addresses.detect { |e| e.email == attributes['email'].to_s.strip }
           email.attributes = attributes
         else
           attributes['primary'] = (person.email_addresses.present? ? false : true) if attributes['primary'].nil?
@@ -98,7 +97,6 @@ class EmailAddress < ActiveRecord::Base
         end
       end
     end
-
   end
 
   def subscribe_to_mail_chimp
@@ -111,7 +109,6 @@ class EmailAddress < ActiveRecord::Base
         mail_chimp_account.queue_subscribe_person(person)
       end
     end
-
   end
 
   def delete_from_mailchimp
@@ -119,5 +116,4 @@ class EmailAddress < ActiveRecord::Base
       mail_chimp_account.queue_unsubscribe_email(email)
     end
   end
-
 end

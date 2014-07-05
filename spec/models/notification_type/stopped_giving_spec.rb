@@ -17,7 +17,7 @@ describe NotificationType::StoppedGiving do
         notifications.length.should == 1
       end
 
-      it "skips people with future pledge_start_date" do
+      it 'skips people with future pledge_start_date' do
         create(:donation, donor_account: contact.donor_accounts.first, designation_account: da, donation_date: 60.days.ago)
         contact.update_attributes(pledge_start_date: 1.day.from_now)
         notifications = stopped_giving.check(contact.account_list)
@@ -74,7 +74,7 @@ describe NotificationType::StoppedGiving do
       }.to change(Activity, :count).by(1)
     end
 
-    it "associates the contact with the task created" do
+    it 'associates the contact with the task created' do
       task = stopped_giving.create_task(account_list, contact.notifications.new)
       task.contacts.reload.should include contact
     end

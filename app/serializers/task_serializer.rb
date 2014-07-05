@@ -16,7 +16,7 @@ class TaskSerializer < ActiveModel::Serializer
     hash = super
 
     if scope.is_a?(Hash) && scope[:since]
-      hash[:deleted_comments] = Version.where(item_type: 'ActivityComment', event: 'destroy', related_object_type: 'Activity', related_object_id: id).where("created_at > ?", Time.at(scope[:since].to_i)).pluck(:item_id)
+      hash[:deleted_comments] = Version.where(item_type: 'ActivityComment', event: 'destroy', related_object_type: 'Activity', related_object_id: id).where('created_at > ?', Time.at(scope[:since].to_i)).pluck(:item_id)
     end
     hash
   end
@@ -26,5 +26,4 @@ class TaskSerializer < ActiveModel::Serializer
       add_since(object.send(relationship))
     end
   end
-
 end

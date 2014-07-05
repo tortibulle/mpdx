@@ -18,7 +18,6 @@ class Person::OrganizationAccountsController < ApplicationController
         format.js { render :create }
       end
     end
-
   end
 
   def create
@@ -55,5 +54,4 @@ class Person::OrganizationAccountsController < ApplicationController
   def person_organization_account_params
     params.require(:person_organization_account).permit(:username, :password, :organization_id)
   end
-
 end

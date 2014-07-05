@@ -2,7 +2,7 @@
 
 FactoryGirl.define do
   factory :notification_type do
-    type ""
-    description "MyText"
+    type ''
+    description 'MyText'
   end
 end

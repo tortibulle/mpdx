@@ -4,7 +4,6 @@ class Person::TwitterAccount < ActiveRecord::Base
 
   # attr_accessible :screen_name
 
-
   def self.find_or_create_from_auth(auth_hash, person)
     @rel = person.twitter_accounts
     params = auth_hash.extra.access_token.params
@@ -12,7 +11,7 @@ class Person::TwitterAccount < ActiveRecord::Base
     @remote_id = params[:screen_name]
     @attributes = {
                     remote_id: params[:screen_name],
-                    screen_name: params[:screen_name], 
+                    screen_name: params[:screen_name],
                     token: params[:oauth_token],
                     secret: params[:oauth_token_secret],
                     valid_token: true,
@@ -37,7 +36,7 @@ class Person::TwitterAccount < ActiveRecord::Base
   end
 
   def queue_import_data
-    
+
   end
 
   def url
@@ -46,8 +45,7 @@ class Person::TwitterAccount < ActiveRecord::Base
 
   private
     def ensure_only_one_primary
-      primaries = self.person.twitter_accounts.where(primary: true)
-      primaries[0..-2].map {|p| p.update_column(:primary, false)} if primaries.length > 1
+      primaries = person.twitter_accounts.where(primary: true)
+      primaries[0..-2].map { |p| p.update_column(:primary, false) } if primaries.length > 1
     end
-
 end

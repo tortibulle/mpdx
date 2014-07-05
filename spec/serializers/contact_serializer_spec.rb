@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe ContactSerializer do
-  describe "contacts list" do
+  describe 'contacts list' do
     let(:contact) {
       c = create(:contact)
       c.addresses << build(:address)
@@ -17,7 +17,7 @@ describe ContactSerializer do
     let(:json){ ContactSerializer.new(contact).as_json }
     subject{ json[:contact] }
 
-    describe "contact" do
+    describe 'contact' do
       it { should include :id }
       it { should include :name }
       it { should include :pledge_amount }
@@ -27,11 +27,11 @@ describe ContactSerializer do
       it { should include :person_ids }
     end
 
-    it "people list" do
+    it 'people list' do
       json.should include :people
     end
 
-    it "addresses list" do
+    it 'addresses list' do
       json.should include :addresses
     end
 

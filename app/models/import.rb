@@ -11,8 +11,8 @@ class Import < ActiveRecord::Base
   belongs_to :account_list
   # attr_accessible :file, :importing, :source, :file_cache, :override, :tags
   validates :source, inclusion: { in: %w[facebook twitter linkedin tnt] }
-  #validates_with TntImportValidator, if: lambda {|import| 'tnt' == import.source }
-  validates_with FacebookImportValidator, if: lambda {|import| 'facebook' == import.source }
+  # validates_with TntImportValidator, if: lambda {|import| 'tnt' == import.source }
+  validates_with FacebookImportValidator, if: lambda { |import| 'facebook' == import.source }
 
   after_commit :queue_import
 
@@ -38,5 +38,4 @@ class Import < ActiveRecord::Base
   ensure
     update_column(:importing, false)
   end
-
 end

@@ -6,7 +6,7 @@ describe AccountList do
     let(:org_account) { create(:organization_account) }
     let(:profile) { create(:designation_profile, user_id: org_account.person_id, organization: org_account.organization) }
 
-    it "should create a new account list if none is found" do
+    it 'should create a new account list if none is found' do
       da = create(:designation_account, organization: org_account.organization)
       profile.designation_accounts << da
       expect {
@@ -14,7 +14,7 @@ describe AccountList do
       }.to change(AccountList, :count).by(1)
     end
 
-    it "should not create a new account list if one is found" do
+    it 'should not create a new account list if one is found' do
       da = create(:designation_account, organization: org_account.organization)
       profile.designation_accounts << da
       account_list = create(:account_list)
@@ -36,7 +36,7 @@ describe AccountList do
     let(:account_list) { build(:account_list) }
 
     it 'returns true if there is a mailchimp associated with this account list that has a valid primary list' do
-      mail_chimp_account = double(active?: true, primary_list: {id: 'foo', name: 'bar'})
+      mail_chimp_account = double(active?: true, primary_list: { id: 'foo', name: 'bar' })
       account_list.should_receive(:mail_chimp_account).twice.and_return(mail_chimp_account)
       account_list.valid_mail_chimp_account.should == true
     end
@@ -63,7 +63,7 @@ describe AccountList do
   context '#top_partners' do
     let(:account_list) { create(:account_list) }
 
-    it "returns the top 10 donors on your list" do
+    it 'returns the top 10 donors on your list' do
       11.times do |i|
         account_list.contacts << create(:contact, total_donations: i)
       end
@@ -82,11 +82,11 @@ describe AccountList do
       account_list.contacts << contact
     end
 
-    it "handles a date range where the start and end day are in the same month" do
+    it 'handles a date range where the start and end day are in the same month' do
       account_list.people_with_birthdays(Date.new(2012, 8, 29), Date.new(2012, 8, 31)).should == [person]
     end
 
-    it "handles a date range where the start and end day are in different months" do
+    it 'handles a date range where the start and end day are in different months' do
       account_list.people_with_birthdays(Date.new(2012, 8, 29), Date.new(2012, 9, 1)).should == [person]
     end
 
@@ -101,11 +101,11 @@ describe AccountList do
       account_list.contacts << contact
     end
 
-    it "handles a date range where the start and end day are in the same month" do
+    it 'handles a date range where the start and end day are in the same month' do
       account_list.people_with_anniversaries(Date.new(2012, 8, 29), Date.new(2012, 8, 31)).should == [person]
     end
 
-    it "handles a date range where the start and end day are in different months" do
+    it 'handles a date range where the start and end day are in different months' do
       account_list.people_with_anniversaries(Date.new(2012, 8, 29), Date.new(2012, 9, 1)).should == [person]
     end
 

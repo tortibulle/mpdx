@@ -14,8 +14,8 @@ describe TntImport do
 
   before do
     stub_request(:get, /api\.smartystreets\.com\/.*/).
-        with(:headers => {'Accept' => 'application/json', 'Accept-Encoding' => 'gzip, deflate', 'Content-Type' => 'application/json', 'User-Agent' => 'Ruby'}).
-        to_return(:status => 200, :body => "{}", :headers => {})
+        with(headers: { 'Accept' => 'application/json', 'Accept-Encoding' => 'gzip, deflate', 'Content-Type' => 'application/json', 'User-Agent' => 'Ruby' }).
+        to_return(status: 200, body: '{}', headers: {})
   end
 
   context '#import_contacts' do
@@ -84,12 +84,12 @@ describe TntImport do
     it 'updates newsletter preferences correctly' do
       contact = Contact.new
       import.send(:update_contact, contact, contact_rows.first)
-      expect(contact.send_newsletter).to eq("Physical")
+      expect(contact.send_newsletter).to eq('Physical')
     end
   end
 
   context '#update_person_attributes' do
-    it "imports a phone number for a person" do
+    it 'imports a phone number for a person' do
       person = Person.new
       expect {
         person = import.send(:update_person_attributes, person, contact_rows.first)
@@ -117,7 +117,6 @@ describe TntImport do
         import.send(:add_or_update_donor_accounts, contact_rows.first, designation_profile)
       }.not_to change(Contact, :count)
     end
-
 
     it 'creates a new donor account' do
       expect {
@@ -147,7 +146,6 @@ describe TntImport do
       }.not_to change(Person, :count)
     end
 
-
   end
 
   context '#import_tasks' do
@@ -168,11 +166,11 @@ describe TntImport do
 
     it 'accociates a contact with the task' do
       expect {
-        import.send(:import_tasks, {task_contact_rows.first['ContactID'] => contact})
+        import.send(:import_tasks,  task_contact_rows.first['ContactID'] => contact)
       }.to change(ActivityContact, :count).by(1)
     end
 
-    it "adds notes as a task comment" do
+    it 'adds notes as a task comment' do
       task = create(:task, source: 'tnt', remote_id: task_rows.first['id'], account_list: tnt_import.account_list)
 
       import.send(:import_tasks)
@@ -199,14 +197,14 @@ describe TntImport do
 
     it 'accociates a contact with the task' do
       expect {
-        import.send(:import_history, {history_contact_rows.first['ContactID'] => contact})
+        import.send(:import_history,  history_contact_rows.first['ContactID'] => contact)
       }.to change(ActivityContact, :count).by(1)
     end
 
   end
 
   context '#import_settings' do
-    it "updates monthly goal" do
+    it 'updates monthly goal' do
       import.should_receive(:create_or_update_mailchimp).and_return
 
       expect {

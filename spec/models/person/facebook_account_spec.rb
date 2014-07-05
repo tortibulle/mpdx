@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Person::FacebookAccount do
   describe 'when authenticating' do
     before do
-      @auth_hash = Hashie::Mash.new(uid: '5', credentials: {token: 'a', expires_at: 5}, info: {first_name: 'John', last_name: 'Doe'})
+      @auth_hash = Hashie::Mash.new(uid: '5', credentials: { token: 'a', expires_at: 5 }, info: { first_name: 'John', last_name: 'Doe' })
     end
     describe 'create from auth' do
       it 'should create an account linked to a person' do
@@ -16,7 +16,7 @@ describe Person::FacebookAccount do
     end
 
     describe 'create user from auth' do
-      it "should create a user with a first and last name" do
+      it 'should create a user with a first and last name' do
         -> {
           user = Person::FacebookAccount.create_user_from_auth(@auth_hash)
           user.first_name.should == @auth_hash.info.first_name
@@ -40,7 +40,7 @@ describe Person::FacebookAccount do
 
   it 'should generate a facebook url if there is a remote_id' do
     account = Person::FacebookAccount.new(remote_id: 1)
-    account.url.should == "http://facebook.com/profile.php?id=1"
+    account.url.should == 'http://facebook.com/profile.php?id=1'
   end
 
   describe 'setting facebook id from a url' do
@@ -73,14 +73,14 @@ describe Person::FacebookAccount do
 
     it 'when url contains permalink' do
       stub_request(:get, /https:\/\/graph.facebook.com\/.*/).
-         with(:headers => {'Accept'=>'application/json'}).to_return(:status => 200, :body => '{"id": 1}')
+         with(headers: { 'Accept' => 'application/json' }).to_return(status: 200, body: '{"id": 1}')
       @account.get_id_from_url('https://www.facebook.com/john.doe').should == 1
     end
 
     it 'should raise an exception if the url is bad' do
       stub_request(:get, /https:\/\/graph.facebook.com\/.*/).
-         with(:headers => {'Accept'=>'application/json'}).to_return(:status => 400)
-      lambda {@account.get_id_from_url('https://www.facebook.com/john.doe')}.should raise_error(Errors::FacebookLink)
+         with(headers: { 'Accept' => 'application/json' }).to_return(status: 400)
+      lambda { @account.get_id_from_url('https://www.facebook.com/john.doe') }.should raise_error(Errors::FacebookLink)
     end
 
   end

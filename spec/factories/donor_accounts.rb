@@ -3,7 +3,7 @@
 FactoryGirl.define do
   factory :donor_account do
     association :organization
-    account_number "MyString"
-    name "MyString"
+    account_number 'MyString'
+    name 'MyString'
   end
 end

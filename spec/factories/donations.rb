@@ -5,13 +5,13 @@ FactoryGirl.define do
     sequence(:remote_id) { |n| n.to_s }
     association :donor_account
     association :designation_account
-    motivation "MyString"
-    payment_method "MyString"
-    tendered_currency "MyString"
-    tendered_amount "9.99"
-    currency "MyString"
-    amount "9.99"
-    memo "MyText"
+    motivation 'MyString'
+    payment_method 'MyString'
+    tendered_currency 'MyString'
+    tendered_amount '9.99'
+    currency 'MyString'
+    amount '9.99'
+    memo 'MyText'
     donation_date { Date.today }
   end
 end

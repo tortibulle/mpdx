@@ -1,5 +1,5 @@
 class ActivityCommentsController < ApplicationController
-  before_filter :get_activity
+  before_action :get_activity
   respond_to :js
 
   def create
@@ -24,5 +24,4 @@ class ActivityCommentsController < ApplicationController
   def activity_comment_params
     params.require(:activity_comment).permit(:body)
   end
-
 end

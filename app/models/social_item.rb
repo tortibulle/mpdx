@@ -58,8 +58,6 @@ class SocialItem
         #@story_tags << StoryTag.new(tag['id'], tag['name'], tag['offset'], tag['length'], tag['type'])
       #end
     #end
-
-
   end
 
   def body

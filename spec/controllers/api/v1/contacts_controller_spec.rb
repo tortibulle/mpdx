@@ -6,7 +6,7 @@ describe Api::V1::ContactsController do
     let!(:contact) { create(:contact, account_list: user.account_lists.first, pledge_amount: 100) }
 
     context '#count' do
-      it "succeeds" do
+      it 'succeeds' do
         get :count, access_token: user.access_token
         response.should be_success
       end
@@ -24,6 +24,6 @@ describe Api::V1::ContactsController do
         json['contacts'][0].should_not include 'pledge_amount'
       end
     end
-    
+
   end
 end

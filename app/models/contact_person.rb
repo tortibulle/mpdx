@@ -25,5 +25,4 @@ class ContactPerson < ActiveRecord::Base
       self.primary = true
     end
   end
-
 end

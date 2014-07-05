@@ -17,7 +17,7 @@ describe ContactsController do
         contact2.donor_accounts << donor_account
       end
 
-      it "gets all" do
+      it 'gets all' do
         get :index
         response.should be_success
         assigns(:contacts).length.should.should == 2
@@ -30,22 +30,21 @@ describe ContactsController do
         assigns(:contacts).length.should == 1
       end
 
-
-      it "gets people" do
+      it 'gets people' do
         get :index, filters: { contact_type: 'person' }
         response.should be_success
         assigns(:contacts).should == [contact]
       end
 
-      it "gets companies" do
+      it 'gets companies' do
         get :index, filters: { contact_type: 'company' }
         response.should be_success
         assigns(:contacts).should == [contact2]
       end
 
-      it "filters by tag" do
+      it 'filters by tag' do
         contact.update_attributes(tag_list: 'asdf')
-        get :index, filters: {tags: 'asdf'}
+        get :index, filters: { tags: 'asdf' }
         response.should be_success
         assigns(:contacts).should == [contact]
       end
@@ -56,7 +55,7 @@ describe ContactsController do
           contact.addresses << create(:address, addressable: contact)
         end
 
-        get :index, filters: {newsletter: 'address'}
+        get :index, filters: { newsletter: 'address' }
         assigns(:contacts).length.should == 1
       end
 
@@ -68,13 +67,13 @@ describe ContactsController do
           create(:email_address, person: p)
         end
 
-        get :index, filters: {newsletter: 'email'}
+        get :index, filters: { newsletter: 'email' }
         assigns(:contacts).length.should == 1
       end
     end
 
     describe '#show' do
-      it "should find a contact in the current account list" do
+      it 'should find a contact in the current account list' do
         get :show, id: contact.id
         response.should be_success
         contact.should == assigns(:contact)
@@ -82,7 +81,7 @@ describe ContactsController do
     end
 
     describe '#edit' do
-      it "should edit a contact in the current account list" do
+      it 'should edit a contact in the current account list' do
         get :edit, id: contact.id
         response.should be_success
         contact.should == assigns(:contact)
@@ -90,17 +89,17 @@ describe ContactsController do
     end
 
     describe '#new' do
-      it "should render the new template" do
+      it 'should render the new template' do
         get :new
         response.should be_success
         response.should render_template('new')
       end
     end
 
-    describe "#create" do
-      it "should create a good record" do
+    describe '#create' do
+      it 'should create a good record' do
         -> {
-          post :create, contact: {name: 'foo'}
+          post :create, contact: { name: 'foo' }
           contact = assigns(:contact)
           contact.errors.full_messages.should == []
           response.should redirect_to(contact)
@@ -108,30 +107,30 @@ describe ContactsController do
       end
 
       it "doesn't create a contact without a name" do
-        post :create, contact: {name: ''}
+        post :create, contact: { name: '' }
         assigns(:contact).errors.full_messages.should == ["Name can't be blank"]
         response.should be_success
       end
 
     end
 
-    describe "#update" do
-      it "updates a contact when passed valid attributes" do
-        put :update, id: contact.id, contact: {name: 'Bob'}
+    describe '#update' do
+      it 'updates a contact when passed valid attributes' do
+        put :update, id: contact.id, contact: { name: 'Bob' }
         contact = assigns(:contact)
         contact.name.should == 'Bob'
         response.should redirect_to(contact)
       end
 
       it "doesn't update a contact when passed invalid attributes" do
-        put :update, id: contact.id, contact: {name: ''}
+        put :update, id: contact.id, contact: { name: '' }
         assigns(:contact).errors.full_messages.should == ["Name can't be blank"]
         response.should be_success
       end
     end
 
-    describe "#destroy" do
-      it "should hide a contact" do
+    describe '#destroy' do
+      it 'should hide a contact' do
         contact # instantiate object
         delete :destroy, id: contact.id
 
@@ -141,22 +140,21 @@ describe ContactsController do
 
     describe '#bulk_update' do
       it "doesn't error out when all the attributes to update are blank" do
-        xhr :put, :bulk_update, bulk_edit_contact_ids: '1', contact: {send_newsletter: ''}
+        xhr :put, :bulk_update, bulk_edit_contact_ids: '1', contact: { send_newsletter: '' }
         response.should be_success
       end
 
       it "correctly updates the 'next ask' field" do
-        xhr :put, :bulk_update, {"bulk_edit_contact_ids"=>contact.id, "contact"=>{"next_ask(2i)"=>"3", "next_ask(3i)"=>"3", "next_ask(1i)"=>"2012"}}
+        xhr :put, :bulk_update,  'bulk_edit_contact_ids' => contact.id, 'contact' => { 'next_ask(2i)' => '3', 'next_ask(3i)' => '3', 'next_ask(1i)' => '2012' }
         contact.reload.next_ask.should == Date.parse('2012-03-03')
       end
-      
+
       it "ignores a partial 'next ask' value" do
-        xhr :put, :bulk_update, {"bulk_edit_contact_ids"=>contact.id, "contact"=>{"next_ask(3i)"=>"3", "next_ask(1i)"=>"2012"}}
+        xhr :put, :bulk_update,  'bulk_edit_contact_ids' => contact.id, 'contact' => { 'next_ask(3i)' => '3', 'next_ask(1i)' => '2012' }
         contact.reload.next_ask.should == nil
       end
 
     end
-
 
   end
 end

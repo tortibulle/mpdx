@@ -28,5 +28,4 @@ class Organization < ActiveRecord::Base
   def self.cru_usa
     Organization.find_by_code('CCC-USA')
   end
-
 end

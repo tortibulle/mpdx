@@ -24,5 +24,4 @@ module AddressMethods
   def destroy_addresses
     addresses.map(&:destroy!)
   end
-
 end

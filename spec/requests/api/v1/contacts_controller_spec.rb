@@ -8,11 +8,11 @@ describe Api::V1::ContactsController do
 
     before do
       stub_auth
-      get "/api/v1/contacts?access_token=" + user.access_token
+      get '/api/v1/contacts?access_token=' + user.access_token
     end
 
-    it "responds 200" do
-      response.code.should == "200"
+    it 'responds 200' do
+      response.code.should == '200'
     end
   end
 end

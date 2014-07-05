@@ -1,7 +1,6 @@
 class ActivityComment < ActiveRecord::Base
-
-  has_paper_trail :on => [:destroy],
-                  :meta => { related_object_type: 'Activity',
+  has_paper_trail on: [:destroy],
+                  meta: { related_object_type: 'Activity',
                              related_object_id: :activity_id }
 
   belongs_to :activity, counter_cache: true, touch: true
@@ -18,5 +17,4 @@ class ActivityComment < ActiveRecord::Base
       self.person = Thread.current[:user]
     end
   end
-
 end

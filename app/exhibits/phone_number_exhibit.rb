@@ -1,5 +1,4 @@
 class PhoneNumberExhibit < DisplayCase::Exhibit
-
   def self.applicable_to?(object)
     object.class.name == 'PhoneNumber'
   end
@@ -17,7 +16,5 @@ class PhoneNumberExhibit < DisplayCase::Exhibit
     else
       global.international_format
     end
-
   end
-
 end

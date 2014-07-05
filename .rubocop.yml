@@ -1,0 +1,27 @@
+# rubocop --format fuubar --format offenses -R
+
+AllCops:
+  Exclude:
+    - 'db/**/*'
+    - 'config/**/*'
+    - 'vendor/**/*'
+
+Style/LineLength:
+  Enabled: false
+
+LeadingCommentSpace:
+  Enabled: false
+
+Blocks:
+  Enabled: false
+
+Documentation:
+  Enabled: false
+
+Style/MethodLength:
+  Enabled: false
+  CountComments: false
+  Max: 20
+
+CommentIndentation:
+  Enabled: false

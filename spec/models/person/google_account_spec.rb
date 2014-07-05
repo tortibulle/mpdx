@@ -4,8 +4,8 @@ describe Person::GoogleAccount do
   describe 'create from auth' do
     it 'should create an account linked to a person' do
       auth_hash = Hashie::Mash.new(uid: '1',
-                                   info: {email: 'foo@example.com'},
-                                   credentials: {token: 'a', refresh_token: 'b', expires: true, expires_at: Time.now.to_i + 100})
+                                   info: { email: 'foo@example.com' },
+                                   credentials: { token: 'a', refresh_token: 'b', expires: true, expires_at: Time.now.to_i + 100 })
       person = FactoryGirl.create(:person)
       -> {
         @account = Person::GoogleAccount.find_or_create_from_auth(auth_hash, person)
@@ -16,12 +16,12 @@ describe Person::GoogleAccount do
   describe 'update from auth' do
     it 'should update an account that already exists' do
       auth_hash = Hashie::Mash.new(uid: '1',
-                                   info: {email: 'foo@example.com'},
-                                   credentials: {token: 'a', refresh_token: 'b', expires: true, expires_at: Time.now.to_i + 100})
+                                   info: { email: 'foo@example.com' },
+                                   credentials: { token: 'a', refresh_token: 'b', expires: true, expires_at: Time.now.to_i + 100 })
       person = FactoryGirl.create(:person)
       Person::GoogleAccount.find_or_create_from_auth(auth_hash, person)
       -> {
-        @account = Person::GoogleAccount.find_or_create_from_auth(auth_hash.merge!(credentials: {refresh_token: 'c'}), person)
+        @account = Person::GoogleAccount.find_or_create_from_auth(auth_hash.merge!(credentials: { refresh_token: 'c' }), person)
       }.should_not change(Person::GoogleAccount, :count)
       @account.refresh_token.should == 'c'
     end

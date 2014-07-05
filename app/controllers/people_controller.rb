@@ -31,7 +31,7 @@ class PeopleController < ApplicationController
         if @person.save
           format.html { redirect_to @contact }
         else
-          format.html { render action: "new" }
+          format.html { render action: 'new' }
         end
       end
     end
@@ -42,7 +42,7 @@ class PeopleController < ApplicationController
       if @person.update_attributes(person_params)
         format.html { redirect_to @person }
       else
-        format.html { render action: "edit" }
+        format.html { render action: 'edit' }
       end
     end
   end

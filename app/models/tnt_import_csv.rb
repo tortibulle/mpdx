@@ -1,5 +1,4 @@
 class TntImportCsv < TntImport
-
   def get_lines(contents)
     CSV.parse(strip_unicode(contents), headers: true)
   rescue CSV::MalformedCSVError
@@ -9,11 +8,11 @@ class TntImportCsv < TntImport
   def read_csv(import_file)
     lines = []
     begin
-      File.open(import_file, "r:utf-8") do |file|
+      File.open(import_file, 'r:utf-8') do |file|
         lines = get_lines(file.read)
       end
     rescue ArgumentError
-      File.open(import_file, "r:windows-1251:utf-8") do |file|
+      File.open(import_file, 'r:windows-1251:utf-8') do |file|
         lines = get_lines(file.read)
       end
     end
@@ -67,7 +66,7 @@ class TntImportCsv < TntImport
       # Loop over the whole list again now that we've added everyone and try to link up referrals
       lines.each do |line|
         if line['Referred By'].present? &&
-           referred_by = @account_list.contacts.where("name = ? OR full_name = ? OR greeting = ?",
+           referred_by = @account_list.contacts.where('name = ? OR full_name = ? OR greeting = ?',
                                                       line['Referred By'], line['Referred By'], line['Referred By']).first
           contact = tnt_contacts[line['ContactID']]
           contact.referrals_to_me << referred_by unless contact.referrals_to_me.include?(referred_by)
@@ -139,19 +138,18 @@ class TntImportCsv < TntImport
     master_company = MasterCompany.find_by_name(line['Organization Name'])
     company = @user.partner_companies.where(master_company_id: master_company.id).first if master_company
 
-    company ||= @account_list.companies.new({master_company: master_company})
-    company.assign_attributes( {name: line['Organization Name'],
+    company ||= @account_list.companies.new(master_company: master_company)
+    company.assign_attributes(name: line['Organization Name'],
                                 phone_number: line['Phone'],
                                 street: line['Mailing Street Address'],
                                 city: line['Mailing City'],
                                 state: line['Mailing State'],
                                 postal_code: line['Mailing Postal Code'],
-                                country: line['Mailing Country']} )
+                                country: line['Mailing Country'])
     company.save!
     donor_account.update_attribute(:master_company_id, company.master_company_id) unless donor_account.master_company_id == company.master_company.id
     company
   end
-
 
   def add_or_update_primary_contact(line, donor_account, contact)
     remote_id = "#{donor_account.account_number}-1"
@@ -169,12 +167,12 @@ class TntImportCsv < TntImport
     # See if there's already a person by this name on this contact (This is a contact with multiple donation accounts)
     contact_person = contact.people.where(first_name: line[prefix + 'First/Given Name'], last_name: line[prefix + 'Last/Family Name'], middle_name: line[prefix + 'Middle Name']).first
     if contact_person
-      person = Person.new({master_person: contact_person.master_person})
+      person = Person.new(master_person: contact_person.master_person)
     else
       master_person_from_source = organization.master_people.where('master_person_sources.remote_id' => remote_id).first
       person = donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
 
-      person ||= Person.new({master_person: master_person_from_source})
+      person ||= Person.new(master_person: master_person_from_source)
     end
 
     update_person_attributes(person, line, prefix)
@@ -190,28 +188,28 @@ class TntImportCsv < TntImport
 
     # create the master_person_source if needed
     unless master_person_from_source
-      organization.master_person_sources.where(remote_id: remote_id).first_or_create({master_person_id: person.master_person.id})
+      organization.master_person_sources.where(remote_id: remote_id).first_or_create(master_person_id: person.master_person.id)
     end
 
     [person, contact_person]
   end
 
   def update_person_attributes(person, line, prefix)
-    person.attributes = {first_name: line[prefix + 'First/Given Name'], last_name: line[prefix + 'Last/Family Name'], middle_name: line[prefix + 'Middle Name'],
-                          title: line[prefix + 'Title'], suffix: line[prefix + 'Suffix'], gender: prefix.present? ? 'female' : 'male'}
+    person.attributes = { first_name: line[prefix + 'First/Given Name'], last_name: line[prefix + 'Last/Family Name'], middle_name: line[prefix + 'Middle Name'],
+                          title: line[prefix + 'Title'], suffix: line[prefix + 'Suffix'], gender: prefix.present? ? 'female' : 'male' }
     # Phone numbers
-    {'Home Phone' => 'home', 'Home Phone 2' => 'home', 'Home Fax' => 'fax',
+    { 'Home Phone' => 'home', 'Home Phone 2' => 'home', 'Home Fax' => 'fax',
      'Business Phone' => 'work', 'Business Phone 2' => 'work', 'Business Fax' => 'fax',
      'Company Main Phone' => 'work', 'Assistant Phone' => 'work', 'Other Phone' => 'other',
      'Car Phone' => 'mobile', 'Mobile Phone' => 'mobile', 'Pager Number' => 'other',
      'Callback Phone' => 'other', 'ISDN Phone' => 'other', 'Primary Phone' => 'other',
-     'Radio Phone' => 'other', 'Telex Phone' => 'other'}.each_with_index do |key, i|
-       person.phone_number = {number: line[key[0]], location: key[1], primary: line['Preferred Phone Type'].to_i == i} if line[key[0]].present?
+     'Radio Phone' => 'other', 'Telex Phone' => 'other' }.each_with_index do |key, i|
+       person.phone_number = { number: line[key[0]], location: key[1], primary: line['Preferred Phone Type'].to_i == i } if line[key[0]].present?
      end
 
     # email address
     3.times do |i|
-      person.email_address = {email: line["Email #{i}"], primary: line['Preferred Email Types'] == i} if line["Email #{i}"].present?
+      person.email_address = { email: line["Email #{i}"], primary: line['Preferred Email Types'] == i } if line["Email #{i}"].present?
     end
 
     person
@@ -264,6 +262,4 @@ class TntImportCsv < TntImport
   def self.required_columns
     ['ContactID', 'Is Organization', 'Organization Account IDs']
   end
-
-
 end

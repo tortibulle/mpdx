@@ -4,6 +4,6 @@ FactoryGirl.define do
   factory :master_person_source do
     master_person nil
     organization nil
-    remote_id "MyString"
+    remote_id 'MyString'
   end
 end

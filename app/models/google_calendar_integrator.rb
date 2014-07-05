@@ -32,9 +32,9 @@ class GoogleCalendarIntegrator
 
   def remove_google_event(google_event)
     result = @client.execute(
-      :api_method => @google_integration.calendar_api.events.delete,
-      :parameters => {'calendarId' => @google_integration.calendar_id,
-                      'eventId' => google_event.google_event_id}
+      api_method: @google_integration.calendar_api.events.delete,
+      parameters: { 'calendarId' => @google_integration.calendar_id,
+                      'eventId' => google_event.google_event_id }
     )
     handle_error(result, google_event)
   rescue GoogleCalendarIntegrator::Deleted
@@ -45,10 +45,10 @@ class GoogleCalendarIntegrator
 
   def update_task(task, google_event)
     result = @client.execute(
-      :api_method => @google_integration.calendar_api.events.patch,
-      :parameters => {'calendarId' => @google_integration.calendar_id,
-                      'eventId' => google_event.google_event_id},
-      :body_object => event_attributes(task)
+      api_method: @google_integration.calendar_api.events.patch,
+      parameters: { 'calendarId' => @google_integration.calendar_id,
+                      'eventId' => google_event.google_event_id },
+      body_object: event_attributes(task)
     )
     handle_error(result, task)
   rescue GoogleCalendarIntegrator::NotFound, GoogleCalendarIntegrator::Deleted
@@ -58,9 +58,9 @@ class GoogleCalendarIntegrator
 
   def add_task(task)
     result = @client.execute(
-      :api_method => @google_integration.calendar_api.events.insert,
-      :parameters => {'calendarId' => @google_integration.calendar_id},
-      :body_object => event_attributes(task)
+      api_method: @google_integration.calendar_api.events.insert,
+      parameters: { 'calendarId' => @google_integration.calendar_id },
+      body_object: event_attributes(task)
     )
     handle_error(result, task)
     task.google_events.create!(google_integration_id: @google_integration.id, google_event_id: result.data['id'])
@@ -78,16 +78,16 @@ class GoogleCalendarIntegrator
       summary: task.subject_with_contacts,
       location: task.calculated_location.to_s,
       description: task.activity_comments.collect(&:body).join("\n\n"),
-      source: {title: 'MPDX', url: 'https://mpdx.org/tasks'}
+      source: { title: 'MPDX', url: 'https://mpdx.org/tasks' }
     }
 
     if task.default_length
       end_at = task.end_at || task.start_at + task.default_length
-      attributes.merge!(start: {dateTime: task.start_at.to_datetime.rfc3339, date: nil},
-                        end: {dateTime: end_at.to_datetime.rfc3339, date: nil})
+      attributes.merge!(start: { dateTime: task.start_at.to_datetime.rfc3339, date: nil },
+                        end: { dateTime: end_at.to_datetime.rfc3339, date: nil })
     else
-      attributes.merge!(start: {date: task.start_at.to_date.to_s(:db), dateTime: nil},
-                        end: {date: task.start_at.to_date.to_s(:db), dateTime: nil})
+      attributes.merge!(start: { date: task.start_at.to_date.to_s(:db), dateTime: nil },
+                        end: { date: task.start_at.to_date.to_s(:db), dateTime: nil })
     end
 
     attributes[:attendees] = []

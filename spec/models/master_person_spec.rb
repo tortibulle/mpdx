@@ -7,7 +7,7 @@ describe MasterPerson do
     }.should change(MasterPerson, :count).from(0).to(1)
   end
 
-  it "should find an existing person based on name and email address" do
+  it 'should find an existing person based on name and email address' do
     person = create(:person)
     email = create(:email_address, person: person)
     -> {
@@ -27,7 +27,7 @@ describe MasterPerson do
     #}.should_not change(MasterPerson, :count)
   #end
 
-  it "should find an existing person based on name and phone number" do
+  it 'should find an existing person based on name and phone number' do
     person = create(:person)
     phone_number = create(:phone_number, person: person)
     -> {
@@ -37,7 +37,7 @@ describe MasterPerson do
     }.should_not change(MasterPerson, :count)
   end
 
-  it "should find an existing person based on name and donor account" do
+  it 'should find an existing person based on name and donor account' do
     person = create(:person)
     donor_account = create(:donor_account)
     donor_account.master_people << person.master_person

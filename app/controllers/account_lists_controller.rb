@@ -1,3 +1,2 @@
 class AccountListsController < ApplicationController
-
 end

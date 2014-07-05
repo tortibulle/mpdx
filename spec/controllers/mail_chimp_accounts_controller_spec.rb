@@ -18,7 +18,7 @@ describe MailChimpAccountsController do
       @account_list.stub(:mail_chimp_account).and_return(chimp)
     end
 
-    it "should validate the current key if there is a mail chimp account" do
+    it 'should validate the current key if there is a mail chimp account' do
       chimp.should_receive(:validate_key).and_return(false)
       chimp.stub(:primary_list)
 
@@ -51,8 +51,8 @@ describe MailChimpAccountsController do
   context '#create' do
     it 'creates a new mailchimp account' do
       stub_request(:post, 'https://us4.api.mailchimp.com/1.3/?method=lists').
-          with(:body => '%7B%22apikey%22%3A%22foo-us4%22%7D').
-          to_return(:status => 200, :body => '{"total": 0,"data": []}', :headers => {})
+          with(body: '%7B%22apikey%22%3A%22foo-us4%22%7D').
+          to_return(status: 200, body: '{"total": 0,"data": []}', headers: {})
 
       expect {
         post :create, mail_chimp_account: valid_attributes

@@ -1,5 +1,4 @@
 class FacebookImport
-
   def initialize(import)
     @user = import.user
     @import = import
@@ -20,8 +19,8 @@ class FacebookImport
       FbGraph::User.new(facebook_account.remote_id, access_token: facebook_account.token).friends.each do |f|
         # Add to friend set
         begin
-          friend = Retryable.retryable :on => FbGraph::Unauthorized, :times => 5, :sleep => 60 do
-                     Retryable.retryable :on => [FbGraph::InvalidRequest, OpenSSL::SSL::SSLError, HTTPClient::ConnectTimeoutError, HTTPClient::ReceiveTimeoutError], :times => 5, :sleep => 5 do
+          friend = Retryable.retryable on: FbGraph::Unauthorized, times: 5, sleep: 60 do
+                     Retryable.retryable on: [FbGraph::InvalidRequest, OpenSSL::SSL::SSLError, HTTPClient::ConnectTimeoutError, HTTPClient::ReceiveTimeoutError], times: 5, sleep: 5 do
                        sleep 3 unless Rails.env.test? # facebook apparently limits api calls to 600 calls every 600s
                        f.fetch
                      end
@@ -86,7 +85,6 @@ class FacebookImport
     end
   end
 
-
   def create_or_update_person(friend, account_list)
     birthday = friend.raw_attributes['birthday'].to_s.split('/')
 
@@ -100,7 +98,6 @@ class FacebookImport
       birthday_year: birthday[2],
       marital_status: friend.relationship_status
     }.select { |_, v| v.present? }
-
 
     # First from my contacts
     fb_person = account_list.people.includes(:facebook_account).where('person_facebook_accounts.remote_id' => friend.identifier).first
@@ -144,10 +141,9 @@ class FacebookImport
 
     # add phone number and email if available
     fb_person.email = friend.email if friend.email.present?
-    fb_person.phone_number = {number: friend.mobile_phone, location: 'mobile'} if friend.mobile_phone.present?
+    fb_person.phone_number = { number: friend.mobile_phone, location: 'mobile' } if friend.mobile_phone.present?
     fb_person.save
 
     fb_person
   end
-
 end

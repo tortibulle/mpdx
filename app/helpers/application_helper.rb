@@ -8,20 +8,20 @@ module ApplicationHelper
     else
       prompt = _('Add another Account') unless "Person::#{provider.camelcase}Account".constantize.one_per_user?
     end
-    link_to(prompt, "/auth/#{provider}", :class => "btn") if prompt
+    link_to(prompt, "/auth/#{provider}", class: 'btn') if prompt
   end
 
   def link_to_remove_fields(f, hidden = false)
-    f.hidden_field(:_destroy) + link_to(_('Remove'), 'javascript:void(0)', class: 'ico ico_trash', style: hidden ? 'display:none' : '', data: {behavior: 'remove_field'})
+    f.hidden_field(:_destroy) + link_to(_('Remove'), 'javascript:void(0)', class: 'ico ico_trash', style: hidden ? 'display:none' : '', data: { behavior: 'remove_field' })
   end
 
   def link_to_add_fields(name, f, association, options = {})
     partial = options[:partial] || "#{association.to_s.singularize}_fields"
     new_object = f.object.class.reflect_on_association(association).klass.new
-    fields = f.fields_for(association, new_object, :child_index => "new_#{association}") do |builder|
-      render(partial, :builder => builder, object: f.object)
+    fields = f.fields_for(association, new_object, child_index: "new_#{association}") do |builder|
+      render(partial, builder: builder, object: f.object)
     end
-    link_to_function(name, raw("addFields(this, \"#{association}\", \"#{escape_javascript(fields)}\")"), class: "add_field")
+    link_to_function(name, raw("addFields(this, \"#{association}\", \"#{escape_javascript(fields)}\")"), class: 'add_field')
   end
 
   def link_to_clear_contact_filters(f)
@@ -88,17 +88,17 @@ module ApplicationHelper
     when 0, 1; ''
     else
        _("Displaying #{b}%{from}#{sp}-#{sp}%{to}#{eb} of #{b}%{count}#{eb}").localize % {
-        :count => collection.total_entries,
-        :from => collection.offset + 1, :to => collection.offset + collection.length
+        count: collection.total_entries,
+        from: collection.offset + 1, to: collection.offset + collection.length
       }
     end.html_safe
   end
 
   def calendar_date_select_tag(name, value = nil, options = {})
-    options.merge!({'data-calendar' => true})
-    options.merge!({'id' => ''})
-    options.merge!({'style' => 'width:100px;'})
-    options.merge!({'readonly' => ''})
+    options.merge!('data-calendar' => true)
+    options.merge!('id' => '')
+    options.merge!('style' => 'width:100px;')
+    options.merge!('readonly' => '')
     value = case
               when value.is_a?(Time) || value.is_a?(DateTime)
                 l(value.to_date)
@@ -109,5 +109,4 @@ module ApplicationHelper
             end
     text_field_tag(name, value, options)
   end
-
 end

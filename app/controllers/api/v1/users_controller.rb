@@ -1,5 +1,4 @@
 class Api::V1::UsersController < Api::V1::BaseController
-
   def show
     render json: user, callback: params[:callback]
   end
@@ -8,7 +7,7 @@ class Api::V1::UsersController < Api::V1::BaseController
     current_user.update_attributes(user_params)
     render json: user, callback: params[:callback]
   end
-  
+
   private
 
   def user
@@ -23,5 +22,4 @@ class Api::V1::UsersController < Api::V1::BaseController
   def user_params
     params.require(:user).permit!
   end
-
 end

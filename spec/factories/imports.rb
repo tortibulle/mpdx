@@ -13,7 +13,7 @@ FactoryGirl.define do
 
   factory :tnt_import, parent: :import do
     file { File.new(Rails.root.join('spec/fixtures/tnt_export.xml')) }
-    source "tnt"
+    source 'tnt'
   end
 
   factory :tnt_import_non_donor, parent: :tnt_import do

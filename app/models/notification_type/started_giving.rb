@@ -1,5 +1,4 @@
 class NotificationType::StartedGiving < NotificationType
-
   def check(account_list)
     notifications = []
     account_list.contacts.where(account_list_id: account_list.id).financial_partners.each do |contact|
@@ -7,8 +6,8 @@ class NotificationType::StartedGiving < NotificationType
       unless prior_notification
         # If they just gave their first gift, note it as such
         if !contact.pledge_received? &&
-           (donation = contact.donations.for_accounts(account_list.designation_accounts).where("donation_date > ?", 2.weeks.ago).last) &&
-           contact.donations.for_accounts(account_list.designation_accounts).where("donation_date < ?", 2.weeks.ago).count == 0
+           (donation = contact.donations.for_accounts(account_list.designation_accounts).where('donation_date > ?', 2.weeks.ago).last) &&
+           contact.donations.for_accounts(account_list.designation_accounts).where('donation_date < ?', 2.weeks.ago).count == 0
 
           # update pledge amount/received
           contact.pledge_amount = donation.amount if contact.pledge_amount.blank?
@@ -32,8 +31,7 @@ class NotificationType::StartedGiving < NotificationType
   end
 
   def task_description(notification)
-    _("%{contact_name} just gave their first gift. Send them a Thank You.").localize %
+    _('%{contact_name} just gave their first gift. Send them a Thank You.').localize %
       { contact_name: notification.contact.name }
   end
-
 end

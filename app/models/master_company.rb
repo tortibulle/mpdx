@@ -5,5 +5,4 @@ class MasterCompany < ActiveRecord::Base
   def self.find_or_create_for_company(company)
     where(name: company.name).first_or_create!
   end
-
 end

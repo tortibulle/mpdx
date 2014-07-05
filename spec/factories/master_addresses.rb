@@ -2,10 +2,10 @@
 
 FactoryGirl.define do
   factory :master_address do
-    street "MyText"
-    city "MyString"
-    state "MyString"
-    country "MyString"
-    postal_code "MyString"
+    street 'MyText'
+    city 'MyString'
+    state 'MyString'
+    country 'MyString'
+    postal_code 'MyString'
   end
 end

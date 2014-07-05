@@ -5,7 +5,7 @@ class DesignationProfile < ActiveRecord::Base
   has_many :designation_accounts, through: :designation_profile_accounts
   belongs_to :account_list
 
-  scope :for_org, lambda {|org_id| where(organization_id: org_id)}
+  scope :for_org, lambda { |org_id| where(organization_id: org_id) }
 
   def to_s() name; end
 
@@ -16,7 +16,7 @@ class DesignationProfile < ActiveRecord::Base
   def merge(other)
     DesignationProfile.transaction do
       other.designation_profile_accounts.each do |da|
-        designation_profile_accounts << da unless designation_profile_accounts.detect {|dpa| dpa.designation_account_id == da.designation_account_id }
+        designation_profile_accounts << da unless designation_profile_accounts.detect { |dpa| dpa.designation_account_id == da.designation_account_id }
       end
 
       other.reload
@@ -25,5 +25,4 @@ class DesignationProfile < ActiveRecord::Base
       save(validate: false)
     end
   end
-
 end

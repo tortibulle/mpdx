@@ -16,12 +16,12 @@ describe PreferencesController do
   end
 
   context '#update' do
-    it "updates successfully" do
-      put :update, id: 1, preference_set: {first_name: 'John', email: 'john@example.com'}
+    it 'updates successfully' do
+      put :update, id: 1, preference_set: { first_name: 'John', email: 'john@example.com' }
       response.should redirect_to(preferences_path)
     end
 
-    it "renders errors when update fails" do
+    it 'renders errors when update fails' do
       put :update, id: 1, preference_set: {}
       response.should be_success
       flash.alert.should include("Email can't be blank")

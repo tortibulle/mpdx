@@ -141,8 +141,8 @@ class AccountList < ActiveRecord::Base
     start_month = start_date.month
     end_month = end_date.month
     if start_month == end_month
-      people_with_birthdays = people.where("people.birthday_month = ?", start_month)
-                                    .where("people.birthday_day BETWEEN ? AND ?", start_date.day, end_date.day)
+      people_with_birthdays = people.where('people.birthday_month = ?', start_month)
+                                    .where('people.birthday_day BETWEEN ? AND ?', start_date.day, end_date.day)
     else
       people_with_birthdays = people.where("(people.birthday_month = ? AND people.birthday_day >= ?)
                                            OR (people.birthday_month = ? AND people.birthday_day <= ?)",
@@ -156,8 +156,8 @@ class AccountList < ActiveRecord::Base
     start_month = start_date.month
     end_month = end_date.month
     if start_month == end_month
-      people_with_birthdays = people.where("people.anniversary_month = ?", start_month)
-                                    .where("people.anniversary_day BETWEEN ? AND ?", start_date.day, end_date.day)
+      people_with_birthdays = people.where('people.anniversary_month = ?', start_month)
+                                    .where('people.anniversary_day BETWEEN ? AND ?', start_date.day, end_date.day)
     else
       people_with_birthdays = people.where("(people.anniversary_month = ? AND people.anniversary_day >= ?)
                                            OR (people.anniversary_month = ? AND people.anniversary_day <= ?)",
@@ -169,8 +169,8 @@ class AccountList < ActiveRecord::Base
 
   def top_50_percent
     unless @top_50_percent
-      financial_partners_count = contacts.where("pledge_amount > 0").count
-      @top_50_percent = contacts.where("pledge_amount > 0")
+      financial_partners_count = contacts.where('pledge_amount > 0').count
+      @top_50_percent = contacts.where('pledge_amount > 0')
                                 .order('(pledge_amount::numeric / (pledge_frequency::numeric)) desc')
                                 .limit(financial_partners_count / 2)
     end
@@ -179,21 +179,20 @@ class AccountList < ActiveRecord::Base
 
   def bottom_50_percent
     unless @bottom_50_percent
-      financial_partners_count = contacts.where("pledge_amount > 0").count
-      @bottom_50_percent = contacts.where("pledge_amount > 0")
+      financial_partners_count = contacts.where('pledge_amount > 0').count
+      @bottom_50_percent = contacts.where('pledge_amount > 0')
                                 .order('(pledge_amount::numeric / (pledge_frequency::numeric))')
                                 .limit(financial_partners_count / 2)
     end
     @bottom_50_percent
   end
 
-
   def no_activity_since(date, contacts_scope = nil, activity_type = nil)
     @no_activity_since = []
     contacts_scope ||= contacts
-    contacts_scope.includes({people: [:primary_phone_number, :primary_email_address]}).each do |contact|
-      activities = contact.tasks.where("completed_at > ?", date)
-      activities = activities.where("activity_type = ?", activity_type) if activity_type.present?
+    contacts_scope.includes(people: [:primary_phone_number, :primary_email_address]).each do |contact|
+      activities = contact.tasks.where('completed_at > ?', date)
+      activities = activities.where('activity_type = ?', activity_type) if activity_type.present?
       @no_activity_since << contact if activities.blank?
     end
     @no_activity_since
@@ -209,7 +208,7 @@ class AccountList < ActiveRecord::Base
       other_contacts = ordered_contacts.find_all {|c| c.name == contact.name &&
                                                            c.id != contact.id &&
                                                            (c.donor_accounts.first == contact.donor_accounts.first ||
-                                                            c.addresses.detect {|a| contact.addresses.detect {|ca| ca.equal_to? a}}) }
+                                                            c.addresses.detect { |a| contact.addresses.detect { |ca| ca.equal_to? a } }) }
       if other_contacts.present?
         other_contacts.each do |other_contact|
           contact.merge(other_contact)
@@ -226,12 +225,11 @@ class AccountList < ActiveRecord::Base
   # Download all donations / info for all accounts associated with this list
   def self.update_linked_org_accounts
     AccountList.joins(:organization_accounts)
-               .where("locked_at is null").order('last_download asc')
+               .where('locked_at is null').order('last_download asc')
                .each do |al|
       al.async(:import_data)
     end
   end
-
 
   def self.find_or_create_from_profile(profile, org_account)
     user = org_account.user
@@ -277,7 +275,7 @@ class AccountList < ActiveRecord::Base
 
       unless mail_chimp_account
         if other.mail_chimp_account
-          other.mail_chimp_account.update_attributes({account_list_id: id})
+          other.mail_chimp_account.update_attributes(account_list_id: id)
         end
       end
       other.reload
@@ -380,5 +378,4 @@ class AccountList < ActiveRecord::Base
       NotificationMailer.notify(self, notifications_to_email).deliver
     end
   end
-
 end

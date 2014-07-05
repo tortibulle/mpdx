@@ -6,5 +6,4 @@ class FacebookImportValidator < ActiveModel::Validator
       import.errors[:base] << _('The link to your facebook account needs to be refreshed. <a href="/auth/facebook">Click here to re-connect to facebook</a> then try your import again.')
     end
   end
-
 end

@@ -23,7 +23,7 @@ class Person::GoogleAccount < ActiveRecord::Base
   end
 
   def self.create_user_from_auth(auth_hash)
-    raise Person::Account::NoSessionError, "Somehow a user without an account/session is trying to sign in using google"
+    raise Person::Account::NoSessionError, 'Somehow a user without an account/session is trying to sign in using google'
   end
 
   def google_integration(account_list_id)
@@ -90,6 +90,5 @@ class Person::GoogleAccount < ActiveRecord::Base
   end
 
   class MissingRefreshToken < StandardError
-
   end
 end

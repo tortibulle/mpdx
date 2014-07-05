@@ -1,6 +1,5 @@
 require 'csv'
 class DataServer
-
   def self.requires_username_and_password?() true; end
 
   def initialize(org_account)
@@ -56,7 +55,7 @@ class DataServer
 
   def import_donors(profile, date_from = nil)
     check_credentials!
-    date_from = date_from.strftime("%m/%d/%Y")if date_from.present?
+    date_from = date_from.strftime('%m/%d/%Y')if date_from.present?
 
     user = @org_account.user
 
@@ -65,9 +64,9 @@ class DataServer
     begin
       response = Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:addresses_url) do
         get_response(@org.addresses_url,
-                     get_params(@org.addresses_params, {profile: profile.code.to_s,
+                     get_params(@org.addresses_params,  profile: profile.code.to_s,
                                                         datefrom: (date_from || @org.minimum_gift_date).to_s,
-                                                        personid: @org_account.remote_id}))
+                                                        personid: @org_account.remote_id))
       end
     rescue DataServerError => e
       if e.message.include?('no profile associated')
@@ -87,9 +86,9 @@ class DataServer
         # handle bad data
         unless %w[P O].include?(line['PERSON_TYPE'])
           Airbrake.notify(
-            :error_class   => "Unknown PERSON_TYPE",
-            :error_message => "Unknown PERSON_TYPE: #{line['PERSON_TYPE']}",
-            :parameters    => {line: line, org: @org.inspect, user: @user.inspect, org_account: @org_account.inspect}
+            error_class: 'Unknown PERSON_TYPE',
+            error_message: "Unknown PERSON_TYPE: #{line['PERSON_TYPE']}",
+            parameters: { line: line, org: @org.inspect, user: @user.inspect, org_account: @org_account.inspect }
           )
           # Go ahead and assume this is a person
           line['PERSON_TYPE'] = 'P'
@@ -121,18 +120,17 @@ class DataServer
     check_credentials!
 
     # if no date_from was passed in, use min date from query_ini
-    date_from = date_from.strftime("%m/%d/%Y") if date_from.present?
+    date_from = date_from.strftime('%m/%d/%Y') if date_from.present?
     date_from = @org.minimum_gift_date || '1/1/2004' if date_from.blank?
-    date_to = Time.now.strftime("%m/%d/%Y") if date_to.blank?
+    date_to = Time.now.strftime('%m/%d/%Y') if date_to.blank?
 
     response = Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:donations_url) do
       get_response(@org.donations_url,
-                    get_params(@org.donations_params, {profile: profile.code.to_s,
+                    get_params(@org.donations_params,  profile: profile.code.to_s,
                                                        datefrom: date_from,
                                                        dateto: date_to,
-                                                       personid: @org_account.remote_id}))
+                                                       personid: @org_account.remote_id))
     end
-
 
     CSV.new(response, headers: :first_row).each do |line|
       designation_account = find_or_create_designation_account(line['DESIGNATION'], profile)
@@ -144,11 +142,11 @@ class DataServer
     check_credentials!
 
     balance = profile_balance(profile.code)
-    attributes = {balance: balance[:balance], balance_updated_at: balance[:date]}
+    attributes = { balance: balance[:balance], balance_updated_at: balance[:date] }
     profile.update_attributes(attributes)
 
     if balance[:designation_numbers]
-      attributes.merge!(:name => balance[:account_names].first) if balance[:designation_numbers].length == 1
+      attributes.merge!(name: balance[:account_names].first) if balance[:designation_numbers].length == 1
       balance[:designation_numbers].each_with_index do |number, i|
         find_or_create_designation_account(number, profile, attributes)
       end
@@ -157,7 +155,7 @@ class DataServer
 
   def check_credentials!
     raise OrgAccountMissingCredentialsError, _('Your username and password are missing for this account.') unless @org_account.username && @org_account.password
-    raise OrgAccountInvalidCredentialsError, _('Your username and password for %{org} are invalid.').localize % {org: @org} unless @org_account.valid_credentials?
+    raise OrgAccountInvalidCredentialsError, _('Your username and password for %{org} are invalid.').localize % { org: @org } unless @org_account.valid_credentials?
   end
 
   def validate_username_and_password
@@ -186,7 +184,7 @@ class DataServer
   def profiles_with_designation_numbers
     unless @profiles_with_designation_numbers
       @profiles_with_designation_numbers = profiles.collect do |profile|
-        {designation_numbers: designation_numbers(profile[:code])}
+        { designation_numbers: designation_numbers(profile[:code]) }
          .merge(profile.slice(:name, :code, :balance, :balance_udated_at))
       end
     end
@@ -198,17 +196,17 @@ class DataServer
     balance = {}
     response = Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:account_balance_url) do
       get_response(@org.account_balance_url,
-                   get_params(@org.account_balance_params, {profile: profile_code.to_s}))
+                   get_params(@org.account_balance_params,  profile: profile_code.to_s))
     end
 
     # This csv should always only have one line (besides the headers)
     begin
       CSV.new(response, headers: :first_row).each do |line|
-        balance[:designation_numbers] = line['EMPLID'].split(',').collect {|e| e.gsub('"','')} if line['EMPLID']
+        balance[:designation_numbers] = line['EMPLID'].split(',').collect { |e| e.gsub('"','') } if line['EMPLID']
         balance[:account_names] = line['ACCT_NAME'].split('\n') if line['ACCT_NAME']
         balance_match = line['BALANCE'].gsub(',','').match(/([-]?\d+\.?\d*)/)
         balance[:balance] = balance_match[0] if balance_match
-        balance[:date] = line['EFFDT'] ? DateTime.strptime(line['EFFDT'], "%Y-%m-%d %H:%M:%S") : Time.now
+        balance[:date] = line['EFFDT'] ? DateTime.strptime(line['EFFDT'], '%Y-%m-%d %H:%M:%S') : Time.now
         break
       end
     rescue NoMethodError
@@ -222,7 +220,6 @@ class DataServer
     balance[:designation_numbers]
   end
 
-
   def profiles
     unless @profiles
       @profiles = []
@@ -235,7 +232,7 @@ class DataServer
           CSV.new(response, headers: :first_row).each do |line|
             name = line['PROFILE_DESCRIPTION'] || line['ROLE_DESCRIPTION']
             code = line['PROFILE_CODE'] || line['ROLE_CODE']
-            @profiles << {name: name, code: code}
+            @profiles << { name: name, code: code }
           end
         rescue CSV::MalformedCSVError
           raise "CSV::MalformedCSVError: #{response}"
@@ -252,13 +249,13 @@ class DataServer
     params_string.sub!('$DATEFROM$', options[:datefrom]) if options[:datefrom]
     params_string.sub!('$DATETO$', options[:dateto]) if options[:dateto].present?
     params_string.sub!('$PERSONIDS$', options[:personid].to_s) if options[:personid].present?
-    params = Hash[params_string.split('&').collect {|p| p.split('=')}]
+    params = Hash[params_string.split('&').collect { |p| p.split('=') }]
     params
   end
 
   def get_response(url, params)
-    RestClient::Request.execute(:method => :post, :url => url, :payload => params, :timeout => -1, :user => 'foo',
-        :password => 'bar') { |response, request, result, &block|
+    RestClient::Request.execute(method: :post, url: url, payload: params, timeout: -1, user: 'foo',
+        password: 'bar') { |response, request, result, &block|
       # check for error response
       lines = response.split("\n")
       first_line = lines.first.to_s.upcase
@@ -267,11 +264,11 @@ class DataServer
            first_line.include?('password') ||
            lines[1].to_s.include?('password')
         @org_account.update_column(:valid_credentials, false) if @org_account.valid_credentials? && !@org_account.new_record?
-        raise OrgAccountInvalidCredentialsError, _('Your username and password for %{org} are invalid.').localize % {org: @org}
+        raise OrgAccountInvalidCredentialsError, _('Your username and password for %{org} are invalid.').localize % { org: @org }
       when response.code.to_i == 500 || first_line.include?('ERROR') || first_line.include?('HTML')
         raise DataServerError, response
       end
-      response = response.to_str.unpack("C*").pack("U*")
+      response = response.to_str.unpack('C*').pack('U*')
       # Strip annoying extra unicode at the beginning of the file
       response = response[3..-1] if response.first.localize.code_points.first == 239
 
@@ -299,12 +296,12 @@ class DataServer
     master_person_from_source = organization.master_people.where('master_person_sources.remote_id' => remote_id.to_s).first
     person = donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
 
-    person ||= Person.new({master_person: master_person_from_source})
-    person.attributes = {first_name: line[prefix + 'FIRST_NAME'], last_name: line[prefix + 'LAST_NAME'], middle_name: line[prefix + 'MIDDLE_NAME'],
-                          title: line[prefix + 'TITLE'], suffix: line[prefix + 'SUFFIX'], gender: prefix.present? ? 'female' : 'male'}
+    person ||= Person.new(master_person: master_person_from_source)
+    person.attributes = { first_name: line[prefix + 'FIRST_NAME'], last_name: line[prefix + 'LAST_NAME'], middle_name: line[prefix + 'MIDDLE_NAME'],
+                          title: line[prefix + 'TITLE'], suffix: line[prefix + 'SUFFIX'], gender: prefix.present? ? 'female' : 'male' }
     # Phone numbers
-    person.phone_number = {'number' => line[prefix + 'PHONE']} if line[prefix + 'PHONE'].present? && line[prefix + 'PHONE'] != line[prefix + 'MOBILE_PHONE']
-    person.phone_number = {'number' => line[prefix + 'MOBILE_PHONE'], 'location' => 'mobile'} if line[prefix + 'MOBILE_PHONE'].present?
+    person.phone_number = { 'number' => line[prefix + 'PHONE'] } if line[prefix + 'PHONE'].present? && line[prefix + 'PHONE'] != line[prefix + 'MOBILE_PHONE']
+    person.phone_number = { 'number' => line[prefix + 'MOBILE_PHONE'], 'location' => 'mobile' } if line[prefix + 'MOBILE_PHONE'].present?
 
     # email address
     person.email = line[prefix + 'EMAIL'] if line[prefix + 'EMAIL'] && line[prefix + 'EMAIL_VALID'] != 'FALSE'
@@ -320,7 +317,7 @@ class DataServer
     # create the master_person_source if needed
     unless master_person_from_source
       Retryable.retryable do
-        organization.master_person_sources.where(remote_id: remote_id.to_s).first_or_create({master_person_id: person.master_person.id})
+        organization.master_person_sources.where(remote_id: remote_id.to_s).first_or_create(master_person_id: person.master_person.id)
       end
     end
 
@@ -331,14 +328,14 @@ class DataServer
     master_company = MasterCompany.find_by_name(line['LAST_NAME_ORG'])
     company = user.partner_companies.where(master_company_id: master_company.id).first if master_company
 
-    company ||= account_list.companies.new({master_company: master_company})
-    company.assign_attributes( {name: line['LAST_NAME_ORG'],
+    company ||= account_list.companies.new(master_company: master_company)
+    company.assign_attributes(name: line['LAST_NAME_ORG'],
                                 phone_number: line['PHONE'],
-                                street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select {|a| a.present?}.join("\n"),
+                                street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select { |a| a.present? }.join("\n"),
                                 city: line['CITY'],
                                 state: line['STATE'],
                                 postal_code: line['ZIP'],
-                                country: line['CNTRY_DESCR']} )
+                                country: line['CNTRY_DESCR'])
     company.save!
     donor_account.update_attributes(master_company_id: company.master_company_id) unless donor_account.master_company_id == company.master_company.id
     company
@@ -348,12 +345,12 @@ class DataServer
     account_list ||= profile.account_list
     donor_account = Retryable.retryable do
       donor_account = @org.donor_accounts.where(account_number: line['PEOPLE_ID']).first_or_initialize
-      donor_account.attributes = {name: line['ACCT_NAME'],
-                                  donor_type: line['PERSON_TYPE'] == 'P' ? 'Household' : 'Organization'} # if the acccount already existed, update the name
+      donor_account.attributes = { name: line['ACCT_NAME'],
+                                  donor_type: line['PERSON_TYPE'] == 'P' ? 'Household' : 'Organization' } # if the acccount already existed, update the name
       # physical address
       if [line['ADDR1'],line['ADDR2'],line['ADDR3'],line['ADDR4'],line['CITY'],line['STATE'],line['ZIP'],line['CNTRY_DESCR']].any?(&:present?)
         donor_account.addresses_attributes = [{
-                                                street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select {|a| a.present?}.join("\n"),
+                                                street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select { |a| a.present? }.join("\n"),
                                                 city: line['CITY'],
                                                 state: line['STATE'],
                                                 postal_code: line['ZIP'],
@@ -388,7 +385,7 @@ class DataServer
     Retryable.retryable do
       donation = designation_account.donations.where(remote_id: line['DONATION_ID']).first_or_initialize
       date = line['DISPLAY_DATE'] ? Date.strptime(line['DISPLAY_DATE'], '%m/%d/%Y') : nil
-      donation.assign_attributes( {
+      donation.assign_attributes(
         donor_account_id: donor_account.id,
         motivation: line['MOTIVATION'],
         payment_method: line['PAYMENT_METHOD'],
@@ -398,7 +395,7 @@ class DataServer
         amount: line['AMOUNT'],
         tendered_amount: line['TENDERED_AMOUNT'] || line['AMOUNT'],
         currency: default_currency
-      } )
+       )
       donation.save!
       donation
     end

@@ -2,8 +2,8 @@
 
 FactoryGirl.define do
   factory :prayer_letters_account do
-    token "MyString"
-    secret "MyString"
+    token 'MyString'
+    secret 'MyString'
     valid_token true
     association :account_list
   end

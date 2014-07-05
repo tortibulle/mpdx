@@ -1,7 +1,6 @@
 require 'async'
 
 class PrayerLettersAccount < ActiveRecord::Base
-
   include Async
   include Sidekiq::Worker
   sidekiq_options unique: true
@@ -20,7 +19,7 @@ class PrayerLettersAccount < ActiveRecord::Base
   def subscribe_contacts
     contacts = []
 
-    account_list.contacts.includes([:primary_address, {primary_person: :companies}]).each do |contact|
+    account_list.contacts.includes([:primary_address, { primary_person: :companies }]).each do |contact|
       if contact.send_physical_letter? &&
          contact.addresses.present? &&
          contact.active? &&
@@ -48,7 +47,7 @@ class PrayerLettersAccount < ActiveRecord::Base
       end
     end
 
-    get_response(:put, '/api/v1/contacts', {contacts: contacts}.to_json)
+    get_response(:put, '/api/v1/contacts', { contacts: contacts }.to_json)
 
     # Now that we've replaced the list, we need to fetch the whole list and match it to our existing contacts
 
@@ -82,7 +81,7 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def contacts(params = {})
-    JSON.parse(get_response(:get, '/api/v1/contacts?' + params.collect {|k,v| "#{k}=#{v}"}.join('&')))['contacts']
+    JSON.parse(get_response(:get, '/api/v1/contacts?' + params.collect { |k,v| "#{k}=#{v}" }.join('&')))['contacts']
   end
 
   def add_or_update_contact(contact)
@@ -114,7 +113,6 @@ class PrayerLettersAccount < ActiveRecord::Base
     end
     contact.update_column(:prayer_letters_id, json['contact_id'])
   end
-
 
   def update_contact(contact)
     begin
@@ -163,7 +161,7 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def get_response(method, path, params = nil)
-    consumer = OAuth::Consumer.new(APP_CONFIG['prayer_letters_key'], APP_CONFIG['prayer_letters_secret'], {site: SERVICE_URL, scheme: :query_string, oauth_version: '1.0'})
+    consumer = OAuth::Consumer.new(APP_CONFIG['prayer_letters_key'], APP_CONFIG['prayer_letters_secret'],  site: SERVICE_URL, scheme: :query_string, oauth_version: '1.0')
     oauth_token = OAuth::Token.new(token, secret)
 
     response = consumer.request(method, path, oauth_token, {}, params)
@@ -175,7 +173,6 @@ class PrayerLettersAccount < ActiveRecord::Base
     else
       raise response.body
     end
-
   end
 
   def handle_bad_token

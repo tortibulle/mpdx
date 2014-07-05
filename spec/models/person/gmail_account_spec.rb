@@ -10,14 +10,14 @@ describe Person::GmailAccount do
   let(:client) { double }
 
   context '#client' do
-    it "initializes a gmail client" do
+    it 'initializes a gmail client' do
       client = gmail_account.client
       client.authorization.access_token.should == google_account.token
     end
   end
 
   context '#folders' do
-    it "returns a list of gmail folders/labels" do
+    it 'returns a list of gmail folders/labels' do
       gmail_account.stub(:client).and_return(client)
 
       client.should_receive(:labels).and_return(double(all: []))
@@ -27,7 +27,7 @@ describe Person::GmailAccount do
   end
 
   context '#gmail' do
-    it "refreshes the google account token if expired" do
+    it 'refreshes the google account token if expired' do
       Gmail.stub(:connect).and_return(double(logout: true))
       google_account.expires_at = 1.hour.ago
 
@@ -54,7 +54,7 @@ describe Person::GmailAccount do
       client.stub(:mailbox).with('[Gmail]/All Mail').and_return(all_mailbox)
     end
 
-    it "logs a sent email" do
+    it 'logs a sent email' do
       sent_mailbox.should_receive(:emails).and_return([email])
       all_mailbox.should_receive(:emails).and_return([])
 
@@ -63,7 +63,7 @@ describe Person::GmailAccount do
       gmail_account.import_emails(account_list)
     end
 
-    it "logs a received email" do
+    it 'logs a received email' do
       sent_mailbox.should_receive(:emails).and_return([])
       all_mailbox.should_receive(:emails).and_return([email])
 
@@ -78,7 +78,7 @@ describe Person::GmailAccount do
                                  envelope: double(date: Time.zone.now, message_id: '1'),
                                  subject: 'subject') }
 
-    it "creates a completed task" do
+    it 'creates a completed task' do
       expect {
       expect {
         gmail_account.log_email(gmail_message, account_list, contact, person.id, user.id, 'Done')
@@ -102,7 +102,7 @@ describe Person::GmailAccount do
       }.to change(ActivityContact, :count).by(1)
     end
 
-    it "creates a message" do
+    it 'creates a message' do
       expect {
         gmail_account.log_email(gmail_message, account_list, contact, person.id, user.id, 'Done')
       }.to change(Message, :count).by(1)
