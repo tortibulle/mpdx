@@ -176,6 +176,14 @@ class Contact < ActiveRecord::Base
     spouse.try(:first_name)
   end
 
+  def spouse_phone
+    spouse.try(:spouse_phone)
+  end
+
+  def spouse_email
+    spouse.try(:spouse_email)
+  end
+
   def greeting
     return name if siebel_organization?
     self[:greeting] || [first_name, spouse_name].compact.join(_(' and '))

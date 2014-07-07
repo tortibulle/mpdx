@@ -11,6 +11,9 @@
         <th><%= _('Postal Code') %></th>
         <th><%= _('Phone') %></th>
         <th><%= _('Email') %></th>
+        <th><%= _('Spouse Phone') %></th>
+        <th><%= _('Spouse Email') %></th>
+        <th><%= _('Notes') %></th>
       </tr>
       <% 15.times do %>
         <%= f.fields_for :contacts, Contact.new do |cf| %>
