@@ -48,7 +48,9 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         $scope.contactQuery.timezone = [''];
         $scope.contactQuery.relatedTaskAction = [''];
         $scope.contactQuery.wildcardSearch = null;
-        document.getElementById('globalContactSearch').value = '';
+        if(!_.isNull(document.getElementById('globalContactSearch'))) {
+            document.getElementById('globalContactSearch').value = '';
+        }
     };
 
     //view preferences
