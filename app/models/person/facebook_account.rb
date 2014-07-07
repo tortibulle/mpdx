@@ -46,7 +46,7 @@ class Person::FacebookAccount < ActiveRecord::Base
     return nil unless value.present?
     self.remote_id ||= get_id_from_url(value)
     if remote_id.blank? && person_id.present?
-      raise Errors::FacebookLink, _('We were unable to link this person to the facebook url you provided. Check the url you entered and try again. If you are currently running the "Import contacts from facebook" process, please wait until you get the email saying the import finished before trying again.')
+      fail Errors::FacebookLink, _('We were unable to link this person to the facebook url you provided. Check the url you entered and try again. If you are currently running the "Import contacts from facebook" process, please wait until you get the email saying the import finished before trying again.')
     end
   end
 
@@ -68,7 +68,7 @@ class Person::FacebookAccount < ActiveRecord::Base
           name = name.split('?').first
           response = RestClient.get("https://graph.facebook.com/#{name}",  accept: :json)
           json = JSON.parse(response)
-          raise RestClient::ResourceNotFound unless json['id'].to_i > 0
+          fail RestClient::ResourceNotFound unless json['id'].to_i > 0
           json['id']
         end.to_i
       end

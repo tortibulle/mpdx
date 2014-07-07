@@ -10,8 +10,8 @@ describe ContactFilter do
       create(:email_address, person: p)
       cf = ContactFilter.new(newsletter: 'email', state: a.state)
       cf.filter(Contact).includes([{ primary_person: [:facebook_account, :primary_picture] },
-                                                 :tags, :primary_address,
-                                                 { people: :primary_phone_number }]).should == [c]
+                                   :tags, :primary_address,
+                                   { people: :primary_phone_number }]).should == [c]
     end
 
     it 'filters contacts with statuses null and another' do

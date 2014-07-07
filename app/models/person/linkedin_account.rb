@@ -35,14 +35,14 @@ class Person::LinkedinAccount < ActiveRecord::Base
 
     # grab some valid linkedin credentials
     l = Person::LinkedinAccount.valid_token.first
-    raise LinkedIn::Errors::UnauthorizedError, _('The connection to your LinkedIn account needs to be renewed.') unless l
+    fail LinkedIn::Errors::UnauthorizedError, _('The connection to your LinkedIn account needs to be renewed.') unless l
 
     begin
       LINKEDIN.authorize_from_access(l.token, l.secret)
 
       value = 'http://' + value unless value.include?('http')
 
-      json = LINKEDIN.profile(url: value, fields: %w[id first_name last_name public-profile-url])
+      json = LINKEDIN.profile(url: value, fields: %w(id first_name last_name public-profile-url))
       update_attributes_from_json(json)
     rescue RestClient::ResourceNotFound
       destroy

@@ -14,15 +14,12 @@ class ContactPerson < ActiveRecord::Base
 
   def delete_orphaned_person
     # See if there is any other contact_person with the same person id
-    unless ContactPerson.where(person_id: person_id).where('id <> ?', id).first
-      # if there isn't, delete the associated person
-      person.destroy if person
-    end
+    return if ContactPerson.where(person_id: person_id).where('id <> ?', id).any?
+    # if there isn't, delete the associated person
+    person.destroy if person
   end
 
   def set_primary_contact
-    if contact && !contact.primary_person
-      self.primary = true
-    end
+    self.primary = true if contact && !contact.primary_person
   end
 end

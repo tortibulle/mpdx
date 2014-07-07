@@ -187,10 +187,7 @@ class MailChimpAccount < ActiveRecord::Base
 
   def subscribe_contacts(contact_ids = nil)
     contacts = account_list.contacts
-
-    if contact_ids
-      contacts = contacts.where(id: contact_ids)
-    end
+    contacts = contacts.where(id: contact_ids) if contact_ids
 
     contacts = contacts
       .includes(people: :primary_email_address)
@@ -276,9 +273,7 @@ class MailChimpAccount < ActiveRecord::Base
   end
 
   def queue_import_if_list_changed
-    if changed.include?('primary_list_id')
-      queue_export_to_primary_list
-    end
+    queue_export_to_primary_list if changed.include?('primary_list_id')
   end
 
   def set_active

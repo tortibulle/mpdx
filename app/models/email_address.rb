@@ -100,20 +100,17 @@ class EmailAddress < ActiveRecord::Base
   end
 
   def subscribe_to_mail_chimp
-    if person
-      contact = person.contacts.first
+    return unless person
+    contact = person.contacts.first
 
-      if contact && contact.send_email_letter? &&
-          mail_chimp_account &&
-          (primary? || person.email_addresses.length == 1)
-        mail_chimp_account.queue_subscribe_person(person)
-      end
+    if contact && contact.send_email_letter? &&
+       mail_chimp_account &&
+       (primary? || person.email_addresses.length == 1)
+      mail_chimp_account.queue_subscribe_person(person)
     end
   end
 
   def delete_from_mailchimp
-    if mail_chimp_account
-      mail_chimp_account.queue_unsubscribe_email(email)
-    end
+    mail_chimp_account.queue_unsubscribe_email(email) if mail_chimp_account
   end
 end

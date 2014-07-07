@@ -6,5 +6,4 @@ describe 'Home' do
     login(@user)
   end
 
-
 end

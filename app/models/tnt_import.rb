@@ -20,7 +20,7 @@ class TntImport
           # to unescape a unicode character.
           begin
             bad_char = e.message.match(/"([^"]*)"/)[1]
-            @contents.gsub!(eval(%Q{"#{bad_char}"}), ' ')
+            @contents.gsub!(eval(%Q("#{bad_char}")), ' ')
           rescue
             raise e
           end
@@ -101,7 +101,7 @@ class TntImport
 
       @tnt_contacts[row['id']] = contact
 
-      if is_true?(row['IsOrganization'])
+      if true?(row['IsOrganization'])
         # organization
         donor_accounts.each do |donor_account|
           add_or_update_company(row, donor_account)
@@ -114,7 +114,8 @@ class TntImport
     rows.each do |row|
       referred_by = @tnt_contacts.find {|_tnt_id, c| c.name == row['ReferredBy'] ||
                                                      c.full_name == row['ReferredBy'] ||
-                                                     c.greeting == row['ReferredBy'] }
+                                                     c.greeting == row['ReferredBy']
+      }
       next unless referred_by
       contact = @tnt_contacts[row['id']]
       contact.referrals_to_me << referred_by[1] unless contact.referrals_to_me.include?(referred_by[1])
@@ -229,17 +230,18 @@ class TntImport
     contact.website = row['WebPage'] if @import.override? || contact.website.blank?
     contact.updated_at = parse_date(row['LastEdit']) if @import.override?
     contact.created_at = parse_date(row['CreatedDate']) if @import.override?
-    contact.notes = row['Notes'] if (@import.override? || contact.notes.blank?)
+    contact.notes = row['Notes'] if @import.override? || contact.notes.blank?
     contact.pledge_amount = row['PledgeAmount'] if @import.override? || contact.pledge_amount.blank?
     contact.pledge_frequency = row['PledgeFrequencyID'] if (@import.override? || contact.pledge_frequency.blank?) && row['PledgeFrequencyID'].to_i != 0
     contact.pledge_start_date = parse_date(row['PledgeStartDate']) if (@import.override? || contact.pledge_start_date.blank?) && row['PledgeStartDate'].present?
-    contact.pledge_received = is_true?(row['PledgeReceived']) if @import.override? || contact.pledge_received.blank?
+    contact.pledge_received = true?(row['PledgeReceived']) if @import.override? || contact.pledge_received.blank?
     contact.status = lookup_mpd_phase(row['MPDPhaseID']) if (@import.override? || contact.status.blank?) && lookup_mpd_phase(row['MPDPhaseID']).present?
     contact.next_ask = parse_date(row['NextAsk']) if (@import.override? || contact.next_ask.blank?) && row['NextAsk'].present?
     contact.likely_to_give = contact.assignable_likely_to_gives[row['LikelyToGiveID'].to_i - 1] if (@import.override? || contact.likely_to_give.blank?) && row['LikelyToGiveID'].to_i != 0
-    contact.never_ask = is_true?(row['NeverAsk']) if @import.override? || contact.never_ask.blank?
+    contact.never_ask = true?(row['NeverAsk']) if @import.override? || contact.never_ask.blank?
     contact.church_name = row['ChurchName'] if @import.override? || contact.church_name.blank?
-    if (@import.override? || contact.send_newsletter.blank?) && is_true?(row['SendNewsletter'])
+
+    if (@import.override? || contact.send_newsletter.blank?) && true?(row['SendNewsletter'])
       case row['NewsletterMediaPref']
       when '+E', '+E-P'
         contact.send_newsletter = 'Email'
@@ -249,8 +251,9 @@ class TntImport
         contact.send_newsletter = 'Both'
       end
     end
-    contact.direct_deposit = is_true?(row['DirectDeposit']) if @import.override? || contact.direct_deposit.blank?
-    contact.magazine = is_true?(row['Magazine']) if @import.override? || contact.magazine.blank?
+
+    contact.direct_deposit = true?(row['DirectDeposit']) if @import.override? || contact.direct_deposit.blank?
+    contact.magazine = true?(row['Magazine']) if @import.override? || contact.magazine.blank?
     contact.last_activity = parse_date(row['LastActivity']) if (@import.override? || contact.last_activity.blank?) && row['LastActivity'].present?
     contact.last_appointment = parse_date(row['LastAppointment']) if (@import.override? || contact.last_appointment.blank?) && row['LastAppointment'].present?
     contact.last_letter = parse_date(row['LastLetter']) if (@import.override? || contact.last_letter.blank?) && row['LastLetter'].present?
@@ -263,14 +266,13 @@ class TntImport
     contact.save
   end
 
-  def is_true?(val)
+  def true?(val)
     val.upcase == 'TRUE'
   end
 
   def parse_date(val)
-    begin
-      Date.parse(val)
-    rescue; end
+    Date.parse(val)
+  rescue
   end
 
   def lookup_mpd_phase(phase)
@@ -366,14 +368,18 @@ class TntImport
                           title: row[prefix + 'Title'], suffix: row[prefix + 'Suffix'], gender: prefix.present? ? 'female' : 'male',
                           profession: prefix.present? ? nil : row['Profession'] }
     # Phone numbers
+    phone_number_locations =
     { 'HomePhone' => 'home', 'HomePhone2' => 'home', 'HomeFax' => 'fax',
-      prefix + 'BusinessPhone' => 'work', prefix + 'BusinessPhone2' => 'work', prefix + 'BusinessFax' => 'fax',
-      prefix + 'CompanyMainPhone' => 'work', 'AssistantPhone' => 'work', 'OtherPhone' => 'other',
-      'CarPhone' => 'mobile', prefix + 'MobilePhone' => 'mobile', prefix + 'MobilePhone2' => 'mobile',
-      prefix + 'PagerNumber' => 'other', 'CallbackPhone' => 'other', 'ISDNPhone' => 'other', 'PrimaryPhone' => 'other',
-      'RadioPhone' => 'other', 'TelexPhone' => 'other' }.each_with_index do |key, i|
-       person.phone_number = { number: row[key[0]], location: key[1], primary: row['PreferredPhoneType'].to_i == i } if row[key[0]].present?
-     end
+      prefix + 'BusinessPhone' => 'work', prefix + 'BusinessPhone2' => 'work',
+      prefix + 'BusinessFax' => 'fax', prefix + 'CompanyMainPhone' => 'work',
+      'AssistantPhone' => 'work', 'OtherPhone' => 'other', 'CarPhone' => 'mobile',
+      prefix + 'MobilePhone' => 'mobile', prefix + 'MobilePhone2' => 'mobile',
+      prefix + 'PagerNumber' => 'other', 'CallbackPhone' => 'other',
+      'ISDNPhone' => 'other', 'PrimaryPhone' => 'other', 'RadioPhone' => 'other',
+      'TelexPhone' => 'other' }
+    phone_number_locations.each_with_index do |key, i|
+      person.phone_number = { number: row[key[0]], location: key[1], primary: row['PreferredPhoneType'].to_i == i } if row[key[0]].present?
+    end
 
     # email address
     3.times do |i|
@@ -407,7 +413,7 @@ class TntImport
 
   def build_address_array(row, contact = nil, override = true)
     addresses = []
-    %w[Home Business Other].each_with_index do |location, i|
+    %w(Home Business Other).each_with_index do |location, i|
       street = row["#{location}StreetAddress"]
       city = row["#{location}City"]
       state = row["#{location}State"]

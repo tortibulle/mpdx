@@ -31,7 +31,7 @@ describe AccountListExhibit do
 
   it 'sums the balances of multiple designation accounts' do
     account_list.stub(:designation_accounts).and_return([create(:designation_account, name: 'foo', balance: 1),
-                                                          create(:designation_account, name: 'bar', balance: 2)])
+                                                         create(:designation_account, name: 'bar', balance: 2)])
     context.stub(:number_to_current_currency).with(3).and_return('$3')
     subject.balances(user).should include('Balance: $3')
   end

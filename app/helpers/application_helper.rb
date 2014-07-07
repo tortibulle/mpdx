@@ -40,9 +40,7 @@ module ApplicationHelper
 
   def l(date, options = {})
     options[:format] ||= :date_time
-    unless date.class == Date || date.class == DateTime
-      date = date.to_datetime
-    end
+    date = date.to_datetime unless date.class == Date || date.class == DateTime
     if date.class == Date
       date = date.to_datetime.localize(FastGettext.locale).to_date
     else
@@ -88,10 +86,10 @@ module ApplicationHelper
     case collection.total_entries
     when 0, 1; ''
     else
-       _("Displaying #{b}%{from}#{sp}-#{sp}%{to}#{eb} of #{b}%{count}#{eb}").localize % {
-         count: collection.total_entries,
-         from: collection.offset + 1, to: collection.offset + collection.length
-       }
+      _("Displaying #{b}%{from}#{sp}-#{sp}%{to}#{eb} of #{b}%{count}#{eb}").localize % {
+        count: collection.total_entries,
+        from: collection.offset + 1, to: collection.offset + collection.length
+      }
     end.html_safe
   end
 
@@ -101,12 +99,12 @@ module ApplicationHelper
     options.merge!('style' => 'width:100px;')
     options.merge!('readonly' => '')
     value = case
-              when value.is_a?(Time) || value.is_a?(DateTime)
-                l(value.to_date)
-              when value.is_a?(Date)
-                l(value)
-              else
-                value
+            when value.is_a?(Time) || value.is_a?(DateTime)
+              l(value.to_date)
+            when value.is_a?(Date)
+              l(value)
+            else
+              value
             end
     text_field_tag(name, value, options)
   end

@@ -4,7 +4,7 @@ class Foo
   include Async
   include Sidekiq::Worker
 
-  def kill(person) end
+  def kill(_person) end
 end
 
 describe 'Async' do

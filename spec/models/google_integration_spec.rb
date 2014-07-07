@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe GoogleIntegration do
   let(:google_integration) { build(:google_integration) }
-  let(:calendar_data) { Hashie::Mash.new(JSON.parse(%q|{"kind":"calendar#calendarList","etag":"\"brXLH9dIsANhw0fUafNoxUtvJn8/z-s-EUrs3E9y8jAlApPmQlV5S88\"","items":[{"kind":"calendar#calendarListEntry","etag":"\"brXLH9dIsANhw0fUafNoxUtvJn8/wj94O5gU621uu4faAu06IKOk9jk\"","id":"f4r590q526okeq1osnv5bt6fd8@group.calendar.google.com","summary":"WebandMobileDevelopmentTeam","description":"Thiscalendarcanbeusedtotrackteammembers'vacation/leaverequests","timeZone":"America/New_York","colorId":"12","backgroundColor":"#fad165","foregroundColor":"#000000","selected":true,"accessRole":"owner"}]}|)) }
+  let(:calendar_data) { Hashie::Mash.new(JSON.parse(%q({"kind":"calendar#calendarList","etag":"\"brXLH9dIsANhw0fUafNoxUtvJn8/z-s-EUrs3E9y8jAlApPmQlV5S88\"","items":[{"kind":"calendar#calendarListEntry","etag":"\"brXLH9dIsANhw0fUafNoxUtvJn8/wj94O5gU621uu4faAu06IKOk9jk\"","id":"f4r590q526okeq1osnv5bt6fd8@group.calendar.google.com","summary":"WebandMobileDevelopmentTeam","description":"Thiscalendarcanbeusedtotrackteammembers'vacation/leaverequests","timeZone":"America/New_York","colorId":"12","backgroundColor":"#fad165","foregroundColor":"#000000","selected":true,"accessRole":"owner"}]}))) }
 
   context '#queue_sync_data' do
     it 'queues a data sync when an integration type is passed in' do

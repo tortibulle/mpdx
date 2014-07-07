@@ -6,27 +6,19 @@ class HomeController < ApplicationController
   end
 
   def connect
-    if !request.xhr?
-      redirect_to '/#dash-connect' and return
-    end
+    redirect_to '/#dash-connect' && return if !request.xhr?
   end
 
   def cultivate
-    if !request.xhr?
-      redirect_to '/#dash-cultivate' and return
-    end
+    redirect_to '/#dash-cultivate' && return if !request.xhr?
   end
 
   def care
-    if !request.xhr?
-      redirect_to '/#dash-care' and return
-    end
+    redirect_to '/#dash-care' && return if !request.xhr?
   end
 
   def progress
-    if !request.xhr?
-      redirect_to '/#dash-progress' and return
-    end
+    redirect_to '/#dash-progress' && return if !request.xhr?
 
     if params[:start_date]
       @start_date = Date.parse(params[:start_date])

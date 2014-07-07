@@ -84,7 +84,7 @@ class DataServer
         donor_account = add_or_update_donor_account(line, profile, account_list)
 
         # handle bad data
-        unless %w[P O].include?(line['PERSON_TYPE'])
+        unless %w(P O).include?(line['PERSON_TYPE'])
           Airbrake.notify(
             error_class: 'Unknown PERSON_TYPE',
             error_message: "Unknown PERSON_TYPE: #{line['PERSON_TYPE']}",
@@ -126,10 +126,10 @@ class DataServer
 
     response = Retryable.retryable on: Errors::UrlChanged, times: 1, then: update_url(:donations_url) do
       get_response(@org.donations_url,
-                    get_params(@org.donations_params,  profile: profile.code.to_s,
-                                                       datefrom: date_from,
-                                                       dateto: date_to,
-                                                       personid: @org_account.remote_id))
+                   get_params(@org.donations_params,  profile: profile.code.to_s,
+                                                      datefrom: date_from,
+                                                      dateto: date_to,
+                                                      personid: @org_account.remote_id))
     end
 
     CSV.new(response, headers: :first_row).each do |line|
@@ -154,8 +154,8 @@ class DataServer
   end
 
   def check_credentials!
-    raise OrgAccountMissingCredentialsError, _('Your username and password are missing for this account.') unless @org_account.username && @org_account.password
-    raise OrgAccountInvalidCredentialsError, _('Your username and password for %{org} are invalid.').localize % { org: @org } unless @org_account.valid_credentials?
+    fail OrgAccountMissingCredentialsError, _('Your username and password are missing for this account.') unless @org_account.username && @org_account.password
+    fail OrgAccountInvalidCredentialsError, _('Your username and password for %{org} are invalid.').localize % { org: @org } unless @org_account.valid_credentials?
   end
 
   def validate_username_and_password
@@ -203,9 +203,9 @@ class DataServer
     # This csv should always only have one line (besides the headers)
     begin
       CSV.new(response, headers: :first_row).each do |line|
-        balance[:designation_numbers] = line['EMPLID'].split(',').map { |e| e.gsub('"','') } if line['EMPLID']
+        balance[:designation_numbers] = line['EMPLID'].split(',').map { |e| e.gsub('"', '') } if line['EMPLID']
         balance[:account_names] = line['ACCT_NAME'].split('\n') if line['ACCT_NAME']
-        balance_match = line['BALANCE'].gsub(',','').match(/([-]?\d+\.?\d*)/)
+        balance_match = line['BALANCE'].gsub(',', '').match(/([-]?\d+\.?\d*)/)
         balance[:balance] = balance_match[0] if balance_match
         balance[:date] = line['EFFDT'] ? DateTime.strptime(line['EFFDT'], '%Y-%m-%d %H:%M:%S') : Time.now
         break
@@ -243,7 +243,7 @@ class DataServer
     @profiles
   end
 
-  def get_params(raw_params, options={})
+  def get_params(raw_params, options = {})
     params_string = raw_params.sub('$ACCOUNT$', @org_account.username)
                               .sub('$PASSWORD$', @org_account.password)
     params_string.sub!('$PROFILE$', options[:profile]) if options[:profile]
@@ -265,9 +265,9 @@ class DataServer
            first_line.include?('password') ||
            lines[1].to_s.include?('password')
         @org_account.update_column(:valid_credentials, false) if @org_account.valid_credentials? && !@org_account.new_record?
-        raise OrgAccountInvalidCredentialsError, _('Your username and password for %{org} are invalid.').localize % { org: @org }
+        fail OrgAccountInvalidCredentialsError, _('Your username and password for %{org} are invalid.').localize % { org: @org }
       when response.code.to_i == 500 || first_line.include?('ERROR') || first_line.include?('HTML')
-        raise DataServerError, response
+        fail DataServerError, response
       end
       response = response.to_str.unpack('C*').pack('U*')
       # Strip annoying extra unicode at the beginning of the file
@@ -275,7 +275,7 @@ class DataServer
 
       # look for a redirect
       if lines[1] && lines[1].include?('RedirectQueryIni')
-        raise Errors::UrlChanged, lines[1].split('=')[1]
+        fail Errors::UrlChanged, lines[1].split('=')[1]
       end
 
       response
@@ -292,7 +292,7 @@ class DataServer
     add_or_update_person(account_list, user, line, donor_account, remote_id, 'SP_')
   end
 
-  def add_or_update_person(account_list, user, line, donor_account, remote_id, prefix = '')
+  def add_or_update_person(account_list, _user, line, donor_account, remote_id, prefix = '')
     organization = donor_account.organization
     master_person_from_source = organization.master_people.where('master_person_sources.remote_id' => remote_id.to_s).first
     person = donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
@@ -349,7 +349,7 @@ class DataServer
       donor_account.attributes = { name: line['ACCT_NAME'],
                                    donor_type: line['PERSON_TYPE'] == 'P' ? 'Household' : 'Organization' } # if the acccount already existed, update the name
       # physical address
-      if [line['ADDR1'],line['ADDR2'],line['ADDR3'],line['ADDR4'],line['CITY'],line['STATE'],line['ZIP'],line['CNTRY_DESCR']].any?(&:present?)
+      if [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4'], line['CITY'], line['STATE'], line['ZIP'], line['CNTRY_DESCR']].any?(&:present?)
         donor_account.addresses_attributes = [{
           street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select { |a| a.present? }.join("\n"),
           city: line['CITY'],
@@ -362,7 +362,7 @@ class DataServer
       donor_account
     end
     contact = donor_account.link_to_contact_for(account_list)
-    raise 'Failed to link to contact' unless contact
+    fail 'Failed to link to contact' unless contact
     donor_account
   end
 

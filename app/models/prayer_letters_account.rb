@@ -81,7 +81,7 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def contacts(params = {})
-    JSON.parse(get_response(:get, '/api/v1/contacts?' + params.map { |k,v| "#{k}=#{v}" }.join('&')))['contacts']
+    JSON.parse(get_response(:get, '/api/v1/contacts?' + params.map { |k, v| "#{k}=#{v}" }.join('&')))['contacts']
   end
 
   def add_or_update_contact(contact)
@@ -171,7 +171,7 @@ class PrayerLettersAccount < ActiveRecord::Base
     when 401
       handle_bad_token
     else
-      raise response.body
+      fail response.body
     end
   end
 
@@ -179,7 +179,7 @@ class PrayerLettersAccount < ActiveRecord::Base
     update_column(:valid_token, false)
     AccountMailer.prayer_letters_invalid_token(account_list).deliver
 
-    raise AccessError
+    fail AccessError
   end
 
   class AccessError < StandardError

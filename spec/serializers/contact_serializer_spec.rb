@@ -14,8 +14,8 @@ describe ContactSerializer do
       contact.people << p
       p
     }
-    let(:json){ ContactSerializer.new(contact).as_json }
-    subject{ json[:contact] }
+    let(:json) { ContactSerializer.new(contact).as_json }
+    subject { json[:contact] }
 
     describe 'contact' do
       it { should include :id }

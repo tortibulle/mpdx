@@ -13,7 +13,6 @@ describe Person::OrganizationAccountsController do
     @valid_attributes ||= { username: 'foo@example.com', password: 'foobar1', organization_id: @org.id }
   end
 
-
   #describe "GET index" do
     #it "assigns all person_organization_accounts as @person_organization_accounts" do
       #organization_account = Person::OrganizationAccount.create! valid_attributes

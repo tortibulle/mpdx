@@ -7,7 +7,7 @@ module Person::Account
   end
 
   module ClassMethods
-    def find_or_create_from_auth(auth_hash, person)
+    def find_or_create_from_auth(_auth_hash, person)
       @attributes.merge!(authenticated: true)
       @account = @rel.find_by_remote_id_and_authenticated(@remote_id, true)
       if @account
@@ -32,7 +32,7 @@ module Person::Account
       @account
     end
 
-    def create_user_from_auth(auth_hash)
+    def create_user_from_auth(_auth_hash)
       @attributes ||= {}
       User.create!(@attributes)
     end

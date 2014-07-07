@@ -26,7 +26,7 @@ class ContactFilter
           filtered_contacts = filtered_contacts.where("concat(first_name,' ',last_name) like ? ", "%#{@filters[:name_like]}%")
         else
           filtered_contacts = filtered_contacts.where('first_name like :search OR last_name like :search',
-                                                    search: "#{@filters[:name_like]}%")
+                                                      search: "#{@filters[:name_like]}%")
         end
       end
 

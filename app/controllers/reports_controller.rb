@@ -12,19 +12,19 @@ class ReportsController < ApplicationController
     @raw_donations = current_account_list
       .donations
       .where('donation_date BETWEEN ? AND ?', @start_date, @end_date)
-      .select('"donations"."donor_account_id",' +
-              'date_trunc(\'month\', "donations"."donation_date"),' +
-              'SUM("donations"."tendered_amount") as tendered_amount,' +
-              '"donations"."tendered_currency",' +
-              '"donor_accounts"."name",' +
+      .select('"donations"."donor_account_id",' \
+              'date_trunc(\'month\', "donations"."donation_date"),' \
+              'SUM("donations"."tendered_amount") as tendered_amount,' \
+              '"donations"."tendered_currency",' \
+              '"donor_accounts"."name",' \
               '"contact_donor_accounts"."contact_id" as contact_id'
       )
       .where('contacts.account_list_id' => current_account_list.id)
       .joins(donor_account: [:contacts])
-      .group('donations.donor_account_id, ' +
-             'date_trunc, ' +
-             'tendered_currency, ' +
-             'donor_accounts.name, ' +
+      .group('donations.donor_account_id, ' \
+             'date_trunc, ' \
+             'tendered_currency, ' \
+             'donor_accounts.name, ' \
              'contact_donor_accounts.id')
       .reorder('donor_accounts.name')
       .to_a

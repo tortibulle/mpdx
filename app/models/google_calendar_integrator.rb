@@ -125,16 +125,16 @@ class GoogleCalendarIntegrator
   def handle_error(result, object)
     case result.status
     when 404
-      raise NotFound, result.data.inspect
+      fail NotFound, result.data.inspect
     when 410
-      raise Deleted, result.data.inspect
+      fail Deleted, result.data.inspect
     else
       return unless result.data && result.data['error'] # no error, everything is fine.
       case result.data['error']['message']
       when 'Invalid attendee email.'
-        raise InvalidEmail, event_attributes(object).inspect
+        fail InvalidEmail, event_attributes(object).inspect
       else
-        raise Error, result.data['error']['message'] + " -- #{result.data.inspect}"
+        fail Error, result.data['error']['message'] + " -- #{result.data.inspect}"
       end
     end
   end

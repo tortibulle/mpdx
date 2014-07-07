@@ -6,7 +6,7 @@ describe EmailAddress do
     let(:address) { 'test@example.com' }
 
     it "should create an email address if it's new" do
-      ->{
+      -> {
         EmailAddress.add_for_person(person,  email: address)
         person.email_addresses.first.email.should == address
       }.should change(EmailAddress, :count).from(0).to(1)
@@ -14,7 +14,7 @@ describe EmailAddress do
 
     it "doesn't create an email address if it exists" do
       EmailAddress.add_for_person(person,  email: address)
-      ->{
+      -> {
         EmailAddress.add_for_person(person,  email: address)
         person.email_addresses.first.email.should == address
       }.should_not change(EmailAddress, :count)
@@ -22,7 +22,7 @@ describe EmailAddress do
 
     it 'does nothing when adding itself to a person' do
       email = EmailAddress.add_for_person(person,  email: address)
-      ->{
+      -> {
         EmailAddress.add_for_person(person,  email: address, id: email.id)
       }.should_not change(EmailAddress, :count)
     end

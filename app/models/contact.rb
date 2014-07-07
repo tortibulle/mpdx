@@ -12,10 +12,10 @@ class Contact < ActiveRecord::Base
   belongs_to :account_list
   has_many :contact_people, dependent: :destroy
   has_many :people, -> { order('contact_people.primary::int desc') }, through: :contact_people
-  has_one  :primary_contact_person, -> { where(primary: true) }, class_name: 'ContactPerson'
-  has_one  :primary_person, through: :primary_contact_person, source: :person
-  has_one  :spouse_contact_person, -> { where(['"primary" = ? OR "primary" is NULL', false]) }, class_name: 'ContactPerson'
-  has_one  :spouse, through: :spouse_contact_person, source: :person
+  has_one :primary_contact_person, -> { where(primary: true) }, class_name: 'ContactPerson'
+  has_one :primary_person, through: :primary_contact_person, source: :person
+  has_one :spouse_contact_person, -> { where(['"primary" = ? OR "primary" is NULL', false]) }, class_name: 'ContactPerson'
+  has_one :spouse, through: :spouse_contact_person, source: :person
   has_many :contact_referrals_to_me, foreign_key: :referred_to_id, class_name: 'ContactReferral', dependent: :destroy
   has_many :contact_referrals_by_me, foreign_key: :referred_by_id, class_name: 'ContactReferral', dependent: :destroy
   has_many :referrals_to_me, through: :contact_referrals_to_me, source: :referred_by
@@ -36,7 +36,7 @@ class Contact < ActiveRecord::Base
   scope :with_referrals, -> { joins(:contact_referrals_by_me).uniq }
   scope :active, -> { where(active_conditions) }
   scope :inactive, -> { where(inactive_conditions) }
-  scope :late_by, -> (min_days, max_days=nil) { financial_partners.where('last_donation_date BETWEEN ? AND ?', max_days ? Date.today - max_days : Date.new(1951, 1, 1), Date.today - min_days) }
+  scope :late_by, -> (min_days, max_days = nil) { financial_partners.where('last_donation_date BETWEEN ? AND ?', max_days ? Date.today - max_days : Date.new(1951, 1, 1), Date.today - min_days) }
 
   PERMITTED_ATTRIBUTES = [
     :name, :pledge_amount, :status, :notes, :full_name, :greeting, :website, :pledge_frequency,
@@ -57,9 +57,9 @@ class Contact < ActiveRecord::Base
   accepts_nested_attributes_for :contact_people, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :contact_referrals_to_me, reject_if: :all_blank, allow_destroy: true
 
-  before_save     :set_notes_saved_at
-  after_commit    :sync_with_mail_chimp, :sync_with_prayer_letters, :set_timezone
-  before_destroy  :delete_from_prayer_letters, :delete_people
+  before_save :set_notes_saved_at
+  after_commit :sync_with_mail_chimp, :sync_with_prayer_letters, :set_timezone
+  before_destroy :delete_from_prayer_letters, :delete_people
 
   assignable_values_for :status, allow_blank: true do
     # Don't change these willy-nilly, they break the mobile app
@@ -141,7 +141,7 @@ class Contact < ActiveRecord::Base
 
   def self.create_from_donor_account(donor_account, account_list)
     contact = account_list.contacts.new(name: donor_account.name)
-    contact.addresses_attributes = Hash[donor_account.addresses.collect.with_index { |address, i| [i, address.attributes.slice(*%w{street city state country postal_code})] }]
+    contact.addresses_attributes = Hash[donor_account.addresses.collect.with_index { |address, i| [i, address.attributes.slice(*%w(street city state country postal_code))] }]
     contact.save!
     contact.donor_accounts << donor_account
     contact
@@ -177,21 +177,13 @@ class Contact < ActiveRecord::Base
   end
 
   def greeting
-    result = self[:greeting].present? ?
-      self[:greeting] :
-      [first_name, spouse_name].compact.join(_(' and '))
-    if siebel_organization?
-      result = name
-    end
-    result
+    return name if siebel_organization?
+    self[:greeting] || [first_name, spouse_name].compact.join(_(' and '))
   end
 
   def envelope_greeting
-    result = greeting.include?(last_name.to_s) ? greeting : [greeting, last_name].compact.join(' ')
-    if siebel_organization?
-      result = name
-    end
-    result
+    return name if siebel_organization?
+    greeting.include?(last_name.to_s) ? greeting : [greeting, last_name].compact.join(' ')
   end
 
   def siebel_organization?
@@ -210,11 +202,11 @@ class Contact < ActiveRecord::Base
   end
 
   def send_email_letter?
-    %w[Email Both].include?(send_newsletter)
+    %w(Email Both).include?(send_newsletter)
   end
 
   def send_physical_letter?
-    %w[Physical Both].include?(send_newsletter)
+    %w(Physical Both).include?(send_newsletter)
   end
 
   def not_same_as?(other)

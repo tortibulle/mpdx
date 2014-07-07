@@ -1,5 +1,4 @@
 class DataServerNavigators < DataServer
-
   protected
 
   def profile_balance(profile_code)

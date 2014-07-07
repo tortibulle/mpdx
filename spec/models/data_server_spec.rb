@@ -217,16 +217,16 @@ describe DataServer do
     it 'raise an error if credentials are missing' do
       no_user_account = @org_account.dup
       no_user_account.username = nil
-      ->{ DataServer.new(no_user_account).import_donors(profile) }.should raise_error(OrgAccountMissingCredentialsError, 'Your username and password are missing for this account.')
+      -> { DataServer.new(no_user_account).import_donors(profile) }.should raise_error(OrgAccountMissingCredentialsError, 'Your username and password are missing for this account.')
       no_pass_account = @org_account.dup
       no_pass_account.password = nil
-      ->{ DataServer.new(no_pass_account).import_donors(profile) }.should raise_error(OrgAccountMissingCredentialsError, 'Your username and password are missing for this account.')
+      -> { DataServer.new(no_pass_account).import_donors(profile) }.should raise_error(OrgAccountMissingCredentialsError, 'Your username and password are missing for this account.')
     end
     it 'raise an error if credentials are invalid' do
       @org_account.valid_credentials = false
-      ->{ DataServer.new(@org_account).import_donors(profile) }.should raise_error(OrgAccountInvalidCredentialsError,
-                                                                                 _('Your username and password for %{org} are invalid.').localize %
-                                                                                { org: @org })
+      -> { DataServer.new(@org_account).import_donors(profile) }.should raise_error(OrgAccountInvalidCredentialsError,
+                                                                                    _('Your username and password for %{org} are invalid.').localize %
+                                                                                   { org: @org })
     end
   end
 

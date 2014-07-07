@@ -204,7 +204,7 @@ class Siebel < DataServer
     company
   end
 
-  def add_or_update_donor_account(account_list, donor, profile, date_from = nil)
+  def add_or_update_donor_account(account_list, donor, _profile, date_from = nil)
     Retryable.retryable do
       donor_account = @org.donor_accounts.where(account_number: donor.id).first_or_initialize
       donor_account.attributes = { name: donor.account_name,
@@ -212,7 +212,7 @@ class Siebel < DataServer
       donor_account.save!
 
       contact = donor_account.link_to_contact_for(account_list)
-      raise 'Failed to link to contact' unless contact
+      fail 'Failed to link to contact' unless contact
 
       # Save addresses
       if donor.addresses
@@ -332,7 +332,7 @@ class Siebel < DataServer
     # If we can match it to an existing address, update that address
     object.addresses_including_deleted.each do |a|
       if a.remote_id == new_address.remote_id || a.equal_to?(new_address)
-        a.update_attributes(new_address.attributes.select { |_k,v| v.present? })
+        a.update_attributes(new_address.attributes.select { |_k, v| v.present? })
         return a
       end
     end

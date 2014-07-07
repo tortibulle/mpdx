@@ -254,9 +254,9 @@ describe Contact do
       loser_contact.tasks << task
       contact.tasks << task
       expect {
-      expect {
-        contact.merge(loser_contact)
-      }.not_to change(Task, :count)
+        expect {
+          contact.merge(loser_contact)
+        }.not_to change(Task, :count)
       }.to change(ActivityContact, :count).by(-1)
     end
 

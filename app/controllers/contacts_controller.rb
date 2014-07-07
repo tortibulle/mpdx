@@ -33,8 +33,8 @@ class ContactsController < ApplicationController
       wants.csv do
         @contacts = @filtered_contacts.includes(:primary_person, :primary_address,  people: :email_addresses)
         @headers = ['Contact Name', 'First Name', 'Last Name', 'Spouse First Name', 'Greeting',
-                    'Mailing Street Address','Mailing City', 'Mailing State','Mailing Postal Code',
-                    'Mailing Country', 'Email 1','Email 2','Email 3','Email 4']
+                    'Mailing Street Address', 'Mailing City', 'Mailing State', 'Mailing Postal Code',
+                    'Mailing Country', 'Email 1', 'Email 2', 'Email 3', 'Email 4']
 
         render_csv("contacts-#{Time.now.strftime('%Y%m%d')}")
       end
@@ -128,7 +128,7 @@ class ContactsController < ApplicationController
       if attributes_to_update['send_newsletter'].present?
         attributes_to_update['send_newsletter'] = nil if attributes_to_update['send_newsletter'] == 'none'
         if mail_chimp_account = current_account_list.mail_chimp_account
-          if %w[Email Both].include?(attributes_to_update['send_newsletter'])
+          if %w(Email Both).include?(attributes_to_update['send_newsletter'])
             contacts.map { |c| mail_chimp_account.queue_subscribe_contact(c) }
           else
             contacts.map { |c| mail_chimp_account.queue_unsubscribe_contact(c) }
@@ -183,7 +183,7 @@ class ContactsController < ApplicationController
   end
 
   def social_search
-    render nothing: true and return unless %[facebook twitter linkedin].include?(params[:network])
+    render nothing: true and return unless %(facebook twitter linkedin).include?(params[:network])
     @results = "Person::#{params[:network].titleize}Account".constantize.search(current_user, params)
     render layout: false
   end
@@ -307,9 +307,9 @@ class ContactsController < ApplicationController
     current_user.contacts_filter ||= {}
     clear_filters = params.delete(:clear_filter)
     if filters_params.present? && current_user.contacts_filter[current_account_list.id.to_s] != filters_params
-        @view_options[:page] = 1
-        current_user.contacts_filter[current_account_list.id.to_s] = filters_params
-        current_user.save
+      @view_options[:page] = 1
+      current_user.contacts_filter[current_account_list.id.to_s] = filters_params
+      current_user.save
     elsif clear_filters == 'true'
       current_user.contacts_filter[current_account_list.id.to_s] = nil
       current_user.save

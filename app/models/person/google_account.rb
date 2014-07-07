@@ -22,8 +22,8 @@ class Person::GoogleAccount < ActiveRecord::Base
     super
   end
 
-  def self.create_user_from_auth(auth_hash)
-    raise Person::Account::NoSessionError, 'Somehow a user without an account/session is trying to sign in using google'
+  def self.create_user_from_auth(_auth_hash)
+    fail Person::Account::NoSessionError, 'Somehow a user without an account/session is trying to sign in using google'
   end
 
   def google_integration(account_list_id)
@@ -63,7 +63,7 @@ class Person::GoogleAccount < ActiveRecord::Base
   end
 
   def refresh_token!
-    raise MissingRefreshToken, 'No refresh token' if refresh_token.blank?
+    fail MissingRefreshToken, 'No refresh token' if refresh_token.blank?
 
     # Refresh auth token from google_oauth2.
     params = {
@@ -81,9 +81,9 @@ class Person::GoogleAccount < ActiveRecord::Base
       else
         case json['error']
         when 'invalid_grant'
-          raise MissingRefreshToken, 'Invalid Grant'
+          fail MissingRefreshToken, 'Invalid Grant'
         else
-          raise response.inspect
+          fail response.inspect
         end
       end
     }

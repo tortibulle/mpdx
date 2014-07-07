@@ -36,7 +36,7 @@ class AccountList < ActiveRecord::Base
   has_many :tasks
   has_many :activities, dependent: :destroy
   has_many :imports, dependent: :destroy
-  has_one  :mail_chimp_account, dependent: :destroy
+  has_one :mail_chimp_account, dependent: :destroy
   has_many :notification_preferences, dependent: :destroy, autosave: true
   has_many :messages
   has_many :designation_profiles
@@ -206,9 +206,10 @@ class AccountList < ActiveRecord::Base
       next if merged_contacts.include?(contact)
 
       other_contacts = ordered_contacts.select {|c| c.name == contact.name &&
-                                                           c.id != contact.id &&
-                                                           (c.donor_accounts.first == contact.donor_accounts.first ||
-                                                            c.addresses.find { |a| contact.addresses.find { |ca| ca.equal_to? a } }) }
+                                                    c.id != contact.id &&
+                                                    (c.donor_accounts.first == contact.donor_accounts.first ||
+                                                     c.addresses.find { |a| contact.addresses.find { |ca| ca.equal_to? a } })
+      }
       if other_contacts.present?
         other_contacts.each do |other_contact|
           contact.merge(other_contact)

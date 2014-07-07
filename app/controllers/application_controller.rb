@@ -73,7 +73,7 @@ class ApplicationController < ActionController::Base
     Time.zone = old_time_zone
   end
 
-  def after_sign_out_path_for(resource_or_scope = :user)
+  def after_sign_out_path_for(_resource_or_scope = :user)
     case session[:signed_in_with]
     when 'relay'
       "https://signin.relaysso.org/cas/logout?service=#{login_url}"

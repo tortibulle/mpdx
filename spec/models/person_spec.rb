@@ -66,7 +66,7 @@ describe Person do
     let(:email) { 'test@example.com' }
 
     it 'creates an email' do
-      ->{
+      -> {
         person.email = email
         person.email_addresses.first.email.should == email
       }.should change(EmailAddress, :count).from(0).to(1)

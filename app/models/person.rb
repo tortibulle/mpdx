@@ -20,7 +20,7 @@ class Person < ActiveRecord::Base
   has_many :twitter_accounts, class_name: 'Person::TwitterAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
   has_one :twitter_account, -> { where('person_twitter_accounts.primary' => true) }, class_name: 'Person::TwitterAccount', foreign_key: :person_id
   has_many :facebook_accounts, class_name: 'Person::FacebookAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
-  has_one  :facebook_account, class_name: 'Person::FacebookAccount', foreign_key: :person_id
+  has_one :facebook_account, class_name: 'Person::FacebookAccount', foreign_key: :person_id
   has_many :linkedin_accounts, class_name: 'Person::LinkedinAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
   has_one :linkedin_account, -> { where('person_linkedin_accounts.valid_token' => true) }, class_name: 'Person::LinkedinAccount', foreign_key: :person_id
   has_many :google_accounts, class_name: 'Person::GoogleAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
@@ -65,7 +65,7 @@ class Person < ActiveRecord::Base
 
   before_create :find_master_person
   after_destroy :clean_up_master_person, :clean_up_contact_people
-  after_commit  :sync_with_mailchimp
+  after_commit :sync_with_mailchimp
   after_save :touch_contacts
 
   validates_presence_of :first_name
@@ -214,7 +214,8 @@ class Person < ActiveRecord::Base
   def merge_phone_numbers
     phone_numbers.reload.each do |phone_number|
       other_phone = phone_numbers.find { |pn| pn.id != phone_number.id &&
-                                                   pn == phone_number }
+                                              pn == phone_number
+      }
       if other_phone
         phone_number.merge(other_phone)
         merge_phone_numbers
@@ -228,7 +229,7 @@ class Person < ActiveRecord::Base
       other.messages_sent.update_all(from_id: id)
       other.messages_received.update_all(to_id: id)
 
-      %w[phone_numbers company_positions].each do |relationship|
+      %w(phone_numbers company_positions).each do |relationship|
         other.send(relationship.to_sym).each do |other_rel|
           unless send(relationship.to_sym).find { |rel| rel == other_rel }
             other_rel.update_column(:person_id, id)
@@ -239,8 +240,8 @@ class Person < ActiveRecord::Base
       merge_phone_numbers
 
       # handle a few things separately to check for duplicates
-      %w[twitter_accounts facebook_accounts linkedin_accounts
-        google_accounts relay_accounts organization_accounts].each do |relationship|
+      %w(twitter_accounts facebook_accounts linkedin_accounts
+         google_accounts relay_accounts organization_accounts).each do |relationship|
         other.send(relationship).each do |record|
           unless send(relationship).where(person_id: id, remote_id: record.remote_id).any?
             record.update_attributes!(person_id: id)

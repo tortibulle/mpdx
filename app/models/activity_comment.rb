@@ -13,8 +13,6 @@ class ActivityComment < ActiveRecord::Base
   private
 
   def ensure_person
-    unless person_id
-      self.person = Thread.current[:user]
-    end
+    self.person = Thread.current[:user] unless person_id
   end
 end

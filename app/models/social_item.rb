@@ -12,7 +12,7 @@ class SocialItem
                 :object_id
 
   def initialize(json, names)
-    %w[id message picture object_id type status_type link name caption description icon story].each do |field|
+    %w(id message picture object_id type status_type link name caption description icon story).each do |field|
       send("#{field}=".to_sym, json[field]) if json[field].present?
     end
     @created_time = Time.at(json['created_time'])

@@ -36,7 +36,6 @@ class Person::TwitterAccount < ActiveRecord::Base
   end
 
   def queue_import_data
-
   end
 
   def url

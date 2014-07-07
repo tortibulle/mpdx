@@ -8,7 +8,7 @@ class AddressExhibit < DisplayCase::Exhibit
   def to_html
     case country
     when 'United States', nil, '', 'USA', 'United States of America'
-      [street ? street.gsub(/\n/,'<br />') : nil, [[city, state].select(&:present?).join(', '), postal_code].select(&:present?).join(' ')].select(&:present?).join('<br />').html_safe
+      [street ? street.gsub(/\n/, '<br />') : nil, [[city, state].select(&:present?).join(', '), postal_code].select(&:present?).join(' ')].select(&:present?).join('<br />').html_safe
     else
       to_google
     end

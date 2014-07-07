@@ -7,7 +7,7 @@ describe PhoneNumber do
       @attributes = { 'number' => '123-345-2313' }
     end
     it "creates a phone number if it's new" do
-      ->{
+      -> {
         PhoneNumber.add_for_person(@person, @attributes)
         phone_number = @person.reload.phone_numbers.first
         phone_number.number.should == '+11233452313'
@@ -16,7 +16,7 @@ describe PhoneNumber do
 
     it "doesn't create a phone number if it exists" do
       PhoneNumber.add_for_person(@person, @attributes)
-      ->{
+      -> {
         PhoneNumber.add_for_person(@person, @attributes)
         @person.phone_numbers.first.number.should == '+11233452313'
       }.should_not change(PhoneNumber, :count)

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe MasterPerson do
   it 'should create a MasterPerson for a new person' do
-    ->{
+    -> {
       MasterPerson.find_or_create_for_person(Person.new)
     }.should change(MasterPerson, :count).from(0).to(1)
   end

@@ -25,7 +25,7 @@ class TntImportCsv < TntImport
       lines = read_csv(@import.file.file.file)
 
       unless lines.first.headers.include?('Organization Account IDs')
-        raise "export didn't include Organization Account IDs'"
+        fail "export didn't include Organization Account IDs'"
       end
 
       tnt_contacts = {}
@@ -37,7 +37,12 @@ class TntImportCsv < TntImport
         # add additional data to contact
         update_contact(contact, line)
 
-        unless is_true?(line['Is Organization'])
+        if true?(line['Is Organization'])
+          # organization
+          donor_accounts.each do |donor_account|
+            add_or_update_company(line, donor_account)
+          end
+        else
           # person
           donor_accounts.each do |donor_account|
             primary_person, primary_contact_person = add_or_update_primary_contact(line, donor_account, contact)
@@ -53,11 +58,6 @@ class TntImportCsv < TntImport
             end
             # TODO: handle children
 
-          end
-        else
-          # organization
-          donor_accounts.each do |donor_account|
-            add_or_update_company(line, donor_account)
           end
         end
       end
@@ -90,11 +90,11 @@ class TntImportCsv < TntImport
     contact.status = lookup_mpd_phase(line['MPD Phase']) if (@import.override? || contact.status.blank?) && lookup_mpd_phase(line['MPD Phase']).present?
     contact.next_ask = parse_date(line['Next Ask']) if (@import.override? || contact.next_ask.blank?) && line['Next Ask'].present?
     contact.likely_to_give = contact.assignable_likely_to_gives[line['Likely To Give'].to_i - 1] if (@import.override? || contact.likely_to_give.blank?) && line['Likely To Give'].to_i != 0
-    contact.never_ask = is_true?(line['Never Ask']) if @import.override? || contact.never_ask.blank?
+    contact.never_ask = true?(line['Never Ask']) if @import.override? || contact.never_ask.blank?
     contact.church_name = line['Church Name'] if @import.override? || contact.church_name.blank?
-    contact.send_newsletter = 'Physical' if (@import.override? || contact.send_newsletter.blank?) && is_true?(line['Send Newsletter'])
-    contact.direct_deposit = is_true?(line['Direct Deposit']) if @import.override? || contact.direct_deposit.blank?
-    contact.magazine = is_true?(line['Magazine']) if @import.override? || contact.magazine.blank?
+    contact.send_newsletter = 'Physical' if (@import.override? || contact.send_newsletter.blank?) && true?(line['Send Newsletter'])
+    contact.direct_deposit = true?(line['Direct Deposit']) if @import.override? || contact.direct_deposit.blank?
+    contact.magazine = true?(line['Magazine']) if @import.override? || contact.magazine.blank?
     contact.last_activity = parse_date(line['Last Activity']) if (@import.override? || contact.last_activity.blank?) && line['Last Activity'].present?
     contact.last_appointment = parse_date(line['Last Appointment']) if (@import.override? || contact.last_appointment.blank?) && line['Last Appointment'].present?
     contact.last_letter = parse_date(line['Last Letter']) if (@import.override? || contact.last_letter.blank?) && line['Last Letter'].present?
@@ -106,14 +106,13 @@ class TntImportCsv < TntImport
     contact.save
   end
 
-  def is_true?(val)
+  def true?(val)
     val.upcase == 'TRUE'
   end
 
   def parse_date(val)
-    begin
-      Date.parse(val)
-    rescue; end
+    Date.parse(val)
+  rescue
   end
 
   def lookup_mpd_phase(phase)
@@ -198,14 +197,20 @@ class TntImportCsv < TntImport
     person.attributes = { first_name: line[prefix + 'First/Given Name'], last_name: line[prefix + 'Last/Family Name'], middle_name: line[prefix + 'Middle Name'],
                           title: line[prefix + 'Title'], suffix: line[prefix + 'Suffix'], gender: prefix.present? ? 'female' : 'male' }
     # Phone numbers
+    phone_number_locations =
     { 'Home Phone' => 'home', 'Home Phone 2' => 'home', 'Home Fax' => 'fax',
-      'Business Phone' => 'work', 'Business Phone 2' => 'work', 'Business Fax' => 'fax',
-      'Company Main Phone' => 'work', 'Assistant Phone' => 'work', 'Other Phone' => 'other',
-      'Car Phone' => 'mobile', 'Mobile Phone' => 'mobile', 'Pager Number' => 'other',
-      'Callback Phone' => 'other', 'ISDN Phone' => 'other', 'Primary Phone' => 'other',
-      'Radio Phone' => 'other', 'Telex Phone' => 'other' }.each_with_index do |key, i|
-       person.phone_number = { number: line[key[0]], location: key[1], primary: line['Preferred Phone Type'].to_i == i } if line[key[0]].present?
-     end
+      'Business Phone' => 'work', 'Business Phone 2' => 'work',
+      'Business Fax' => 'fax', 'Company Main Phone' => 'work',
+      'Assistant Phone' => 'work', 'Other Phone' => 'other',
+      'Car Phone' => 'mobile', 'Mobile Phone' => 'mobile',
+      'Pager Number' => 'other', 'Callback Phone' => 'other',
+      'ISDN Phone' => 'other', 'Primary Phone' => 'other',
+      'Radio Phone' => 'other', 'Telex Phone' => 'other' }
+    phone_number_locations.each_with_index do |key, i|
+      next unless line[key[0]].present?
+      person.phone_number = { number: line[key[0]], location: key[1],
+                              primary: line['Preferred Phone Type'].to_i == i }
+    end
 
     # email address
     3.times do |i|
@@ -242,17 +247,17 @@ class TntImportCsv < TntImport
 
   def build_address_array(line)
     addresses = []
-    %w[Home Business Other].each_with_index do |location, i|
-      if [line["#{location} Street Address"],line["#{location} City"],line["#{location} State/Province"],line["#{location} ZIP/Postal Code"]].any?(&:present?)
+    %w(Home Business Other).each_with_index do |location, i|
+      if [line["#{location} Street Address"], line["#{location} City"], line["#{location} State/Province"], line["#{location} ZIP/Postal Code"]].any?(&:present?)
         addresses << {
-                        street: line["#{location} Street Address"],
-                        city: line["#{location} City"],
-                        state: line["#{location} State/Province"],
-                        postal_code: line["#{location} ZIP/Postal Code"],
-                        country: line["#{location} Country/Region"],
-                        location: location,
-                        primary_mailing_address: line['Preferred Address Type'].to_i == (i + 1)
-                      }
+          street: line["#{location} Street Address"],
+          city: line["#{location} City"],
+          state: line["#{location} State/Province"],
+          postal_code: line["#{location} ZIP/Postal Code"],
+          country: line["#{location} Country/Region"],
+          location: location,
+          primary_mailing_address: line['Preferred Address Type'].to_i == (i + 1)
+        }
       end
     end
 

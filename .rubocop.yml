@@ -17,6 +17,9 @@ Style/MethodLength:
   CountComments: false
   Max: 20
 
+ClassLength:
+  Enabled: false
+
 CommentIndentation:
   Enabled: false
 
@@ -24,16 +27,25 @@ AssignmentInCondition:
   Enabled: false
 
 # Hope to soon enable
+ClassAndModuleChildren:
+  Enabled: false
+
 CyclomaticComplexity:
   Enabled: false
 
 GuardClause:
   Enabled: false
 
+HandleExceptions:
+  Enabled: false
+
 LeadingCommentSpace:
   Enabled: false
 
 Lambda:
+  Enabled: false
+
+SingleLineMethods:
   Enabled: false
 
 Style/LineLength:

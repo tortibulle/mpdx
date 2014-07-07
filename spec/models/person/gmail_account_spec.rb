@@ -76,13 +76,14 @@ describe Person::GmailAccount do
   context '#log_email' do
     let(:gmail_message) { double(message: double(multipart?: false, body: double(decoded: 'message body')),
                                  envelope: double(date: Time.zone.now, message_id: '1'),
-                                 subject: 'subject') }
+                                 subject: 'subject')
+    }
 
     it 'creates a completed task' do
       expect {
-      expect {
-        gmail_account.log_email(gmail_message, account_list, contact, person.id, user.id, 'Done')
-      }.to change(Task, :count).by(1)
+        expect {
+          gmail_account.log_email(gmail_message, account_list, contact, person.id, user.id, 'Done')
+        }.to change(Task, :count).by(1)
       }.to change(ActivityComment, :count).by(1)
 
       task = Task.last
@@ -96,9 +97,9 @@ describe Person::GmailAccount do
       create(:task, account_list: account_list, remote_id: gmail_message.envelope.message_id, source: 'gmail')
 
       expect {
-      expect {
-        gmail_account.log_email(gmail_message, account_list, contact, person.id, user.id, 'Done')
-      }.not_to change(Task, :count)
+        expect {
+          gmail_account.log_email(gmail_message, account_list, contact, person.id, user.id, 'Done')
+        }.not_to change(Task, :count)
       }.to change(ActivityContact, :count).by(1)
     end
 

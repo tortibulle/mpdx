@@ -10,7 +10,7 @@ class Import < ActiveRecord::Base
   mount_uploader :file, ImportUploader
   belongs_to :account_list
   # attr_accessible :file, :importing, :source, :file_cache, :override, :tags
-  validates :source, inclusion: { in: %w[facebook twitter linkedin tnt] }
+  validates :source, inclusion: { in: %w(facebook twitter linkedin tnt) }
   # validates_with TntImportValidator, if: lambda {|import| 'tnt' == import.source }
   validates_with FacebookImportValidator, if: lambda { |import| 'facebook' == import.source }
 

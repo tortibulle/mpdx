@@ -94,7 +94,7 @@ describe Siebel do
     it "creates a designation account when it can't find one" do
       expect {
         siebel.send(:find_or_create_designation_account, '1', designation_profile,
-                                                          name: 'foo')
+                    name: 'foo')
 
       }.to change { DesignationAccount.count }.by(1)
     end
@@ -104,7 +104,7 @@ describe Siebel do
 
       expect {
         siebel.send(:find_or_create_designation_account, da1.designation_number, designation_profile,
-                                                          name: 'foo')
+                    name: 'foo')
 
       }.not_to change { DesignationAccount.count }
 
@@ -304,7 +304,7 @@ describe Siebel do
     it 'adds a new address' do
       expect {
         siebel.send(:add_or_update_address, siebel_address, contact)
-      }.to change{ Address.count }.by(1)
+      }.to change { Address.count }.by(1)
     end
 
     it 'updates an existing address' do
@@ -395,7 +395,7 @@ describe Siebel do
 
   context '#profiles_with_designation_numbers' do
     it 'returns a hash of attributes' do
-      siebel.should_receive(:profiles).and_return([SiebelDonations::Profile.new('id' => '','name' => 'Profile 1','designations' => [{ 'number' => '1234' }])])
+      siebel.should_receive(:profiles).and_return([SiebelDonations::Profile.new('id' => '', 'name' => 'Profile 1', 'designations' => [{ 'number' => '1234' }])])
       siebel.profiles_with_designation_numbers.should == [{ name: 'Profile 1', code: '', designation_numbers: ['1234'] }]
     end
   end
