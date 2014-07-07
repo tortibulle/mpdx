@@ -37,7 +37,7 @@ class GoogleIntegrationsController < ApplicationController
   end
 
   def google_integration_params
-    params.require(:google_integration).permit([:calendar_integration, { calendar_integrations: [] }, :calendar_id, :calendar_name, :new_calendar])
+    params.require(:google_integration).permit([:calendar_integration, { calendar_integrations: [] }, :calendar_id, :calendar_name, :new_calendar, :email_integration])
   end
 
   def missing_refresh_token

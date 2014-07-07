@@ -36,10 +36,6 @@ class Person::GoogleAccount < ActiveRecord::Base
 
   def self.one_per_user?() false; end
 
-  def token_expired?
-    expires_at < Time.now
-  end
-
   def import_emails(account_list)
     since = last_email_sync || 30.days.ago
 
@@ -91,14 +87,6 @@ class Person::GoogleAccount < ActiveRecord::Base
     ensure
       client.logout
     end
-  end
-
-  def client
-    unless @client
-      @client = Google::APIClient.new(application_name: 'MPDX', application_version: '1.0')
-      @client.authorization.access_token = token
-    end
-    @client
   end
 
   def plus
