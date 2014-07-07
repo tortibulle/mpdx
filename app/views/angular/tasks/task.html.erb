@@ -13,7 +13,7 @@
         </div>
         <span ng-hide="task.activity_type === ''">{{task.activity_type}}</span>
         <strong><span class="tasktitle">{{task.subject}}</span></strong>
-        <span ng-show="task.completed">- {{task.result}} {{task.next_action}} - {{task.created_at | ignoreTimezone | date:'MM/dd/yyyy, h:mma'}}</span>
+        <span ng-show="task.completed">- {{task.result}} {{task.next_action}} - {{task.completed_at | ignoreTimezone | date:'MM/dd/yyyy, h:mma'}}</span>
         <span ng-show="!task.completed">- {{task.due_date | ignoreTimezone | date:'MM/dd/yyyy, h:mma'}}</span>
 
         <div style="display:inline" class="tags">
