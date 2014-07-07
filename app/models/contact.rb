@@ -45,7 +45,7 @@ class Contact < ActiveRecord::Base
     {
       contact_referrals_to_me_attributes: [:referred_by_id, :_destroy, :id],
       donor_accounts_attributes: [:account_number, :organization_id, :_destroy, :id],
-      addresses_attributes: [:remote_id, :master_address_id, :location, :street, :city, :state, :postal_code, :country, :primary_mailing_address, :_destroy, :id],
+      addresses_attributes: [:remote_id, :master_address_id, :location, :street, :city, :state, :postal_code, :region, :metro_area, :country, :primary_mailing_address, :_destroy, :id],
       people_attributes: Person::PERMITTED_ATTRIBUTES
     }
   ]

@@ -42,6 +42,20 @@
           </li>
 
           <li>
+            <label id="filter_region"><%= _('Region') %></label>
+            <div class="collapse" style="display:none;">
+              <%= select_tag 'filters[region]', options_for_select([[_('-- Any --'), '']] + current_account_list.regions.select(&:present?)), multiple: true, size: 5, :'ng-model' => 'contactQuery.region' %>
+            </div>
+          </li>
+
+          <li>
+            <label id="filter_metro_area"><%= _('Metro Area') %></label>
+            <div class="collapse" style="display:none;">
+              <%= select_tag 'filters[metro_area]', options_for_select([[_('-- Any --'), '']] + current_account_list.metro_areas.select(&:present?)), multiple: true, size: 5, :'ng-model' => 'contactQuery.metro_area' %>
+            </div>
+          </li>
+
+          <li>
             <label id="filter_newsletter"><%= _('Newsletter Recipients') %></label>
             <div class="collapse" style="display:none;">
               <%= radio_button_tag '', '', false, :'ng-model' => 'contactQuery.newsletter' %> <%= _('-- Any --') %><br />

@@ -92,6 +92,20 @@ class AccountList < ActiveRecord::Base
                                                        order by a.state")
   end
 
+  def regions
+    @regions ||= ActiveRecord::Base.connection.select_values("select distinct(a.region) from account_lists al inner join contacts c on c.account_list_id = al.id
+                                                       inner join addresses a on a.addressable_id = c.id AND a.addressable_type = 'Contact' where al.id = #{id}
+                                                       AND (#{Contact.active_conditions})
+                                                       order by a.region")
+  end
+
+  def metro_areas
+    @metro_areas ||= ActiveRecord::Base.connection.select_values("select distinct(a.metro_area) from account_lists al inner join contacts c on c.account_list_id = al.id
+                                                       inner join addresses a on a.addressable_id = c.id AND a.addressable_type = 'Contact' where al.id = #{id}
+                                                       AND (#{Contact.active_conditions})
+                                                       order by a.metro_area")
+  end
+
   def churches
     @churches ||= ActiveRecord::Base.connection.select_values("select distinct(c.church_name) from account_lists al inner join contacts c on c.account_list_id = al.id
                                                        where al.id = #{id}
