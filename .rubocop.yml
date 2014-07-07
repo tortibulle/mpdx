@@ -26,11 +26,26 @@ CommentIndentation:
 AssignmentInCondition:
   Enabled: false
 
+GlobalVars:
+  Exclude:
+    - 'app/controllers/application_controller.rb'
+    - 'spec/spec_helper.rb'
+
 # Hope to soon enable
+AccessorMethodName:
+  # we have a bunch of methods starting with get_
+  Enabled: false
+
 ClassAndModuleChildren:
   Enabled: false
 
+ClassVars:
+  Enabled: false
+
 CyclomaticComplexity:
+  Enabled: false
+
+Eval:
   Enabled: false
 
 GuardClause:
@@ -45,6 +60,9 @@ LeadingCommentSpace:
 Lambda:
   Enabled: false
 
+ParameterLists:
+  Enabled: false
+
 SingleLineMethods:
   Enabled: false
 
@@ -52,6 +70,9 @@ Style/LineLength:
   Enabled: false
 
 Style/Next:
+  Enabled: false
+
+Rails/Validation:
   Enabled: false
 
 Void:

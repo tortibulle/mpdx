@@ -18,7 +18,7 @@ class EmailAddress < ActiveRecord::Base
 
   def self.add_for_person(person, attributes)
     attributes = attributes.with_indifferent_access.except(:_destroy)
-    then_cb = Proc.new do |_exception, _handler, _attempts, _retries, _times|
+    then_cb = proc do |_exception, _handler, _attempts, _retries, _times|
       person.email_addresses.reload
     end
 
@@ -40,7 +40,7 @@ class EmailAddress < ActiveRecord::Base
         if email = person.email_addresses.find { |e| e.email == attributes['email'].to_s.strip }
           email.attributes = attributes
         else
-          attributes['primary'] = (person.email_addresses.present? ? false : true) if attributes['primary'].nil?
+          attributes['primary'] ||= !person.email_addresses.present?
           new_or_create = person.new_record? ? :new : :create
           email = person.email_addresses.send(new_or_create, attributes)
         end
@@ -66,35 +66,33 @@ class EmailAddress < ActiveRecord::Base
   end
 
   def sync_with_mail_chimp
-    if mail_chimp_account
-      if contact && contact.send_email_letter?
+    return unless mail_chimp_account
+    if contact && contact.send_email_letter?
 
-        # If the value of the email field changed, unsubscribe the old
-        if changed.include?('email') && email_was.present?
-          mail_chimp_account.queue_update_email(email_was, email)
-        end
+      # If the value of the email field changed, unsubscribe the old
+      if changed.include?('email') && email_was.present?
+        mail_chimp_account.queue_update_email(email_was, email)
+      end
 
-        if changed.include?('primary')
-          if primary?
-            # If this is the newly designated primary email, we need to
-            # change the old one to this one
-            if old_email = person.primary_email_address.try(:email)
-              mail_chimp_account.queue_update_email(old_email, email)
-            else
-              mail_chimp_account.queue_subscribe_person(person)
-            end
-          else
-            # If this used to be the primary, and now isn't, that means
-            # something else is now the primary and will take care of
-            # updating itself.
-          end
+      return unless changed.include?('primary')
+      if primary?
+        # If this is the newly designated primary email, we need to
+        # change the old one to this one
+        if old_email = person.primary_email_address.try(:email)
+          mail_chimp_account.queue_update_email(old_email, email)
+        else
+          mail_chimp_account.queue_subscribe_person(person)
         end
       else
-        begin
-          mail_chimp_account.queue_unsubscribe_email(email)
-        rescue Gibbon::MailChimpError => e
-          logger.info(e)
-        end
+        # If this used to be the primary, and now isn't, that means
+        # something else is now the primary and will take care of
+        # updating itself.
+      end
+    else
+      begin
+        mail_chimp_account.queue_unsubscribe_email(email)
+      rescue Gibbon::MailChimpError => e
+        logger.info(e)
       end
     end
   end

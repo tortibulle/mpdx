@@ -11,11 +11,14 @@ class Api::V1::ContactsController < Api::V1::BaseController
 
     filtered_contacts = add_includes_and_order(filtered_contacts, order: order)
 
-    meta = params[:since] ?
-      {
+    if params[:since]
+      meta = {
         deleted: Version.where(item_type: 'Contact', event: 'destroy', related_object_type: 'AccountList', related_object_id: current_account_list.id).where('created_at > ?', Time.at(params[:since].to_i)).pluck(:item_id),
         inactivated: inactivated
-      } : {}
+      }
+    else
+      meta = {}
+    end
 
     meta.merge!(total: filtered_contacts.total_entries, from: correct_from(filtered_contacts),
                 to: correct_to(filtered_contacts), page: page,

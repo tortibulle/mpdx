@@ -11,9 +11,7 @@ class Api::V1::DonationsController < Api::V1::BaseController
            callback: params[:callback]
   end
 
-  def donations
-    current_account_list.donations
-  end
+  delegate :donations, to: :current_account_list
 
   protected
 

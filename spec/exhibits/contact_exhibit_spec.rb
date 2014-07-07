@@ -33,7 +33,7 @@ describe ContactExhibit do
     address = create(:address, addressable: contact)
     contact.addresses << address
     contact.mailing_address.should eq address
-    exhib.send_newsletter_error.should == nil
+    exhib.send_newsletter_error.should.nil?
   end
 
   it 'should have a newsletter error' do

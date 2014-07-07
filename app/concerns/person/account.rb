@@ -42,6 +42,7 @@ module Person::Account
     end
 
     def one_per_user?() true; end
+
     def queue() :import; end
   end
 

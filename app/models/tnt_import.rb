@@ -20,7 +20,7 @@ class TntImport
           # to unescape a unicode character.
           begin
             bad_char = e.message.match(/"([^"]*)"/)[1]
-            @contents.gsub!(eval(%Q("#{bad_char}")), ' ')
+            @contents.gsub!(eval(%Q("#{bad_char}")), ' ') # rubocop:disable Eval
           rescue
             raise e
           end

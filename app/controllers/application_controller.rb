@@ -1,7 +1,8 @@
+# rubocop:disable RegexpLiteral
 class ApplicationController < ActionController::Base
   force_ssl(if: :ssl_configured?, except: :lb)
   ensure_security_headers
-  MAX_PER_PAGE = 4294967296
+  MAX_PER_PAGE = 4_294_967_296
 
   protect_from_forgery
   before_action :redirect_to_mobile
@@ -21,7 +22,8 @@ class ApplicationController < ActionController::Base
 
     if !session[:fullsite] && mobile_agent
       url = 'http://m.mpdx.org/#' + request.fullpath[1..-1]
-      redirect_to url and return false
+      redirect_to url
+      return false
     end
   end
 

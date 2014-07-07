@@ -6,7 +6,7 @@ class PersonSerializer < ActiveModel::Serializer
                 :anniversary_month, :anniversary_year, :anniversary_day, :title, :suffix, :gender,
                 :marital_status, :master_person_id, :birthday_day, :avatar]
 
-  attributes *ATTRIBUTES
+  attributes(*ATTRIBUTES)
 
   INCLUDES = [:phone_numbers, :email_addresses, :facebook_accounts]
   INCLUDES.each do |i|

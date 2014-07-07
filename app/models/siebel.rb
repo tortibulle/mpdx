@@ -50,11 +50,11 @@ class Siebel < DataServer
     profile.designation_accounts.each do |da|
       if da.staff_account_id.present?
         balance = SiebelDonations::Balance.find(employee_ids: da.staff_account_id).first
-        da.update_attributes(balance: balance.primary, balance_updated_at: Time.now())
+        da.update_attributes(balance: balance.primary, balance_updated_at: Time.now)
         total += balance.primary
       end
     end
-    profile.update_attributes(balance: total, balance_updated_at: Time.now())
+    profile.update_attributes(balance: total, balance_updated_at: Time.now)
     profile
   end
 
@@ -128,7 +128,7 @@ class Siebel < DataServer
 
   def find_or_create_designation_account(number, profile, extra_attributes = {})
     @designation_accounts ||= {}
-    unless @designation_accounts.has_key?(number)
+    unless @designation_accounts.key?(number)
       da = Retryable.retryable do
         @org.designation_accounts.where(designation_number: number).first_or_create
       end
@@ -252,7 +252,7 @@ class Siebel < DataServer
 
     person = donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
 
-    if !person
+    unless person
       person = contact.people.where(first_name: siebel_person.first_name, last_name: siebel_person.last_name).first
     end
 

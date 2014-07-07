@@ -33,7 +33,7 @@ describe TntImport do
         tnt_import.account_list = account_list
         tnt_import.save
         TntImport.new(tnt_import)
-        contact.tnt_id = 1620699916
+        contact.tnt_id = 1_620_699_916
         contact.status = 'Ask in Future'
         contact.account_list = account_list
         contact.save

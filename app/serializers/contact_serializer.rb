@@ -10,7 +10,7 @@ class ContactSerializer < ActiveModel::Serializer
                 :magazine, :last_activity, :last_appointment, :last_letter, :last_phone_call, :last_pre_call,
                 :last_thank, :avatar, :square_avatar, :referrals_to_me_ids, :tag_list, :uncompleted_tasks_count, :timezone]
 
-  attributes *ATTRIBUTES
+  attributes(*ATTRIBUTES)
 
   INCLUDES = [:people, :addresses]
   INCLUDES.each do |i|

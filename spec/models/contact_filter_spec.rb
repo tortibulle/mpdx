@@ -15,13 +15,13 @@ describe ContactFilter do
     end
 
     it 'filters contacts with statuses null and another' do
-      nilStatus = create(:contact, status: nil)
-      hasStatus = create(:contact, status: 'Never Contacted')
+      nil_status = create(:contact, status: nil)
+      has_status = create(:contact, status: 'Never Contacted')
       cf = ContactFilter.new(status: ['null', 'Never Contacted'])
 
       filtered_contacts = cf.filter(Contact)
-      filtered_contacts.should include nilStatus
-      filtered_contacts.should include hasStatus
+      filtered_contacts.should include nil_status
+      filtered_contacts.should include has_status
     end
   end
 end

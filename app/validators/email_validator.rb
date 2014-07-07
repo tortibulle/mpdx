@@ -17,7 +17,7 @@ class EmailValidator < ActiveModel::EachValidator
   private
 
   def valid?
-    !!(domain_and_address_present? && domain_has_more_than_one_atom?)
+    domain_and_address_present? && domain_has_more_than_one_atom?
   end
 
   def domain_and_address_present?

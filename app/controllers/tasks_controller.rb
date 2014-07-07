@@ -105,7 +105,7 @@ class TasksController < ApplicationController
       respond_to do |format|
         if @task.save
           format.html {
-            redirect_to (session[:contact_redirect_to] || tasks_path)
+            redirect_to session[:contact_redirect_to] || tasks_path
             session[:contact_redirect_to] = nil
           }
           format.js

@@ -55,7 +55,7 @@ class DataServer
 
   def import_donors(profile, date_from = nil)
     check_credentials!
-    date_from = date_from.strftime('%m/%d/%Y')if date_from.present?
+    date_from = date_from.strftime('%m/%d/%Y') if date_from.present?
 
     user = @org_account.user
 
@@ -368,7 +368,7 @@ class DataServer
 
   def find_or_create_designation_account(number, profile, extra_attributes = {})
     @designation_accounts ||= {}
-    unless @designation_accounts.has_key?(number)
+    unless @designation_accounts.key?(number)
       da = Retryable.retryable do
         @org.designation_accounts.where(designation_number: number).first_or_create
       end
@@ -403,7 +403,7 @@ class DataServer
   end
 
   def update_url(url)
-    Proc.new { |exception, _handler, _attempts, _retries, _times|
+    proc { |exception, _handler, _attempts, _retries, _times|
       @org.update_attributes(url => exception.message)
     }
   end

@@ -1,3 +1,4 @@
+# rubocop:disable BlockNesting
 class ContactFilter
   attr_accessor :contacts, :filters
 
@@ -51,7 +52,7 @@ class ContactFilter
       end
 
       if @filters[:status].present? && @filters[:status].first != ''
-        if !@filters[:status].include? '*'
+        unless @filters[:status].include? '*'
           if (@filters[:status].include? '') && !(@filters[:status].include?('null'))
             @filters[:status] << 'null'
           end
@@ -71,7 +72,7 @@ class ContactFilter
       end
 
       if @filters[:referrer].present? && @filters[:referrer].first != ''
-        if(@filters[:referrer].first == '*')
+        if (@filters[:referrer].first == '*')
           filtered_contacts = filtered_contacts.joins(:contact_referrals_to_me).where('contact_referrals.referred_by_id is not null').uniq
         else
           filtered_contacts = filtered_contacts.joins(:contact_referrals_to_me).where('contact_referrals.referred_by_id' => @filters[:referrer]).uniq

@@ -16,14 +16,14 @@ describe Contact do
     it 'should mark an address deleted' do
       address = create(:address, addressable: contact)
 
-      contact.addresses_attributes = [ { id: address.id, _destroy: '1' } ]
+      contact.addresses_attributes = [{ id: address.id, _destroy: '1' }]
       contact.save!
 
       address.reload.deleted.should == true
     end
 
     it 'should update an address' do
-      stub_request(:get, /http:\/\/api\.smartystreets\.com\/street-address/)
+      stub_request(:get, %r{http:\/\/api\.smartystreets\.com\/street-address})
          .with(headers: { 'Accept' => 'application/json', 'Accept-Encoding' => 'gzip, deflate', 'Content-Type' => 'application/json', 'User-Agent' => 'Ruby' })
          .to_return(status: 200, body: '[]', headers: {})
 

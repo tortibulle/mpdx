@@ -38,7 +38,7 @@ class PersonExhibit < DisplayCase::Exhibit
       root_url = (@context) ? @context.root_url : 'https://mpdx.org'
       url = URI.join(root_url, url).to_s
     end
-    return url
+    url
   end
 
   def twitter_handles
@@ -51,7 +51,7 @@ class PersonExhibit < DisplayCase::Exhibit
     name
   end
 
-  def has_social?
+  def social?
     facebook_account || twitter_account || linkedin_account
   end
 end

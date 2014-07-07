@@ -151,7 +151,7 @@ describe ContactsController do
 
       it "ignores a partial 'next ask' value" do
         xhr :put, :bulk_update,  'bulk_edit_contact_ids' => contact.id, 'contact' => { 'next_ask(3i)' => '3', 'next_ask(1i)' => '2012' }
-        contact.reload.next_ask.should == nil
+        contact.reload.next_ask.should.nil?
       end
 
     end

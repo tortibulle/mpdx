@@ -78,7 +78,7 @@ describe AccountsController do
     describe "GET 'failure'" do
       it 'redirects to index' do
         get 'failure'
-        flash[:alert].should_not == nil
+        flash[:alert].should_not.nil?
         response.should redirect_to(accounts_path)
       end
     end

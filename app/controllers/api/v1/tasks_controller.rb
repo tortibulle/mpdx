@@ -1,8 +1,10 @@
 class Api::V1::TasksController < Api::V1::BaseController
   def index
-    meta = params[:since] ?
-        { deleted: Version.where(item_type: 'Activity', event: 'destroy', related_object_type: 'AccountList', related_object_id: current_account_list.id).where('created_at > ?', Time.at(params[:since].to_i)).pluck(:item_id) } :
-        {}
+    if params[:since]
+      meta = { deleted: Version.where(item_type: 'Activity', event: 'destroy', related_object_type: 'AccountList', related_object_id: current_account_list.id).where('created_at > ?', Time.at(params[:since].to_i)).pluck(:item_id) }
+    else
+      meta = {}
+    end
 
     meta.merge!(total: tasks.total_entries, from: correct_from(tasks),
                 to: correct_to(tasks), page: page,

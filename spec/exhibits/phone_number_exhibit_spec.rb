@@ -13,7 +13,7 @@ describe PhoneNumberExhibit do
   it "should return nil number if it's not a valid phone number" do
     phone_number.number = '555'
     phone_number.country_code = '2'
-    subject.number.should == nil
+    subject.number.should.nil?
   end
 
 end

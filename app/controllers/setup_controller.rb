@@ -13,7 +13,8 @@ class SetupController < ApplicationController
     when :social_accounts
     when :finish
       current_user.setup_finished!
-      redirect_to '/' and return
+      redirect_to '/'
+      return
     end
     render_wizard
   end

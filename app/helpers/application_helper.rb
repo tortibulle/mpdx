@@ -84,7 +84,7 @@ module ApplicationHelper
     end
 
     case collection.total_entries
-    when 0, 1; ''
+    when 0, 1 then ''
     else
       _("Displaying #{b}%{from}#{sp}-#{sp}%{to}#{eb} of #{b}%{count}#{eb}").localize % {
         count: collection.total_entries,

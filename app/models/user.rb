@@ -64,7 +64,7 @@ class User < Person
     # look for an authenticated record from this provider
     user = provider.find_authenticated_user(auth_hash)
     unless user
-      # TODO hook into IdM to find other identities for this person
+      # TODO: hook into IdM to find other identities for this person
       # that might link to an existing user in MPDX
 
       # Create a new user

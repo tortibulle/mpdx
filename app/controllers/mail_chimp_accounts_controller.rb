@@ -5,7 +5,8 @@ class MailChimpAccountsController < ApplicationController
     @mail_chimp_account.validate_key if current_account_list.mail_chimp_account
 
     unless @mail_chimp_account.active?
-      redirect_to new_mail_chimp_account_path and return
+      redirect_to new_mail_chimp_account_path
+      return
     end
 
     unless @mail_chimp_account.primary_list

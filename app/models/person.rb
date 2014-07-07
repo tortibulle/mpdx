@@ -277,7 +277,7 @@ class Person < ActiveRecord::Base
       # Copy fields over updating any field that's blank on the winner
       [:first_name, :last_name, :legal_first_name, :birthday_month, :birthday_year, :birthday_day, :anniversary_month,
        :anniversary_year, :anniversary_day, :title, :suffix, :gender, :marital_status,
-       :middle_name,].each do |field|
+       :middle_name].each do |field|
         if send(field).blank? && other.send(field).present?
           send("#{field}=".to_sym, other.send(field))
         end

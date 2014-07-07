@@ -123,20 +123,19 @@ class ContactsController < ApplicationController
     end
 
     attributes_to_update = contact_params.select { |_, v| v.present? }
-    if attributes_to_update.present?
-      # Since update_all doesn't trigger callbacks, we need to manually sync with mail chimp
-      if attributes_to_update['send_newsletter'].present?
-        attributes_to_update['send_newsletter'] = nil if attributes_to_update['send_newsletter'] == 'none'
-        if mail_chimp_account = current_account_list.mail_chimp_account
-          if %w(Email Both).include?(attributes_to_update['send_newsletter'])
-            contacts.map { |c| mail_chimp_account.queue_subscribe_contact(c) }
-          else
-            contacts.map { |c| mail_chimp_account.queue_unsubscribe_contact(c) }
-          end
+    return unless attributes_to_update.present?
+    # Since update_all doesn't trigger callbacks, we need to manually sync with mail chimp
+    if attributes_to_update['send_newsletter'].present?
+      attributes_to_update['send_newsletter'] = nil if attributes_to_update['send_newsletter'] == 'none'
+      if mail_chimp_account = current_account_list.mail_chimp_account
+        if %w(Email Both).include?(attributes_to_update['send_newsletter'])
+          contacts.map { |c| mail_chimp_account.queue_subscribe_contact(c) }
+        else
+          contacts.map { |c| mail_chimp_account.queue_unsubscribe_contact(c) }
         end
       end
-      contacts.update_all(attributes_to_update)
     end
+    contacts.update_all(attributes_to_update)
   end
 
   def merge
@@ -183,9 +182,12 @@ class ContactsController < ApplicationController
   end
 
   def social_search
-    render nothing: true and return unless %(facebook twitter linkedin).include?(params[:network])
-    @results = "Person::#{params[:network].titleize}Account".constantize.search(current_user, params)
-    render layout: false
+    if %(facebook twitter linkedin).include?(params[:network])
+      @results = "Person::#{params[:network].titleize}Account".constantize.search(current_user, params)
+      render layout: false
+    else
+      render nothing: true
+    end
   end
 
   def add_referrals

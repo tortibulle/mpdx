@@ -39,7 +39,7 @@ class Person::OrganizationAccountsController < ApplicationController
 
   def update
     @organization_account = current_user.organization_accounts.find(params[:id])
-    if !@organization_account.update_attributes(person_organization_account_params)
+    unless @organization_account.update_attributes(person_organization_account_params)
       render :edit
     end
   end
