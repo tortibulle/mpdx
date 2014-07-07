@@ -117,4 +117,5 @@ group :test do
   gem 'capybara'
   gem 'resque_spec'
   gem 'emoji_spec', :git => "https://gist.github.com/6112257.git"
+  gem 'rubocop', '~> 0.24.1'
 end
