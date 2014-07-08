@@ -417,6 +417,7 @@ angular.module('mpdxApp')
                         task: {
                             start_at: $scope.followUpDialogResult.callTask.date + ' ' + $scope.followUpDialogResult.callTask.hour + ':' + $scope.followUpDialogResult.callTask.min + ':00',
                             subject: $scope.followUpDialogResult.callTask.subject,
+                            tag_list: $scope.followUpDialogResult.callTask.tags,
                             activity_type: taskType,
                             activity_contacts_attributes: contactsObject,
                             activity_comments_attributes: {
