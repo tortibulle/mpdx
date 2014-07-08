@@ -15,6 +15,10 @@
     <%= builder.text_field :state, placeholder: "State" %>
     <%= builder.label :postal_code %>
     <%= builder.text_field :postal_code, placeholder: "Postal Code" %>
+    <%= builder.label :region %>
+    <%= builder.text_field :region, placeholder: "Region" %>
+    <%= builder.label :metro_area %>
+    <%= builder.text_field :metro_area, placeholder: "Metro Area" %>
     <%= builder.label :country %>
     <%= builder.country_select :country, nil, {include_blank: true}, {class: 'country_select'} %><br/>
     <div class="field_action">

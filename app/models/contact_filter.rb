@@ -47,6 +47,18 @@ class ContactFilter
                                              .references('addresses')
       end
 
+      if @filters[:region].present? && @filters[:region].first != ''
+        filtered_contacts = filtered_contacts.where('addresses.region' => @filters[:region])
+        .includes(:addresses)
+        .references('addresses')
+      end
+
+      if @filters[:metro_area].present? && @filters[:metro_area].first != ''
+        filtered_contacts = filtered_contacts.where('addresses.metro_area' => @filters[:metro_area])
+        .includes(:addresses)
+        .references('addresses')
+      end
+
       if @filters[:likely].present? && @filters[:likely].first != ''
         filtered_contacts = filtered_contacts.where(likely_to_give: @filters[:likely])
       end

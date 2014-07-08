@@ -12,6 +12,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         type: '',
         city: [''],
         state: [''],
+        region: [''],
+        metro_area: [''],
         newsletter: '',
         status: ['active', 'null'],
         likely: [''],
@@ -36,6 +38,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         $scope.contactQuery.type = '';
         $scope.contactQuery.city = [''];
         $scope.contactQuery.state = [''];
+        $scope.contactQuery.region = [''];
+        $scope.contactQuery.metro_area = [''];
         $scope.contactQuery.newsletter = '';
         $scope.contactQuery.status = ['active', 'null'];
         $scope.contactQuery.likely = [''];
@@ -44,7 +48,9 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         $scope.contactQuery.timezone = [''];
         $scope.contactQuery.relatedTaskAction = [''];
         $scope.contactQuery.wildcardSearch = null;
-        document.getElementById('globalContactSearch').value = '';
+        if(!_.isNull(document.getElementById('globalContactSearch'))) {
+            document.getElementById('globalContactSearch').value = '';
+        }
     };
 
     //view preferences
@@ -93,6 +99,18 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             if(prefs.state[0]){
                 jQuery("#leftmenu #filter_state").trigger("click");
             }
+        }
+        if(angular.isDefined(prefs.region)){
+          $scope.contactQuery.region = prefs.region;
+          if(prefs.region[0]){
+            jQuery("#leftmenu #filter_region").trigger("click");
+          }
+        }
+        if(angular.isDefined(prefs.metro_area)){
+          $scope.contactQuery.metro_area = prefs.metro_area;
+          if(prefs.metro_area[0]){
+            jQuery("#leftmenu #filter_metro_area").trigger("click");
+          }
         }
         if(angular.isDefined(prefs.newsletter)){
             $scope.contactQuery.newsletter = prefs.newsletter;
@@ -206,6 +224,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
           '&filters[contact_type]=' + encodeURIComponent(q.type) +
           '&filters[city][]=' + encodeURLarray(q.city).join('&filters[city][]=') +
           '&filters[state][]=' + encodeURLarray(q.state).join('&filters[state][]=') +
+          '&filters[region][]=' + encodeURLarray(q.region).join('&filters[region][]=') +
+          '&filters[metro_area][]=' + encodeURLarray(q.metro_area).join('&filters[metro_area][]=') +
           '&filters[newsletter]=' + encodeURIComponent(q.newsletter) +
           '&filters[tags][]=' + encodeURLarray(q.tags).join('&filters[tags][]=') +
           '&filters[status][]=' + encodeURLarray(statusApiArray).join('&filters[status][]=') +
@@ -248,6 +268,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
           type: q.type,
           city: q.city,
           state: q.state,
+          region: q.region,
+          metro_area: q.metro_area,
           newsletter: q.newsletter,
           status: statusApiArray,
           likely: q.likely,
@@ -270,7 +292,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
     }, true);
 
     var isEmptyFilter = function (q) {
-      if (!_.isEmpty(q.tags) || !_.isEmpty(q.name) || !_.isEmpty(q.type) || !_.isEmpty(_.without(q.city, '')) || !_.isEmpty(_.without(q.state, '')) || !_.isEmpty(q.newsletter) || !_.isEmpty(_.without(q.likely, '')) || !_.isEmpty(_.without(q.church, '')) || !_.isEmpty(_.without(q.referrer, '')) || !_.isEmpty(_.without(q.relatedTaskAction, '')) || !_.isEmpty(_.without(q.timezone, ''))) {
+      if (!_.isEmpty(q.tags) || !_.isEmpty(q.name) || !_.isEmpty(q.type) || !_.isEmpty(_.without(q.city, '')) || !_.isEmpty(_.without(q.state, '')) || !_.isEmpty(_.without(q.region, '')) || !_.isEmpty(_.without(q.metro_area, '')) || !_.isEmpty(q.newsletter) || !_.isEmpty(_.without(q.likely, '')) || !_.isEmpty(_.without(q.church, '')) || !_.isEmpty(_.without(q.referrer, '')) || !_.isEmpty(_.without(q.relatedTaskAction, '')) || !_.isEmpty(_.without(q.timezone, ''))) {
         return false;
       }
 
