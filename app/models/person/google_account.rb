@@ -4,6 +4,7 @@ class Person::GoogleAccount < ActiveRecord::Base
   include Person::Account
 
   has_many :google_integrations, foreign_key: :google_account_id, dependent: :destroy
+  has_many :google_emails
 
   def self.find_or_create_from_auth(auth_hash, person)
     @rel = person.google_accounts
@@ -37,11 +38,11 @@ class Person::GoogleAccount < ActiveRecord::Base
   def self.one_per_user?() false; end
 
   def import_emails(account_list)
-    since = last_email_sync || 30.days.ago
+    since = last_email_sync || 60.days.ago
 
     gmail do |g|
       # loop through all contacts, logging email addresses
-      account_list.contacts.each do |contact|
+      account_list.contacts.includes(:people => :email_addresses).each do |contact|
         contact.people.each do |person|
           person.email_addresses.collect(&:email).uniq.each do |email|
             # sent emails
@@ -68,14 +69,19 @@ class Person::GoogleAccount < ActiveRecord::Base
     else
       message = gmail_message.message.body.decoded
     end
-    task = contact.tasks.create!(subject: gmail_message.subject,
-                                start_at: gmail_message.envelope.date,
-                                completed: true,
-                                completed_at: gmail_message.envelope.date,
-                                account_list_id: account_list.id,
-                                activity_type: 'Email',
-                                result: result)
-    task.activity_comments.create!(body: message, person: person)
+    google_email = google_emails.find_or_create_by!(google_email_id: gmail_message.msg_id)
+    if contact.tasks.where(id: google_email.activities.pluck(:id)).empty?
+      task = contact.tasks.create!(subject: gmail_message.subject,
+                                  start_at: gmail_message.envelope.date,
+                                  completed: true,
+                                  completed_at: gmail_message.envelope.date,
+                                  account_list_id: account_list.id,
+                                  activity_type: 'Email',
+                                  result: result)
+      task.activity_comments.create!(body: message, person: person)
+      google_email.activities << task
+      google_email.save!
+    end
   end
 
   def gmail

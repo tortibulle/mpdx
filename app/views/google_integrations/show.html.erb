@@ -57,19 +57,19 @@
       <% end %>
       <br/>
 
-      <h2><%= _('Email integration') %></h2>
+      <h2><%= _('Gmail integration') %></h2>
 
       <% if @google_integration.email_integration? %>
           <%= _("Gmail integration has been enabled.") %>
           <br/><br/>
-          <%= link_to(_('Disable Email Integration'), google_integration_path(@google_integration, google_integration: { email_integration: false }), method: :put,
+          <%= link_to(_('Disable Gmail Integration'), google_integration_path(@google_integration, google_integration: { email_integration: false }), method: :put,
                       class: 'btn', data: { confirm: _('Are you sure you want to disable Gmail integration?') }) %>
           <%= link_to(_('Sync Now'), sync_google_integration_path(@google_integration, integration: 'email'), class: 'btn desired_action') %>
       <% else %>
           <%= _("MPDX can automatically update your MPDX task history based on emails you've sent
-                or received to/from your contacts in your gmail account.") %>
+                or received to/from your contacts in your Gmail account.") %>
           <br/><br/>
-          <%= link_to(_('Enable Email Integration'), google_integration_path(@google_integration, google_integration: { email_integration: true }), method: :put, class: 'btn desired_action') %>
+          <%= link_to(_('Enable Gmail Integration'), google_integration_path(@google_integration, google_integration: { email_integration: true }), method: :put, class: 'btn desired_action') %>
       <% end %>
     </div>
 
