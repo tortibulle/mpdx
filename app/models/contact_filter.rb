@@ -32,7 +32,7 @@ class ContactFilter
       end
 
       if @filters[:city].present? && @filters[:city].first != ''
-        filtered_contacts = filtered_contacts.where('addresses.city' => @filters[:city])
+        filtered_contacts = filtered_contacts.where('addresses.city' => @filters[:city], 'addresses.historic' => @filters[:address_historic] || false)
                                              .includes(:addresses)
                                              .references('addresses')
       end
@@ -42,19 +42,19 @@ class ContactFilter
       end
 
       if @filters[:state].present? && @filters[:state].first != ''
-        filtered_contacts = filtered_contacts.where('addresses.state' => @filters[:state])
+        filtered_contacts = filtered_contacts.where('addresses.state' => @filters[:state], 'addresses.historic' => @filters[:address_historic] || false)
                                              .includes(:addresses)
                                              .references('addresses')
       end
 
       if @filters[:region].present? && @filters[:region].first != ''
-        filtered_contacts = filtered_contacts.where('addresses.region' => @filters[:region])
+        filtered_contacts = filtered_contacts.where('addresses.region' => @filters[:region], 'addresses.historic' => @filters[:address_historic] || false)
         .includes(:addresses)
         .references('addresses')
       end
 
       if @filters[:metro_area].present? && @filters[:metro_area].first != ''
-        filtered_contacts = filtered_contacts.where('addresses.metro_area' => @filters[:metro_area])
+        filtered_contacts = filtered_contacts.where('addresses.metro_area' => @filters[:metro_area], 'addresses.historic' => @filters[:address_historic] || false)
         .includes(:addresses)
         .references('addresses')
       end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140708013152) do
+ActiveRecord::Schema.define(version: 20140709113152) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -115,7 +115,7 @@ ActiveRecord::Schema.define(version: 20140708013152) do
     t.boolean  "deleted",                 default: false, null: false
     t.string   "region"
     t.string   "metro_area"
-    t.boolean  "historic"
+    t.boolean  "historic",                default: false
   end
 
   add_index "addresses", ["addressable_id"], name: "index_addresses_on_addressable_id", using: :btree

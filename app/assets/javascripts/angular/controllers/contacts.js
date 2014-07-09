@@ -10,6 +10,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         tags: [''],
         name: '',
         type: '',
+        activeAddresses: true,
         city: [''],
         state: [''],
         region: [''],
@@ -36,6 +37,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         $scope.contactQuery.tags = [''];
         $scope.contactQuery.name = '';
         $scope.contactQuery.type = '';
+        $scope.contactQuery.activeAddresses = true;
         $scope.contactQuery.city = [''];
         $scope.contactQuery.state = [''];
         $scope.contactQuery.region = [''];
@@ -222,6 +224,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
           '&page=' + q.page +
           '&filters[name]=' + encodeURIComponent(q.name) +
           '&filters[contact_type]=' + encodeURIComponent(q.type) +
+          '&filters[address_historic]=' + encodeURIComponent(!q.activeAddresses) +
           '&filters[city][]=' + encodeURLarray(q.city).join('&filters[city][]=') +
           '&filters[state][]=' + encodeURLarray(q.state).join('&filters[state][]=') +
           '&filters[region][]=' + encodeURLarray(q.region).join('&filters[region][]=') +

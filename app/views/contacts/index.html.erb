@@ -31,6 +31,9 @@
             <label id="filter_city"><%= _('City') %></label>
             <div class="collapse" style="display:none;">
               <%= select_tag 'filters[city]', options_for_select([[_('-- Any --'), '']] + current_account_list.cities.select(&:present?)), multiple: true, size: 5, :'ng-model' => 'contactQuery.city' %>
+              <label>
+                <input type="checkbox" ng-model="contactQuery.activeAddresses"> Active addresses
+              </label>
             </div>
           </li>
 
@@ -38,6 +41,9 @@
             <label id="filter_state"><%= _('State') %></label>
             <div class="collapse" style="display:none;">
               <%= select_tag 'filters[state]', options_for_select([[_('-- Any --'), '']] + current_account_list.states.select(&:present?)), multiple: true, size: 5, :'ng-model' => 'contactQuery.state' %>
+              <label>
+                <input type="checkbox" ng-model="contactQuery.activeAddresses"> Active addresses
+              </label>
             </div>
           </li>
 
@@ -45,6 +51,9 @@
             <label id="filter_region"><%= _('Region') %></label>
             <div class="collapse" style="display:none;">
               <%= select_tag 'filters[region]', options_for_select([[_('-- Any --'), '']] + current_account_list.regions.select(&:present?)), multiple: true, size: 5, :'ng-model' => 'contactQuery.region' %>
+              <label>
+                <input type="checkbox" ng-model="contactQuery.activeAddresses"> Active addresses
+              </label>
             </div>
           </li>
 
@@ -52,6 +61,9 @@
             <label id="filter_metro_area"><%= _('Metro Area') %></label>
             <div class="collapse" style="display:none;">
               <%= select_tag 'filters[metro_area]', options_for_select([[_('-- Any --'), '']] + current_account_list.metro_areas.select(&:present?)), multiple: true, size: 5, :'ng-model' => 'contactQuery.metro_area' %>
+              <label>
+                <input type="checkbox" ng-model="contactQuery.activeAddresses"> Active addresses
+              </label>
             </div>
           </li>
 
