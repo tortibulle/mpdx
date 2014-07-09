@@ -22,6 +22,10 @@
     <%= builder.label :country %>
     <%= builder.country_select :country, nil, {include_blank: true}, {class: 'country_select'} %><br/>
     <div class="field_action">
+        <%= builder.check_box :historic, class: 'address_historic' %>
+        <%= builder.label :historic, "Address no longer valid" %>
+    </div><br>
+    <div class="field_action">
       <%= builder.check_box :primary_mailing_address, class: 'primary' %>
       <%= builder.label :primary_mailing_address %>
       <%= link_to_remove_fields(builder) %>

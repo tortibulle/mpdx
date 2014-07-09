@@ -339,6 +339,21 @@ $ ->
         $('input[type=checkbox].primary', fieldset).prop('checked',false)
         $(this).prop('checked', true)
 
+    $(document).on 'click', 'input.address_historic', ->
+      historicAddressDisable this
+
+    historicAddressDisable = (check) ->
+      fieldset = $(check).closest(".rs")
+      if $(check).is(":checked")
+        $("input[type=text], textarea, .country_select", fieldset).attr "disabled", true
+      else
+        $("input[type=text], textarea, .country_select", fieldset).removeAttr "disabled"
+      return
+
+    $("input.address_historic").each ->
+      historicAddressDisable this
+      return
+
     $(document).on 'click', 'td.qaction a.quick', ->
       td = $(this).closest('td')
       $('td.qaction[id!='+td.attr('id')+'] .quick_action_list').hide()
