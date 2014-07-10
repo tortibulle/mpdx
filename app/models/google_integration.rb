@@ -13,6 +13,7 @@ class GoogleIntegration < ActiveRecord::Base
 
   before_save :create_new_calendar, if: -> { new_calendar.present? }
   before_save :toggle_calendar_integration_for_appointments, :set_default_calendar, if: :calendar_integration_changed?
+  before_save :toggle_email_integration, if: :email_integration_changed?
 
   delegate :sync_task, to: :calendar_integrator
 
@@ -24,11 +25,17 @@ class GoogleIntegration < ActiveRecord::Base
     case integration
     when 'calendar'
       calendar_integrator.sync_tasks
+    when 'email'
+      email_integrator.sync_mail
     end
   end
 
   def calendar_integrator
     @calendar_integrator ||= GoogleCalendarIntegrator.new(self)
+  end
+
+  def email_integrator
+    @email_integrator ||= GoogleEmailIntegrator.new(self)
   end
 
   def plus_api
@@ -74,5 +81,16 @@ class GoogleIntegration < ActiveRecord::Base
     )
     self.calendar_id = result.data['id']
     self.calendar_name = new_calendar
+  end
+
+  def toggle_email_integration
+    queue_sync_data('email') if email_integration?
+  end
+
+  def self.sync_all_email_accounts
+    email_accounts = GoogleIntegration.where(email_integration: true)
+    email_accounts.each do |integration|
+      integration.queue_sync_data('email')
+    end
   end
 end
