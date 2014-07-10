@@ -390,7 +390,7 @@ class Contact < ActiveRecord::Base
 
     return unless primary_address
 
-    if (previous_changes.keys & ['street', 'city', 'state']).present?
+    if primary_mailing_address? && (previous_changes.keys & ['street', 'city', 'state', 'country']).present?
       begin
         latitude, longitude = Geocoder.coordinates([primary_address.street, primary_address.city, primary_address.state, primary_address.country].join(','))
         timezone = GoogleTimezone.fetch(latitude, longitude).time_zone_id
