@@ -88,4 +88,11 @@ class GoogleIntegration < ActiveRecord::Base
       queue_sync_data('email')
     end
   end
+
+  def self.sync_all_email_accounts
+    email_accounts = GoogleIntegration.where(email_integration: true)
+    email_accounts.each do |integration|
+      integration.queue_sync_data('email')
+    end
+  end
 end
