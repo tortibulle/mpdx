@@ -8,7 +8,8 @@ class GoogleEmailIntegrator
 
   def sync_mail
     if @google_integration.email_integration?
-      @google_account.import_emails(@google_integration.account_list)
+      gmail_account = Person::GmailAccount.new(@google_account)
+      gmail_account.import_emails(@google_integration.account_list)
     end
   end
 end
