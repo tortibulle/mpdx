@@ -390,11 +390,13 @@ class Contact < ActiveRecord::Base
 
     return unless primary_address
 
-    begin
-      latitude, longitude = Geocoder.coordinates([primary_address.street, primary_address.city, primary_address.state, primary_address.country].join(','))
-      timezone = GoogleTimezone.fetch(latitude, longitude).time_zone_id
-      ActiveSupport::TimeZone::MAPPING.invert[timezone]
-    rescue
+    if (previous_changes.keys & ['street', 'city', 'state']).present?
+      begin
+        latitude, longitude = Geocoder.coordinates([primary_address.street, primary_address.city, primary_address.state, primary_address.country].join(','))
+        timezone = GoogleTimezone.fetch(latitude, longitude).time_zone_id
+        ActiveSupport::TimeZone::MAPPING.invert[timezone]
+      rescue
+      end
     end
   end
 
