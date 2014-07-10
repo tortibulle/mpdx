@@ -58,7 +58,7 @@ class Contact < ActiveRecord::Base
   accepts_nested_attributes_for :contact_referrals_to_me, reject_if: :all_blank, allow_destroy: true
 
   before_save :set_notes_saved_at
-  after_commit :sync_with_mail_chimp, :sync_with_prayer_letters, :set_timezone
+  after_commit :sync_with_mail_chimp, :sync_with_prayer_letters
   before_destroy :delete_from_prayer_letters, :delete_people
 
   assignable_values_for :status, allow_blank: true do
@@ -390,14 +390,16 @@ class Contact < ActiveRecord::Base
 
     return unless primary_address
 
-    if primary_mailing_address? && (previous_changes.keys & ['street', 'city', 'state', 'country']).present?
-      begin
-        latitude, longitude = Geocoder.coordinates([primary_address.street, primary_address.city, primary_address.state, primary_address.country].join(','))
-        timezone = GoogleTimezone.fetch(latitude, longitude).time_zone_id
-        ActiveSupport::TimeZone::MAPPING.invert[timezone]
-      rescue
-      end
+    begin
+      latitude, longitude = Geocoder.coordinates([primary_address.street, primary_address.city, primary_address.state, primary_address.country].join(','))
+      timezone = GoogleTimezone.fetch(latitude, longitude).time_zone_id
+      ActiveSupport::TimeZone::MAPPING.invert[timezone]
+    rescue
     end
+  end
+
+  def set_timezone
+    update_column(:timezone, get_timezone)
   end
 
   private
@@ -448,9 +450,5 @@ class Contact < ActiveRecord::Base
        !account_list.contacts.where("prayer_letters_id = '#{prayer_letters_id}' AND id <> #{id}").present?
       account_list.prayer_letters_account.delete_contact(self)
     end
-  end
-
-  def set_timezone
-    update_column(:timezone, get_timezone)
   end
 end
