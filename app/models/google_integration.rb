@@ -84,9 +84,7 @@ class GoogleIntegration < ActiveRecord::Base
   end
 
   def toggle_email_integration
-    if email_integration?
-      queue_sync_data('email')
-    end
+    queue_sync_data('email') if email_integration?
   end
 
   def self.sync_all_email_accounts

@@ -37,13 +37,13 @@ class Person::GmailAccount
               # sent emails
               sent = g.mailbox('[Gmail]/Sent Mail')
               sent.emails(to: email, after: since).each do |gmail_message|
-                log_email(gmail_message, account_list, contact, @google_account.person_id, person.id, 'Done')
+                log_email(gmail_message, account_list, contact, person, 'Done')
               end
 
               # received emails
               all = g.mailbox('[Gmail]/All Mail')
               all.emails(from: email, after: since).each do |gmail_message|
-                log_email(gmail_message, account_list, contact, person.id, @google_account.person_id, 'Received')
+                log_email(gmail_message, account_list, contact, person, 'Received')
               end
             end
           end
@@ -53,7 +53,7 @@ class Person::GmailAccount
     @google_account.update_attributes(last_email_sync: Time.now)
   end
 
-  def log_email(gmail_message, account_list, contact, from_id, to_id, result)
+  def log_email(gmail_message, account_list, contact, person, result)
     if gmail_message.message.multipart?
       message = gmail_message.message.text_part.body.decoded
     else
@@ -73,7 +73,7 @@ class Person::GmailAccount
                                      remote_id: gmail_message.envelope.message_id,
                                      source: 'gmail')
 
-        task.activity_comments.create!(body: message, person_id: from_id)
+        task.activity_comments.create!(body: message, person: person)
         google_email.activities << task
         google_email.save!
       end
