@@ -161,7 +161,9 @@ class Address < ActiveRecord::Base
   end
 
   def update_contact_timezone
-    if primary_mailing_address? && (changed & %w(street city state country)).present?
+    return unless primary_mailing_address
+
+    if (changed & %w(street city state country)).present?
       addressable.set_timezone if addressable.respond_to?(:set_timezone)
     end
   end
