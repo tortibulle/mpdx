@@ -3,6 +3,18 @@
   <script type="text/javascript" charset="utf-8">
     var account_contacts_json = <%= contacts_for_filter.collect { |c| {value: c.name, id: c.id} }.to_json.html_safe %>
     var filtered_contacts_ids = <%= @filtered_contacts.collect { |c| c.id }.to_json.html_safe %>
+    jQuery(window).scroll(function () {
+        var yOffset = jQuery(window).scrollTop();
+        var filtersTop = jQuery('#contentbody').offset().top;
+        var filtersHeight = jQuery('.filters').first().height();
+        if (yOffset > filtersTop) {
+            jQuery('.filters').first().css('position', 'fixed');
+            jQuery('.padded').css('padding-top', filtersHeight + 10);
+        } else {
+            jQuery('.filters').first().css('position', 'relative');
+            jQuery('.padded').css('padding-top', 0);
+        }
+    });
   </script>
   <aside id="leftmenu">
   <ul>
