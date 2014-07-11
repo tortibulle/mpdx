@@ -161,11 +161,11 @@ class Address < ActiveRecord::Base
   end
 
   def update_contact_timezone
-    return unless primary_mailing_address
+    return unless primary_mailing_address?
+    return unless (changed & %w(street city state country primary_mailing_address)).present?
+    return unless addressable.respond_to?(:set_timezone)
 
-    if (changed & %w(street city state country primary_mailing_address)).present?
-      addressable.set_timezone if addressable.respond_to?(:set_timezone)
-    end
+    addressable.set_timezone
   end
 
   def attributes_for_master_address
