@@ -83,7 +83,7 @@ describe Person::GmailAccount do
     it 'creates a completed task' do
       expect {
         expect {
-          gmail_account.log_email(gmail_message, account_list, contact, person.id, user.id, 'Done')
+          gmail_account.log_email(gmail_message, account_list, contact, person, 'Done')
         }.to change(Task, :count).by(1)
       }.to change(ActivityComment, :count).by(1)
 
@@ -101,13 +101,13 @@ describe Person::GmailAccount do
       create(:google_email_activity, google_email: google_email, activity: task)
 
       expect {
-        gmail_account.log_email(gmail_message, account_list, contact, person.id, user.id, 'Done')
+        gmail_account.log_email(gmail_message, account_list, contact, person, 'Done')
       }.not_to change(Task, :count)
     end
 
     it 'creates a google_email' do
       expect {
-        gmail_account.log_email(gmail_message, account_list, contact, person.id, user.id, 'Done')
+        gmail_account.log_email(gmail_message, account_list, contact, person, 'Done')
       }.to change(GoogleEmail, :count).by(1)
 
       task = GoogleEmail.last
@@ -118,7 +118,7 @@ describe Person::GmailAccount do
       google_email.save
 
       expect {
-        gmail_account.log_email(gmail_message, account_list, contact, person.id, user.id, 'Done')
+        gmail_account.log_email(gmail_message, account_list, contact, person, 'Done')
       }.not_to change(GoogleEmail, :count)
     end
   end
