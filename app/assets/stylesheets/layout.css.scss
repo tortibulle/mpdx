@@ -522,7 +522,7 @@ div.name {font-size: 14px; margin-bottom: 4px;}
       background: $blue_comments;
       padding-bottom: 0px;
       border-bottom:  2px solid #F7F7F7;
-      label {
+      > label {
         font-weight: bold;
         padding: 6px 12px 6px 27px;
         background: image-url("btn_expand.gif")  no-repeat 2% 37%;

@@ -13,7 +13,7 @@
                 <i class="fa fa-check green"></i>
               <% end %>
             </td>
-            <td class="meta_data">
+            <td class="meta_data"<% if address.historic %> style="text-decoration: line-through;"<% end %>>
               <%= address_exhibit.to_html %>
               <br />
               <%= link_to(_('Map It'), "http://maps.google.com?q=#{address_exhibit.to_google}", target: '_blank', class: 'mapit') %>

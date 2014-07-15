@@ -28,7 +28,7 @@
         <h2><a ng-href="/contacts/{{contactInfo.contact.id}}">{{contactInfo.contact.name}}</a></h2>
         <div style="width:100%; display: block;">
             <div class="column">
-                <p ng-repeat="address in contactInfo.addresses">
+                <p ng-repeat="address in contactInfo.addresses | filter: { historic: false }">
                     <strong>{{address.location}} Address</strong> <i class="fa fa-check green" ng-show="address.primary_mailing_address"></i>
                     <br>
                     {{address.street}}<br>{{address.city}}, {{address.state}} {{address.postal_code}} {{address.country}}
