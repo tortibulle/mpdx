@@ -5,7 +5,7 @@ angular.module('mpdxApp')
             templateUrl: '/templates/tasks/followupDialog.html',
             controller: function ($scope, api) {
                 $scope.logTask = function(formData) {
-                    api.call('post', 'tasks/', {
+                    api.call('post', 'tasks/?account_list_id=' + window.current_account_list_id, {
                         task: {
                             subject: jQuery('#modal_task_subject', formData).val(),
                             activity_type: jQuery('#modal_task_activity_type', formData).val(),
