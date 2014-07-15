@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Person::GmailAccount do
-  let(:google_account) { build(:google_account) }
+  let(:google_account) { create(:google_account) }
   let(:gmail_account) { Person::GmailAccount.new(google_account) }
   let(:account_list) { create(:account_list) }
   let(:contact) { create(:contact, account_list: account_list) }
@@ -76,13 +76,14 @@ describe Person::GmailAccount do
   context '#log_email' do
     let(:gmail_message) { double(message: double(multipart?: false, body: double(decoded: 'message body')),
                                  envelope: double(date: Time.zone.now, message_id: '1'),
-                                 subject: 'subject')
+                                 subject: 'subject', msg_id: 1)
     }
+    let(:google_email) { build(:google_email, google_email_id: gmail_message.msg_id, google_account: google_account) }
 
     it 'creates a completed task' do
       expect {
         expect {
-          gmail_account.log_email(gmail_message, account_list, contact, person.id, user.id, 'Done')
+          gmail_account.log_email(gmail_message, account_list, contact, person, 'Done')
         }.to change(Task, :count).by(1)
       }.to change(ActivityComment, :count).by(1)
 
@@ -94,33 +95,31 @@ describe Person::GmailAccount do
     end
 
     it "doesn't create a duplicate task" do
-      create(:task, account_list: account_list, remote_id: gmail_message.envelope.message_id, source: 'gmail')
+      google_email.save
+      task = create(:task, account_list: account_list, remote_id: gmail_message.envelope.message_id, source: 'gmail')
+      contact.tasks << task
+      create(:google_email_activity, google_email: google_email, activity: task)
 
       expect {
-        expect {
-          gmail_account.log_email(gmail_message, account_list, contact, person.id, user.id, 'Done')
-        }.not_to change(Task, :count)
-      }.to change(ActivityContact, :count).by(1)
+        gmail_account.log_email(gmail_message, account_list, contact, person, 'Done')
+      }.not_to change(Task, :count)
     end
 
-    it 'creates a message' do
+    it 'creates a google_email' do
       expect {
-        gmail_account.log_email(gmail_message, account_list, contact, person.id, user.id, 'Done')
-      }.to change(Message, :count).by(1)
+        gmail_account.log_email(gmail_message, account_list, contact, person, 'Done')
+      }.to change(GoogleEmail, :count).by(1)
 
-      task = Message.last
-      task.subject.should == 'subject'
-      task.body.should == 'message body'
-      task.remote_id.should == gmail_message.envelope.message_id
-      task.sent_at.to_s(:db).should == gmail_message.envelope.date.to_s(:db)
+      task = GoogleEmail.last
+      task.google_email_id.should == gmail_message.msg_id
     end
 
-    it "doesn't create a duplicate message" do
-      create(:message, account_list: account_list, remote_id: gmail_message.envelope.message_id, source: 'gmail')
+    it "doesn't create a duplicate google_email" do
+      google_email.save
 
       expect {
-        gmail_account.log_email(gmail_message, account_list, contact, person.id, user.id, 'Done')
-      }.not_to change(Message, :count)
+        gmail_account.log_email(gmail_message, account_list, contact, person, 'Done')
+      }.not_to change(GoogleEmail, :count)
     end
   end
 end

@@ -13,6 +13,7 @@ class Address < ActiveRecord::Base
   before_create :find_or_create_master_address
   before_update :update_or_create_master_address
   after_destroy :clean_up_master_address
+  after_save :update_contact_timezone
 
   alias_method :destroy!, :destroy
 
@@ -157,6 +158,14 @@ class Address < ActiveRecord::Base
     end
 
     master_address
+  end
+
+  def update_contact_timezone
+    return unless primary_mailing_address?
+    return unless (changed & %w(street city state country primary_mailing_address)).present?
+    return unless addressable.respond_to?(:set_timezone)
+
+    addressable.set_timezone
   end
 
   def attributes_for_master_address
