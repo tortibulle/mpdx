@@ -17,28 +17,29 @@
 #   runner "AnotherModel.prune_old_records"
 # end
 
-set :output, '/tmp/sync.log'
+if @environment == 'production'
+  set :output, '/tmp/sync.log'
 
-job_type :rake,    "cd :path && PATH=/usr/local/bin:$PATH RAILS_ENV=:environment /usr/local/bin/bundle exec rake :task --silent :output"
-job_type :rails,    "cd :path && PATH=/usr/local/bin:$PATH RAILS_ENV=:environment /usr/local/bin/bundle exec rails :task --silent :output"
-job_type :runner,    "cd :path && PATH=/usr/local/bin:$PATH RAILS_ENV=:environment /usr/local/bin/bundle exec rails runner :task --silent :output"
+  job_type :rake,    "cd :path && PATH=/usr/local/bin:$PATH RAILS_ENV=:environment /usr/local/bin/bundle exec rake :task --silent :output"
+  job_type :rails,    "cd :path && PATH=/usr/local/bin:$PATH RAILS_ENV=:environment /usr/local/bin/bundle exec rails :task --silent :output"
+  job_type :runner,    "cd :path && PATH=/usr/local/bin:$PATH RAILS_ENV=:environment /usr/local/bin/bundle exec rails runner :task --silent :output"
 
-every :day, at: '3am' do
-  runner "GoogleIntegration.sync_all_email_accounts"
+  every :day, at: '3am' do
+    runner "GoogleIntegration.sync_all_email_accounts"
+    end
+
+  every :day, at: '5am' do
+    runner "AccountList.update_linked_org_accounts"
   end
 
-every :day, at: '5am' do
-  runner "AccountList.update_linked_org_accounts"
-end
+  every :day, at: '10am' do
+    rake 'organizations:fetch'
+    rake 'mpdx:clear_stalled_downloads'
+    rake 'mailchimp:sync'
+  end
 
-every :day, at: '10am' do
-  rake 'organizations:fetch'
-  rake 'mpdx:clear_stalled_downloads'
-  rake 'mailchimp:sync'
+  every :day, at: '11am' do
+    runner "Person::FacebookAccount.refresh_tokens"
+  end
 end
-
-every :day, at: '11am' do
-  runner "Person::FacebookAccount.refresh_tokens"
-end
-
 # Learn more: http://github.com/javan/whenever
