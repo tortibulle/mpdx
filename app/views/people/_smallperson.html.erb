@@ -6,7 +6,7 @@
       <%= render 'people/contact_details_compact', person: p %>
     </div>
     <% if p.social? %>
-      <div class="social">
+      <div class="social-icons">
         <% if p.facebook_account %>
           <%= link_to('f', p.facebook_account.url, {class: "facebook"}) %>
         <% end %>
