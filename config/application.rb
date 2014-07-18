@@ -41,11 +41,6 @@ module Mpdx
     config.active_record.disable_implicit_join_references = true
 
     config.exceptions_app = self.routes
-
-    config.peek.adapter = :redis, {
-      :client => Redis.current,
-      :expires_in => 60 * 30 # => 30 minutes in seconds
-    }
   end
 end
 
