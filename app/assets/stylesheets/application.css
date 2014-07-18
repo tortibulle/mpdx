@@ -8,4 +8,6 @@
 *= require errors
 *= require adaptive
 *= require font-awesome
+*= require peek
+*= require peek/views/performance_bar
 */

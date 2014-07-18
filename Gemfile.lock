@@ -78,6 +78,7 @@ GEM
     assignable_values (0.5.3)
       activerecord
     ast (2.0.0)
+    atomic (1.1.16)
     attr_required (1.0.0)
     autoparse (0.3.3)
       addressable (>= 2.3.1)
@@ -334,6 +335,31 @@ GEM
       daemon_controller (>= 1.2.0)
       rack
       rake (>= 0.8.1)
+    peek (0.1.8)
+      atomic (>= 1.0.0)
+      rails (>= 3.0.0)
+    peek-dalli (1.1.2)
+      atomic (>= 1.0.0)
+      dalli
+      peek
+    peek-gc (0.0.2)
+      peek
+    peek-git (1.0.2)
+      peek
+    peek-performance_bar (1.1.5)
+      peek (>= 0.1.0)
+    peek-pg (1.1.0)
+      atomic (>= 1.0.0)
+      peek
+      pg
+    peek-redis (1.1.0)
+      atomic (>= 1.0.0)
+      peek
+      redis
+    peek-sidekiq (1.0.3)
+      atomic (>= 1.0.0)
+      peek
+      sidekiq
     pg (0.14.1)
     polyglot (0.3.4)
     powerpack (0.0.9)
@@ -601,6 +627,14 @@ DEPENDENCIES
   omniauth-twitter (~> 1.0.1)
   paper_trail (~> 3.0.0)
   passenger
+  peek
+  peek-dalli
+  peek-gc
+  peek-git
+  peek-performance_bar
+  peek-pg
+  peek-redis
+  peek-sidekiq
   pg (~> 0.14.1)
   quiet_assets
   railroady

@@ -12,6 +12,10 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def peek_enabled?
+    user_signed_in? && current_user.developer == true
+  end
+
   def ssl_configured?
     request.get? && !Rails.env.development? && !Rails.env.test?
   end

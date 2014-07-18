@@ -12,7 +12,7 @@ class User < Person
   devise :trackable
   store :preferences, accessors: [:time_zone, :locale, :setup, :contacts_filter,
                                   :tasks_filter, :default_account_list, :contacts_view_options,
-                                  :tab_orders]
+                                  :tab_orders, :developer]
 
   after_create :set_setup_mode
 

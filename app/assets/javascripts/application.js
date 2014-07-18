@@ -39,6 +39,8 @@
 //= require home
 //= require google_integrations
 //= require research
+//= require peek
+//= require peek/views/performance_bar
 
 //angular
 //= require angular
