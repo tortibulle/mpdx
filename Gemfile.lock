@@ -356,10 +356,6 @@ GEM
       atomic (>= 1.0.0)
       peek
       redis
-    peek-sidekiq (1.0.3)
-      atomic (>= 1.0.0)
-      peek
-      sidekiq
     pg (0.14.1)
     polyglot (0.3.4)
     powerpack (0.0.9)
@@ -634,7 +630,6 @@ DEPENDENCIES
   peek-performance_bar
   peek-pg
   peek-redis
-  peek-sidekiq
   pg (~> 0.14.1)
   quiet_assets
   railroady
