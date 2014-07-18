@@ -154,6 +154,7 @@ Mpdx::Application.routes.draw do
 
   get '/mobile', to: redirect(subdomain: 'm', path: '/')
 
+  mount Peek::Railtie => '/peek'
   root :to => 'home#index'
 
   get '/templates/:path.html' => 'templates#template', :constraints => { :path => /.+/  }
