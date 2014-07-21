@@ -20,7 +20,7 @@
             <a class="tag" ng-repeat-start="tag in task.tag_list">{{tag}}</a>
             <span ng-repeat-end> </span>
         </div>
-        <span class="people" ng-show="task.contacts.length > 0">(<span ng-repeat="contact in task.contacts"><span ng-show="!$first">, </span><a ng-click="showContactInfo(contact)" ng-bind="contacts[contact]" href="" title="Click to view contact details"></a></span>)</span>
+        <span class="people" ng-show="task.contacts.length > 0">(<span ng-repeat="contact in task.contacts"><span ng-show="!$first">, </span><a ng-click="showContactInfo(contact); $event.preventDefault();" ng-bind="contacts[contact]" href="/contacts/{{contact}}" title="Click to view contact details"></a></span>)</span>
     </div>
 
     <div ng-show="visibleContactInfo" class="contact-info">
