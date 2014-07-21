@@ -62,11 +62,11 @@ angular.module('mpdxApp')
                     dateTwoDaysFromToday.setDate(dateTwoDaysFromToday.getDate() + 2);
                     dateTwoDaysFromToday = dateTwoDaysFromToday.getFullYear() + '-' + ("0" + (dateTwoDaysFromToday.getMonth() + 1)).slice(-2) + '-' + ("0" + dateTwoDaysFromToday.getDate()).slice(-2);
 
-                    if(strContains(taskResult, 'Call Again') || strContains(taskResult, 'Left Message') || strContains(taskResult, 'Call for Decision') || strContains(taskResult, 'Email Again') || strContains(taskResult, 'Message Again') || strContains(taskResult, 'Text Again')) {
+                    if(strContains(taskResult, 'Call Again') || strContains(taskResult, 'Call for Decision') || strContains(taskResult, 'Email Again') || strContains(taskResult, 'Message Again') || strContains(taskResult, 'Text Again')) {
 
                         //generic followup task type
                         var taskType;
-                        if(strContains(taskResult, 'Call Again') || strContains(taskResult, 'Left Message') || strContains(taskResult, 'Call for Decision')){
+                        if(strContains(taskResult, 'Call Again') || strContains(taskResult, 'Call for Decision')){
                             taskType = 'Call';
                         }else if(strContains(taskResult, 'Email Again')){
                             taskType = 'Email';
@@ -95,7 +95,7 @@ angular.module('mpdxApp')
                               angular.forEach(followUpTask.contacts, function (c) {
                                 api.call('put', 'contacts/' + c, {
                                   contact: {
-                                    status: 'Ask in Future'
+                                    status: 'Call for Decision'
                                   }
                                 });
                               });
