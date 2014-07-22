@@ -41,9 +41,7 @@ class Person::GoogleAccount < ActiveRecord::Base
   end
 
   def contacts
-    if token_expired?
-      return false unless refresh_token!
-    end
+    return false if token_expired? && !refresh_token!
 
     unless @contacts
       client = OAuth2::Client.new(APP_CONFIG['google_key'], APP_CONFIG['google_secret'])
@@ -55,9 +53,7 @@ class Person::GoogleAccount < ActiveRecord::Base
   end
 
   def client
-    if token_expired?
-      return false unless refresh_token!
-    end
+    return false if token_expired? && !refresh_token!
 
     unless @client
       @client = Google::APIClient.new(application_name: 'MPDX', application_version: '1.0')
