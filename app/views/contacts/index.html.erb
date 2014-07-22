@@ -3,18 +3,16 @@
   <script type="text/javascript" charset="utf-8">
     var account_contacts_json = <%= contacts_for_filter.collect { |c| {value: c.name, id: c.id} }.to_json.html_safe %>
     var filtered_contacts_ids = <%= @filtered_contacts.collect { |c| c.id }.to_json.html_safe %>
-    jQuery(window).scroll(function () {
-        var yOffset = jQuery(window).scrollTop();
-        var filtersTop = jQuery('#contentbody').offset().top;
-        var filtersHeight = jQuery('.filters').first().height();
-        if (yOffset > filtersTop) {
-            jQuery('.filters').first().css('position', 'fixed');
-            jQuery('.padded').css('padding-top', filtersHeight + 10);
-        } else {
-            jQuery('.filters').first().css('position', 'relative');
-            jQuery('.padded').css('padding-top', 0);
-        }
+    jQuery(window).resize(function () {
+        contactAreaSize();
     });
+    jQuery(function() {
+        contactAreaSize();
+    });
+    function contactAreaSize(){
+        var contactAreaHeight = jQuery(window).height() - 350;
+        jQuery('.contacts-scrollable').height(contactAreaHeight);
+    }
   </script>
   <aside id="leftmenu">
   <ul>
@@ -150,8 +148,8 @@
     </div>
     <div class="">
       <div class="padded">
-        <table class="tablelist" ng-class="{'contact_loading': contactsLoading}">
-          <% unless @contacts.length == @contacts.total_entries %>
+      <table class="tablelist">
+        <% unless @contacts.length == @contacts.total_entries %>
             <tr id="select_more" style="display:none">
               <td colspan="6">
                 <span id="select_all_prompt">
@@ -164,14 +162,14 @@
                 </span>
               </td>
             </tr>
-          <% end %>
-          <tr>
-            <td colspan="10">
-              <div style="float:left">
-                Displaying <b>{{page.from}}&nbsp;-&nbsp;{{page.to}}</b> of <b>{{totalContacts}}</b>
-                <div class="pagination">
-                  <span class="previous_page disabled" ng-show="page.current === 1">← Previous</span>
-                  <a class="previous_page" rel="prev start" href="#" ng-click="page.current=page.current-1" ng-show="page.current > 1">← Previous</a>
+        <% end %>
+        <tr>
+          <td colspan="10">
+            <div style="float:left">
+              Displaying <b>{{page.from}}&nbsp;-&nbsp;{{page.to}}</b> of <b>{{totalContacts}}</b>
+              <div class="pagination">
+                <span class="previous_page disabled" ng-show="page.current === 1">← Previous</span>
+                <a class="previous_page" rel="prev start" href="#" ng-click="page.current=page.current-1" ng-show="page.current > 1">← Previous</a>
 
                   <span ng-repeat="n in [1, page.total] | makeRange">
                     <em class="current" ng-show="n === page.current">{{n}}</em>
@@ -179,16 +177,22 @@
                     <span ng-show="(n === 2 && page.current > 9) || (n === page.total-1 && page.current < page.total - 8)">...</span>
                   </span>
 
-                  <span class="next_page disabled" ng-show="page.current === page.total">Next →</span>
-                  <a class="next_page" rel="next" href="#" ng-click="page.current=page.current+1" ng-show="page.current < page.total">Next →</a>
-                </div>
+                <span class="next_page disabled" ng-show="page.current === page.total">Next →</span>
+                <a class="next_page" rel="next" href="#" ng-click="page.current=page.current+1" ng-show="page.current < page.total">Next →</a>
               </div>
+            </div>
 
-              <div style="float:right">Show: <select ng-model="contactQuery.limit" ng-options="i as i for i in [25, 50, 100, 1000]"></select></div>
-            </td>
-          </tr>
+            <div style="float:right">Show: <select ng-model="contactQuery.limit" ng-options="i as i for i in [25, 50, 100, 1000]"></select></div>
+          </td>
+        </tr>
+      </table>
+      <div class="contacts-scrollable">
+        <table class="tablelist" ng-class="{'contact_loading': contactsLoading}">
           <tr ng-show="contacts.length === 0 && contactQuery.viewPrefsLoaded"><td style="color:red;">Sorry, there are no contacts that match the filters and/or tags you have selected. Try <a href="/contacts/new">adding a new contact</a> or <a href="#" ng-click="resetFilters()">resetting your filters</a>.</td></tr>
           <tr contact="contact" ng-repeat="contact in contacts" id="contact_{{contact.id}}" data-hook="contact"></tr>
+        </table>
+      </div>
+        <table class="tablelist">
           <tr>
             <td colspan="10">
               <div style="float:left">
@@ -212,7 +216,6 @@
             </td>
           </tr>
         </table>
-
 
         <div class="filters">
           <div class="right" class="contacts_actions">
