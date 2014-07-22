@@ -8,14 +8,14 @@ class GoogleCalendarIntegrator
   end
 
   def sync_tasks
-    if @google_integration.calendar_integration?
+    if @google_integration.calendar_integration? && @client
       tasks = @google_integration.account_list.tasks.future.uncompleted.of_type(@google_integration.calendar_integrations)
       tasks.map { |task| sync_task(task.id) }
     end
   end
 
   def sync_task(task_id)
-    return nil unless @google_integration.calendar_id
+    return nil unless @google_integration.calendar_integration? && @google_integration.calendar_id
 
     task = Task.find_by(id: task_id)
     google_event = GoogleEvent.find_by(google_integration_id: @google_integration.id, activity_id: task_id)

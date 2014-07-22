@@ -49,6 +49,8 @@ describe GoogleIntegration do
 
   context '#toggle_calendar_integration_for_appointments' do
     before do
+      google_integration.stub(:calendars).and_return([{}])
+      google_integration.calendar_id = ''
       google_integration.calendar_integrations = []
       google_integration.calendar_integration = true
       google_integration.save!

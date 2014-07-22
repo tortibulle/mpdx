@@ -41,7 +41,7 @@ class Person::GoogleAccount < ActiveRecord::Base
   end
 
   def contacts
-    refresh_token! if token_expired?
+    return false if token_expired? && !refresh_token!
 
     unless @contacts
       client = OAuth2::Client.new(APP_CONFIG['google_key'], APP_CONFIG['google_secret'])
@@ -53,7 +53,7 @@ class Person::GoogleAccount < ActiveRecord::Base
   end
 
   def client
-    refresh_token! if token_expired?
+    return false if token_expired? && !refresh_token!
 
     unless @client
       @client = Google::APIClient.new(application_name: 'MPDX', application_version: '1.0')
@@ -63,7 +63,10 @@ class Person::GoogleAccount < ActiveRecord::Base
   end
 
   def refresh_token!
-    fail MissingRefreshToken, 'No refresh token' if refresh_token.blank?
+    if refresh_token.blank?
+      needs_refresh
+      return false
+    end
 
     # Refresh auth token from google_oauth2.
     params = {
@@ -81,12 +84,20 @@ class Person::GoogleAccount < ActiveRecord::Base
       else
         case json['error']
         when 'invalid_grant'
-          fail MissingRefreshToken, 'Invalid Grant'
+          needs_refresh
+          return false
         else
           fail response.inspect
         end
       end
     }
+  end
+
+  def needs_refresh
+    google_integrations.each do |integration|
+      integration.update_columns(calendar_integration: false, email_integration: false) #no callbacks
+      AccountMailer.google_account_refresh(person, integration).deliver
+    end
   end
 
   class MissingRefreshToken < StandardError

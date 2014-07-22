@@ -8,7 +8,7 @@ class Person::GmailAccount
   end
 
   def gmail
-    @google_account.refresh_token! if @google_account.token_expired?
+    return false if @google_account.token_expired? && !@google_account.refresh_token!
 
     begin
       client = Gmail.connect(:xoauth2, @google_account.email, @google_account.token)
@@ -23,6 +23,8 @@ class Person::GmailAccount
   end
 
   def import_emails(account_list)
+    return false unless client
+
     since = @google_account.last_email_sync || 60.days.ago
 
     gmail do |g|

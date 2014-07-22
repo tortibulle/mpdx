@@ -43,18 +43,24 @@ class GoogleIntegration < ActiveRecord::Base
   end
 
   def calendar_api
-    @calendar_api ||= google_account.client.discovered_api('calendar', 'v3')
+    client = google_account.client
+    @calendar_api ||= client.discovered_api('calendar', 'v3') if client
   end
 
   def calendars
-    unless @calendars
+    return @calendars if @calendars
+
+    @calendars = nil
+    api = calendar_api
+    if api
       result = google_account.client.execute(
-        api_method: calendar_api.calendar_list.list,
+        api_method: api.calendar_list.list,
         parameters: { 'userId' => 'me' }
       )
       calendar_list = result.data
       @calendars = calendar_list.items.select { |c| c.accessRole == 'owner' }
     end
+
     @calendars
   end
 
@@ -67,11 +73,13 @@ class GoogleIntegration < ActiveRecord::Base
   end
 
   def set_default_calendar
-    if calendar_integration? && calendar_id.blank? && calendars.length == 1
+    if calendar_integration? && calendar_id.blank? && calendars && calendars.length == 1
       calendar = calendars.first
       self.calendar_id = calendar['id']
       self.calendar_name = calendar['summary']
+      return true
     end
+    false
   end
 
   def create_new_calendar

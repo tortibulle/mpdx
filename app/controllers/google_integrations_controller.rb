@@ -6,14 +6,14 @@ class GoogleIntegrationsController < ApplicationController
   end
 
   def update
-    google_integration.update_attributes(google_integration_params)
-
-    respond_to do |format|
-      format.html { redirect_to google_integration }
-      format.js { render nothing: true }
+    if google_integration.update_attributes(google_integration_params)
+      respond_to do |format|
+        format.html { redirect_to google_integration }
+        format.js { render nothing: true }
+      end
+    else
+      missing_refresh_token
     end
-  rescue Person::GoogleAccount::MissingRefreshToken
-    missing_refresh_token
   end
 
   def create
