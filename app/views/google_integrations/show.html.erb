@@ -75,15 +75,15 @@
         <br/>
       <% end %>
 
-      <div id='google_resync'>
-        <h2><%= _('Resync Google Account') %></h2>
+      <div id='google_refresh'>
+        <h2><%= _('Refresh Google Account') %></h2>
 
         <%= _('If the link between MPDx and your Google account breaks,
               click the button below to re-establish the connection.') %>
         <br/>
         <%= _('(You should only need to do this if you receive an email from MPDx.)') %>
         <br/><br/>
-        <%= link_to(_('Resync Google Account'), new_account_path(provider: :google, redirect: google_integration_path(@google_integration)), class: 'btn desired_action') %>
+        <%= link_to(_('Refresh Google Account'), new_account_path(provider: :google, redirect: google_integration_path(@google_integration)), class: 'btn desired_action') %>
       </div>
     </div>
 

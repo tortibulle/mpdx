@@ -15,4 +15,10 @@ class AccountMailer < ActionMailer::Base
     mail to: account_list.users.map(&:email).compact.map(&:email),
          subject: _('prayerletters.com account needs to be refreshed')
   end
+
+  def google_account_refresh(person, integration)
+    @google_integration = integration
+    mail to: person.email,
+         subject: _('Google account needs to be refreshed')
+  end
 end

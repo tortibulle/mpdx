@@ -6,14 +6,14 @@ class GoogleIntegrationsController < ApplicationController
   end
 
   def update
-    google_integration.update_attributes(google_integration_params)
-
-    respond_to do |format|
-      format.html { redirect_to google_integration }
-      format.js { render nothing: true }
+    if google_integration.update_attributes(google_integration_params)
+      respond_to do |format|
+        format.html { redirect_to google_integration }
+        format.js { render nothing: true }
+      end
+    else
+      missing_refresh_token
     end
-  rescue Person::GoogleAccount::MissingRefreshToken
-    missing_refresh_token
   end
 
   def create
@@ -49,6 +49,6 @@ class GoogleIntegrationsController < ApplicationController
   end
 
   def missing_refresh_token
-    redirect_to google_integration_path(google_integration), alert: "<a href=\"#{new_account_path(provider: :google, redirect: google_integration_path(google_integration))}\">#{_('The link to your google account needs to be resynced. Click here to re-connect to google.')}</a>"
+    redirect_to google_integration_path(google_integration), alert: "<a href=\"#{new_account_path(provider: :google, redirect: google_integration_path(google_integration))}\">#{_('The link to your google account needs to be refreshed. Click here to re-connect to google.')}</a>"
   end
 end

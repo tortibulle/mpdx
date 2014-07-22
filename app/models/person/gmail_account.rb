@@ -8,7 +8,9 @@ class Person::GmailAccount
   end
 
   def gmail
-    @google_account.refresh_token! if @google_account.token_expired?
+    if @google_account.token_expired?
+      return false unless @google_account.refresh_token!
+    end
 
     begin
       client = Gmail.connect(:xoauth2, @google_account.email, @google_account.token)
@@ -25,32 +27,34 @@ class Person::GmailAccount
   def import_emails(account_list)
     since = @google_account.last_email_sync || 60.days.ago
 
-    gmail do |g|
-      # loop through all contacts, logging email addresses
-      email_addresses = []
-      account_list.contacts.active.includes(people: :email_addresses).each do |contact|
-        contact.people.each do |person|
-          person.email_addresses.map(&:email).uniq.each do |email|
-            unless email_addresses.include?(email)
-              email_addresses << email
+    if client
+      gmail do |g|
+        # loop through all contacts, logging email addresses
+        email_addresses = []
+        account_list.contacts.active.includes(people: :email_addresses).each do |contact|
+          contact.people.each do |person|
+            person.email_addresses.map(&:email).uniq.each do |email|
+              unless email_addresses.include?(email)
+                email_addresses << email
 
-              # sent emails
-              sent = g.mailbox('[Gmail]/Sent Mail')
-              sent.emails(to: email, after: since).each do |gmail_message|
-                log_email(gmail_message, account_list, contact, person, 'Done')
-              end
+                # sent emails
+                sent = g.mailbox('[Gmail]/Sent Mail')
+                sent.emails(to: email, after: since).each do |gmail_message|
+                  log_email(gmail_message, account_list, contact, person, 'Done')
+                end
 
-              # received emails
-              all = g.mailbox('[Gmail]/All Mail')
-              all.emails(from: email, after: since).each do |gmail_message|
-                log_email(gmail_message, account_list, contact, person, 'Received')
+                # received emails
+                all = g.mailbox('[Gmail]/All Mail')
+                all.emails(from: email, after: since).each do |gmail_message|
+                  log_email(gmail_message, account_list, contact, person, 'Received')
+                end
               end
             end
           end
         end
       end
+      @google_account.update_attributes(last_email_sync: Time.now)
     end
-    @google_account.update_attributes(last_email_sync: Time.now)
   end
 
   def log_email(gmail_message, account_list, contact, person, result)
