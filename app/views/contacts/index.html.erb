@@ -186,7 +186,7 @@
           </td>
         </tr>
       </table>
-      <div class="contacts-scrollable">
+      <div class="contacts-scrollable" id="contacts-scrollable">
         <table class="tablelist" ng-class="{'contact_loading': contactsLoading}">
           <tr ng-show="contacts.length === 0 && contactQuery.viewPrefsLoaded"><td style="color:red;">Sorry, there are no contacts that match the filters and/or tags you have selected. Try <a href="/contacts/new">adding a new contact</a> or <a href="#" ng-click="resetFilters()">resetting your filters</a>.</td></tr>
           <tr contact="contact" ng-repeat="contact in contacts" id="contact_{{contact.id}}" data-hook="contact"></tr>
