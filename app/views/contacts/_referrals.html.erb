@@ -5,7 +5,7 @@
 <% else %>
   <ul>
     <% @contact.contact_referrals_by_me.each do |r| %>
-      <li><%= link_to(r.referred_to, r.referred_to, remote: true) %> on <%= l r.created_at.to_date %></li>
+      <li><%= link_to(r.referred_to, r.referred_to) %> on <%= l r.created_at.to_date %></li>
     <% end %>
   </ul>
   <%= link_to(_('Add Referrals'), add_referrals_contact_path(@contact), remote: true, :class => "add_referrals no-new-tab") %>
