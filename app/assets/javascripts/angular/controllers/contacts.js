@@ -159,13 +159,13 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
     });
 
     var taskFilterExists = function(){
-      return ($scope.contactQuery.relatedTaskAction[0] !== '');
+      return $scope.contactQuery.relatedTaskAction[0];
     };
 
-    var getTaskFilterIds = function (group) {
+    var getTaskFilterIds = function (relatedTaskAction) {
         api.call('get', 'tasks?account_list_id=' + window.current_account_list_id +
                 '&filters[completed]=false' +
-                '&filters[activity_type][]=' + encodeURLarray($scope.contactQuery.relatedTaskAction).join('&filters[activity_type][]=') +
+                '&filters[activity_type][]=' + encodeURLarray(relatedTaskAction).join('&filters[activity_type][]=') +
                 '&include=&per_page=10000'
             , {}, function (tData) {
                 refreshContacts(_.uniq(_.flatten(tData.tasks, 'contacts')));
@@ -199,8 +199,10 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             }
         }
 
-        if(taskFilterExists()){
-          getTaskFilterIds();
+        if(taskFilterExists() === 'null') {
+          getTaskFilterIds('');
+        }else if(taskFilterExists() !== ''){
+          getTaskFilterIds($scope.contactQuery.relatedTaskAction);
         }else{
           refreshContacts();
         }
@@ -238,7 +240,11 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
           '&filters[timezone][]=' + encodeURLarray(q.timezone).join('&filters[timezone][]=') +
           '&filters[wildcard_search]=' + encodeURIComponent(q.wildcardSearch);
       if (angular.isDefined(taskContactIds)) {
-        requestUrl = requestUrl + '&filters[ids][]=' + encodeURLarray(taskContactIds).join('&filters[ids][]=');
+        if(taskFilterExists() === 'null') {
+          requestUrl = requestUrl + '&filters[not_ids][]=' + encodeURLarray(taskContactIds).join('&filters[not_ids][]=');
+        }else{
+          requestUrl = requestUrl + '&filters[ids][]=' + encodeURLarray(taskContactIds).join('&filters[ids][]=');
+        }
       }
 
       api.call('get', requestUrl, {}, function (data) {

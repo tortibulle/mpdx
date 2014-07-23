@@ -17,6 +17,10 @@ class ContactFilter
         filtered_contacts = filtered_contacts.where('contacts.id' => @filters[:ids].split(','))
       end
 
+      if @filters[:not_ids]
+        filtered_contacts = filtered_contacts.where('contacts.id not in (?)', @filters[:not_ids])
+      end
+
       if @filters[:tags].present? && @filters[:tags].first != ''
         filtered_contacts = filtered_contacts.tagged_with(@filters[:tags].split(','))
       end
