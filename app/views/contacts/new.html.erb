@@ -28,7 +28,9 @@
 
       //second person
       if(firstNames.length > 1){
-          $('#add_person a').trigger('click');
+          if($(".last_name").length < 2){
+            $('#add_person a').trigger('click');
+          }
           if(!$(".last_name:eq(1)").val()){
               $(".last_name:eq(1)").val(lastName);
           }

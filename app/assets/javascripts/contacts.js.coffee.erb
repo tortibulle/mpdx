@@ -1,6 +1,11 @@
 $ ->
   if $('.contacts_controller')[0]?
 
+    $("#contact_pledge_amount").focusout ->
+        amount = $(this).val()
+        $("#contact_status").val "Partner - Financial"  if amount and amount > 0
+        return
+
     if $('#contacts_find_duplicates')[0]?
       $.ajax {
         url: '/contacts/find_duplicates',
