@@ -1,18 +1,12 @@
 <%= render 'form', contact: @contact %>
 
+
 <script>
   $("#contact_name").focusout(function () {
       var contactName = $(this).val();
       var lastName = contactName.substr(0, contactName.indexOf(','));
       var afterLastName = contactName.substr(contactName.indexOf(',') + 1).trim();
-      var firstNames;
-      if(_.contains(afterLastName, ' and ')) {
-          firstNames = afterLastName.split(' and ');
-      }else if(_.contains(afterLastName, ' & ')){
-          firstNames = afterLastName.split(' & ');
-      }else{
-          firstNames = [afterLastName];
-      }
+      var firstNames = afterLastName.split(/ & | and /);
 
       if(!$("#contact_greeting").val()){
           $("#contact_greeting").val(afterLastName);
