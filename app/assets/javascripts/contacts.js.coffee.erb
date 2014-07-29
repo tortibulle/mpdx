@@ -1,30 +1,31 @@
 $ ->
+
+  if $('#new_contact')[0]?
+      $("#contact_name").focusout ->
+          contactName = $(this).val()
+          lastName = contactName.substr(0, contactName.indexOf(","))
+          afterLastName = contactName.substr(contactName.indexOf(",") + 1).trim()
+          firstNames = afterLastName.split(RegExp(" & | and "))
+          $("#contact_greeting").val afterLastName  unless $("#contact_greeting").val()
+
+          #first person
+          $(".last_name").first().val lastName  unless $(".last_name").first().val()
+          $(".first_name").first().val firstNames[0]  unless $(".first_name").first().val()
+
+          #second person
+          if firstNames.length > 1
+              $("#add_person a").trigger "click"  if $(".last_name").length < 2
+              $(".last_name:eq(1)").val lastName  unless $(".last_name:eq(1)").val()
+              $(".first_name:eq(1)").val firstNames[1]  unless $(".first_name:eq(1)").val()
+          window.scrollTo 0, 0
+          return
+
   if $('.contacts_controller')[0]?
 
     $("#contact_pledge_amount").focusout ->
         amount = $(this).val()
         $("#contact_status").val "Partner - Financial"  if amount and amount > 0
         return
-
-    $("#contact_name").focusout ->
-        contactName = $(this).val()
-        lastName = contactName.substr(0, contactName.indexOf(","))
-        afterLastName = contactName.substr(contactName.indexOf(",") + 1).trim()
-        firstNames = afterLastName.split(RegExp(" & | and "))
-        $("#contact_greeting").val afterLastName  unless $("#contact_greeting").val()
-
-        #first person
-        $(".last_name").first().val lastName  unless $(".last_name").first().val()
-        $(".first_name").first().val firstNames[0]  unless $(".first_name").first().val()
-
-        #second person
-        if firstNames.length > 1
-            $("#add_person a").trigger "click"  if $(".last_name").length < 2
-            $(".last_name:eq(1)").val lastName  unless $(".last_name:eq(1)").val()
-            $(".first_name:eq(1)").val firstNames[1]  unless $(".first_name:eq(1)").val()
-        window.scrollTo 0, 0
-        return
-
 
     if $('#contacts_find_duplicates')[0]?
       $.ajax {
