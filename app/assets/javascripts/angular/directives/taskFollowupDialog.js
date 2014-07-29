@@ -43,7 +43,7 @@ angular.module('mpdxApp')
                         followUpDialogCallback(followUpTask, taskResult);
                     }else{
                         //fetch task data (not on tasks page)
-                        api.call('get', 'tasks/' + taskId, {}, function(tData){
+                        api.call('get', 'tasks/' + taskId + '?account_list_id=' + window.current_account_list_id, {}, function(tData){
                             followUpDialogCallback(tData.task, taskResult);
                         });
                     }
