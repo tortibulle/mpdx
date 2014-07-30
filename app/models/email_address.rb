@@ -74,6 +74,12 @@ class EmailAddress < ActiveRecord::Base
         mail_chimp_account.queue_update_email(email_was, email)
       end
 
+      if changed.include?('optout_newsletter')
+        if optout_newsletter
+
+        end
+      end
+
       return unless changed.include?('primary')
       if primary?
         # If this is the newly designated primary email, we need to
