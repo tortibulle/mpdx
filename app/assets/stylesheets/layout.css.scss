@@ -279,6 +279,7 @@ div.right {
 }
 
 .contacts-scrollable{
+  position: relative;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
 }
