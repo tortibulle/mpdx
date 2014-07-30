@@ -13,7 +13,7 @@ namespace :karma  do
     Tempfile.open('karma_unit.js', Rails.root.join('tmp') ) do |f|
       f.write unit_js(application_spec_files)
       f.flush
-      system "./node_modules/karma/bin/karma #{command} #{f.path} #{args}"
+      fail unless system "./node_modules/karma/bin/karma #{command} #{f.path} #{args}"
     end
   end
 
