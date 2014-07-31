@@ -1,0 +1,11 @@
+<div class="importoptions formstyles" data-behavior="import_options" style="display:none">
+  <%= form_for Import.new(source: provider, source_account_id: account.id) do |f| %>
+      <%= f.hidden_field :source %>
+      <%= f.hidden_field :source_account_id %>
+      <div class="importtags">
+        <%= f.text_field :tags, placeholder: _('Add tags to these contacts') %>
+      </div>
+      <a href="#" class="btn btngreen" data-behavior="import_button"><%= _('Import') %></a>
+  <% end %>
+</div>
+<div><a href="#" class="btn desired_action" data-behavior="show_import"><%= _('Import Contacts') %></a></div>

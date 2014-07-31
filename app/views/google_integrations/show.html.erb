@@ -75,6 +75,14 @@
         <br/>
       <% end %>
 
+      <% # if $rollout.active?(:google_import, current_account_list) %>
+        <h2><%= _('Import Contacts') %></h2>
+
+        <%= _('MPDX can import contacts from your google account.') %>
+        <br/><br/>
+        <%= render 'import_contacts_form', provider: 'google', account: @google_integration.google_account %>
+      <% # end %>
+
       <div id='google_refresh'>
         <h2><%= _('Refresh Google Account') %></h2>
 
