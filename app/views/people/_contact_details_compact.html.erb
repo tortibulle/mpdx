@@ -27,6 +27,18 @@
   <% end %>
 </div>
 
+<% if person.birthday_month.present? %>
+    <div class="set">
+      <strong>Birthday:</strong> <%= I18n.t("date.month_names")[person.birthday_month] %> <%= person.birthday_day %>, <%= person.birthday_year %>
+    </div>
+<% end %>
+
+<% if person.anniversary_month.present? %>
+    <div class="set">
+      <strong>Anniversary:</strong> <%= I18n.t("date.month_names")[person.anniversary_month] %> <%= person.anniversary_day %>, <%= person.anniversary_year %>
+    </div>
+<% end %>
+
 
 <%#<a href="" class="icos ico_fb"></a>%>
 <%#<a href="" class="icos ico_twitter"></a>%>
