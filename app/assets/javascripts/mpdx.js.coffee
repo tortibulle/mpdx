@@ -4,7 +4,7 @@ $ ->
     params = $.set_param('page', 1, params)
     document.location = document.location.pathname + '?' + params
 
-  $(document).on 'click', '#leftmenu ul.left_filters li label', ->
+  $(document).on 'click', '#leftmenu ul.left_filters li > label', ->
     $(this).next(".collapse").slideToggle('fast')
     $(this).toggleClass("opened")
     $(this).parent("li").toggleClass("opened")
