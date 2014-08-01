@@ -82,7 +82,10 @@
 
     <div class="fieldset">
       <label class="fieldset_label"><%= _('Email') %></label>
-      <%# person.email_addresses.build if person.email_addresses.blank? %>
+      <div class="field_action">
+        <%= builder.check_box :optout_enewsletter %>
+        <%= builder.label :optout_enewsletter, "Opt-out of email newsletter" %>
+      </div>
       <%= builder.fields_for :email_addresses do |builder| %>
         <%= render 'people/email_address_fields', builder: builder, object: person %>
       <% end %>

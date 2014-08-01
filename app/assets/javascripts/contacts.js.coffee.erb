@@ -354,6 +354,21 @@ $ ->
       historicAddressDisable this
       return
 
+    $(document).on 'click', 'input.email_historic', ->
+      historicEmailDisable this
+
+    historicEmailDisable = (check) ->
+      fieldset = $(check).closest(".rs")
+      if $(check).is(":checked")
+        $("input[type=email]", fieldset).attr "disabled", true
+      else
+        $("input[type=email]", fieldset).removeAttr "disabled"
+      return
+
+    $("input.email_historic").each ->
+      historicEmailDisable this
+      return
+
     $(document).on 'click', 'td.qaction a.quick', ->
       td = $(this).closest('td')
       $('td.qaction[id!='+td.attr('id')+'] .quick_action_list').hide()

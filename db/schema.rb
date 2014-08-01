@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140730113152) do
+ActiveRecord::Schema.define(version: 20140801103154) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -325,13 +325,13 @@ ActiveRecord::Schema.define(version: 20140730113152) do
 
   create_table "email_addresses", force: true do |t|
     t.integer  "person_id"
-    t.string   "email",                                        null: false
-    t.boolean  "primary",                      default: false
+    t.string   "email",                                 null: false
+    t.boolean  "primary",               default: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "remote_id"
-    t.string   "location",          limit: 50
-    t.boolean  "optout_newsletter",            default: false
+    t.string   "location",   limit: 50
+    t.boolean  "historic",              default: false
   end
 
   add_index "email_addresses", ["email", "person_id"], name: "index_email_addresses_on_email_and_person_id", unique: true, using: :btree
@@ -595,6 +595,7 @@ ActiveRecord::Schema.define(version: 20140730113152) do
     t.string   "profession"
     t.boolean  "deceased",                         default: false, null: false
     t.boolean  "subscribed_to_updates"
+    t.boolean  "optout_enewsletter",               default: false
   end
 
   add_index "people", ["access_token"], name: "index_people_on_access_token", unique: true, using: :btree
