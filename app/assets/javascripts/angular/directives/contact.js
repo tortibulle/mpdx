@@ -55,7 +55,23 @@ angular.module('mpdxApp')
                         case '24.0':
                             return 'Biennial';
                     }
-                }
+                };
+
+                $scope.hasSendNewsletterError = function() {
+                    data = contactCache.getFromCache($scope.contact.id)
+                    contact = data.contact
+                    missing_address = data.addresses.length == 0
+                    missing_email_address = data.email_addresses.length == 0
+                    switch(contact.send_newsletter) {
+                        case 'Both':
+                            return missing_address || missing_email_address;
+                        case 'Physical':
+                            return missing_address
+                        case 'Email':
+                            return missing_email_address
+                    }
+                    return false;
+                };
             }
         };
     });
