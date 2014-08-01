@@ -11,7 +11,7 @@ class EmailAddress < ActiveRecord::Base
   validates_uniqueness_of :email, scope: :person_id
   before_save :strip_email
   after_update :sync_with_mail_chimp
-  after_commit :subscribe_to_mail_chimp
+  #after_commit :subscribe_to_mail_chimp
   after_destroy :delete_from_mailchimp
 
   def to_s() email; end
@@ -67,20 +67,7 @@ class EmailAddress < ActiveRecord::Base
 
   def sync_with_mail_chimp
     return unless mail_chimp_account
-    if contact && contact.send_email_letter?
-
-      # If the value of the email field changed, unsubscribe the old
-      if changed.include?('email') && email_was.present?
-        mail_chimp_account.queue_update_email(email_was, email)
-      end
-
-      if changed.include?('optout_newsletter')
-        if optout_newsletter
-
-        end
-      end
-
-      return unless changed.include?('primary')
+    if contact && contact.send_email_letter? && !person.optout_enewsletter?
       if primary?
         # If this is the newly designated primary email, we need to
         # change the old one to this one
@@ -90,9 +77,7 @@ class EmailAddress < ActiveRecord::Base
           mail_chimp_account.queue_subscribe_person(person)
         end
       else
-        # If this used to be the primary, and now isn't, that means
-        # something else is now the primary and will take care of
-        # updating itself.
+        mail_chimp_account.queue_unsubscribe_email(email)
       end
     else
       begin
