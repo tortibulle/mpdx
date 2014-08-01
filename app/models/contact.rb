@@ -186,7 +186,7 @@ class Contact < ActiveRecord::Base
 
   def greeting
     return name if siebel_organization?
-    self[:greeting].present? self[:greeting] : [first_name, spouse_name].compact.join(_(' and '))
+    self[:greeting].present? ? self[:greeting] : [first_name, spouse_name].compact.join(_(' and '))
   end
 
   def envelope_greeting
