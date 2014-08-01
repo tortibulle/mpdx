@@ -279,6 +279,7 @@ div.right {
 }
 
 .contacts-scrollable{
+  position: relative;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
 }
@@ -729,6 +730,7 @@ tbody.tasks {
   background: $white;
   box-shadow: 0 0 6px #bbb;
   position: absolute;
+  z-index: 10;
 
   a {background: image-url("sprite.png") no-repeat 0 50%; line-height: 25px; height: 25px; padding-left: 25px; padding-right: 10px; display: block;}
   a.text {background-position: 0 -192px;}

@@ -23,7 +23,9 @@
             <div style="padding-top:10px;">
                 <label>Commitment Amount</label><br>
                 <input type="text" ng-model="followUpDialogResult.financialCommitment.amount"
-                       placeholder="<%= TwitterCldr::Shared::Currencies.for_code(current_currency)[:symbol] %>">
+                       placeholder="<%= TwitterCldr::Shared::Currencies.for_code(current_currency) ?
+                                            TwitterCldr::Shared::Currencies.for_code(current_currency)[:symbol] :
+                                            current_currency %>">
             </div>
             <div style="padding-top:10px;">
                 <label>Commitment Start Date</label><br>

@@ -205,7 +205,9 @@ class ContactsController < ApplicationController
           attributes[:last_name] = _('Unknown') if attributes[:last_name].blank?
           contact_name = "#{attributes[:last_name]}, #{attributes[:first_name]}"
           contact_name += " & #{attributes[:spouse_name]}" if attributes[:spouse_name].present?
-          contact = current_account_list.contacts.create(name: contact_name, notes: attributes[:notes])
+          contact_greeting = "#{attributes[:first_name]}"
+          contact_greeting += " & #{attributes[:spouse_name]}" if attributes[:spouse_name].present?
+          contact = current_account_list.contacts.create(name: contact_name, greeting: contact_greeting, notes: attributes[:notes])
 
           begin
             # create primary
