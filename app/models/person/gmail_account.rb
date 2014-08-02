@@ -65,7 +65,7 @@ class Person::GmailAccount
     if message.strip.present?
       google_email = @google_account.google_emails.find_or_create_by!(google_email_id: gmail_message.msg_id)
       if contact.tasks.where(id: google_email.activities.pluck(:id)).empty?
-        task = contact.tasks.create!(subject: gmail_message.subject,
+        task = contact.tasks.create!(subject: gmail_message.subject.present? ? gmail_message.subject : _('No Subject'),
                                      start_at: gmail_message.envelope.date,
                                      completed: true,
                                      completed_at: gmail_message.envelope.date,

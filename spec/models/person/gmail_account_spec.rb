@@ -94,6 +94,13 @@ describe Person::GmailAccount do
       task.result.should == 'Done'
     end
 
+    it "creates a task even if the email doesn't have a subject" do
+      expect(gmail_message).to receive(:subject).and_return('')
+      expect {
+        gmail_account.log_email(gmail_message, account_list, contact, person, 'Done')
+      }.to change(Task, :count).by(1)
+    end
+
     it "doesn't create a duplicate task" do
       google_email.save
       task = create(:task, account_list: account_list, remote_id: gmail_message.envelope.message_id, source: 'gmail')
