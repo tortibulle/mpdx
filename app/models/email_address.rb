@@ -11,7 +11,6 @@ class EmailAddress < ActiveRecord::Base
   validates_uniqueness_of :email, scope: :person_id
   before_save :strip_email
   after_update :sync_with_mail_chimp
-  #after_commit :subscribe_to_mail_chimp
   after_destroy :delete_from_mailchimp
 
   def to_s() email; end
