@@ -262,7 +262,10 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
           });
         });
         $scope.contacts = data.contacts;
-        document.getElementById('contacts-scrollable').scrollTop = 0;
+
+        if(!_.isNull(document.getElementById('contacts-scrollable'))) {
+            document.getElementById('contacts-scrollable').scrollTop = 0;
+        }
 
         $scope.totalContacts = data.meta.total;
         $scope.page.total = data.meta.total_pages;
