@@ -1,4 +1,7 @@
 <%= form_for(@task || current_account_list.tasks.new(start_at: Time.zone.now), remote: true, namespace: 'modal', html: {class: '', id: 'task_modal_form'}) do |f| %>
   <%= render 'tasks/fields', task: f.object, f: f %>
 <% end %>
-
+<script>
+    // This will re-apply the bootstrap-tagsinput to the tags input for modal dialog.
+    $("input[data-role=tagsinput], select[multiple][data-role=tagsinput]").tagsinput();
+</script>

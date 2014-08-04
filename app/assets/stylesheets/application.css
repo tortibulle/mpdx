@@ -10,4 +10,5 @@
 *= require font-awesome
 *= require peek
 *= require peek/views/performance_bar
+*= require bootstrap-tagsinput
 */
