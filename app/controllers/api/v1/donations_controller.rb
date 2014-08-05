@@ -2,7 +2,10 @@ class Api::V1::DonationsController < Api::V1::BaseController
   def index
     order = params[:order] || 'donations.id'
 
-    filtered_donations = current_account_list.contacts.find(params[:contact_id]).donations if params[:contact_id].present?
+    if params[:contact_id].present?
+      donor_account_ids = current_account_list.contacts.find(params[:contact_id]).donor_account_ids
+      filtered_donations = current_account_list.donations.where(donor_account_id: donor_account_ids)
+    end
     filtered_donations ||= donations
 
     filtered_donations = add_includes_and_order(filtered_donations, per_page: params[:limit], order: order)
