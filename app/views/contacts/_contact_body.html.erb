@@ -68,11 +68,11 @@
             <% end %>
             <tr>
               <td class="meta_name"><%= _('Magazine') %></td>
-              <td class="meta_data"><% if contact_exhibit.magazine %>Yes<% else %>No<% end %></td>
+              <td class="meta_data"><%= contact_exhibit.magazine ? _('Yes') : _('No') %></td>
             </tr>
             <tr>
               <td class="meta_name"><%= _('Direct Deposit') %></td>
-              <td class="meta_data"><% if contact_exhibit.direct_deposit %>Yes<% else %>No<% end %></td>
+              <td class="meta_data"><%= contact_exhibit.direct_deposit ? _('Yes') : _('No') %></td>
             </tr>
           </table>
         </div>
