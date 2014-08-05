@@ -8,7 +8,6 @@
   </div>
 <% end %>
 
-
 <div class="field">
   <%= f.label :subject, _('Subject') %>
   <%= f.text_field :subject, autofocus: true, maxlength: 255, required: true %>
@@ -48,6 +47,7 @@
   <%= f.label :tag_list, _('Tags') %>
   <%= f.text_field :tag_list, data: {role: 'tagsinput'} %>
 </div>
+<script><%= render "tags/tags_input.js" %></script>
 
 <div class="field">
 
@@ -57,5 +57,4 @@
     <%= builder.text_area :body, rows: 3 %>
   <% end %>
 </div>
-
 
