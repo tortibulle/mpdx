@@ -27,6 +27,14 @@ $ ->
         $("#contact_status").val "Partner - Financial"  if amount and amount > 0
         return
 
+    $("#contact_send_newsletter").change ->
+        val = $(this).val()
+        if val is "Email" or val is "Both"
+            $(".optout_enewsletter").show()
+        else
+            $(".optout_enewsletter").hide()
+        return
+
     if $('#contacts_find_duplicates')[0]?
       $.ajax {
         url: '/contacts/find_duplicates',
@@ -371,13 +379,28 @@ $ ->
     historicAddressDisable = (check) ->
       fieldset = $(check).closest(".rs")
       if $(check).is(":checked")
-        $("input[type=text], textarea, .country_select", fieldset).attr "disabled", true
+        $("input[type=text], textarea, .country_select", fieldset).attr "readonly", true
       else
-        $("input[type=text], textarea, .country_select", fieldset).removeAttr "disabled"
+        $("input[type=text], textarea, .country_select", fieldset).removeAttr "readonly"
       return
 
     $("input.address_historic").each ->
       historicAddressDisable this
+      return
+
+    $(document).on 'click', 'input.email_historic', ->
+      historicEmailDisable this
+
+    historicEmailDisable = (check) ->
+      fieldset = $(check).closest(".rs")
+      if $(check).is(":checked")
+        $("input[type=email]", fieldset).attr "readonly", true
+      else
+        $("input[type=email]", fieldset).removeAttr "readonly"
+      return
+
+    $("input.email_historic").each ->
+      historicEmailDisable this
       return
 
     $(document).on 'click', 'td.qaction a.quick', ->

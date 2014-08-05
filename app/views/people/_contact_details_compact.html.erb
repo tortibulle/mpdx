@@ -14,7 +14,7 @@
 
 <div class="set email">
   <% if person.email_addresses.present? %>
-    <% person.email_addresses.each do |email| %>
+    <% person.email_addresses.each do |email| next if email.historic? %>
       <%= exhibit(email, self) %>
 
       <% if person.email_addresses.length > 1 && email.primary? %>

@@ -83,6 +83,13 @@ form, .formstyles {
     color: $black;
   }
 
+  .optout_enewsletter{
+    label{
+      font-size: 12px;
+      color: black;
+    }
+  }
+
   input[type=text],
   input[type=password],
   input[type=email],
