@@ -56,7 +56,7 @@
             <% end %>
             <% if contact_exhibit.pledge_as_currency.present? %>
               <tr>
-                <td class="meta_name"><%= _('Commitment') %> </td>
+                <td class="meta_name"><%= _('Commitment') %></td>
                 <td class="meta_data"><%= contact_exhibit.pledge_as_currency %></td>
               </tr>
             <% end %>
@@ -66,6 +66,14 @@
                 <td class="meta_data"><%= contact_exhibit.send_newsletter %></td>
               </tr>
             <% end %>
+            <tr>
+              <td class="meta_name"><%= _('Magazine') %></td>
+              <td class="meta_data"><%= contact_exhibit.magazine ? _('Yes') : _('No') %></td>
+            </tr>
+            <tr>
+              <td class="meta_name"><%= _('Direct Deposit') %></td>
+              <td class="meta_data"><%= contact_exhibit.direct_deposit ? _('Yes') : _('No') %></td>
+            </tr>
           </table>
         </div>
         <div class="cols col_30">
@@ -97,6 +105,12 @@
                   </div>
                 </td>
               </tr>
+            <% end %>
+            <% if contact_exhibit.mailing_address.street.present? && !contact_exhibit.mailing_address.historic %>
+                <tr>
+                  <td class="meta_name">Address</td>
+                  <td class="meta_data"><%= contact_exhibit.mailing_address.street %><br><%= contact_exhibit.mailing_address.city %>, <%= contact_exhibit.mailing_address.state %> <%= contact_exhibit.mailing_address.postal_code %><br><%= contact_exhibit.mailing_address.country %></td>
+                </tr>
             <% end %>
           </table>
         </div>
