@@ -116,6 +116,10 @@ class ContactFilter
         filtered_contacts = filtered_contacts.where('lower(contacts.name) like ?', "%#{@filters[:name].downcase}%")
       end
 
+      if @filters[:timezone].present? && @filters[:timezone].first != ''
+        filtered_contacts = filtered_contacts.where('contacts.timezone' => @filters[:timezone])
+      end
+
       if @filters[:relatedTaskAction].present? && @filters[:relatedTaskAction].first != ''
         if @filters[:relatedTaskAction].first === 'null'
           contacts_with_activities = filtered_contacts.where('activities.completed' => false)
