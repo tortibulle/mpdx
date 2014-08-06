@@ -121,7 +121,7 @@ class ContactFilter
       end
 
       if @filters[:relatedTaskAction].present? && @filters[:relatedTaskAction].first != ''
-        if @filters[:relatedTaskAction].first === 'null'
+        if @filters[:relatedTaskAction].first == 'null'
           contacts_with_activities = filtered_contacts.where('activities.completed' => false)
                                                       .includes(:activities).map(&:id)
           filtered_contacts = filtered_contacts.where('contacts.id not in (?)', contacts_with_activities)
