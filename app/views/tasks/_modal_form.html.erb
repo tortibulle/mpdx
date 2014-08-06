@@ -1,4 +1,7 @@
 <%= form_for(@task || current_account_list.tasks.new(start_at: Time.zone.now), remote: true, namespace: 'modal', html: {class: '', id: 'task_modal_form'}) do |f| %>
   <%= render 'tasks/fields', task: f.object, f: f %>
 <% end %>
-
+<script>
+<%= render 'tags_input.js', input_selector: '#modal_task_tag_list',
+    tags: current_account_list.activity_tags  %>
+</script>

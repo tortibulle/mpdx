@@ -146,21 +146,28 @@ p:last-child {margin-bottom: 0;}
   }
 }
 
+.formatted-tag-base {
+  background: $blue;
+  color: $white;
+  display: inline-block;
+  font-weight: normal;
+  height: 18px;
+  font-size: 11px;
+  border-radius: 5px;
+  line-height: 18px;
+  text-align: center;
+  padding: 0 5px;
+  margin-bottom: 3px;
+}
+
+.bootstrap-tagsinput .tag {
+  @extend .formatted-tag-base;
+}
 
 .tags,
 #leftmenu ul li .tags {
   a {
-    background: $blue;
-    color: $white;
-    display: inline-block;
-    font-weight: normal;
-    height: 18px;
-    font-size: 11px;
-    border-radius: 5px;
-    line-height: 18px;
-    text-align: center;
-    padding: 0 5px;
-    margin-bottom: 3px;
+    @extend .formatted-tag-base;
   }
   a.selected {
     background: $blue_dark;

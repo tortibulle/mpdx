@@ -10,4 +10,7 @@
 *= require font-awesome
 *= require peek
 *= require peek/views/performance_bar
+*= require bootstrap-tagsinput
+*= require bootstrap-tagsinput
+*= require typeahead
 */
