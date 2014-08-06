@@ -1,0 +1,46 @@
+(function(tags, input_selector) {
+    debugger;
+
+    var substringMatcher = function(strs) {
+        return function findMatches(q, cb) {
+            var matches, substrRegex;
+            matches = [];
+            substrRegex = new RegExp(q, 'i');
+            $.each(strs, function(i, str) {
+                if (substrRegex.test(str)) {
+                    matches.push({ val: str });
+                }
+            });
+            cb(matches);
+        };
+    };
+
+    var tags_elem = $(input_selector);
+
+    // The acts-as-taggable-on gem gives the tag_list ", " as the delimiter but
+    // bootstrap-tagsinput expects the tags to just be separated by ","
+    tags_elem.val(tags_elem.val().replace(/\,\ /g,','));
+
+    tags_elem.tagsinput();
+
+    var tags_input = tags_elem.tagsinput('input');
+
+    tags_input.typeahead(null, {
+        name: 'tags',
+        displayKey: 'val',
+        valueKey: 'val',
+        source: substringMatcher(tags)
+    }).on('typeahead:selected', function (obj, datum) {
+        tags_elem.tagsinput('add', datum.val);
+        tags_input.typeahead('val', '');
+    }).on('focusout', function(event) {
+        tags_elem.tagsinput('add', tags_input.val());
+        tags_input.typeahead('val', '');
+        tags_input.typeahead('close');
+    });
+
+    tags_elem.on('itemAdded', function(event) {
+        tags_input.typeahead('val', '');
+        tags_input.typeahead('close');
+    });
+})(<%= raw tags.to_json %>, '<%= input_selector %>');

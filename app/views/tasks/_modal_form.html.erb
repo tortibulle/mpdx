@@ -2,6 +2,6 @@
   <%= render 'tasks/fields', task: f.object, f: f %>
 <% end %>
 <script>
-    // This will re-apply the bootstrap-tagsinput to the tags input for modal dialog.
-    $("input[data-role=tagsinput], select[multiple][data-role=tagsinput]").tagsinput();
+<%= render 'tags_input.js', input_selector: '#modal_task_tag_list',
+    tags: current_account_list.activity_tags  %>
 </script>

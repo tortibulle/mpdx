@@ -61,9 +61,10 @@
 
         <div class="field">
           <%= f.label :tag_list, _('Tags') %>
-          <%= f.text_field :tag_list, data: {role: 'tagsinput'} %>
+          <%= f.text_field :tag_list %>
         </div>
-        <script><%= render "tags/tags_input.js" %></script>
+        <script><%= render 'tags_input.js', input_selector: '#contact_tag_list',
+            tags: current_account_list.contact_tags  %></script>
 
         <div class="field radiocheck">
           <%= f.check_box :magazine %>

@@ -53,4 +53,4 @@
 //= require_tree ./angular/filters
 
 //= require bootstrap-tagsinput
-//= require typeahead.bundle.js
+//= require typeahead.jquery.js
