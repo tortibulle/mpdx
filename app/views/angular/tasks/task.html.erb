@@ -64,7 +64,7 @@
                 <p ng-show="!p.phone_numbers.length">No phone number</p>
 
                 <p>
-                    <span ng-repeat="email in p.email_addresses">
+                    <span ng-repeat="email in p.email_addresses | filter:{ historic: false }">
                         <a ng-href="mailto:{{email.email}}">{{email.email}}</a> <i class="fa fa-check green" ng-show="email.primary"></i><br>
                     </span>
 

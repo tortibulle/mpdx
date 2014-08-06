@@ -166,3 +166,7 @@ $leftmenuwidth: 200px;
 .green_dark { color: $green_dark; }
 .green_darkest { color: $green_darkest; }
 .red { color: $error_red }
+
+input:read-only{
+  background-color: #d3d3d3;
+}

@@ -49,11 +49,11 @@ class Person < ActiveRecord::Base
   PERMITTED_ATTRIBUTES = [
     :first_name, :legal_first_name, :last_name, :birthday_month, :birthday_year, :birthday_day,
     :anniversary_month, :anniversary_year, :anniversary_day, :title, :suffix, :gender, :marital_status,
-    :middle_name, :profession, :deceased, :_destroy, :id,
+    :middle_name, :profession, :deceased, :optout_enewsletter, :_destroy, :id,
     {
       email_address: :email,
       phone_number: :number,
-      email_addresses_attributes: [:email, :primary, :_destroy, :id],
+      email_addresses_attributes: [:email, :historic, :primary, :_destroy, :id],
       phone_numbers_attributes: [:number, :location, :primary, :_destroy, :id],
       linkedin_accounts_attributes: [:url, :_destroy, :id],
       facebook_accounts_attributes: [:url, :_destroy, :id],
@@ -337,7 +337,7 @@ class Person < ActiveRecord::Base
   end
 
   def sync_with_mailchimp
-    if mail_chimp_account && contact && contact.send_email_letter?
+    if mail_chimp_account && contact && contact.send_email_letter? && !self.optout_enewsletter?
       mail_chimp_account.queue_subscribe_person(self)
     end
   end
