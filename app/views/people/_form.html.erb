@@ -134,8 +134,14 @@
         </div>
 
         <hr class="thin"/>
-
       <% end %>
+
+      <%= builder.fields_for :websites do |pf| %>
+          <%= render 'people/website_fields', builder: pf, object: person %>
+      <% end %>
+      <div class="sfield field_indent" data-behavior="add-wrapper">
+        <%= link_to_add_fields(_('Add Website/Blog'), builder, :websites, partial: 'people/website_fields') %>
+      </div>
     </div>
 
     <div class="spacer"></div>

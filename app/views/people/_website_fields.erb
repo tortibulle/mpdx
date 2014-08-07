@@ -1,0 +1,11 @@
+<div class="field phone_field" data-behavior="field-wrapper">
+  <div class="ls"><%= builder.label :number, _('URL') %></div>
+  <div class="rs">
+    <%= builder.text_field :url, placeholder: 'http://' %>
+    <div class="field_action">
+      <%= builder.check_box :primary, class: 'primary' %>
+      <%= builder.label :primary %>
+      <%= link_to_remove_fields(builder) %>
+    </div>
+  </div>
+</div>

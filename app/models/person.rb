@@ -23,6 +23,8 @@ class Person < ActiveRecord::Base
   has_one :facebook_account, class_name: 'Person::FacebookAccount', foreign_key: :person_id
   has_many :linkedin_accounts, class_name: 'Person::LinkedinAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
   has_one :linkedin_account, -> { where('person_linkedin_accounts.valid_token' => true) }, class_name: 'Person::LinkedinAccount', foreign_key: :person_id
+  has_many :websites, class_name: 'Person::Website', foreign_key: :person_id, dependent: :destroy, autosave: true
+  has_one :website, -> { where('person_websites.primary' => true) }, class_name: 'Person::Website', foreign_key: :person_id
   has_many :google_accounts, class_name: 'Person::GoogleAccount', foreign_key: :person_id, dependent: :destroy, autosave: true
   has_many :relay_accounts, class_name: 'Person::RelayAccount', foreign_key: :person_id, dependent: :destroy
   has_many :organization_accounts, class_name: 'Person::OrganizationAccount', foreign_key: :person_id, dependent: :destroy
@@ -45,6 +47,7 @@ class Person < ActiveRecord::Base
   accepts_nested_attributes_for :twitter_accounts, reject_if: lambda { |p| p[:screen_name].blank? }, allow_destroy: true
   accepts_nested_attributes_for :linkedin_accounts, reject_if: lambda { |p| p[:url].blank? }, allow_destroy: true
   accepts_nested_attributes_for :pictures, reject_if: lambda { |p| p[:image].blank? && p[:image_cache].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :websites, reject_if: lambda { |p| p[:url].blank? }, allow_destroy: true
 
   PERMITTED_ATTRIBUTES = [
     :first_name, :legal_first_name, :last_name, :birthday_month, :birthday_year, :birthday_day,
@@ -59,7 +62,8 @@ class Person < ActiveRecord::Base
       facebook_accounts_attributes: [:url, :_destroy, :id],
       twitter_accounts_attributes: [:screen_name, :_destroy, :id],
       pictures_attributes: [:image, :image_cache, :primary, :_destroy, :id],
-      family_relationships_attributes: [:related_person_id, :relationship, :_destroy, :id]
+      family_relationships_attributes: [:related_person_id, :relationship, :_destroy, :id],
+      websites_attributes: [:url, :primary, :_destroy, :id]
     }
   ]
 
