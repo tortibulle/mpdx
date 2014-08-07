@@ -25,7 +25,7 @@ class Person::GmailAccount
   def import_emails(account_list)
     return false unless client
 
-    since = @google_account.last_email_sync || 60.days.ago
+    since = @google_account.last_email_sync || 1.hour.ago
 
     gmail do |g|
       # loop through all contacts, logging email addresses
