@@ -158,20 +158,6 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         }
     });
 
-    var taskFilterExists = function(){
-      return $scope.contactQuery.relatedTaskAction[0];
-    };
-
-    var getTaskFilterIds = function (relatedTaskAction) {
-        api.call('get', 'tasks?account_list_id=' + window.current_account_list_id +
-                '&filters[completed]=false' +
-                '&filters[activity_type][]=' + encodeURLarray(relatedTaskAction).join('&filters[activity_type][]=') +
-                '&include=&per_page=10000'
-            , {}, function (tData) {
-                refreshContacts(_.uniq(_.flatten(tData.tasks, 'contacts')));
-            }, null, true);
-    };
-
     $scope.tagIsActive = function(tag){
         return _.contains($scope.contactQuery.tags, tag);
     };
@@ -199,16 +185,10 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             }
         }
 
-        if(taskFilterExists() === 'null') {
-          getTaskFilterIds('');
-        }else if(taskFilterExists() !== ''){
-          getTaskFilterIds($scope.contactQuery.relatedTaskAction);
-        }else{
-          refreshContacts();
-        }
+        refreshContacts();
     }, true);
 
-    var refreshContacts = function (taskContactIds) {
+    var refreshContacts = function () {
       var q = $scope.contactQuery;
 
       $scope.contactsLoading = true;
@@ -238,14 +218,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
           '&filters[church][]=' + encodeURLarray(q.church).join('&filters[church][]=') +
           '&filters[referrer][]=' + encodeURLarray(q.referrer).join('&filters[referrer][]=') +
           '&filters[timezone][]=' + encodeURLarray(q.timezone).join('&filters[timezone][]=') +
+          '&filters[relatedTaskAction][]=' + encodeURLarray(q.relatedTaskAction).join('&filters[relatedTaskAction][]=') +
           '&filters[wildcard_search]=' + encodeURIComponent(q.wildcardSearch);
-      if (angular.isDefined(taskContactIds)) {
-        if(taskFilterExists() === 'null') {
-          requestUrl = requestUrl + '&filters[not_ids][]=' + encodeURLarray(taskContactIds).join('&filters[not_ids][]=');
-        }else{
-          requestUrl = requestUrl + '&filters[ids][]=' + encodeURLarray(taskContactIds).join('&filters[ids][]=');
-        }
-      }
 
       api.call('get', requestUrl, {}, function (data) {
         angular.forEach(data.contacts, function (contact) {

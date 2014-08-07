@@ -120,6 +120,18 @@ class ContactFilter
         filtered_contacts = filtered_contacts.where('contacts.timezone' => @filters[:timezone])
       end
 
+      if @filters[:relatedTaskAction].present? && @filters[:relatedTaskAction].first != ''
+        if @filters[:relatedTaskAction].first == 'null'
+          contacts_with_activities = filtered_contacts.where('activities.completed' => false)
+                                                      .includes(:activities).map(&:id)
+          filtered_contacts = filtered_contacts.where('contacts.id not in (?)', contacts_with_activities)
+        else
+          filtered_contacts = filtered_contacts.where('activities.activity_type' => @filters[:relatedTaskAction])
+                                               .where('activities.completed' => false)
+                                               .includes(:activities)
+        end
+      end
+
       case @filters[:contact_type]
       when 'person'
         filtered_contacts = filtered_contacts.people
