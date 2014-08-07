@@ -613,6 +613,7 @@ DEPENDENCIES
   mailcatcher
   newrelic_rpm (~> 3.7.1)
   ngmin-rails
+  nokogiri (~> 1.5.11)
   oauth!
   oj (~> 2.1.0)
   omniauth-cas (~> 1.0.2)

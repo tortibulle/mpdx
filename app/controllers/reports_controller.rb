@@ -1,3 +1,5 @@
+require 'csv_util'
+
 class ReportsController < ApplicationController
   def contributions
     @page_title = _('Contribution Report')
@@ -46,6 +48,14 @@ class ReportsController < ApplicationController
       @sum_row[donation.date_trunc.strftime '%b %y'] ||= 0
 
       @sum_row[donation.date_trunc.strftime '%b %y'] += donation.tendered_amount
+    end
+
+    respond_to do |format|
+      format.html
+      format.csv do
+        html_table = render_to_string formats: [:html], layout: false
+        render text: CSVUtil.html_table_to_csv(html_table)
+      end
     end
   end
 end

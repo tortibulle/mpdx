@@ -9,12 +9,12 @@
   </div>
   <div class="clr"></div>
   <h2><%= _('Contribution Report for %{start_date} through %{end_date}').localize % {start_date: l(@start_date), end_date: l(@end_date)} %></h2>
+  <a href="/reports/contributions.csv"><%= _('Download as CSV spreadsheet file') %></a>
 <% end %>
 <table class="tablelist donations" id="donations_table">
   <thead>
     <tr>
       <th><%= _('Donor') %></th>
-      <th></th>
       <% (0..11).reverse_each do |index| %>
         <th class="right"><%= index.month.ago(@end_date).strftime '%b %y' %></th>
       <% end %>
@@ -24,7 +24,7 @@
   <tbody>
     <% @donations.each do |key, row| %>
       <tr>
-        <td><%= link_to(row[:donor], contact_path(row[:id])) %><td>
+        <td><%= link_to(row[:donor], contact_path(row[:id])) %></td>
         <% (0..11).reverse_each do |index| %>
           <td class="right">
             <% unless row[:amounts][index.month.ago(@end_date).strftime '%b %y'].nil? %>
