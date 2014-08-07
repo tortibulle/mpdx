@@ -49,7 +49,7 @@ class Person < ActiveRecord::Base
   PERMITTED_ATTRIBUTES = [
     :first_name, :legal_first_name, :last_name, :birthday_month, :birthday_year, :birthday_day,
     :anniversary_month, :anniversary_year, :anniversary_day, :title, :suffix, :gender, :marital_status,
-    :middle_name, :profession, :deceased, :optout_enewsletter, :_destroy, :id,
+    :middle_name, :profession, :deceased, :optout_enewsletter, :occupation, :employer, :_destroy, :id,
     {
       email_address: :email,
       phone_number: :number,

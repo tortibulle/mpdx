@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140801103154) do
+ActiveRecord::Schema.define(version: 20140807133855) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -595,7 +595,10 @@ ActiveRecord::Schema.define(version: 20140801103154) do
     t.string   "profession"
     t.boolean  "deceased",                         default: false, null: false
     t.boolean  "subscribed_to_updates"
+    t.boolean  "optout_enewletter",                default: false
     t.boolean  "optout_enewsletter",               default: false
+    t.string   "occupation"
+    t.string   "employer"
   end
 
   add_index "people", ["access_token"], name: "index_people_on_access_token", unique: true, using: :btree

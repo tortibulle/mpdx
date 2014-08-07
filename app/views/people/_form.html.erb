@@ -71,6 +71,17 @@
       <%= builder.select :anniversary_day, (1..31).to_a, include_blank: true %>
       <%= builder.select :anniversary_year, Time.now.year.downto(1900).to_a, include_blank: true %>
     </div>
+
+    <div class="field">
+      <%= builder.label :occupation %>
+      <%= builder.text_field :occupation %>
+    </div>
+
+    <div class="field">
+      <%= builder.label :employer %>
+      <%= builder.text_field :employer %>
+    </div>
+
     <div class="spacer"></div>
     <% if builder.options[:parent_builder] && builder.options[:parent_builder].object.is_a?(Contact) %>
       <%= link_to_remove_fields(builder) %>
