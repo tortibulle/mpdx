@@ -15,6 +15,9 @@
   <thead>
     <tr>
       <th><%= _('Donor') %></th>
+      <th><%= _('Status') %></th>
+      <th><%= _('Pledge Amount') %></th>
+      <th><%= _('Pledge Frequency') %></th>
       <% (0..11).reverse_each do |index| %>
         <th class="right"><%= index.month.ago(@end_date).strftime '%b %y' %></th>
       <% end %>
@@ -25,6 +28,9 @@
     <% @donations.each do |key, row| %>
       <tr>
         <td><%= link_to(row[:donor], contact_path(row[:id])) %></td>
+        <td><%= row[:status] %></td>
+        <td><%= row[:pledge_amount] %></td>
+        <td><%= row[:pledge_frequency] %></td>
         <% (0..11).reverse_each do |index| %>
           <td class="right">
             <% unless row[:amounts][index.month.ago(@end_date).strftime '%b %y'].nil? %>

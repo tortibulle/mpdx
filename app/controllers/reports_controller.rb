@@ -1,6 +1,8 @@
 require 'csv_util'
 
 class ReportsController < ApplicationController
+  include LocalizationHelper
+
   def contributions
     @page_title = _('Contribution Report')
 
@@ -11,6 +13,7 @@ class ReportsController < ApplicationController
       @end_date = Date.today.end_of_month
       @start_date = 11.month.ago(@end_date).beginning_of_month
     end
+
     @raw_donations = current_account_list
       .donations
       .where('donation_date BETWEEN ? AND ?', @start_date, @end_date)
@@ -19,7 +22,10 @@ class ReportsController < ApplicationController
               'SUM("donations"."tendered_amount") as tendered_amount,' \
               '"donations"."tendered_currency",' \
               '"donor_accounts"."name",' \
-              '"contact_donor_accounts"."contact_id" as contact_id'
+              '"contact_donor_accounts"."contact_id" as contact_id,' \
+              '"contacts"."status",'\
+              '"contacts"."pledge_amount",' \
+              '"contacts"."pledge_frequency"'
       )
       .where('contacts.account_list_id' => current_account_list.id)
       .joins(donor_account: [:contacts])
@@ -27,16 +33,22 @@ class ReportsController < ApplicationController
              'date_trunc, ' \
              'tendered_currency, ' \
              'donor_accounts.name, ' \
-             'contact_donor_accounts.id')
+             'contact_donor_accounts.id, ' \
+             'status, ' \
+             'pledge_amount, ' \
+             'pledge_frequency '
+             )
       .reorder('donor_accounts.name')
       .to_a
     @donations = {}
     @sum_row = {}
     @raw_donations.each do |donation|
-      @donations[donation.donor_account_id] ||= { donor: donation.name,
-                                                  id: donation.contact_id,
-                                                  amounts: {},
-                                                  total: 0 }
+      @donations[donation.donor_account_id] ||= {
+        donor: donation.name, id: donation.contact_id, status: donation.status,
+        pledge_amount: number_to_current_currency(donation.pledge_amount),
+        pledge_frequency: Contact.pledge_frequencies[donation.pledge_frequency],
+        amounts: {}, total: 0
+        }
 
       @donations[donation.donor_account_id][:amounts][donation.date_trunc.strftime '%b %y'] = {
         value: donation.tendered_amount,
