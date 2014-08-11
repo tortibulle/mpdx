@@ -120,8 +120,6 @@ class Person < ActiveRecord::Base
     if self.deceased?
       self.optout_enewsletter = true
       contacts.each do |c|
-        #return unless c.greeting.not_nil?
-
         #remove name from greeting
         if ! c.greeting.index(self.first_name).nil?
           c.greeting = c.greeting.sub(self.first_name, '').strip
