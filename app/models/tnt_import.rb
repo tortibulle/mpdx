@@ -394,7 +394,7 @@ class TntImport
 
   def pad_account_number_with_zeros(account_number)
     num_leading_zeros = DONOR_NUMBER_NORMAL_LEN - account_number.length
-    '0'*num_leading_zeros + account_number
+    '0' * num_leading_zeros + account_number
   end
 
   def add_or_update_donor_accounts(row, designation_profile)
@@ -411,7 +411,7 @@ class TntImport
           # donation services import to make all donor numbers be a common length (9 characters).
           # But the TntMPD export but not have such leading zeros, so we need to add them on to make a match
           # succeed.
-          if da.nil? and account_number.length < DONOR_NUMBER_NORMAL_LEN
+          if da.nil? && account_number.length < DONOR_NUMBER_NORMAL_LEN
             account_number = pad_account_number_with_zeros(account_number)
             da = designation_profile.organization.donor_accounts.where(account_number: account_number).first
           end

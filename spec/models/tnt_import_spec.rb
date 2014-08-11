@@ -92,8 +92,8 @@ describe TntImport do
       import.send(:import_contacts)
 
       # Should match existing contact based on the donor account with leading zeros
-      expect(DonorAccount.all.count).to eq (1)
-      expect(Contact.all.count).to eq (1)
+      expect(DonorAccount.all.count).to eq(1)
+      expect(Contact.all.count).to eq(1)
     end
   end
 
