@@ -1,22 +1,22 @@
 language: ruby
 rvm:
-- 2.0.0
+  - 2.0.0
 services:
-- memcache
-- redis-server
+  - memcache
+  - redis-server
 script:
-- bundle exec rake spec
-- bundle exec rake karma:run
-- bundle exec rubocop -R
+  - bundle exec rake spec
+  - bundle exec rake karma:run
+  - bundle exec rubocop -R
 before_script:
-- npm install
-- psql -c 'create database mpdx_test;' -U postgres
-- cp config/database.travis.yml config/database.yml
-- cp config/config.travis.yml config/config.yml
-- bundle exec rake db:schema:load RAILS_ENV=test
+  - npm install
+  - psql -c 'create database mpdx_test;' -U postgres
+  - cp config/database.travis.yml config/database.yml
+  - cp config/config.travis.yml config/config.yml
+  - bundle exec rake db:schema:load RAILS_ENV=test
 branches:
   only:
-  - master
+    - master
 deploy:
   provider: opsworks
   access-key-id: AKIAJNKHB3Q5LKUKC2QQ
