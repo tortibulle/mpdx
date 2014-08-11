@@ -392,11 +392,6 @@ class TntImport
     person
   end
 
-  def pad_account_number_with_zeros(account_number)
-    num_leading_zeros = DONOR_NUMBER_NORMAL_LEN - account_number.length
-    '0' * num_leading_zeros + account_number
-  end
-
   def add_or_update_donor_accounts(row, designation_profile)
     # create variables outside the block scope
     donor_accounts = []
@@ -412,7 +407,7 @@ class TntImport
           # But the TntMPD export but not have such leading zeros, so we need to add them on to make a match
           # succeed.
           if da.nil? && account_number.length < DONOR_NUMBER_NORMAL_LEN
-            account_number = pad_account_number_with_zeros(account_number)
+            account_number = account_number.rjust(DONOR_NUMBER_NORMAL_LEN, '0')
             da = designation_profile.organization.donor_accounts.where(account_number: account_number).first
           end
 
