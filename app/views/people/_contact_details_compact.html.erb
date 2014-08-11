@@ -39,6 +39,18 @@
     </div>
 <% end %>
 
+<% if person.occupation.present? %>
+    <div class="set">
+      <strong>Occupation:</strong> <%= person.occupation %>
+    </div>
+<% end %>
+
+<% if person.employer.present? %>
+    <div class="set">
+      <strong>Employer:</strong> <%= person.employer %>
+    </div>
+<% end %>
+
 
 <%#<a href="" class="icos ico_fb"></a>%>
 <%#<a href="" class="icos ico_twitter"></a>%>
