@@ -8,7 +8,7 @@
       <br/>
     <% end %>
   <% else %>
-    <%= link_to(_('Click here to add a phone number'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %>
+    <%= link_to(_('Add a phone number'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %>
   <% end %>
 </div>
 
@@ -23,7 +23,7 @@
       <br/>
     <% end %>
   <% else %>
-    <%= link_to(_('Click here to add an email address'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %>
+    <%= link_to(_('Add an email address'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %>
   <% end %>
 </div>
 
