@@ -1,4 +1,7 @@
 class TntImport
+  # Donation Services seems to pad donor accounts with zeros up to length 9. TntMPD does not though.
+  DONOR_NUMBER_NORMAL_LEN = 9
+
   def initialize(import)
     @import = import
     @account_list = @import.account_list
@@ -389,6 +392,11 @@ class TntImport
     person
   end
 
+  def pad_account_number_with_zeros(account_number)
+    num_leading_zeros = DONOR_NUMBER_NORMAL_LEN - account_number.length
+    '0'*num_leading_zeros + account_number
+  end
+
   def add_or_update_donor_accounts(row, designation_profile)
     # create variables outside the block scope
     donor_accounts = []
@@ -396,7 +404,18 @@ class TntImport
     if designation_profile
       donor_accounts = row['OrgDonorCodes'].to_s.split(',').map do |account_number|
         donor_account = Retryable.retryable do
+          # First try matching without any leading zeros
           da = designation_profile.organization.donor_accounts.where(account_number: account_number).first
+
+          # Certain account numbers (e.g. former and current Cru staff) have leading zeros in the MPDX
+          # donation services import to make all donor numbers be a common length (9 characters).
+          # But the TntMPD export but not have such leading zeros, so we need to add them on to make a match
+          # succeed.
+          if da.nil? and account_number.length < DONOR_NUMBER_NORMAL_LEN
+            account_number = pad_account_number_with_zeros(account_number)
+            da = designation_profile.organization.donor_accounts.where(account_number: account_number).first
+          end
+
           unless da
             da = designation_profile.organization.donor_accounts.new(account_number: account_number, name: row['FileAs'])
             da.addresses_attributes = build_address_array(row)
