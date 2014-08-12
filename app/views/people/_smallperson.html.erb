@@ -1,22 +1,23 @@
 <% exhibit(person, self).tap do |p| %>
   <div class="small-person" id="person-<%= p.id %>">
-    <%= link_to(image_tag(p.avatar(:square), class: "person_avatar"), p) %>
+    <%= link_to(image_tag(p.avatar(:large), class: "person_avatar"), p) %>
     <div class="person_details">
       <div class="name"><%= link_to(p, p) %></div>
       <%= render 'people/contact_details_compact', person: p %>
     </div>
-    <% if p.social? %>
-      <div class="social-icons">
-        <% if p.facebook_account %>
-          <%= link_to('f', p.facebook_account.url, {class: "facebook"}) %>
-        <% end %>
-        <% if p.twitter_account %>
-          <%= link_to('f', p.twitter_account.url, {class: "twitter"}) %>
-        <% end %>
-        <% if p.linkedin_account %>
-          <%= link_to('f', p.linkedin_account.url, {class: "linkedin"}) %>
-        <% end %>
-      </div>
-    <% end %>
+    <div class="social-icons">
+      <% if p.facebook_account %>
+        <%= link_to('f', p.facebook_account.url, {class: "facebook"}) %>
+      <% end %>
+      <% if p.twitter_account %>
+        <%= link_to('f', p.twitter_account.url, {class: "twitter"}) %>
+      <% end %>
+      <% if p.linkedin_account %>
+        <%= link_to('f', p.linkedin_account.url, {class: "linkedin"}) %>
+      <% end %>
+      <% if p.website %>
+        <%= link_to('f', p.website.url, {target: "_blank", class: "website"}) %>
+      <% end %>
+    </div>
   </div>
 <% end %>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140801103154) do
+ActiveRecord::Schema.define(version: 20140807135553) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -595,7 +595,10 @@ ActiveRecord::Schema.define(version: 20140801103154) do
     t.string   "profession"
     t.boolean  "deceased",                         default: false, null: false
     t.boolean  "subscribed_to_updates"
+    t.boolean  "optout_enewletter",                default: false
     t.boolean  "optout_enewsletter",               default: false
+    t.string   "occupation"
+    t.string   "employer"
   end
 
   add_index "people", ["access_token"], name: "index_people_on_access_token", unique: true, using: :btree
@@ -733,6 +736,16 @@ ActiveRecord::Schema.define(version: 20140801103154) do
 
   add_index "person_twitter_accounts", ["person_id", "remote_id"], name: "index_person_twitter_accounts_on_person_id_and_remote_id", unique: true, using: :btree
   add_index "person_twitter_accounts", ["remote_id"], name: "index_person_twitter_accounts_on_remote_id", using: :btree
+
+  create_table "person_websites", force: true do |t|
+    t.integer  "person_id"
+    t.string   "url"
+    t.boolean  "primary",    default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "person_websites", ["person_id"], name: "index_person_websites_on_person_id", using: :btree
 
   create_table "phone_numbers", force: true do |t|
     t.integer  "person_id"

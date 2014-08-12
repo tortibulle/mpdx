@@ -72,7 +72,6 @@ class Contact < ActiveRecord::Base
   IN_PROGRESS_STATUSES = [_('Never Contacted'), _('Ask in Future'), _('Contact for Appointment'), _('Appointment Scheduled'), _('Call for Decision')]
 
   TABS = {
-    'details' => _('Details'),
     'tasks' => _('Tasks'),
     'history' => _('History'),
     'referrals' => _('Referrals'),
