@@ -46,7 +46,7 @@ class ReportsController < ApplicationController
         pledge_amount: donation.pledge_amount,
         pledge_frequency: donation.pledge_frequency,
         amounts: {}, total: 0
-        }
+      }
 
       @donations[donation.donor_account_id][:amounts][donation.date_trunc.strftime '%b %y'] = {
         value: donation.tendered_amount,
@@ -60,15 +60,15 @@ class ReportsController < ApplicationController
       @sum_row[donation.date_trunc.strftime '%b %y'] += donation.tendered_amount
     end
 
-    @donations.each do |key, row|
-      if not row[:pledge_frequency].nil? && row[:pledge_frequency].to_f <= 1.0
+    @donations.each do |_key, row|
+      if !row[:pledge_frequency].nil? && row[:pledge_frequency].to_f <= 1.0
         # If someone gives monthly and they gave, e.g. $50/month for the past four month
         # and not before that, then assume they are a new ministry partner and their average
         # should be $50/month.
         # Thus we find the first month in the report (from left to right) where they
         # gave a donation and exclude earlier months from the average.
         month_of_first_donation = (0..11).to_a.reverse.find_index {|index|
-          not row[:amounts][index.month.ago(@end_date).strftime '%b %y'].nil?
+          !row[:amounts][index.month.ago(@end_date).strftime '%b %y'].nil?
         }
         months_for_average = 12.0 - month_of_first_donation
 
