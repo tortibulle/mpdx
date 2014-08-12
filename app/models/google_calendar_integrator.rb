@@ -90,7 +90,6 @@ class GoogleCalendarIntegrator
                         end: { date: task.start_at.to_date.to_s(:db), dateTime: nil })
     end
 
-    Rails.logger.debug(attributes)
     attributes
   end
 
