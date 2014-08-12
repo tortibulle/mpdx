@@ -73,13 +73,13 @@ class GoogleIntegration < ActiveRecord::Base
   end
 
   def set_default_calendar
-    if calendar_integration? && calendar_id.blank? && calendars && calendars.length == 1
+    return false unless calendars
+
+    if calendar_integration? && calendar_id.blank? && calendars.length == 1
       calendar = calendars.first
       self.calendar_id = calendar['id']
       self.calendar_name = calendar['summary']
-      return true
     end
-    false
   end
 
   def create_new_calendar
