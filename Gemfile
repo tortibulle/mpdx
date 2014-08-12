@@ -106,6 +106,7 @@ group :development, :test do
   gem 'rspec', '~> 2.14.1' #3.0.0.beta2'
   gem 'rspec-rails'#, '3.0.0.beta2'
   gem 'factory_girl_rails'
+  gem 'guard-rubocop'
   gem 'guard-rspec'
   gem 'simplecov', :require => false
   #only used for mo/po file generation in development, !do not load(:require=>false)! since it will eat 7mb ram
