@@ -90,35 +90,6 @@ class GoogleCalendarIntegrator
                         end: { date: task.start_at.to_date.to_s(:db), dateTime: nil })
     end
 
-    attributes[:attendees] = []
-
-    # We never want google sending partners event notifications, so it's safer to not add them as normal attendees.
-    # Instead we can create a comment with their names.
-    attendees_without_emails = []
-
-    if task.contacts.present?
-      task.contacts.each do |contact|
-        contact.people.each do |person|
-          attendees_without_emails << person.to_s
-        end
-      end
-    end
-
-    @google_integration.account_list.users.each do |user|
-      if user.email
-        attributes[:attendees] << {
-          displayName: user.to_s,
-          email: user.email.to_s,
-          responseStatus: 'accepted',
-          comment: attendees_without_emails.join(', ')
-        }
-
-        # clear out the attendees_without_emails variable so this comment doesn't get added multiple times
-        attendees_without_emails = []
-      end
-    end
-
-    Rails.logger.debug(attributes)
     attributes
   end
 
