@@ -72,6 +72,29 @@ describe TntImport do
         import.send(:import_contacts)
       }.to change(Person, :count).by(1)
     end
+
+    it 'matches an existing contact with leading zeros in their donor account' do
+      donor_account = create(:donor_account, account_number: '000139111')
+
+      organziation = build(:organization)
+      organziation.donor_accounts << donor_account
+      organziation.save
+
+      contact.donor_accounts << donor_account
+      contact.save
+
+      account_list = build(:account_list)
+      account_list.designation_profiles << create(:designation_profile, organization: organziation)
+      account_list.contacts << contact
+      account_list.save
+
+      import = TntImport.new(create(:tnt_import_short_donor_code, account_list: account_list))
+      import.send(:import_contacts)
+
+      # Should match existing contact based on the donor account with leading zeros
+      expect(DonorAccount.all.count).to eq(1)
+      expect(Contact.all.count).to eq(1)
+    end
   end
 
   context '#update_contact' do
