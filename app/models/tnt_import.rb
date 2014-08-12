@@ -399,17 +399,10 @@ class TntImport
     if designation_profile
       donor_accounts = row['OrgDonorCodes'].to_s.split(',').map do |account_number|
         donor_account = Retryable.retryable do
-          # First try matching without any leading zeros
-          da = designation_profile.organization.donor_accounts.where(account_number: account_number).first
-
-          # Certain account numbers (e.g. former and current Cru staff) have leading zeros in the MPDX
-          # donation services import to make all donor numbers be a common length (9 characters).
-          # But the TntMPD export but not have such leading zeros, so we need to add them on to make a match
-          # succeed.
-          if da.nil? && account_number.length < DONOR_NUMBER_NORMAL_LEN
-            account_number = account_number.rjust(DONOR_NUMBER_NORMAL_LEN, '0')
-            da = designation_profile.organization.donor_accounts.where(account_number: account_number).first
-          end
+          da = designation_profile.organization.donor_accounts
+          .where('account_number = :account_number OR account_number = :padded_account_number',
+                 account_number: account_number,
+                 padded_account_number: account_number.rjust(DONOR_NUMBER_NORMAL_LEN, '0')).first
 
           unless da
             da = designation_profile.organization.donor_accounts.new(account_number: account_number, name: row['FileAs'])
