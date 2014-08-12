@@ -1,4 +1,7 @@
 class TntImport
+  # Donation Services seems to pad donor accounts with zeros up to length 9. TntMPD does not though.
+  DONOR_NUMBER_NORMAL_LEN = 9
+
   def initialize(import)
     @import = import
     @account_list = @import.account_list
@@ -396,7 +399,11 @@ class TntImport
     if designation_profile
       donor_accounts = row['OrgDonorCodes'].to_s.split(',').map do |account_number|
         donor_account = Retryable.retryable do
-          da = designation_profile.organization.donor_accounts.where(account_number: account_number).first
+          da = designation_profile.organization.donor_accounts
+          .where('account_number = :account_number OR account_number = :padded_account_number',
+                 account_number: account_number,
+                 padded_account_number: account_number.rjust(DONOR_NUMBER_NORMAL_LEN, '0')).first
+
           unless da
             da = designation_profile.organization.donor_accounts.new(account_number: account_number, name: row['FileAs'])
             da.addresses_attributes = build_address_array(row)
