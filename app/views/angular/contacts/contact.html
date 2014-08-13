@@ -10,7 +10,7 @@
             <i class="fa fa-<%= current_currency.downcase %>" title="Partner - Financial" ng-show="contact.status === 'Partner - Financial'"></i>
         </span>
         <div class="people">
-            <div ng-repeat="i in contact.person_ids">
+            <div ng-repeat="i in contact.person_ids" ng-show="!getPerson(i).deceased">
                 <a href="/people/{{i}}">{{getPerson(i).name}}</a><span ng-show="getPrimaryPhone(getPerson(i).id)" style="display:inline;"> - {{getPrimaryPhone(getPerson(i).id).number}} - {{getPrimaryPhone(getPerson(i).id).location}}</span>
             </div>
         </div>

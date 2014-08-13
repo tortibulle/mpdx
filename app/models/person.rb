@@ -70,6 +70,7 @@ class Person < ActiveRecord::Base
   before_create :find_master_person
   after_destroy :clean_up_master_person, :clean_up_contact_people
   after_commit :sync_with_mailchimp
+  before_save :deceased_check
   after_save :touch_contacts
 
   validates_presence_of :first_name
@@ -117,6 +118,27 @@ class Person < ActiveRecord::Base
 
   def email
     primary_email_address || email_addresses.first
+  end
+
+  def deceased_check
+    return unless self.deceased?
+
+    self.optout_enewsletter = true
+    contacts.each do |c|
+      #remove name from greeting
+      if c.greeting.include?(first_name)
+        c.greeting = c.greeting.sub(first_name, '')
+        c.greeting = c.greeting.sub('and ', '').strip
+        c.save
+      end
+
+      #remove name from contact name
+      if c.name.include?(first_name)
+        c.name = c.name.sub(first_name, '')
+        c.name = c.name.sub(' and ', '').strip
+        c.save
+      end
+    end
   end
 
   def family_relationships_attributes=(hash)
