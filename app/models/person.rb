@@ -121,18 +121,18 @@ class Person < ActiveRecord::Base
       self.optout_enewsletter = true
       contacts.each do |c|
         #remove name from greeting
-        if ! c.greeting.index(self.first_name).nil?
-          c.greeting = c.greeting.sub(self.first_name, '').strip
-          if ! c.greeting.index('and').nil?
+        unless c.greeting.index(first_name).nil?
+          c.greeting = c.greeting.sub(first_name, '').strip
+          unless c.greeting.index('and').nil?
             c.greeting = c.greeting.sub('and', '').strip
           end
           c.save
         end
 
         #remove name from contact name
-        if ! c.name.index(self.first_name).nil?
-          c.name = c.name.sub(self.first_name, '').strip
-          if ! c.name.index('and').nil?
+        unless c.name.index(first_name).nil?
+          c.name = c.name.sub(first_name, '').strip
+          unless c.name.index('and').nil?
             c.name = c.name.sub('and', '').strip
           end
           c.save
