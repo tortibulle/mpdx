@@ -113,7 +113,7 @@ class Task < Activity
 
   def sync_to_google_calendar
     account_list.google_integrations.each do |google_integration|
-      google_integration.async(:sync_task, id)
+      google_integration.lower_retry_async(:sync_task, id)
     end
   end
 end
