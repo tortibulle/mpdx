@@ -44,13 +44,13 @@ describe Task do
     it 'syncs a task to google after a save call' do
       google_integration.should_receive(:lower_retry_async)
 
-      create(:task, start_at: Time.now + 1.day, account_list: account_list, activity_type: 'Appointment')
+      create(:task, start_at: 1.day.from_now, account_list: account_list, activity_type: 'Appointment')
     end
 
     it 'syncs a task to google after a destroy call' do
       google_integration.should_receive(:lower_retry_async).twice
 
-      create(:task, start_at: Time.now + 1.day, account_list: account_list, activity_type: 'Appointment').destroy
+      create(:task, start_at: 1.day.from_now, account_list: account_list, activity_type: 'Appointment').destroy
     end
   end
 end
