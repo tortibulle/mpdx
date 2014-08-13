@@ -29,16 +29,28 @@ describe Task do
       AccountList.any_instance.stub(:google_integrations) { [google_integration] }
     end
 
-    it 'syncs a task to google after a save call' do
-      google_integration.should_receive(:async)
+    it 'does not sync an old task to google after a save call' do
+      google_integration.should_not_receive(:lower_retry_async)
 
       create(:task, account_list: account_list, activity_type: 'Appointment')
     end
 
-    it 'syncs a task to google after a destroy call' do
-      google_integration.should_receive(:async).twice
+    it 'does not sync a completed task to google after a save call' do
+      google_integration.should_not_receive(:lower_retry_async)
 
-      create(:task, account_list: account_list, activity_type: 'Appointment').destroy
+      create(:task, result: 'completed', account_list: account_list, activity_type: 'Appointment')
+    end
+
+    it 'syncs a task to google after a save call' do
+      google_integration.should_receive(:lower_retry_async)
+
+      create(:task, start_at: Time.now + 1.day, account_list: account_list, activity_type: 'Appointment')
+    end
+
+    it 'syncs a task to google after a destroy call' do
+      google_integration.should_receive(:lower_retry_async).twice
+
+      create(:task, start_at: Time.now + 1.day, account_list: account_list, activity_type: 'Appointment').destroy
     end
   end
 end
