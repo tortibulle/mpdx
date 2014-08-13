@@ -23,5 +23,32 @@
       <% end %>
     </table>
   </div>
+  <div class="cols col_50">
+    <table class="meta">
+      <tr>
+        <th colspan="2"><%= _('Other Details') %></th>
+      </tr>
+      <% if contact_exhibit.likely_to_give.present? %>
+          <tr>
+            <td class="meta_name_wide"><%= _('Likelihood') %></td>
+            <td class="meta_data"><%= _(contact_exhibit.likely_to_give) %></td>
+          </tr>
+      <% end %>
+      <tr>
+        <td class="meta_name_wide"><%= _('Magazine') %></td>
+        <td class="meta_data"><%= contact_exhibit.magazine ? _('Yes') : _('No') %></td>
+      </tr>
+      <tr>
+        <td class="meta_name_wide"><%= _('Direct Deposit') %></td>
+        <td class="meta_data"><%= contact_exhibit.direct_deposit ? _('Yes') : _('No') %></td>
+      </tr>
+      <% if contact.church_name.present? %>
+          <tr>
+            <td class="meta_name_wide"><%= _('Church') %></td>
+            <td class="meta_data"><%= contact_exhibit.church_name %></td>
+          </tr>
+      <% end %>
+      </table>
+    </div>
   <div class="clr"></div>
 <% end %>
