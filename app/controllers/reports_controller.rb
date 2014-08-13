@@ -70,7 +70,13 @@ class ReportsController < ApplicationController
       @sum_row[donation.date_trunc.strftime '%b %y'] += donation.tendered_amount
     end
 
+    @total_pledges = 0.0
+    @total_average = 0.0
     @donations.each do |_key, row|
+      if !row[:pledge_amount].nil? && !row[:pledge_frequency].nil?
+        @total_pledges += row[:pledge_amount] / row[:pledge_frequency]
+      end
+
       if !row[:pledge_frequency].nil? && row[:pledge_frequency].to_f <= 1.0
         # If someone gives monthly and they gave, e.g. $50/month for the past four month
         # and not before that, then assume they are a new ministry partner and their average
@@ -93,6 +99,7 @@ class ReportsController < ApplicationController
       end
 
       row[:average] = row[:total] / months_for_average
+      @total_average += row[:average]
     end
 
     respond_to do |format|

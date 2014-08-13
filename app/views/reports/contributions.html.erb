@@ -45,7 +45,10 @@
     <% end %>
     <tr class="sum">
       <td><strong><%= _('Total Donations') %></strong></td>
-      <td></td><td></td><td></td><td></td>
+      <td></td>
+      <td><%= number_to_current_currency(@total_pledges) %></td>
+      <td></td>
+      <td><%= number_to_current_currency(@total_average) %></td>
       <% (0..11).reverse_each do |index| %>
         <td class="right">
           <% unless @sum_row[index.month.ago(@end_date).strftime '%b %y'].nil? %>
