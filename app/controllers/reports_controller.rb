@@ -12,6 +12,9 @@ class ReportsController < ApplicationController
       @start_date = 11.month.ago(@end_date).beginning_of_month
     end
 
+    # The reason for the "distinct_contact_donor_accounts" inner query is that it's possible
+    # due to a TntMPD import that two different contacts could both be assigned the same donor id
+    # which would cause duplicated results in the sum columns of the report.
     @raw_donations = current_account_list
       .donations
       .where('donation_date BETWEEN ? AND ?', @start_date, @end_date)
@@ -20,23 +23,30 @@ class ReportsController < ApplicationController
               'SUM("donations"."tendered_amount") as tendered_amount,' \
               '"donations"."tendered_currency",' \
               '"donor_accounts"."name",' \
-              '"contact_donor_accounts"."contact_id" as contact_id,' \
+              '"distinct_contact_donor_accounts"."contact_id" as contact_id,' \
               '"contacts"."status",'\
               '"contacts"."pledge_amount",' \
               '"contacts"."pledge_frequency"'
       )
       .where('contacts.account_list_id' => current_account_list.id)
-      .joins(donor_account: [:contacts])
+      .joins('INNER JOIN donor_accounts ON donor_accounts.id = donations.donor_account_id')
+      .joins('INNER JOIN ' \
+               '(SELECT donor_account_id, MIN(contact_id) as contact_id' \
+               ' FROM contact_donor_accounts GROUP BY donor_account_id) ' \
+               'distinct_contact_donor_accounts ' \
+              'ON distinct_contact_donor_accounts.donor_account_id = donations.donor_account_id')
+      .joins('INNER JOIN contacts ON contacts.id = distinct_contact_donor_accounts.contact_id')
       .group('donations.donor_account_id, ' \
              'date_trunc, ' \
              'tendered_currency, ' \
              'donor_accounts.name, ' \
-             'contact_donor_accounts.id, ' \
+             'distinct_contact_donor_accounts.contact_id, ' \
              'status, ' \
              'pledge_amount, ' \
              'pledge_frequency '
              )
       .reorder('donor_accounts.name')
+      .distinct
       .to_a
     @donations = {}
     @sum_row = {}
