@@ -128,7 +128,7 @@ class Person < ActiveRecord::Base
       #remove name from greeting
       if c.greeting.include?(first_name)
         c.greeting = c.greeting.sub(first_name, '')
-        c.greeting = c.greeting.sub('and ', '').strip
+        c.greeting = c.greeting.sub(' and ', '').strip
         c.save
       end
 
