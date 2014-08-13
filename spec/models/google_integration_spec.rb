@@ -8,13 +8,13 @@ describe GoogleIntegration do
     it 'queues a data sync when an integration type is passed in' do
       expect {
         google_integration.queue_sync_data('calendar')
-      }.to change(GoogleIntegration.jobs, :size).by(1)
+      }.to change(LowerRetryWorker.jobs, :size).by(1)
     end
 
     it 'does not queue a data sync when an integration type is passed in' do
       expect {
         google_integration.queue_sync_data
-      }.to_not change(GoogleIntegration.jobs, :size)
+      }.to_not change(LowerRetryWorker.jobs, :size)
     end
   end
 
