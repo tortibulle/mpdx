@@ -19,4 +19,9 @@ FactoryGirl.define do
   factory :tnt_import_non_donor, parent: :tnt_import do
     file { File.new(Rails.root.join('spec/fixtures/tnt_export_non_donor.xml')) }
   end
+
+  factory :tnt_import_short_donor_code, parent: :tnt_import do
+    association :account_list, factory: :account_list_with_designation_profile
+    file { File.new(Rails.root.join('spec/fixtures/tnt_export_short_donor_code.xml')) }
+  end
 end

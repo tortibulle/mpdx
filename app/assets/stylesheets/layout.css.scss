@@ -429,6 +429,7 @@ h2.section {
   .facebook { background-image: image-url('soc_facebook.gif'); }
   .twitter { background-image: image-url('soc_twitter.gif'); }
   .linkedin { background-image: image-url('soc_linkedin.gif'); }
+  .website { background-image: image-url('soc_website.gif'); }
 }
 
 .small-person {
@@ -443,10 +444,11 @@ h2.section {
     line-height: initial;
     padding: 2px .5em 2px 2px;
     vertical-align: top;
+    width: 162px;
   }
   .person_avatar {
-    height: 80px;
-    width: 80px;
+    height: 120px;
+    width: 133px;
     padding: 0;
     margin: 0;
   }

@@ -1,19 +1,29 @@
 language: ruby
 rvm:
-  - 2.0.0
+- 2.0.0
 services:
-  - memcache
-  - redis-server
+- memcache
+- redis-server
 script:
-  - "bundle exec rake spec"
-  - "bundle exec rake karma:run"
-  - "bundle exec rubocop -R"
+- bundle exec rake spec
+- bundle exec rake karma:run
+- bundle exec rubocop -R
 before_script:
-  - npm install
-  - psql -c 'create database mpdx_test;' -U postgres
-  - cp config/database.travis.yml config/database.yml
-  - cp config/config.travis.yml config/config.yml
-  - bundle exec rake db:schema:load RAILS_ENV=test
+- npm install
+- psql -c 'create database mpdx_test;' -U postgres
+- cp config/database.travis.yml config/database.yml
+- cp config/config.travis.yml config/config.yml
+- bundle exec rake db:schema:load RAILS_ENV=test
 branches:
   only:
-    - master
+  - master
+deploy:
+  provider: opsworks
+  access_key_id: AKIAJNKHB3Q5LKUKC2QQ
+  secret_access_key:
+    secure: T7hDi/XyKCBWe2ZsZodEsDYiqZlaZgl62ZmsyrrGzIIOERixeIDlB+6slBVDElQFbX7JTxgnHfkBe8VhhcUDy1tqAwbPEwwK2/yw8bBxBzYPhaFeTWkeaTFVWy65H6bEcSFrdZwMr4pZZvtIuKab+hUBC6d1sl6I3hyFGoYXukw=
+  app-id: 36c106d9-e3c9-495c-a826-1e29854d12c7
+  migrate: true
+  on:
+    repo: CruGlobal/mpdx
+    branch: master

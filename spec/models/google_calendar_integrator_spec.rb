@@ -27,12 +27,14 @@ describe GoogleCalendarIntegrator do
     end
 
     it 'calls update_task if a google_event exists' do
+      google_integration.stub(:calendars).and_return(nil)
       integrator.should_receive(:update_task).with(task, google_event)
 
       integrator.sync_task(task)
     end
 
     it 'calls remove_google_event if task is nil' do
+      google_integration.stub(:calendars).and_return(nil)
       integrator.should_receive(:remove_google_event).with(google_event)
 
       task.destroy
@@ -67,6 +69,7 @@ describe GoogleCalendarIntegrator do
 
   context '#update_task' do
     it 'updates a google_event' do
+      google_integration.stub(:calendars).and_return(nil)
       google_integration.stub_chain(:calendar_api, :events, :patch).and_return('')
       integrator.client.should_receive(:execute).and_return(double(data: { 'id' => 'foo' }, status: 200))
       integrator.should_receive(:event_attributes).and_return({})
@@ -79,6 +82,7 @@ describe GoogleCalendarIntegrator do
     end
 
     it 'adds the google event if it is missing from google' do
+      google_integration.stub(:calendars).and_return(nil)
       google_integration.stub_chain(:calendar_api, :events, :patch).and_return('')
       integrator.client.should_receive(:execute).and_return(double(data: { 'error' => { 'errors' => [{ 'domain' => 'global', 'reason' => 'notFound', 'message' => 'Not Found' }], 'code' => 404, 'message' => 'Not Found' } }, status: 404))
       integrator.should_receive(:event_attributes).and_return({})
@@ -92,6 +96,7 @@ describe GoogleCalendarIntegrator do
 
   context '#remove_google_event' do
     it 'deletes a google_event' do
+      google_integration.stub(:calendars).and_return(nil)
       google_integration.stub_chain(:calendar_api, :events, :delete).and_return('')
       integrator.client.should_receive(:execute).and_return(double(data: {}, status: 200))
 
@@ -103,24 +108,6 @@ describe GoogleCalendarIntegrator do
   end
 
   context '#event_attributes' do
-    it 'adds all mpdx users on this account to the event' do
-      google_integration.account_list.users << (user1 = create(:user))
-      google_integration.account_list.users << (user2 = create(:user))
-      user1.email_addresses << build(:email_address)
-      user2.email_addresses << build(:email_address)
-
-      expect(integrator.event_attributes(task)[:attendees].length).to eq(2)
-    end
-
-    it 'addds task contacts as a comment' do
-      google_integration.account_list.users << (user1 = create(:user))
-      user1.email_addresses << build(:email_address)
-      task.contacts << (contact = create(:contact, account_list: google_integration.account_list))
-      contact.people << (person = build(:person))
-
-      expect(integrator.event_attributes(task)[:attendees].first[:comment]).to eq(person.to_s)
-    end
-
     it 'sets start and end times for tasks with default lengths' do
       expect(integrator.event_attributes(task)[:start][:dateTime]).to_not be_nil
       expect(integrator.event_attributes(task)[:end][:dateTime]).to_not be_nil

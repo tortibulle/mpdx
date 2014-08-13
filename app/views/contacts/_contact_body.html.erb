@@ -78,6 +78,12 @@
         </div>
         <div class="cols col_30">
           <table class="meta">
+            <% if contact_exhibit.mailing_address.street.present? && !contact_exhibit.mailing_address.historic %>
+                <tr>
+                  <td class="meta_name">Address</td>
+                  <td class="meta_data"><%= contact_exhibit.mailing_address.street %><br><%= contact_exhibit.mailing_address.city %>, <%= contact_exhibit.mailing_address.state %> <%= contact_exhibit.mailing_address.postal_code %><br><%= contact_exhibit.mailing_address.country %></td>
+                </tr>
+            <% end %>
             <% if contact.church_name.present? %>
               <tr>
                 <td class="meta_name"><%= _('Church') %></td>
@@ -105,12 +111,6 @@
                   </div>
                 </td>
               </tr>
-            <% end %>
-            <% if contact_exhibit.mailing_address.street.present? && !contact_exhibit.mailing_address.historic %>
-                <tr>
-                  <td class="meta_name">Address</td>
-                  <td class="meta_data"><%= contact_exhibit.mailing_address.street %><br><%= contact_exhibit.mailing_address.city %>, <%= contact_exhibit.mailing_address.state %> <%= contact_exhibit.mailing_address.postal_code %><br><%= contact_exhibit.mailing_address.country %></td>
-                </tr>
             <% end %>
           </table>
         </div>
@@ -159,12 +159,6 @@
           <% end %>
         </ul>
         <div class="clr"></div>
-
-
-        <div id="details-tab">
-          <%= spinner(extra: 'details', visible: true) %>
-          <div id="details"></div>
-        </div>
 
         <div id="tasks-tab" ng-controller="taskShortListController" ng-init="init('contact','<%= contact.id %>')">
           <table class="list tasklist">

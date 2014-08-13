@@ -1,8 +1,6 @@
 require 'async'
 class GoogleIntegration < ActiveRecord::Base
   include Async
-  include Sidekiq::Worker
-  sidekiq_options backtrace: true, unique: true
 
   belongs_to :google_account, class_name: 'Person::GoogleAccount', inverse_of: :google_integrations
   belongs_to :account_list, inverse_of: :google_integrations
@@ -18,7 +16,7 @@ class GoogleIntegration < ActiveRecord::Base
   delegate :sync_task, to: :calendar_integrator
 
   def queue_sync_data(integration = nil)
-    async(:sync_data, integration) if integration
+    lower_retry_async(:sync_data, integration) if integration
   end
 
   def sync_data(integration)
@@ -73,13 +71,13 @@ class GoogleIntegration < ActiveRecord::Base
   end
 
   def set_default_calendar
-    if calendar_integration? && calendar_id.blank? && calendars && calendars.length == 1
+    return false unless calendars
+
+    if calendar_integration? && calendar_id.blank? && calendars.length == 1
       calendar = calendars.first
       self.calendar_id = calendar['id']
       self.calendar_name = calendar['summary']
-      return true
     end
-    false
   end
 
   def create_new_calendar

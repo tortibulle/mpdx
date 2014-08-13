@@ -8,7 +8,7 @@
       <br/>
     <% end %>
   <% else %>
-    <%= link_to(_('Click here to add a phone number'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %>
+    <%= link_to(_('Add a phone number'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %>
   <% end %>
 </div>
 
@@ -23,7 +23,7 @@
       <br/>
     <% end %>
   <% else %>
-    <%= link_to(_('Click here to add an email address'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %>
+    <%= link_to(_('Add an email address'), @contact ? edit_contact_path(@contact) : edit_person_path(person)) %>
   <% end %>
 </div>
 
@@ -36,6 +36,18 @@
 <% if person.anniversary_month.present? %>
     <div class="set">
       <strong>Anniversary:</strong> <%= I18n.t("date.month_names")[person.anniversary_month] %> <%= person.anniversary_day %>, <%= person.anniversary_year %>
+    </div>
+<% end %>
+
+<% if person.occupation.present? %>
+    <div class="set">
+      <strong>Occupation:</strong> <%= person.occupation %>
+    </div>
+<% end %>
+
+<% if person.employer.present? %>
+    <div class="set">
+      <strong>Employer:</strong> <%= person.employer %>
     </div>
 <% end %>
 

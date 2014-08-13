@@ -81,11 +81,14 @@ angular.module('mpdxApp')
                             options: [],
                             callTask: true
                         };
+
                         $scope.followUpDialogResult = {
                             callTask: {
                                 type: taskType,
                                 subject: followUpTask.subject,
-                                date: dateTwoDaysFromToday
+                                date: dateTwoDaysFromToday,
+                                hour: ("0" + (new Date().getHours())).slice(-2),
+                                min: ("0" + (new Date().getMinutes())).slice(-2)
                             }
                         };
 
@@ -120,12 +123,16 @@ angular.module('mpdxApp')
                         $scope.followUpDialogResult = {
                             apptTask: {
                                 subject: 'Support',
-                                date: dateTwoDaysFromToday
+                                date: dateTwoDaysFromToday,
+                                hour: ("0" + (new Date().getHours())).slice(-2),
+                                min: ("0" + (new Date().getMinutes())).slice(-2)
                             },
                             callTask: {
                               type: 'Call',
                               subject: followUpTask.subject,
-                              date: dateTwoDaysFromToday
+                              date: dateTwoDaysFromToday,
+                                hour: ("0" + (new Date().getHours())).slice(-2),
+                                min: ("0" + (new Date().getMinutes())).slice(-2)
                             }
                         };
 
@@ -163,7 +170,9 @@ angular.module('mpdxApp')
                             },
                             givingTask: {
                                 subject: 'For First Gift',
-                                date: dateTwoDaysFromToday
+                                date: dateTwoDaysFromToday,
+                                hour: ("0" + (new Date().getHours())).slice(-2),
+                                min: ("0" + (new Date().getMinutes())).slice(-2)
                             }
                         };
 
@@ -222,7 +231,9 @@ angular.module('mpdxApp')
                             },
                             givingTask: {
                                 subject: 'For Gift',
-                                date: dateTwoDaysFromToday
+                                date: dateTwoDaysFromToday,
+                                hour: ("0" + (new Date().getHours())).slice(-2),
+                                min: ("0" + (new Date().getMinutes())).slice(-2)
                             }
                         };
 
@@ -301,7 +312,9 @@ angular.module('mpdxApp')
                             callTask: {
                                 type: 'Call',
                                 subject: 'Ask again for financial partnership',
-                                date: dateTwoDaysFromToday
+                                date: dateTwoDaysFromToday,
+                                hour: ("0" + (new Date().getHours())).slice(-2),
+                                min: ("0" + (new Date().getMinutes())).slice(-2)
                             }
                         };
 

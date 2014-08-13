@@ -37,6 +37,16 @@ describe CredentialValidator do
       @record.errors.full_messages.should == [_('Your username and password for %{org} are invalid.').localize % { org: @record.organization }]
     end
 
+    it 'should not add error if an error already exists' do
+      @record.password = nil
+      expect {
+        @record.valid?
+      }.to change { @record.errors.full_messages }
+      expect {
+        @record.valid?
+      }.not_to change { @record.errors.full_messages }
+    end
+
   end
 
   describe 'when username and password is not required' do

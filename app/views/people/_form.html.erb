@@ -71,6 +71,17 @@
       <%= builder.select :anniversary_day, (1..31).to_a, include_blank: true %>
       <%= builder.select :anniversary_year, Time.now.year.downto(1900).to_a, include_blank: true %>
     </div>
+
+    <div class="field">
+      <%= builder.label :occupation %>
+      <%= builder.text_field :occupation %>
+    </div>
+
+    <div class="field">
+      <%= builder.label :employer %>
+      <%= builder.text_field :employer %>
+    </div>
+
     <div class="spacer"></div>
     <% if builder.options[:parent_builder] && builder.options[:parent_builder].object.is_a?(Contact) %>
       <%= link_to_remove_fields(builder) %>
@@ -83,7 +94,7 @@
     <div class="fieldset">
       <div class="field_action optout_enewsletter"<% if @contact.send_newsletter.blank? || @contact.send_newsletter == "Physical" %> style="display:none;"<% end %>>
         <%= builder.check_box :optout_enewsletter %>
-        <%= builder.label :optout_enewsletter, "Opt-out of email newsletter" %>
+        <%= builder.label :optout_enewsletter, "Opt-out of email newsletter", title: "This will prevent this person's primary email address from being synced with MailChimp and from being included in a contact export from MPDx." %>
       </div>
       <label class="fieldset_label"><%= _('Email') %></label>
       <%= builder.fields_for :email_addresses do |builder| %>
@@ -123,8 +134,14 @@
         </div>
 
         <hr class="thin"/>
-
       <% end %>
+
+      <%= builder.fields_for :websites do |pf| %>
+          <%= render 'people/website_fields', builder: pf, object: person %>
+      <% end %>
+      <div class="sfield field_indent" data-behavior="add-wrapper">
+        <%= link_to_add_fields(_('Add Website/Blog'), builder, :websites, partial: 'people/website_fields') %>
+      </div>
     </div>
 
     <div class="spacer"></div>
