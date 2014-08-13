@@ -1,4 +1,7 @@
+require 'async'
 class GoogleIntegration < ActiveRecord::Base
+  include Async
+
   belongs_to :google_account, class_name: 'Person::GoogleAccount', inverse_of: :google_integrations
   belongs_to :account_list, inverse_of: :google_integrations
 
@@ -13,7 +16,7 @@ class GoogleIntegration < ActiveRecord::Base
   delegate :sync_task, to: :calendar_integrator
 
   def queue_sync_data(integration = nil)
-    GoogleIntegrationWorker.perform_async(id, :sync_data) if integration
+    lower_retry_async(:sync_data, integration) if integration
   end
 
   def sync_data(integration)

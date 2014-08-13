@@ -1,4 +1,4 @@
-class GoogleIntegrationWorker
+class LowerRetryWorker
   include Sidekiq::Worker
 
   sidekiq_options backtrace: true, unique: true
@@ -7,10 +7,10 @@ class GoogleIntegrationWorker
     count**6 + 30 # 30, 31, 94, 759, 4126 ... second delays
   end
 
-  def perform(id, method, *args)
+  def perform(klass_str, id, method, *args)
     if id
       begin
-        GoogleIntegration.find(id).send(method, *args)
+        klass_str.constantize.find(id).send(method, *args)
       rescue ActiveRecord::RecordNotFound
         # If this instance has been deleted, oh well.
       end
