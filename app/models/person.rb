@@ -118,26 +118,23 @@ class Person < ActiveRecord::Base
 
   def deceased_check
     return unless self.deceased?
-      self.optout_enewsletter = true
-      contacts.each do |c|
-        #remove name from greeting
-        if c.greeting.include?(first_name)
-          c.greeting = c.greeting.sub(first_name, '').strip
-          if c.greeting.include?('and ')
-            c.greeting = c.greeting.sub('and ', '').strip
-          end
-          c.save
-        end
 
-        #remove name from contact name
-        if c.name.include?(first_name)
-          c.name = c.name.sub(first_name, '').strip
-          if c.name.include?(' and ')
-            c.name = c.name.sub(' and ', '').strip
-          end
-          c.save
-        end
+    self.optout_enewsletter = true
+    contacts.each do |c|
+      #remove name from greeting
+      if c.greeting.include?(first_name)
+        c.greeting = c.greeting.sub(first_name, '')
+        c.greeting = c.greeting.sub('and ', '').strip
+        c.save
       end
+
+      #remove name from contact name
+      if c.name.include?(first_name)
+        c.name = c.name.sub(first_name, '')
+        c.name = c.name.sub(' and ', '').strip
+        c.save
+      end
+    end
   end
 
   def family_relationships_attributes=(hash)
