@@ -40,17 +40,15 @@ class DonationsController < ApplicationController
   def create
     @donation = current_account_list.donations.new(donation_params)
 
-    unless @donation.save
-      get_donor_accounts
-      render action: :new
-    end
+    return if @donation.save
+    get_donor_accounts
+    render action: :new
   end
 
   def update
-    unless @donation.update_attributes(donation_params)
-      get_donor_accounts
-      render action: :edit
-    end
+    return if @donation.update_attributes(donation_params)
+    get_donor_accounts
+    render action: :edit
   end
 
   def destroy
