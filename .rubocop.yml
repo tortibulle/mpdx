@@ -50,8 +50,6 @@ Eval:
 
 GuardClause:
   MinBodyLength: 3
-  Exclude:
-   - 'app/models/**/*'
 
 HandleExceptions:
   Enabled: false

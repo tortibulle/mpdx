@@ -420,35 +420,34 @@ class Contact < ActiveRecord::Base
   end
 
   def sync_with_mail_chimp
-    if mail_chimp_account = account_list.mail_chimp_account
-      if changed.include?('send_newsletter')
-        if send_email_letter?
-          mail_chimp_account.queue_subscribe_contact(self)
-        else
-          mail_chimp_account.queue_unsubscribe_contact(self)
-        end
-      end
+    mail_chimp_account = account_list.mail_chimp_account
+    return unless mail_chimp_account
+    return unless changed.include?('send_newsletter')
+
+    if send_email_letter?
+      mail_chimp_account.queue_subscribe_contact(self)
+    else
+      mail_chimp_account.queue_unsubscribe_contact(self)
     end
   end
 
   def sync_with_prayer_letters
-    if account_list.valid_prayer_letters_account
-      pl = account_list.prayer_letters_account
-      if send_physical_letter?
-        pl.add_or_update_contact(self)
-      else
-        delete_from_prayer_letters
-      end
+    return unless account_list.valid_prayer_letters_account
+    pl = account_list.prayer_letters_account
+    if send_physical_letter?
+      pl.add_or_update_contact(self)
+    else
+      delete_from_prayer_letters
     end
   end
 
   def delete_from_prayer_letters
     # If this contact was at prayerletters.com and no other contact on this list has the
     # same prayer_letters_id, remove this contact from prayerletters.com
-    if prayer_letters_id.present? &&
-       account_list.valid_prayer_letters_account &&
-       !account_list.contacts.where("prayer_letters_id = '#{prayer_letters_id}' AND id <> #{id}").present?
-      account_list.prayer_letters_account.delete_contact(self)
-    end
+    return if prayer_letters_id.blank?
+    return unless account_list.valid_prayer_letters_account
+    return if account_list.contacts.where("prayer_letters_id = '#{prayer_letters_id}' AND id <> #{id}").present?
+
+    account_list.prayer_letters_account.delete_contact(self)
   end
 end

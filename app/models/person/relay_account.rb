@@ -42,22 +42,21 @@ class Person::RelayAccount < ActiveRecord::Base
   end
 
   def find_or_create_org_account(auth_hash)
-    if SiebelDonations::Profile.find(ssoGuid: remote_id).present?
-      org = Organization.cru_usa
+    return unless SiebelDonations::Profile.find(ssoGuid: remote_id).present?
+    org = Organization.cru_usa
 
-      # we need to create an organization account if we don't already have one
-      account = person.organization_accounts.where(organization_id: org.id).first_or_initialize
+    # we need to create an organization account if we don't already have one
+    account = person.organization_accounts.where(organization_id: org.id).first_or_initialize
 
-      emplid = auth_hash.extra.attributes.first.emplid || 'NO-EMPLID'
-      designation = auth_hash.extra.attributes.first.designation || 'NO-DESIG'
+    emplid = auth_hash.extra.attributes.first.emplid || 'NO-EMPLID'
+    designation = auth_hash.extra.attributes.first.designation || 'NO-DESIG'
 
-      account.assign_attributes(remote_id: remote_id,
-                                token: "#{APP_CONFIG['itg_auth_key']}_#{designation}_#{emplid}",
-                                authenticated: true,
-                                valid_credentials: true)
+    account.assign_attributes(remote_id: remote_id,
+                              token: "#{APP_CONFIG['itg_auth_key']}_#{designation}_#{emplid}",
+                              authenticated: true,
+                              valid_credentials: true)
 
-      account.save(validate: false)
-    end
+    account.save(validate: false)
   end
 
   private

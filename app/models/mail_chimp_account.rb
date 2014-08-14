@@ -87,21 +87,18 @@ class MailChimpAccount < ActiveRecord::Base
   private
 
   def call_mailchimp(method, *args)
-    if active? && primary_list_id
-      begin
-        send(method, *args)
-      rescue Gibbon::MailChimpError => e
-        case
-        when e.message.include?('API Key Disabled')
-          update_column(:active, false)
-          AccountMailer.invalid_mailchimp_key(account_list).deliver
-        when e.message.include?('code -91') # A backend database error has occurred. Please try again later or report this issue. (code -91)
-          # raise the exception and the background queue will retry
-          raise e
-        else
-          raise e
-        end
-      end
+    return if !active? || primary_list_id.blank?
+    send(method, *args)
+  rescue Gibbon::MailChimpError => e
+    case
+    when e.message.include?('API Key Disabled')
+      update_column(:active, false)
+      AccountMailer.invalid_mailchimp_key(account_list).deliver
+    when e.message.include?('code -91') # A backend database error has occurred. Please try again later or report this issue. (code -91)
+      # raise the exception and the background queue will retry
+      raise e
+    else
+      raise e
     end
   end
 
@@ -118,21 +115,18 @@ class MailChimpAccount < ActiveRecord::Base
   end
 
   def unsubscribe_email(email)
-    if email.present? && primary_list_id.present?
-      begin
-        gb.list_unsubscribe(id: primary_list_id, email_address: email,
-                            send_goodbye: false, delete_member: true)
-      rescue Gibbon::MailChimpError => e
-        case
-        when e.message.include?('code 232') || e.message.include?('code 215')
-          # do nothing
-        when e.message.include?('code 232') || e.message.include?('code 200')
-          # Invalid MailChimp List ID
-          update_column(:primary_list_id, nil)
-        else
-          raise e
-        end
-      end
+    return if email.blank? || primary_list_id.blank?
+    gb.list_unsubscribe(id: primary_list_id, email_address: email,
+                        send_goodbye: false, delete_member: true)
+  rescue Gibbon::MailChimpError => e
+    case
+    when e.message.include?('code 232') || e.message.include?('code 215')
+      # do nothing
+    when e.message.include?('code 232') || e.message.include?('code 200')
+      # Invalid MailChimp List ID
+      update_column(:primary_list_id, nil)
+    else
+      raise e
     end
   end
 
@@ -156,25 +150,24 @@ class MailChimpAccount < ActiveRecord::Base
       return false
     end
 
-    if person.primary_email_address
-      vars = { EMAIL: person.primary_email_address.email, FNAME: person.first_name,
-               LNAME: person.last_name }
-      begin
-        gb.list_subscribe(id: primary_list_id, email_address: vars[:EMAIL], update_existing: true,
-                          double_optin: false, merge_vars: vars, send_welcome: false, replace_interests: true)
-      rescue Gibbon::MailChimpError => e
-        case
-        when e.message.include?('code 250') # MMERGE3 must be provided - Please enter a value (code 250)
-          # Notify user and nulify primary_list_id until they fix the problem
-          update_column(:primary_list_id, nil)
-          AccountMailer.mailchimp_required_merge_field(account_list).deliver
-        when e.message.include?('code 200') # Invalid MailChimp List ID (code 200)
-          # TODO: Notify user and nulify primary_list_id until they fix the problem
-          update_column(:primary_list_id, nil)
-        when e.message.include?('code 502') # Invalid Email Address: "Rajah Tony" <amrajah@gmail.com> (code 502)
-        else
-          raise e
-        end
+    return unless person.primary_email_address
+    vars = { EMAIL: person.primary_email_address.email, FNAME: person.first_name,
+             LNAME: person.last_name }
+    begin
+      gb.list_subscribe(id: primary_list_id, email_address: vars[:EMAIL], update_existing: true,
+                        double_optin: false, merge_vars: vars, send_welcome: false, replace_interests: true)
+    rescue Gibbon::MailChimpError => e
+      case
+      when e.message.include?('code 250') # MMERGE3 must be provided - Please enter a value (code 250)
+        # Notify user and nulify primary_list_id until they fix the problem
+        update_column(:primary_list_id, nil)
+        AccountMailer.mailchimp_required_merge_field(account_list).deliver
+      when e.message.include?('code 200') # Invalid MailChimp List ID (code 200)
+        # TODO: Notify user and nulify primary_list_id until they fix the problem
+        update_column(:primary_list_id, nil)
+      when e.message.include?('code 502') # Invalid Email Address: "Rajah Tony" <amrajah@gmail.com> (code 502)
+      else
+        raise e
       end
     end
   end
