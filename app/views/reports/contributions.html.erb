@@ -15,6 +15,10 @@
   <thead>
     <tr>
       <th><%= _('Donor') %></th>
+      <th><%= _('Status') %></th>
+      <th><%= _('Pledge Amount') %></th>
+      <th><%= _('Pledge Frequency') %></th>
+      <th><%= _('Average') %></th>
       <% (0..11).reverse_each do |index| %>
         <th class="right"><%= index.month.ago(@end_date).strftime '%b %y' %></th>
       <% end %>
@@ -25,6 +29,10 @@
     <% @donations.each do |key, row| %>
       <tr>
         <td><%= link_to(row[:donor], contact_path(row[:id])) %></td>
+        <td><%= row[:status] %></td>
+        <td><%= number_to_current_currency(row[:pledge_amount]) %></td>
+        <td><%= Contact.pledge_frequencies[row[:pledge_frequency]] %></td>
+        <td><%= number_to_current_currency(row[:average], precision: 2) %></td>
         <% (0..11).reverse_each do |index| %>
           <td class="right">
             <% unless row[:amounts][index.month.ago(@end_date).strftime '%b %y'].nil? %>
@@ -36,7 +44,11 @@
       </tr>
     <% end %>
     <tr class="sum">
-      <td><strong><%= _('Total Donations') %></strong></td><td></td>
+      <td><strong><%= _('Total Donations') %></strong></td>
+      <td></td>
+      <td><%= number_to_current_currency(@total_pledges) %></td>
+      <td></td>
+      <td><%= number_to_current_currency(@total_average) %></td>
       <% (0..11).reverse_each do |index| %>
         <td class="right">
           <% unless @sum_row[index.month.ago(@end_date).strftime '%b %y'].nil? %>
