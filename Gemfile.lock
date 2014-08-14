@@ -220,6 +220,9 @@ GEM
     guard-rspec (4.2.9)
       guard (~> 2.1)
       rspec (>= 2.14, < 4.0)
+    guard-rubocop (1.1.0)
+      guard (~> 2.0)
+      rubocop (~> 0.20)
     guard-spork (1.5.1)
       childprocess (>= 0.2.3)
       guard (>= 1.1)
@@ -603,6 +606,7 @@ DEPENDENCIES
   google_timezone
   growl
   guard-rspec
+  guard-rubocop
   guard-spork
   iniparse (~> 1.1.6)
   jquery-rails (~> 3.0.4)
