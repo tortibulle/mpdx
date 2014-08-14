@@ -24,11 +24,10 @@ class ApplicationController < ActionController::Base
     session[:fullsite] = true if params[:fullsite] == 'true'
     session[:fullsite] = false if params[:fullsite] == 'false'
 
-    if !session[:fullsite] && mobile_agent
-      url = 'http://m.mpdx.org/#' + request.fullpath[1..-1]
-      redirect_to url
-      return false
-    end
+    return if session[:fullsite] || !mobile_agent
+    url = 'http://m.mpdx.org/#' + request.fullpath[1..-1]
+    redirect_to url
+    false
   end
 
   def mobile_agent
@@ -37,22 +36,22 @@ class ApplicationController < ActionController::Base
   end
 
   def ensure_login
-    unless user_signed_in?
-      if $request_test
-        sign_in(:user, $user)
+    return true if user_signed_in?
+
+    if $request_test
+      sign_in(:user, $user)
+    else
+      session[:user_return_to] = request.fullpath unless request.path == '/'
+      case
+      when request.host =~ /us/
+        redirect_to '/auth/relay'
+      when request.host =~ /mpdxs|key/
+        redirect_to '/auth/key'
       else
-        session[:user_return_to] = request.fullpath unless request.path == '/'
-        case
-        when request.host =~ /us/
-          redirect_to '/auth/relay'
-        when request.host =~ /mpdxs|key/
-          redirect_to '/auth/key'
-        else
-          flash[:timeout] = true
-          redirect_to '/login'
-        end
-        return false
+        flash[:timeout] = true
+        redirect_to '/login'
       end
+      return false
     end
     true
   end
@@ -166,11 +165,11 @@ class ApplicationController < ActionController::Base
   helper_method :tag_params
 
   def authenticate_admin_user!
-    unless admin_user_signed_in?
-      session[:user_return_to] = request.fullpath
-      redirect_to '/auth/admin'
-      return false
-    end
+    return if admin_user_signed_in?
+
+    session[:user_return_to] = request.fullpath
+    redirect_to '/auth/admin'
+    false
   end
 
   def auth_hash

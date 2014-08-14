@@ -58,12 +58,12 @@ class PeopleController < ApplicationController
 
   def merge
     ids_to_merge = params[:merge_people_ids].split(',')
-    if ids_to_merge.length > 1 && ids_to_merge.include?(params[:merge_winner]) # just to be sure
-      people_to_merge = @contact.people.where(id: ids_to_merge - [params[:merge_winner]])
-      merge_winner = @contact.people.find(params[:merge_winner])
-      people_to_merge.each do |p|
-        merge_winner.merge(p)
-      end
+    return unless ids_to_merge.length > 1 && ids_to_merge.include?(params[:merge_winner])
+
+    people_to_merge = @contact.people.where(id: ids_to_merge - [params[:merge_winner]])
+    merge_winner = @contact.people.find(params[:merge_winner])
+    people_to_merge.each do |p|
+      merge_winner.merge(p)
     end
   end
 

@@ -49,9 +49,7 @@ Eval:
   Enabled: false
 
 GuardClause:
-  Exclude:
-    - 'app/controllers/**/*'
-    - 'app/models/**/*'
+  MinBodyLength: 3
 
 HandleExceptions:
   Enabled: false

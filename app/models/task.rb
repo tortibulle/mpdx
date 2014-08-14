@@ -95,15 +95,14 @@ class Task < Activity
   private
 
   def update_completed_at
-    if changed.include?('completed')
-      if completed
-        self.completed_at ||= completed? ? Time.now : nil
-        self.start_at ||= completed_at
-        self.result = 'Done' if result.blank?
-      else
-        self.completed_at = ''
-        self.result = ''
-      end
+    return unless changed.include?('completed')
+    if completed
+      self.completed_at ||= completed? ? Time.now : nil
+      self.start_at ||= completed_at
+      self.result = 'Done' if result.blank?
+    else
+      self.completed_at = ''
+      self.result = ''
     end
   end
 

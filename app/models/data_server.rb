@@ -145,11 +145,10 @@ class DataServer
     attributes = { balance: balance[:balance], balance_updated_at: balance[:date] }
     profile.update_attributes(attributes)
 
-    if balance[:designation_numbers]
-      attributes.merge!(name: balance[:account_names].first) if balance[:designation_numbers].length == 1
-      balance[:designation_numbers].each_with_index do |number, _i|
-        find_or_create_designation_account(number, profile, attributes)
-      end
+    return unless balance[:designation_numbers]
+    attributes.merge!(name: balance[:account_names].first) if balance[:designation_numbers].length == 1
+    balance[:designation_numbers].each_with_index do |number, _i|
+      find_or_create_designation_account(number, profile, attributes)
     end
   end
 

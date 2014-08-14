@@ -319,9 +319,9 @@ class ContactsController < ApplicationController
       current_user.save
     end
 
-    if current_user.contacts_filter.present? && current_user.contacts_filter[current_account_list.id.to_s].present?
-      @filters_params = current_user.contacts_filter[current_account_list.id.to_s]
-    end
+    return if current_user.contacts_filter.blank? || current_user.contacts_filter[current_account_list.id.to_s].blank?
+
+    @filters_params = current_user.contacts_filter[current_account_list.id.to_s]
   end
 
   def filtered_contacts
@@ -356,10 +356,9 @@ class ContactsController < ApplicationController
   end
 
   def clear_annoying_redirect_locations
-    if session[:contact_return_to].to_s.include?('edit') ||
-       session[:contact_return_to].to_s.include?('new')
-      session[:contact_return_to] = nil
-    end
+    return unless session[:contact_return_to].to_s.include?('edit') ||
+                  session[:contact_return_to].to_s.include?('new')
+    session[:contact_return_to] = nil
   end
 
   def contact_params

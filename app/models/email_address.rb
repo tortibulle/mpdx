@@ -91,11 +91,9 @@ class EmailAddress < ActiveRecord::Base
     return unless person
     contact = person.contacts.first
 
-    if contact && contact.send_email_letter? &&
-       mail_chimp_account &&
-       (primary? || person.email_addresses.length == 1)
-      mail_chimp_account.queue_subscribe_person(person)
-    end
+    return unless contact && contact.send_email_letter? && mail_chimp_account
+    return unless primary? || person.email_addresses.length == 1
+    mail_chimp_account.queue_subscribe_person(person)
   end
 
   def delete_from_mailchimp

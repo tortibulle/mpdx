@@ -61,21 +61,20 @@ class Siebel < DataServer
   def import_donors(profile, date_from = nil)
     designation_numbers = profile.designation_accounts.pluck(:designation_number)
 
-    if designation_numbers.present?
-      account_list = profile.account_list
+    return unless designation_numbers.present?
+    account_list = profile.account_list
 
-      SiebelDonations::Donor.find(having_given_to_designations: designation_numbers.join(','),
-                                  contact_filter: :all,
-                                  account_address_filter: :primary,
-                                  contact_email_filter: :all,
-                                  contact_phone_filter: :all
-                                  ).each do |siebel_donor|
+    SiebelDonations::Donor.find(having_given_to_designations: designation_numbers.join(','),
+                                contact_filter: :all,
+                                account_address_filter: :primary,
+                                contact_email_filter: :all,
+                                contact_phone_filter: :all
+                                ).each do |siebel_donor|
 
-        donor_account = add_or_update_donor_account(account_list, siebel_donor, profile, date_from)
+      donor_account = add_or_update_donor_account(account_list, siebel_donor, profile, date_from)
 
-        if siebel_donor.type == 'Business'
-          add_or_update_company(account_list, siebel_donor, donor_account)
-        end
+      if siebel_donor.type == 'Business'
+        add_or_update_company(account_list, siebel_donor, donor_account)
       end
     end
   end

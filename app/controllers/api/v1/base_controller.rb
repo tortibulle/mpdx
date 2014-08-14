@@ -32,22 +32,22 @@ class Api::V1::BaseController < ApplicationController
 
   def ensure_login
     return if request.request_method == 'OPTIONS'
-    unless super
-      unless oauth_access_token
-        render json: { errors: ['Missing access token'] }, status: :unauthorized, callback: params[:callback]
+    return if super
+
+    unless oauth_access_token
+      render json: { errors: ['Missing access token'] }, status: :unauthorized, callback: params[:callback]
+      return false
+    end
+    begin
+      unless current_user
+        render json: { errors: ['Please go to https://mpdx.org and log in using Relay before trying to use the mobile app.'] },
+               status: :unauthorized,
+               callback: params[:callback]
         return false
       end
-      begin
-        unless current_user
-          render json: { errors: ['Please go to https://mpdx.org and log in using Relay before trying to use the mobile app.'] },
-                 status: :unauthorized,
-                 callback: params[:callback]
-          return false
-        end
-      rescue RestClient::Unauthorized
-        render json: { errors: ['Invalid access token'] }, status: :unauthorized, callback: params[:callback]
-        return false
-      end
+    rescue RestClient::Unauthorized
+      render json: { errors: ['Invalid access token'] }, status: :unauthorized, callback: params[:callback]
+      return false
     end
   end
 
