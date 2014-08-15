@@ -72,7 +72,7 @@ class GoogleIntegration < ActiveRecord::Base
 
   def set_default_calendar
     return false unless calendars
-    return if !calendar_integration? || calendar_id.present? || calendars.length != 1
+    return unless calendar_integration? && calendar_id.blank? && calendars.length == 1
 
     calendar = calendars.first
     self.calendar_id = calendar['id']
