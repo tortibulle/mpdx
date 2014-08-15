@@ -430,6 +430,10 @@ $ ->
           alert(__('There was an error hiding your contacts'))
       }
 
+      # unselect items
+      $(ids).each ->
+        $('#contact_' + this + '_check').prop('checked', false)
+
     $.mpdx.loadDonations()
 
     # fix to hide mysterious donations tab that won't go away
