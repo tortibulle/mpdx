@@ -60,6 +60,22 @@ describe Person do
                                })
       person.facebook_accounts.length.should == 0
     end
+
+    describe 'saving deceased person' do
+      it 'should remove persons name from greeting' do
+        contact = create(:contact)
+        person.first_name = 'Jack'
+        contact.people << person
+        contact.people << create(:person, first_name: 'Jill')
+        contact.name = 'Smith, Jack and Jill'
+        contact.save!
+        person.reload
+        person.deceased = true
+        person.save!
+        contact.reload
+        expect(contact.name).to_not include('Jack')
+      end
+    end
   end
 
   context '#email=' do
