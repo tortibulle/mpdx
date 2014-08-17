@@ -20,31 +20,29 @@ class PrayerLettersAccount < ActiveRecord::Base
     contacts = []
 
     account_list.contacts.includes([:primary_address, { primary_person: :companies }]).each do |contact|
-      if contact.send_physical_letter? &&
-         contact.addresses.present? &&
-         contact.active? &&
-         contact.mailing_address.valid_mailing_address?
-
-        params = {
-          name: contact.envelope_greeting,
-          greeting: contact.greeting,
-          file_as: contact.name,
-          contact_id: contact.prayer_letters_id,
-          address: {
-            street: contact.mailing_address.street,
-            city: contact.mailing_address.city,
-            state: contact.mailing_address.state,
-            postal_code: contact.mailing_address.postal_code,
-            country: contact.mailing_address.country
-          },
-          external_id: contact.id
-        }
-        if contact.siebel_organization?
-          params[:name] = nil
-          params[:company] = contact.name
-        end
-        contacts << params
+      next unless contact.send_physical_letter? &&
+                  contact.addresses.present? &&
+                  contact.active? &&
+                  contact.mailing_address.valid_mailing_address?
+      params = {
+        name: contact.envelope_greeting,
+        greeting: contact.greeting,
+        file_as: contact.name,
+        contact_id: contact.prayer_letters_id,
+        address: {
+          street: contact.mailing_address.street,
+          city: contact.mailing_address.city,
+          state: contact.mailing_address.state,
+          postal_code: contact.mailing_address.postal_code,
+          country: contact.mailing_address.country
+        },
+        external_id: contact.id
+      }
+      if contact.siebel_organization?
+        params[:name] = nil
+        params[:company] = contact.name
       end
+      contacts << params
     end
 
     get_response(:put, '/api/v1/contacts', { contacts: contacts }.to_json)
@@ -58,9 +56,8 @@ class PrayerLettersAccount < ActiveRecord::Base
     contacts = JSON.parse(get_response(:get, '/api/v1/contacts'))['contacts']
 
     contacts.each do |pl_contact|
-      if pl_contact['external_id'] && contact = account_list.contacts.where(id: pl_contact['external_id']).first
-        contact.update_column(:prayer_letters_id, pl_contact['contact_id'])
-      end
+      next unless pl_contact['external_id'] && contact = account_list.contacts.where(id: pl_contact['external_id']).first
+      contact.update_column(:prayer_letters_id, pl_contact['contact_id'])
     end
   end
 

@@ -195,22 +195,18 @@ class MailChimpAccount < ActiveRecord::Base
     batch = []
 
     contacts.each do |contact|
-
       # Make sure we don't try to add to a blank group
       contact.status = 'Partner - Pray' if contact.status.blank?
 
       contact.people.each do |person|
-        if person.primary_email_address
-          batch << { EMAIL: person.primary_email_address.email, FNAME: person.first_name,
-                     LNAME: person.last_name }
-        end
+        next unless person.primary_email_address
+        batch << { EMAIL: person.primary_email_address.email, FNAME: person.first_name,
+                   LNAME: person.last_name }
       end
 
       # if we have a grouping_id, add them to that group
-      if grouping_id.present?
-        batch.each { |p| p[:GROUPINGS] ||= [{ id: grouping_id, groups: _(contact.status) }] }
-      end
-
+      next unless grouping_id.present?
+      batch.each { |p| p[:GROUPINGS] ||= [{ id: grouping_id, groups: _(contact.status) }] }
     end
 
     begin

@@ -33,20 +33,19 @@ class Person::GmailAccount
       account_list.contacts.active.includes(people: :email_addresses).each do |contact|
         contact.people.each do |person|
           person.email_addresses.map(&:email).uniq.each do |email|
-            unless email_addresses.include?(email)
-              email_addresses << email
+            next if email_addresses.include?(email)
+            email_addresses << email
 
-              # sent emails
-              sent = g.mailbox('[Gmail]/Sent Mail')
-              sent.emails(to: email, after: since).each do |gmail_message|
-                log_email(gmail_message, account_list, contact, person, 'Done')
-              end
+            # sent emails
+            sent = g.mailbox('[Gmail]/Sent Mail')
+            sent.emails(to: email, after: since).each do |gmail_message|
+              log_email(gmail_message, account_list, contact, person, 'Done')
+            end
 
-              # received emails
-              all = g.mailbox('[Gmail]/All Mail')
-              all.emails(from: email, after: since).each do |gmail_message|
-                log_email(gmail_message, account_list, contact, person, 'Received')
-              end
+            # received emails
+            all = g.mailbox('[Gmail]/All Mail')
+            all.emails(from: email, after: since).each do |gmail_message|
+              log_email(gmail_message, account_list, contact, person, 'Received')
             end
           end
         end
