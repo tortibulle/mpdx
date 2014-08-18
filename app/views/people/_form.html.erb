@@ -92,7 +92,7 @@
 
 
     <div class="fieldset">
-      <div class="field_action optout_enewsletter"<% if @contact.send_newsletter.blank? || @contact.send_newsletter == "Physical" %> style="display:none;"<% end %>>
+      <div class="field_action optout_enewsletter">
         <%= builder.check_box :optout_enewsletter %>
         <%= builder.label :optout_enewsletter, "Opt-out of email newsletter", title: "This will prevent this person's primary email address from being synced with MailChimp and from being included in a contact export from MPDx." %>
       </div>
