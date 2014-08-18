@@ -41,11 +41,11 @@ class Person::GoogleAccount < ActiveRecord::Base
   end
 
   def contacts
-    @contacts ||= contacts_api_user.contacts
+    @contacts ||= contacts_api_user.contacts(v: '3')
   end
 
   def contact_groups
-    @contact_groups ||= contacts_api_user.groups
+    @contact_groups ||= contacts_api_user.groups(v: '3')
   end
 
   def contacts_api_user
