@@ -47,6 +47,7 @@
       </p>
 
       <% NotificationType.all.each do |notification_type| %>
+        <% next if notification_type.type == 'NotificationType::LargerGift' %>
         <% field_name = notification_type.class.to_s.split('::').last.to_s.underscore.to_sym %>
         <div class="field">
           <strong><%= f.label field_name, _(notification_type.description) %></strong>
