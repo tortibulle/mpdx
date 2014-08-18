@@ -125,19 +125,22 @@ class Person < ActiveRecord::Base
 
     self.optout_enewsletter = true
     contacts.each do |c|
+      need_to_save = false
       #remove name from greeting
       if c.greeting.include?(first_name)
         c.greeting = c.greeting.sub(first_name, '')
-        c.greeting = c.greeting.sub(' and ', '').strip
-        c.save
+        c.greeting = c.greeting.sub(' and ', ' ').strip
+        need_to_save = true
       end
 
       #remove name from contact name
       if c.name.include?(first_name)
         c.name = c.name.sub(first_name, '')
         c.name = c.name.sub(' and ', '').strip
-        c.save
+        need_to_save = true
       end
+      return unless need_to_save
+      c.save
     end
   end
 
