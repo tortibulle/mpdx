@@ -41,15 +41,22 @@ class Person::GoogleAccount < ActiveRecord::Base
   end
 
   def contacts
+    @contacts ||= contacts_api_user.contacts
+  end
+
+  def contact_groups
+    @contact_groups ||= contacts_api_user.groups
+  end
+
+  def contacts_api_user
     return false if token_expired? && !refresh_token!
 
-    unless @contacts
+    unless @contact_api_user
       client = OAuth2::Client.new(APP_CONFIG['google_key'], APP_CONFIG['google_secret'])
       oath_token = OAuth2::AccessToken.new(client, token)
-      contact_user = GoogleContactsApi::User.new(oath_token)
-      @contacts = contact_user.contacts
+      @contact_api_user = GoogleContactsApi::User.new(oath_token)
     end
-    @contacts
+    @contact_api_user
   end
 
   def client

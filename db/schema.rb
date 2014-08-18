@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140807135553) do
+ActiveRecord::Schema.define(version: 20140818154803) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -414,6 +414,9 @@ ActiveRecord::Schema.define(version: 20140807135553) do
     t.boolean  "override",          default: false, null: false
     t.integer  "user_id"
     t.integer  "source_account_id"
+    t.boolean  "import_by_group",   default: false
+    t.text     "groups"
+    t.text     "group_tags"
   end
 
   add_index "imports", ["account_list_id"], name: "index_imports_on_account_list_id", using: :btree
@@ -595,7 +598,6 @@ ActiveRecord::Schema.define(version: 20140807135553) do
     t.string   "profession"
     t.boolean  "deceased",                         default: false, null: false
     t.boolean  "subscribed_to_updates"
-    t.boolean  "optout_enewletter",                default: false
     t.boolean  "optout_enewsletter",               default: false
     t.string   "occupation"
     t.string   "employer"
