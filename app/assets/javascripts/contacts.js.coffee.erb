@@ -27,14 +27,6 @@ $ ->
         $("#contact_status").val "Partner - Financial"  if amount and amount > 0
         return
 
-    $("#contact_send_newsletter").change ->
-        val = $(this).val()
-        if val is "Email" or val is "Both"
-            $(".optout_enewsletter").show()
-        else
-            $(".optout_enewsletter").hide()
-        return
-
     if $('#contacts_find_duplicates')[0]?
       $.ajax {
         url: '/contacts/find_duplicates',
