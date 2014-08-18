@@ -10,7 +10,6 @@ class Person < ActiveRecord::Base
 
   belongs_to :master_person
   has_many :email_addresses, -> { order('email_addresses.primary::int desc') }, dependent: :destroy, autosave: true
-  has_many :newsletter_email_addresses, -> { where('email_addresses.historic' => false) }, dependent: :destroy, autosave: true
   has_one :primary_email_address, -> { where('email_addresses.primary' => true) }, class_name: 'EmailAddress', foreign_key: :person_id
   has_many :phone_numbers, -> { order('phone_numbers.primary::int desc') }, dependent: :destroy
   has_one :primary_phone_number, -> { where('phone_numbers.primary' => true) }, class_name: 'PhoneNumber', foreign_key: :person_id
