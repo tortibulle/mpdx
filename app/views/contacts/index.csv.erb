@@ -12,11 +12,29 @@
     row << contact.mailing_address.state
     row << contact.mailing_address.postal_code
     row << contact.mailing_address.country
+    row << contact.status
+    row << contact.pledge_amount
+    row << Contact.pledge_frequencies[contact.pledge_frequency || 1.0]
+    row << contact.send_newsletter
+    row << (contact.pledge_received ? 'Yes' : 'No')
+    row << contact.tag_list
+
     email_addresses = contact.people.collect(&:email_addresses).flatten[0..3]
+    email_row = 0
     email_addresses.each do |email|
       next if email.historic?
       row << email.email
+      email_row += 1
     end
+    (email_row..3).each do |i|
+      row << ''
+    end
+
+    phone_numbers = contact.people.collect(&:phone_numbers).flatten[0..3]
+    phone_numbers.each do |phone|
+      row << phone.number
+    end
+
     csv << row
   end
 end %>
