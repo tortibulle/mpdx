@@ -34,12 +34,12 @@
                   <%= form_for Import.new(source: provider, source_account_id: account.id) do |f| %>
                       <div class="field radiocheck">
                         <%= f.radio_button(:import_by_group, 'false') %>
-                        <%= f.label(:google_contacts_import_all_true, _('Import all contacts')) %>
+                        <%= f.label(:import_by_group_false, _('Import all contacts')) %>
                       </div>
 
                       <div class="field radiocheck">
-                        <%= f.radio_button(:import_by_group, 'true') %>
-                        <%= f.label(:google_contacts_import_all_false, _('Only import contacts from certain groups')) %>
+                        <%= f.radio_button(:import_by_group, 'true', checked: true) %>
+                        <%= f.label(:import_by_group_true, _('Only import contacts from certain groups')) %>
                       </div>
 
                       <table>
@@ -51,14 +51,15 @@
                             <tr>
                               <td class="google_import_group">
                                 <div class="field radiocheck google_import_group">
-                                  <%= check_box_tag 'import[groups][]', group.id, false, id: "group_#{index}"  %>
+                                  <%= check_box_tag 'import[groups][]', group.id, false,
+                                                    id: "group_#{index}", class: 'import_by_group'  %>
                                   <%= label 'group', index, group.title.gsub('System Group: ','') %>
                                 </div>
                               </td>
                               <td class="google_import_tags">
                                 <%= text_field_tag "import[group_tags[#{group.id}]]",
                                                    group.title.gsub('System Group: ','').downcase.gsub(' ','-'),
-                                                   class: 'import_contact_tags' %>
+                                                   class: 'import_by_group import_contact_tags' %>
                               </td>
                             </tr>
                         <% end %>
@@ -83,8 +84,18 @@
                       </div>
 
                       <a href="#" class="btn btngreen" data-behavior="import_button"><%= _('Import') %></a>
-                      <script><%= render 'tags_input.js', input_selector: '.import_contact_tags',
-                                         tags: current_account_list.contact_tags  %></script>
+                      <script>
+                        <%= render 'tags_input.js', input_selector: '.import_contact_tags',
+                                         tags: current_account_list.contact_tags  %>
+
+                        $('#import_import_by_group_false').click(function() {
+                            $('.import_by_group').prop('disabled', true);
+                        });
+
+                        $('#import_import_by_group_true').click(function() {
+                            $('.import_by_group').prop('disabled', false);
+                        });
+                      </script>
                   <% end %>
                 </div>
                 <div><a href="#" class="btn smallbtn" data-behavior="show_import"><%= _('Import Contacts') %></a></div>
