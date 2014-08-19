@@ -413,6 +413,7 @@ $ ->
 
     $(document).on 'click', '[data-behavior=hide_contact]', ->
       $(this).closest('tr').fadeOut('fast')
+      $(this).closest('tr').remove()
 
     $(document).on 'click', '[data-behavior=bulk_hide_contact]', ->
       ids = $.mpdx.updateSelectedContactIds()
@@ -420,6 +421,7 @@ $ ->
       # remove items
       $(ids).each ->
         $('#contact_' + this).fadeOut('fast')
+        $('#contact_' + this).remove()
 
       $.ajax {
         url: '/contacts/bulk_destroy',
@@ -429,10 +431,6 @@ $ ->
         error: ->
           alert(__('There was an error hiding your contacts'))
       }
-
-      # unselect items
-      $(ids).each ->
-        $('#contact_' + this + '_check').prop('checked', false)
 
     $.mpdx.loadDonations()
 
