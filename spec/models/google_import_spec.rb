@@ -92,7 +92,7 @@ describe GoogleImport do
   end
 
   describe 'overall import results' do
-    it 'should import person data if no people exist' do
+    it 'should import correct person data if no people exist' do
       @google_import.send(:import_contacts)
 
       expect(@account_list.people.to_a.count).to eq(1)
@@ -132,27 +132,38 @@ describe GoogleImport do
       expect(phone.number).to eq('+11233345158')
       expect(phone.location).to eq('mobile')
       expect(phone.primary).to be_false
+    end
+  end
 
-      # Contact: notes
-      # Person: middle_name, title, suffix, gender, organization
-      # Spouse
-
-      # contact = @account_list.people.where(last_name: 'Doe')
-      # person =
+  describe 'import by group' do
+    it 'should do nothing if no groups specified' do
+      @import.import_by_group = true
+      @import.save
+      -> {
+        @google_import.send(:import_contacts)
+      }.should_not change(Contact, :count)
     end
 
-    it 'should import and override if override set to true' do
-      @import.override = true
-      @google_import = GoogleImport.new(@import)
+    it 'should import a specified group' do
+      @import.import_by_group = true
+      group_url = 'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/6'
+      @import.groups = [group_url]
+      @import.group_tags = {
+        'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/6' => 'more, tags'
+      }
+      @import.tags = 'hi, mom'
+      @import.save
 
-    end
+      stub_request(:get, "https://www.google.com/m8/feeds/contacts/default/full?alt=json&group=#{URI.escape(group_url)}&max-results=100000&v=3")
+        .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
+        .to_return(body: File.new(Rails.root.join('spec/fixtures/google_contacts.json')).read)
+        .times(1)
 
-    it 'should replace blank fields if override is false' do
+      -> {
+        @google_import.send(:import_contacts)
+      }.should change(Contact, :count).by(1)
 
-    end
-
-    it 'should not change non-blank fields if override is false' do
-
+      Contact.last.tag_list.sort.should == %w(hi mom more tags)
     end
   end
 end

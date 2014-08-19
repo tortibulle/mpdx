@@ -16,39 +16,54 @@ class GoogleImport
     begin
       google_account.update_column(:downloading, true)
 
-      google_account.contacts.each do |google_contact|
-        begin
-          next unless google_contact.given_name
-
-          person = create_or_update_person(google_contact, @account_list)
-
-          contact = @account_list.contacts.with_person(person).first
-
-          unless contact
-            # Create a contact
-            name = "#{person.last_name}, #{person.first_name}"
-            contact = @account_list.contacts.find_or_create_by(name: name)
-          end
-
-          update_contact_info(contact, google_contact)
-
-          contact.tag_list.add(@import.tags, parse: true) if @import.tags.present?
-          contact.save
-
-          contact.people.reload
-
-          begin
-            contact.people << person unless contact.people.include?(person)
-          rescue ActiveRecord::RecordNotUnique
-          end
-        rescue => e
-          Airbrake.raise_or_notify(e)
-          next
+      if @import.import_by_group
+        @import.groups.each do |group_id|
+          group = GoogleContactsApi::Group.new({ 'id' => { '$t' => group_id } }, nil,
+                                               google_account.contacts_api_user.api)
+          delimiter = @import.tags.present? && @import.group_tags[group_id].present? ? ',' : ''
+          import_contacts_batch(group.contacts, @import.group_tags[group_id] + delimiter + @import.tags)
         end
+      else
+        import_contacts_batch(google_account.contacts, @import.tags)
       end
+
+      @import.tags.present?
     ensure
       google_account.update_column(:downloading, false)
       google_account.update_column(:last_download, Time.now)
+    end
+  end
+
+  def import_contacts_batch(google_contacts, tags)
+    google_contacts.each do |google_contact|
+      begin
+        next unless google_contact.given_name
+
+        person = create_or_update_person(google_contact, @account_list)
+
+        contact = @account_list.contacts.with_person(person).first
+
+        unless contact
+          # Create a contact
+          name = "#{person.last_name}, #{person.first_name}"
+          contact = @account_list.contacts.find_or_create_by(name: name)
+        end
+
+        update_contact_info(contact, google_contact)
+
+        contact.tag_list.add(tags, parse: true) if tags.present?
+        contact.save
+
+        contact.people.reload
+
+        begin
+          contact.people << person unless contact.people.include?(person)
+        rescue ActiveRecord::RecordNotUnique
+        end
+      rescue => e
+        Airbrake.raise_or_notify(e)
+        next
+      end
     end
   end
 
