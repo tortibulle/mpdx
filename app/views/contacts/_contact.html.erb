@@ -53,6 +53,6 @@
         <li><%= link_to(_('Hide'), contact_path(contact), method: :delete, remote: true, :class => "none", data: {behavior: 'hide_contact'}) %></li>
       </ul>
     </td>
-    <td class="checks"><input type="checkbox" id="<%= dom_id(contact) %>_check" name="contact_ids[]" value="<%= contact.id %>" /></td>
+    <td class="checks"><input type="checkbox" name="contact_ids[]" value="<%= contact.id %>" /></td>
   </tr>
 <% end %>
