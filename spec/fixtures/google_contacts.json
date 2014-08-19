@@ -123,10 +123,10 @@
                             "$t": "United States of America"
                         },
                         "gd$formattedAddress": {
-                            "$t": "2345 Long Dr. #232\nSomwhere\nIL\n12345-2920\nUnited States of America"
+                            "$t": "2345 Long Dr. #232\nSomewhere\nIL\n12345\nUnited States of America"
                         },
                         "gd$city": {
-                            "$t": "Somwhere"
+                            "$t": "Somewhere"
                         },
                         "gd$street": {
                             "$t": "2345 Long Dr. #232"
@@ -135,28 +135,27 @@
                             "$t": "IL"
                         },
                         "gd$postcode": {
-                            "$t": "12345-2920"
+                            "$t": "12345"
                         }
                     },
                     {
-                        "rel": "http://schemas.google.com/g/2005#home",
                         "gd$country": {
                             "$t": "United States of America"
                         },
                         "gd$formattedAddress": {
-                            "$t": "2345 Long Dr. #232\nSomwhere\nIL\n12345-2920\nUnited States of America"
+                            "$t": "123 Big Rd\nAnywhere\nMO\n56789\nUnited States of America"
                         },
                         "gd$city": {
-                            "$t": "Somwhere"
+                            "$t": "Anywhere"
                         },
                         "gd$street": {
-                            "$t": "2345 Long Dr. #232"
+                            "$t": "123 Big Rd"
                         },
                         "gd$region": {
-                            "$t": "IL"
+                            "$t": "MO"
                         },
                         "gd$postcode": {
-                            "$t": "12345-2920"
+                            "$t": "56789"
                         }
                     }
                 ],
@@ -201,6 +200,9 @@
                 "id": {
                     "$t": "http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/6b70f8bb0372c"
                 }
+            },
+            {
+
             }
         ],
         "openSearch$totalResults": {

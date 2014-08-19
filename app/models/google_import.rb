@@ -18,9 +18,9 @@ class GoogleImport
 
       google_account.contacts.each do |google_contact|
         begin
-          # Try to match an existing person
+          next unless google_contact.given_name
+
           person = create_or_update_person(google_contact, @account_list)
-          next unless person
 
           contact = @account_list.contacts.with_person(person).first
 
@@ -29,6 +29,8 @@ class GoogleImport
             name = "#{person.last_name}, #{person.first_name}"
             contact = @account_list.contacts.find_or_create_by(name: name)
           end
+
+          update_contact_info(contact, google_contact)
 
           contact.tag_list.add(@import.tags, parse: true) if @import.tags.present?
           contact.save
@@ -50,14 +52,57 @@ class GoogleImport
     end
   end
 
+  def build_address_array(google_contact, contact, override)
+    addresses = []
+    google_contact.addresses.each do |location|
+      street = location[:street]
+      city = location[:city]
+      state = location[:region]
+      postal_code = location[:postcode]
+      country = location[:country] == 'United States of America' ? 'United States' : location[:country]
+      if [street, city, state, postal_code].any?(&:present?)
+        primary_address = location[:primary] if override
+        if primary_address && contact
+          contact.addresses.each do |address|
+            unless address.street == street && address.city == city && address.state == state && address.postal_code == postal_code && address.country == country
+              address.primary_mailing_address = false
+              address.save
+            end
+          end
+        end
+
+        if location[:rel] == 'work'
+          address_location = 'Business'
+        elsif location[:rel] == 'home'
+          address_location = 'Home'
+        else
+          address_location = 'Other'
+        end
+
+        addresses << {
+          street: street,
+          city: city,
+          state: state,
+          postal_code: postal_code,
+          country: country,
+          location: address_location,
+          primary_mailing_address: primary_address
+        }
+      end
+    end
+
+    addresses
+  end
+
+  def update_contact_info(contact, google_contact)
+    contact.addresses_attributes = build_address_array google_contact, contact, @import.override
+  end
+
   def create_or_update_person(google_contact, account_list)
     person_attributes = {
-      first_name: google_contact['gd$name'].to_h['gd$givenName'].to_h['$t'],
-      last_name: google_contact['gd$name'].to_h['gd$familyName'].to_h['$t'],
-      email: google_contact.primary_email
+      first_name: google_contact.given_name,
+      last_name: google_contact.family_name
     }.select { |_, v| v.present? }
-
-    return unless person_attributes[:first_name].present?
 
     # First from my contacts
     person = account_list.people.includes(:google_accounts).where('person_google_accounts.remote_id' => google_contact.id).first
@@ -65,8 +110,8 @@ class GoogleImport
     # If we can't find a contact with this google account, see if we have a contact with the same name and no google account
     unless person
       person = account_list.people.includes(:google_accounts).where('person_google_accounts.remote_id' => nil,
-                                                                    'people.first_name' => google_contact.first_name,
-                                                                    'people.last_name' => google_contact.last_name).first
+                                                                    'people.first_name' => google_contact.given_name,
+                                                                    'people.last_name' => google_contact.family_name).first
     end
 
     if person
@@ -97,8 +142,20 @@ class GoogleImport
     end
 
     # add phone number and email if available
-    person.email = google_contact.email if google_contact.email.present?
-    person.phone_number = { number: google_contact.mobile_phone, location: 'mobile' } if google_contact.mobile_phone.present?
+    google_contact.emails_full.each do |email_fields|
+      person.email_address = {
+        email: email_fields[:address],
+        location: email_fields[:rel],
+        primary: email_fields[:primary]
+      }
+    end
+    google_contact.phone_numbers_full.each do |number_fields|
+      person.phone_number = {
+        number: number_fields[:number],
+        location: number_fields[:rel],
+        primary: number_fields[:primary]
+      }
+    end
     person.save
 
     person
