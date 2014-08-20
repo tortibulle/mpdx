@@ -120,40 +120,27 @@ class GoogleImport
     }.select { |_, v| v.present? }
 
     # First from my contacts
-    person = account_list.people.includes(:google_accounts).where('person_google_accounts.remote_id' => google_contact.id).first
+    person = account_list.people.includes(:google_contacts).where('google_contacts.remote_id' => google_contact.id).first
 
-    # If we can't find a contact with this google account, see if we have a contact with the same name and no google account
+    # If we can't find a contact with this google account, see if we have a contact with the same name
+    # There can be multiple Google Contacts for a particular person (e.g. one for phone, one for email),
     unless person
-      person = account_list.people.includes(:google_accounts).where('person_google_accounts.remote_id' => nil,
-                                                                    'people.first_name' => google_contact.given_name,
-                                                                    'people.last_name' => google_contact.family_name).first
+      person = account_list.people.where('people.first_name' => google_contact.given_name,
+                                         'people.last_name' => google_contact.family_name).first
     end
 
     if person
       person.update_attributes(person_attributes)
     else
-      # Look for a matching person auth an authenticated google account
-      account = Person::GoogleAccount.where(remote_id: google_contact.id, authenticated: true).first
-      if account
-        # Create a new person using the same master_person
-        person = account.person.master_person.people.create(person_attributes)
-      else
-        begin
-          person = Person.create!(person_attributes)
-        rescue ActiveRecord::RecordInvalid
-          raise person_attributes.inspect
-        end
+      begin
+        person = Person.create!(person_attributes)
+      rescue ActiveRecord::RecordInvalid
+        raise person_attributes.inspect
       end
     end
 
-    unless person.google_accounts.pluck(:remote_id).include?(google_contact.identifier.to_i)
-      # Create a google account
-      begin
-        person.google_accounts.create!(remote_id: google_contact.id,
-                                       email: person_attributes[:email],
-                                       authenticated: true)
-      rescue ActiveRecord::RecordNotUnique
-      end
+    unless person.google_contacts.pluck(:remote_id).include?(google_contact.identifier.to_i)
+      person.google_contacts.create!(remote_id: google_contact.id)
     end
 
     # add phone number and email if available

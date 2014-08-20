@@ -39,6 +39,7 @@ class Person < ActiveRecord::Base
   has_many :activity_comments, dependent: :destroy
   has_many :messages_sent, class_name: 'Message', foreign_key: :from_id, dependent: :destroy
   has_many :messages_received, class_name: 'Message', foreign_key: :to_id, dependent: :destroy
+  has_many :google_contacts
 
   accepts_nested_attributes_for :email_addresses, reject_if: lambda { |e| e[:email].blank? }, allow_destroy: true
   accepts_nested_attributes_for :phone_numbers, reject_if: lambda { |p| p[:number].blank? }, allow_destroy: true

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140818200054) do
+ActiveRecord::Schema.define(version: 20140820120441) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -349,6 +349,16 @@ ActiveRecord::Schema.define(version: 20140818200054) do
   add_index "family_relationships", ["person_id", "related_person_id"], name: "index_family_relationships_on_person_id_and_related_person_id", unique: true, using: :btree
   add_index "family_relationships", ["related_person_id"], name: "index_family_relationships_on_related_person_id", using: :btree
 
+  create_table "google_contacts", force: true do |t|
+    t.string   "remote_id"
+    t.integer  "person_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "google_contacts", ["person_id"], name: "index_google_contacts_on_person_id", using: :btree
+  add_index "google_contacts", ["remote_id"], name: "index_google_contacts_on_remote_id", using: :btree
+
   create_table "google_email_activities", force: true do |t|
     t.integer  "google_email_id"
     t.integer  "activity_id"
@@ -635,7 +645,7 @@ ActiveRecord::Schema.define(version: 20140818200054) do
     t.boolean  "valid_token",     default: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "email"
+    t.string   "email",                           null: false
     t.boolean  "authenticated",   default: false, null: false
     t.boolean  "primary",         default: false
     t.boolean  "downloading",     default: false, null: false

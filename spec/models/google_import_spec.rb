@@ -55,7 +55,7 @@ describe GoogleImport do
     it 'should update the person if they already exist by google remote_id' do
       contact = create(:contact, account_list: @account_list)
       person = create(:person, first_name: 'Not-John')
-      create(:google_account, person: person, remote_id: @google_contact.id)
+      create(:google_contact, person: person, remote_id: @google_contact.id)
       contact.people << person
       -> {
         @google_import.send(:create_or_update_person, @google_contact, @account_list)
@@ -70,16 +70,6 @@ describe GoogleImport do
       -> {
         @google_import.send(:create_or_update_person, @google_contact, @account_list)
       }.should_not change(Person, :count)
-    end
-
-    it 'should create a person with an existing Master Person if a person with this google account already exists' do
-      person = create(:person, email: nil) # check that nil email works OK
-      create(:google_account, person: person, remote_id: @google_contact.id, authenticated: true)
-      -> {
-        -> {
-          @google_import.send(:create_or_update_person, @google_contact, @account_list)
-        }.should change(Person, :count)
-      }.should_not change(MasterPerson, :count)
     end
 
     it 'should create a person and master person if we can\'t find a match' do
