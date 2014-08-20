@@ -1,4 +1,29 @@
 GIT
+  remote: https://gist.github.com/6112257.git
+  revision: 40b1704e6396748b1c3bf7d3a928adcd37933e3d
+  specs:
+    emoji_spec (0.1)
+
+GIT
+  remote: https://github.com/sstephenson/global_phone.git
+  revision: 9b2772c4678dc9e323c58d9258663812bbd9fc73
+  specs:
+    global_phone (1.0.1)
+
+GIT
+  remote: http://github.com/mhfs/sidekiq-failures.git
+  revision: f8d6a86d62f7b9c4d8504bc6f7b82b5e58a211da
+  specs:
+    sidekiq-failures (0.4.1)
+      sidekiq (>= 2.16.0)
+
+GIT
+  remote: http://github.com/CruGlobal/oauth-ruby
+  revision: 8d659d10229df298eda8007b4f09d5d392f69b1c
+  specs:
+    oauth (0.4.7)
+
+GIT
   remote: http://github.com/90seconds/gmail.git
   revision: e98cb130f2306c97a5fbeab077a07da452a42020
   specs:
@@ -12,31 +37,6 @@ GIT
   specs:
     country_select (1.2.0)
       countries (= 0.9.3)
-
-GIT
-  remote: http://github.com/CruGlobal/oauth-ruby
-  revision: 8d659d10229df298eda8007b4f09d5d392f69b1c
-  specs:
-    oauth (0.4.7)
-
-GIT
-  remote: http://github.com/mhfs/sidekiq-failures.git
-  revision: f8d6a86d62f7b9c4d8504bc6f7b82b5e58a211da
-  specs:
-    sidekiq-failures (0.4.1)
-      sidekiq (>= 2.16.0)
-
-GIT
-  remote: https://gist.github.com/6112257.git
-  revision: 40b1704e6396748b1c3bf7d3a928adcd37933e3d
-  specs:
-    emoji_spec (0.1)
-
-GIT
-  remote: https://github.com/sstephenson/global_phone.git
-  revision: 9b2772c4678dc9e323c58d9258663812bbd9fc73
-  specs:
-    global_phone (1.0.1)
 
 GEM
   remote: http://rubygems.org/
@@ -146,7 +146,7 @@ GEM
     docile (1.1.3)
     erubis (2.7.0)
     eventmachine (1.0.3)
-    excon (0.22.1)
+    excon (0.39.5)
     execjs (2.0.2)
     extlib (0.9.16)
     factory_girl (4.4.0)
@@ -163,16 +163,29 @@ GEM
       rack-oauth2 (>= 0.14.4)
       tzinfo
     ffi (1.9.3)
-    fog (1.12.0)
+    fog (1.23.0)
+      fog-brightbox
+      fog-core (~> 1.23)
+      fog-json
+      fog-softlayer
+      ipaddress (~> 0.5)
+      nokogiri (~> 1.5, >= 1.5.11)
+    fog-brightbox (0.3.0)
+      fog-core (~> 1.22)
+      fog-json
+      inflecto
+    fog-core (1.23.0)
       builder
-      excon (~> 0.22.1)
-      formatador (~> 0.2.0)
+      excon (~> 0.38)
+      formatador (~> 0.2)
       mime-types
-      multi_json (~> 1.0)
       net-scp (~> 1.1)
       net-ssh (>= 2.1.3)
-      nokogiri (~> 1.5.0)
-      ruby-hmac
+    fog-json (1.0.0)
+      multi_json (~> 1.0)
+    fog-softlayer (0.3.14)
+      fog-core
+      fog-json
     font-awesome-rails (4.1.0.0)
       railties (>= 3.2, < 5.0)
     formatador (0.2.4)
@@ -185,7 +198,7 @@ GEM
       text
     gettext_i18n_rails (1.0.5)
       fast_gettext (>= 0.4.8)
-    gibberish (1.2.2)
+    gibberish (1.4.0)
     gibbon (0.4.6)
       httparty
       multi_json (>= 1.3.4)
@@ -237,7 +250,9 @@ GEM
     httpauth (0.2.1)
     httpclient (2.3.4.1)
     i18n (0.6.9)
+    inflecto (0.0.2)
     iniparse (1.1.6)
+    ipaddress (0.8.0)
     jquery-rails (3.0.4)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
@@ -448,7 +463,6 @@ GEM
       powerpack (~> 0.0.6)
       rainbow (>= 1.99.1, < 3.0)
       ruby-progressbar (~> 1.4)
-    ruby-hmac (0.4.0)
     ruby-progressbar (1.5.1)
     ruby-rtf (0.0.1)
     ruby_parser (3.6.1)
@@ -590,13 +604,13 @@ DEPENDENCIES
   emoji_spec!
   factory_girl_rails
   fb_graph (~> 2.6.0)
-  fog (~> 1.12.0)
+  fog (~> 1.23.0)
   font-awesome-rails
   fuubar
   geocoder
   gettext (>= 3.0.2)
   gettext_i18n_rails
-  gibberish (~> 1.2.0)
+  gibberish (~> 1.4.0)
   gibbon (~> 0.4.2)
   global_phone!
   global_phone_dbgen
