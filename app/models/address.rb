@@ -63,10 +63,9 @@ class Address < ActiveRecord::Base
       self[:country] = country[:name]
     else
       countries.each do |c|
-        if c[:alternatives].downcase.include?(val.downcase)
-          self[:country] = c[:name]
-          return
-        end
+        next unless c[:alternatives].downcase.include?(val.downcase)
+        self[:country] = c[:name]
+        return
       end
       # If we couldn't find a match anywhere, go ahead and save it anyway
       self[:country] = val

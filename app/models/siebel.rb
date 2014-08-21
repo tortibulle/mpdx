@@ -36,9 +36,8 @@ class Siebel < DataServer
                                                                                      chartfield: designation.chartfield)
       end
 
-      unless designation_profile.account_list
-        AccountList.find_or_create_from_profile(designation_profile, @org_account)
-      end
+      next if designation_profile.account_list
+      AccountList.find_or_create_from_profile(designation_profile, @org_account)
     end
 
     designation_profiles
@@ -48,11 +47,10 @@ class Siebel < DataServer
     total = 0
     # the profile balance is the sum of the balances from each designation account in that profile
     profile.designation_accounts.each do |da|
-      if da.staff_account_id.present?
-        balance = SiebelDonations::Balance.find(employee_ids: da.staff_account_id).first
-        da.update_attributes(balance: balance.primary, balance_updated_at: Time.now)
-        total += balance.primary
-      end
+      next unless da.staff_account_id.present?
+      balance = SiebelDonations::Balance.find(employee_ids: da.staff_account_id).first
+      da.update_attributes(balance: balance.primary, balance_updated_at: Time.now)
+      total += balance.primary
     end
     profile.update_attributes(balance: total, balance_updated_at: Time.now)
     profile
@@ -73,9 +71,8 @@ class Siebel < DataServer
 
       donor_account = add_or_update_donor_account(account_list, siebel_donor, profile, date_from)
 
-      if siebel_donor.type == 'Business'
-        add_or_update_company(account_list, siebel_donor, donor_account)
-      end
+      next unless siebel_donor.type == 'Business'
+      add_or_update_company(account_list, siebel_donor, donor_account)
     end
   end
 
@@ -330,10 +327,9 @@ class Siebel < DataServer
 
     # If we can match it to an existing address, update that address
     object.addresses_including_deleted.each do |a|
-      if a.remote_id == new_address.remote_id || a.equal_to?(new_address)
-        a.update_attributes(new_address.attributes.select { |_k, v| v.present? })
-        return a
-      end
+      next unless a.remote_id == new_address.remote_id || a.equal_to?(new_address)
+      a.update_attributes(new_address.attributes.select { |_k, v| v.present? })
+      return a
     end
 
     # We didn't find a match. save it as a new address

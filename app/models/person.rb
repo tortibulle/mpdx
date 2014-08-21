@@ -172,13 +172,12 @@ class Person < ActiveRecord::Base
       next if attributes['_destroy'] == '1'
 
       remote_id = Person::FacebookAccount.get_id_from_url(attributes['url'])
-      if remote_id
-        attributes['remote_id'] = remote_id
-        if facebook_ids.include?(attributes['remote_id'])
-          hash.delete(key)
-        else
-          facebook_ids << attributes['remote_id']
-        end
+      next unless remote_id
+      attributes['remote_id'] = remote_id
+      if facebook_ids.include?(attributes['remote_id'])
+        hash.delete(key)
+      else
+        facebook_ids << attributes['remote_id']
       end
     end
 
@@ -245,11 +244,10 @@ class Person < ActiveRecord::Base
       other_phone = phone_numbers.find { |pn| pn.id != phone_number.id &&
                                               pn == phone_number
       }
-      if other_phone
-        phone_number.merge(other_phone)
-        merge_phone_numbers
-        return
-      end
+      next unless other_phone
+      phone_number.merge(other_phone)
+      merge_phone_numbers
+      return
     end
   end
 
@@ -260,9 +258,8 @@ class Person < ActiveRecord::Base
 
       %w(phone_numbers company_positions).each do |relationship|
         other.send(relationship.to_sym).each do |other_rel|
-          unless send(relationship.to_sym).find { |rel| rel == other_rel }
-            other_rel.update_column(:person_id, id)
-          end
+          next if send(relationship.to_sym).find { |rel| rel == other_rel }
+          other_rel.update_column(:person_id, id)
         end
       end
 
@@ -272,16 +269,14 @@ class Person < ActiveRecord::Base
       %w(twitter_accounts facebook_accounts linkedin_accounts
          google_accounts relay_accounts organization_accounts).each do |relationship|
         other.send(relationship).each do |record|
-          unless send(relationship).where(person_id: id, remote_id: record.remote_id).any?
-            record.update_attributes!(person_id: id)
-          end
+          next if send(relationship).where(person_id: id, remote_id: record.remote_id).any?
+          record.update_attributes!(person_id: id)
         end
       end
 
       other.email_addresses.each do |email_address|
-        unless email_addresses.find_by_email(email_address.email)
-          email_address.update_attributes(person_id: id)
-        end
+        next if email_addresses.find_by_email(email_address.email)
+        email_address.update_attributes(person_id: id)
       end
 
       other.pictures.each do |picture|
@@ -292,24 +287,21 @@ class Person < ActiveRecord::Base
       # because we're in a transaction, we need to keep track of which relationships we've updated so
       # we don't create duplicates on the next part
       FamilyRelationship.where(related_person_id: other.id).each do |fr|
-        unless FamilyRelationship.where(person_id: fr.person_id, related_person_id: id).first
-          fr.update_attributes(related_person_id: id)
-        end
+        next if FamilyRelationship.where(person_id: fr.person_id, related_person_id: id).first
+        fr.update_attributes(related_person_id: id)
       end
 
       FamilyRelationship.where(person_id: other.id).each do |fr|
-        unless FamilyRelationship.where(related_person_id: fr.person_id, person_id: id)
-          fr.update_attributes(person_id: id)
-        end
+        next if FamilyRelationship.where(related_person_id: fr.person_id, person_id: id)
+        fr.update_attributes(person_id: id)
       end
 
       # Copy fields over updating any field that's blank on the winner
       [:first_name, :last_name, :legal_first_name, :birthday_month, :birthday_year, :birthday_day, :anniversary_month,
        :anniversary_year, :anniversary_day, :title, :suffix, :gender, :marital_status,
        :middle_name].each do |field|
-        if send(field).blank? && other.send(field).present?
-          send("#{field}=".to_sym, other.send(field))
-        end
+        next unless send(field).blank? && other.send(field).present?
+        send("#{field}=".to_sym, other.send(field))
       end
 
       # copy over master person sources from loser

@@ -82,9 +82,8 @@ class Task < Activity
     case activity_type
     when 'Call'
       numbers = contacts.map(&:people).flatten.map do |person|
-        if person.phone_number && person.phone_number.present?
-          "#{person} #{PhoneNumberExhibit.new(person.phone_number, nil)}"
-        end
+        next unless person.phone_number && person.phone_number.present?
+        "#{person} #{PhoneNumberExhibit.new(person.phone_number, nil)}"
       end
       numbers.compact.join("\n")
     else
