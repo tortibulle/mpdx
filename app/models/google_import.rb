@@ -118,7 +118,7 @@ class GoogleImport
     }.select { |_, v| v.present? }
 
     if person
-      person.update_attributes(person_attributes)
+      person.update_attributes(person_attributes) if @import.override
       person
     else
       Person.create!(person_attributes)

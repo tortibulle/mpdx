@@ -136,7 +136,7 @@ describe GoogleImport do
     end
   end
 
-  describe 'import override/non-override behavior' do
+  describe 'import override/non-override behavior for primary contact info' do
     before do
       @contact = build(:contact, account_list: @account_list)
       @contact.addresses_attributes = [{
@@ -173,6 +173,39 @@ describe GoogleImport do
       @person.reload
       expect(@person.primary_email_address.email).to eq('existing_primary@example.com')
       expect(@person.primary_phone_number.number).to eq('+14747474744')
+    end
+  end
+
+  describe 'import override behavior for name fields' do
+    before do
+      contact = create(:contact, account_list: @account_list)
+      @person_already_imported = create(:person, first_name: 'Not-John', last_name: 'Not-Doe',
+                                                 middle_name: 'Not-Henry', title: 'Not-Mr', suffix: 'Not-III')
+      remote_id = 'http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/6b70f8bb0372c'
+      @person_already_imported.google_contacts << create(:google_contact, remote_id: remote_id)
+      contact.people << @person_already_imported
+    end
+
+    it 'should update name fields if set to override' do
+      @import.override = true
+      @google_import.send(:import)
+      @person_already_imported.reload
+      expect(@person_already_imported.first_name).to eq('John')
+      expect(@person_already_imported.last_name).to eq('Doe')
+      expect(@person_already_imported.middle_name).to eq('Henry')
+      expect(@person_already_imported.title).to eq('Mr')
+      expect(@person_already_imported.suffix).to eq('III')
+    end
+
+    it 'should not update name fields if not set to override' do
+      @import.override = false
+      @google_import.send(:import)
+      @person_already_imported.reload
+      expect(@person_already_imported.first_name).to eq('Not-John')
+      expect(@person_already_imported.last_name).to eq('Not-Doe')
+      expect(@person_already_imported.middle_name).to eq('Not-Henry')
+      expect(@person_already_imported.title).to eq('Not-Mr')
+      expect(@person_already_imported.suffix).to eq('Not-III')
     end
   end
 
