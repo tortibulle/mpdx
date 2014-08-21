@@ -52,7 +52,8 @@ describe GoogleImport do
                                        id: Time.now.to_i.to_s)
     end
 
-    it 'should update the person if they already exist by google remote_id' do
+    it 'should update the person if they already exist by google remote_id if override set' do
+      @import.override = true
       contact = create(:contact, account_list: @account_list)
       person = create(:person, first_name: 'Not-John')
       create(:google_contact, person: person, remote_id: @google_contact.id)
@@ -63,7 +64,7 @@ describe GoogleImport do
       }.should_not change(Person, :count)
     end
 
-    it 'should update a person if their name matches' do
+    it 'should not create a new person if their name matches' do
       contact = create(:contact, account_list: @account_list)
       contact.people << create(:person, last_name: 'Doe')
       contact.save
