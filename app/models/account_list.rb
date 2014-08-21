@@ -42,6 +42,7 @@ class AccountList < ActiveRecord::Base
   has_many :designation_profiles
   has_one :prayer_letters_account, dependent: :destroy, autosave: true
   has_many :google_integrations, dependent: :destroy
+  has_many :appeals
 
   accepts_nested_attributes_for :contacts, reject_if: :all_blank, allow_destroy: true
 

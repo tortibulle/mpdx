@@ -1,5 +1,3 @@
 class Appeal < ActiveRecord::Base
-
-  private
-
+  belongs_to :account_list
 end
