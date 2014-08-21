@@ -88,13 +88,11 @@
                         <%= render 'tags_input.js', input_selector: '.import_contact_tags',
                                          tags: current_account_list.contact_tags  %>
 
-                        $('#import_import_by_group_false').click(function() {
-                            $('.import_by_group').prop('disabled', true);
-                        });
-
-                        $('#import_import_by_group_true').click(function() {
-                            $('.import_by_group').prop('disabled', false);
-                        });
+                        var toggle_import_by_group_disabled = function() {
+                            $('.import_by_group').prop('disabled', $('#import_import_by_group_false').is(':checked'));
+                        }
+                        $('#import_import_by_group_false').change(toggle_import_by_group_disabled);
+                        $('#import_import_by_group_true').change(toggle_import_by_group_disabled);
                       </script>
                   <% end %>
                 </div>

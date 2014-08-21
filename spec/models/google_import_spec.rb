@@ -22,7 +22,7 @@ describe GoogleImport do
       contact.people << person
       -> {
         @google_import.should_receive(:create_or_update_person).and_return(person)
-        @google_import.send(:import_contacts)
+        @google_import.send(:import)
       }.should_not change(Contact, :count)
     end
 
@@ -31,7 +31,7 @@ describe GoogleImport do
       -> {
         -> {
           @google_import.should_receive(:create_or_update_person).and_return(create(:person))
-          @google_import.send(:import_contacts)
+          @google_import.send(:import)
         }.should change(Person, :count).by(1)
       }.should change(Contact, :count).by(1)
     end
@@ -40,7 +40,7 @@ describe GoogleImport do
       @google_import.should_receive(:create_or_update_person).and_return(create(:person))
 
       @import.update_column(:tags, 'hi, mom')
-      @google_import.send(:import_contacts)
+      @google_import.send(:import)
       Contact.last.tag_list.sort.should == %w(hi mom)
     end
   end
@@ -58,7 +58,7 @@ describe GoogleImport do
       create(:google_contact, person: person, remote_id: @google_contact.id)
       contact.people << person
       -> {
-        @google_import.send(:create_or_update_person, @google_contact, @account_list)
+        @google_import.send(:create_or_update_person, @google_contact)
         person.reload.first_name.should == 'John'
       }.should_not change(Person, :count)
     end
@@ -68,23 +68,21 @@ describe GoogleImport do
       contact.people << create(:person, last_name: 'Doe')
       contact.save
       -> {
-        @google_import.send(:create_or_update_person, @google_contact, @account_list)
+        @google_import.send(:create_or_update_person, @google_contact)
       }.should_not change(Person, :count)
     end
 
     it 'should create a person and master person if we can\'t find a match' do
       -> {
         -> {
-          @google_import.send(:create_or_update_person, @google_contact, @account_list)
+          @google_import.send(:create_or_update_person, @google_contact)
         }.should change(Person, :count)
       }.should change(MasterPerson, :count)
     end
   end
 
   describe 'overall import results' do
-    it 'should import correct person data if no people exist' do
-      @google_import.send(:import_contacts)
-
+    def check_imported_data
       expect(@account_list.people.to_a.count).to eq(1)
       expect(@account_list.contacts.to_a.count).to eq(1)
 
@@ -96,6 +94,9 @@ describe GoogleImport do
       expect(contact.name).to eq('Doe, John')
       expect(person.first_name).to eq('John')
       expect(person.last_name).to eq('Doe')
+      expect(person.middle_name).to eq('Henry')
+      expect(person.title).to eq('Mr')
+      expect(person.suffix).to eq('III')
 
       expect(contact.addresses.to_a.count).to eq(2)
       address1 = contact.addresses.order(:postal_code).first
@@ -104,6 +105,7 @@ describe GoogleImport do
       expect(address1.street).to eq('2345 Long Dr. #232')
       expect(address1.state).to eq('IL')
       expect(address1.postal_code).to eq('12345')
+      expect(address1.primary_mailing_address).to be_true
       address2 = contact.addresses.order(:postal_code).last
       expect(address2.country).to eq('United States')
       expect(address2.city).to eq('Anywhere')
@@ -112,16 +114,65 @@ describe GoogleImport do
       expect(address2.postal_code).to eq('56789')
 
       expect(person.email_addresses.to_a.count).to eq(1)
-      email = person.email_addresses.to_a.first
+      email = person.email_addresses.order(:email).first
       expect(email.email).to eq('johnsmith@example.com')
       expect(email.location).to eq('other')
       expect(email.primary).to be_true
 
       expect(person.phone_numbers.to_a.count).to eq(1)
-      phone = person.phone_numbers.to_a.first
+      phone = person.phone_numbers.order(:number).first
       expect(phone.number).to eq('+11233345158')
       expect(phone.location).to eq('mobile')
-      expect(phone.primary).to be_false
+      expect(phone.primary).to be_true
+    end
+
+    it 'should import correct person data if no people exist and be the same for repeat imports' do
+      @google_import.send(:import)
+      check_imported_data
+
+      # Repeat the import and make sure the data is the same
+      @google_import.send(:import)
+      check_imported_data
+    end
+  end
+
+  describe 'import override/non-override behavior' do
+    before do
+      @contact = build(:contact, account_list: @account_list)
+      @contact.addresses_attributes = [{
+        street: '1 Way', city: 'Town', state: 'IL', postal_code: '22222',
+        country: 'United States', location: 'Home', primary_mailing_address: true
+      }]
+      @contact.save
+      @person = build(:person, last_name: 'Doe')
+      @person.email_address = { email: 'existing_primary@example.com', primary: true }
+      @person.phone_number = { number: '474-747-4744', primary: true }
+      @person.save
+      @contact.people << @person
+    end
+
+    it 'should make imported phone/email/address primary if set to override (and marked as primary in imported data)' do
+      @import.override = true
+      @google_import.send(:import)
+
+      @contact.reload
+      expect(@contact.primary_address.street).to eq('2345 Long Dr. #232')
+
+      @person.reload
+      expect(@person.primary_email_address.email).to eq('johnsmith@example.com')
+      expect(@person.primary_phone_number.number).to eq('+11233345158')
+    end
+
+    it 'should not make imported phone/email/address primary if not set to override' do
+      @import.override = false
+      @google_import.send(:import)
+
+      @contact.reload
+      expect(@contact.primary_address.street).to eq('1 Way')
+
+      @person.reload
+      expect(@person.primary_email_address.email).to eq('existing_primary@example.com')
+      expect(@person.primary_phone_number.number).to eq('+14747474744')
     end
   end
 
@@ -130,7 +181,7 @@ describe GoogleImport do
       @import.import_by_group = true
       @import.save
       -> {
-        @google_import.send(:import_contacts)
+        @google_import.send(:import)
       }.should_not change(Contact, :count)
     end
 
@@ -150,7 +201,7 @@ describe GoogleImport do
         .times(1)
 
       -> {
-        @google_import.send(:import_contacts)
+        @google_import.send(:import)
       }.should change(Contact, :count).by(1)
 
       Contact.last.tag_list.sort.should == %w(hi mom more tags)

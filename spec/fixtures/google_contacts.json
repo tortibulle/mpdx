@@ -104,7 +104,16 @@
                         "$t": "John"
                     },
                     "gd$fullName": {
-                        "$t": "John Doe"
+                        "$t": "Mr John Henry Doe, III"
+                    },
+                    "gd$additionalName": {
+                        "$t": "Henry"
+                    },
+                    "gd$namePrefix": {
+                        "$t": "Mr"
+                    },
+                    "gd$nameSuffix": {
+                        "$t": "III"
                     }
                 },
                 "gContact$relation": [
@@ -119,6 +128,7 @@
                 "gd$structuredPostalAddress": [
                     {
                         "rel": "http://schemas.google.com/g/2005#home",
+                        "primary": "true",
                         "gd$country": {
                             "$t": "United States of America"
                         },
@@ -190,7 +200,8 @@
                 "gd$phoneNumber": [
                     {
                         "$t": "(123) 334-5158",
-                        "rel": "http://schemas.google.com/g/2005#mobile"
+                        "rel": "http://schemas.google.com/g/2005#mobile",
+                        "primary": "true"
                     }
                 ],
                 "app$edited": {

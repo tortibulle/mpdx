@@ -48,6 +48,10 @@ class Person::GoogleAccount < ActiveRecord::Base
     @contact_groups ||= contacts_api_user.groups
   end
 
+  def contacts_for_group(group_id)
+    GoogleContactsApi::Group.new({ 'id' => { '$t' => group_id } }, nil, contacts_api_user.api).contacts
+  end
+
   def contacts_api_user
     return false if token_expired? && !refresh_token!
 

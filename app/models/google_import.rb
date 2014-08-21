@@ -6,60 +6,33 @@ class GoogleImport
   end
 
   def import
-    import_contacts
-  end
-
-  def import_contacts
     return false unless @import.source_account_id
 
     google_account = @user.google_accounts.find(@import.source_account_id)
     begin
       google_account.update_column(:downloading, true)
-
-      if @import.import_by_group
-        @import.groups.each do |group_id|
-          group = GoogleContactsApi::Group.new({ 'id' => { '$t' => group_id } }, nil,
-                                               google_account.contacts_api_user.api)
-          delimiter = @import.tags.present? && @import.group_tags[group_id].present? ? ',' : ''
-          import_contacts_batch(group.contacts, @import.group_tags[group_id] + delimiter + @import.tags)
-        end
-      else
-        import_contacts_batch(google_account.contacts, @import.tags)
-      end
-
-      @import.tags.present?
+      import_contacts(google_account)
     ensure
       google_account.update_column(:downloading, false)
       google_account.update_column(:last_download, Time.now)
     end
   end
 
+  def import_contacts(google_account)
+    if @import.import_by_group
+      @import.groups.each do |group_id|
+        import_contacts_batch(google_account.contacts_for_group(group_id),
+                              @import.tags + ',' + @import.group_tags[group_id])
+      end
+    else
+      import_contacts_batch(google_account.contacts, @import.tags)
+    end
+  end
+
   def import_contacts_batch(google_contacts, tags)
-    google_contacts.each do |google_contact|
+    google_contacts.each do |g_contact|
       begin
-        next unless google_contact.given_name
-
-        person = create_or_update_person(google_contact, @account_list)
-
-        contact = @account_list.contacts.with_person(person).first
-
-        unless contact
-          # Create a contact
-          name = "#{person.last_name}, #{person.first_name}"
-          contact = @account_list.contacts.find_or_create_by(name: name)
-        end
-
-        update_contact_info(contact, google_contact)
-
-        contact.tag_list.add(tags, parse: true) if tags.present?
-        contact.save
-
-        contact.people.reload
-
-        begin
-          contact.people << person unless contact.people.include?(person)
-        rescue ActiveRecord::RecordNotUnique
-        end
+        import_contact(g_contact, tags)
       rescue => e
         Airbrake.raise_or_notify(e)
         next
@@ -67,99 +40,112 @@ class GoogleImport
     end
   end
 
-  def build_address_array(google_contact, contact, override)
-    addresses = []
-    google_contact.addresses.each do |location|
-      street = location[:street]
-      city = location[:city]
-      state = location[:region]
-      postal_code = location[:postcode]
-      country = location[:country] == 'United States of America' ? 'United States' : location[:country]
-      if [street, city, state, postal_code].any?(&:present?)
-        primary_address = location[:primary] if override
-        if primary_address && contact
-          contact.addresses.each do |address|
-            unless address.street == street && address.city == city && address.state == state && address.postal_code == postal_code && address.country == country
-              address.primary_mailing_address = false
-              address.save
-            end
-          end
-        end
+  def import_contact(g_contact, tags)
+    return unless g_contact.given_name
 
-        if location[:rel] == 'work'
-          address_location = 'Business'
-        elsif location[:rel] == 'home'
-          address_location = 'Home'
-        else
-          address_location = 'Other'
-        end
+    person = create_or_update_person(g_contact)
+    contact = create_or_update_contact(person, g_contact, tags)
 
-        addresses << {
-          street: street,
-          city: city,
-          state: state,
-          postal_code: postal_code,
-          country: country,
-          location: address_location,
-          primary_mailing_address: primary_address
-        }
-      end
+    contact.people.reload
+
+    begin
+      contact.people << person unless contact.people.include?(person)
+    rescue ActiveRecord::RecordNotUnique
+    end
+  end
+
+  def create_or_update_contact(person, g_contact, tags)
+    contact = @account_list.contacts.with_person(person).first
+
+    unless contact
+      name = "#{person.last_name}, #{person.first_name}"
+      contact = @account_list.contacts.find_or_create_by(name: name)
     end
 
-    addresses
+    contact.addresses_attributes = g_contact.addresses.map { |address| build_address(address, contact) }
+    contact.tag_list.add(tags, parse: true) if tags.present?
+    contact.save
+    contact
   end
 
-  def update_contact_info(contact, google_contact)
-    contact.addresses_attributes = build_address_array google_contact, contact, @import.override
+  def build_address(google_address, contact)
+    address = {
+      street:  google_address[:street], city: google_address[:city], state: google_address[:region],
+      postal_code: google_address[:postcode],
+      country: google_address[:country] == 'United States of America' ? 'United States' : google_address[:country],
+      location: google_address_rel_to_location(google_address[:rel])
+    }
+
+    if google_address[:primary] && (@import.override || contact.addresses.count == 0)
+      contact.addresses.each { |non_primary| non_primary.update_attribute(:primary_mailing_address, false) }
+      address[:primary_mailing_address] = true
+    end
+
+    address
   end
 
-  def create_or_update_person(google_contact, account_list)
+  def google_address_rel_to_location(rel)
+    if rel == 'work'
+      'Business'
+    elsif rel == 'home'
+      'Home'
+    else
+      'Other'
+    end
+  end
+
+  def create_or_update_person(g_contact)
+    person = create_or_update_person_basic_info(g_contact)
+
+    unless person.google_contacts.pluck(:remote_id).include?(g_contact.id)
+      person.google_contacts.create!(remote_id: g_contact.id)
+    end
+
+    update_person_emails(person, g_contact)
+    update_person_phones(person, g_contact)
+
+    person.save
+    person
+  end
+
+  def create_or_update_person_basic_info(g_contact)
+    person = (@account_list.people.includes(:google_contacts).where('google_contacts.remote_id' => g_contact.id).first ||
+              @account_list.people.where(first_name: g_contact.given_name, last_name: g_contact.family_name).first)
+
     person_attributes = {
-      first_name: google_contact.given_name,
-      last_name: google_contact.family_name
+      title: g_contact.name_prefix, first_name: g_contact.given_name, middle_name: g_contact.additional_name,
+      last_name: g_contact.family_name,  suffix: g_contact.name_suffix
     }.select { |_, v| v.present? }
-
-    # First from my contacts
-    person = account_list.people.includes(:google_contacts).where('google_contacts.remote_id' => google_contact.id).first
-
-    # If we can't find a contact with this google account, see if we have a contact with the same name
-    # There can be multiple Google Contacts for a particular person (e.g. one for phone, one for email),
-    unless person
-      person = account_list.people.where('people.first_name' => google_contact.given_name,
-                                         'people.last_name' => google_contact.family_name).first
-    end
 
     if person
       person.update_attributes(person_attributes)
+      person
     else
-      begin
-        person = Person.create!(person_attributes)
-      rescue ActiveRecord::RecordInvalid
-        raise person_attributes.inspect
+      Person.create!(person_attributes)
+    end
+  end
+
+  def update_person_emails(person, g_contact)
+    num_emails_before_import = person.email_addresses.count
+    g_contact.emails_full.each do |import_email|
+      email = { email: import_email[:address], location: import_email[:rel] }
+      if import_email[:primary] && (@import.override || num_emails_before_import == 0)
+        person.email_addresses.update_all primary: false
+        email[:primary] = true
       end
+      person.email_address = email
     end
+  end
 
-    unless person.google_contacts.pluck(:remote_id).include?(google_contact.identifier.to_i)
-      person.google_contacts.create!(remote_id: google_contact.id)
+  def update_person_phones(person, g_contact)
+    num_phones_before_import = person.phone_numbers.count
+    g_contact.phone_numbers_full.each do |import_phone|
+      phone = { number: import_phone[:number], location: import_phone[:rel] }
+      if import_phone[:primary] && (@import.override || num_phones_before_import == 0)
+        person.phone_numbers.update_all primary: false
+        phone[:primary] = true
+      end
+      person.phone_number = phone
     end
-
-    # add phone number and email if available
-    google_contact.emails_full.each do |email_fields|
-      person.email_address = {
-        email: email_fields[:address],
-        location: email_fields[:rel],
-        primary: email_fields[:primary]
-      }
-    end
-    google_contact.phone_numbers_full.each do |number_fields|
-      person.phone_number = {
-        number: number_fields[:number],
-        location: number_fields[:rel],
-        primary: number_fields[:primary]
-      }
-    end
-    person.save
-
-    person
   end
 end
