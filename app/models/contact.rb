@@ -243,28 +243,24 @@ class Contact < ActiveRecord::Base
       other.messages.update_all(contact_id: id)
 
       other.contact_people.each do |r|
-        unless contact_people.where(person_id: r.person_id).first
-          r.update_attributes(contact_id: id)
-        end
+        next if contact_people.where(person_id: r.person_id).first
+        r.update_attributes(contact_id: id)
       end
 
       other.contact_donor_accounts.each do |other_contact_donor_account|
-        unless donor_accounts.map(&:account_number).include?(other_contact_donor_account.donor_account.account_number)
-          other_contact_donor_account.update_column(:contact_id, id)
-        end
+        next if donor_accounts.map(&:account_number).include?(other_contact_donor_account.donor_account.account_number)
+        other_contact_donor_account.update_column(:contact_id, id)
       end
 
       other.activity_contacts.each do |other_activity_contact|
-        unless activities.include?(other_activity_contact.activity)
-          other_activity_contact.update_column(:contact_id, id)
-        end
+        next if activities.include?(other_activity_contact.activity)
+        other_activity_contact.update_column(:contact_id, id)
       end
       update_uncompleted_tasks_count
 
       other.addresses.each do |other_address|
-        unless addresses.find { |address| address.equal_to? other_address }
-          other_address.update_column(:addressable_id, id)
-        end
+        next if addresses.find { |address| address.equal_to? other_address }
+        other_address.update_column(:addressable_id, id)
       end
 
       other.notifications.update_all(contact_id: id)
@@ -282,9 +278,8 @@ class Contact < ActiveRecord::Base
        :pledge_frequency, :pledge_start_date, :next_ask, :never_ask, :likely_to_give,
        :church_name, :send_newsletter, :direct_deposit, :magazine, :last_activity, :last_appointment,
        :last_letter, :last_phone_call, :last_pre_call, :last_thank, :prayer_letters_id].each do |field|
-         if send(field).blank? && other.send(field).present?
-           send("#{field}=".to_sym, other.send(field))
-         end
+         next unless send(field).blank? && other.send(field).present?
+         send("#{field}=".to_sym, other.send(field))
        end
 
        # If one of these is marked as a finanical partner, we want that status
@@ -337,11 +332,10 @@ class Contact < ActiveRecord::Base
     ordered_addresses.reload
     ordered_addresses.each do |address|
       other_address = ordered_addresses.find { |a| a.id != address.id && a.equal_to?(address) }
-      if other_address
-        address.merge(other_address)
-        merge_addresses
-        return
-      end
+      next unless other_address
+      address.merge(other_address)
+      merge_addresses
+      return
     end
   end
 
@@ -356,11 +350,10 @@ class Contact < ActiveRecord::Base
                                          p.last_name == person.last_name &&
                                          p.id != person.id
       }
-      if other_people
-        other_people.each do |other_person|
-          person.merge(other_person)
-          merged_people << other_person
-        end
+      next unless other_people
+      other_people.each do |other_person|
+        person.merge(other_person)
+        merged_people << other_person
       end
     end
     people.reload
@@ -370,13 +363,13 @@ class Contact < ActiveRecord::Base
   def merge_donor_accounts
     # Merge donor accounts that have the same number
     donor_accounts.reload.each do |account|
-      if other = donor_accounts.find { |da| da.id != account.id &&
-                                            da.account_number == account.account_number
-         }
-        account.merge(other)
-        merge_donor_accounts
-        return
-      end
+      other = donor_accounts.find { |da| da.id != account.id &&
+                                         da.account_number == account.account_number
+      }
+      next unless other
+      account.merge(other)
+      merge_donor_accounts
+      return
     end
   end
 
@@ -407,9 +400,8 @@ class Contact < ActiveRecord::Base
   def delete_people
     people.each do |person|
       # If this person isn't linked to any other contact, delete them
-      unless account_list.people.where("people.id = #{person.id} AND contact_people.contact_id <> #{id}").first
-        person.destroy
-      end
+      next if account_list.people.where("people.id = #{person.id} AND contact_people.contact_id <> #{id}").any?
+      person.destroy
     end
 
     contact_people.destroy_all

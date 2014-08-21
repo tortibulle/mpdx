@@ -104,11 +104,10 @@ class TntImport
 
       @tnt_contacts[row['id']] = contact
 
-      if true?(row['IsOrganization'])
-        # organization
-        donor_accounts.each do |donor_account|
-          add_or_update_company(row, donor_account)
-        end
+      next unless true?(row['IsOrganization'])
+      # organization
+      donor_accounts.each do |donor_account|
+        add_or_update_company(row, donor_account)
       end
     end
 
@@ -140,21 +139,16 @@ class TntImport
         subject: row['Description'],
         start_at: DateTime.parse(row['TaskDate'] + ' ' + DateTime.parse(row['TaskTime']).strftime('%I:%M%p'))
       }
-      if task.save
-        # Add any notes as a comment
-        if row['Notes'].present?
-          task.activity_comments.create(body: row['Notes'].strip)
-        end
-
-        tnt_tasks[row['id']] = task
-      end
+      next unless task.save
+      # Add any notes as a comment
+      task.activity_comments.create(body: row['Notes'].strip) if row['Notes'].present?
+      tnt_tasks[row['id']] = task
     end
 
     # Add contacts to tasks
     Array.wrap(xml['TaskContact']['row']).each do |row|
-      if tnt_contacts[row['ContactID']] && tnt_tasks[row['TaskID']]
-        tnt_tasks[row['TaskID']].contacts << tnt_contacts[row['ContactID']] unless tnt_tasks[row['TaskID']].contacts.include? tnt_contacts[row['ContactID']]
-      end
+      next unless tnt_contacts[row['ContactID']] && tnt_tasks[row['TaskID']]
+      tnt_tasks[row['TaskID']].contacts << tnt_contacts[row['ContactID']] unless tnt_tasks[row['TaskID']].contacts.include? tnt_contacts[row['ContactID']]
     end
 
     tnt_tasks
@@ -176,22 +170,17 @@ class TntImport
         completed: true,
         result: lookup_history_result(row['HistoryResultID'])
       }
-      if task.save
-        # Add any notes as a comment
-        if row['Notes'].present?
-          task.activity_comments.create(body: row['Notes'].strip)
-        end
-
-        tnt_history[row['id']] = task
-      end
+      next unless task.save
+      # Add any notes as a comment
+      task.activity_comments.create(body: row['Notes'].strip) if row['Notes'].present?
+      tnt_history[row['id']] = task
     end
 
     # Add contacts to tasks
     Array.wrap(xml['HistoryContact']['row']).each do |row|
-      if tnt_contacts[row['ContactID']] && tnt_history[row['HistoryID']]
-        Retryable.retryable times: 3, sleep: 1 do
-          tnt_history[row['HistoryID']].contacts << tnt_contacts[row['ContactID']] unless tnt_history[row['HistoryID']].contacts.include? tnt_contacts[row['ContactID']]
-        end
+      next unless tnt_contacts[row['ContactID']] && tnt_history[row['HistoryID']]
+      Retryable.retryable times: 3, sleep: 1 do
+        tnt_history[row['HistoryID']].contacts << tnt_contacts[row['ContactID']] unless tnt_history[row['HistoryID']].contacts.include? tnt_contacts[row['ContactID']]
       end
     end
 
@@ -426,29 +415,26 @@ class TntImport
       state = row["#{location}State"]
       postal_code = row["#{location}PostalCode"]
       country = row["#{location}Country"] == 'United States of America' ? 'United States' : row["#{location}Country"]
-      if [street, city, state, postal_code].any?(&:present?)
-        primary_address = false
-        primary_address = row['MailingAddressType'].to_i == (i + 1) if override
-        if primary_address && contact
-          contact.addresses.each do |address|
-            unless address.street == street && address.city == city && address.state == state && address.postal_code == postal_code && address.country == country
-              address.primary_mailing_address = false
-              address.save
-            end
-          end
+      next unless [street, city, state, postal_code].any?(&:present?)
+      primary_address = false
+      primary_address = row['MailingAddressType'].to_i == (i + 1) if override
+      if primary_address && contact
+        contact.addresses.each do |address|
+          next if address.street == street && address.city == city && address.state == state && address.postal_code == postal_code && address.country == country
+          address.primary_mailing_address = false
+          address.save
         end
-        addresses << {
-          street: street,
-          city: city,
-          state: state,
-          postal_code: postal_code,
-          country: country,
-          location: location,
-          primary_mailing_address: primary_address
-        }
       end
+      addresses << {
+        street: street,
+        city: city,
+        state: state,
+        postal_code: postal_code,
+        country: country,
+        location: location,
+        primary_mailing_address: primary_address
+      }
     end
-
     addresses
   end
 end
