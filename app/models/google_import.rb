@@ -12,14 +12,14 @@ class GoogleImport
     begin
       google_account.update_column(:downloading, true)
       import_contacts(google_account)
+      google_account.update_column(:last_download, Time.now)
     ensure
       google_account.update_column(:downloading, false)
-      google_account.update_column(:last_download, Time.now)
     end
   end
 
   def import_contacts(google_account)
-    if @import.import_by_group
+    if @import.import_by_group?
       @import.groups.each do |group_id|
         import_contacts_batch(google_account.contacts_for_group(group_id),
                               @import.tags + ',' + @import.group_tags[group_id])
@@ -76,7 +76,7 @@ class GoogleImport
       location: google_address_rel_to_location(google_address[:rel])
     }
 
-    if google_address[:primary] && (@import.override || contact.addresses.count == 0)
+    if google_address[:primary] && (@import.override? || contact.addresses.count == 0)
       contact.addresses.each { |non_primary| non_primary.update_attribute(:primary_mailing_address, false) }
       address[:primary_mailing_address] = true
     end
@@ -118,7 +118,7 @@ class GoogleImport
     }.select { |_, v| v.present? }
 
     if person
-      person.update_attributes(person_attributes) if @import.override
+      person.update_attributes(person_attributes) if @import.override?
       person
     else
       Person.create!(person_attributes)
@@ -129,7 +129,7 @@ class GoogleImport
     num_emails_before_import = person.email_addresses.count
     g_contact.emails_full.each do |import_email|
       email = { email: import_email[:address], location: import_email[:rel] }
-      if import_email[:primary] && (@import.override || num_emails_before_import == 0)
+      if import_email[:primary] && (@import.override? || num_emails_before_import == 0)
         person.email_addresses.update_all primary: false
         email[:primary] = true
       end
@@ -141,7 +141,7 @@ class GoogleImport
     num_phones_before_import = person.phone_numbers.count
     g_contact.phone_numbers_full.each do |import_phone|
       phone = { number: import_phone[:number], location: import_phone[:rel] }
-      if import_phone[:primary] && (@import.override || num_phones_before_import == 0)
+      if import_phone[:primary] && (@import.override? || num_phones_before_import == 0)
         person.phone_numbers.update_all primary: false
         phone[:primary] = true
       end
