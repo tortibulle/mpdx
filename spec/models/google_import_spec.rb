@@ -16,7 +16,7 @@ describe GoogleImport do
   end
 
   describe 'when importing contacts' do
-    it 'should match an existing person on my list' do
+    it 'matches an existing person on my list' do
       contact = create(:contact, account_list: @account_list)
       person = create(:person)
       contact.people << person
@@ -26,7 +26,7 @@ describe GoogleImport do
       }.should_not change(Contact, :count)
     end
 
-    it 'should create a new contact for someone not on my list and ignore contact without first name' do
+    it 'creates a new contact for someone not on my list and ignore contact without first name' do
       # note the json file has a blank contact record which should be ignored, so the count changes by 1 only
       -> {
         -> {
@@ -36,7 +36,7 @@ describe GoogleImport do
       }.should change(Contact, :count).by(1)
     end
 
-    it 'should add tags from the import' do
+    it 'adds tags from the import' do
       @google_import.should_receive(:create_or_update_person).and_return(create(:person))
 
       @import.update_column(:tags, 'hi, mom')
@@ -52,7 +52,7 @@ describe GoogleImport do
                                        id: Time.now.to_i.to_s)
     end
 
-    it 'should update the person if they already exist by google remote_id if override set' do
+    it 'updates the person if they already exist by google remote_id if override set' do
       @import.override = true
       contact = create(:contact, account_list: @account_list)
       person = create(:person, first_name: 'Not-John')
@@ -64,7 +64,7 @@ describe GoogleImport do
       }.should_not change(Person, :count)
     end
 
-    it 'should not create a new person if their name matches' do
+    it 'does not create a new person if their name matches' do
       contact = create(:contact, account_list: @account_list)
       contact.people << create(:person, last_name: 'Doe')
       contact.save
@@ -73,7 +73,7 @@ describe GoogleImport do
       }.should_not change(Person, :count)
     end
 
-    it 'should create a person and master person if we can\'t find a match' do
+    it 'creates a person and master person if we can\'t find a match' do
       -> {
         -> {
           @google_import.send(:create_or_update_person, @google_contact)
@@ -127,7 +127,7 @@ describe GoogleImport do
       expect(phone.primary).to be_true
     end
 
-    it 'should import correct person data if no people exist and be the same for repeat imports' do
+    it 'imports correct person data if no people exist and be the same for repeat imports' do
       @google_import.send(:import)
       check_imported_data
 
@@ -152,7 +152,7 @@ describe GoogleImport do
       @contact.people << @person
     end
 
-    it 'should make imported phone/email/address primary if set to override (and marked as primary in imported data)' do
+    it 'makes imported phone/email/address primary if set to override (and marked as primary in imported data)' do
       @import.override = true
       @google_import.send(:import)
 
@@ -164,7 +164,7 @@ describe GoogleImport do
       expect(@person.primary_phone_number.number).to eq('+11233345158')
     end
 
-    it 'should not make imported phone/email/address primary if not set to override' do
+    it 'does not not make imported phone/email/address primary if not set to override' do
       @import.override = false
       @google_import.send(:import)
 
@@ -187,7 +187,7 @@ describe GoogleImport do
       contact.people << @person_already_imported
     end
 
-    it 'should update name fields if set to override' do
+    it 'updates name fields if set to override' do
       @import.override = true
       @google_import.send(:import)
       @person_already_imported.reload
@@ -198,7 +198,7 @@ describe GoogleImport do
       expect(@person_already_imported.suffix).to eq('III')
     end
 
-    it 'should not update name fields if not set to override' do
+    it 'does not not update name fields if not set to override' do
       @import.override = false
       @google_import.send(:import)
       @person_already_imported.reload
@@ -211,7 +211,7 @@ describe GoogleImport do
   end
 
   describe 'import by group' do
-    it 'should do nothing if no groups specified' do
+    it 'does nothing if no groups specified' do
       @import.import_by_group = true
       @import.save
       -> {
@@ -219,7 +219,7 @@ describe GoogleImport do
       }.should_not change(Contact, :count)
     end
 
-    it 'should import a specified group' do
+    it 'imports a specified group' do
       @import.import_by_group = true
       group_url = 'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/6'
       @import.groups = [group_url]
