@@ -77,7 +77,7 @@ class GoogleImport
     }
 
     if google_address[:primary] && (@import.override? || contact.addresses.count == 0)
-      contact.addresses.each { |non_primary| non_primary.update_attribute(:primary_mailing_address, false) }
+      contact.addresses.each { |non_primary| non_primary.update(primary_mailing_address: false) }
       address[:primary_mailing_address] = true
     end
 
@@ -118,7 +118,7 @@ class GoogleImport
     }.select { |_, v| v.present? }
 
     if person
-      person.update_attributes(person_attributes) if @import.override?
+      person.update(person_attributes) if @import.override?
       person
     else
       Person.create!(person_attributes)
