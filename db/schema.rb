@@ -392,7 +392,7 @@ ActiveRecord::Schema.define(version: 20140825144750) do
     t.string  "calendar_id"
     t.string  "calendar_name"
     t.boolean "email_integration",     default: false, null: false
-    t.boolean "contacts_integration"
+    t.boolean "contacts_integration",  default: false, null: false
   end
 
   add_index "google_integrations", ["account_list_id"], name: "index_google_integrations_on_account_list_id", using: :btree
