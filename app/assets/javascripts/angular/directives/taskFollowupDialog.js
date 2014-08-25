@@ -4,10 +4,6 @@ angular.module('mpdxApp')
             restrict: 'E',
             templateUrl: '/templates/tasks/followupDialog.html',
             controller: function ($scope, api) {
-                api.call('get','appeals?account_list_id=' + (window.current_account_list_id || ''), {}, function(data) {
-                    console.log(data);
-                }, null);
-
                 $scope.logTask = function(formData) {
                     api.call('post', 'tasks/?account_list_id=' + window.current_account_list_id, {
                         task: {
