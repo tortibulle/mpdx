@@ -1,9 +1,7 @@
 class AppealSerializer < ActiveModel::Serializer
   embed :ids, include: true
   #has_many :contacts
-  ATTRIBUTES = [:id, :name, :amount, :description, :end_date]
-  attributes(*ATTRIBUTES)
+  ATTRIBUTES = [:name, :amount, :description, :end_date, :contact_ids]
 
-  attribute :contact_ids, key: :contacts
-  attribute :donations, key: :donations
+  attributes(*ATTRIBUTES)
 end
