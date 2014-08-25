@@ -98,7 +98,7 @@ class GoogleImport
     person = create_or_update_person_basic_info(g_contact)
 
     unless person.google_contacts.pluck(:remote_id).include?(g_contact.id)
-      person.google_contacts.create!(remote_id: g_contact.id)
+      person.google_contacts.create!(remote_id: g_contact.id, source_google_account_id: @import.source_account_id)
     end
 
     update_person_emails(person, g_contact)
