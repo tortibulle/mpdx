@@ -17,6 +17,9 @@ class ImportsController < ApplicationController
   private
 
   def import_params
-    params.require(:import).permit(:source, :source_account_id, :file, :tags, :override)
+    group_tags = params.require(:import).fetch(:group_tags, nil).try(:permit!)
+    params.require(:import)
+      .permit(:source, :source_account_id, :file, :tags, :override, :import_by_group, groups: [])
+      .merge(group_tags: group_tags)
   end
 end

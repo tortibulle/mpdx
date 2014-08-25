@@ -32,6 +32,16 @@ GIT
       mail (>= 2.2.1)
 
 GIT
+  remote: https://github.com/CruGlobal/google_contacts_api
+  revision: b3172fea04b4fcd4206e02a70441257d4590e41e
+  specs:
+    google_contacts_api (0.4.0)
+      activesupport
+      hashie
+      i18n
+      json
+
+GIT
   remote: http://github.com/CruGlobal/country_select.git
   revision: 1ac18d07568b2a94b45818ae107bc3f08965301b
   specs:
@@ -217,11 +227,6 @@ GEM
       retriable (>= 1.4)
       signet (>= 0.5.0)
       uuidtools (>= 2.1.0)
-    google_contacts_api (0.3.3)
-      activesupport
-      hashie
-      i18n
-      json
     google_timezone (0.0.3)
     growl (1.0.3)
     guard (2.6.1)
@@ -249,7 +254,7 @@ GEM
       multi_xml (>= 0.5.2)
     httpauth (0.2.1)
     httpclient (2.3.4.1)
-    i18n (0.6.9)
+    i18n (0.6.11)
     inflecto (0.0.2)
     iniparse (1.1.6)
     ipaddress (0.8.0)
@@ -299,7 +304,7 @@ GEM
     minitest (4.7.5)
     mock_redis (0.13.2)
     mono_logger (1.1.0)
-    multi_json (1.10.0)
+    multi_json (1.10.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
     net-scp (1.2.1)
@@ -538,7 +543,7 @@ GEM
       eventmachine (>= 0.12.6)
       rack (>= 1.0.0)
     thor (0.19.1)
-    thread_safe (0.3.3)
+    thread_safe (0.3.4)
     tilt (1.4.1)
     timers (1.1.0)
     treetop (1.4.15)
@@ -547,7 +552,7 @@ GEM
     twitter_cldr (2.4.3)
       json
       tzinfo
-    tzinfo (0.3.39)
+    tzinfo (0.3.41)
     uglifier (2.4.0)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
@@ -616,7 +621,7 @@ DEPENDENCIES
   global_phone_dbgen
   gmail!
   google-api-client
-  google_contacts_api
+  google_contacts_api!
   google_timezone
   growl
   guard-rspec

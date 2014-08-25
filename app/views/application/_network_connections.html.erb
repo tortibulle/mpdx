@@ -1,49 +1,123 @@
 <div class="network_connections">
   <% current_user.send("#{provider}_accounts".to_sym).each do |account| %>
-    <div class="account_single <%= 'error_element' if account.try(:valid_credentials) == false %>" 
-         data-behavior="account" id="<%= provider%>-account-<%= account.id %>">
-      <div class="actions">
-        <% if provider == 'organization' %>
-          <%= link_to(_('edit'), edit_person_organization_account_path(account, format: :js), class: "edit ico ico_edit no-new-tab",
-                      data: {behavior: "edit_#{provider}_account"}) %>
-        <% else %>
-          <%= link_to(_('delete'), account_path(account, provider: provider), method: :delete, :class => "inlineaction delete",
-                      data: { confirm: _('Are you sure you want to remove this connection?') }) %>
-        <% end %>
-      </div>
-      <span class="account_name"><%= account %></span>
-
-      <% case provider %>
-      <% when 'google' %>
-        <% if $rollout.active?(:google_integration, current_account_list) %>
-          <% account.google_integration(current_account_list).tap do |google_integration| %>
-            <% link_text = _('Configure synchronization with this connection') %>
-            <% if google_integration %>
-              <%= link_to(link_text, google_integration_path(google_integration)) %>
-            <% else %>
-              <%= link_to(link_text, google_integrations_path(google_account_id: account.id), method: :post) %>
-            <% end %>
+      <div class="account_single <%= 'error_element' if account.try(:valid_credentials) == false %>"
+           data-behavior="account" id="<%= provider%>-account-<%= account.id %>">
+        <div class="actions">
+          <% if provider == 'organization' %>
+              <%= link_to(_('edit'), edit_person_organization_account_path(account, format: :js), class: "edit ico ico_edit no-new-tab",
+                          data: {behavior: "edit_#{provider}_account"}) %>
+          <% else %>
+              <%= link_to(_('delete'), account_path(account, provider: provider), method: :delete, :class => "inlineaction delete",
+                          data: { confirm: _('Are you sure you want to remove this connection?') }) %>
           <% end %>
-        <% end %>
-      <% when 'facebook' %>
-        <% if account.downloading? %>
-          <%= _('Contacts are currently being imported') %>
-        <% else %>
-          <div class="importoptions formstyles" data-behavior="import_options" style="display:none">
-            <%= form_for Import.new(source: provider, source_account_id: account.id) do |f| %>
-              <%= f.hidden_field :source %>
-              <%= f.hidden_field :source_account_id %>
-              <div class="importtags">
-                <%= f.text_field :tags, placeholder: _('Add tags to these contacts') %>
-              </div>
-              <a href="#" class="btn btngreen" data-behavior="import_button"><%= _('Import') %></a>
+        </div>
+        <span class="account_name"><%= account %></span>
+
+        <% case provider %>
+        <% when 'google' %>
+            <% if $rollout.active?(:google_integration, current_account_list) %>
+                <% account.google_integration(current_account_list).tap do |google_integration| %>
+                    <% link_text = _('Configure synchronization') %>
+                    <% if google_integration %>
+                        <%= link_to(link_text, google_integration_path(google_integration), class: 'btn smallbtn') %>
+                    <% else %>
+                        <%= link_to(link_text, google_integrations_path(google_account_id: account.id), method: :post, class: 'btn smallbtn') %>
+                    <% end %>
+                <% end %>
             <% end %>
-          </div>
-          <div><a href="#" class="btn smallbtn" data-behavior="show_import"><%= _('Import Contacts') %></a></div>
+
+            <% if $rollout.active?(:google_contacts_import, current_account_list) %>
+                <br/><br/>
+                <div class="importoptions formstyles" data-behavior="import_options" style="display:none">
+                  <h3><%= _('Import Google Contacts') %></h3>
+
+                  <%= form_for Import.new(source: provider, source_account_id: account.id) do |f| %>
+                      <div class="field radiocheck">
+                        <%= f.radio_button(:import_by_group, 'false') %>
+                        <%= f.label(:import_by_group_false, _('Import all contacts')) %>
+                      </div>
+
+                      <div class="field radiocheck">
+                        <%= f.radio_button(:import_by_group, 'true', checked: true) %>
+                        <%= f.label(:import_by_group_true, _('Only import contacts from certain groups')) %>
+                      </div>
+
+                      <table>
+                        <tr>
+                          <th>Contact group</th>
+                          <th>Tags for group</th>
+                        </tr>
+                        <% account.contact_groups.each_with_index do |group, index| %>
+                            <tr>
+                              <td class="google_import_group">
+                                <div class="field radiocheck google_import_group">
+                                  <%= check_box_tag 'import[groups][]', group.id, false,
+                                                    id: "group_#{index}", class: 'import_by_group'  %>
+                                  <%= label 'group', index, group.title.gsub('System Group: ','') %>
+                                </div>
+                              </td>
+                              <td class="google_import_tags">
+                                <%= text_field_tag "import[group_tags[#{group.id}]]",
+                                                   group.title.gsub('System Group: ','').downcase.gsub(' ','-'),
+                                                   class: 'import_by_group import_contact_tags' %>
+                              </td>
+                            </tr>
+                        <% end %>
+                      </table>
+
+                      <%= f.hidden_field :source %>
+                      <%= f.hidden_field :source_account_id %>
+
+                      <br/>
+                      <div class="importtags">
+                        Tags for all imported Google contacts:
+                        <%= f.text_field :tags, class: 'import_contact_tags' %>
+                      </div>
+
+                      <div class="field radiocheck">
+                        <%= f.radio_button :override, false %>
+                        <%= f.label 'override_false', _('Only add data to matched contact records when the current field is blank.') %>
+                      </div>
+                      <div class="field radiocheck">
+                        <%= f.radio_button :override, true %>
+                        <%= f.label 'override_true', _('Override existing contact fields with data in the uploaded file.') %>
+                      </div>
+
+                      <a href="#" class="btn btngreen" data-behavior="import_button"><%= _('Import') %></a>
+                      <script>
+                        <%= render 'tags_input.js', input_selector: '.import_contact_tags',
+                                         tags: current_account_list.contact_tags  %>
+
+                        var toggle_import_by_group_disabled = function() {
+                            $('.import_by_group').prop('disabled', $('#import_import_by_group_false').is(':checked'));
+                        }
+                        $('#import_import_by_group_false').change(toggle_import_by_group_disabled);
+                        $('#import_import_by_group_true').change(toggle_import_by_group_disabled);
+                      </script>
+                  <% end %>
+                </div>
+                <div><a href="#" class="btn smallbtn" data-behavior="show_import"><%= _('Import Contacts') %></a></div>
+            <% end %>
+
+        <% when 'facebook' %>
+            <% if account.downloading? %>
+                <%= _('Contacts are currently being imported') %>
+            <% else %>
+                <div class="importoptions formstyles" data-behavior="import_options" style="display:none">
+                  <%= form_for Import.new(source: provider, source_account_id: account.id) do |f| %>
+                      <%= f.hidden_field :source %>
+                      <%= f.hidden_field :source_account_id %>
+                      <div class="importtags">
+                        <%= f.text_field :tags, placeholder: _('Add tags to these contacts') %>
+                      </div>
+                      <a href="#" class="btn btngreen" data-behavior="import_button"><%= _('Import') %></a>
+                  <% end %>
+                </div>
+                <div><a href="#" class="btn smallbtn" data-behavior="show_import"><%= _('Import Contacts') %></a></div>
+            <% end %>
+
         <% end %>
 
-      <% end %>
-
-    </div>
+      </div>
   <% end %>
 </div>
