@@ -1,6 +1,6 @@
 class Api::V1::AppealsController < Api::V1::BaseController
   def index
-    render json: appeal, callback: params[:callback]
+    render json: appeals, callback: params[:callback]
   end
 
   def update
@@ -10,9 +10,8 @@ class Api::V1::AppealsController < Api::V1::BaseController
 
   private
 
-  def appeal
+  def appeals
     al = AccountList.find(params[:account_list_id])
-    appeals = al.appeals.includes(:contacts)
-    return appeals
+    al.appeals.includes(:contacts)
   end
 end
