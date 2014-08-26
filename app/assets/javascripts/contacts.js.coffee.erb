@@ -232,16 +232,6 @@ $ ->
         }
         false
 
-
-      $('.contacts_actions').hoverIntent {
-        over: ->{},
-        timeout: 500,
-        out: ->
-          $('.action_list', $(this)).hide()
-          $('a.actionbtn', $(this)).removeClass('on')
-      }
-
-
     if $('#contacts_show')[0]?
       # Merge people stuff
       $(document).on 'click', '.js-merge_people', ->
