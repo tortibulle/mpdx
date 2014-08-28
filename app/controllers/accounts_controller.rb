@@ -16,15 +16,17 @@ class AccountsController < ApplicationController
   def create
     provider = "Person::#{params[:provider].camelcase}Account".constantize
 
-    sign_out(current_user) if user_signed_in?
+    sign_out(current_user) if user_signed_in? && params['origin'] == 'login'
 
-    session[:signed_in_with] = params[:provider]
-    sign_in(User.from_omniauth(provider, request.env['omniauth.auth']))
-    session[:user_return_to] ||= '/'
+    unless user_signed_in?
+      session[:signed_in_with] = params[:provider]
+      sign_in(User.from_omniauth(provider, request.env['omniauth.auth']))
+      session[:user_return_to] ||= '/'
 
-    # queue up data imports
-    current_user.queue_imports
-    current_account_list.async(:update_geocodes) if current_account_list
+      # queue up data imports
+      current_user.queue_imports
+      current_account_list.async(:update_geocodes) if current_account_list
+    end
 
     # Connect this account to the user
     @account = provider.find_or_create_from_auth(request.env['omniauth.auth'], current_user)
