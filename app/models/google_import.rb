@@ -182,10 +182,10 @@ class GoogleImport
         person.websites.update_all primary: false
         import_website[:primary] = true
         at_least_one_primary = true
-      end
-
-      if !at_least_one_primary && index == g_contact.websites.length - 1
+      elsif !at_least_one_primary && index == g_contact.websites.length - 1
         import_website[:primary] = true
+      else
+        import_website[:primary] = false
       end
 
       person.websites << Person::Website.new(url: import_website[:href], primary: import_website[:primary])

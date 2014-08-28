@@ -163,6 +163,7 @@ describe GoogleImport do
       @person = build(:person, last_name: 'Doe')
       @person.email_address = { email: 'existing_primary@example.com', primary: true }
       @person.phone_number = { number: '474-747-4744', primary: true }
+      @person.websites << Person::Website.create(url: 'original.example.com', primary: true)
       @person.save
       @contact.people << @person
     end
@@ -177,6 +178,7 @@ describe GoogleImport do
       @person.reload
       expect(@person.primary_email_address.email).to eq('johnsmith@example.com')
       expect(@person.primary_phone_number.number).to eq('+11233345158')
+      expect(@person.website.url).to eq('www.example.com')
     end
 
     it 'does not not make imported phone/email/address primary if not set to override' do
@@ -189,6 +191,7 @@ describe GoogleImport do
       @person.reload
       expect(@person.primary_email_address.email).to eq('existing_primary@example.com')
       expect(@person.primary_phone_number.number).to eq('+14747474744')
+      expect(@person.website.url).to eq('original.example.com')
     end
   end
 
