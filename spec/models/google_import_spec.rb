@@ -48,8 +48,8 @@ describe GoogleImport do
   describe 'create_or_update_person' do
     before do
       @google_contact = OpenStruct.new(given_name: 'John', family_name: 'Doe',
-                                       emails_full: [], phone_numbers_full: [],
-                                       id: Time.now.to_i.to_s)
+                                       emails_full: [], phone_numbers_full: [], organizations: [],
+                                       websites: [], id: Time.now.to_i.to_s)
     end
 
     it 'updates the person if they already exist by google remote_id if override set' do
@@ -98,6 +98,21 @@ describe GoogleImport do
       expect(person.middle_name).to eq('Henry')
       expect(person.title).to eq('Mr')
       expect(person.suffix).to eq('III')
+      expect(person.birthday_year).to eq(1988)
+      expect(person.birthday_month).to eq(5)
+      expect(person.birthday_day).to eq(12)
+      expect(person.employer).to eq('Example, Inc')
+      expect(person.occupation).to eq('Worker Person')
+
+      expect(person.websites.to_a.count).to eq(2)
+      website1 = person.websites.order(:url).first
+      expect(website1.url).to eq('blog.example.com')
+      expect(website1.primary).to be_false
+      website2 = person.websites.order(:url).last
+      expect(website2.url).to eq('www.example.com')
+      expect(website2.primary).to be_true
+
+      expect(contact.notes).to eq('Notes here')
 
       expect(contact.addresses.to_a.count).to eq(2)
       address1 = contact.addresses.order(:postal_code).first
@@ -177,20 +192,22 @@ describe GoogleImport do
     end
   end
 
-  describe 'import override behavior for name fields' do
+  describe 'import override behavior for basic fields' do
     before do
-      contact = create(:contact, account_list: @account_list)
+      @contact_already_imported = create(:contact, account_list: @account_list, notes: 'Original notes')
       @person_already_imported = create(:person, first_name: 'Not-John', last_name: 'Not-Doe',
                                                  middle_name: 'Not-Henry', title: 'Not-Mr', suffix: 'Not-III')
       remote_id = 'http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/6b70f8bb0372c'
       @person_already_imported.google_contacts << create(:google_contact, remote_id: remote_id)
-      contact.people << @person_already_imported
+      @contact_already_imported.people << @person_already_imported
     end
 
-    it 'updates name fields if set to override' do
+    it 'updates fields if set to override' do
       @import.override = true
       @google_import.send(:import)
       @person_already_imported.reload
+      @contact_already_imported.reload
+      expect(@contact_already_imported.notes).to eq('Notes here')
       expect(@person_already_imported.first_name).to eq('John')
       expect(@person_already_imported.last_name).to eq('Doe')
       expect(@person_already_imported.middle_name).to eq('Henry')
@@ -198,15 +215,26 @@ describe GoogleImport do
       expect(@person_already_imported.suffix).to eq('III')
     end
 
-    it 'does not not update name fields if not set to override' do
+    it 'does not not update fields if not set to override' do
       @import.override = false
       @google_import.send(:import)
       @person_already_imported.reload
+      @contact_already_imported.reload
+      expect(@contact_already_imported.notes).to eq('Original notes')
       expect(@person_already_imported.first_name).to eq('Not-John')
       expect(@person_already_imported.last_name).to eq('Not-Doe')
       expect(@person_already_imported.middle_name).to eq('Not-Henry')
       expect(@person_already_imported.title).to eq('Not-Mr')
       expect(@person_already_imported.suffix).to eq('Not-III')
+    end
+
+    it 'updates notes fields if they were blank even if set to not override' do
+      @contact_already_imported.update notes: ''
+      @import.override = false
+      @google_import.send(:import)
+      @person_already_imported.reload
+      @contact_already_imported.reload
+      expect(@contact_already_imported.notes).to eq('Notes here')
     end
   end
 

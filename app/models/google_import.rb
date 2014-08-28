@@ -62,6 +62,7 @@ class GoogleImport
       contact = @account_list.contacts.find_or_create_by(name: name)
     end
 
+    contact.notes = g_contact.content if @import.override? || contact.notes.blank?
     contact.addresses_attributes = g_contact.addresses.map { |address| build_address(address, contact) }
     contact.tag_list.add(tags, parse: true) if tags.present?
     contact.save
@@ -103,6 +104,7 @@ class GoogleImport
 
     update_person_emails(person, g_contact)
     update_person_phones(person, g_contact)
+    update_person_websites(person, g_contact)
 
     person.save
     person
@@ -112,17 +114,38 @@ class GoogleImport
     person = (@account_list.people.includes(:google_contacts).where('google_contacts.remote_id' => g_contact.id).first ||
               @account_list.people.where(first_name: g_contact.given_name, last_name: g_contact.family_name).first)
 
-    person_attributes = {
-      title: g_contact.name_prefix, first_name: g_contact.given_name, middle_name: g_contact.additional_name,
-      last_name: g_contact.family_name,  suffix: g_contact.name_suffix
-    }.select { |_, v| v.present? }
+    person_attrs = person_attr_from_g_contact(g_contact)
 
     if person
-      person.update(person_attributes) if @import.override?
+      person.update(person_attrs.select { |k, v| v.present? && (@import.override? || person.send(k).blank?) })
       person
     else
-      Person.create!(person_attributes)
+      Person.create!(person_attrs)
     end
+  end
+
+  def person_attr_from_g_contact(g_contact)
+    attrs = {
+      title: g_contact.name_prefix,
+      first_name: g_contact.given_name,
+      middle_name: g_contact.additional_name,
+      last_name: g_contact.family_name,
+      suffix: g_contact.name_suffix,
+      birthday_day: g_contact.birthday ? g_contact.birthday[:day] : nil,
+      birthday_month: g_contact.birthday ? g_contact.birthday[:month] : nil,
+      birthday_year: g_contact.birthday ? g_contact.birthday[:year] : nil
+    }
+
+    # The Google Contacts Web UI seems to only let you add a single organization for a contact, so let's just
+    # take the first one or the one that's primary and save that to the person's employer and occupation.
+    if g_contact.organizations.length > 0
+      primary_org = g_contact.organizations.first
+      g_contact.organizations.each { |org| primary_org = org if org[:primary] }
+      attrs[:occupation] = primary_org[:org_title]
+      attrs[:employer] = primary_org[:org_name]
+    end
+
+    attrs
   end
 
   def update_person_emails(person, g_contact)
@@ -146,6 +169,26 @@ class GoogleImport
         phone[:primary] = true
       end
       person.phone_number = phone
+    end
+  end
+
+  def update_person_websites(person, g_contact)
+    num_websites_before_import = person.websites.count
+    at_least_one_primary = num_websites_before_import > 0
+    g_contact.websites.each_with_index do |import_website, index|
+      next if import_website[:href].in? person.websites.pluck(:url)
+
+      if import_website[:primary] && (@import.override? || num_websites_before_import == 0)
+        person.websites.update_all primary: false
+        import_website[:primary] = true
+        at_least_one_primary = true
+      end
+
+      if !at_least_one_primary && index == g_contact.websites.length - 1
+        import_website[:primary] = true
+      end
+
+      person.websites << Person::Website.new(url: import_website[:href], primary: import_website[:primary])
     end
   end
 end
