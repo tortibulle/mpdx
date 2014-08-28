@@ -69,6 +69,7 @@ class MailChimpAccount < ActiveRecord::Base
   end
 
   def queue_update_email(old_email, new_email)
+    return if old_email == new_email
     async(:call_mailchimp, :update_email, old_email, new_email)
   end
 
