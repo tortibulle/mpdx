@@ -39,30 +39,15 @@ describe AccountsController do
     end
 
     describe "POST 'create'" do
-      it 'creates an account' do
+      it 'signs out current user and create new user' do
         mash = Hashie::Mash.new(uid: '5', credentials: { token: 'a', expires_at: 5 }, info: { first_name: 'John', last_name: 'Doe' })
         request.env['omniauth.auth'] = mash
         -> {
           post 'create', provider: 'facebook'
-          response.should redirect_to(accounts_path)
-          @user.facebook_accounts.should include(assigns(:account))
+          response.should redirect_to(setup_path(:org_accounts))
         }.should change(Person::FacebookAccount, :count).from(0).to(1)
+        subject.current_user.should_not eq @user
       end
-
-      it 'should redirect to social accounts if the user is in setup mode' do
-        @user.update_attributes(preferences: { setup: true })
-        Person::FacebookAccount.stub(:find_or_create_from_auth)
-        post 'create', provider: 'facebook'
-        response.should redirect_to(setup_path(:social_accounts))
-      end
-
-      it 'should redirect to a stored user_return_to' do
-        session[:user_return_to] = '/foo'
-        Person::FacebookAccount.stub(:find_or_create_from_auth)
-        post 'create', provider: 'facebook'
-        response.should redirect_to('/foo')
-      end
-
     end
 
     describe "GET 'destroy'" do
