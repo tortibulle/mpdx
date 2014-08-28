@@ -30,8 +30,8 @@
       <p><%= _('Please choose your preferred <br/> method of logging in:') %></p>
 
       <div id="login_links">
-        <%= link_to(image_tag('splash/relay_logo.png'), '/auth/relay', class: "loginlink relay") %>
-        <%= link_to(image_tag('splash/key_logo.png'), '/auth/key', class: "loginlink relay") %>
+        <%= link_to(image_tag('splash/relay_logo.png'), '/auth/relay?origin=login', class: "loginlink relay") %>
+        <%= link_to(image_tag('splash/key_logo.png'), '/auth/key?origin=login', class: "loginlink relay") %>
 
       </div>
 

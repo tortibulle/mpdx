@@ -39,6 +39,16 @@ describe AccountsController do
     end
 
     describe "POST 'create'" do
+      it 'signs out current user and create new user' do
+        mash = Hashie::Mash.new(uid: '5', credentials: { token: 'a', expires_at: 5 }, info: { first_name: 'John', last_name: 'Doe' })
+        request.env['omniauth.auth'] = mash
+        -> {
+          post 'create', provider: 'facebook', origin: 'login'
+          response.should redirect_to(setup_path(:org_accounts))
+        }.should change(Person::FacebookAccount, :count).from(0).to(1)
+        subject.current_user.should_not eq @user
+      end
+
       it 'creates an account' do
         mash = Hashie::Mash.new(uid: '5', credentials: { token: 'a', expires_at: 5 }, info: { first_name: 'John', last_name: 'Doe' })
         request.env['omniauth.auth'] = mash
@@ -62,7 +72,6 @@ describe AccountsController do
         post 'create', provider: 'facebook'
         response.should redirect_to('/foo')
       end
-
     end
 
     describe "GET 'destroy'" do
