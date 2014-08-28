@@ -105,6 +105,7 @@ class GoogleImport
     update_person_emails(person, g_contact)
     update_person_phones(person, g_contact)
     update_person_websites(person, g_contact)
+    update_person_photo(person, g_contact)
 
     person.save
     person
@@ -190,5 +191,21 @@ class GoogleImport
 
       person.websites << Person::Website.new(url: import_website[:href], primary: import_website[:primary])
     end
+  end
+
+  def update_person_photo(person, g_contact)
+    photo = g_contact.photo_with_metadata
+    return unless photo
+
+    case photo[:content_type]
+    when 'image/jpeg'
+      ext = 'jpg'
+    when 'image/jpg'
+      ext = 'jpg'
+    when 'image/png'
+      ext = 'png'
+    end
+
+    person.pictures << Picture.create(image: StringIOWithPath.new(photo[:etag] + '.' + ext, photo[:data]))
   end
 end
