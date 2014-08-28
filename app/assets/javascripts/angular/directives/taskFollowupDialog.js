@@ -386,7 +386,7 @@ angular.module('mpdxApp')
 
 
                 var createThankTask = function(contactsObject){
-                    api.call('post', 'tasks/', {
+                    api.call('post', 'tasks/?account_list_id=' + window.current_account_list_id, {
                         task: {
                             start_at: $scope.followUpDialogResult.thankTask.date + ' ' + $scope.followUpDialogResult.thankTask.hour + ':' + $scope.followUpDialogResult.thankTask.min + ':00',
                             subject: $scope.followUpDialogResult.thankTask.subject,
@@ -406,7 +406,7 @@ angular.module('mpdxApp')
                 };
 
                 var createGivingTask = function(contactsObject){
-                    api.call('post', 'tasks/', {
+                    api.call('post', 'tasks/?account_list_id=' + window.current_account_list_id, {
                         task: {
                             start_at: $scope.followUpDialogResult.givingTask.date + ' ' + $scope.followUpDialogResult.givingTask.hour + ':' + $scope.followUpDialogResult.givingTask.min + ':00',
                             subject: $scope.followUpDialogResult.givingTask.subject,
@@ -426,7 +426,7 @@ angular.module('mpdxApp')
                 };
 
                 var createGenericTask = function(contactsObject, taskType){
-                    api.call('post', 'tasks/', {
+                    api.call('post', 'tasks/?account_list_id=' + window.current_account_list_id, {
                         task: {
                             start_at: $scope.followUpDialogResult.callTask.date + ' ' + $scope.followUpDialogResult.callTask.hour + ':' + $scope.followUpDialogResult.callTask.min + ':00',
                             subject: $scope.followUpDialogResult.callTask.subject,
@@ -448,7 +448,7 @@ angular.module('mpdxApp')
 
 
                 var createApptTask = function(contactsObject){
-                    api.call('post', 'tasks/', {
+                    api.call('post', 'tasks/?account_list_id=' + window.current_account_list_id, {
                         task: {
                             start_at: $scope.followUpDialogResult.apptTask.date + ' ' + $scope.followUpDialogResult.apptTask.hour + ':' + $scope.followUpDialogResult.apptTask.min + ':00',
                             subject: $scope.followUpDialogResult.apptTask.subject,
