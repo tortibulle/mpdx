@@ -1,4 +1,6 @@
 class ResearchController < ApplicationController
+  before_action :ensure_rollout
+
   def index
   end
 
@@ -14,5 +16,12 @@ class ResearchController < ApplicationController
     @other_contacts = Contact.joins(:donor_accounts)
       .where('donor_accounts.account_number' => account_numbers)
       .where.not('contacts.id' => @contact.id)
+  end
+
+  private
+
+  def ensure_rollout
+    return if $rollout.active?(:research, current_account_list)
+    fail ActionController::RoutingError.new('Not Found'), 'Research access not granted.'
   end
 end
