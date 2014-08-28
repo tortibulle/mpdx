@@ -83,6 +83,7 @@ angular.module('mpdxApp')
                         };
 
                         $scope.followUpDialogResult = {
+                            createCallTask: true,
                             callTask: {
                                 type: taskType,
                                 subject: followUpTask.subject,
