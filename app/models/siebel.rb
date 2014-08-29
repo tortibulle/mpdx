@@ -5,15 +5,6 @@ class Siebel < DataServer
   def import_profiles
     designation_profiles = []
 
-    #designation_profiles = @org.designation_profiles.where(user_id: @org_account.person_id)
-
-    # Remove any profiles this user no longer has access to
-    #designation_profiles.each do |designation_profile|
-      #unless profiles.detect { |profile| profile.name == designation_profile.name && profile.id == designation_profile.code}
-        #designation_profile.destroy
-      #end
-    #end
-
     profiles.each do |profile|
       designation_profile = Retryable.retryable do
         if profile.id
@@ -38,6 +29,15 @@ class Siebel < DataServer
 
       next if designation_profile.account_list
       AccountList.find_or_create_from_profile(designation_profile, @org_account)
+    end
+
+    # Deactivate designation profiles user no longer has access to
+    all_designation_profiles = @org.designation_profiles.where(user_id: @org_account.person_id)
+    old_profiles = all_designation_profiles - designation_profiles
+    old_profiles.each do |profile|
+      # Remove designation accounts from AccountList
+      AccountList.find_and_remove_from_profile(profile, @org_account)
+      profile.update(user_id: nil)
     end
 
     designation_profiles
@@ -131,7 +131,7 @@ class Siebel < DataServer
 
       Retryable.retryable do
         profile.designation_accounts << da unless profile.designation_accounts.include?(da)
-        da.update_attributes(extra_attributes) if extra_attributes.present?
+        da.update(extra_attributes) if extra_attributes.present?
         @designation_accounts[number] = da
       end
     end

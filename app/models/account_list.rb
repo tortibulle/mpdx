@@ -267,6 +267,22 @@ class AccountList < ActiveRecord::Base
     account_list
   end
 
+  def self.find_and_remove_from_profile(profile, org_account)
+    user = org_account.user
+    organization = org_account.organization
+    designation_numbers = profile.designation_accounts.map(&:designation_number)
+    # look for an existing account list with the same designation numbers in it
+    return unless account_list = AccountList.find_with_designation_numbers(designation_numbers, organization)
+
+    # Remove designation accounts from account_list
+    profile.designation_accounts.each do |da|
+      #TODO: check other designation profiles for this designation account
+      account_list.designation_accounts.delete(da)
+    end
+
+    account_list
+  end
+
   def merge(other)
     AccountList.transaction do
       other.designation_profiles.update_all(account_list_id: id)
