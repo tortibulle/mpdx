@@ -98,14 +98,13 @@ class GoogleImport
   def create_or_update_person(g_contact)
     person = create_or_update_person_basic_info(g_contact)
 
-    unless person.google_contacts.pluck(:remote_id).include?(g_contact.id)
-      person.google_contacts.create!(remote_id: g_contact.id)
-    end
-
     update_person_emails(person, g_contact)
     update_person_phones(person, g_contact)
     update_person_websites(person, g_contact)
-    update_person_photo(person, g_contact)
+
+    google_contact = person.google_contacts.create_with(source_google_account_id: @import.source_account_id)
+                                           .find_or_create_by(remote_id: g_contact.id)
+    update_person_picture(person, google_contact, g_contact)
 
     person.save
     person
@@ -193,19 +192,23 @@ class GoogleImport
     end
   end
 
-  def update_person_photo(person, g_contact)
-    photo = g_contact.photo_with_metadata
-    return unless photo
+  def update_person_picture(person, google_contact, g_contact_to_import)
+    # Don't update the picture of people who have a connected facebook account as that will provide their picture
+    return if person.facebook_account
 
-    case photo[:content_type]
-    when 'image/jpeg'
-      ext = 'jpg'
-    when 'image/jpg'
-      ext = 'jpg'
-    when 'image/png'
-      ext = 'png'
-    end
+    photo = g_contact_to_import.photo_with_metadata
+    return if photo.nil? || google_contact.picture_etag == photo[:tag]
 
-    person.pictures << Picture.create(image: StringIOWithPath.new(photo[:etag] + '.' + ext, photo[:data]))
+    primary = person.pictures.count == 0 || @import.override?
+    person.pictures.update_all(primary: false) if primary
+
+    image_io = StringIOWithPath.new(photo[:etag] + image_mime_to_extension(photo[:content_type]), photo[:data])
+    picture = Picture.create(image: image_io, primary: primary)
+    google_contact.update(picture_etag: photo[:etag], picture_id: picture.id)
+    person.pictures << picture
+  end
+
+  def image_mime_to_extension(mime)
+    '.' + mime.gsub('image/', '')
   end
 end

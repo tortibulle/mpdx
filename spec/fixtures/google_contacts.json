@@ -198,7 +198,8 @@
                     {
                         "href": "https://www.google.com/m8/feeds/photos/media/test.user%40cru.org/6b70f8bb0372c?v=3",
                         "type": "image/*",
-                        "rel": "http://schemas.google.com/contacts/2008/rel#photo"
+                        "rel": "http://schemas.google.com/contacts/2008/rel#photo",
+                        "gd$etag": "\"dxt2DAEZfCp7ImA-AV4zRxBoPG4UK3owXBM.\""
                     },
                     {
                         "href": "https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full/6b70f8bb0372c?v=3",
