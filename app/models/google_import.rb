@@ -62,6 +62,7 @@ class GoogleImport
       contact = @account_list.contacts.find_or_create_by(name: name)
     end
 
+    contact.notes = g_contact.content if @import.override? || contact.notes.blank?
     contact.addresses_attributes = g_contact.addresses.map { |address| build_address(address, contact) }
     contact.tag_list.add(tags, parse: true) if tags.present?
     contact.save
@@ -97,12 +98,13 @@ class GoogleImport
   def create_or_update_person(g_contact)
     person = create_or_update_person_basic_info(g_contact)
 
-    unless person.google_contacts.pluck(:remote_id).include?(g_contact.id)
-      person.google_contacts.create!(remote_id: g_contact.id, source_google_account_id: @import.source_account_id)
-    end
-
     update_person_emails(person, g_contact)
     update_person_phones(person, g_contact)
+    update_person_websites(person, g_contact)
+
+    google_contact = person.google_contacts.create_with(google_account_id: @import.source_account_id)
+                                           .find_or_create_by(remote_id: g_contact.id)
+    update_person_picture(person, google_contact, g_contact)
 
     person.save
     person
@@ -112,17 +114,38 @@ class GoogleImport
     person = (@account_list.people.includes(:google_contacts).where('google_contacts.remote_id' => g_contact.id).first ||
               @account_list.people.where(first_name: g_contact.given_name, last_name: g_contact.family_name).first)
 
-    person_attributes = {
-      title: g_contact.name_prefix, first_name: g_contact.given_name, middle_name: g_contact.additional_name,
-      last_name: g_contact.family_name,  suffix: g_contact.name_suffix
-    }.select { |_, v| v.present? }
+    person_attrs = person_attr_from_g_contact(g_contact)
 
     if person
-      person.update(person_attributes) if @import.override?
+      person.update(person_attrs.select { |k, v| v.present? && (@import.override? || person.send(k).blank?) })
       person
     else
-      Person.create!(person_attributes)
+      Person.create!(person_attrs)
     end
+  end
+
+  def person_attr_from_g_contact(g_contact)
+    attrs = {
+      title: g_contact.name_prefix,
+      first_name: g_contact.given_name,
+      middle_name: g_contact.additional_name,
+      last_name: g_contact.family_name,
+      suffix: g_contact.name_suffix,
+      birthday_day: g_contact.birthday ? g_contact.birthday[:day] : nil,
+      birthday_month: g_contact.birthday ? g_contact.birthday[:month] : nil,
+      birthday_year: g_contact.birthday ? g_contact.birthday[:year] : nil
+    }
+
+    # The Google Contacts Web UI seems to only let you add a single organization for a contact, so let's just
+    # take the first one or the one that's primary and save that to the person's employer and occupation.
+    if g_contact.organizations.length > 0
+      primary_org = g_contact.organizations.first
+      g_contact.organizations.each { |org| primary_org = org if org[:primary] }
+      attrs[:occupation] = primary_org[:org_title]
+      attrs[:employer] = primary_org[:org_name]
+    end
+
+    attrs
   end
 
   def update_person_emails(person, g_contact)
@@ -147,5 +170,45 @@ class GoogleImport
       end
       person.phone_number = phone
     end
+  end
+
+  def update_person_websites(person, g_contact)
+    num_websites_before_import = person.websites.count
+    at_least_one_primary = num_websites_before_import > 0
+    g_contact.websites.each_with_index do |import_website, index|
+      next if import_website[:href].in? person.websites.pluck(:url)
+
+      if import_website[:primary] && (@import.override? || num_websites_before_import == 0)
+        person.websites.update_all primary: false
+        import_website[:primary] = true
+        at_least_one_primary = true
+      elsif !at_least_one_primary && index == g_contact.websites.length - 1
+        import_website[:primary] = true
+      else
+        import_website[:primary] = false
+      end
+
+      person.websites << Person::Website.new(url: import_website[:href], primary: import_website[:primary])
+    end
+  end
+
+  def update_person_picture(person, google_contact, g_contact_to_import)
+    # Don't update the picture of people who have a connected facebook account as that will provide their picture
+    return if person.facebook_account
+
+    photo = g_contact_to_import.photo_with_metadata
+    return if photo.nil? || google_contact.picture_etag == photo[:etag]
+
+    primary = person.pictures.count == 0 || @import.override?
+    person.pictures.update_all(primary: false) if primary
+
+    image_io = StringIOWithPath.new(photo[:etag] + image_mime_to_extension(photo[:content_type]), photo[:data])
+    picture = Picture.create(image: image_io, primary: primary)
+    google_contact.update(picture_etag: photo[:etag], picture_id: picture.id)
+    person.pictures << picture
+  end
+
+  def image_mime_to_extension(mime)
+    '.' + mime.gsub('image/', '')
   end
 end

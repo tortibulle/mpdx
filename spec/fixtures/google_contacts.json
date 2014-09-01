@@ -79,6 +79,17 @@
                         "scheme": "http://schemas.google.com/g/2005#kind"
                     }
                 ],
+                "gd$organization": [
+                    {
+                        "gd$orgTitle": {
+                            "$t": "Worker Person"
+                        },
+                        "gd$orgName": {
+                            "$t": "Example, Inc"
+                        },
+                        "rel": "http://schemas.google.com/g/2005#other"
+                    }
+                ],
                 "updated": {
                     "$t": "2014-04-03T19:42:38.718Z"
                 },
@@ -125,6 +136,17 @@
                 "title": {
                     "$t": "John Doe"
                 },
+                "gContact$website": [
+                    {
+                        "href": "blog.example.com",
+                        "rel": "blog"
+                    },
+                    {
+                        "href": "www.example.com",
+                        "rel": "profile",
+                        "primary": "true"
+                    }
+                ],
                 "gd$structuredPostalAddress": [
                     {
                         "rel": "http://schemas.google.com/g/2005#home",
@@ -170,13 +192,14 @@
                     }
                 ],
                 "content": {
-                    "$t": "Notes are stored here"
+                    "$t": "Notes here"
                 },
                 "link": [
                     {
                         "href": "https://www.google.com/m8/feeds/photos/media/test.user%40cru.org/6b70f8bb0372c?v=3",
                         "type": "image/*",
-                        "rel": "http://schemas.google.com/contacts/2008/rel#photo"
+                        "rel": "http://schemas.google.com/contacts/2008/rel#photo",
+                        "gd$etag": "\"dxt2DAEZfCp7ImA-AV4zRxBoPG4UK3owXBM.\""
                     },
                     {
                         "href": "https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full/6b70f8bb0372c?v=3",
@@ -210,6 +233,9 @@
                 },
                 "id": {
                     "$t": "http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/6b70f8bb0372c"
+                },
+                "gContact$birthday": {
+                    "when": "1988-05-12"
                 }
             },
             {

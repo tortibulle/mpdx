@@ -1,23 +1,14 @@
 GIT
-  remote: http://github.com/90seconds/gmail.git
-  revision: e98cb130f2306c97a5fbeab077a07da452a42020
+  remote: https://gist.github.com/6112257.git
+  revision: 40b1704e6396748b1c3bf7d3a928adcd37933e3d
   specs:
-    gmail (0.4.0)
-      gmail_xoauth (>= 0.3.0)
-      mail (>= 2.2.1)
+    emoji_spec (0.1)
 
 GIT
-  remote: http://github.com/CruGlobal/country_select.git
-  revision: 1ac18d07568b2a94b45818ae107bc3f08965301b
+  remote: https://github.com/sstephenson/global_phone.git
+  revision: 9b2772c4678dc9e323c58d9258663812bbd9fc73
   specs:
-    country_select (1.2.0)
-      countries (= 0.9.3)
-
-GIT
-  remote: http://github.com/CruGlobal/oauth-ruby
-  revision: 8d659d10229df298eda8007b4f09d5d392f69b1c
-  specs:
-    oauth (0.4.7)
+    global_phone (1.0.1)
 
 GIT
   remote: http://github.com/mhfs/sidekiq-failures.git
@@ -27,14 +18,22 @@ GIT
       sidekiq (>= 2.16.0)
 
 GIT
-  remote: https://gist.github.com/6112257.git
-  revision: 40b1704e6396748b1c3bf7d3a928adcd37933e3d
+  remote: http://github.com/CruGlobal/oauth-ruby
+  revision: 8d659d10229df298eda8007b4f09d5d392f69b1c
   specs:
-    emoji_spec (0.1)
+    oauth (0.4.7)
+
+GIT
+  remote: http://github.com/90seconds/gmail.git
+  revision: e98cb130f2306c97a5fbeab077a07da452a42020
+  specs:
+    gmail (0.4.0)
+      gmail_xoauth (>= 0.3.0)
+      mail (>= 2.2.1)
 
 GIT
   remote: https://github.com/CruGlobal/google_contacts_api
-  revision: b3172fea04b4fcd4206e02a70441257d4590e41e
+  revision: 6edbb82a175f3d56d5de520dd6badd7dd3eec2f8
   specs:
     google_contacts_api (0.4.0)
       activesupport
@@ -43,10 +42,11 @@ GIT
       json
 
 GIT
-  remote: https://github.com/sstephenson/global_phone.git
-  revision: 9b2772c4678dc9e323c58d9258663812bbd9fc73
+  remote: http://github.com/CruGlobal/country_select.git
+  revision: 1ac18d07568b2a94b45818ae107bc3f08965301b
   specs:
-    global_phone (1.0.1)
+    country_select (1.2.0)
+      countries (= 0.9.3)
 
 GEM
   remote: http://rubygems.org/
