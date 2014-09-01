@@ -16,7 +16,8 @@ class AccountsController < ApplicationController
   def create
     provider = "Person::#{params[:provider].camelcase}Account".constantize
 
-    # If we don't have a current user, login with this method
+    sign_out(current_user) if user_signed_in? && params['origin'] == 'login'
+
     unless user_signed_in?
       session[:signed_in_with] = params[:provider]
       sign_in(User.from_omniauth(provider, request.env['omniauth.auth']))

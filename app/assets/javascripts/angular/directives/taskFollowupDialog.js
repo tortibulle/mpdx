@@ -89,7 +89,8 @@ angular.module('mpdxApp')
                                 subject: followUpTask.subject,
                                 date: dateTwoDaysFromToday,
                                 hour: ("0" + (new Date().getHours())).slice(-2),
-                                min: ("0" + (new Date().getMinutes())).slice(-2)
+                                min: ("0" + (new Date().getMinutes())).slice(-2),
+                                tags: followUpTask.tag_list.join()
                             }
                         };
 
@@ -97,7 +98,7 @@ angular.module('mpdxApp')
                             //Contact Updates
                             if(strContains(taskResult, 'Call for Decision')) {
                               angular.forEach(followUpTask.contacts, function (c) {
-                                api.call('put', 'contacts/' + c, {
+                                api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
                                   contact: {
                                     status: 'Call for Decision'
                                   }
@@ -132,15 +133,16 @@ angular.module('mpdxApp')
                               type: 'Call',
                               subject: followUpTask.subject,
                               date: dateTwoDaysFromToday,
-                                hour: ("0" + (new Date().getHours())).slice(-2),
-                                min: ("0" + (new Date().getMinutes())).slice(-2)
+                              hour: ("0" + (new Date().getHours())).slice(-2),
+                              min: ("0" + (new Date().getMinutes())).slice(-2),
+                              tags: followUpTask.tag_list.join()
                             }
                         };
 
                         $scope.followUpSaveFunc = function(){
                             //Contact Updates
                             angular.forEach(followUpTask.contacts, function(c){
-                                api.call('put', 'contacts/' + c, {
+                                api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
                                     contact: {
                                         status: 'Appointment Scheduled'
                                     }
@@ -150,6 +152,11 @@ angular.module('mpdxApp')
                             //Create Appointment Task
                             if($scope.followUpDialogResult.createApptTask){
                                 createApptTask(contactsObject);
+                            }
+
+                            //Create Call Task
+                            if($scope.followUpDialogResult.createCallTask){
+                                createGenericTask(contactsObject, 'Call');
                             }
                             jQuery('#complete_task_followup_modal').dialog('close');
                         };
@@ -184,7 +191,7 @@ angular.module('mpdxApp')
                             }
                             //Contact Updates
                             angular.forEach(followUpTask.contacts, function(c){
-                                api.call('put', 'contacts/' + c, {
+                                api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
                                     contact: {
                                         status: 'Partner - Financial',
                                         pledge_amount: $scope.followUpDialogResult.financialCommitment.amount,
@@ -195,7 +202,7 @@ angular.module('mpdxApp')
 
                                 //Newsletter signup
                                 if($scope.followUpDialogResult.newsletterSignup){
-                                    api.call('put', 'contacts/' + c, {
+                                    api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
                                         contact: {
                                             send_newsletter: $scope.followUpDialogResult.newsletter.type
                                         }
@@ -241,7 +248,7 @@ angular.module('mpdxApp')
                         $scope.followUpSaveFunc = function(){
                             //Contact Updates
                             angular.forEach(followUpTask.contacts, function(c){
-                                api.call('put', 'contacts/' + c, {
+                                api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
                                     contact: {
                                         status: 'Partner - Special'
                                     }
@@ -249,7 +256,7 @@ angular.module('mpdxApp')
 
                                 //Newsletter signup
                                 if($scope.followUpDialogResult.newsletterSignup){
-                                    api.call('put', 'contacts/' + c, {
+                                    api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
                                         contact: {
                                             send_newsletter: $scope.followUpDialogResult.newsletter.type
                                         }
@@ -283,7 +290,7 @@ angular.module('mpdxApp')
                         $scope.followUpSaveFunc = function(){
                             //Contact Updates
                             angular.forEach(followUpTask.contacts, function(c){
-                                api.call('put', 'contacts/' + c, {
+                                api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
                                     contact: {
                                         status: 'Partner - Pray'
                                     }
@@ -291,7 +298,7 @@ angular.module('mpdxApp')
 
                                 //Newsletter signup
                                 if($scope.followUpDialogResult.newsletterSignup){
-                                    api.call('put', 'contacts/' + c, {
+                                    api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
                                         contact: {
                                             send_newsletter: $scope.followUpDialogResult.newsletter.type
                                         }
@@ -315,14 +322,15 @@ angular.module('mpdxApp')
                                 subject: 'Ask again for financial partnership',
                                 date: dateTwoDaysFromToday,
                                 hour: ("0" + (new Date().getHours())).slice(-2),
-                                min: ("0" + (new Date().getMinutes())).slice(-2)
+                                min: ("0" + (new Date().getMinutes())).slice(-2),
+                                tags: followUpTask.tag_list.join()
                             }
                         };
 
                         $scope.followUpSaveFunc = function(){
                             //Contact Updates
                             angular.forEach(followUpTask.contacts, function(c){
-                                api.call('put', 'contacts/' + c, {
+                                api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
                                     contact: {
                                         status: 'Ask in Future'
                                     }
@@ -330,7 +338,7 @@ angular.module('mpdxApp')
 
                                 //Newsletter signup
                                 if($scope.followUpDialogResult.newsletterSignup){
-                                    api.call('put', 'contacts/' + c, {
+                                    api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
                                         contact: {
                                             send_newsletter: $scope.followUpDialogResult.newsletter.type
                                         }
@@ -356,7 +364,7 @@ angular.module('mpdxApp')
                         $scope.followUpSaveFunc = function(){
                             //Contact Updates
                             angular.forEach(followUpTask.contacts, function(c){
-                                api.call('put', 'contacts/' + c, {
+                                api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
                                     contact: {
                                         status: 'Not Interested'
                                     }

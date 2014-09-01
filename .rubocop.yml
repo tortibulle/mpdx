@@ -27,6 +27,7 @@ AssignmentInCondition:
   Enabled: false
 
 GlobalVars:
+  AllowedVariables: ['$rollout']
   Exclude:
     - 'app/controllers/application_controller.rb'
     - 'spec/spec_helper.rb'
