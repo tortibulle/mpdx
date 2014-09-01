@@ -18,6 +18,20 @@ describe GoogleImport do
       .to_return(body: 'photo data', headers: { 'content-type' => 'image/jpeg' })
 
     stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
+
+    # Based on sample from docs at http://cloudinary.com/documentation/upload_images
+    cloudinary_reponse = {
+      url: 'http://res.cloudinary.com/cru/image/upload/v1/img.jpg',
+      secure_url: 'https://res.cloudinary.com/cru/image/upload/v1/img.jpg',
+      public_id: 'img',
+      version: '1',
+      width: 864,
+      height: 564,
+      format: 'jpg',
+      resource_type: 'image',
+      signature: 'abcdefgc024acceb1c5baa8dca46797137fa5ae0c3'
+    }.to_json
+    stub_request(:post, 'https://api.cloudinary.com/v1_1/cru/auto/upload').to_return(body: cloudinary_reponse)
   end
 
   describe 'when importing contacts' do
@@ -142,6 +156,11 @@ describe GoogleImport do
       expect(phone.number).to eq('+11233345158')
       expect(phone.location).to eq('mobile')
       expect(phone.primary).to be_true
+
+      expect(person.pictures.count).to eq(1)
+      picture = person.pictures.first
+      expect(picture.image.url).to eq('http://res.cloudinary.com/cru/image/upload/v1/img.jpg')
+      expect(picture.primary).to be_true
     end
 
     it 'imports correct person data if no people exist and be the same for repeat imports' do
@@ -196,89 +215,91 @@ describe GoogleImport do
     end
   end
 
-  describe 'website primary assignment when no websites present' do
-    it 'assigns the last website a primary role if no websites existed before and none imported are marked as primary' do
-      person = create(:person, last_name: 'Doe')
-      @contact.people << person
-      g_contact = double(websites: [{ href: 'example.com' }, { href: 'other.example.com' }])
-      @google_import.update_person_websites(person, g_contact)
-      person.reload
-      expect(person.websites.count).to eq(2)
-      website1 = person.websites.order(:url).first
-      expect(website1.url).to eq('example.com')
-      expect(website1.primary).to be_false
-      website2 = person.websites.order(:url).last
-      expect(website2.url).to eq('other.example.com')
-      expect(website2.primary).to be_true
-    end
+  it 'assigns the last website a primary role if no websites existed before and none imported are marked as primary' do
+    person = create(:person, last_name: 'Doe')
+    @contact.people << person
+    g_contact = double(websites: [{ href: 'example.com' }, { href: 'other.example.com' }])
+    @google_import.update_person_websites(person, g_contact)
+    person.reload
+    expect(person.websites.count).to eq(2)
+    website1 = person.websites.order(:url).first
+    expect(website1.url).to eq('example.com')
+    expect(website1.primary).to be_false
+    website2 = person.websites.order(:url).last
+    expect(website2.url).to eq('other.example.com')
+    expect(website2.primary).to be_true
   end
 
   describe 'import override behavior for basic fields' do
     before do
-      @contact_already_imported = create(:contact, account_list: @account_list, notes: 'Original notes')
-      @person_already_imported = create(:person, first_name: 'Not-John', last_name: 'Not-Doe',
-                                                 middle_name: 'Not-Henry', title: 'Not-Mr', suffix: 'Not-III')
+      @existing_contact = create(:contact, account_list: @account_list, notes: 'Original notes')
+      @existing_person = create(:person, first_name: 'Not-John', last_name: 'Not-Doe',
+                                         middle_name: 'Not-Henry', title: 'Not-Mr', suffix: 'Not-III')
       remote_id = 'http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/6b70f8bb0372c'
-      @person_already_imported.google_contacts << create(:google_contact, remote_id: remote_id)
-      @contact_already_imported.people << @person_already_imported
+      @existing_person.google_contacts << create(:google_contact, remote_id: remote_id)
+      @original_picture = create(:picture, picture_of: @existing_person, primary: true)
+      @existing_person.pictures << @original_picture
+      @existing_contact.people << @existing_person
     end
 
     it 'updates fields if set to override' do
       @import.override = true
       @google_import.send(:import)
-      @person_already_imported.reload
-      @contact_already_imported.reload
-      expect(@contact_already_imported.notes).to eq('Notes here')
-      expect(@person_already_imported.first_name).to eq('John')
-      expect(@person_already_imported.last_name).to eq('Doe')
-      expect(@person_already_imported.middle_name).to eq('Henry')
-      expect(@person_already_imported.title).to eq('Mr')
-      expect(@person_already_imported.suffix).to eq('III')
+      @existing_person.reload
+      @existing_contact.reload
+      expect(@existing_contact.notes).to eq('Notes here')
+      expect(@existing_person.first_name).to eq('John')
+      expect(@existing_person.last_name).to eq('Doe')
+      expect(@existing_person.middle_name).to eq('Henry')
+      expect(@existing_person.title).to eq('Mr')
+      expect(@existing_person.suffix).to eq('III')
+
+      @original_picture.reload
+      expect(@original_picture.primary).to be_false
+      expect(@existing_person.pictures.count).to eq(2)
+      expect(@existing_person.primary_picture.image.url).to eq('http://res.cloudinary.com/cru/image/upload/v1/img.jpg')
     end
 
     it 'does not not update fields if not set to override' do
       @import.override = false
       @google_import.send(:import)
-      @person_already_imported.reload
-      @contact_already_imported.reload
-      expect(@contact_already_imported.notes).to eq('Original notes')
-      expect(@person_already_imported.first_name).to eq('Not-John')
-      expect(@person_already_imported.last_name).to eq('Not-Doe')
-      expect(@person_already_imported.middle_name).to eq('Not-Henry')
-      expect(@person_already_imported.title).to eq('Not-Mr')
-      expect(@person_already_imported.suffix).to eq('Not-III')
+      @existing_person.reload
+      @existing_contact.reload
+      expect(@existing_contact.notes).to eq('Original notes')
+      expect(@existing_person.first_name).to eq('Not-John')
+      expect(@existing_person.last_name).to eq('Not-Doe')
+      expect(@existing_person.middle_name).to eq('Not-Henry')
+      expect(@existing_person.title).to eq('Not-Mr')
+      expect(@existing_person.suffix).to eq('Not-III')
+
+      @original_picture.reload
+
+      # Check that it does add the picture but doesn't set it to primary
+      expect(@original_picture.primary).to be_true
+      expect(@existing_person.pictures.count).to eq(2)
+      expect(@existing_person.primary_picture.image.url).to be_nil
     end
 
     it 'updates notes fields if they were blank even if set to not override' do
-      @contact_already_imported.update notes: ''
+      @existing_contact.update notes: ''
+      @existing_person.pictures.first.destroy
       @import.override = false
       @google_import.send(:import)
-      @person_already_imported.reload
-      @contact_already_imported.reload
-      expect(@contact_already_imported.notes).to eq('Notes here')
+      @existing_person.reload
+      @existing_contact.reload
+      expect(@existing_contact.notes).to eq('Notes here')
+
+      expect(@existing_person.pictures.count).to eq(1)
+      expect(@existing_person.primary_picture.image.url).to eq('http://res.cloudinary.com/cru/image/upload/v1/img.jpg')
     end
   end
 
-  describe 'import picture' do
-    before do
-      pending
-    end
-
-    it 'imports a picture' do
-      pending
-    end
-
-    it 'doesn\'t import a picture if the person has an associated facebook account' do
-      pending
-    end
-
-    it 'doesn\'t set imported picture to primary if a primary picture already exists and override=false' do
-      pending
-    end
-
-    it 'sets imported picture to primary if a primary picture already exists and override=true' do
-      pending
-    end
+  it 'doesn\'t import a picture if the person has an associated facebook account' do
+    person = build(:person, last_name: 'Doe')
+    @contact.people << person
+    create(:facebook_account, person: person)
+    @google_import.send(:import)
+    expect(person.pictures.count).to eq(0)
   end
 
   describe 'import by group' do

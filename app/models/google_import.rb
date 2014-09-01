@@ -197,7 +197,7 @@ class GoogleImport
     return if person.facebook_account
 
     photo = g_contact_to_import.photo_with_metadata
-    return if photo.nil? || google_contact.picture_etag == photo[:tag]
+    return if photo.nil? || google_contact.picture_etag == photo[:etag]
 
     primary = person.pictures.count == 0 || @import.override?
     person.pictures.update_all(primary: false) if primary
