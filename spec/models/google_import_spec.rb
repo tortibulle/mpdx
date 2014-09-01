@@ -161,6 +161,12 @@ describe GoogleImport do
       picture = person.pictures.first
       expect(picture.image.url).to eq('http://res.cloudinary.com/cru/image/upload/v1/img.jpg')
       expect(picture.primary).to be_true
+
+      expect(person.google_contacts.count).to eq(1)
+      google_contact = person.google_contacts.first
+      expect(google_contact.google_account).to eq(@account)
+      expect(google_contact.picture_etag).to eq('dxt2DAEZfCp7ImA-AV4zRxBoPG4UK3owXBM.')
+      expect(google_contact.picture).to eq(picture)
     end
 
     it 'imports correct person data if no people exist and be the same for repeat imports' do
