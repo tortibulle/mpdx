@@ -36,7 +36,7 @@ class Siebel < DataServer
     old_profiles = all_designation_profiles - designation_profiles
     old_profiles.each do |profile|
       # Remove designation accounts from AccountList
-      AccountList.find_and_remove_from_profile(profile, @org_account)
+      remove_designation_accounts(profile, @org_account)
       profile.update(user_id: nil)
     end
 
@@ -373,6 +373,55 @@ class Siebel < DataServer
       else
         EmailAddress.add_for_person(person, attributes)
       end
+    end
+  end
+
+  def remove_designation_accounts(designation_profile, org_account)
+    user = org_account.user
+    user.account_lists.each do |account_list|
+      if check_other_users(account_list, org_account, designation_profile)
+        designation_profile.update(account_list_id: nil)
+        remove_designation_accounts_from_account_list(account_list, org_account, designation_profile)
+      end
+    end
+  end
+
+  # Returns true if no other users on the account list have access to the passed in designation profile
+  def check_other_users(account_list, org_account, designation_profile)
+    account_list.users.each do |user|
+      next if user == org_account.user
+      next unless user_org_account = user.organization_accounts.find_by_organization_id(org_account.id)
+
+      api = user_org_account.organization.api(user_org_account)
+      api.profiles.each do |profile|
+        return false if profile.name == designation_profile.name
+      end
+    end
+    true
+  end
+
+  # Removes designation accounts from account list unless another user has access to that designation account
+  # from a different designation profile
+  def remove_designation_accounts_from_account_list(account_list, org_account, designation_profile)
+    designation_numbers_to_remove = designation_profile.designation_accounts.pluck(:designation_number)
+
+    account_list.users.each do |user|
+      next if user == org_account.user
+      next unless user_org_account = user.organization_accounts.find_by_organization_id(org_account.id)
+
+      api = user_org_account.organization.api(user_org_account)
+      api.profiles.each do |profile|
+        profile.designations.each do |designation|
+          if designation_numbers_to_remove.include?(designation.number)
+            designation_numbers_to_remove.delete(designation.number)
+          end
+        end
+      end
+    end
+
+    designation_numbers_to_remove.each do |number|
+      designation_account = org_account.organization.designation_accounts.find_by_number(number)
+      account_list.designation_accounts.delete(designation_account)
     end
   end
 
