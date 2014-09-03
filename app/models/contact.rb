@@ -378,21 +378,19 @@ class Contact < ActiveRecord::Base
     save(validate: false)
   end
 
-  def get_timezone
+  def find_timezone
     primary_address = addresses.find(&:primary_mailing_address?) || addresses.first
-
     return unless primary_address
 
-    begin
-      latitude, longitude = Geocoder.coordinates([primary_address.street, primary_address.city, primary_address.state, primary_address.country].join(','))
-      timezone = GoogleTimezone.fetch(latitude, longitude).time_zone_id
-      ActiveSupport::TimeZone::MAPPING.invert[timezone]
-    rescue
-    end
+    latitude, longitude = Geocoder.coordinates([primary_address.street, primary_address.city, primary_address.state, primary_address.country].join(','))
+    timezone = GoogleTimezone.fetch(latitude, longitude).time_zone_id
+    ActiveSupport::TimeZone::MAPPING.invert[timezone]
+  rescue
   end
 
   def set_timezone
-    update_column(:timezone, get_timezone)
+    timezone = find_timezone
+    update_column(:timezone, find_timezone) unless timezone == self.timezone
   end
 
   private

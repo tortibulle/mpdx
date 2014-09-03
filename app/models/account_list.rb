@@ -345,10 +345,7 @@ class AccountList < ActiveRecord::Base
     return if Redis.current.get("geocodes:#{id}")
     Redis.current.set("geocodes:#{id}", true)
 
-    contacts.where(timezone: nil).find_each do |contact|
-      timezone = contact.get_timezone
-      contact.update_column(:timezone, timezone) if timezone
-    end
+    contacts.where(timezone: nil).find_each(&:set_timezone)
   end
 
   private

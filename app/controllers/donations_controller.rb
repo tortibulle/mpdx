@@ -1,7 +1,7 @@
 class DonationsController < ApplicationController
-  before_action :get_donation, only: [:edit, :destroy, :update]
-  before_action :get_contact
-  before_action :get_donor_accounts, only: [:edit, :new]
+  before_action :find_donation, only: [:edit, :destroy, :update]
+  before_action :find_contact
+  before_action :find_donor_accounts, only: [:edit, :new]
 
   def index
     if @contact
@@ -41,13 +41,13 @@ class DonationsController < ApplicationController
     @donation = current_account_list.donations.new(donation_params)
 
     return if @donation.save
-    get_donor_accounts
+    find_donor_accounts
     render action: :new
   end
 
   def update
     return if @donation.update_attributes(donation_params)
-    get_donor_accounts
+    find_donor_accounts
     render action: :edit
   end
 
@@ -64,7 +64,7 @@ class DonationsController < ApplicationController
     @prior_year_index = 24.downto(12).map { |i| i.months.ago.to_date.beginning_of_month }
   end
 
-  def get_donation
+  def find_donation
     @donation = current_account_list.donations.find(params[:id])
   end
 
@@ -72,11 +72,11 @@ class DonationsController < ApplicationController
     params.require(:donation).permit('donation_date(1i)', 'donation_date(2i)', 'donation_date(3i)', 'tendered_amount', 'donor_account_id', 'designation_account_id')
   end
 
-  def get_contact
+  def find_contact
     @contact = current_account_list.contacts.where(id: params[:contact_id]).first if params[:contact_id]
   end
 
-  def get_donor_accounts
+  def find_donor_accounts
     @donor_accounts = []
     if @contact
       @contact.donor_accounts.each do |da|
