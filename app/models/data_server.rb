@@ -332,7 +332,7 @@ class DataServer
     company ||= account_list.companies.new(master_company: master_company)
     company.assign_attributes(name: line['LAST_NAME_ORG'],
                               phone_number: line['PHONE'],
-                              street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select { |a| a.present? }.join("\n"),
+                              street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select(&:present?).join("\n"),
                               city: line['CITY'],
                               state: line['STATE'],
                               postal_code: line['ZIP'],
@@ -351,7 +351,7 @@ class DataServer
       # physical address
       if [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4'], line['CITY'], line['STATE'], line['ZIP'], line['CNTRY_DESCR']].any?(&:present?)
         donor_account.addresses_attributes = [{
-          street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select { |a| a.present? }.join("\n"),
+          street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select(&:present?).join("\n"),
           city: line['CITY'],
           state: line['STATE'],
           postal_code: line['ZIP'],

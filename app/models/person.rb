@@ -242,8 +242,9 @@ class Person < ActiveRecord::Base
 
   def merge_phone_numbers
     phone_numbers.reload.each do |phone_number|
-      other_phone = phone_numbers.find { |pn| pn.id != phone_number.id &&
-                                              pn == phone_number
+      other_phone = phone_numbers.find { |pn|
+        pn.id != phone_number.id &&
+        pn == phone_number
       }
       next unless other_phone
       phone_number.merge(other_phone)

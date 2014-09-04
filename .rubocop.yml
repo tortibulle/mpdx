@@ -12,7 +12,7 @@ Blocks:
 Documentation:
   Enabled: false
 
-Style/MethodLength:
+Metrics/MethodLength:
   Enabled: false
   CountComments: false
   Max: 20
@@ -44,6 +44,8 @@ ClassVars:
 
 CyclomaticComplexity:
   Enabled: false
+PerceivedComplexity:
+  Enabled: false
 
 Eval:
   Exclude:
@@ -64,8 +66,12 @@ ParameterLists:
 SingleLineMethods:
   Enabled: false
 
-Style/LineLength:
+Metrics/LineLength:
   Enabled: false
+
+RegexpLiteral:
+  Exclude:
+    - 'Guardfile'
 
 Rails/Validation:
   Enabled: false
