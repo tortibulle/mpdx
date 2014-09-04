@@ -88,7 +88,7 @@ describe GoogleImport do
       }.should_not change(Person, :count)
     end
 
-    it 'creates a person and master person if we can\'t find a match' do
+    it "creates a person and master person if we can't find a match" do
       -> {
         -> {
           @google_import.send(:create_or_update_person, @google_contact)
@@ -300,7 +300,7 @@ describe GoogleImport do
     end
   end
 
-  it 'doesn\'t import a picture if the person has an associated facebook account' do
+  it "doesn't import a picture if the person has an associated facebook account" do
     person = build(:person, last_name: 'Doe')
     @contact.people << person
     create(:facebook_account, person: person)
