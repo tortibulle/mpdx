@@ -4,6 +4,7 @@ class Person::GoogleAccount < ActiveRecord::Base
 
   has_many :google_integrations, foreign_key: :google_account_id, dependent: :destroy
   has_many :google_emails, foreign_key: :google_account_id
+  has_many :google_contacts, foreign_key: :google_account_id
 
   def self.find_or_create_from_auth(auth_hash, person)
     @rel = person.google_accounts
