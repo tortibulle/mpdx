@@ -36,10 +36,6 @@ LeadingCommentSpace:
   Enabled: false
 
 # Hope to soon enable
-AccessorMethodName:
-  # we have a bunch of methods starting with get_
-  Enabled: false
-
 ClassAndModuleChildren:
   Enabled: false
 

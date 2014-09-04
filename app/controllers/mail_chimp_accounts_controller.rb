@@ -1,5 +1,5 @@
 class MailChimpAccountsController < ApplicationController
-  before_action :get_mail_chimp_account
+  before_action :find_mail_chimp_account
 
   def index
     @mail_chimp_account.validate_key if current_account_list.mail_chimp_account
@@ -62,7 +62,7 @@ class MailChimpAccountsController < ApplicationController
     end
   end
 
-  def get_mail_chimp_account
+  def find_mail_chimp_account
     @mail_chimp_account = current_account_list.mail_chimp_account ||
                           current_account_list.build_mail_chimp_account
   end

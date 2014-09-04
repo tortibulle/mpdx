@@ -1,5 +1,5 @@
 class ActivityCommentsController < ApplicationController
-  before_action :get_activity
+  before_action :fetch_activity
   respond_to :js
 
   def create
@@ -15,7 +15,7 @@ class ActivityCommentsController < ApplicationController
 
   protected
 
-  def get_activity
+  def fetch_activity
     return unless params[:activity_id]
     @activity = current_account_list.activities.find(params[:activity_id])
   end
