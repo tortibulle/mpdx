@@ -52,7 +52,11 @@
                             .uncompleted
                             .created_between(@start_date, @end_date)
                             .count %>
-
+    (<%= current_account_list.tasks.of_type('Call')
+                             .where(next_action: 'Appointment Scheduled')
+                             .completed_between(@start_date, @end_date)
+                             .count %>
+    <%= _('Through Phone Calls') %>)
   </li>
 </ul>
 
@@ -86,6 +90,24 @@
   <li>
     <%= _('Received:') %>
     <%= current_account_list.tasks.of_type('Facebook Message')
+                            .with_result('Received')
+                            .completed_between(@start_date, @end_date)
+                            .count %>
+  </li>
+</ul>
+
+<strong><%= _('Text Message:') %></strong>
+<ul>
+  <li>
+    <%= _('Sent:') %>
+    <%= current_account_list.tasks.of_type('Text Message')
+                            .with_result('Completed')
+                            .completed_between(@start_date, @end_date)
+                            .count %>
+  </li>
+  <li>
+    <%= _('Received:') %>
+    <%= current_account_list.tasks.of_type('Text Message')
                             .with_result('Received')
                             .completed_between(@start_date, @end_date)
                             .count %>

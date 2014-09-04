@@ -207,6 +207,7 @@ class DataServer
         balance_match = line['BALANCE'].gsub(',', '').match(/([-]?\d+\.?\d*)/)
         balance[:balance] = balance_match[0] if balance_match
         balance[:date] = line['EFFDT'] ? DateTime.strptime(line['EFFDT'], '%Y-%m-%d %H:%M:%S') : Time.now
+
         break
       end
     rescue NoMethodError
@@ -257,7 +258,7 @@ class DataServer
     RestClient::Request.execute(method: :post, url: url, payload: params, timeout: -1, user: 'foo',
                                 password: 'bar') { |response, _request, _result, &_block|
       # check for error response
-      lines = response.split("\n")
+      lines = response.split(/\n|\r/)
       first_line = lines.first.to_s.upcase
       case
       when first_line.include?('BAD_PASSWORD') ||

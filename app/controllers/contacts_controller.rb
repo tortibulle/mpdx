@@ -1,6 +1,6 @@
 class ContactsController < ApplicationController
   respond_to :html, :js
-  before_action :get_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals, :details, :referrals]
+  before_action :find_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals, :details, :referrals]
   before_action :setup_view_options, only: [:index]
   before_action :setup_filters, only: [:index, :show]
   before_action :clear_annoying_redirect_locations
@@ -302,7 +302,7 @@ class ContactsController < ApplicationController
 
   private
 
-  def get_contact
+  def find_contact
     @contact = current_account_list.contacts.includes(people: [:primary_email_address, :primary_phone_number, :email_addresses, :phone_numbers, :family_relationships]).find(params[:id])
   end
 
