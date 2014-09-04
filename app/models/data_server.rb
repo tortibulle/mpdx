@@ -206,15 +206,8 @@ class DataServer
         balance[:account_names] = line['ACCT_NAME'].split('\n') if line['ACCT_NAME']
         balance_match = line['BALANCE'].gsub(',', '').match(/([-]?\d+\.?\d*)/)
         balance[:balance] = balance_match[0] if balance_match
-        if line['EFFDT']
-          begin
-            balance[:date] = DateTime.strptime(line['EFFDT'], '%Y-%m-%d %H:%M:%S')
-          rescue ArgumentError
-            balance[:date] = DateTime.strptime(line['EFFDT'], '%m/%d/%Y')
-          end
-        else
-          balance[:date] = Time.now
-        end
+        balance[:date] = line['EFFDT'] ? DateTime.strptime(line['EFFDT'], '%Y-%m-%d %H:%M:%S') : Time.now
+
         break
       end
     rescue NoMethodError
