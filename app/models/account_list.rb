@@ -219,10 +219,11 @@ class AccountList < ActiveRecord::Base
     ordered_contacts.each do |contact|
       next if merged_contacts.include?(contact)
 
-      other_contacts = ordered_contacts.select {|c| c.name == contact.name &&
-                                                    c.id != contact.id &&
-                                                    (c.donor_accounts.first == contact.donor_accounts.first ||
-                                                     c.addresses.find { |a| contact.addresses.find { |ca| ca.equal_to? a } })
+      other_contacts = ordered_contacts.select { |c|
+        c.name == contact.name &&
+        c.id != contact.id &&
+        (c.donor_accounts.first == contact.donor_accounts.first ||
+         c.addresses.find { |a| contact.addresses.find { |ca| ca.equal_to? a } })
       }
       next unless other_contacts.present?
       other_contacts.each do |other_contact|

@@ -23,7 +23,7 @@ class TntImport
           # to unescape a unicode character.
           begin
             bad_char = e.message.match(/"([^"]*)"/)[1]
-            @contents.gsub!(eval(%Q("#{bad_char}")), ' ') # rubocop:disable Eval
+            @contents.gsub!(eval(%("#{bad_char}")), ' ') # rubocop:disable Eval
           rescue
             raise e
           end
@@ -114,9 +114,10 @@ class TntImport
     # set referrals
     # Loop over the whole list again now that we've added everyone and try to link up referrals
     rows.each do |row|
-      referred_by = @tnt_contacts.find {|_tnt_id, c| c.name == row['ReferredBy'] ||
-                                                     c.full_name == row['ReferredBy'] ||
-                                                     c.greeting == row['ReferredBy']
+      referred_by = @tnt_contacts.find { |_tnt_id, c|
+        c.name == row['ReferredBy'] ||
+        c.full_name == row['ReferredBy'] ||
+        c.greeting == row['ReferredBy']
       }
       next unless referred_by
       contact = @tnt_contacts[row['id']]

@@ -346,9 +346,10 @@ class Contact < ActiveRecord::Base
     people.reload.each do |person|
       next if merged_people.include?(person)
 
-      other_people = people.select { |p| p.first_name == person.first_name &&
-                                         p.last_name == person.last_name &&
-                                         p.id != person.id
+      other_people = people.select { |p|
+        p.first_name == person.first_name &&
+        p.last_name == person.last_name &&
+        p.id != person.id
       }
       next unless other_people
       other_people.each do |other_person|
@@ -363,8 +364,9 @@ class Contact < ActiveRecord::Base
   def merge_donor_accounts
     # Merge donor accounts that have the same number
     donor_accounts.reload.each do |account|
-      other = donor_accounts.find { |da| da.id != account.id &&
-                                         da.account_number == account.account_number
+      other = donor_accounts.find { |da|
+        da.id != account.id &&
+        da.account_number == account.account_number
       }
       next unless other
       account.merge(other)
