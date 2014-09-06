@@ -60,9 +60,6 @@ HandleExceptions:
 Lambda:
   Enabled: false
 
-ParameterLists:
-  Enabled: false
-
 SingleLineMethods:
   Enabled: false
 

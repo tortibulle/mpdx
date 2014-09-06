@@ -97,11 +97,11 @@ class DataServer
         case line['PERSON_TYPE']
         when 'P' # Person
           # Create or update people associated with this account
-          primary_person, primary_contact_person = add_or_update_primary_contact(account_list, user, line, donor_account)
+          primary_person, primary_contact_person = add_or_update_primary_contact(account_list, line, donor_account)
 
           # Now the secondary person (persumably spouse)
           if line['SP_FIRST_NAME'].present?
-            spouse, contact_spouse = add_or_update_spouse(account_list, user, line, donor_account)
+            spouse, contact_spouse = add_or_update_spouse(account_list, line, donor_account)
             # Wed the two peple
             primary_person.add_spouse(spouse)
             primary_contact_person.add_spouse(contact_spouse)
@@ -282,17 +282,17 @@ class DataServer
     }
   end
 
-  def add_or_update_primary_contact(account_list, user, line, donor_account)
+  def add_or_update_primary_contact(account_list, line, donor_account)
     remote_id = "#{donor_account.account_number}-1"
-    add_or_update_person(account_list, user, line, donor_account, remote_id, '')
+    add_or_update_person(account_list, line, donor_account, remote_id, '')
   end
 
-  def add_or_update_spouse(account_list, user, line, donor_account)
+  def add_or_update_spouse(account_list, line, donor_account)
     remote_id = "#{donor_account.account_number}-2"
-    add_or_update_person(account_list, user, line, donor_account, remote_id, 'SP_')
+    add_or_update_person(account_list, line, donor_account, remote_id, 'SP_')
   end
 
-  def add_or_update_person(account_list, _user, line, donor_account, remote_id, prefix = '')
+  def add_or_update_person(account_list, line, donor_account, remote_id, prefix = '')
     organization = donor_account.organization
     master_person_from_source = organization.master_people.where('master_person_sources.remote_id' => remote_id.to_s).first
     person = donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
