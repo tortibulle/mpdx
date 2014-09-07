@@ -11,8 +11,8 @@ class DonorAccount < ActiveRecord::Base
   has_many :contacts, through: :contact_donor_accounts, inverse_of: :donor_accounts
   belongs_to :organization
   belongs_to :master_company
-  validates_uniqueness_of :account_number, scope: :organization_id
-  validates_presence_of :organization_id, :account_number
+  validates :account_number, uniqueness: { scope: :organization_id }
+  validates :organization_id, :account_number, presence: true
 
   def primary_master_person
     master_people.where('master_person_donor_accounts.primary' => true).first

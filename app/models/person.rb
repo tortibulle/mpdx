@@ -74,7 +74,7 @@ class Person < ActiveRecord::Base
   before_save :deceased_check
   after_save :touch_contacts
 
-  validates_presence_of :first_name
+  validates :first_name, presence: true
 
   def to_s
     [first_name, last_name].join(' ')

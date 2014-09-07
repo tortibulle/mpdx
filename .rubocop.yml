@@ -70,9 +70,6 @@ RegexpLiteral:
   Exclude:
     - 'Guardfile'
 
-Rails/Validation:
-  Enabled: false
-
 Void:
   Exclude:
     - 'spec/**/*'
