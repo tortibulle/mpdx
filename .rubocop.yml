@@ -35,10 +35,10 @@ GlobalVars:
 LeadingCommentSpace:
   Enabled: false
 
-# Hope to soon enable
 ClassAndModuleChildren:
   Enabled: false
 
+# Hope to soon enable
 ClassVars:
   Enabled: false
 
