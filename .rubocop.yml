@@ -58,7 +58,8 @@ HandleExceptions:
   Enabled: false
 
 Lambda:
-  Enabled: false
+  Exclude:
+    - 'spec/**/*'
 
 SingleLineMethods:
   Enabled: false
