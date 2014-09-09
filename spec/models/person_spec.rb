@@ -13,15 +13,15 @@ describe Person do
   describe 'saving family relationships' do
     it 'should create a family relationship' do
       family_relationship = build(:family_relationship, person: nil, related_person: create(:person))
-      -> {
+      expect {
         person.family_relationships_attributes = { '0' => family_relationship.attributes.with_indifferent_access.except(:id, :person_id, :created_at, :updated_at) }
-      }.should change(FamilyRelationship, :count).by(1)
+      }.to change(FamilyRelationship, :count).by(1)
     end
     it 'should destroy a family relationship' do
       family_relationship = create(:family_relationship, person: person, related_person: create(:person))
-      -> {
+      expect {
         person.family_relationships_attributes = { '0' => family_relationship.attributes.merge(_destroy: '1').with_indifferent_access }
-      }.should change(FamilyRelationship, :count).from(1).to(0)
+      }.to change(FamilyRelationship, :count).from(1).to(0)
     end
     it 'should update a family relationship' do
       family_relationship = create(:family_relationship, person: person)
@@ -82,10 +82,10 @@ describe Person do
     let(:email) { 'test@example.com' }
 
     it 'creates an email' do
-      -> {
+      expect {
         person.email = email
         person.email_addresses.first.email.should == email
-      }.should change(EmailAddress, :count).from(0).to(1)
+      }.to change(EmailAddress, :count).from(0).to(1)
     end
   end
 
@@ -179,9 +179,9 @@ describe Person do
       create(:facebook_account, person: loser, remote_id: fb_account.remote_id)
 
       # this shouldn't blow up
-      -> {
+      expect {
         winner.merge(loser)
-      }.should change(Person::FacebookAccount, :count)
+      }.to change(Person::FacebookAccount, :count)
     end
 
     it "should move loser's facebook over" do

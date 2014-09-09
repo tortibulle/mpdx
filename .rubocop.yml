@@ -57,10 +57,6 @@ GuardClause:
 HandleExceptions:
   Enabled: false
 
-Lambda:
-  Exclude:
-    - 'spec/**/*'
-
 SingleLineMethods:
   Enabled: false
 

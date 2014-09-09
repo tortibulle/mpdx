@@ -9,10 +9,10 @@ describe DonorAccount do
     @donor_account.master_people << @mp1
     @donor_account.primary_master_person.should == @mp1
 
-    -> {
+    expect {
       @donor_account.master_people << create(:master_person)
       @donor_account.primary_master_person.should == @mp1
-    }.should_not change(MasterPersonDonorAccount.primary, :count)
+    }.to_not change(MasterPersonDonorAccount.primary, :count)
   end
 
   describe 'link_to_contact_for' do
@@ -43,17 +43,17 @@ describe DonorAccount do
     #end
 
     it 'should create a new contact if no match is found' do
-      -> {
+      expect {
         @donor_account.link_to_contact_for(@account_list)
-      }.should change(Contact, :count)
+      }.to change(Contact, :count)
     end
 
     it 'should not match to a contact with no addresses' do
       create(:contact, account_list: @account_list)
       create(:address, addressable: @donor_account)
-      -> {
+      expect {
         @donor_account.link_to_contact_for(@account_list)
-      }.should change(Contact, :count)
+      }.to change(Contact, :count)
     end
 
   end
