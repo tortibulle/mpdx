@@ -109,11 +109,11 @@ describe DataServer do
     end
     it 'should add or update primary contact' do
       @data_server.should_receive(:add_or_update_person)
-      @data_server.send(:add_or_update_primary_contact, create(:account_list), @person, '', create(:donor_account))
+      @data_server.send(:add_or_update_primary_contact, create(:account_list), '', create(:donor_account))
     end
     it 'should add or update spouse' do
       @data_server.should_receive(:add_or_update_person)
-      @data_server.send(:add_or_update_spouse, create(:account_list), @person, '', create(:donor_account))
+      @data_server.send(:add_or_update_spouse, create(:account_list), '', create(:donor_account))
     end
 
     describe 'add or update a company' do
@@ -163,25 +163,25 @@ describe DataServer do
         mp = create(:master_person)
         @donor_account.organization.master_person_sources.create(master_person_id: mp.id, remote_id: 1)
         -> {
-          @data_server.send(:add_or_update_person, @account_list, @user, line, @donor_account, 1)
+          @data_server.send(:add_or_update_person, @account_list, line, @donor_account, 1)
         }.should_not change(MasterPerson, :count)
       end
       it 'should add a contact without an existing master person and create a master person' do
         -> {
           -> {
-            @data_server.send(:add_or_update_person, @account_list, @user, line, @donor_account, 1)
+            @data_server.send(:add_or_update_person, @account_list, line, @donor_account, 1)
           }.should change(MasterPerson, :count).by(1)
         }.should change(Person, :count).by(2)
       end
 
       it 'should add a new contact with no spouse prefix' do
         -> {
-          @data_server.send(:add_or_update_person, @account_list, @user, line, @donor_account, 1)
+          @data_server.send(:add_or_update_person, @account_list, line, @donor_account, 1)
         }.should change(MasterPerson, :count).by(1)
       end
       it 'should add a new contact with a spouse prefix' do
         -> {
-          @data_server.send(:add_or_update_person, @account_list, @user, line, @donor_account, 1, 'SP_')
+          @data_server.send(:add_or_update_person, @account_list, line, @donor_account, 1, 'SP_')
         }.should change(MasterPerson, :count).by(1)
       end
       it 'should update an existing person' do
@@ -191,13 +191,13 @@ describe DataServer do
         @donor_account.people << person
         @donor_account.organization.master_person_sources.create(master_person_id: person.master_person_id, remote_id: 1)
         -> {
-          new_contact, _other = @data_server.send(:add_or_update_person, @account_list, @user, line, @donor_account, 1)
+          new_contact, _other = @data_server.send(:add_or_update_person, @account_list, line, @donor_account, 1)
           new_contact.should == person
         }.should_not change(MasterPerson, :count)
       end
       it 'should associate new contacts with the donor account' do
         -> {
-          @data_server.send(:add_or_update_person, @account_list, @user, line, @donor_account, 1)
+          @data_server.send(:add_or_update_person, @account_list, line, @donor_account, 1)
         }.should change(MasterPersonDonorAccount, :count).by(1)
       end
     end
