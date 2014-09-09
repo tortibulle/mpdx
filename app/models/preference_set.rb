@@ -23,6 +23,7 @@ class PreferenceSet
   attribute :locale, String, default: lambda { |preference_set, _attribute| preference_set.user.locale }
   attribute :monthly_goal, String, default: lambda { |preference_set, _attribute| preference_set.account_list.monthly_goal }
   attribute :default_account_list, Integer, default: lambda { |preference_set, _attribute| preference_set.user.default_account_list }
+  attribute :tester, Boolean, default: lambda { |preference_set, _attribute| preference_set.account_list.tester }
 
   # AccountList preferences
   # - Notification Preferences
