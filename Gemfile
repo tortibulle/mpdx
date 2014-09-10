@@ -20,7 +20,7 @@ gem 'ngmin-rails'
 # gem 'rails_karma'
 
 #gem 'activeadmin'
-gem 'active_model_serializers' #, git: 'http://github.com/rails-api/active_model_serializers.git'
+gem 'active_model_serializers', '~> 0.8.1'
 gem 'acts-as-taggable-on', '~> 3.0.0'
 gem 'airbrake' #, '~> 3.1.6'
 gem 'assignable_values', '~> 0.5.3'
