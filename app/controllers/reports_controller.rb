@@ -15,7 +15,7 @@ class ReportsController < ApplicationController
     # The reason for the "distinct_contact_donor_accounts" inner query is that it's possible
     # due to a TntMPD import that two different contacts could both be assigned the same donor id
     # which would cause duplicated results in the sum columns of the report.
-    contact_ids = current_account_list.contacts.map(&:id).to_s.gsub!('[', '').gsub!(']', '')
+    contact_ids = current_account_list.contacts.map(&:id).join(", ")
     @raw_donations = current_account_list
       .donations
       .where('donation_date BETWEEN ? AND ?', @start_date, @end_date)
