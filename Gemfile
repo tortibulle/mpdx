@@ -99,6 +99,8 @@ group :development do
   gem 'rails-footnotes' #, git: 'http://github.com/josevalim/rails-footnotes.git'
   gem 'bluepill'
   gem 'quiet_assets'
+  gem 'better_errors'
+  #gem 'binding_of_caller'
 end
 
 group :development, :test do
