@@ -32,7 +32,7 @@ class Api::V1::BaseController < ApplicationController
 
   def ensure_login
     return if request.request_method == 'OPTIONS'
-    return if super
+    return if !oauth_access_token && super
 
     unless oauth_access_token
       render json: { errors: ['Missing access token'] }, status: :unauthorized, callback: params[:callback]
