@@ -10,8 +10,9 @@
         contactAreaSize();
     });
     function contactAreaSize(){
-        var contactAreaHeight = jQuery(window).height() - 250;
-        jQuery('.contacts-scrollable').height(contactAreaHeight);
+        var windowHeight = jQuery(window).height() - 250;
+        var filtersHeight = jQuery('#filters_form').height();
+        jQuery('.contacts-scrollable').height(Math.max(windowHeight, filtersHeight));
     }
   </script>
   <aside id="leftmenu">
