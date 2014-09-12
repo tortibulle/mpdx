@@ -98,12 +98,12 @@ describe ContactsController do
 
     describe '#create' do
       it 'should create a good record' do
-        -> {
+        expect {
           post :create, contact: { name: 'foo' }
           contact = assigns(:contact)
           contact.errors.full_messages.should == []
           response.should redirect_to(contact)
-        }.should change(Contact, :count).by(1)
+        }.to change(Contact, :count).by(1)
       end
 
       it "doesn't create a contact without a name" do

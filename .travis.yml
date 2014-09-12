@@ -13,6 +13,7 @@ before_script:
 - psql -c 'create database mpdx_test;' -U postgres
 - cp config/database.travis.yml config/database.yml
 - cp config/config.travis.yml config/config.yml
+- cp config/cloudinary.travis.yml config/cloudinary.yml
 - bundle exec rake db:schema:load RAILS_ENV=test
 branches:
   only:

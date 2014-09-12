@@ -33,11 +33,11 @@ Mpdx::Application.configure do
 
   config.assets.prefix = "/dev-assets"
 
-  config.action_mailer.default_url_options = { :host => 'local.mpdx.org:3000' }
+  config.action_mailer.default_url_options = { :host => 'mpdx.localhost:3000' }
   #config.action_mailer.default_url_options = { :host => 'localhost:3000' }
 
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = { :host => "localhost", :port => 1025 }
 
-  Rails.application.routes.default_url_options[:host] = 'local.mpdx.org:3000'
+  Rails.application.routes.default_url_options[:host] = 'mpdx.localhost:3000'
 end

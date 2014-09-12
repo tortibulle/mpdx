@@ -737,7 +737,7 @@ tbody.tasks {
 
 /* ************************************************************** */
 
-.qaction ul.quick_action_list, .action_list {
+.qaction .quick_action_list, .action_list {
   @include listclear;
   padding: 4px;
   background: $white;
@@ -753,10 +753,6 @@ tbody.tasks {
   a.none {padding-left: 10px; background: none;}
   a:hover {background-color: $green; color: $white;}
   a:active {background-color: $green_dark;}
-}
-
-.action_list--bottom {
-  margin-top: -15em; /* Warning: kinda a magic number :( */
 }
 
 /* ************************************************************** */

@@ -1,4 +1,7 @@
 $('#contentbody').html('<%= j(render('contact', contact: @contact)) %>')
+<% @other_contacts.each do |contact| %>
+  $('#contentbody').append('<%= j(render('other_contact', contact: contact)) %>')
+<% end %>
 $('.contact_list a').removeClass('active')
 $('[data-id=<%= @contact.id %>]').addClass('active')
 

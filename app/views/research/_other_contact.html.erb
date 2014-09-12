@@ -1,0 +1,67 @@
+<div class="wpp">
+  <h2><%= contact.name %> - <%= contact.id %></h2>
+  <strong><%= _('People:') %></strong>
+  <ul>
+    <% contact.people.each do |person| %>
+      <li>
+        <strong>
+          <%= person.title %>
+          <%= person.first_name %>
+          <%= "(#{person.legal_first_name})" if person.legal_first_name.present? && person.legal_first_name != person.first_name %>
+          <%= person.middle_name %>
+          <%= person.last_name %>
+        </strong>
+        <br/>
+        <strong><%= _('Gender:') %></strong>
+        <%= person.gender %>
+        <br/>
+        <% if person.phone_numbers.present? %>
+          <strong><%= _('Phone Numbers:') %></strong>
+          <ul>
+            <% person.phone_numbers.each do |pn| %>
+              <li>
+                <%= GlobalPhone.parse(pn.number).national_format %>
+                <%= "(#{pn.location})" if pn.location.present? %>
+                <% if person.phone_numbers.length > 1 && pn.primary? %>
+                  <i class="fa fa-check green"></i>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+        <% if person.email_addresses.present? %>
+          <strong><%= _('Email Addresses:') %></strong>
+          <ul>
+            <% person.email_addresses.each do |email| %>
+              <li>
+                <%= email.email %>
+                <%= "(#{email.location})" if email.location.present? %>
+                <% if person.email_addresses.length > 1 && email.primary %>
+                  <i class="fa fa-check green"></i>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+  <strong><%= _('Addresses:') %></strong>
+  <ul>
+    <% contact.addresses.each do |address| %>
+      <li>
+        <%= address.street %>
+        <%= address.city %>, <%= address.state %> <%= address.postal_code %>
+        <br/>
+        <strong><%= _('Type:') %></strong>
+        <%= address.location %>
+        <br/>
+        <strong><%= _('Last Updated') %></strong>
+        <%= begin Date.parse(address.updated_at).to_s(:long); rescue; end %>
+        <br/>
+        <strong><%= _('Primary:') %></strong>
+        <%= address.primary_mailing_address? %>
+      </li>
+    <% end %>
+  </ul>
+</div>

@@ -2,10 +2,18 @@
   <ul>
     <li ng-class="{'selected': filter.page === 'all'}"><a href="/tasks/#" class="inbox menu_item" ng-click="filter.page = 'all'">All</a></li>
     <% if params[:action] == 'index' %>
-      <li ng-class="{'selected': filter.page === 'today'}"><a href="#" class="inbox menu_item" ng-click="filter.page = 'today'">Today</a></li>
-      <li ng-class="{'selected': filter.page === 'overdue'}"><a href="#" class="inbox menu_item" ng-click="filter.page = 'overdue'">Overdue</a></li>
-      <li ng-class="{'selected': filter.page === 'upcoming'}"><a href="#" class="inbox menu_item" ng-click="filter.page = 'upcoming'">Upcoming</a></li>
-      <li ng-class="{'selected': filter.page === 'starred'}"><a href="#" class="starred menu_item" ng-click="filter.page = 'starred'">Starred</a></li>
+      <li ng-class="{'selected': filter.page === 'today'}">
+        <a href="#" class="inbox menu_item" ng-click="filter.page = 'today'">Today</a>
+      </li>
+      <li ng-class="{'selected': filter.page === 'overdue'}">
+        <a href="#" class="inbox menu_item" ng-click="filter.page = 'overdue'">Overdue</a>
+      </li>
+      <li ng-class="{'selected': filter.page === 'upcoming'}">
+        <a href="#" class="inbox menu_item" ng-click="filter.page = 'upcoming'">Upcoming</a>
+      </li>
+      <li ng-class="{'selected': filter.page === 'starred'}">
+        <a href="#" class="starred menu_item" ng-click="filter.page = 'starred'">Starred</a>
+      </li>
     <% end %>
     <li class="<%= 'selected' if params[:action] == 'history' %>"><%= link_to(_('History'), history_tasks_path, class: "completed menu_item") %></li>
     <% if params[:action] == 'index' %>
@@ -33,12 +41,6 @@
             </li>
           <% end %>
           <% if params[:action] == 'index' %>
-          <li>
-            <label><%= _('Tags') %></label>
-            <div class="collapse" style="display:none;">
-              <%= select_tag 'filters[tags]', options_for_select([[_('-- Any --'), '']] + current_account_list.activity_tags, filters_params[:tags]), multiple: true, size: 5, :'ng-model' => 'filter.tagsSelect' %>
-            </div>
-          </li>
           <li>
             <label><%= _('Action') %></label>
             <div class="collapse" style="display:none;">

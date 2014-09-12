@@ -1,6 +1,6 @@
 class ContactsController < ApplicationController
   respond_to :html, :js
-  before_action :get_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals, :details, :referrals]
+  before_action :find_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals, :details, :referrals]
   before_action :setup_view_options, only: [:index]
   before_action :setup_filters, only: [:index, :show]
   before_action :clear_annoying_redirect_locations
@@ -275,15 +275,12 @@ class ContactsController < ApplicationController
           contacts = current_account_list.contacts.people.includes(:people)
                                                          .where('people.id' => pair.split(','))
                                                          .references('people')[0..1]
-          if contacts.length > 1
-            already_included = false
-            contacts.each { |c| already_included = true if contacts_checked.include?(c) }
-            next if already_included
-            contacts_checked += contacts
-            unless contacts.first.not_same_as?(contacts.last)
-              @contact_sets << contacts
-            end
-          end
+          next if contacts.length <= 1
+          already_included = false
+          contacts.each { |c| already_included = true if contacts_checked.include?(c) }
+          next if already_included
+          contacts_checked += contacts
+          @contact_sets << contacts unless contacts.first.not_same_as?(contacts.last)
         end
         @contact_sets.sort_by! { |s| s.first.name }
       end
@@ -305,7 +302,7 @@ class ContactsController < ApplicationController
 
   private
 
-  def get_contact
+  def find_contact
     @contact = current_account_list.contacts.includes(people: [:primary_email_address, :primary_phone_number, :email_addresses, :phone_numbers, :family_relationships]).find(params[:id])
   end
 

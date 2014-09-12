@@ -9,18 +9,18 @@ describe FamilyRelationship do
       @attributes = { related_person_id: @wife.id, relationship: @relationship }
     end
     it "should create a family relationship if it's new" do
-      -> {
+      expect {
         FamilyRelationship.add_for_person(@person, @attributes)
         @person.family_relationships.first.relationship.should == @relationship
-      }.should change(FamilyRelationship, :count).from(0).to(1)
+      }.to change(FamilyRelationship, :count).from(0).to(1)
     end
 
     it 'should not create a family relationship if it exists' do
       FamilyRelationship.add_for_person(@person, @attributes)
-      -> {
+      expect {
         FamilyRelationship.add_for_person(@person, @attributes)
         @person.family_relationships.first.relationship.should == @relationship
-      }.should_not change(FamilyRelationship, :count)
+      }.to_not change(FamilyRelationship, :count)
     end
   end
 end

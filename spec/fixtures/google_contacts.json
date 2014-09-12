@@ -1,0 +1,254 @@
+{
+    "feed": {
+        "category": [
+            {
+                "term": "http://schemas.google.com/contact/2008#contact",
+                "scheme": "http://schemas.google.com/g/2005#kind"
+            }
+        ],
+        "updated": {
+            "$t": "2014-08-18T17:52:00.829Z"
+        },
+        "xmlns$gd": "http://schemas.google.com/g/2005",
+        "generator": {
+            "$t": "Contacts",
+            "version": "1.0",
+            "uri": "http://www.google.com/m8/feeds"
+        },
+        "title": {
+            "$t": "Test User's Contacts"
+        },
+        "author": [
+            {
+                "name": {
+                    "$t": "Test User"
+                },
+                "email": {
+                    "$t": "test.user@cru.org"
+                }
+            }
+        ],
+        "openSearch$itemsPerPage": {
+            "$t": "1"
+        },
+        "xmlns$gContact": "http://schemas.google.com/contact/2008",
+        "openSearch$startIndex": {
+            "$t": "1"
+        },
+        "xmlns$batch": "http://schemas.google.com/gdata/batch",
+        "xmlns": "http://www.w3.org/2005/Atom",
+        "link": [
+            {
+                "href": "https://www.google.com/",
+                "type": "text/html",
+                "rel": "alternate"
+            },
+            {
+                "href": "https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full?v=3",
+                "type": "application/atom+xml",
+                "rel": "http://schemas.google.com/g/2005#feed"
+            },
+            {
+                "href": "https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full?v=3",
+                "type": "application/atom+xml",
+                "rel": "http://schemas.google.com/g/2005#post"
+            },
+            {
+                "href": "https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full/batch?v=3",
+                "type": "application/atom+xml",
+                "rel": "http://schemas.google.com/g/2005#batch"
+            },
+            {
+                "href": "https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full?max-results=1&v=3&alt=json",
+                "type": "application/atom+xml",
+                "rel": "self"
+            },
+            {
+                "href": "https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full?max-results=1&v=3&alt=json&start-index=2",
+                "type": "application/atom+xml",
+                "rel": "next"
+            }
+        ],
+        "xmlns$openSearch": "http://a9.com/-/spec/opensearch/1.1/",
+        "gd$etag": "\"QXY5cTVSLyt7I2A9XRZbE0UORAY.\"",
+        "entry": [
+            {
+                "category": [
+                    {
+                        "term": "http://schemas.google.com/contact/2008#contact",
+                        "scheme": "http://schemas.google.com/g/2005#kind"
+                    }
+                ],
+                "gd$organization": [
+                    {
+                        "gd$orgTitle": {
+                            "$t": "Worker Person"
+                        },
+                        "gd$orgName": {
+                            "$t": "Example, Inc"
+                        },
+                        "rel": "http://schemas.google.com/g/2005#other"
+                    }
+                ],
+                "updated": {
+                    "$t": "2014-04-03T19:42:38.718Z"
+                },
+                "gContact$groupMembershipInfo": [
+                    {
+                        "deleted": "false",
+                        "href": "http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/1b9d086d0a95e81a"
+                    },
+                    {
+                        "deleted": "false",
+                        "href": "http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/6"
+                    },
+                    {
+                        "deleted": "false",
+                        "href": "http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/33bfe364885eed6f"
+                    }
+                ],
+                "gd$name": {
+                    "gd$familyName": {
+                        "$t": "Doe"
+                    },
+                    "gd$givenName": {
+                        "$t": "John"
+                    },
+                    "gd$fullName": {
+                        "$t": "Mr John Henry Doe, III"
+                    },
+                    "gd$additionalName": {
+                        "$t": "Henry"
+                    },
+                    "gd$namePrefix": {
+                        "$t": "Mr"
+                    },
+                    "gd$nameSuffix": {
+                        "$t": "III"
+                    }
+                },
+                "gContact$relation": [
+                    {
+                        "$t": "Jane",
+                        "rel": "spouse"
+                    }
+                ],
+                "title": {
+                    "$t": "John Doe"
+                },
+                "gContact$website": [
+                    {
+                        "href": "blog.example.com",
+                        "rel": "blog"
+                    },
+                    {
+                        "href": "www.example.com",
+                        "rel": "profile",
+                        "primary": "true"
+                    }
+                ],
+                "gd$structuredPostalAddress": [
+                    {
+                        "rel": "http://schemas.google.com/g/2005#home",
+                        "primary": "true",
+                        "gd$country": {
+                            "$t": "United States of America"
+                        },
+                        "gd$formattedAddress": {
+                            "$t": "2345 Long Dr. #232\nSomewhere\nIL\n12345\nUnited States of America"
+                        },
+                        "gd$city": {
+                            "$t": "Somewhere"
+                        },
+                        "gd$street": {
+                            "$t": "2345 Long Dr. #232"
+                        },
+                        "gd$region": {
+                            "$t": "IL"
+                        },
+                        "gd$postcode": {
+                            "$t": "12345"
+                        }
+                    },
+                    {
+                        "gd$country": {
+                            "$t": "United States of America"
+                        },
+                        "gd$formattedAddress": {
+                            "$t": "123 Big Rd\nAnywhere\nMO\n56789\nUnited States of America"
+                        },
+                        "gd$city": {
+                            "$t": "Anywhere"
+                        },
+                        "gd$street": {
+                            "$t": "123 Big Rd"
+                        },
+                        "gd$region": {
+                            "$t": "MO"
+                        },
+                        "gd$postcode": {
+                            "$t": "56789"
+                        }
+                    }
+                ],
+                "content": {
+                    "$t": "Notes here"
+                },
+                "link": [
+                    {
+                        "href": "https://www.google.com/m8/feeds/photos/media/test.user%40cru.org/6b70f8bb0372c?v=3",
+                        "type": "image/*",
+                        "rel": "http://schemas.google.com/contacts/2008/rel#photo",
+                        "gd$etag": "\"dxt2DAEZfCp7ImA-AV4zRxBoPG4UK3owXBM.\""
+                    },
+                    {
+                        "href": "https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full/6b70f8bb0372c?v=3",
+                        "type": "application/atom+xml",
+                        "rel": "self"
+                    },
+                    {
+                        "href": "https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full/6b70f8bb0372c?v=3",
+                        "type": "application/atom+xml",
+                        "rel": "edit"
+                    }
+                ],
+                "gd$email": [
+                    {
+                        "primary": "true",
+                        "rel": "http://schemas.google.com/g/2005#other",
+                        "address": "johnsmith@example.com"
+                    }
+                ],
+                "gd$etag": "\"SXk6cDdXKit7I2A9Wh9VFUgORgE.\"",
+                "gd$phoneNumber": [
+                    {
+                        "$t": "(123) 334-5158",
+                        "rel": "http://schemas.google.com/g/2005#mobile",
+                        "primary": "true"
+                    }
+                ],
+                "app$edited": {
+                    "xmlns$app": "http://www.w3.org/2007/app",
+                    "$t": "2014-04-03T19:42:38.718Z"
+                },
+                "id": {
+                    "$t": "http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/6b70f8bb0372c"
+                },
+                "gContact$birthday": {
+                    "when": "1988-05-12"
+                }
+            },
+            {
+
+            }
+        ],
+        "openSearch$totalResults": {
+            "$t": "6675"
+        },
+        "id": {
+            "$t": "test.user@cru.org"
+        }
+    },
+    "version": "1.0",
+    "encoding": "UTF-8"
+}

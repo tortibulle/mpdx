@@ -220,16 +220,16 @@ class AccountList < ActiveRecord::Base
     ordered_contacts.each do |contact|
       next if merged_contacts.include?(contact)
 
-      other_contacts = ordered_contacts.select {|c| c.name == contact.name &&
-                                                    c.id != contact.id &&
-                                                    (c.donor_accounts.first == contact.donor_accounts.first ||
-                                                     c.addresses.find { |a| contact.addresses.find { |ca| ca.equal_to? a } })
+      other_contacts = ordered_contacts.select { |c|
+        c.name == contact.name &&
+        c.id != contact.id &&
+        (c.donor_accounts.first == contact.donor_accounts.first ||
+         c.addresses.find { |a| contact.addresses.find { |ca| ca.equal_to? a } })
       }
-      if other_contacts.present?
-        other_contacts.each do |other_contact|
-          contact.merge(other_contact)
-          merged_contacts << other_contact
-        end
+      next unless other_contacts.present?
+      other_contacts.each do |other_contact|
+        contact.merge(other_contact)
+        merged_contacts << other_contact
       end
     end
 
@@ -275,10 +275,9 @@ class AccountList < ActiveRecord::Base
       other.messages.update_all(account_list_id: id)
 
       other.users.each do |user|
-        unless users.include?(user)
-          users << user
-          user.update_attributes(preferences: nil)
-        end
+        next if users.include?(user)
+        users << user
+        user.update_attributes(preferences: nil)
       end
       other.designation_accounts.each do |da|
         designation_accounts << da unless designation_accounts.include?(da)
@@ -348,10 +347,7 @@ class AccountList < ActiveRecord::Base
     return if Redis.current.get("geocodes:#{id}")
     Redis.current.set("geocodes:#{id}", true)
 
-    contacts.where(timezone: nil).find_each do |contact|
-      timezone = contact.get_timezone
-      contact.update_column(:timezone, timezone) if timezone
-    end
+    contacts.where(timezone: nil).find_each(&:set_timezone)
   end
 
   private
@@ -371,21 +367,19 @@ class AccountList < ActiveRecord::Base
     NotificationType.types.each do |notification_type_string|
       notification_type = notification_type_string.constantize.first
 
-      if notifications[notification_type_string].present?
-        actions = notification_preferences.find_by_notification_type_id(notification_type.id).try(:actions) ||
-          NotificationPreference.default_actions
+      next unless notifications[notification_type_string].present?
+      actions = notification_preferences.find_by_notification_type_id(notification_type.id).try(:actions) ||
+        NotificationPreference.default_actions
 
-        # Collect any emails that need sent
-        if actions.include?('email')
-          notifications_to_email[notification_type] = notifications[notification_type_string]
-        end
+      # Collect any emails that need sent
+      if actions.include?('email')
+        notifications_to_email[notification_type] = notifications[notification_type_string]
+      end
 
-        if actions.include?('task')
-          # Create a task for each notification
-          notifications[notification_type_string].each do |notification|
-            notification_type.create_task(self, notification)
-          end
-        end
+      next unless actions.include?('task')
+      # Create a task for each notification
+      notifications[notification_type_string].each do |notification|
+        notification_type.create_task(self, notification)
       end
     end
 

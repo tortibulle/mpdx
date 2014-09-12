@@ -7,20 +7,20 @@ describe Person::KeyAccount do
   describe 'create from auth' do
     it 'should create an account linked to a person' do
       person = FactoryGirl.create(:person)
-      -> {
+      expect {
         @account = Person::KeyAccount.find_or_create_from_auth(@auth_hash, person)
-      }.should change(Person::KeyAccount, :count).from(0).to(1)
+      }.to change(Person::KeyAccount, :count).from(0).to(1)
       person.key_accounts.should include(@account)
     end
   end
 
   describe 'create user from auth' do
     it 'should create a user with a first and last name' do
-      -> {
+      expect {
         user = Person::KeyAccount.create_user_from_auth(@auth_hash)
         user.first_name.should == @auth_hash.extra.attributes.first.firstName
         user.last_name.should == @auth_hash.extra.attributes.first.lastName
-      }.should change(User, :count).from(0).to(1)
+      }.to change(User, :count).from(0).to(1)
     end
   end
 

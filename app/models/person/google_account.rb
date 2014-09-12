@@ -4,6 +4,7 @@ class Person::GoogleAccount < ActiveRecord::Base
 
   has_many :google_integrations, foreign_key: :google_account_id, dependent: :destroy
   has_many :google_emails, foreign_key: :google_account_id
+  has_many :google_contacts, foreign_key: :google_account_id
 
   def self.find_or_create_from_auth(auth_hash, person)
     @rel = person.google_accounts
@@ -41,15 +42,26 @@ class Person::GoogleAccount < ActiveRecord::Base
   end
 
   def contacts
+    @contacts ||= contacts_api_user.contacts
+  end
+
+  def contact_groups
+    @contact_groups ||= contacts_api_user.groups
+  end
+
+  def contacts_for_group(group_id)
+    GoogleContactsApi::Group.new({ 'id' => { '$t' => group_id } }, nil, contacts_api_user.api).contacts
+  end
+
+  def contacts_api_user
     return false if token_expired? && !refresh_token!
 
-    unless @contacts
+    unless @contact_api_user
       client = OAuth2::Client.new(APP_CONFIG['google_key'], APP_CONFIG['google_secret'])
       oath_token = OAuth2::AccessToken.new(client, token)
-      contact_user = GoogleContactsApi::User.new(oath_token)
-      @contacts = contact_user.contacts
+      @contact_api_user = GoogleContactsApi::User.new(oath_token)
     end
-    @contacts
+    @contact_api_user
   end
 
   def client

@@ -7,9 +7,9 @@ describe Person::GoogleAccount do
                                    info: { email: 'foo@example.com' },
                                    credentials: { token: 'a', refresh_token: 'b', expires: true, expires_at: Time.now.to_i + 100 })
       person = FactoryGirl.create(:person)
-      -> {
+      expect {
         @account = Person::GoogleAccount.find_or_create_from_auth(auth_hash, person)
-      }.should change(Person::GoogleAccount, :count).from(0).to(1)
+      }.to change(Person::GoogleAccount, :count).from(0).to(1)
       person.google_accounts.should include(@account)
     end
   end
@@ -20,9 +20,9 @@ describe Person::GoogleAccount do
                                    credentials: { token: 'a', refresh_token: 'b', expires: true, expires_at: Time.now.to_i + 100 })
       person = FactoryGirl.create(:person)
       Person::GoogleAccount.find_or_create_from_auth(auth_hash, person)
-      -> {
+      expect {
         @account = Person::GoogleAccount.find_or_create_from_auth(auth_hash.merge!(credentials: { refresh_token: 'c' }), person)
-      }.should_not change(Person::GoogleAccount, :count)
+      }.to_not change(Person::GoogleAccount, :count)
       @account.refresh_token.should == 'c'
     end
   end

@@ -12,7 +12,7 @@ Blocks:
 Documentation:
   Enabled: false
 
-Style/MethodLength:
+Metrics/MethodLength:
   Enabled: false
   CountComments: false
   Max: 20
@@ -27,26 +27,29 @@ AssignmentInCondition:
   Enabled: false
 
 GlobalVars:
+  AllowedVariables: ['$rollout']
   Exclude:
     - 'app/controllers/application_controller.rb'
     - 'spec/spec_helper.rb'
 
-# Hope to soon enable
-AccessorMethodName:
-  # we have a bunch of methods starting with get_
+LeadingCommentSpace:
   Enabled: false
 
 ClassAndModuleChildren:
   Enabled: false
 
+# Hope to soon enable
 ClassVars:
   Enabled: false
 
 CyclomaticComplexity:
   Enabled: false
+PerceivedComplexity:
+  Enabled: false
 
 Eval:
-  Enabled: false
+  Exclude:
+    - 'app/models/sieble.rb'
 
 GuardClause:
   MinBodyLength: 3
@@ -54,26 +57,15 @@ GuardClause:
 HandleExceptions:
   Enabled: false
 
-LeadingCommentSpace:
-  Enabled: false
-
-Lambda:
-  Enabled: false
-
-ParameterLists:
-  Enabled: false
-
 SingleLineMethods:
   Enabled: false
 
-Style/LineLength:
+Metrics/LineLength:
   Enabled: false
 
-Style/Next:
-  Enabled: false
-
-Rails/Validation:
-  Enabled: false
+RegexpLiteral:
+  Exclude:
+    - 'Guardfile'
 
 Void:
   Exclude:

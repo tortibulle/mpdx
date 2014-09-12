@@ -9,9 +9,9 @@ describe Person::LinkedinAccount do
                                    info: { first_name: 'John', last_name: 'Doe' }
                                   )
       person = FactoryGirl.create(:person)
-      -> {
+      expect {
         @account = Person::LinkedinAccount.find_or_create_from_auth(auth_hash, person)
-      }.should change(Person::LinkedinAccount, :count).from(0).to(1)
+      }.to change(Person::LinkedinAccount, :count).from(0).to(1)
       person.linkedin_accounts.should include(@account)
     end
   end

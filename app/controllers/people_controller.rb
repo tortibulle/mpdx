@@ -1,7 +1,7 @@
 class PeopleController < ApplicationController
   respond_to :html, :js
-  before_action :get_contact
-  before_action :get_person, only: [:show, :edit, :update, :social_search]
+  before_action :find_contact
+  before_action :find_person, only: [:show, :edit, :update, :social_search]
 
   def show
     @person = current_account_list.people.find(params[:id])
@@ -69,11 +69,11 @@ class PeopleController < ApplicationController
 
   private
 
-  def get_person
+  def find_person
     @person = current_account_list.people.find(params[:id])
   end
 
-  def get_contact
+  def find_contact
     @contact = current_account_list.contacts.find(params[:contact_id]) if params[:contact_id]
   end
 

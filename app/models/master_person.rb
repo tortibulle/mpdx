@@ -33,17 +33,16 @@ class MasterPerson < ActiveRecord::Base
     # if we have an exact match on name and phone number, that's also pretty good
     person.phone_numbers.each do |phone_number|
       phone_number.clean_up_number
-      if phone_number.number.present?
-        if other_person = Person.where('people.first_name' => person.first_name,
-                                       'people.last_name' => person.last_name,
-                                       'people.suffix' => person.suffix,
-                                       'phone_numbers.number' => phone_number.number,
-                                       'phone_numbers.country_code' => phone_number.country_code)
-                                .where('people.middle_name = ? OR people.middle_name is null', person.middle_name)
-                                .joins(:phone_numbers).first
-          return other_person.master_person
-        end
-      end
+      next unless phone_number.number.present?
+      other_person = Person.where('people.first_name' => person.first_name,
+                                  'people.last_name' => person.last_name,
+                                  'people.suffix' => person.suffix,
+                                  'phone_numbers.number' => phone_number.number,
+                                  'phone_numbers.country_code' => phone_number.country_code)
+                            .where('people.middle_name = ? OR people.middle_name is null', person.middle_name)
+                            .joins(:phone_numbers).first
+
+      return other_person.master_person if other_person
     end
 
     # If we have a donor account to look at, donor account + name is pretty safe
