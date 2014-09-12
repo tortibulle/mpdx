@@ -41,11 +41,97 @@ class GoogleContactsIntegrator
   end
 
   def sync_with_g_contact(person, contact, g_contact_record, g_contact, override = true, import_from_google = true)
-    # We are already in sync with this contact
-    return if g_contact_record && g_contact_record.last_etag == g_contact.etag
+    return if g_contact_record && g_contact_record.last_etag == g_contact.etag # already in sync
 
-    g_contact_changes = {}
+    sync_basic_person_fields(g_contact, person, import_from_google, override)
+    sync_contact_fields(g_contact, contact, import_from_google, override)
+    sync_employer_and_title(g_contact, person, import_from_google, override)
 
+    # sync_phone_numbers(g_contact, g_contact_record, person, import_from_google, override)
+
+    # For array lists, like phone numbers, emails, addresses, websites:
+    # If already associated with the contact && override => Favor MPDX completely
+
+    g_contact.send_update
+    person.save
+    contact.save
+  end
+
+  def sync_phone_numbers(g_contact, g_contact_record, person, import_from_google, override)
+    # There's a tension between:
+    # 1. added data, like a new number in Google or a new number in MPDX
+    # 2. updated or fixed data, like a changed number in Google or MPDX
+    # 3. what about a deleted phone number?
+    # The system can't easily tell the difference between the two.
+    # What if we stored a JSON representation of the Google Contact as of last sync?
+
+
+    # Step 1: MPDX changes from previous sync
+    # Step 2: Google changes from previous sync
+
+    # Step 3: Combine the changes
+
+
+
+    # Adds to both sides
+    # Updates to both, if conflict, preserve both numbers in both
+
+    # Deletions ?? Possible the person just didn't want a particular number in MPDX or in Google. Even if the docs
+    # tell them something they might not follow it and could lose information
+    # On the other hand, if something really is an old number, would be good to allow them to get rid of it.
+  end
+
+  def mpdx_changes_since_sync(g_contact_record, person)
+    changes = []
+
+    mpdx_g_number_map = g_contact_record.last_sync_map[:phone_numbers]
+    person_number_ids = []
+    person.phone_numbers.each do |number|
+      if mpdx_g_number_map.has_key?(number.id)
+        old_number = g_contact_record.last_sync_data[:phone_numbers].find {|n| n[:number] ==  mpdx_g_number_map[id] }
+        new_number = format_phone_for_google(number)
+        changes << [:update, number.id, mpdx_g_number_map[id], new_number] unless old_number == new_number
+      else
+        changes << [:create, number.id, format_phone_for_google(number) ]
+      end
+      person_number_ids << number.id
+    end
+
+    person_number_ids.each do |id|
+      unless mpdx_g_number_map.has_key?(id)
+        changes << [:delete, mpdx_g_number_map[id]]
+      end
+    end
+
+    changes
+  end
+
+  def google_changes_since_sync(g_contact_record, g_contact)
+    # Probably run an alignment algorithm over the two arrays of numbers
+    # http://stackoverflow.com/questions/16323571/measure-the-distance-between-two-strings-with-ruby
+  end
+
+  def sync_employer_and_title(g_contact, person, import_from_google, override)
+    person_orgs = g_contact_organizations_for(person)
+    g_contact_orgs = g_contact.organizations
+    if g_contact_orgs.size > 0
+      if person_orgs.size > 0
+        g_contact.prep_update(organizations: person_orgs) if override
+      else
+        # The Google Contacts GUI only lets you edit a single organization, so we'll assume we can pull from the first
+        first_org = g_contact_orgs.first
+        person.update(employer: first_org.org_name, occupation: first_org.org_title) if import_from_google
+      end
+    else
+      g_contact.prep_update(organizations: person_orgs) if person_orgs.size > 0
+    end
+  end
+
+  def sync_contact_fields(g_contact, contact, import_from_google, override)
+    sync_g_contact_and_record({ notes: :content }, g_contact, contact, import_from_google, override)
+  end
+
+  def sync_basic_person_fields(g_contact, person, import_from_google, override)
     person_to_g_contact_fields = {
       title: :name_prefix,
       first_name: :given_name,
@@ -53,39 +139,24 @@ class GoogleContactsIntegrator
       last_name: :family_name,
       suffix: :name_suffix
     }
-    person_to_g_contact_fields.each do |person_field, g_contact_field|
+    sync_g_contact_and_record(person_to_g_contact_fields, g_contact, person, import_from_google, override)
+  end
+
+  def sync_g_contact_and_record(field_map, g_contact, record, import_from_google, override)
+    field_map.each do |record_field, g_contact_field|
       if g_contact.send(g_contact_field).present?
-        if person[person_field].present?
-          g_contact_changes[g_contact_field] = person[person_field] if override
+        if record[record_field].present?
+          g_contact.prep_update(g_contact_field => record.send(record_field)) if override
         else
-          person.update(person_field => g_contact.send(g_contact_field)) if import_from_google
+          record.update(record_field => g_contact.send(g_contact_field)) if import_from_google
         end
       else
-        g_contact_changes[g_contact_field] = person[person_field] if person[person_field].present?
+        g_contact.prep_update(g_contact_field => record.send(record_field)) if record.send(record_field).present?
       end
     end
-
-    if g_contact.content.present?
-      if contact.notes.present?
-        g_contact_changes[:content] = contact.notes if override
-      else
-        contact.notes = g_contact.content if import_from_google
-      end
-    else
-      g_contact_changes[:content] = contact.notes if contact.notes.present?
-    end
-
-    # TODO: Figure out employer and occupation
-
-    # For array lists, like phone numbers, emails, addresses, websites:
-    # If already associated with the contact && override => Favor MPDX completely
-
-    person.save
-    contact.save
   end
 
   def create_g_contact(person, contact)
-    # TODO: Add in employer and occupation
     @account.contacts_api_user.create_contact(
       name_prefix: person.title,
       given_name: person.first_name,
@@ -95,9 +166,18 @@ class GoogleContactsIntegrator
       content: contact.notes,
       emails: person.email_addresses.map(&method(:format_email_for_google)),
       phone_numbers: person.phone_numbers.map(&method(:format_phone_for_google)),
+      organizations: g_contact_organizations_for(person),
       websites: person.websites.map(&method(:format_website_for_google)),
       addresses: contact.addresses.map(&method(:format_address_for_google))
     )
+  end
+
+  def g_contact_organizations_for(person)
+    if person.employer.present? || person.occupation.present?
+      [ { org_name: person.employer, org_title: person.occupation, primary: true } ]
+    else
+      []
+    end
   end
 
   def format_email_for_google(email)
