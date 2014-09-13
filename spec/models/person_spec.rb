@@ -75,6 +75,23 @@ describe Person do
         contact.reload
         expect(contact.name).to_not include('Jack')
       end
+
+      it 'has no stack overflow if deceased person modified' do
+        contact = create(:contact)
+        person.first_name = 'Jack'
+        contact.people << person
+        contact.name = 'Smith, Jack'
+        contact.save!
+        person.reload
+        person.deceased = true
+        person.save!
+        contact.reload
+        expect(contact.name).to_not include('Jack')
+
+        person.reload
+        person.occupation = 'random change'
+        person.save # Used to cause a stack overflow
+      end
     end
   end
 

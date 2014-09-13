@@ -128,7 +128,10 @@ class Person < ActiveRecord::Base
     contacts.each do |c|
       need_to_save = false
       #remove name from greeting
-      if c.greeting.include?(first_name)
+      # We need to access the field value directly via c[:greeting] because c.greeting defaults to the first name
+      # even if the field is nil. That causes an infinite loop here where it keeps trying to remove the first name
+      # from the greeting but it keeps getting defaulted back to having it.
+      if c[:greeting].present? && c[:greeting].include?(first_name)
         c.greeting = c.greeting.sub(first_name, '')
         c.greeting = c.greeting.sub(' and ', ' ').strip
         need_to_save = true
