@@ -97,11 +97,11 @@ class DataServer
         case line['PERSON_TYPE']
         when 'P' # Person
           # Create or update people associated with this account
-          primary_person, primary_contact_person = add_or_update_primary_contact(account_list, user, line, donor_account)
+          primary_person, primary_contact_person = add_or_update_primary_contact(account_list, line, donor_account)
 
           # Now the secondary person (persumably spouse)
           if line['SP_FIRST_NAME'].present?
-            spouse, contact_spouse = add_or_update_spouse(account_list, user, line, donor_account)
+            spouse, contact_spouse = add_or_update_spouse(account_list, line, donor_account)
             # Wed the two peple
             primary_person.add_spouse(spouse)
             primary_contact_person.add_spouse(contact_spouse)
@@ -207,6 +207,7 @@ class DataServer
         balance_match = line['BALANCE'].gsub(',', '').match(/([-]?\d+\.?\d*)/)
         balance[:balance] = balance_match[0] if balance_match
         balance[:date] = line['EFFDT'] ? DateTime.strptime(line['EFFDT'], '%Y-%m-%d %H:%M:%S') : Time.now
+
         break
       end
     rescue NoMethodError
@@ -257,7 +258,7 @@ class DataServer
     RestClient::Request.execute(method: :post, url: url, payload: params, timeout: -1, user: 'foo',
                                 password: 'bar') { |response, _request, _result, &_block|
       # check for error response
-      lines = response.split("\n")
+      lines = response.split(/\n|\r/)
       first_line = lines.first.to_s.upcase
       case
       when first_line.include?('BAD_PASSWORD') ||
@@ -281,17 +282,17 @@ class DataServer
     }
   end
 
-  def add_or_update_primary_contact(account_list, user, line, donor_account)
+  def add_or_update_primary_contact(account_list, line, donor_account)
     remote_id = "#{donor_account.account_number}-1"
-    add_or_update_person(account_list, user, line, donor_account, remote_id, '')
+    add_or_update_person(account_list, line, donor_account, remote_id, '')
   end
 
-  def add_or_update_spouse(account_list, user, line, donor_account)
+  def add_or_update_spouse(account_list, line, donor_account)
     remote_id = "#{donor_account.account_number}-2"
-    add_or_update_person(account_list, user, line, donor_account, remote_id, 'SP_')
+    add_or_update_person(account_list, line, donor_account, remote_id, 'SP_')
   end
 
-  def add_or_update_person(account_list, _user, line, donor_account, remote_id, prefix = '')
+  def add_or_update_person(account_list, line, donor_account, remote_id, prefix = '')
     organization = donor_account.organization
     master_person_from_source = organization.master_people.where('master_person_sources.remote_id' => remote_id.to_s).first
     person = donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
@@ -331,7 +332,7 @@ class DataServer
     company ||= account_list.companies.new(master_company: master_company)
     company.assign_attributes(name: line['LAST_NAME_ORG'],
                               phone_number: line['PHONE'],
-                              street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select { |a| a.present? }.join("\n"),
+                              street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select(&:present?).join("\n"),
                               city: line['CITY'],
                               state: line['STATE'],
                               postal_code: line['ZIP'],
@@ -350,7 +351,7 @@ class DataServer
       # physical address
       if [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4'], line['CITY'], line['STATE'], line['ZIP'], line['CNTRY_DESCR']].any?(&:present?)
         donor_account.addresses_attributes = [{
-          street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select { |a| a.present? }.join("\n"),
+          street: [line['ADDR1'], line['ADDR2'], line['ADDR3'], line['ADDR4']].select(&:present?).join("\n"),
           city: line['CITY'],
           state: line['STATE'],
           postal_code: line['ZIP'],

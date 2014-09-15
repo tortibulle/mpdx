@@ -22,10 +22,10 @@ describe Import do
     import = create(:tnt_import)
     @tnt_import.should_receive(:import).and_raise('foo')
 
-    -> {
+    expect {
       ImportMailer.should_receive(:failed).and_return(OpenStruct.new)
       import.send(:import)
-    }.should raise_error
+    }.to raise_error
 
   end
 end

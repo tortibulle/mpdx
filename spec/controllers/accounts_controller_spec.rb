@@ -42,21 +42,21 @@ describe AccountsController do
       it 'signs out current user and create new user' do
         mash = Hashie::Mash.new(uid: '5', credentials: { token: 'a', expires_at: 5 }, info: { first_name: 'John', last_name: 'Doe' })
         request.env['omniauth.auth'] = mash
-        -> {
+        expect {
           post 'create', provider: 'facebook', origin: 'login'
           response.should redirect_to(setup_path(:org_accounts))
-        }.should change(Person::FacebookAccount, :count).from(0).to(1)
+        }.to change(Person::FacebookAccount, :count).from(0).to(1)
         subject.current_user.should_not eq @user
       end
 
       it 'creates an account' do
         mash = Hashie::Mash.new(uid: '5', credentials: { token: 'a', expires_at: 5 }, info: { first_name: 'John', last_name: 'Doe' })
         request.env['omniauth.auth'] = mash
-        -> {
+        expect {
           post 'create', provider: 'facebook'
           response.should redirect_to(accounts_path)
           @user.facebook_accounts.should include(assigns(:account))
-        }.should change(Person::FacebookAccount, :count).from(0).to(1)
+        }.to change(Person::FacebookAccount, :count).from(0).to(1)
       end
 
       it 'should redirect to social accounts if the user is in setup mode' do
@@ -77,10 +77,10 @@ describe AccountsController do
     describe "GET 'destroy'" do
       it 'returns http success' do
         @account = FactoryGirl.create(:facebook_account, person: @user)
-        -> {
+        expect {
           get 'destroy', provider: 'facebook', id: @account.id
           response.should redirect_to(accounts_path)
-        }.should change(Person::FacebookAccount, :count).from(1).to(0)
+        }.to change(Person::FacebookAccount, :count).from(1).to(0)
       end
     end
 

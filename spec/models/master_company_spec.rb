@@ -3,14 +3,14 @@ require 'spec_helper'
 describe MasterCompany do
   it 'should find an existing master company' do
     company = FactoryGirl.create(:company)
-    -> {
+    expect {
       MasterCompany.find_or_create_for_company(FactoryGirl.build(:company)).should == company.master_company
-    }.should_not change(MasterCompany, :count)
+    }.to_not change(MasterCompany, :count)
   end
 
   it 'should create a new master company' do
-    -> {
+    expect {
       MasterCompany.find_or_create_for_company(FactoryGirl.build(:company))
-    }.should change(MasterCompany, :count)
+    }.to change(MasterCompany, :count)
   end
 end

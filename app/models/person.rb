@@ -41,14 +41,14 @@ class Person < ActiveRecord::Base
   has_many :messages_received, class_name: 'Message', foreign_key: :to_id, dependent: :destroy
   has_many :google_contacts
 
-  accepts_nested_attributes_for :email_addresses, reject_if: lambda { |e| e[:email].blank? }, allow_destroy: true
-  accepts_nested_attributes_for :phone_numbers, reject_if: lambda { |p| p[:number].blank? }, allow_destroy: true
-  accepts_nested_attributes_for :family_relationships, reject_if: lambda { |p| p[:related_contact_id].blank? }, allow_destroy: true
-  accepts_nested_attributes_for :facebook_accounts, reject_if: lambda { |p| p[:url].blank? }, allow_destroy: true
-  accepts_nested_attributes_for :twitter_accounts, reject_if: lambda { |p| p[:screen_name].blank? }, allow_destroy: true
-  accepts_nested_attributes_for :linkedin_accounts, reject_if: lambda { |p| p[:url].blank? }, allow_destroy: true
-  accepts_nested_attributes_for :pictures, reject_if: lambda { |p| p[:image].blank? && p[:image_cache].blank? }, allow_destroy: true
-  accepts_nested_attributes_for :websites, reject_if: lambda { |p| p[:url].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :email_addresses, reject_if: -> (e) { e[:email].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :phone_numbers, reject_if: -> (p) { p[:number].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :family_relationships, reject_if: -> (p) { p[:related_contact_id].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :facebook_accounts, reject_if: -> (p) { p[:url].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :twitter_accounts, reject_if: -> (p) { p[:screen_name].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :linkedin_accounts, reject_if: -> (p) { p[:url].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :pictures, reject_if: -> (p) { p[:image].blank? && p[:image_cache].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :websites, reject_if: -> (p) { p[:url].blank? }, allow_destroy: true
 
   PERMITTED_ATTRIBUTES = [
     :first_name, :legal_first_name, :last_name, :birthday_month, :birthday_year, :birthday_day,
@@ -74,7 +74,7 @@ class Person < ActiveRecord::Base
   before_save :deceased_check
   after_save :touch_contacts
 
-  validates_presence_of :first_name
+  validates :first_name, presence: true
 
   def to_s
     [first_name, last_name].join(' ')
@@ -128,7 +128,10 @@ class Person < ActiveRecord::Base
     contacts.each do |c|
       need_to_save = false
       #remove name from greeting
-      if c.greeting.include?(first_name)
+      # We need to access the field value directly via c[:greeting] because c.greeting defaults to the first name
+      # even if the field is nil. That causes an infinite loop here where it keeps trying to remove the first name
+      # from the greeting but it keeps getting defaulted back to having it.
+      if c[:greeting].present? && c[:greeting].include?(first_name)
         c.greeting = c.greeting.sub(first_name, '')
         c.greeting = c.greeting.sub(' and ', ' ').strip
         need_to_save = true
@@ -242,8 +245,9 @@ class Person < ActiveRecord::Base
 
   def merge_phone_numbers
     phone_numbers.reload.each do |phone_number|
-      other_phone = phone_numbers.find { |pn| pn.id != phone_number.id &&
-                                              pn == phone_number
+      other_phone = phone_numbers.find { |pn|
+        pn.id != phone_number.id &&
+        pn == phone_number
       }
       next unless other_phone
       phone_number.merge(other_phone)

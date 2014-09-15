@@ -15,6 +15,7 @@ class ReportsController < ApplicationController
     # The reason for the "distinct_contact_donor_accounts" inner query is that it's possible
     # due to a TntMPD import that two different contacts could both be assigned the same donor id
     # which would cause duplicated results in the sum columns of the report.
+    contact_ids = current_account_list.contacts.map(&:id).join(', ')
     @raw_donations = current_account_list
       .donations
       .where('donation_date BETWEEN ? AND ?', @start_date, @end_date)
@@ -32,7 +33,8 @@ class ReportsController < ApplicationController
       .joins('INNER JOIN donor_accounts ON donor_accounts.id = donations.donor_account_id')
       .joins('INNER JOIN ' \
                '(SELECT donor_account_id, MIN(contact_id) as contact_id' \
-               ' FROM contact_donor_accounts GROUP BY donor_account_id) ' \
+               " FROM contact_donor_accounts WHERE contact_id IN (#{contact_ids}) " \
+               ' GROUP BY donor_account_id) ' \
                'distinct_contact_donor_accounts ' \
               'ON distinct_contact_donor_accounts.donor_account_id = donations.donor_account_id')
       .joins('INNER JOIN contacts ON contacts.id = distinct_contact_donor_accounts.contact_id')

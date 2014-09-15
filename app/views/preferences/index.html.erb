@@ -38,6 +38,18 @@
         <%= f.select :default_account_list, current_user.account_lists.collect { |al| [al.name, al.id] } %>
       </div>
 
+      <div class="field">
+        <%= f.check_box :tester %> <%= _('Early adopter') %>
+        <div>
+          <em>
+            By checking this box, you are telling us that you'd like to test new features for bugs before they are
+            rolled out to the full MPDx user base. We'll send you an email when new features are available on your
+            account to test, and then ask for you to give us feedback - both if you experience bugs and also about
+            your thoughts about the feature(s) you are testing.
+          </em>
+        </div>
+      </div>
+
       <br />
 
       <h3><%= _('Notifications / Alerts') %></h3>

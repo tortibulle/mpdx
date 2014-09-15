@@ -7,19 +7,19 @@ describe PhoneNumber do
       @attributes = { 'number' => '123-345-2313' }
     end
     it "creates a phone number if it's new" do
-      -> {
+      expect {
         PhoneNumber.add_for_person(@person, @attributes)
         phone_number = @person.reload.phone_numbers.first
         phone_number.number.should == '+11233452313'
-      }.should change(PhoneNumber, :count).from(0).to(1)
+      }.to change(PhoneNumber, :count).from(0).to(1)
     end
 
     it "doesn't create a phone number if it exists" do
       PhoneNumber.add_for_person(@person, @attributes)
-      -> {
+      expect {
         PhoneNumber.add_for_person(@person, @attributes)
         @person.phone_numbers.first.number.should == '+11233452313'
-      }.should_not change(PhoneNumber, :count)
+      }.to_not change(PhoneNumber, :count)
     end
 
     it 'sets only the first phone number to primary' do

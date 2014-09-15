@@ -5,7 +5,7 @@ class DesignationProfile < ActiveRecord::Base
   has_many :designation_accounts, through: :designation_profile_accounts
   belongs_to :account_list
 
-  scope :for_org, lambda { |org_id| where(organization_id: org_id) }
+  scope :for_org, -> (org_id) { where(organization_id: org_id) }
 
   def to_s() name; end
 

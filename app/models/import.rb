@@ -12,7 +12,7 @@ class Import < ActiveRecord::Base
   # attr_accessible :file, :importing, :source, :file_cache, :override, :tags
   validates :source, inclusion: { in: %w(facebook twitter linkedin tnt google) }
   # validates_with TntImportValidator, if: lambda {|import| 'tnt' == import.source }
-  validates_with FacebookImportValidator, if: lambda { |import| 'facebook' == import.source }
+  validates_with FacebookImportValidator, if: -> (import) { 'facebook' == import.source }
 
   serialize :groups, Array
   serialize :group_tags, JSON

@@ -38,20 +38,20 @@ describe GoogleImport do
     it 'matches an existing person on my list' do
       person = create(:person)
       @contact.people << person
-      -> {
+      expect {
         @google_import.should_receive(:create_or_update_person).and_return(person)
         @google_import.send(:import)
-      }.should_not change(Contact, :count)
+      }.to_not change(Contact, :count)
     end
 
     it 'creates a new contact for someone not on my list and ignore contact without first name' do
       # note the json file has a blank contact record which should be ignored, so the count changes by 1 only
-      -> {
-        -> {
+      expect {
+        expect {
           @google_import.should_receive(:create_or_update_person).and_return(create(:person))
           @google_import.send(:import)
-        }.should change(Person, :count).by(1)
-      }.should change(Contact, :count).by(1)
+        }.to change(Person, :count).by(1)
+      }.to change(Contact, :count).by(1)
     end
 
     it 'adds tags from the import' do
@@ -75,25 +75,25 @@ describe GoogleImport do
       person = create(:person, first_name: 'Not-John')
       create(:google_contact, person: person, remote_id: @google_contact.id)
       @contact.people << person
-      -> {
+      expect {
         @google_import.send(:create_or_update_person, @google_contact)
         person.reload.first_name.should == 'John'
-      }.should_not change(Person, :count)
+      }.to_not change(Person, :count)
     end
 
     it 'does not create a new person if their name matches' do
       @contact.people << create(:person, last_name: 'Doe')
-      -> {
+      expect {
         @google_import.send(:create_or_update_person, @google_contact)
-      }.should_not change(Person, :count)
+      }.to_not change(Person, :count)
     end
 
-    it 'creates a person and master person if we can\'t find a match' do
-      -> {
-        -> {
+    it "creates a person and master person if we can't find a match" do
+      expect {
+        expect {
           @google_import.send(:create_or_update_person, @google_contact)
-        }.should change(Person, :count)
-      }.should change(MasterPerson, :count)
+        }.to change(Person, :count)
+      }.to change(MasterPerson, :count)
     end
   end
 
@@ -300,7 +300,7 @@ describe GoogleImport do
     end
   end
 
-  it 'doesn\'t import a picture if the person has an associated facebook account' do
+  it "doesn't import a picture if the person has an associated facebook account" do
     person = build(:person, last_name: 'Doe')
     @contact.people << person
     create(:facebook_account, person: person)
@@ -312,9 +312,9 @@ describe GoogleImport do
     it 'does nothing if no groups specified' do
       @import.import_by_group = true
       @import.save
-      -> {
+      expect {
         @google_import.send(:import)
-      }.should_not change(Contact, :count)
+      }.to_not change(Contact, :count)
     end
 
     it 'imports a specified group' do
@@ -332,9 +332,9 @@ describe GoogleImport do
         .to_return(body: File.new(Rails.root.join('spec/fixtures/google_contacts.json')).read)
         .times(1)
 
-      -> {
+      expect {
         @google_import.send(:import)
-      }.should change(Contact, :count).by(1)
+      }.to change(Contact, :count).by(1)
 
       Contact.last.tag_list.sort.should == %w(hi mom more tags)
     end

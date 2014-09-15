@@ -12,9 +12,9 @@ describe Person::RelayAccount do
     it 'should create an account linked to a person' do
       person = create(:user)
       @org.stub(:api).and_return(FakeApi.new)
-      -> {
+      expect {
         @account = Person::RelayAccount.find_or_create_from_auth(@auth_hash, person)
-      }.should change(Person::RelayAccount, :count).from(0).to(1)
+      }.to change(Person::RelayAccount, :count).from(0).to(1)
       person.relay_accounts.should include(@account)
     end
 
@@ -23,9 +23,9 @@ describe Person::RelayAccount do
       @person2 = create(:user)
       @org.stub(:api).and_return(FakeApi.new)
       @account = Person::RelayAccount.find_or_create_from_auth(@auth_hash, @person)
-      -> {
+      expect {
         @account2 = Person::RelayAccount.find_or_create_from_auth(@auth_hash, @person2)
-      }.should_not change(Person::RelayAccount, :count)
+      }.to_not change(Person::RelayAccount, :count)
       @account.should == @account2
     end
 
@@ -44,11 +44,11 @@ describe Person::RelayAccount do
 
   describe 'create user from auth' do
     it 'should create a user with a first and last name' do
-      -> {
+      expect {
         user = Person::RelayAccount.create_user_from_auth(@auth_hash)
         user.first_name.should == @auth_hash.extra.attributes.first.firstName
         user.last_name.should == @auth_hash.extra.attributes.first.lastName
-      }.should change(User, :count).from(0).to(1)
+      }.to change(User, :count).from(0).to(1)
     end
   end
 

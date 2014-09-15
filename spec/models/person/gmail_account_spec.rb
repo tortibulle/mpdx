@@ -74,7 +74,8 @@ describe Person::GmailAccount do
   end
 
   context '#log_email' do
-    let(:gmail_message) { double(message: double(multipart?: false, body: double(decoded: 'message body')),
+    let(:gmail_message) {
+      double(message: double(multipart?: false, body: double(decoded: 'message body')),
                                  envelope: double(date: Time.zone.now, message_id: '1'),
                                  subject: 'subject', msg_id: 1)
     }
