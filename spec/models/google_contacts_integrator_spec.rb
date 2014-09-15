@@ -63,7 +63,7 @@ describe GoogleContactsIntegrator do
 
     it 'syncs a google contact if one is retrieved/queried' do
       expect(@integrator).to receive(:get_or_query_g_contact).with(@g_contact_link, @person).and_return(@g_contact)
-      expect(@integrator).to receive(:sync_with_g_contact).with(@person, @contact, @g_contact)
+      expect(@integrator).to receive(:sync_with_g_contact).with(@person, @contact, @g_contact, @g_contact_link)
       @integrator.sync_person(@person, @contact)
     end
 
@@ -173,13 +173,15 @@ describe GoogleContactsIntegrator do
 
   describe 'sync_with_g_contact' do
     it 'syncs each of the parts, saves the records and sends the g_contact update' do
+      g_contact_link = build(:google_contact, google_account: @account, person: @person)
       expect(@integrator).to receive(:sync_basic_person_fields).with(@g_contact, @person)
       expect(@integrator).to receive(:sync_contact_fields).with(@g_contact, @contact)
       expect(@integrator).to receive(:sync_employer_and_title).with(@g_contact, @person)
+      expect(@integrator).to receive(:sync_emails).with(@g_contact, @person, g_contact_link)
       expect(@person).to receive(:save)
       expect(@contact).to receive(:save)
       expect(@g_contact).to receive(:send_update)
-      @integrator.sync_with_g_contact(@person, @contact, @g_contact)
+      @integrator.sync_with_g_contact(@person, @contact, @g_contact, g_contact_link)
     end
   end
 
@@ -303,6 +305,100 @@ describe GoogleContactsIntegrator do
       expect(@g_contact.prepped_changes).to eq({})
       expect(@person.employer).to eq('Company')
       expect(@person.occupation).to eq('Worker')
+    end
+  end
+
+  describe 'sync_emails first time sync' do
+    it 'combines distinct emails from google and mpdx' do
+      g_contact_link = build(:google_contact, google_account: @account, person: @person)
+
+      @person.email_address = { email: 'mpdx@example.com', location: 'home', primary: true }
+      @g_contact['gd$email'] = [
+        { address: 'google@example.com', primary: 'true', rel: 'http://schemas.google.com/g/2005#other' }
+      ]
+
+      @integrator.sync_emails(@g_contact, @person, g_contact_link)
+
+      expect(@g_contact.prepped_changes).to eq(emails: [
+        { primary: true, rel: 'other', address: 'google@example.com' },
+        { primary: false, rel: 'home', address: 'mpdx@example.com' }
+      ])
+
+      expect(@person.email_addresses.count).to eq(2)
+      email1 = @person.email_addresses.first
+      expect(email1.email).to eq('mpdx@example.com')
+      expect(email1.location).to eq('home')
+      expect(email1.primary).to be_true
+      email2 = @person.email_addresses.last
+      expect(email2.email).to eq('google@example.com')
+      expect(email2.location).to eq('other')
+      expect(email2.primary).to be_false
+    end
+  end
+
+  describe 'sync_emails subsequent sync' do
+    before do
+      @g_contact_json_text = File.new(Rails.root.join('spec/fixtures/google_contacts.json')).read
+      @api_url = 'https://www.google.com/m8/feeds/contacts'
+      stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&q=John%20Doe&v=3")
+        .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
+        .to_return(body: @g_contact_json_text)
+
+      updated_g_contact_obj = JSON.parse(@g_contact_json_text)['feed']['entry'][0]
+      updated_g_contact_obj['gd$email'] = [
+        { primary: true, rel: 'http://schemas.google.com/g/2005#other', address: 'johnsmith@example.com' },
+        { primary: false, rel: 'http://schemas.google.com/g/2005#home', address: 'mpdx@example.com' }
+      ]
+      @first_sync_put = stub_request(:put, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
+        .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
+        .to_return(body: { 'entry' => [updated_g_contact_obj] }.to_json)
+
+      @person.email_address = { email: 'mpdx@example.com', location: 'home', primary: true }
+
+      @integrator.sync_contacts
+
+      @person.reload
+      expect(@person.email_addresses.count).to eq(2)
+      email1 = @person.email_addresses.first
+      expect(email1.email).to eq('mpdx@example.com')
+      expect(email1.location).to eq('home')
+      expect(email1.primary).to be_true
+      email2 = @person.email_addresses.last
+      expect(email2.email).to eq('johnsmith@example.com')
+      expect(email2.location).to eq('other')
+      expect(email2.primary).to be_false
+    end
+
+    it 'passes on updates from mpdx to google and vice versa' do
+      email = @person.email_addresses.first
+      email.email = 'mpdx_MODIFIED@example.com'
+      email.save
+
+      WebMock.reset!
+
+      updated_g_contact_obj = JSON.parse(@g_contact_json_text)['feed']['entry'][0]
+      updated_g_contact_obj['gd$email'] = [
+        { primary: true, rel: 'http://schemas.google.com/g/2005#other', address: 'johnsmith_MODIFIED@example.com' },
+        { primary: false, rel: 'http://schemas.google.com/g/2005#home', address: 'mpdx@example.com' }
+      ]
+      stub_request(:get, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
+        .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
+        .to_return(body: { 'entry' => [updated_g_contact_obj] }.to_json)
+
+      put_xml_regex_str = Regexp.quote('</atom:content>
+        <gd:email rel="http://schemas.google.com/g/2005#other" address="johnsmith_MODIFIED@example.com"/>
+        <gd:email rel="http://schemas.google.com/g/2005#home" address="mpdx_MODIFIED@example.com"/>
+        <gd:phoneNumber').gsub(' ', '\s*').gsub("\n", '\s*')
+      stub_request(:put, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
+        .with(body: /.*#{put_xml_regex_str}.*/m, headers: { 'Authorization' => "Bearer #{@account.token}" })
+        .to_return(body: { 'entry' => [updated_g_contact_obj] }.to_json)
+
+      @integrator.sync_contacts
+
+      @person.reload
+      expect(@person.email_addresses.count).to eq(2)
+      expect(@person.email_addresses.first.email).to eq('mpdx_MODIFIED@example.com')
+      expect(@person.email_addresses.last.email).to eq('johnsmith_MODIFIED@example.com')
     end
   end
 

@@ -11,7 +11,14 @@ class GoogleContactsIntegrator
   end
 
   def sync_contact(contact)
-    contact.people.each { |person| sync_person(person, contact) }
+    contact.people.each do |person|
+      begin
+        sync_person(person, contact)
+      rescue => e
+        Airbrake.raise_or_notify(e)
+        next
+      end
+    end
   end
 
   def sync_person(person, contact)
@@ -21,9 +28,10 @@ class GoogleContactsIntegrator
     if g_contact.nil?
       g_contact = create_g_contact(person, contact)
     else
-      sync_with_g_contact(person, contact, g_contact)
+      sync_with_g_contact(person, contact, g_contact, g_contact_link)
     end
 
+    g_contact_link.last_data = g_contact.formatted_attrs
     g_contact_link.remote_id = g_contact.id
     g_contact_link.last_etag = g_contact.etag
     g_contact_link.last_synced = Time.now
@@ -46,34 +54,71 @@ class GoogleContactsIntegrator
 
   def create_g_contact(person, contact)
     @account.contacts_api_user.create_contact(
-        name_prefix: person.title,
-        given_name: person.first_name,
-        additional_name: person.middle_name,
-        family_name: person.last_name,
-        name_suffix: person.suffix,
-        content: contact.notes,
-        emails: person.email_addresses.map(&method(:format_email_for_google)),
-        phone_numbers: person.phone_numbers.map(&method(:format_phone_for_google)),
-        organizations: g_contact_organizations_for(person),
-        websites: person.websites.map(&method(:format_website_for_google)),
-        addresses: contact.addresses.map(&method(:format_address_for_google))
+      name_prefix: person.title,
+      given_name: person.first_name,
+      additional_name: person.middle_name,
+      family_name: person.last_name,
+      name_suffix: person.suffix,
+      content: contact.notes,
+      emails: person.email_addresses.map(&method(:format_email_for_google)),
+      phone_numbers: person.phone_numbers.map(&method(:format_phone_for_google)),
+      organizations: g_contact_organizations_for(person),
+      websites: person.websites.map(&method(:format_website_for_google)),
+      addresses: contact.addresses.map(&method(:format_address_for_google))
     )
   end
 
-  def sync_with_g_contact(person, contact, g_contact)
+  def sync_with_g_contact(person, contact, g_contact, g_contact_link)
     sync_basic_person_fields(g_contact, person)
     sync_contact_fields(g_contact, contact)
     sync_employer_and_title(g_contact, person)
-
-    # sync_phone_numbers(g_contact, g_contact_link, person, import_from_google, override)
-
-    # For array lists, like phone numbers, emails, addresses, websites:
-    # If already associated with the contact && override => Favor MPDX completely
+    sync_emails(g_contact, person, g_contact_link)
 
     g_contact.send_update
     person.save
     contact.save
   end
+
+  def sync_emails(g_contact, person, g_contact_link)
+    person_emails = person.email_addresses
+    g_contact_emails = g_contact.emails_full
+
+    if g_contact_link.last_data
+      # Do a more clever 2-way sync using the mapping of old emails and email record ids, and of the old google contact
+      # info and an alignment algorithm using the 'align' gem
+    else
+      combine_g_contact_emails(g_contact, g_contact_emails, person_emails)
+      combine_mpdx_emails(person, g_contact_emails, person_emails)
+    end
+  end
+
+  def combine_g_contact_emails(g_contact, g_contact_emails, person_emails)
+    g_contact_emails_set = g_contact_emails.map { |e| e[:address] }.to_set
+    g_contact_primary = g_contact_emails.find { |e| e[:primary] }
+    person_emails.each do |email|
+      next if g_contact_emails_set.include?(email.email)
+      g_contact_email = format_email_for_google(email)
+      g_contact_email[:primary] = false if g_contact_primary
+      g_contact_emails << g_contact_email
+    end
+    g_contact.prep_update(emails: g_contact_emails)
+  end
+
+  def combine_mpdx_emails(person, g_contact_emails, person_emails)
+    mpdx_primary = person_emails.find(&:primary)
+    person_emails_set = person_emails.map(&:email).to_set
+    g_contact_emails.each do |email|
+      next if person_emails_set.include?(email[:address])
+      mpdx_email = format_email_for_mpdx(email)
+      mpdx_email[:primary] = false if mpdx_primary
+      person.email_address = mpdx_email
+    end
+  end
+
+  # sync_phone_numbers(g_contact, g_contact_link, person, import_from_google, override)
+
+  # For array lists, like phone numbers, emails, addresses, websites:
+  # If already associated with the contact && override => Favor MPDX completely
 
   # def sync_phone_numbers(g_contact, g_contact_link, person)
   #   # There's a tension between:
@@ -166,8 +211,12 @@ class GoogleContactsIntegrator
     end
   end
 
+  def format_email_for_mpdx(email)
+    { email: email[:address], primary: email[:primary], location: email[:rel] }
+  end
+
   def format_email_for_google(email)
-    { address: email.email, primary: email.primary, rel: email.location.in?(%w(work home)) ? email.location : 'other' }
+    { primary: email.primary, rel: email.location.in?(%w(work home)) ? email.location : 'other', address: email.email }
   end
 
   def format_phone_for_google(phone)
