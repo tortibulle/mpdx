@@ -5,98 +5,349 @@ describe GoogleContactsIntegrator do
     stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
 
     @user = create(:user)
-    @google_account = create(:google_account, person_id: @user.id)
+    @account = create(:google_account, person_id: @user.id)
     @account_list = create(:account_list, creator: @user)
-    @integration = create(:google_integration, google_account: @google_account, account_list: @account_list,
+    @integration = create(:google_integration, google_account: @account, account_list: @account_list,
                                                contacts_integration: true, calendar_integration: false)
     @integrator = GoogleContactsIntegrator.new(@integration)
 
     @contact = create(:contact, account_list: @account_list, status: 'Partner - Pray', notes: 'about')
-    @contact.addresses_attributes = [
-      { street: '2 Ln', city: 'City', state: 'MO', postal_code: '23456', country: 'United States', location: 'Business',
-        primary_mailing_address: true },
-      { street: '1 Way', city: 'Town', state: 'IL', postal_code: '12345', country: 'United States', location: 'Home',
-        primary_mailing_address: false }
-    ]
-    @contact.save
 
     @person = create(:person, last_name: 'Doe', middle_name: 'Henry', title: 'Mr', suffix: 'III',
                               occupation: 'Worker', employer: 'Company, Inc')
-
-    @person.email_address = { email: 'home@example.com', location: 'home', primary: true }
-    @person.email_address = { email: 'john@example.com', location: 'work', primary: false }
-
-    @person.phone_number = { number: '+12223334444', location: 'mobile', primary: true }
-    @person.phone_number = { number: '+15552224444', location: 'home', primary: false }
-
-    @person.websites << Person::Website.create(url: 'blog.example.com', primary: true)
-    @person.websites << Person::Website.create(url: 'www.example.com', primary: false)
-
     @contact.people << @person
+
+    @g_contact = GoogleContactsApi::Contact.new(
+      'gd$etag' => 'a',
+      'id' => { '$t' => '1' },
+      'gd$name' => {
+        'gd$givenName' => { '$t' => 'John' },
+        'gd$familyName' => { '$t' => 'Doe' }
+      }
+    )
   end
 
-  it 'doesn\'t export inactive contacts' do
-    @contact.update_column(:status, 'Not Interested')
-    expect(@google_account.contacts_api_user).to_not receive(:create_contact)
-    @integrator.sync_contacts
-  end
-
-  it 'creates a new google contact for an active contact' do
-    g_contact_attrs = {
-      name_prefix: 'Mr',
-      given_name: 'John',
-      additional_name: 'Henry',
-      family_name: 'Doe',
-      name_suffix: 'III',
-      content: 'about',
-      emails: [
-        { address: 'home@example.com', primary: true, rel: 'home' },
-        { address: 'john@example.com', primary: false, rel: 'work' }
-      ],
-      phone_numbers: [
-        { number: '+12223334444', primary: true, rel: 'mobile' },
-        { number: '+15552224444', primary: false, rel: 'home' }
-      ],
-      websites: [
-        { href: 'blog.example.com', primary: true,  rel: 'other' },
-        { href: 'www.example.com', primary: false, rel: 'other' }
-      ],
-      addresses: [
-        { rel: 'work', primary: true,  street: '2 Ln', city: 'City', region: 'MO', postcode: '23456',
-          country: 'United States of America' },
-        { rel: 'home', primary: false,  street: '1 Way', city: 'Town', region: 'IL', postcode: '12345',
-          country: 'United States of America' }
-      ]
-    }
-    expect(@google_account.contacts_api_user).to receive(:create_contact).exactly(1)
-                                                 .times.and_return(double(id: '1')) do |arg|
-      arg.each do |k, v|
-        if v.is_a?(Array)
-          expect(arg[k].to_set).to eq(g_contact_attrs[k].to_set)
-        else
-          expect(arg[k]).to eq(g_contact_attrs[k])
-        end
-      end
+  describe 'sync_contacts' do
+    it "doesn't sync inactive contacts" do
+      @contact.update_column(:status, 'Not Interested')
+      expect(@integrator).to_not receive(:sync_contact)
+      @integrator.sync_contacts
     end
 
-    @integrator.sync_contacts
-
-    expect(@person.google_contacts.count).to eq(1)
-    google_contact = @person.google_contacts.first
-    expect(google_contact.remote_id).to eq('1')
+    it 'syncs active contacts and their people' do
+      expect(@integrator).to receive(:sync_contact).with(@contact)
+      @integrator.sync_contacts
+    end
   end
 
-  it 'doesn\'t create a contact if the person is matched to one already' do
-    create(:google_contact, person: @person, remote_id: '1', google_account: @google_account)
-
-    expect(@google_account.contacts_api_user).to_not receive(:create_contact)
-    @integrator.sync_contacts
+  describe 'sync_contact' do
+    it 'syncs its people' do
+      expect(@integrator).to receive(:sync_person).with(@person, @contact)
+      @integrator.sync_contact(@contact)
+    end
   end
 
-  it 'creates a contact if person matched to a different google account' do
-    other_google_account = create(:google_account)
-    create(:google_contact, person: @person, remote_id: '1', google_account: other_google_account)
-    expect(@google_account.contacts_api_user).to receive(:create_contact).and_return(double(id: '1'))
-    @integrator.sync_contacts
+  describe 'sync_person' do
+    before do
+      @g_contact_link = build(:google_contact, google_account: @account, person: @person)
+
+      expect(@person.google_contacts).to receive(:first_or_initialize).with(google_account: @account)
+                                          .and_return(@g_contact_link)
+    end
+
+    it 'creates a google contact if none retrieved/queried' do
+      expect(@integrator).to receive(:get_or_query_g_contact).with(@g_contact_link, @person).and_return(nil)
+      expect(@integrator).to receive(:create_g_contact).with(@person, @contact).and_return(@g_contact)
+      @integrator.sync_person(@person, @contact)
+    end
+
+    it 'syncs a google contact if one is retrieved/queried' do
+      expect(@integrator).to receive(:get_or_query_g_contact).with(@g_contact_link, @person).and_return(@g_contact)
+      expect(@integrator).to receive(:sync_with_g_contact).with(@person, @contact, @g_contact)
+      @integrator.sync_person(@person, @contact)
+    end
+
+    after do
+      expect(@person.google_contacts.count).to eq(1)
+      g_contact_link = @person.google_contacts.first
+      expect(g_contact_link.remote_id).to eq('1')
+      expect(g_contact_link.last_etag).to eq('a')
+    end
   end
+
+  describe 'get_or_query_g_contact' do
+    it 'gets the g_contact if there is a remote_id in the passed google contact link record' do
+      expect(@integrator).to receive(:get_g_contact).with('1').and_return('g contact')
+      expect(@integrator.get_or_query_g_contact(double(remote_id: '1'), @person)).to eq('g contact')
+    end
+
+    it 'queries the g_contact if there is no remote_id in the passed google contact link record' do
+      expect(@integrator).to receive(:query_g_contact).with(@person).and_return('g contact')
+      expect(@integrator.get_or_query_g_contact(double(remote_id: nil), @person)).to eq('g contact')
+    end
+  end
+
+  describe 'get_g_contact' do
+    it 'calls the api to get a contact' do
+      expect(@account.contacts_api_user).to receive(:get_contact).with('1').and_return('g contact')
+      expect(@integrator.get_g_contact('1')).to eq('g contact')
+    end
+  end
+
+  describe 'query_g_contact' do
+    it 'queries by first and last name returns nil if no results from api query' do
+      expect(@account.contacts_api_user).to receive(:query_contacts).with('John Doe').and_return([])
+      expect(@integrator.query_g_contact(@person)).to be_nil
+    end
+
+    it 'queries by first and last name returns nil if there are results with different name' do
+      g_contact = double(given_name: 'Not-John', family_name: 'Doe')
+      expect(@account.contacts_api_user).to receive(:query_contacts).with('John Doe').and_return([g_contact])
+      expect(@integrator.query_g_contact(@person)).to be_nil
+    end
+
+    it 'queries by first and last name returns match if there are results with same name' do
+      g_contact = double(given_name: 'John', family_name: 'Doe')
+      expect(@account.contacts_api_user).to receive(:query_contacts).with('John Doe').and_return([g_contact])
+      expect(@integrator.query_g_contact(@person)).to eq(g_contact)
+    end
+  end
+
+  describe 'create_g_contact' do
+    before do
+      @contact.addresses_attributes = [
+        { street: '2 Ln', city: 'City', state: 'MO', postal_code: '23456', country: 'United States', location: 'Business',
+          primary_mailing_address: true },
+        { street: '1 Way', city: 'Town', state: 'IL', postal_code: '12345', country: 'United States', location: 'Home',
+          primary_mailing_address: false }
+      ]
+      @contact.save
+
+      @g_contact_attrs = {
+        name_prefix: 'Mr',
+        given_name: 'John',
+        additional_name: 'Henry',
+        family_name: 'Doe',
+        name_suffix: 'III',
+        content: 'about',
+        emails: [
+          { address: 'home@example.com', primary: true, rel: 'home' },
+          { address: 'john@example.com', primary: false, rel: 'work' }
+        ],
+        phone_numbers: [
+          { number: '+12223334444', primary: true, rel: 'mobile' },
+          { number: '+15552224444', primary: false, rel: 'home' }
+        ],
+        organizations: [
+          { org_name: 'Company, Inc', org_title: 'Worker', primary: true }
+        ],
+        websites: [
+          { href: 'www.example.com', primary: false, rel: 'other' },
+          { href: 'blog.example.com', primary: true,  rel: 'other' }
+        ],
+        addresses: [
+          { rel: 'work', primary: true,  street: '2 Ln', city: 'City', region: 'MO', postcode: '23456',
+            country: 'United States of America' },
+          { rel: 'home', primary: false,  street: '1 Way', city: 'Town', region: 'IL', postcode: '12345',
+            country: 'United States of America' }
+        ]
+      }
+
+      @person.email_address = { email: 'home@example.com', location: 'home', primary: true }
+      @person.email_address = { email: 'john@example.com', location: 'work', primary: false }
+
+      @person.phone_number = { number: '+12223334444', location: 'mobile', primary: true }
+      @person.phone_number = { number: '+15552224444', location: 'home', primary: false }
+
+      @person.websites << Person::Website.create(url: 'blog.example.com', primary: true)
+      @person.websites << Person::Website.create(url: 'www.example.com', primary: false)
+
+      @person.save
+    end
+
+    it 'calls the api to create a contact with correct attributes' do
+      expect(@account.contacts_api_user).to receive(:create_contact).with(@g_contact_attrs).and_return('g contact')
+      expect(@integrator.create_g_contact(@person, @contact)).to eq('g contact')
+    end
+  end
+
+  describe 'sync_with_g_contact' do
+    it 'syncs each of the parts, saves the records and sends the g_contact update' do
+      expect(@integrator).to receive(:sync_basic_person_fields).with(@g_contact, @person)
+      expect(@integrator).to receive(:sync_contact_fields).with(@g_contact, @contact)
+      expect(@integrator).to receive(:sync_employer_and_title).with(@g_contact, @person)
+      expect(@person).to receive(:save)
+      expect(@contact).to receive(:save)
+      expect(@g_contact).to receive(:send_update)
+      @integrator.sync_with_g_contact(@person, @contact, @g_contact)
+    end
+  end
+
+  describe 'sync_contact_fields' do
+    it 'sets blank mpdx notes with google contact notes' do
+      @g_contact['content'] = { '$t' => 'google notes' }
+      @contact.notes = ''
+      @integrator.sync_contact_fields(@g_contact, @contact)
+      expect(@contact.notes).to eq('google notes')
+      expect(@g_contact.prepped_changes).to eq({})
+    end
+
+    it 'sets blank google contact notes to mpdx notes' do
+      @g_contact['content'] = { '$t' => '' }
+      @contact.notes = 'mpdx notes'
+      @integrator.sync_contact_fields(@g_contact, @contact)
+      expect(@contact.notes).to eq('mpdx notes')
+      expect(@g_contact.prepped_changes).to eq(content: 'mpdx notes')
+    end
+
+    it 'leaves both as is if both are present' do
+      @g_contact['content'] = { '$t' => 'google notes' }
+      @contact.notes = 'mpdx notes'
+      @integrator.sync_contact_fields(@g_contact, @contact)
+      expect(@contact.notes).to eq('mpdx notes')
+      expect(@g_contact.prepped_changes).to eq({})
+    end
+  end
+
+  describe 'sync_basic_person_fields' do
+    it 'sets blank mpdx fields with google contact fields' do
+      @person.update(title: nil, first_name: '', middle_name: nil, last_name: '', suffix: '')
+      @g_contact['gd$name'] = {
+        'gd$namePrefix' => { '$t' => 'Mr' },
+        'gd$givenName' => { '$t' => 'John' },
+        'gd$additionalName' => { '$t' => 'Henry' },
+        'gd$familyName' => { '$t' => 'Doe' },
+        'gd$nameSuffix' => { '$t' => 'III' }
+      }
+
+      @integrator.sync_basic_person_fields(@g_contact, @person)
+
+      expect(@g_contact.prepped_changes).to eq({})
+
+      expect(@person.title).to eq('Mr')
+      expect(@person.first_name).to eq('John')
+      expect(@person.middle_name).to eq('Henry')
+      expect(@person.last_name).to eq('Doe')
+      expect(@person.suffix).to eq('III')
+    end
+
+    it 'sets blank google fields to mpdx fields' do
+      @person.update(title: 'Mr', middle_name: 'Henry', suffix: 'III')
+      @g_contact['gd$name'] = {}
+
+      @integrator.sync_basic_person_fields(@g_contact, @person)
+
+      expect(@g_contact.prepped_changes).to eq(name_prefix: 'Mr', given_name: 'John', additional_name: 'Henry',
+                                               family_name: 'Doe', name_suffix: 'III')
+    end
+
+    it 'leaves both as is if both are present' do
+      @g_contact['gd$name'] = {
+        'gd$namePrefix' => { '$t' => 'Not-Mr' },
+        'gd$givenName' => { '$t' => 'Not-John' },
+        'gd$additionalName' => { '$t' => 'Not-Henry' },
+        'gd$familyName' => { '$t' => 'Not-Doe' },
+        'gd$nameSuffix' => { '$t' => 'Not-III' }
+      }
+      @person.update(title: 'Mr', middle_name: 'Henry', suffix: 'III')
+
+      @integrator.sync_basic_person_fields(@g_contact, @person)
+
+      expect(@g_contact.prepped_changes).to eq({})
+
+      expect(@person.title).to eq('Mr')
+      expect(@person.first_name).to eq('John')
+      expect(@person.middle_name).to eq('Henry')
+      expect(@person.last_name).to eq('Doe')
+      expect(@person.suffix).to eq('III')
+    end
+  end
+
+  describe 'sync_employer_and_title' do
+    it 'sets blank mpdx employer and occupation from google' do
+      @person.employer = ''
+      @person.occupation = nil
+      @g_contact['gd$organization'] = [{
+        'gd$orgName' => { '$t' => 'Company' },
+        'gd$orgTitle' => { '$t' => 'Worker' }
+      }]
+
+      @integrator.sync_employer_and_title(@g_contact, @person)
+
+      expect(@g_contact.prepped_changes).to eq({})
+      expect(@person.employer).to eq('Company')
+      expect(@person.occupation).to eq('Worker')
+    end
+
+    it 'sets blank google employer and occupation from mpdx' do
+      @person.employer = 'Company'
+      @person.occupation = 'Worker'
+      @g_contact['gd$organization'] = []
+
+      @integrator.sync_employer_and_title(@g_contact, @person)
+
+      expect(@g_contact.prepped_changes).to eq(organizations: [{ org_name: 'Company', org_title: 'Worker',
+                                                                 primary: true }])
+    end
+
+    it 'leaves both as is if both are present' do
+      @person.employer = 'Company'
+      @person.occupation = 'Worker'
+      @g_contact['gd$organization'] = [{
+        'gd$orgName' => { '$t' => 'Not-Company' },
+        'gd$orgTitle' => { '$t' => 'Not-Worker' }
+      }]
+
+      @integrator.sync_employer_and_title(@g_contact, @person)
+
+      expect(@g_contact.prepped_changes).to eq({})
+      expect(@person.employer).to eq('Company')
+      expect(@person.occupation).to eq('Worker')
+    end
+  end
+
+  # it 'creates a google contact for active contact with no google_contact link record and no existing google contact' do
+  #   expect(@account.contacts_api_user).to receive(:query_contacts).with('John Doe').and_return([])
+  #
+  #   expect(@account.contacts_api_user).to receive(:create_contact).with(@g_contact_attrs).exactly(1).times
+  #                                                   .and_return(double(id: '1', etag: 'a'))
+  #
+  #   @integrator.sync_contacts
+  #
+  #   expect_correct_g_contact_link
+  # end
+  #
+  # it 'updates google contact if there is a matching queried contact' do
+  #   g_contact = GoogleContactsApi::Contact.new(
+  #     'gd$etag' => 'a',
+  #     'id' => { '$t' => '1' },
+  #     'gd$name' => {
+  #       'gd$givenName' => { '$t' => 'John' },
+  #       'gd$familyName' => { '$t' => 'Doe' }
+  #     }
+  #   )
+  #
+  #   expect(@account.contacts_api_user).to receive(:query_contacts).with('John Doe').and_return([g_contact])
+  #
+  #   expect(g_contact).to receive(:create_contact).with(@g_contact_attrs).exactly(1).times
+  #                                         .and_return(double(id: '1', etag: 'a'))
+  #
+  #   @integrator.sync_contacts
+  #
+  #   expect_correct_g_contact_link
+  # end
+
+  # it 'doesn\'t create a contact if the person is matched to one already' do
+  #   create(:google_contact, person: @person, remote_id: '1', google_account: @account)
+  #
+  #   expect(@account.contacts_api_user).to_not receive(:create_contact)
+  #   @integrator.sync_contacts
+  # end
+  #
+  # it 'creates a contact if person matched to a different google account' do
+  #   other_google_account = create(:google_account)
+  #   create(:google_contact, person: @person, remote_id: '1', google_account: other_google_account)
+  #   expect(@account.contacts_api_user).to receive(:create_contact).and_return(double(id: '1'))
+  #   @integrator.sync_contacts
+  # end
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140901165529) do
+ActiveRecord::Schema.define(version: 20140915141209) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -357,6 +357,11 @@ ActiveRecord::Schema.define(version: 20140901165529) do
     t.string   "picture_etag"
     t.integer  "picture_id"
     t.integer  "google_account_id"
+    t.datetime "last_synced"
+    t.string   "last_etag"
+    t.text     "last_data"
+    t.text     "last_mappings"
+    t.text     "overwrite_log"
   end
 
   add_index "google_contacts", ["google_account_id"], name: "index_google_contacts_on_google_account_id", using: :btree
