@@ -1,4 +1,6 @@
-OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+silence_warnings do
+  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+end
 OmniAuth.config.full_host = (Rails.env.development? ? 'http://' : 'https://') + ActionMailer::Base.default_url_options[:host]
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :twitter, APP_CONFIG['twitter_key'], APP_CONFIG['twitter_secret']
