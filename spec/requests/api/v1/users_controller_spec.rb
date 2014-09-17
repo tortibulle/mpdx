@@ -10,8 +10,20 @@ describe Api::V1::UsersController do
       get '/api/v1/users/me?access_token=' + user.access_token
     end
 
-    it 'respond with success' do
+    it 'responds with success' do
       expect(response.status).to eq(200)
+    end
+  end
+
+  context 'with invalid token' do
+    let(:user) { create(:user, access_token: 'badToken1') }
+
+    it 'responds with error' do
+      stub_request(:get, 'http://oauth.ccci.us/users/badToken').to_raise(RestClient::Unauthorized)
+      get '/api/v1/users/me?access_token=badToken'
+
+      expect(response.status).to eq(401)
+      expect(JSON.parse(response.body)['errors']).to_not be_nil
     end
   end
 
