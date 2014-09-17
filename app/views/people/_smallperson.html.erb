@@ -1,6 +1,6 @@
 <% exhibit(person, self).tap do |p| %>
   <div class="small-person" id="person-<%= p.id %>">
-    <%= link_to(image_tag(p.avatar(:large), class: "person_avatar"), p) %>
+    <%= link_to(image_tag(p.avatar(:large_square), class: "person_avatar"), p) %>
     <div class="person_details">
       <div class="name"><%= link_to(p, p) %></div>
       <%= render 'people/contact_details_compact', person: p %>
