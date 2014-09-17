@@ -148,16 +148,24 @@ class Contact < ActiveRecord::Base
   end
 
   def primary_or_first_person
-    unless @primary_or_first_person
-      @primary_or_first_person = primary_person
-      if !@primary_or_first_person && people.present?
-        @primary_or_first_person = people.where(gender: 'male').first || people.order('created_at').first
-        if @primary_or_first_person && @primary_or_first_person.new_record? && !self.new_record?
-          self.primary_person_id = @primary_or_first_person.id
-        end
-      end
+    @primary_or_first_person ||= primary_person
+    return @primary_or_first_person if @primary_or_first_person
+    return Person.new if people.blank?
+
+    if people.count == 1
+      @primary_or_first_person = people.first
+    else
+      @primary_or_first_person = people.alive.where(gender: 'male').first || people.alive.order('created_at').first
+    end
+    if @primary_or_first_person && @primary_or_first_person.new_record? && !self.new_record?
+      self.primary_person_id = @primary_or_first_person.id
     end
     @primary_or_first_person || Person.new
+  end
+
+  def clear_primary_person
+    @primary_or_first_person = nil
+    self.primary_person_id = nil
   end
 
   def primary_person_id
@@ -186,7 +194,10 @@ class Contact < ActiveRecord::Base
 
   def greeting
     return name if siebel_organization?
-    self[:greeting].present? ? self[:greeting] : [first_name, spouse_name].compact.join(_(' and '))
+    return self[:greeting] if self[:greeting].present?
+    return first_name if spouse.try(:deceased)
+    return spouse_name if primary_or_first_person.deceased && spouse
+    [first_name, spouse_name].compact.join(_(' and '))
   end
 
   def envelope_greeting

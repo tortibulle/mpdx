@@ -41,6 +41,8 @@ class Person < ActiveRecord::Base
   has_many :messages_received, class_name: 'Message', foreign_key: :to_id, dependent: :destroy
   has_many :google_contacts
 
+  scope :alive, -> { where.not(deceased: true) }
+
   accepts_nested_attributes_for :email_addresses, reject_if: -> (e) { e[:email].blank? }, allow_destroy: true
   accepts_nested_attributes_for :phone_numbers, reject_if: -> (p) { p[:number].blank? }, allow_destroy: true
   accepts_nested_attributes_for :family_relationships, reject_if: -> (p) { p[:related_contact_id].blank? }, allow_destroy: true
@@ -141,6 +143,11 @@ class Person < ActiveRecord::Base
       if c.name.include?(first_name)
         c.name = c.name.sub(first_name, '')
         c.name = c.name.sub(' and ', '').strip
+        need_to_save = true
+      end
+
+      if c.primary_person_id == id && c.people.count > 1
+        c.clear_primary_person
         need_to_save = true
       end
       return unless need_to_save
