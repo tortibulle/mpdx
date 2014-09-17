@@ -336,6 +336,21 @@ describe GoogleContactsIntegrator do
     end
   end
 
+  describe 'mpdx_email_changes' do
+    it 'properly records creates, updates and deletes since last sync' do
+      email1 = double(id: 1, email: 'a')
+      email2 = double(id: 2, email: 'b2')
+      email4 = double(id: 4, email: 'd')
+      person = double(email_addresses: [email1, email2, email4])
+      g_contact_link = double(last_mappings: { emails: { 1 => 'a', 2 => 'b', 3 => 'c' } })
+      expect(@integrator.mpdx_email_changes(person, g_contact_link)).to eq([
+        { type: :update, old: 'b', new: 'b2', mpdx_data: email2 },
+        { type: :create, new: 'd', mpdx_data: email4 },
+        { type: :delete, old: 'c' }
+      ])
+    end
+  end
+
   describe 'sync_emails subsequent sync' do
     before do
       @g_contact_json_text = File.new(Rails.root.join('spec/fixtures/google_contacts.json')).read
@@ -367,6 +382,35 @@ describe GoogleContactsIntegrator do
       expect(email2.email).to eq('johnsmith@example.com')
       expect(email2.location).to eq('other')
       expect(email2.primary).to be_false
+
+      g_contact_link = @person.google_contacts.first
+      expect(g_contact_link.remote_id).to eq('http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/6b70f8bb0372c')
+      expect(g_contact_link.last_etag).to eq('"SXk6cDdXKit7I2A9Wh9VFUgORgE."')
+      last_data = {
+        name_prefix: 'Mr',
+        given_name: 'John',
+        additional_name: 'Henry',
+        family_name: 'Doe',
+        name_suffix: 'III',
+        content: 'Notes here',
+        emails: [{ primary: false, rel: 'other', address: 'johnsmith@example.com' },
+                 { primary: false, rel: 'home', address: 'mpdx@example.com' }],
+        phone_numbers: [{ primary: true, rel: 'mobile', number: '(123) 334-5158' }],
+        addresses: [
+          { primary: true, rel: 'home', country: 'United States of America',
+            formatted_address: "2345 Long Dr. #232\nSomewhere\nIL\n12345\nUnited States of America",
+            city: 'Somewhere', street: '2345 Long Dr. #232', region: 'IL', postcode: '12345' },
+          { primary: false, rel: 'work', country: 'United States of America',
+            formatted_address: "123 Big Rd\nAnywhere\nMO\n56789\nUnited States of America",
+            city: 'Anywhere', street: '123 Big Rd', region: 'MO', postcode: '56789' }
+        ],
+        organizations: [{ primary: false, rel: 'other', org_title: 'Worker Person', org_name: 'Example, Inc' }],
+        websites: [{ primary: false, rel: 'blog', href: 'blog.example.com' },
+                   { primary: true, rel: 'profile', href: 'www.example.com' }]
+      }
+      expect(g_contact_link.last_data).to eq(last_data)
+
+      expect(g_contact_link.last_mappings).to eq(emails: { email1.id => email1.email, email2.id => email2.email })
     end
 
     it 'passes on updates from mpdx to google and vice versa' do

@@ -32,10 +32,15 @@ class GoogleContactsIntegrator
     end
 
     g_contact_link.last_data = g_contact.formatted_attrs
+    g_contact_link.last_mappings = mpdx_to_g_contact_mappings(person, contact)
     g_contact_link.remote_id = g_contact.id
     g_contact_link.last_etag = g_contact.etag
     g_contact_link.last_synced = Time.now
     g_contact_link.save
+  end
+
+  def mpdx_to_g_contact_mappings(person, _contact)
+    { emails: Hash[person.email_addresses.map { |e| [e.id, e.email] }] }
   end
 
   def get_or_query_g_contact(g_contact_link, person)
@@ -68,6 +73,10 @@ class GoogleContactsIntegrator
     )
   end
 
+  ################################################################################
+  ## Sync of basic fields
+  ################################################################################
+
   def sync_with_g_contact(person, contact, g_contact, g_contact_link)
     sync_basic_person_fields(g_contact, person)
     sync_contact_fields(g_contact, contact)
@@ -79,107 +88,14 @@ class GoogleContactsIntegrator
     contact.save
   end
 
-  def sync_emails(g_contact, person, g_contact_link)
-    person_emails = person.email_addresses
-    g_contact_emails = g_contact.emails_full
-
-    if g_contact_link.last_data
-      # Do a more clever 2-way sync using the mapping of old emails and email record ids, and of the old google contact
-      # info and an alignment algorithm using the 'align' gem
-    else
-      combine_g_contact_emails(g_contact, g_contact_emails, person_emails)
-      combine_mpdx_emails(person, g_contact_emails, person_emails)
-    end
-  end
-
-  def combine_g_contact_emails(g_contact, g_contact_emails, person_emails)
-    g_contact_emails_set = g_contact_emails.map { |e| e[:address] }.to_set
-    g_contact_primary = g_contact_emails.find { |e| e[:primary] }
-    person_emails.each do |email|
-      next if g_contact_emails_set.include?(email.email)
-      g_contact_email = format_email_for_google(email)
-      g_contact_email[:primary] = false if g_contact_primary
-      g_contact_emails << g_contact_email
-    end
-    g_contact.prep_update(emails: g_contact_emails)
-  end
-
-  def combine_mpdx_emails(person, g_contact_emails, person_emails)
-    mpdx_primary = person_emails.find(&:primary)
-    person_emails_set = person_emails.map(&:email).to_set
-    g_contact_emails.each do |email|
-      next if person_emails_set.include?(email[:address])
-      mpdx_email = format_email_for_mpdx(email)
-      mpdx_email[:primary] = false if mpdx_primary
-      person.email_address = mpdx_email
-    end
-  end
-
-  # sync_phone_numbers(g_contact, g_contact_link, person, import_from_google, override)
-
-  # For array lists, like phone numbers, emails, addresses, websites:
-  # If already associated with the contact && override => Favor MPDX completely
-
-  # def sync_phone_numbers(g_contact, g_contact_link, person)
-  #   # There's a tension between:
-  #   # 1. added data, like a new number in Google or a new number in MPDX
-  #   # 2. updated or fixed data, like a changed number in Google or MPDX
-  #   # 3. what about a deleted phone number?
-  #   # The system can't easily tell the difference between the two.
-  #   # What if we stored a JSON representation of the Google Contact as of last sync?
-  #
-  #   # Step 1: MPDX changes from previous sync
-  #   # Step 2: Google changes from previous sync
-  #
-  #   # Step 3: Combine the changes
-  #
-  #   # Adds to both sides
-  #   # Updates to both, if conflict, preserve both numbers in both
-  #
-  #   # Deletions ?? Possible the person just didn't want a particular number in MPDX or in Google. Even if the docs
-  #   # tell them something they might not follow it and could lose information
-  #   # On the other hand, if something really is an old number, would be good to allow them to get rid of it.
-  #   [g_contact, g_contact_link, person]
-  # end
-  #
-  # def mpdx_changes_since_sync(g_contact_link, person)
-  #   changes = []
-  #
-  #   mpdx_g_number_map = g_contact_link.last_sync_map[:phone_numbers]
-  #   person_number_ids = []
-  #   person.phone_numbers.each do |number|
-  #     if mpdx_g_number_map.key?(number.id)
-  #       old_number = g_contact_link.last_sync_data[:phone_numbers].find { |n| n[:number] ==  mpdx_g_number_map[id] }
-  #       new_number = format_phone_for_google(number)
-  #       changes << [:update, number.id, mpdx_g_number_map[id], new_number] unless old_number == new_number
-  #     else
-  #       changes << [:create, number.id, format_phone_for_google(number)]
-  #     end
-  #     person_number_ids << number.id
-  #   end
-  #
-  #   person_number_ids.each do |id|
-  #     unless mpdx_g_number_map.key?(id)
-  #       changes << [:delete, mpdx_g_number_map[id]]
-  #     end
-  #   end
-  #
-  #   changes
-  # end
-  #
-  # def google_changes_since_sync(_g_contact_link, _g_contact)
-  #   # Probably run an alignment algorithm over the two arrays of numbers
-  #   # http://stackoverflow.com/questions/16323571/measure-the-distance-between-two-strings-with-ruby
-  # end
-
   def sync_contact_fields(g_contact, contact)
     sync_g_contact_and_record(g_contact, contact, notes: :content)
   end
 
   def sync_basic_person_fields(g_contact, person)
     sync_g_contact_and_record(g_contact, person, title: :name_prefix, first_name: :given_name,
-                                                 middle_name: :additional_name, last_name: :family_name,
-                                                 suffix: :name_suffix)
+                              middle_name: :additional_name, last_name: :family_name,
+                              suffix: :name_suffix)
   end
 
   def sync_g_contact_and_record(g_contact, record, field_map)
@@ -202,6 +118,52 @@ class GoogleContactsIntegrator
       g_contact.prep_update(organizations: person_orgs) if g_contact_orgs.empty?
     end
   end
+
+  ################################################################################
+  ## Email two-way sync
+  ################################################################################
+
+  # Propages adds and deletes between both the Google Contact and MPDX. An update just becomes an add and a delete
+  def sync_emails(g_contact, person, g_contact_link)
+    g_contact_adds, g_contact_dels, mpdx_adds, mpdx_dels = compare_emails_for_sync(g_contact, person, g_contact_link)
+
+    g_contact_emails = g_contact.emails_full
+
+    (g_contact_adds - mpdx_adds).each do |add_in_mpdx|
+      person.email_address = format_email_for_mpdx(find_hash(g_contact_emails, address: add_in_mpdx))
+    end
+    (g_contact_dels - mpdx_dels).each { |delete_in_mpdx| person.email_addresses.delete(email: delete_in_mpdx) }
+
+    g_contact_emails += (mpdx_adds - g_contact_adds).map do |add_in_g_contact|
+      format_email_for_google(person.email_addresses.find_by_email(add_in_g_contact))
+    end
+    g_contact_emails.delete_if { |e| mpdx_dels.include?(e[:address]) }
+    g_contact.prep_update(emails: g_contact_emails)
+  end
+
+  def compare_emails_for_sync(g_contact, person, g_contact_link)
+    g_contact_emails_full = g_contact.emails_full
+    last_emails = g_contact_link.new_record? ? Set.new : g_contact_link.last_data[:emails].map { |e| e[:address] }.to_set
+    mpdx_emails = person.email_addresses.map(&:email).to_set
+    g_contact_emails = g_contact_emails_full.map { |e| e[:address] }.to_set
+
+    g_contact_adds = (g_contact_emails - last_emails)
+    g_contact_dels = (last_emails - g_contact_emails)
+    mpdx_adds = (mpdx_emails - last_emails)
+    mpdx_dels = (last_emails - mpdx_emails)
+
+    [g_contact_adds, g_contact_dels, mpdx_adds, mpdx_dels]
+  end
+
+  def find_hash(hashes_list, search_key_value)
+    key = search_key_value.keys[0]
+    value = search_key_value.values[0]
+    hashes_list.find { |hash| hash[key] == value }
+  end
+
+  ################################################################################
+  ## Helper functions
+  ################################################################################
 
   def g_contact_organizations_for(person)
     if person.employer.present? || person.occupation.present?
