@@ -1,4 +1,4 @@
-angular.module('mpdxApp', []).run(function () {
+angular.module('mpdxApp', ['ui.bootstrap']).run(function () {
 
 }).config(function() {
 

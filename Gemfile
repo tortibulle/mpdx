@@ -16,6 +16,7 @@ gem 'jquery-ui-rails', '~> 4.2.1'
 
 gem 'angularjs-rails' #, '~> 1.2.16'
 gem 'lodash-rails' #, '~> 2.4.1'
+gem 'angular-ui-bootstrap-rails'
 gem 'ngmin-rails'
 # gem 'rails_karma'
 

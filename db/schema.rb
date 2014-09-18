@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140821112305) do
+ActiveRecord::Schema.define(version: 20140917114705) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -131,6 +131,16 @@ ActiveRecord::Schema.define(version: 20140821112305) do
 
   add_index "appeal_contacts", ["appeal_id", "contact_id"], name: "index_appeal_contacts_on_appeal_id_and_contact_id", using: :btree
   add_index "appeal_contacts", ["contact_id"], name: "index_appeal_contacts_on_contact_id", using: :btree
+
+  create_table "appeal_donations", force: true do |t|
+    t.integer  "appeal_id"
+    t.integer  "donation_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "appeal_donations", ["appeal_id", "donation_id"], name: "index_appeal_donations_on_appeal_id_and_donation_id", using: :btree
+  add_index "appeal_donations", ["donation_id"], name: "index_appeal_donations_on_donation_id", using: :btree
 
   create_table "appeals", force: true do |t|
     t.string   "name"
@@ -634,6 +644,7 @@ ActiveRecord::Schema.define(version: 20140821112305) do
     t.string   "profession"
     t.boolean  "deceased",                         default: false, null: false
     t.boolean  "subscribed_to_updates"
+    t.boolean  "optout_enewletter",                default: false
     t.boolean  "optout_enewsletter",               default: false
     t.string   "occupation"
     t.string   "employer"
