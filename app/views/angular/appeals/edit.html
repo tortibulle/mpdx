@@ -1,0 +1,57 @@
+<div class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons" style="width: 100%;">
+    <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
+        <span id="ui-id-7" class="ui-dialog-title" ng-bind="appeal.name"></span>
+        <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" title="close" ng-click="cancel()">
+            <span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>
+            <span class="ui-button-text">close</span>
+        </button>
+    </div>
+<div class="ui-dialog-content ui-widget-content">
+    <div class="form_wrapper">
+        <form>
+            <div class="field">
+                <label>Name</label>
+                <input autofocus="autofocus" type="text" ng-model="appeal.name">
+            </div>
+
+            <div class="field">
+                <label>Goal</label>
+                <input type="text" ng-model="appeal.amount">
+            </div>
+
+            <div class="field">
+                <label>Contacts</label>
+                <table style="width:100%;">
+                    <thead style="font-weight: bold;">
+                        <tr>
+                            <td style="text-align: center;">Contact</td>
+                            <td style="width:18%; text-align: center;">Donation</td>
+                            <td style="width:4%;"></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="c in appeal.contacts">
+                            <td>{{contactName(c)}}</td>
+                            <td>-</td>
+                            <td><a class="ico ico_trash" href ng-click="deleteContact(c)">Delete</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <strong>Add contact</strong>
+                <select ng-model="newContact" ng-options="c.id as c.name for c in contacts">
+                </select>
+                <button ng-click="addContact(newContact)">Add</button>
+            </div>
+        </form>
+    </div>
+    <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+        <div class="ui-dialog-buttonset">
+            <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" ng-click="save()">
+                <span class="ui-button-text">Save</span>
+            </button>
+            <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" ng-click="cancel()">
+                <span class="ui-button-text">Cancel</span>
+            </button>
+        </div>
+    </div>
+</div>
