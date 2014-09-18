@@ -4,14 +4,30 @@ class Api::V1::AppealsController < Api::V1::BaseController
   end
 
   def update
-    #current_user.update_attributes(user_params)
-    #render json: user, callback: params[:callback]
+    if appeal.update_attributes(appeal_params)
+      render json: appeal, callback: params[:callback]
+    else
+      render json: { errors: task.errors.full_messages }, callback: params[:callback], status: :bad_request
+    end
+  end
+
+  def destroy
+    appeal = appeals.find(params[:id])
+    appeal.destroy
+    #render json: task, callback: params[:callback]
   end
 
   private
 
   def appeals
-    al = AccountList.find(params[:account_list_id])
-    al.appeals.includes(:contacts)
+    current_account_list.appeals.includes(:contacts)
+  end
+
+  def appeal
+    current_account_list.appeals.find(params['id'])
+  end
+
+  def appeal_params
+    @appeal_params ||= params.require(:appeal).permit(Appeal::PERMITTED_ATTRIBUTES)
   end
 end
