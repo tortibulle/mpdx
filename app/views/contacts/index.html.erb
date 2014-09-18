@@ -8,6 +8,11 @@
     });
     jQuery(function() {
         contactAreaSize();
+        jQuery('#filters_form ul li label').click(function() {
+            setTimeout(function() {
+                contactAreaSize();
+            }, 400);
+        });
     });
     function contactAreaSize(){
         var windowHeight = jQuery(window).height() - 250;
