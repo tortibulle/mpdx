@@ -1,4 +1,4 @@
-<% 
+<%
   first_donation = current_account_list.donations.select('donation_date').last
   if(first_donation)
     first_donation_date = first_donation.donation_date
@@ -40,9 +40,9 @@
         '#B5CA92'
       ],
       title: {
-          text: '<span style="color:#007398"><%= _('Pledges:') %> <%= number_to_current_currency(pledges) %></span> | ' +
-                '<span style="color:#3eb1c8"><%= _('Monthly Goal:') %> <%= number_to_current_currency(current_account_list.monthly_goal) %></span> | ' +
-                '<span style="color:#666062"><%= _('Monthly Average:') %> <%= number_to_current_currency(monthly_average) %></span>',
+          text: '<span style="color:#007398"><%= j _('Pledges:') %> <%= number_to_current_currency(pledges) %></span> | ' +
+                '<span style="color:#3eb1c8"><%= j _('Monthly Goal:') %> <%= number_to_current_currency(current_account_list.monthly_goal) %></span> | ' +
+                '<span style="color:#666062"><%= j _('Monthly Average:') %> <%= number_to_current_currency(monthly_average) %></span>',
           useHTML: true,
           style: {
             fontSize: '12px'
@@ -57,7 +57,7 @@
         min: 0,
         max: <%= (plot_line_values + monthly_values).max * 1.1 %>,
         title: {
-          text: '<%= _('Amount (%{currency})').localize % {currency: current_currency} %>'
+          text: '<%= j _('Amount (%{currency})').localize % {currency: current_currency} %>'
         },
         plotLines: [{
           value: <%= pledges %>,
@@ -80,9 +80,9 @@
           $.each(this.points, function(i, point) {
             s += '<br/>'+ point.series.name +': '+
                   point.y +
-                  '<br/><%= _('Percentage of goal') %>: '+
+                  '<br/><%= j _('Percentage of goal') %>: '+
                   Math.round(Number(point.y) / <%= current_account_list.monthly_goal %> * 100) + '%'+
-                  '<br/><%= _('Percentage of average') %>: '+
+                  '<br/><%= j _('Percentage of average') %>: '+
                   Math.round(Number(point.y) / <%= monthly_average + 0.1 %> * 100) + '%';
           });
           return s;
