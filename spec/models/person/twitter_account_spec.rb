@@ -5,9 +5,9 @@ describe Person::TwitterAccount do
     it 'should create an account linked to a person' do
       auth_hash = Hashie::Mash.new(extra: { access_token: { params: { user_id: 5, screen_name: 'foo', oauth_token: 'a', oauth_token_secret: 'b' } } })
       person = FactoryGirl.create(:person)
-      -> {
+      expect {
         @account = Person::TwitterAccount.find_or_create_from_auth(auth_hash, person)
-      }.should change(Person::TwitterAccount, :count).from(0).to(1)
+      }.to change(Person::TwitterAccount, :count).from(0).to(1)
       person.twitter_accounts.should include(@account)
     end
   end
@@ -16,9 +16,9 @@ describe Person::TwitterAccount do
       auth_hash = Hashie::Mash.new(extra: { access_token: { params: { user_id: 5, screen_name: 'foo', oauth_token: 'a', oauth_token_secret: 'b' } } })
       person = FactoryGirl.create(:person)
       Person::TwitterAccount.find_or_create_from_auth(auth_hash, person)
-      -> {
+      expect {
         @account = Person::TwitterAccount.find_or_create_from_auth(auth_hash, person)
-      }.should_not change(Person::TwitterAccount, :count)
+      }.to_not change(Person::TwitterAccount, :count)
     end
   end
 

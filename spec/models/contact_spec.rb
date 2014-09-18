@@ -7,10 +7,10 @@ describe Contact do
   describe 'saving addresses' do
     it 'should create an address' do
       address = build(:address, addressable: nil)
-      -> {
+      expect {
         contact.addresses_attributes = [address.attributes.with_indifferent_access.except(:id, :addressable_id, :addressable_type, :updated_at, :created_at)]
         contact.save!
-      }.should change(Address, :count).by(1)
+      }.to change(Address, :count).by(1)
     end
 
     it 'should mark an address deleted' do
@@ -128,9 +128,9 @@ describe Contact do
 
     it "should copy the donor account's addresses" do
       create(:address, addressable: @donor_account)
-      -> {
+      expect {
         @contact = Contact.create_from_donor_account(@donor_account, @account_list)
-      }.should change(Address, :count)
+      }.to change(Address, :count)
       @contact.addresses.first.equal_to?(@donor_account.addresses.first).should be_true
     end
 
@@ -145,9 +145,9 @@ describe Contact do
   describe 'when being deleted' do
     it 'should delete people not linked to another contact' do
       contact.people << create(:person)
-      -> {
+      expect {
         contact.destroy
-      }.should change(Person, :count)
+      }.to change(Person, :count)
     end
 
     it 'should NOT delete people linked to another contact' do
@@ -155,9 +155,9 @@ describe Contact do
       contact.people << person
       contact2 = create(:contact, account_list: contact.account_list)
       contact2.people << person
-      -> {
+      expect {
         contact.destroy
-      }.should_not change(Person, :count)
+      }.to_not change(Person, :count)
     end
 
     it 'deletes associated addresses' do
@@ -303,6 +303,44 @@ describe Contact do
       contact.update_column(:prayer_letters_id, prayer_letters_id)
       create(:contact, account_list: account_list, prayer_letters_id: prayer_letters_id)
       contact.send(:delete_from_prayer_letters)
+    end
+  end
+
+  context 'without set greeting' do
+    let(:person) { create(:person) }
+    let(:spouse) { create(:person, first_name: 'Jill') }
+
+    before do
+      contact.people << person
+      contact.people << spouse
+      contact.save
+      person.save
+      spouse.save
+    end
+
+    it 'generates a greeting' do
+      contact.reload
+      expect(contact['greeting']).to be_nil
+      expect(contact.greeting).to eq(person.first_name + ' and ' + spouse.first_name)
+    end
+
+    it 'excludes deceased person from greeting' do
+      person.deceased = true
+      person.save
+      expect(contact.greeting).to eq spouse.first_name
+    end
+
+    it 'excludes deceased spouse from greeting' do
+      spouse.deceased = true
+      spouse.save
+      expect(contact.greeting).to eq person.first_name
+    end
+
+    it 'still gives name with single deceased' do
+      spouse.destroy
+      contact.reload
+      expect(contact.people.count).to be 1
+      expect(contact.greeting).to eq person.first_name
     end
   end
 

@@ -9,9 +9,9 @@ describe User do
 
       it 'should create a new user from omniauth' do
         FactoryGirl.create(:ccc)
-        -> {
+        expect {
           User.from_omniauth(Person::RelayAccount, @auth_hash)
-        }.should change(User, :count).from(0).to(1)
+        }.to change(User, :count).from(0).to(1)
       end
 
     end

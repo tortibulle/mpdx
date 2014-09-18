@@ -8,20 +8,20 @@ describe Person::FacebookAccount do
     describe 'create from auth' do
       it 'should create an account linked to a person' do
         person = create(:person)
-        -> {
+        expect {
           @account = Person::FacebookAccount.find_or_create_from_auth(@auth_hash, person)
-        }.should change(Person::FacebookAccount, :count).from(0).to(1)
+        }.to change(Person::FacebookAccount, :count).from(0).to(1)
         person.facebook_accounts.should include(@account)
       end
     end
 
     describe 'create user from auth' do
       it 'should create a user with a first and last name' do
-        -> {
+        expect {
           user = Person::FacebookAccount.create_user_from_auth(@auth_hash)
           user.first_name.should == @auth_hash.info.first_name
           user.last_name.should == @auth_hash.info.last_name
-        }.should change(User, :count).from(0).to(1)
+        }.to change(User, :count).from(0).to(1)
       end
     end
 
@@ -80,7 +80,7 @@ describe Person::FacebookAccount do
     it 'should raise an exception if the url is bad' do
       stub_request(:get, %r{https:\/\/graph.facebook.com\/.*})
         .with(headers: { 'Accept' => 'application/json' }).to_return(status: 400)
-      lambda { @account.get_id_from_url('https://www.facebook.com/john.doe') }.should raise_error(Errors::FacebookLink)
+      expect { @account.get_id_from_url('https://www.facebook.com/john.doe') }.to raise_error(Errors::FacebookLink)
     end
 
   end

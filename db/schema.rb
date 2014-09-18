@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140820120441) do
+ActiveRecord::Schema.define(version: 20140901145600) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -354,8 +354,12 @@ ActiveRecord::Schema.define(version: 20140820120441) do
     t.integer  "person_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "picture_etag"
+    t.integer  "picture_id"
+    t.integer  "google_account_id"
   end
 
+  add_index "google_contacts", ["google_account_id"], name: "index_google_contacts_on_google_account_id", using: :btree
   add_index "google_contacts", ["person_id"], name: "index_google_contacts_on_person_id", using: :btree
   add_index "google_contacts", ["remote_id"], name: "index_google_contacts_on_remote_id", using: :btree
 
@@ -392,6 +396,7 @@ ActiveRecord::Schema.define(version: 20140820120441) do
     t.string  "calendar_id"
     t.string  "calendar_name"
     t.boolean "email_integration",     default: false, null: false
+    t.boolean "contacts_integration",  default: false, null: false
   end
 
   add_index "google_integrations", ["account_list_id"], name: "index_google_integrations_on_account_list_id", using: :btree

@@ -48,18 +48,18 @@ describe Person::OrganizationAccount do
     it "doesn't create a new list if an existing list contains only the designation number for a profile" do
       account_list.designation_accounts << create(:designation_account, designation_number: '1234')
 
-      -> {
+      expect {
         org_account.send(:set_up_account_list)
-      }.should_not change(AccountList, :count)
+      }.to_not change(AccountList, :count)
     end
 
     it "doesn't create a new designation profile if linking to an account list that already has one" do
       account_list.designation_accounts << create(:designation_account, designation_number: '1234')
       create(:designation_profile, name: 'Profile 1', account_list: account_list)
 
-      -> {
+      expect {
         org_account.send(:set_up_account_list)
-      }.should_not change(DesignationProfile, :count)
+      }.to_not change(DesignationProfile, :count)
     end
   end
 

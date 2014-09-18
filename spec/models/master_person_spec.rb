@@ -2,19 +2,19 @@ require 'spec_helper'
 
 describe MasterPerson do
   it 'should create a MasterPerson for a new person' do
-    -> {
+    expect {
       MasterPerson.find_or_create_for_person(Person.new)
-    }.should change(MasterPerson, :count).from(0).to(1)
+    }.to change(MasterPerson, :count).from(0).to(1)
   end
 
   it 'should find an existing person based on name and email address' do
     person = create(:person)
     email = create(:email_address, person: person)
-    -> {
+    expect {
       person = Person.new(first_name: person.first_name, last_name: person.last_name, suffix: person.suffix)
       person.email = email.email
       person.save!
-    }.should_not change(MasterPerson, :count)
+    }.to_not change(MasterPerson, :count)
   end
 
   #it "should find an existing person based on name and address" do
@@ -30,11 +30,11 @@ describe MasterPerson do
   it 'should find an existing person based on name and phone number' do
     person = create(:person)
     phone_number = create(:phone_number, person: person)
-    -> {
+    expect {
       person = Person.new(first_name: person.first_name, last_name: person.last_name, suffix: person.suffix)
       person.phone_number = phone_number.attributes.with_indifferent_access.slice(:number, :country_code)
       person.save!
-    }.should_not change(MasterPerson, :count)
+    }.to_not change(MasterPerson, :count)
   end
 
   it 'should find an existing person based on name and donor account' do

@@ -1,5 +1,3 @@
-# rubocop:disable UnusedMethodArgument
-
 class NotificationType < ActiveRecord::Base
   # attr_accessible :description, :type
 
@@ -23,12 +21,12 @@ class NotificationType < ActiveRecord::Base
   end
 
   # Check to see if this designation_account has donations that should trigger a notification
-  def check(account_list)
+  def check(_account_list)
     fail 'This method needs to be implemented in a subclass'
   end
 
   # Create a task that corresponds to this notification
-  def create_task(account_list, contact)
+  def create_task(_account_list, _contact)
     fail 'This method needs to be implemented in a subclass'
   end
 
