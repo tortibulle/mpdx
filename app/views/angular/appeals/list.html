@@ -1,10 +1,11 @@
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
 <table class="list">
-    <tbody ng-repeat="appeal in appeals.appeals">
-        <tr>
+    <tbody>
+        <tr ng-repeat="appeal in appeals">
             <td>
                 <div class="actions">
-                    <a class="ico ico_edit edit_task" data-id="{{task.id}}" data-remote="true" ng-href="/tasks/{{task.id}}/edit">Edit</a>
-                    <a class="ico ico_trash" data-confirm="Are you sure you want to delete this appeal?" data-method="delete" data-remote="true" ng-href="/tasks/{{task.id}}" rel="nofollow">Delete</a>
+                    <a class="ico ico_edit" href ng-click="editAppeal(appeal.id)">Edit</a>
+                    <a class="ico ico_trash" href ng-click="deleteAppeal(appeal.id)">Delete</a>
                 </div>
             </td>
             <td style="width: 350px;">
