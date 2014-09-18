@@ -25,7 +25,15 @@ class PersonExhibit < DisplayCase::Exhibit
   end
 
   def avatar(size = :square)
-    return primary_picture.image.url(size) if primary_picture && primary_picture.image.url(size)
+    if primary_picture
+      size_to_load = size
+      size_to_load = :large if size == :large_square
+      begin
+        url = primary_picture.image.url(size_to_load)
+        return url if url
+      rescue
+      end
+    end
     if facebook_account
       return "https://graph.facebook.com/#{facebook_account.remote_id}/picture?height=120&width=120" if size == :large_square
       return "https://graph.facebook.com/#{facebook_account.remote_id}/picture?type=#{size}"
