@@ -123,36 +123,61 @@ class GoogleContactsIntegrator
   ## Email two-way sync
   ################################################################################
 
-  # Propages adds and deletes between both the Google Contact and MPDX. An update just becomes an add and a delete
   def sync_emails(g_contact, person, g_contact_link)
-    g_contact_adds, g_contact_dels, mpdx_adds, mpdx_dels = compare_emails_for_sync(g_contact, person, g_contact_link)
+    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels = compare_emails_for_sync(g_contact, person, g_contact_link)
+
+    add_emails_from_g_contact(mpdx_adds, g_contact, person)
+    mpdx_dels.each { |email| person.email_addresses.where(email: email).destroy_all }
 
     g_contact_emails = g_contact.emails_full
-
-    (g_contact_adds - mpdx_adds).each do |add_in_mpdx|
-      person.email_address = format_email_for_mpdx(find_hash(g_contact_emails, address: add_in_mpdx))
-    end
-    (g_contact_dels - mpdx_dels).each { |delete_in_mpdx| person.email_addresses.delete(email: delete_in_mpdx) }
-
-    g_contact_emails += (mpdx_adds - g_contact_adds).map do |add_in_g_contact|
-      format_email_for_google(person.email_addresses.find_by_email(add_in_g_contact))
-    end
-    g_contact_emails.delete_if { |e| mpdx_dels.include?(e[:address]) }
+    g_contact_primary = g_contact_emails.find { |e| e[:primary] }
+    g_contact_emails += g_contact_adds.map { |email|
+      email_attrs = format_email_for_google(person.email_addresses.find_by_email(email))
+      email_attrs[:primary] = false if g_contact_primary
+      email_attrs
+    }
+    g_contact_emails.delete_if { |email| g_contact_dels.include?(email[:address]) }
     g_contact.prep_update(emails: g_contact_emails)
   end
 
+  def add_emails_from_g_contact(emails_to_add, g_contact, person)
+    had_primary = person.primary_email_address.present?
+
+    g_contact_emails = g_contact.emails_full
+    emails_to_add.each do |email|
+      email_address = format_email_for_mpdx(find_hash(g_contact_emails, address: email))
+      email_address[:primary] = false if had_primary
+      person.email_address = email_address
+    end
+  end
+
   def compare_emails_for_sync(g_contact, person, g_contact_link)
-    g_contact_emails_full = g_contact.emails_full
-    last_emails = g_contact_link.new_record? ? Set.new : g_contact_link.last_data[:emails].map { |e| e[:address] }.to_set
-    mpdx_emails = person.email_addresses.map(&:email).to_set
-    g_contact_emails = g_contact_emails_full.map { |e| e[:address] }.to_set
+    last_sync_emails = g_contact_link.new_record? ? [] : g_contact_link.last_data[:emails].map { |e| e[:address] }
+    compare_for_sync(last_sync_emails, person.email_addresses.map(&:email), g_contact.emails)
+  end
 
-    g_contact_adds = (g_contact_emails - last_emails)
-    g_contact_dels = (last_emails - g_contact_emails)
-    mpdx_adds = (mpdx_emails - last_emails)
-    mpdx_dels = (last_emails - mpdx_emails)
+  # Propages adds, deletes (and updates) between both the Google Contact and MPDX.
+  # An update becomes interpreted and applied as just an add of the new value and a delete of the old value.
+  def compare_for_sync(last_sync_list, mpdx_list, g_contact_list)
+    last_sync_set = last_sync_list.to_set
+    mpdx_set = mpdx_list.to_set
+    g_contact_set = g_contact_list.to_set
 
-    [g_contact_adds, g_contact_dels, mpdx_adds, mpdx_dels]
+    # These sets represent what MPDX and Google Contacts added or deleted since the last sync
+    mpdx_added = mpdx_set - last_sync_set
+    g_contact_added = g_contact_set - last_sync_set
+    mpdx_deleleted = last_sync_set - mpdx_set
+    g_contact_deleleted = last_sync_set - g_contact_set
+
+    # These sets represent what MPDX and Google Contacts need to add or delete to get in sync again
+    # Basically, you just propgate the added/deleted entries from one to the other, but we also subtract out the
+    # entries that system already addd or deleted on its own.
+    mpdx_to_add = g_contact_added - mpdx_added
+    g_contact_to_add = mpdx_added - g_contact_added
+    mpdx_to_delete = g_contact_deleleted - mpdx_deleleted
+    g_contact_to_delete = mpdx_deleleted - g_contact_deleleted
+
+    [mpdx_to_add, mpdx_to_delete, g_contact_to_add, g_contact_to_delete]
   end
 
   def find_hash(hashes_list, search_key_value)

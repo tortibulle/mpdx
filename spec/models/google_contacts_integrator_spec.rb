@@ -308,14 +308,15 @@ describe GoogleContactsIntegrator do
     end
   end
 
-  describe 'sync_emails first time sync' do
+  describe 'overall first time sync' do
     it 'combines distinct emails from google and mpdx' do
       g_contact_link = build(:google_contact, google_account: @account, person: @person)
 
       @person.email_address = { email: 'mpdx@example.com', location: 'home', primary: true }
-      @g_contact['gd$email'] = [
-        { address: 'google@example.com', primary: 'true', rel: 'http://schemas.google.com/g/2005#other' }
-      ]
+
+      @g_contact.update('gd$email' => [
+        { 'address' => 'google@example.com', 'primary' => 'true', 'rel' => 'http://schemas.google.com/g/2005#other' }
+      ])
 
       @integrator.sync_emails(@g_contact, @person, g_contact_link)
 
@@ -336,22 +337,7 @@ describe GoogleContactsIntegrator do
     end
   end
 
-  describe 'mpdx_email_changes' do
-    it 'properly records creates, updates and deletes since last sync' do
-      email1 = double(id: 1, email: 'a')
-      email2 = double(id: 2, email: 'b2')
-      email4 = double(id: 4, email: 'd')
-      person = double(email_addresses: [email1, email2, email4])
-      g_contact_link = double(last_mappings: { emails: { 1 => 'a', 2 => 'b', 3 => 'c' } })
-      expect(@integrator.mpdx_email_changes(person, g_contact_link)).to eq([
-        { type: :update, old: 'b', new: 'b2', mpdx_data: email2 },
-        { type: :create, new: 'd', mpdx_data: email4 },
-        { type: :delete, old: 'c' }
-      ])
-    end
-  end
-
-  describe 'sync_emails subsequent sync' do
+  describe 'overall subsequent sync' do
     before do
       @g_contact_json_text = File.new(Rails.root.join('spec/fixtures/google_contacts.json')).read
       @api_url = 'https://www.google.com/m8/feeds/contacts'
@@ -414,9 +400,9 @@ describe GoogleContactsIntegrator do
     end
 
     it 'passes on updates from mpdx to google and vice versa' do
-      email = @person.email_addresses.first
-      email.email = 'mpdx_MODIFIED@example.com'
-      email.save
+      old_email = @person.email_addresses.first
+      @person.email_address = { email: 'mpdx_MODIFIED@example.com', primary: true, _destroy: 1, id: old_email.id }
+      @account_list.reload
 
       WebMock.reset!
 
@@ -429,12 +415,16 @@ describe GoogleContactsIntegrator do
         .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
         .to_return(body: { 'entry' => [updated_g_contact_obj] }.to_json)
 
-      put_xml_regex_str = Regexp.quote('</atom:content>
-        <gd:email rel="http://schemas.google.com/g/2005#other" address="johnsmith_MODIFIED@example.com"/>
-        <gd:email rel="http://schemas.google.com/g/2005#home" address="mpdx_MODIFIED@example.com"/>
-        <gd:phoneNumber').gsub(' ', '\s*').gsub("\n", '\s*')
+      # put_xml_regex_str = Regexp.quote('</atom:content>
+      #   <gd:email rel="http://schemas.google.com/g/2005#other" address="johnsmith_MODIFIED@example.com"/>
+      #   <gd:email rel="http://schemas.google.com/g/2005#home" primary="true" address="mpdx_MODIFIED@example.com"/>
+      #   <gd:phoneNumber').gsub(' ', '\s+').gsub("\n", '\s+')
+      put_xml_regex_str = '</atom:content>\s+'\
+        '<gd:email\s+rel="http://schemas.google.com/g/2005#other"\s+address="johnsmith_MODIFIED@example.com"/>\s+'\
+        '<gd:email\s+rel="http://schemas.google.com/g/2005#home"\s+primary="true"\s+address="mpdx_MODIFIED@example.com"/>\s+'\
+        '<gd:phoneNumber'
       stub_request(:put, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
-        .with(body: /.*#{put_xml_regex_str}.*/m, headers: { 'Authorization' => "Bearer #{@account.token}" })
+        .with(body: /#{put_xml_regex_str}/m, headers: { 'Authorization' => "Bearer #{@account.token}" })
         .to_return(body: { 'entry' => [updated_g_contact_obj] }.to_json)
 
       @integrator.sync_contacts
@@ -445,49 +435,4 @@ describe GoogleContactsIntegrator do
       expect(@person.email_addresses.last.email).to eq('johnsmith_MODIFIED@example.com')
     end
   end
-
-  # it 'creates a google contact for active contact with no google_contact link record and no existing google contact' do
-  #   expect(@account.contacts_api_user).to receive(:query_contacts).with('John Doe').and_return([])
-  #
-  #   expect(@account.contacts_api_user).to receive(:create_contact).with(@g_contact_attrs).exactly(1).times
-  #                                                   .and_return(double(id: '1', etag: 'a'))
-  #
-  #   @integrator.sync_contacts
-  #
-  #   expect_correct_g_contact_link
-  # end
-  #
-  # it 'updates google contact if there is a matching queried contact' do
-  #   g_contact = GoogleContactsApi::Contact.new(
-  #     'gd$etag' => 'a',
-  #     'id' => { '$t' => '1' },
-  #     'gd$name' => {
-  #       'gd$givenName' => { '$t' => 'John' },
-  #       'gd$familyName' => { '$t' => 'Doe' }
-  #     }
-  #   )
-  #
-  #   expect(@account.contacts_api_user).to receive(:query_contacts).with('John Doe').and_return([g_contact])
-  #
-  #   expect(g_contact).to receive(:create_contact).with(@g_contact_attrs).exactly(1).times
-  #                                         .and_return(double(id: '1', etag: 'a'))
-  #
-  #   @integrator.sync_contacts
-  #
-  #   expect_correct_g_contact_link
-  # end
-
-  # it 'doesn\'t create a contact if the person is matched to one already' do
-  #   create(:google_contact, person: @person, remote_id: '1', google_account: @account)
-  #
-  #   expect(@account.contacts_api_user).to_not receive(:create_contact)
-  #   @integrator.sync_contacts
-  # end
-  #
-  # it 'creates a contact if person matched to a different google account' do
-  #   other_google_account = create(:google_account)
-  #   create(:google_contact, person: @person, remote_id: '1', google_account: other_google_account)
-  #   expect(@account.contacts_api_user).to receive(:create_contact).and_return(double(id: '1'))
-  #   @integrator.sync_contacts
-  # end
 end
