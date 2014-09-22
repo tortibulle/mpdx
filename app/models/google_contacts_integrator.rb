@@ -18,17 +18,22 @@ class GoogleContactsIntegrator
   end
 
   def sync_contact(contact)
-    contact.people.each do |person|
-      g_contact, g_contact_link = sync_person(person)
+    g_contacts_and_links = contact.people.map(&method(:sync_person))
+
+    g_contacts = g_contacts_and_links.map(&:first)
+    g_contact_links = g_contacts_and_links.map(&:second)
+    sync_addresses(g_contacts, contact, g_contact_links)
+
+    g_contacts_and_links.each do |g_contact_and_link|
+      g_contact, g_contact_link = g_contact_and_link
       g_contact.create_or_update
 
       g_contact_link.last_data = g_contact.formatted_attrs
       g_contact_link.remote_id = g_contact.id
       g_contact_link.last_etag = g_contact.etag
       g_contact_link.save
-
-      person.save
     end
+
     contact.save
 
     #
@@ -162,13 +167,13 @@ class GoogleContactsIntegrator
     g_contact.prep_changes(phone_numbers: g_contact_numbers)
   end
 
-  def sync_addresses(g_contacts, contact, g_contact_link)
-    g_contact_addresses = g_contacts.flat_map(&:addresses_full)
-    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels = compare_addresses_for_sync(g_contacts, contact,
-                                                                                      g_contact_link)
+  def sync_addresses(g_contacts, contact, g_contact_links)
+    last_addresses = g_contact_links.flat_map { |g_contact_link| g_contact_link.last_data[:addresses] }.to_set
+    g_contact_addresses = g_contacts.flat_map(&:addresses).to_set
+    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels = compare_addresses_for_sync(g_contacts, contact, last_addresses)
 
     add_addresses_from_g_contact(mpdx_adds, contact)
-    mpdx_dels.each(&:destroy)
+    mpdx_dels.destroy_all
 
     g_contact_primary = g_contact_addresses.find { |address| address[:primary] }
     g_contact_addresses += g_contact_adds.map { |address|
@@ -177,7 +182,7 @@ class GoogleContactsIntegrator
       address_attrs
     }
     g_contact_addresses.delete_if { |address| g_contact_dels.include?(address) }
-    g_contact.prep_changes(addresses: g_contact_addresses)
+    g_contacts.each { |g_contact| g_contact.prep_changes(addresses: g_contact_addresses) }
   end
 
   def add_addresses_from_g_contact(addresses, contact)
@@ -224,23 +229,34 @@ class GoogleContactsIntegrator
                                 method(:normalize_number))
   end
 
-  def compare_addresses_for_sync(g_contact_addresses, contact, g_contact_link)
+  def compare_addresses_for_sync(g_contact_addresses, contact, last_addresses)
     # Build address records for previous sync address list and each address from Google
-    last_addresses = g_contact_link.last_data[:addresses].map(&method(:new_address_for_g_address))
+    last_address_records = last_addresses.map(&method(:new_address_for_g_address))
     g_contact_address_records = g_contact_addresses.map(&method(:new_address_for_g_address))
 
     # Compare normalized addresses (by master_address_id)
-    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels = compare_normalized_for_sync(last_addresses, contact.addresses,
-                                                                                       g_contact_address_records,
-                                                                                       method(:normalize_address))
+    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels =
+        compare_normalized_for_sync(last_address_records, contact.addresses, g_contact_address_records,
+                                    method(:normalize_address))
 
     # Convert back from the master_address_id to entries in the addresses lists
-    [mpdx_adds.map { |master_address_id| g_contact_address_records.lookup_by_key(master_address_id: master_address_id) },
-     contact.addresses.where(master_address_id: mpdx_dels),
-     contact.addresses.where(master_address_id: g_contact_adds),
-     g_contact_dels.map { |master_address_id|
-       g_contact_addresses[g_contact_address_records.index_by_key(master_address_id: master_address_id)]
-     }]
+    [
+      # mpdx_adds
+      mpdx_adds.map { |master_address_id|
+        lookup_by_key(g_contact_address_records, master_address_id: master_address_id)
+      },
+
+      # mpdx_dels
+      contact.addresses.where(master_address_id: mpdx_dels.to_a),
+
+      # g_contact_adds
+      contact.addresses.where(master_address_id: g_contact_adds.to_a),
+
+      # g_contact_dels
+      g_contact_dels.map { |master_address_id|
+        g_contact_addresses[g_contact_address_records.index_by_key(master_address_id: master_address_id)]
+      }
+    ]
   end
 
   def normalize_number(number)

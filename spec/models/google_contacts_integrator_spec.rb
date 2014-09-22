@@ -282,6 +282,8 @@ describe GoogleContactsIntegrator do
 
   describe 'overall first and subsequent sync' do
     before do
+      stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
+
       @g_contact_json_text = File.new(Rails.root.join('spec/fixtures/google_contacts.json')).read
       @api_url = 'https://www.google.com/m8/feeds/contacts'
       stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&q=John%20Doe&v=3")
@@ -366,6 +368,8 @@ describe GoogleContactsIntegrator do
       @account_list.reload
 
       WebMock.reset!
+
+      stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
 
       updated_g_contact_obj = JSON.parse(@g_contact_json_text)['feed']['entry'][0]
       updated_g_contact_obj['gd$email'] = [
