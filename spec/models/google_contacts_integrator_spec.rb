@@ -40,41 +40,6 @@ describe GoogleContactsIntegrator do
     end
   end
 
-  describe 'sync_contact' do
-    it 'syncs its people' do
-      expect(@integrator).to receive(:sync_person).with(@person, @contact)
-      @integrator.sync_contact(@contact)
-    end
-  end
-
-  describe 'sync_person' do
-    before do
-      @g_contact_link = build(:google_contact, google_account: @account, person: @person)
-
-      expect(@person.google_contacts).to receive(:first_or_initialize).with(google_account: @account)
-                                          .and_return(@g_contact_link)
-    end
-
-    it 'creates a google contact if none retrieved/queried' do
-      expect(@integrator).to receive(:get_or_query_g_contact).with(@g_contact_link, @person).and_return(nil)
-      expect(@integrator).to receive(:create_g_contact).with(@person, @contact).and_return(@g_contact)
-      @integrator.sync_person(@person, @contact)
-    end
-
-    it 'syncs a google contact if one is retrieved/queried' do
-      expect(@integrator).to receive(:get_or_query_g_contact).with(@g_contact_link, @person).and_return(@g_contact)
-      expect(@integrator).to receive(:sync_with_g_contact).with(@person, @contact, @g_contact, @g_contact_link)
-      @integrator.sync_person(@person, @contact)
-    end
-
-    after do
-      expect(@person.google_contacts.count).to eq(1)
-      g_contact_link = @person.google_contacts.first
-      expect(g_contact_link.remote_id).to eq('1')
-      expect(g_contact_link.last_etag).to eq('a')
-    end
-  end
-
   describe 'get_or_query_g_contact' do
     it 'gets the g_contact if there is a remote_id in the passed google contact link record' do
       expect(@integrator).to receive(:get_g_contact).with('1').and_return('g contact')
@@ -113,7 +78,7 @@ describe GoogleContactsIntegrator do
     end
   end
 
-  describe 'create_g_contact' do
+  describe 'new_g_contact' do
     before do
       @contact.addresses_attributes = [
         { street: '2 Ln', city: 'City', state: 'MO', postal_code: '23456', country: 'United States', location: 'Business',
@@ -129,14 +94,13 @@ describe GoogleContactsIntegrator do
         additional_name: 'Henry',
         family_name: 'Doe',
         name_suffix: 'III',
-        content: 'about',
         emails: [
-          { address: 'home@example.com', primary: true, rel: 'home' },
-          { address: 'john@example.com', primary: false, rel: 'work' }
+          { primary: true, rel: 'home', address: 'home@example.com' },
+          { primary: false, rel: 'work', address: 'john@example.com' }
         ],
         phone_numbers: [
-          { number: '+12223334444', primary: true, rel: 'mobile' },
-          { number: '+15552224444', primary: false, rel: 'home' }
+          { number: '(222) 333-4444', primary: true, rel: 'mobile' },
+          { number: '(555) 222-4444', primary: false, rel: 'home' }
         ],
         organizations: [
           { org_name: 'Company, Inc', org_title: 'Worker', primary: true }
@@ -144,12 +108,6 @@ describe GoogleContactsIntegrator do
         websites: [
           { href: 'www.example.com', primary: false, rel: 'other' },
           { href: 'blog.example.com', primary: true,  rel: 'other' }
-        ],
-        addresses: [
-          { rel: 'work', primary: true,  street: '2 Ln', city: 'City', region: 'MO', postcode: '23456',
-            country: 'United States of America' },
-          { rel: 'home', primary: false,  street: '1 Way', city: 'Town', region: 'IL', postcode: '12345',
-            country: 'United States of America' }
         ]
       }
 
@@ -166,22 +124,7 @@ describe GoogleContactsIntegrator do
     end
 
     it 'calls the api to create a contact with correct attributes' do
-      expect(@account.contacts_api_user).to receive(:create_contact).with(@g_contact_attrs).and_return('g contact')
-      expect(@integrator.create_g_contact(@person, @contact)).to eq('g contact')
-    end
-  end
-
-  describe 'sync_with_g_contact' do
-    it 'syncs each of the parts, saves the records and sends the g_contact update' do
-      g_contact_link = build(:google_contact, google_account: @account, person: @person)
-      expect(@integrator).to receive(:sync_basic_person_fields).with(@g_contact, @person)
-      expect(@integrator).to receive(:sync_contact_fields).with(@g_contact, @contact)
-      expect(@integrator).to receive(:sync_employer_and_title).with(@g_contact, @person)
-      expect(@integrator).to receive(:sync_emails).with(@g_contact, @person, g_contact_link)
-      expect(@person).to receive(:save)
-      expect(@contact).to receive(:save)
-      expect(@g_contact).to receive(:send_update)
-      @integrator.sync_with_g_contact(@person, @contact, @g_contact, g_contact_link)
+      expect(@integrator.new_g_contact(@person).prepped_changes).to eq(@g_contact_attrs)
     end
   end
 
@@ -308,9 +251,9 @@ describe GoogleContactsIntegrator do
     end
   end
 
-  describe 'overall first time sync' do
+  describe 'sync emails' do
     it 'combines distinct emails from google and mpdx' do
-      g_contact_link = build(:google_contact, google_account: @account, person: @person)
+      g_contact_link = build(:google_contact, google_account: @account, person: @person, last_data: { emails: [] })
 
       @person.email_address = { email: 'mpdx@example.com', location: 'home', primary: true }
 
@@ -337,7 +280,7 @@ describe GoogleContactsIntegrator do
     end
   end
 
-  describe 'overall subsequent sync' do
+  describe 'overall first and subsequent sync' do
     before do
       @g_contact_json_text = File.new(Rails.root.join('spec/fixtures/google_contacts.json')).read
       @api_url = 'https://www.google.com/m8/feeds/contacts'
@@ -350,11 +293,17 @@ describe GoogleContactsIntegrator do
         { primary: true, rel: 'http://schemas.google.com/g/2005#other', address: 'johnsmith@example.com' },
         { primary: false, rel: 'http://schemas.google.com/g/2005#home', address: 'mpdx@example.com' }
       ]
+      updated_g_contact_obj['gd$phoneNumber'] = [
+        { '$t' => '(123) 334-5158', 'rel' => 'http://schemas.google.com/g/2005#mobile', 'primary' => 'true' },
+        { '$t' => '(456) 789-0123', 'rel' => 'http://schemas.google.com/g/2005#home', 'primary' => 'false' }
+      ]
+
       @first_sync_put = stub_request(:put, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
         .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
         .to_return(body: { 'entry' => [updated_g_contact_obj] }.to_json)
 
       @person.email_address = { email: 'mpdx@example.com', location: 'home', primary: true }
+      @person.phone_number = { number: '456-789-0123', primary: true, location: 'home' }
 
       @integrator.sync_contacts
 
@@ -369,9 +318,20 @@ describe GoogleContactsIntegrator do
       expect(email2.location).to eq('other')
       expect(email2.primary).to be_false
 
+      expect(@person.phone_numbers.count).to eq(2)
+      number1 = @person.phone_numbers.first
+      expect(number1.number).to eq('+14567890123')
+      expect(number1.location).to eq('home')
+      expect(number1.primary).to be_true
+      number2 = @person.phone_numbers.last
+      expect(number2.number).to eq('+11233345158')
+      expect(number2.location).to eq('mobile')
+      expect(number2.primary).to be_false
+
       g_contact_link = @person.google_contacts.first
       expect(g_contact_link.remote_id).to eq('http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/6b70f8bb0372c')
       expect(g_contact_link.last_etag).to eq('"SXk6cDdXKit7I2A9Wh9VFUgORgE."')
+
       last_data = {
         name_prefix: 'Mr',
         given_name: 'John',
@@ -379,24 +339,25 @@ describe GoogleContactsIntegrator do
         family_name: 'Doe',
         name_suffix: 'III',
         content: 'Notes here',
-        emails: [{ primary: false, rel: 'other', address: 'johnsmith@example.com' },
+        emails: [{ primary: true, rel: 'other', address: 'johnsmith@example.com' },
                  { primary: false, rel: 'home', address: 'mpdx@example.com' }],
-        phone_numbers: [{ primary: true, rel: 'mobile', number: '(123) 334-5158' }],
+        phone_numbers: [
+          { number: '(123) 334-5158', rel: 'mobile', primary: true },
+          { number: '(456) 789-0123', rel: 'home', primary: false }
+        ],
         addresses: [
-          { primary: true, rel: 'home', country: 'United States of America',
+          { rel: 'home', primary: true, country: 'United States of America',
             formatted_address: "2345 Long Dr. #232\nSomewhere\nIL\n12345\nUnited States of America",
             city: 'Somewhere', street: '2345 Long Dr. #232', region: 'IL', postcode: '12345' },
-          { primary: false, rel: 'work', country: 'United States of America',
+          { country: 'United States of America',
             formatted_address: "123 Big Rd\nAnywhere\nMO\n56789\nUnited States of America",
-            city: 'Anywhere', street: '123 Big Rd', region: 'MO', postcode: '56789' }
+            city: 'Anywhere', street: '123 Big Rd', region: 'MO', postcode: '56789', rel: 'work', primary: false }
         ],
-        organizations: [{ primary: false, rel: 'other', org_title: 'Worker Person', org_name: 'Example, Inc' }],
-        websites: [{ primary: false, rel: 'blog', href: 'blog.example.com' },
-                   { primary: true, rel: 'profile', href: 'www.example.com' }]
+        organizations: [{ org_title: 'Worker Person', org_name: 'Example, Inc', rel: 'other', primary: false }],
+        websites: [{ href: 'blog.example.com', rel: 'blog', primary: false },
+                   { href: 'www.example.com', rel: 'profile', primary: true }]
       }
       expect(g_contact_link.last_data).to eq(last_data)
-
-      expect(g_contact_link.last_mappings).to eq(emails: { email1.id => email1.email, email2.id => email2.email })
     end
 
     it 'passes on updates from mpdx to google and vice versa' do
@@ -415,13 +376,9 @@ describe GoogleContactsIntegrator do
         .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
         .to_return(body: { 'entry' => [updated_g_contact_obj] }.to_json)
 
-      # put_xml_regex_str = Regexp.quote('</atom:content>
-      #   <gd:email rel="http://schemas.google.com/g/2005#other" address="johnsmith_MODIFIED@example.com"/>
-      #   <gd:email rel="http://schemas.google.com/g/2005#home" primary="true" address="mpdx_MODIFIED@example.com"/>
-      #   <gd:phoneNumber').gsub(' ', '\s+').gsub("\n", '\s+')
       put_xml_regex_str = '</atom:content>\s+'\
-        '<gd:email\s+rel="http://schemas.google.com/g/2005#other"\s+address="johnsmith_MODIFIED@example.com"/>\s+'\
-        '<gd:email\s+rel="http://schemas.google.com/g/2005#home"\s+primary="true"\s+address="mpdx_MODIFIED@example.com"/>\s+'\
+        '<gd:email\s+rel="http://schemas.google.com/g/2005#other"\s+primary="true"\s+address="johnsmith_MODIFIED@example.com"/>\s+'\
+        '<gd:email\s+rel="http://schemas.google.com/g/2005#home"\s+address="mpdx_MODIFIED@example.com"/>\s+'\
         '<gd:phoneNumber'
       stub_request(:put, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
         .with(body: /#{put_xml_regex_str}/m, headers: { 'Authorization' => "Bearer #{@account.token}" })

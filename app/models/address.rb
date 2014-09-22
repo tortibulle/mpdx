@@ -76,8 +76,7 @@ class Address < ActiveRecord::Base
     city.present? && street.present?
   end
 
-  private
-
+  # Not provide because used by Google Contacts sync to normalize addressed that didn't get assigned a master_address_id
   def find_or_create_master_address
     unless master_address_id
       master_address = find_master_address
@@ -92,6 +91,8 @@ class Address < ActiveRecord::Base
 
     true
   end
+
+  private
 
   def update_or_create_master_address
     if (changed & %w(street city state country postal_code)).present?
