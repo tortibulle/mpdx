@@ -306,4 +306,42 @@ describe Contact do
     end
   end
 
+  context 'without set greeting' do
+    let(:person) { create(:person) }
+    let(:spouse) { create(:person, first_name: 'Jill') }
+
+    before do
+      contact.people << person
+      contact.people << spouse
+      contact.save
+      person.save
+      spouse.save
+    end
+
+    it 'generates a greeting' do
+      contact.reload
+      expect(contact['greeting']).to be_nil
+      expect(contact.greeting).to eq(person.first_name + ' and ' + spouse.first_name)
+    end
+
+    it 'excludes deceased person from greeting' do
+      person.deceased = true
+      person.save
+      expect(contact.greeting).to eq spouse.first_name
+    end
+
+    it 'excludes deceased spouse from greeting' do
+      spouse.deceased = true
+      spouse.save
+      expect(contact.greeting).to eq person.first_name
+    end
+
+    it 'still gives name with single deceased' do
+      spouse.destroy
+      contact.reload
+      expect(contact.people.count).to be 1
+      expect(contact.greeting).to eq person.first_name
+    end
+  end
+
 end

@@ -3,15 +3,19 @@
   <script type="text/javascript" charset="utf-8">
     var account_contacts_json = <%= contacts_for_filter.collect { |c| {value: c.name, id: c.id} }.to_json.html_safe %>
     var filtered_contacts_ids = <%= @filtered_contacts.collect { |c| c.id }.to_json.html_safe %>
-    jQuery(window).resize(function () {
+    $(window).resize(function () {
         contactAreaSize();
     });
-    jQuery(function() {
+    $(function() {
         contactAreaSize();
+        $('#filters_form ul li label').click(function() {
+            setTimeout(contactAreaSize, 400);
+        });
     });
     function contactAreaSize(){
-        var contactAreaHeight = jQuery(window).height() - 250;
-        jQuery('.contacts-scrollable').height(contactAreaHeight);
+        var windowHeight = $(window).height() - 250;
+        var filtersHeight = $('#filters_form').height();
+        $('.contacts-scrollable').height(Math.max(windowHeight, filtersHeight));
     }
   </script>
   <aside id="leftmenu">

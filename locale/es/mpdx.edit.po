@@ -1,22 +1,22 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the mpdx package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Spanish translations for version package.
+# Copyright (C) 2012 THE version'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the version package.
+# Josh Starcher <>, 2012.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: mpdx 1.0.0\n"
+"Project-Id-Version: version 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-19 09:04-0400\n"
-"PO-Revision-Date: 2014-09-19 09:04-0400\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2012-10-10 17:24-0500\n"
+"Last-Translator: Josh Starcher <josh.starcher@gmail.com>\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.5.4\n"
 
 msgid " For %{contact}"
 msgstr ""
@@ -49,7 +49,7 @@ msgid "%{contacts_count:referrals} couldn't be added because they were missing a
 msgstr ""
 
 msgid "%{contacts_count} referrals"
-msgstr ""
+msgstr "%{contacts_count} referencias"
 
 msgid "%{link} has given %{total} since %{since}"
 msgstr ""
@@ -70,19 +70,21 @@ msgid "-- All Hidden --"
 msgstr ""
 
 msgid "-- Any --"
-msgstr ""
+msgstr "- Cualquiera -"
 
+#, fuzzy
 msgid "-- None --"
-msgstr ""
+msgstr "- Cualquiera -"
 
+#, fuzzy
 msgid "-- Someone --"
-msgstr ""
+msgstr "- Cualquiera -"
 
 msgid "... Show More"
 msgstr ""
 
 msgid "1 referral"
-msgstr ""
+msgstr "una remisión"
 
 msgid "<< Previous Month"
 msgstr ""
@@ -97,6 +99,8 @@ msgid ""
 "<p>Easily connect all of your contacts, calendars, communications and social conversations. MPDX will automatically identify contact's social profiles on Facebook, LinkedIn, and </p>\n"
 "                    <p>Twitter so that you connect, listen, and engage with your minitry partners. </p>"
 msgstr ""
+"<p> Conecte fácilmente todos tus contactos, calendarios, comunicaciones y conversaciones sociales. MPDX identificará automáticamente perfiles sociales del contacto en Facebook, LinkedIn, y </p> \n"
+"<p> Twitter para que se conecte, escuchar y participar con sus socios MINISTERIO. </p>"
 
 msgid "About you"
 msgstr ""
@@ -108,55 +112,60 @@ msgid "Accounts"
 msgstr ""
 
 msgid "Action"
-msgstr ""
+msgstr "Acción"
 
 msgid "Actions"
-msgstr ""
+msgstr "Acciones"
 
 msgid "Add %{network} Account"
-msgstr ""
+msgstr "Añadir %{network} Cuenta"
 
 msgid "Add Address"
-msgstr ""
+msgstr "Añadir dirección"
 
+#, fuzzy
 msgid "Add Comment"
-msgstr ""
+msgstr "Añadir este contacto"
 
 msgid "Add Contact"
-msgstr ""
+msgstr "Añadir este contacto"
 
+#, fuzzy
 msgid "Add Donor Account"
-msgstr ""
+msgstr "Añadir una cuenta"
 
 msgid "Add Email Address"
-msgstr ""
+msgstr "Añadir dirección de correo electrónico"
 
+#, fuzzy
 msgid "Add Note"
-msgstr ""
+msgstr "Añadir este contacto"
 
+#, fuzzy
 msgid "Add Person/Child"
-msgstr ""
+msgstr "Añadir persona"
 
 msgid "Add Phone Number"
-msgstr ""
+msgstr "Agregar número de teléfono"
 
 msgid "Add Picture"
 msgstr ""
 
 msgid "Add Referral"
-msgstr ""
+msgstr "Añadir Referencia"
 
 msgid "Add Referrals"
-msgstr ""
+msgstr "Añadir Referidos"
 
 msgid "Add Relationship"
 msgstr ""
 
+#, fuzzy
 msgid "Add Tags"
-msgstr ""
+msgstr "Añadir etiqueta"
 
 msgid "Add Task"
-msgstr ""
+msgstr "Agregar tarea"
 
 msgid "Add Website/Blog"
 msgstr ""
@@ -164,38 +173,42 @@ msgstr ""
 msgid "Add a donation"
 msgstr ""
 
+#, fuzzy
 msgid "Add a phone number"
-msgstr ""
+msgstr "Agregar número de teléfono"
 
 msgid "Add an Account"
-msgstr ""
+msgstr "Añadir una cuenta"
 
+#, fuzzy
 msgid "Add an email address"
-msgstr ""
+msgstr "Añadir dirección de correo electrónico"
 
 msgid "Add another Account"
-msgstr ""
+msgstr "Añadir otra cuenta"
 
 msgid "Add some now"
 msgstr ""
 
 msgid "Add tags to these contacts"
-msgstr ""
+msgstr "Añadir etiquetas a estos contactos"
 
 msgid "Address"
-msgstr ""
+msgstr "Señas"
 
+#, fuzzy
 msgid "Addresses"
-msgstr ""
+msgstr "Señas"
 
+#, fuzzy
 msgid "Addresses:"
-msgstr ""
+msgstr "Señas"
 
 msgid "Age"
 msgstr ""
 
 msgid "All"
-msgstr ""
+msgstr "Todos"
 
 msgid "Amount"
 msgstr ""
@@ -216,13 +229,14 @@ msgid "Another contact on your account already has the donor account number you'
 msgstr ""
 
 msgid "Api Key"
-msgstr ""
+msgstr "Api Key"
 
 msgid "Apply Filters"
 msgstr ""
 
+#, fuzzy
 msgid "Appointment"
-msgstr ""
+msgstr "Llame para cita"
 
 msgid "Appointment Scheduled"
 msgstr ""
@@ -233,23 +247,24 @@ msgstr ""
 msgid "Are you sure you want to delete this task instead of marking it as completed?"
 msgstr ""
 
+#, fuzzy
 msgid "Are you sure you want to disable Gmail integration?"
-msgstr ""
+msgstr "¿Está seguro que desea eliminar esta conexión?"
 
 msgid "Are you sure you want to disable Google Calendar integration?"
 msgstr ""
 
 msgid "Are you sure you want to merge the selected contacts? This action cannot be undone!"
-msgstr ""
+msgstr "¿Estás seguro?"
 
 msgid "Are you sure you want to remove this connection?"
-msgstr ""
+msgstr "¿Está seguro que desea eliminar esta conexión?"
 
 msgid "Are you sure?"
-msgstr ""
+msgstr "¿Estás seguro?"
 
 msgid "Ask in Future"
-msgstr ""
+msgstr "Pregunte en el Futuro"
 
 msgid "Attempted:"
 msgstr ""
@@ -258,7 +273,7 @@ msgid "Aunt"
 msgstr ""
 
 msgid "Average"
-msgstr ""
+msgstr "Promedio"
 
 msgid "Average donations down <span style=\"color:red\">%{amount}</span> from last year"
 msgstr ""
@@ -267,7 +282,7 @@ msgid "Average donations up <span style=\"color:green\">%{amount}</span> from la
 msgstr ""
 
 msgid "Back"
-msgstr ""
+msgstr "Volver"
 
 msgid ""
 "Based on an analysis of a partner's giving history, MPDX can notify you of events that you will probably want to follow up on. The detection logic\n"
@@ -276,7 +291,7 @@ msgid ""
 msgstr ""
 
 msgid "Basic Information"
-msgstr ""
+msgstr "Información Básica"
 
 msgid "Before emailing us, please have a look at %{link} to see if your question is already answered there."
 msgstr ""
@@ -294,13 +309,14 @@ msgid "Blank fields will not be updated"
 msgstr ""
 
 msgid "Both"
-msgstr ""
+msgstr "Los dos"
 
+#, fuzzy
 msgid "Brother"
-msgstr ""
+msgstr "Los dos"
 
 msgid "Business"
-msgstr ""
+msgstr "Empresa"
 
 msgid "Calendar integration"
 msgstr ""
@@ -314,7 +330,7 @@ msgid "Call"
 msgstr ""
 
 msgid "Call for Decision"
-msgstr ""
+msgstr "Convocatoria de la Decisión"
 
 msgid "Cancel"
 msgstr ""
@@ -451,8 +467,9 @@ msgstr ""
 msgid "Contact Type"
 msgstr ""
 
+#, fuzzy
 msgid "Contact for Appointment"
-msgstr ""
+msgstr "Llame para cita"
 
 msgid "Contacts"
 msgstr ""
@@ -520,8 +537,9 @@ msgstr ""
 msgid "Delete Selected"
 msgstr ""
 
+#, fuzzy
 msgid "Designation Account"
-msgstr ""
+msgstr "Añadir una cuenta"
 
 msgid "Details"
 msgstr ""
@@ -553,8 +571,9 @@ msgstr ""
 msgid "Donor"
 msgstr ""
 
+#, fuzzy
 msgid "Donor Accounts"
-msgstr ""
+msgstr "Añadir otra cuenta"
 
 msgid "Donor ID"
 msgstr ""
@@ -592,11 +611,13 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
+#, fuzzy
 msgid "Email Addresses"
-msgstr ""
+msgstr "Añadir dirección de correo electrónico"
 
+#, fuzzy
 msgid "Email Addresses:"
-msgstr ""
+msgstr "Añadir dirección de correo electrónico"
 
 msgid "Email me"
 msgstr ""
@@ -703,8 +724,9 @@ msgstr ""
 msgid "Hide"
 msgstr ""
 
+#, fuzzy
 msgid "Hide Contacts"
-msgstr ""
+msgstr "Añadir este contacto"
 
 msgid "History"
 msgstr ""
@@ -893,8 +915,9 @@ msgstr ""
 msgid "Merge selected contacts"
 msgstr ""
 
+#, fuzzy
 msgid "Merge these contacts"
-msgstr ""
+msgstr "Añadir etiquetas a estos contactos"
 
 msgid "Messages"
 msgstr ""
@@ -962,20 +985,23 @@ msgstr ""
 msgid "Never Contacted"
 msgstr ""
 
+#, fuzzy
 msgid "New Account"
-msgstr ""
+msgstr "Añadir una cuenta"
 
 msgid "New Calendar"
 msgstr ""
 
+#, fuzzy
 msgid "New Contact"
-msgstr ""
+msgstr "Añadir este contacto"
 
 msgid "New Tag"
 msgstr ""
 
+#, fuzzy
 msgid "New Task"
-msgstr ""
+msgstr "Agregar tarea"
 
 msgid "New contact"
 msgstr ""
@@ -986,8 +1012,9 @@ msgstr ""
 msgid "Newsletter Recipients"
 msgstr ""
 
+#, fuzzy
 msgid "Next Action"
-msgstr ""
+msgstr "Acción"
 
 msgid "Next Ask"
 msgstr ""
@@ -1013,8 +1040,9 @@ msgstr ""
 msgid "No email addess on file"
 msgstr ""
 
+#, fuzzy
 msgid "No email address"
-msgstr ""
+msgstr "Añadir dirección de correo electrónico"
 
 msgid "No mailing address on file"
 msgstr ""
@@ -1022,8 +1050,9 @@ msgstr ""
 msgid "No mailing address or email addess on file"
 msgstr ""
 
+#, fuzzy
 msgid "No phone number"
-msgstr ""
+msgstr "Agregar número de teléfono"
 
 msgid "None"
 msgstr ""
@@ -1094,8 +1123,9 @@ msgstr ""
 msgid "Percentage of goal"
 msgstr ""
 
+#, fuzzy
 msgid "Person"
-msgstr ""
+msgstr "Añadir persona"
 
 msgid "Phone"
 msgstr ""
@@ -1103,11 +1133,13 @@ msgstr ""
 msgid "Phone Dials:"
 msgstr ""
 
+#, fuzzy
 msgid "Phone Numbers"
-msgstr ""
+msgstr "Agregar número de teléfono"
 
+#, fuzzy
 msgid "Phone Numbers:"
-msgstr ""
+msgstr "Agregar número de teléfono"
 
 msgid "Physical"
 msgstr ""
@@ -1169,11 +1201,13 @@ msgstr ""
 msgid "Preferences saved"
 msgstr ""
 
+#, fuzzy
 msgid "Preferred Email Address"
-msgstr ""
+msgstr "Añadir dirección de correo electrónico"
 
+#, fuzzy
 msgid "Primary Contact"
-msgstr ""
+msgstr "Añadir este contacto"
 
 msgid "Primary:"
 msgstr ""
@@ -1205,8 +1239,9 @@ msgstr ""
 msgid "Referrals"
 msgstr ""
 
+#, fuzzy
 msgid "Referrals by this contact"
-msgstr ""
+msgstr "Añadir etiquetas a estos contactos"
 
 msgid "Referrals on hand"
 msgstr ""
@@ -1632,3 +1667,34 @@ msgstr ""
 
 msgid "to"
 msgstr ""
+
+#~ msgid "Add Person"
+#~ msgstr "Añadir persona"
+
+#~ msgid ""
+#~ "All <strong>%{this_page}</strong> conversations on this page are selected. <a "
+#~ "data-behavior=\"select_all\">Select all <strong>%{total}</strong> contacts</a>"
+#~ msgstr ""
+#~ "Las <strong>%{this_page}</strong> conversations de seta página son seleccionad"
+#~ "os. <a data-behavior=\"select_all\">Seleccionar todos <strong>%{total}</strong> "
+#~ "contacts</a>"
+
+#~ msgid ""
+#~ "All <strong>%{total}</strong> contacts are selected. <a data-behavior=\"clear_s"
+#~ "election\">Clear selection</a>"
+#~ msgstr ""
+#~ "Todos los <strong>%{total}</strong> contactos están seleccionados. <a data-beh"
+#~ "avior=\"clear_selection\">Borrar selección</a>"
+
+#~ msgid ""
+#~ "%{contacts_count:referrals} couldn't be added because they were missing the fi"
+#~ "rst and last name."
+#~ msgstr ""
+#~ "%{contacts_count:referrals} no se puede agregar porque les faltaba el nombre y"
+#~ " el apellido."
+#~ msgid "Active/Upcoming"
+#~ msgstr "Activo/Upcoming"
+#~ msgid "Add Tag"
+#~ msgstr "Añadir etiqueta"
+#~ msgid "Call for Appointment"
+#~ msgstr "Llame para cita"
