@@ -5,5 +5,5 @@ class AppealSerializer < ActiveModel::Serializer
   attributes(*ATTRIBUTES)
 
   attribute :contact_ids, key: :contacts
-  attribute :donation_ids, key: :donations
+  attribute :donations, key: :donations
 end
