@@ -24,6 +24,7 @@
                 <table style="width:100%;">
                     <thead style="font-weight: bold;">
                         <tr>
+                            <td></td>
                             <td style="text-align: center;">Contact</td>
                             <td style="width:18%; text-align: center;">Donation</td>
                             <td style="width:4%;"></td>
@@ -31,16 +32,20 @@
                     </thead>
                     <tbody>
                         <tr ng-repeat="c in appeal.contacts">
+                            <td><input type="checkbox"></td>
                             <td>{{contactName(c)}}</td>
-                            <td>-</td>
+                            <td ng-bind="listDonations(c)"></td>
                             <td><a class="ico ico_trash" href ng-click="deleteContact(c)">Delete</a></td>
                         </tr>
                     </tbody>
                 </table>
-                <strong>Add contact</strong>
-                <select ng-model="newContact" ng-options="c.id as c.name for c in contacts">
-                </select>
-                <button ng-click="addContact(newContact)">Add</button>
+                <span ng-show="!contacts">Loading contacts...</span>
+                <div ng-show="contacts.length">
+                    <strong>Add contact</strong>
+                    <select ng-model="newContact" ng-options="c.id as c.name for c in contacts">
+                    </select>
+                    <button ng-click="addContact(newContact)">Add</button>
+                </div>
             </div>
         </form>
     </div>
