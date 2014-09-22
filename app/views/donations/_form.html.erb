@@ -31,6 +31,10 @@
       <%= f.hidden_field :donor_account_id, value: @donor_accounts.first[1] %>
     <% end %>
 
+    <div class="field">
+      <%= f.label :appeal_id, _('Appeal') %>
+      <%= f.select :appeal_id, @appeals %>
+    </div>
 
     <% if current_account_list.multiple_designations %>
       <div class="field">

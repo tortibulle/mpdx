@@ -13,10 +13,11 @@ angular.module('mpdxApp')
                         templateUrl: '/templates/appeals/edit.html',
                         controller: function($scope, $modalInstance, appeal){
                             $scope.appeal = angular.copy(appeal);
-                            console.log($scope.appeal);
+                            console.log(appeal);
 
-                            api.call('get','contacts?account_list_id=' + (window.current_account_list_id || ''), {}, function(data) {
+                            api.call('get','contacts?filters[status]=*&per_page=250&account_list_id=' + (window.current_account_list_id || ''), {}, function(data) {
                                 $scope.contacts = data.contacts;
+                                $scope.newContact = data.contacts[0].id;
                             }, null, true);
 
                             $scope.cancel = function () {
@@ -51,6 +52,27 @@ angular.module('mpdxApp')
                             $scope.deleteContact = function(id){
                                 _.remove($scope.appeal.contacts, function(c) { return c == id; });
                             };
+
+                            $scope.listDonations = function(contactId){
+                                var contact = _.find($scope.contacts, { 'id': contactId });
+                                if(angular.isUndefined(contact) || angular.isUndefined(contact.donor_accounts)){
+                                    return '-';
+                                }
+                                var contactDonorIds = _.flatten(contact.donor_accounts, 'id');
+                                var donations = _.where(appeal.donations, function(d) {
+                                    return _.contains(contactDonorIds, d.donor_account_id);
+                                });
+                                console.log(donations);
+                                if(!donations.length){
+                                    return '-';
+                                }else{
+                                    var str = [];
+                                    angular.forEach(donations, function(d){
+                                        str.push(d.donation_date + ' - ' + d.amount);
+                                    });
+                                    return str.join();
+                                }
+                            }
                         },
                         resolve: {
                             appeal: function () {
@@ -60,7 +82,7 @@ angular.module('mpdxApp')
                     });
 
                     modalInstance.result.then(function (updatedAppeal) {
-                        var index = _.findIndex($scope.appeals, { 'id': updatedAppeal.id })
+                        var index = _.findIndex($scope.appeals, { 'id': updatedAppeal.id });
                         $scope.appeals[index] = updatedAppeal;
                     }, function () {
                         //$log.info('Modal dismissed at: ' + new Date());
@@ -75,6 +97,17 @@ angular.module('mpdxApp')
                     api.call('delete','appeals/' + id + '?account_list_id=' + (window.current_account_list_id || ''), {}, function(data) {
                         //$scope.contacts = data.contacts;
                     });
+                };
+
+                $scope.donationTotal = function(donations){
+                    var donations = _.flatten(donations, 'amount');
+                    return donations.reduce(function(pv, cv) { return pv + Number(cv); }, 0);
+                };
+
+                $scope.percentComplete = function(donations, total){
+                    var donations = _.flatten(donations, 'amount');
+                    var sum = donations.reduce(function(pv, cv) { return pv + Number(cv); }, 0);
+                    return parseInt((sum / total) * 100);
                 };
             }
         };
