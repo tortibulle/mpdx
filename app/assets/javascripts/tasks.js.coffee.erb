@@ -77,7 +77,7 @@ $ ->
     false
 
   # Edit task button
-  $(document).on 'click', 'a[class*="edit_task"]', ->
+  $(document).on 'click', 'a.edit-task', ->
     $('#edit_task_modal .form_wrapper').html('<%= image_tag "spinner.gif" %>')
     $('#edit_task_modal').dialog
       resizable: false,
