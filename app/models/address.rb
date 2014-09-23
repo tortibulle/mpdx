@@ -76,7 +76,7 @@ class Address < ActiveRecord::Base
     city.present? && street.present?
   end
 
-  # Not provide because used by Google Contacts sync to normalize addressed that didn't get assigned a master_address_id
+  # Not private because Google Contacts sync uses it to normalize addresses without needing to create a record
   def find_or_create_master_address
     unless master_address_id
       master_address = find_master_address

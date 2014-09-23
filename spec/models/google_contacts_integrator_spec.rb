@@ -280,29 +280,203 @@ describe GoogleContactsIntegrator do
     end
   end
 
+  describe 'sync numbers' do
+    it 'combines and formats numbers from mpdx and google' do
+      g_contact_link = build(:google_contact, google_account: @account, person: @person, last_data: { phone_numbers: [] })
+
+      @person.phone_number = { number: '+12223334444', location: 'mobile', primary: true }
+
+      @g_contact.update('gd$phoneNumber' => [
+        { '$t' => '(777) 888-9999', 'primary' => 'true', 'rel' => 'http://schemas.google.com/g/2005#other' }
+      ])
+
+      @integrator.sync_numbers(@g_contact, @person, g_contact_link)
+
+      expect(@g_contact.prepped_changes).to eq(phone_numbers: [
+        { number: '(777) 888-9999', primary: true, rel: 'other' },
+        { number: '(222) 333-4444', primary: false, rel: 'mobile' }
+      ])
+
+      expect(@person.phone_numbers.count).to eq(2)
+      phone1 = @person.phone_numbers.first
+      expect(phone1.number).to eq('+12223334444')
+      expect(phone1.location).to eq('mobile')
+      expect(phone1.primary).to be_true
+      phone2 = @person.phone_numbers.last
+      expect(phone2.number).to eq('+17778889999')
+      expect(phone2.location).to eq('other')
+      expect(phone2.primary).to be_false
+    end
+  end
+
+  describe 'sync addresses' do
+    it 'combines and addresses from mpdx and google by master address comparison which uses SmartyStreets' do
+      WebMock.reset!
+
+      richmond_smarty = '[{"input_index":0,"candidate_index":0,"delivery_line_1":"7229 Forest Ave Ste 208","last_line":"Richmond VA 23226-3765","delivery_point_barcode":"232263765581","components":{"primary_number":"7229","street_name":"Forest","street_suffix":"Ave","secondary_number":"208","secondary_designator":"Ste","city_name":"Richmond","state_abbreviation":"VA","zipcode":"23226","plus4_code":"3765","delivery_point":"58","delivery_point_check_digit":"1"},"metadata":{"record_type":"H","zip_type":"Standard","county_fips":"51087","county_name":"Henrico","carrier_route":"C023","congressional_district":"07","rdi":"Commercial","elot_sequence":"0206","elot_sort":"A","latitude":37.60519,"longitude":-77.52963,"precision":"Zip9","time_zone":"Eastern","utc_offset":-5.0,"dst":true},"analysis":{"dpv_match_code":"Y","dpv_footnotes":"AABB","dpv_cmra":"N","dpv_vacant":"N","active":"Y","footnotes":"N#"}}]'
+      anchorage_smary = '[{"input_index":0,"candidate_index":0,"delivery_line_1":"2421 E Tudor Rd Ste 102","last_line":"Anchorage AK 99507-1166","delivery_point_barcode":"995071166277","components":{"primary_number":"2421","street_predirection":"E","street_name":"Tudor","street_suffix":"Rd","secondary_number":"102","secondary_designator":"Ste","city_name":"Anchorage","state_abbreviation":"AK","zipcode":"99507","plus4_code":"1166","delivery_point":"27","delivery_point_check_digit":"7"},"metadata":{"record_type":"H","zip_type":"Standard","county_fips":"02020","county_name":"Anchorage","carrier_route":"C024","congressional_district":"AL","rdi":"Commercial","elot_sequence":"0106","elot_sort":"D","latitude":61.18135,"longitude":-149.83548,"precision":"Zip9","time_zone":"Alaska","utc_offset":-9.0,"dst":true},"analysis":{"dpv_match_code":"Y","dpv_footnotes":"AABB","dpv_cmra":"N","dpv_vacant":"N","active":"Y","footnotes":"N#"}}]'
+      {
+        'city=orlando&state=fl&street=100%20lake%20hart%20dr.&zipcode=32832' => '[]',
+        'city=springfield&state=il&street=1025%20south%206th%20street&zipcode=62703' => '[]',
+        'city=richmond&state=va&street=7229%20forest%20avenue%20%23208&zipcode=23226' => richmond_smarty,
+        'city=richmond&state=va&street=7229%20forest%20ave.&street2=apt%20208&zipcode=23226' => richmond_smarty,
+        'city=richmond&state=va&street=7229%20forest%20ave%20suite%20208&zipcode=23226-3765' => richmond_smarty,
+        'city=anchorage&state=ak&street=2421%20east%20tudor%20road%20%23102&zipcode=99507-1166' => anchorage_smary,
+        'city=anchorage&state=ak&street=2421%20e.%20tudor%20rd.&street2=apt%20102&zipcode=99507' => anchorage_smary
+      }.each do |query, result|
+        stub_request(:get, "http://api.smartystreets.com/street-address/?auth-id=&auth-token=&candidates=2&#{query}")
+          .to_return(body: result)
+      end
+
+      person2 = create(:person, first_name: 'Jane', last_name: 'Doe')
+      @contact.people << person2
+
+      @contact.addresses_attributes = [
+        {
+          street: '7229 Forest Avenue #208', city: 'Richmond', state: 'VA', postal_code: '23226',
+          country: 'United States', location: 'Home', primary_mailing_address: true
+        },
+        {
+          street: '100 Lake Hart Dr.', city: 'Orlando', state: 'FL', postal_code: '32832',
+          country: 'United States', location: 'Business', primary_mailing_address: false
+        }
+      ]
+      @contact.save
+
+      g_contact1 = @g_contact
+      g_contact2 = GoogleContactsApi::Contact.new(@g_contact, nil, @account.contacts_api_user.api)
+
+      g_contact1.update('gd$structuredPostalAddress' => [
+        {
+          'rel' => 'http://schemas.google.com/g/2005#home',
+          'primary' => 'false',
+          'gd$street' => { '$t' => "7229 Forest Ave.\nApt 208" },
+          'gd$city' => { '$t' => 'Richmond' },
+          'gd$region' => { '$t' => 'VA' },
+          'gd$postcode' => { '$t' => '23226' },
+          'gd$country' => { '$t' => 'United States of America' }
+        },
+        {
+          'rel' => 'http://schemas.google.com/g/2005#other',
+          'primary' => 'true',
+          'gd$street' => { '$t' => '2421 East Tudor Road #102' },
+          'gd$city' => { '$t' => 'Anchorage' },
+          'gd$region' => { '$t' => 'AK' },
+          'gd$postcode' => { '$t' => '99507-1166' },
+          'gd$country' => { '$t' => 'United States of America' }
+        },
+        {
+          'rel' => 'http://schemas.google.com/g/2005#work',
+          'primary' => 'true',
+          'gd$street' => { '$t' => '1025 South 6th Street' },
+          'gd$city' => { '$t' => 'Springfield' },
+          'gd$region' => { '$t' => 'IL' },
+          'gd$postcode' => { '$t' => '62703' },
+          'gd$country' => { '$t' => 'United States of America' }
+        }
+      ])
+
+      g_contact2.update('gd$structuredPostalAddress' => [
+        {
+          'rel' => 'http://schemas.google.com/g/2005#home',
+          'primary' => 'false',
+          'gd$street' => { '$t' => '7229 Forest Ave Suite 208' },
+          'gd$city' => { '$t' => 'Richmond' },
+          'gd$region' => { '$t' => 'VA' },
+          'gd$postcode' => { '$t' => '23226-3765' },
+          'gd$country' => { '$t' => 'United States of America' }
+        },
+        {
+          'rel' => 'http://schemas.google.com/g/2005#other',
+          'primary' => 'true',
+          'gd$street' => { '$t' => "2421 E. Tudor Rd.\nApt 102" },
+          'gd$city' => { '$t' => 'Anchorage' },
+          'gd$region' => { '$t' => 'AK' },
+          'gd$postcode' => { '$t' => '99507' },
+          'gd$country' => { '$t' => 'United States of America' }
+        }
+      ])
+
+      g_contacts = [g_contact1, g_contact2]
+      g_contact_links = [
+        build(:google_contact, google_account: @account, person: @person, last_data: { addresses: [] }),
+        build(:google_contact, google_account: @account, person: person2, last_data: { addresses: [] })
+      ]
+
+      @integrator.sync_addresses(g_contacts, @contact, g_contact_links)
+
+      g_contact_addresses = [
+        {
+          rel: 'home', primary: false,
+          street: "7229 Forest Ave.\nApt 208", city: 'Richmond', region: 'VA', postcode: '23226',
+          country: 'United States of America'
+        },
+        {
+          rel: 'other', primary: false,
+          street: '2421 East Tudor Road #102', city: 'Anchorage', region: 'AK', postcode: '99507-1166',
+          country: 'United States of America'
+        },
+        {
+          rel: 'work', primary: false,
+          street: '1025 South 6th Street', city: 'Springfield', region: 'IL', postcode: '62703',
+          country: 'United States of America'
+        },
+        {
+          rel: 'work', primary: false,
+          street: '100 Lake Hart Dr.', city: 'Orlando', region: 'FL', postcode: '32832',
+          country: 'United States of America'
+        }
+      ]
+      expect(g_contact1.prepped_changes).to eq(addresses: g_contact_addresses)
+      expect(g_contact2.prepped_changes).to eq(addresses: g_contact_addresses)
+
+      @contact.reload
+
+      addresses = @contact.addresses.order(:state).map { |address|
+        address.attributes.symbolize_keys.slice(:street, :city, :state, :postal_code, :country, :location,
+                                                :primary_mailing_address)
+      }
+      expect(addresses).to eq([
+        {
+          street: '7229 Forest Avenue #208', city: 'Richmond', state: 'VA', postal_code: '23226',
+          country: 'United States', location: 'Home', primary_mailing_address: true
+        },
+        {
+          street: '2421 East Tudor Road #102', city: 'Anchorage', state: 'AK', postal_code: '99507-1166',
+          country: 'United States', location: 'Other', primary_mailing_address: false
+        },
+        {
+          street: '100 Lake Hart Dr.', city: 'Orlando', state: 'FL', postal_code: '32832',
+          country: 'United States', location: 'Business', primary_mailing_address: false
+        },
+        {
+          street: '1025 South 6th Street', city: 'Springfield', state: 'IL', postal_code: '62703',
+          country: 'United States', location: 'Business', primary_mailing_address: false
+        }
+      ])
+    end
+  end
+
   describe 'overall first and subsequent sync' do
     before do
-      stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
-
       @g_contact_json_text = File.new(Rails.root.join('spec/fixtures/google_contacts.json')).read
       @api_url = 'https://www.google.com/m8/feeds/contacts'
       stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&q=John%20Doe&v=3")
         .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
         .to_return(body: @g_contact_json_text)
 
-      updated_g_contact_obj = JSON.parse(@g_contact_json_text)['feed']['entry'][0]
-      updated_g_contact_obj['gd$email'] = [
+      g_contact_obj = JSON.parse(@g_contact_json_text)['feed']['entry'][0]
+      g_contact_obj['gd$email'] = [
         { primary: true, rel: 'http://schemas.google.com/g/2005#other', address: 'johnsmith@example.com' },
         { primary: false, rel: 'http://schemas.google.com/g/2005#home', address: 'mpdx@example.com' }
       ]
-      updated_g_contact_obj['gd$phoneNumber'] = [
+      g_contact_obj['gd$phoneNumber'] = [
         { '$t' => '(123) 334-5158', 'rel' => 'http://schemas.google.com/g/2005#mobile', 'primary' => 'true' },
         { '$t' => '(456) 789-0123', 'rel' => 'http://schemas.google.com/g/2005#home', 'primary' => 'false' }
       ]
-
-      @first_sync_put = stub_request(:put, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
+      stub_request(:put, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
         .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
-        .to_return(body: { 'entry' => [updated_g_contact_obj] }.to_json)
+        .to_return(body: { 'entry' => [g_contact_obj] }.to_json)
 
       @person.email_address = { email: 'mpdx@example.com', location: 'home', primary: true }
       @person.phone_number = { number: '456-789-0123', primary: true, location: 'home' }
@@ -365,28 +539,44 @@ describe GoogleContactsIntegrator do
     it 'passes on updates from mpdx to google and vice versa' do
       old_email = @person.email_addresses.first
       @person.email_address = { email: 'mpdx_MODIFIED@example.com', primary: true, _destroy: 1, id: old_email.id }
+
+      first_number = @person.phone_numbers.first
+      first_number.number = '+14567894444'
+      first_number.save
+
+      @person.reload
+      expect(@person.phone_numbers.count).to eq(2)
+      expect(@person.phone_numbers.first.number).to eq('+14567894444')
+      expect(@person.phone_numbers.last.number).to eq('+11233345158')
+
       @account_list.reload
 
       WebMock.reset!
 
       stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
 
-      updated_g_contact_obj = JSON.parse(@g_contact_json_text)['feed']['entry'][0]
-      updated_g_contact_obj['gd$email'] = [
+      g_contact_obj = JSON.parse(@g_contact_json_text)['feed']['entry'][0]
+      g_contact_obj['gd$email'] = [
         { primary: true, rel: 'http://schemas.google.com/g/2005#other', address: 'johnsmith_MODIFIED@example.com' },
         { primary: false, rel: 'http://schemas.google.com/g/2005#home', address: 'mpdx@example.com' }
       ]
+      g_contact_obj['gd$phoneNumber'] = [
+        { '$t' => '(123) 334-5555', 'rel' => 'http://schemas.google.com/g/2005#mobile', 'primary' => 'true' },
+        { '$t' => '(456) 789-0123', 'rel' => 'http://schemas.google.com/g/2005#home', 'primary' => 'false' }
+      ]
       stub_request(:get, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
         .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
-        .to_return(body: { 'entry' => [updated_g_contact_obj] }.to_json)
+        .to_return(body: { 'entry' => [g_contact_obj] }.to_json)
 
       put_xml_regex_str = '</atom:content>\s+'\
         '<gd:email\s+rel="http://schemas.google.com/g/2005#other"\s+primary="true"\s+address="johnsmith_MODIFIED@example.com"/>\s+'\
         '<gd:email\s+rel="http://schemas.google.com/g/2005#home"\s+address="mpdx_MODIFIED@example.com"/>\s+'\
-        '<gd:phoneNumber'
+        '<gd:phoneNumber\s+rel="http://schemas.google.com/g/2005#mobile"\s+primary="true"\s+>\(123\) 334-5555</gd:phoneNumber>\s+'\
+        '<gd:phoneNumber\s+rel="http://schemas.google.com/g/2005#home"\s+>\(456\) 789-4444</gd:phoneNumber>\s+'\
+        '<gd:structuredPostalAddress'
       stub_request(:put, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
         .with(body: /#{put_xml_regex_str}/m, headers: { 'Authorization' => "Bearer #{@account.token}" })
-        .to_return(body: { 'entry' => [updated_g_contact_obj] }.to_json)
+        .to_return(body: { 'entry' => [g_contact_obj] }.to_json)
 
       @integrator.sync_contacts
 
@@ -394,6 +584,10 @@ describe GoogleContactsIntegrator do
       expect(@person.email_addresses.count).to eq(2)
       expect(@person.email_addresses.first.email).to eq('mpdx_MODIFIED@example.com')
       expect(@person.email_addresses.last.email).to eq('johnsmith_MODIFIED@example.com')
+
+      expect(@person.phone_numbers.count).to eq(2)
+      expect(@person.phone_numbers.first.number).to eq('+14567894444')
+      expect(@person.phone_numbers.last.number).to eq('+11233345555')
     end
   end
 end
