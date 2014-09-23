@@ -346,7 +346,7 @@ describe GoogleContactsIntegrator do
       g_contact1 = @g_contact
       g_contact2 = GoogleContactsApi::Contact.new(@g_contact, nil, @account.contacts_api_user.api)
 
-      g_contact1.update('gd$structuredPostalAddress' => [
+      g_contact1['gd$structuredPostalAddress'] = [
         {
           'rel' => 'http://schemas.google.com/g/2005#home',
           'primary' => 'false',
@@ -374,9 +374,9 @@ describe GoogleContactsIntegrator do
           'gd$postcode' => { '$t' => '62703' },
           'gd$country' => { '$t' => 'United States of America' }
         }
-      ])
+      ]
 
-      g_contact2.update('gd$structuredPostalAddress' => [
+      g_contact2['gd$structuredPostalAddress'] = [
         {
           'rel' => 'http://schemas.google.com/g/2005#home',
           'primary' => 'false',
@@ -395,7 +395,7 @@ describe GoogleContactsIntegrator do
           'gd$postcode' => { '$t' => '99507' },
           'gd$country' => { '$t' => 'United States of America' }
         }
-      ])
+      ]
 
       g_contacts = [g_contact1, g_contact2]
       g_contact_links = [
@@ -465,21 +465,57 @@ describe GoogleContactsIntegrator do
         .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
         .to_return(body: @g_contact_json_text)
 
-      g_contact_obj = JSON.parse(@g_contact_json_text)['feed']['entry'][0]
-      g_contact_obj['gd$email'] = [
+      updated_g_contact_obj = JSON.parse(@g_contact_json_text)['feed']['entry'][0]
+      updated_g_contact_obj['gd$email'] = [
         { primary: true, rel: 'http://schemas.google.com/g/2005#other', address: 'johnsmith@example.com' },
         { primary: false, rel: 'http://schemas.google.com/g/2005#home', address: 'mpdx@example.com' }
       ]
-      g_contact_obj['gd$phoneNumber'] = [
+      updated_g_contact_obj['gd$phoneNumber'] = [
         { '$t' => '(123) 334-5158', 'rel' => 'http://schemas.google.com/g/2005#mobile', 'primary' => 'true' },
         { '$t' => '(456) 789-0123', 'rel' => 'http://schemas.google.com/g/2005#home', 'primary' => 'false' }
       ]
+      updated_g_contact_obj['gd$structuredPostalAddress'] = [
+        {
+          'rel' => 'http://schemas.google.com/g/2005#home',
+          'primary' => 'false',
+          'gd$country' => { '$t' => 'United States of America' },
+          'gd$city' => { '$t' => 'Somewhere' },
+          'gd$street' => { '$t' => '2345 Long Dr. #232' },
+          'gd$region' => { '$t' => 'IL' },
+          'gd$postcode' => { '$t' => '12345' }
+        },
+        {
+          'gd$country' => { '$t' => 'United States of America' },
+          'gd$city' => { '$t' => 'Anywhere' },
+          'gd$street' => { '$t' => '123 Big Rd' },
+          'gd$region' => { '$t' => 'MO' },
+          'gd$postcode' => { '$t' => '56789' }
+        },
+        {
+          'rel' => 'http://schemas.google.com/g/2005#work',
+          'primary' => 'true',
+          'gd$country' => { '$t' => 'United States of America' },
+          'gd$city' => { '$t' => 'Orlando' },
+          'gd$street' => { '$t' => '100 Lake Hart Dr.' },
+          'gd$region' => { '$t' => 'FL' },
+          'gd$postcode' => { '$t' => '32832' }
+        }
+      ]
+
       stub_request(:put, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
         .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
-        .to_return(body: { 'entry' => [g_contact_obj] }.to_json)
+        .to_return(body: { 'entry' => [updated_g_contact_obj] }.to_json)
 
       @person.email_address = { email: 'mpdx@example.com', location: 'home', primary: true }
       @person.phone_number = { number: '456-789-0123', primary: true, location: 'home' }
+
+      @contact.addresses_attributes = [
+        {
+          street: '100 Lake Hart Dr.', city: 'Orlando', state: 'FL', postal_code: '32832',
+          country: 'United States', location: 'Business', primary_mailing_address: true
+        }
+      ]
+      @contact.save
 
       @integrator.sync_contacts
 
@@ -508,6 +544,25 @@ describe GoogleContactsIntegrator do
       expect(g_contact_link.remote_id).to eq('http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/6b70f8bb0372c')
       expect(g_contact_link.last_etag).to eq('"SXk6cDdXKit7I2A9Wh9VFUgORgE."')
 
+      addresses = @contact.addresses.order(:state).map { |address|
+        address.attributes.symbolize_keys.slice(:street, :city, :state, :postal_code, :country, :location,
+                                                :primary_mailing_address)
+      }
+      expect(addresses).to eq([
+        {
+          street: '100 Lake Hart Dr.', city: 'Orlando', state: 'FL', postal_code: '32832',
+          country: 'United States', location: 'Business', primary_mailing_address: true
+        },
+        {
+          street: '2345 Long Dr. #232', city: 'Somewhere', state: 'IL', postal_code: '12345',
+          country: 'United States', location: 'Home', primary_mailing_address: false
+        },
+        {
+          street: '123 Big Rd', city: 'Anywhere', state: 'MO', postal_code: '56789',
+          country: 'United States', location: 'Business', primary_mailing_address: false
+        }
+      ])
+
       last_data = {
         name_prefix: 'Mr',
         given_name: 'John',
@@ -522,12 +577,13 @@ describe GoogleContactsIntegrator do
           { number: '(456) 789-0123', rel: 'home', primary: false }
         ],
         addresses: [
-          { rel: 'home', primary: true, country: 'United States of America',
-            formatted_address: "2345 Long Dr. #232\nSomewhere\nIL\n12345\nUnited States of America",
+          { rel: 'home', primary: false, country: 'United States of America',
             city: 'Somewhere', street: '2345 Long Dr. #232', region: 'IL', postcode: '12345' },
           { country: 'United States of America',
-            formatted_address: "123 Big Rd\nAnywhere\nMO\n56789\nUnited States of America",
-            city: 'Anywhere', street: '123 Big Rd', region: 'MO', postcode: '56789', rel: 'work', primary: false }
+            city: 'Anywhere', street: '123 Big Rd', region: 'MO', postcode: '56789', rel: 'work', primary: false },
+          { rel: 'work', primary: true,
+            street: '100 Lake Hart Dr.', city: 'Orlando', region: 'FL', postcode: '32832',
+            country: 'United States of America' }
         ],
         organizations: [{ org_title: 'Worker Person', org_name: 'Example, Inc', rel: 'other', primary: false }],
         websites: [{ href: 'blog.example.com', rel: 'blog', primary: false },
@@ -544,10 +600,9 @@ describe GoogleContactsIntegrator do
       first_number.number = '+14567894444'
       first_number.save
 
-      @person.reload
-      expect(@person.phone_numbers.count).to eq(2)
-      expect(@person.phone_numbers.first.number).to eq('+14567894444')
-      expect(@person.phone_numbers.last.number).to eq('+11233345158')
+      first_address = @contact.addresses.first
+      first_address.street = 'MODIFIED 100 Lake Hart Dr.'
+      first_address.save
 
       @account_list.reload
 
@@ -555,28 +610,76 @@ describe GoogleContactsIntegrator do
 
       stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
 
-      g_contact_obj = JSON.parse(@g_contact_json_text)['feed']['entry'][0]
-      g_contact_obj['gd$email'] = [
+      updated_g_contact_obj = JSON.parse(@g_contact_json_text)['feed']['entry'][0]
+      updated_g_contact_obj['gd$email'] = [
         { primary: true, rel: 'http://schemas.google.com/g/2005#other', address: 'johnsmith_MODIFIED@example.com' },
         { primary: false, rel: 'http://schemas.google.com/g/2005#home', address: 'mpdx@example.com' }
       ]
-      g_contact_obj['gd$phoneNumber'] = [
+      updated_g_contact_obj['gd$phoneNumber'] = [
         { '$t' => '(123) 334-5555', 'rel' => 'http://schemas.google.com/g/2005#mobile', 'primary' => 'true' },
         { '$t' => '(456) 789-0123', 'rel' => 'http://schemas.google.com/g/2005#home', 'primary' => 'false' }
       ]
+      updated_g_contact_obj['gd$structuredPostalAddress'] = [
+        {
+          'rel' => 'http://schemas.google.com/g/2005#home',
+          'primary' => 'false',
+          'gd$country' => { '$t' => 'United States of America' },
+          'gd$city' => { '$t' => 'Somewhere' },
+          'gd$street' => { '$t' => '2345 Long Dr. #232' },
+          'gd$region' => { '$t' => 'IL' },
+          'gd$postcode' => { '$t' => '12345' }
+        },
+        {
+          'gd$country' => { '$t' => 'United States of America' },
+          'gd$city' => { '$t' => 'Anywhere' },
+          'gd$street' => { '$t' => 'MODIFIED 123 Big Rd' },
+          'gd$region' => { '$t' => 'MO' },
+          'gd$postcode' => { '$t' => '56789' }
+        },
+        {
+          'rel' => 'http://schemas.google.com/g/2005#work',
+          'primary' => 'true',
+          'gd$country' => { '$t' => 'United States of America' },
+          'gd$city' => { '$t' => 'Orlando' },
+          'gd$street' => { '$t' => '100 Lake Hart Dr.' },
+          'gd$region' => { '$t' => 'FL' },
+          'gd$postcode' => { '$t' => '32832' }
+        }
+      ]
       stub_request(:get, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
         .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
-        .to_return(body: { 'entry' => [g_contact_obj] }.to_json)
+        .to_return(body: { 'entry' => [updated_g_contact_obj] }.to_json)
 
       put_xml_regex_str = '</atom:content>\s+'\
         '<gd:email\s+rel="http://schemas.google.com/g/2005#other"\s+primary="true"\s+address="johnsmith_MODIFIED@example.com"/>\s+'\
         '<gd:email\s+rel="http://schemas.google.com/g/2005#home"\s+address="mpdx_MODIFIED@example.com"/>\s+'\
         '<gd:phoneNumber\s+rel="http://schemas.google.com/g/2005#mobile"\s+primary="true"\s+>\(123\) 334-5555</gd:phoneNumber>\s+'\
         '<gd:phoneNumber\s+rel="http://schemas.google.com/g/2005#home"\s+>\(456\) 789-4444</gd:phoneNumber>\s+'\
-        '<gd:structuredPostalAddress'
+        '<gd:structuredPostalAddress\s+rel="http://schemas.google.com/g/2005#home"\s+>\s+'\
+          '<gd:city>Somewhere</gd:city>\s+'\
+          '<gd:street>2345 Long Dr. #232</gd:street>\s+'\
+          '<gd:region>IL</gd:region>\s+'\
+          '<gd:postcode>12345</gd:postcode>\s+'\
+          '<gd:country>United States of America</gd:country>\s+'\
+        '</gd:structuredPostalAddress>\s+'\
+        '<gd:structuredPostalAddress\s+rel="http://schemas.google.com/g/2005#work"\s+>\s+'\
+          '<gd:city>Anywhere</gd:city>\s+'\
+          '<gd:street>MODIFIED 123 Big Rd</gd:street>\s+'\
+          '<gd:region>MO</gd:region>\s+'\
+          '<gd:postcode>56789</gd:postcode>\s+'\
+          '<gd:country>United States of America</gd:country>\s+'\
+        '</gd:structuredPostalAddress>\s+'\
+          '<gd:structuredPostalAddress\s+rel="http://schemas.google.com/g/2005#work"\s+primary="true">\s+'\
+          '<gd:city>Orlando</gd:city>\s+'\
+          '<gd:street>MODIFIED 100 Lake Hart Dr.</gd:street>\s+'\
+          '<gd:region>FL</gd:region>\s+'\
+          '<gd:postcode>32832</gd:postcode>\s+'\
+          '<gd:country>United States of America</gd:country>\s+'\
+        '</gd:structuredPostalAddress>\s+'\
+        '<gd:organization'
       stub_request(:put, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
         .with(body: /#{put_xml_regex_str}/m, headers: { 'Authorization' => "Bearer #{@account.token}" })
-        .to_return(body: { 'entry' => [g_contact_obj] }.to_json)
+        .to_return(body: { 'entry' => [updated_g_contact_obj] }.to_json)
 
       @integrator.sync_contacts
 
@@ -588,6 +691,25 @@ describe GoogleContactsIntegrator do
       expect(@person.phone_numbers.count).to eq(2)
       expect(@person.phone_numbers.first.number).to eq('+14567894444')
       expect(@person.phone_numbers.last.number).to eq('+11233345555')
+
+      addresses = @contact.addresses.order(:state).map { |address|
+        address.attributes.symbolize_keys.slice(:street, :city, :state, :postal_code, :country, :location,
+                                                :primary_mailing_address)
+      }
+      expect(addresses).to eq([
+        {
+          street: 'MODIFIED 100 Lake Hart Dr.', city: 'Orlando', state: 'FL', postal_code: '32832',
+          country: 'United States', location: 'Business', primary_mailing_address: true
+        },
+        {
+          street: '2345 Long Dr. #232', city: 'Somewhere', state: 'IL', postal_code: '12345',
+          country: 'United States', location: 'Home', primary_mailing_address: false
+        },
+        {
+          street: 'MODIFIED 123 Big Rd', city: 'Anywhere', state: 'MO', postal_code: '56789',
+          country: 'United States', location: 'Business', primary_mailing_address: false
+        }
+      ])
     end
   end
 end
