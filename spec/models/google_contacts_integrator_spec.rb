@@ -39,6 +39,7 @@ describe GoogleContactsIntegrator do
 
   describe 'sync_person' do
     before do
+      @g_contact_link = build(:google_contact)
       expect(@integrator).to receive(:find_or_build_g_contact_link).with(@person)
                                             .and_return(@g_contact_link)
 
@@ -440,6 +441,53 @@ describe GoogleContactsIntegrator do
       ])
     end
   end
+
+  describe 'compare_considering_historic' do
+    it "doesn't add or delete historic items in MPDX, doesn't add them to Google, but does delete them from Google" do
+      last_sync_list = ['history1']
+      mpdx_list = ['history1']
+      g_contact_list = ['history2']
+      historic_list = %w(history1 history2)
+
+      mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels =
+        @integrator.compare_considering_historic(last_sync_list, mpdx_list, g_contact_list, historic_list)
+
+      expect(mpdx_adds.to_a).to eq([])
+      expect(mpdx_dels.to_a).to eq([])
+      expect(g_contact_adds.to_a).to eq([])
+      expect(g_contact_dels.to_a).to eq(%w(history1 history2))
+    end
+  end
+
+  describe 'compare_emails_for_sync' do
+    it 'uses historic list for comparision' do
+      g_contact = build(:google_contact, last_data: { emails: [] })
+      @person.email_addresses << build(:email_address, email: 'a@a.co', historic: true)
+      @person.save
+      expect(@integrator).to receive(:compare_considering_historic).with([], [], [], ['a@a.co']).and_return('compared')
+      expect(@integrator.compare_emails_for_sync(@g_contact, @person, g_contact)).to eq('compared')
+    end
+  end
+
+  describe 'compare_numbers_for_sync' do
+    it 'uses historic list for comparision' do
+      @contact.addresses << build(:address, master_address_id: 1, historic: true)
+      @contact.save
+      expect(@integrator).to receive(:compare_considering_historic).with([], [], [], [1])
+                                .and_return([[], [], [], [1], [1]])
+
+      mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels, g_contact_address_records =
+        @integrator.compare_address_records([], @contact, [])
+
+      expect(mpdx_adds.to_a).to eq([])
+      expect(mpdx_dels.to_a).to eq([])
+      expect(g_contact_adds.to_a).to eq([])
+      expect(g_contact_dels.to_a).to eq([1])
+      expect(g_contact_address_records.to_a).to eq([])
+    end
+  end
+
+  #historic addresses and emails test
 
   describe 'overall first and subsequent sync' do
     it 'combines MPDX & Google data on first sync then propagates updates of email/phone/address on subsequent syncs' do

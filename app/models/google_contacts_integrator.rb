@@ -232,8 +232,9 @@ class GoogleContactsIntegrator
   end
 
   def compare_emails_for_sync(g_contact, person, g_contact_link)
-    last_sync_emails = g_contact_link.last_data[:emails].map { |e| e[:address] }
-    compare_for_sync(last_sync_emails, person.email_addresses.map(&:email), g_contact.emails)
+    last_sync_emails = g_contact_link.last_data[:emails].map { |email| email[:address] }
+    compare_considering_historic(last_sync_emails, person.email_addresses.where(historic: false).map(&:email),
+                                 g_contact.emails, person.email_addresses.where(historic: true).map(&:email))
   end
 
   def compare_numbers_for_sync(g_contact, person, g_contact_link)
@@ -243,29 +244,23 @@ class GoogleContactsIntegrator
   end
 
   def compare_addresses_for_sync(g_contact_addresses, contact, last_addresses)
-    # Build address records for previous sync address list and each address from Google
-    last_address_records = last_addresses.map(&method(:new_address_for_g_address))
-    g_contact_address_records = g_contact_addresses.map(&method(:new_address_for_g_address))
+    compare_address_records(g_contact_addresses.map(&method(:new_address_for_g_address)), contact,
+                            last_addresses.map(&method(:new_address_for_g_address)))
+  end
 
+  def compare_address_records(g_contact_address_records, contact, last_address_records)
     # Compare normalized addresses (by master_address_id)
     mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels =
-        compare_normalized_for_sync(last_address_records, contact.addresses, g_contact_address_records,
-                                    method(:normalize_address))
+        compare_normalized_for_sync(last_address_records, contact.addresses.where(historic: false),
+                                    g_contact_address_records, method(:normalize_address),
+                                    contact.addresses.where(historic: true))
 
     # Convert back from the master_address_id to entries in the addresses lists (except for g_contact_dels)
     [
-      # mpdx_adds
       mpdx_adds.map { |master_id| lookup_by_key(g_contact_address_records, master_address_id: master_id) },
-
-      # mpdx_dels
       contact.addresses.where(master_address_id: mpdx_dels.to_a),
-
-      # g_contact_adds
       contact.addresses.where(master_address_id: g_contact_adds.to_a),
-
-      # g_contact_dels
       g_contact_dels,
-
       g_contact_address_records
     ]
   end
@@ -288,8 +283,17 @@ class GoogleContactsIntegrator
     address.master_address_id
   end
 
-  def compare_normalized_for_sync(last_sync_list, mpdx_list, g_contact_list, normalize_fn)
-    compare_for_sync(last_sync_list.map(&normalize_fn), mpdx_list.map(&normalize_fn), g_contact_list.map(&normalize_fn))
+  def compare_normalized_for_sync(last_sync_list, mpdx_list, g_contact_list, normalize_fn, historic_list = [])
+    compare_considering_historic(last_sync_list.map(&normalize_fn), mpdx_list.map(&normalize_fn),
+                                 g_contact_list.map(&normalize_fn), historic_list.map(&normalize_fn))
+  end
+
+  def compare_considering_historic(last_sync_list, mpdx_list, g_contact_list, historic_list)
+    historic = historic_list.to_set
+    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels = compare_for_sync(last_sync_list, mpdx_list, g_contact_list)
+
+    # Don't add/delete MPDX's historic items, don't add them to Google, but do delete them from Google
+    [mpdx_adds - historic, mpdx_dels - historic, g_contact_adds - historic, g_contact_dels + historic]
   end
 
   def compare_for_sync(last_sync_list, mpdx_list, g_contact_list)
