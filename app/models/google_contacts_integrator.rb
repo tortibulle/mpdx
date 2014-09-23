@@ -324,12 +324,6 @@ class GoogleContactsIntegrator
     hashes_list.find { |hash| hash[key] == value }
   end
 
-  def index_by_key(hashes_list, search_key_value)
-    key = search_key_value.keys[0]
-    value = search_key_value.values[0]
-    hashes_list.find_index { |hash| hash[key] == value }
-  end
-
   def g_contact_organizations_for(person)
     if person.employer.present? || person.occupation.present?
       [{ org_name: person.employer, org_title: person.occupation, primary: true }]

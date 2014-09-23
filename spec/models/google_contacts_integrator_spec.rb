@@ -40,6 +40,26 @@ describe GoogleContactsIntegrator do
     end
   end
 
+  describe 'sync_person' do
+    before do
+      expect(@integrator).to receive(:find_or_build_g_contact_link).with(@person)
+                                            .and_return(@g_contact_link)
+
+    end
+
+    it 'creates a google contact if none retrieved/queried' do
+      expect(@integrator).to receive(:get_or_query_g_contact).with(@g_contact_link, @person).and_return(nil)
+      expect(@integrator).to receive(:new_g_contact).with(@person).and_return('new g_contact')
+      expect(@integrator.sync_person(@person)).to eq(['new g_contact', @g_contact_link])
+    end
+
+    it 'syncs a google contact if one is retrieved/queried' do
+      expect(@integrator).to receive(:get_or_query_g_contact).with(@g_contact_link, @person).and_return(@g_contact)
+      expect(@integrator).to receive(:sync_with_g_contact).with(@person, @g_contact, @g_contact_link)
+      expect(@integrator.sync_person(@person)).to eq([@g_contact, @g_contact_link])
+    end
+  end
+
   describe 'get_or_query_g_contact' do
     it 'gets the g_contact if there is a remote_id in the passed google contact link record' do
       expect(@integrator).to receive(:get_g_contact).with('1').and_return('g contact')
@@ -89,11 +109,7 @@ describe GoogleContactsIntegrator do
       @contact.save
 
       @g_contact_attrs = {
-        name_prefix: 'Mr',
-        given_name: 'John',
-        additional_name: 'Henry',
-        family_name: 'Doe',
-        name_suffix: 'III',
+        name_prefix: 'Mr', given_name: 'John', additional_name: 'Henry', family_name: 'Doe', name_suffix: 'III',
         emails: [
           { primary: true, rel: 'home', address: 'home@example.com' },
           { primary: false, rel: 'work', address: 'john@example.com' }
@@ -248,6 +264,18 @@ describe GoogleContactsIntegrator do
       expect(@g_contact.prepped_changes).to eq({})
       expect(@person.employer).to eq('Company')
       expect(@person.occupation).to eq('Worker')
+    end
+  end
+
+  describe 'ensure_single_primary_address' do
+    it 'sets all but the first primary address in the list to do not primary' do
+      address1 = build(:address, primary_mailing_address: true)
+      address2 = build(:address, primary_mailing_address: false)
+      address3 = build(:address, primary_mailing_address: true)
+      @integrator.ensure_single_primary_address([address1, address2, address3])
+      expect(address1.primary_mailing_address).to be_true
+      expect(address2.primary_mailing_address).to be_false
+      expect(address3.primary_mailing_address).to be_false
     end
   end
 
