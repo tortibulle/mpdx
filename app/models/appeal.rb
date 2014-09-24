@@ -9,4 +9,6 @@ class Appeal < ActiveRecord::Base
   PERMITTED_ATTRIBUTES = [:id, :name, :amount, :description, :end_date, {
       activity_contacts_attributes: [:contact_id, :_destroy]
   }]
+
+  accepts_nested_attributes_for :contacts, reject_if: :all_blank, allow_destroy: true
 end
