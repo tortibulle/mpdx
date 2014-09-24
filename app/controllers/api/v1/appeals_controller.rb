@@ -4,7 +4,7 @@ class Api::V1::AppealsController < Api::V1::BaseController
   end
 
   def update
-    if appeal.update_attributes(appeal_params)
+    if appeal.update_attributes(appeal_params) && appeal.add_contacts(current_account_list, params[:appeal][:contacts])
       render json: appeal, callback: params[:callback]
     else
       render json: { errors: task.errors.full_messages }, callback: params[:callback], status: :bad_request
