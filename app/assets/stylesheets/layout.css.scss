@@ -1251,3 +1251,39 @@ body.google_integrations_controller {
     @include listclear;
   }
 }
+
+/* ************************************************************** */
+
+.progress-category {
+  display: inline-block;
+  width: 50%;
+  margin-right: -2px;
+  span {
+    vertical-align: top;
+  }
+  i {
+    float: left;
+    font-size: 5em;
+    margin-right: 10px;
+    width: 60px;
+    text-align: center;
+  }
+  h3 {
+    font-size: 2em;
+    margin: 0 0 5px 0;
+  }
+  ul {
+    margin-top: 5px;
+    padding-left: 86px;
+  }
+}
+.progress-category-stat, .progress-category-stat span {
+  display: inline-block;
+  width: 90px;
+  font-size: 14px;
+  text-align: center;
+}
+.progress-category-stat span {
+  font-size: 18px;
+  margin-bottom: 4px;
+}

@@ -1,8 +1,11 @@
-<p>The mailchimp API key associated with your MPDX account is no longer valid. 
-If you would like Mailchimp syncronization to continue to work, please to go
-<%= link_to(mail_chimp_accounts_url, mail_chimp_accounts_url) %> and update your API key.</p>
+<p>
+<%= _("The mailchimp API key associated with your MPDX account is no longer valid.
+If you would like Mailchimp syncronization to continue to work, please go to
+ %{link} and update your API key.").localize % { link_to(mail_chimp_accounts_url, mail_chimp_accounts_url) } %>
+</p>
 
 <p>
-Thanks!<br />
-MPDX Team
+  <%= _('Thanks!') %>
+  <br />
+  <%= _('MPDX Support Team') %>
 </p>

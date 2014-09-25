@@ -37,6 +37,7 @@ class Contact < ActiveRecord::Base
   scope :active, -> { where(active_conditions) }
   scope :inactive, -> { where(inactive_conditions) }
   scope :late_by, -> (min_days, max_days = nil) { financial_partners.where('last_donation_date BETWEEN ? AND ?', max_days ? Date.today - max_days : Date.new(1951, 1, 1), Date.today - min_days) }
+  scope :created_between, -> (start_date, end_date) { where('contacts.created_at BETWEEN ? and ?', start_date.in_time_zone, (end_date + 1.day).in_time_zone) }
 
   PERMITTED_ATTRIBUTES = [
     :name, :pledge_amount, :status, :notes, :full_name, :greeting, :website, :pledge_frequency,

@@ -11,143 +11,117 @@
   <br /><br />
 <% end %>
 
-<strong><%= _('Phone Dials:') %></strong>
-<ul>
-  <li>
-    <%= _('Completed:') %>
-    <%= current_account_list.tasks.of_type('Call')
-                            .with_result(['Completed', 'Done'])
-                            .completed_between(@start_date, @end_date)
-                            .count %>
-  </li>
-  <li>
-    <%= _('Attempted:') %>
-    <%= current_account_list.tasks.of_type('Call')
-                            .with_result(['Attempted - Left Message', 'Attempted'])
-                            .completed_between(@start_date, @end_date)
-                            .count %>
+<div class="progress-category">
+  <i class="fa fa-mobile" style="margin-top: -8px; font-size: 7em;"></i>
+  <h3><%= _('Phone Dials:') %></h3>
+  <span class="progress-category-stat">
+    <span><%= @counts[:phone][:completed] + @counts[:phone][:attempted] %></span>
+    <%= _('Outgoing Dials') %>
+  </span>
+  <span class="progress-category-stat">
+    <span><%= @counts[:phone][:completed] + @counts[:phone][:received] %></span>
+    <%= _('Talked To') %>
+  </span>
+  <span class="progress-category-stat">
+    <span><%= @counts[:phone][:appointments] %></span>
+    <%= _('Resulted in Appointments') %>
+  </span>
+  <ul>
+    <li>
+      <%= _('Completed:') %>
+      <%= @counts[:phone][:completed] %>
+    </li>
+    <li>
+      <%= _('Attempted:') %>
+      <%= @counts[:phone][:attempted] %>
+    </li>
+    <li>
+      <%= _('Received:') %>
+      <%= @counts[:phone][:received] %>
+    </li>
+  </ul>
+</div>
 
-  </li>
-  <li>
-    <%= _('Received:') %>
-    <%= current_account_list.tasks.of_type('Call')
-                            .with_result(['Received'])
-                            .completed_between(@start_date, @end_date)
-                            .count %>
-  </li>
-</ul>
+<div class="progress-category">
+  <i class="fa fa-laptop" style="margin-top: -5px;"></i>
+  <h3><%= _('Electronic Contacts') %></h3>
+  <span class="progress-category-stat">
+    <span><%= @counts[:electronic][:sent] %></span>
+    <%= _('Sent') %>
+  </span>
+  <span class="progress-category-stat">
+    <span><%= @counts[:electronic][:received] %></span>
+    <%= _('Received') %>
+  </span>
+  <span class="progress-category-stat">
+    <span><%= @counts[:electronic][:appointments] %></span>
+    <%= _('Resulted in Appointments') %>
+  </span>
+  <ul>
+    <li>
+      <%= _('Email:') %>
+      <%= @counts[:email][:sent] %>
+      <%= _('Sent') %> /
+      <%= @counts[:email][:received] %>
+      <%= _('Received') %>
+    </li>
+    <li>
+      <%= _('Facebook:') %>
+      <%= @counts[:facebook][:sent] %>
+      <%= _('Sent') %> /
+      <%= @counts[:facebook][:received] %>
+      <%= _('Received') %>
+    </li>
+    <li>
+      <%= _('Text Message:') %>
+      <%= @counts[:text_message][:sent] %>
+      <%= _('Sent') %> /
+      <%= @counts[:text_message][:received] %>
+      <%= _('Received') %>
+    </li>
+  </ul>
+</div>
 
-<strong><%= _('Appointments:') %></strong>
-<ul>
-  <li>
-    <%= _('Completed:') %>
-    <%= current_account_list.tasks.of_type('Appointment')
-                            .with_result(['Completed', 'Done'])
-                            .completed_between(@start_date, @end_date)
-                            .count %>
-  </li>
-  <li>
-    <%= _('Set up:') %>
-    <%= current_account_list.tasks.of_type('Appointment')
-                            .uncompleted
-                            .created_between(@start_date, @end_date)
-                            .count %>
-    (<%= current_account_list.tasks.of_type('Call')
-                             .where(next_action: 'Appointment Scheduled')
-                             .completed_between(@start_date, @end_date)
-                             .count %>
-    <%= _('Through Phone Calls') %>)
-  </li>
-</ul>
+<div class="progress-category">
+  <i class="fa fa-group" style="margin-top: -2px; font-size: 4.5em;"></i>
+  <h3><%= _('Appointments') %></h3>
+  <span class="progress-category-stat">
+    <span><%= @counts[:appointments][:completed] %></span>
+    <%= _('Completed') %>
+  </span>
+  <ul></ul>
+</div>
 
-<strong><%= _('Emails:') %></strong>
-<ul>
-  <li>
-    <%= _('Sent:') %>
-    <%= current_account_list.tasks.of_type('Email')
-                            .with_result(['Completed', 'Done'])
-                            .completed_between(@start_date, @end_date)
-                            .count %>
-  </li>
-  <li>
-    <%= _('Received:') %>
-    <%= current_account_list.tasks.of_type('Email')
-                            .with_result('Received')
-                            .completed_between(@start_date, @end_date)
-                            .count %>
-  </li>
-</ul>
+<div class="progress-category">
+  <i class="fa fa-envelope" style="margin-top: -4px;"></i>
+  <h3><%= _('Correspondence') %></h3>
+  <span class="progress-category-stat">
+    <span><%= @counts[:correspondence][:precall] %></span>
+    <%= _('Pre-call Letters') %>
+  </span>
+  <span class="progress-category-stat">
+    <span><%= @counts[:correspondence][:support_letters] %></span>
+    <%= _('Support Letters') %>
+  </span>
+  <span class="progress-category-stat">
+    <span><%= @counts[:correspondence][:thank_yous] %></span>
+    <%= _('Thank You Notes') %>
+  </span>
+  <span class="progress-category-stat">
+    <span><%= @counts[:correspondence][:reminders] %></span>
+    <%= _('Reminder Letters') %>
+  </span>
+</div>
 
-<strong><%= _('Facebook Message:') %></strong>
-<ul>
-  <li>
-    <%= _('Sent:') %>
-    <%= current_account_list.tasks.of_type('Facebook Message')
-                            .with_result(['Completed', 'Done'])
-                            .completed_between(@start_date, @end_date)
-                            .count %>
-  </li>
-  <li>
-    <%= _('Received:') %>
-    <%= current_account_list.tasks.of_type('Facebook Message')
-                            .with_result('Received')
-                            .completed_between(@start_date, @end_date)
-                            .count %>
-  </li>
-</ul>
-
-<strong><%= _('Text Message:') %></strong>
-<ul>
-  <li>
-    <%= _('Sent:') %>
-    <%= current_account_list.tasks.of_type('Text Message')
-                            .with_result('Completed')
-                            .completed_between(@start_date, @end_date)
-                            .count %>
-  </li>
-  <li>
-    <%= _('Received:') %>
-    <%= current_account_list.tasks.of_type('Text Message')
-                            .with_result('Received')
-                            .completed_between(@start_date, @end_date)
-                            .count %>
-  </li>
-</ul>
-
-<strong><%= _('Snail Mail:') %></strong>
-
-<ul>
-  <li>
-    <%= _('Pre-call Letters:') %>
-    <%= current_account_list.tasks.of_type('Pre Call Letter')
-                            .with_result('Done')
-                            .completed_between(@start_date, @end_date)
-                            .count %>
-  </li>
-  <li>
-    <%= _('Support Letters:') %>
-    <%= current_account_list.tasks.of_type('Support Letter')
-                            .with_result('Done')
-                            .completed_between(@start_date, @end_date)
-                            .count %>
-
-  </li>
-  <li>
-    <%= _('Thank you notes:') %>
-    <%= current_account_list.tasks.of_type('Thank')
-                            .with_result('Done')
-                            .completed_between(@start_date, @end_date)
-                            .count %>
-
-  </li>
-  <li>
-    <%= _('Reminder Letters:') %>
-    <%= current_account_list.tasks.of_type('Reminder Letter')
-                            .with_result('Done')
-                            .completed_between(@start_date, @end_date)
-                            .count %>
-
-  </li>
-
-</ul>
-
+<div class="progress-category">
+  <i class="fa fa-child" style="font-size: 6em;"></i>
+  <h3><%= _('Contacts') %></h3>
+  <span class="progress-category-stat tip" title="<%= _('Always current. Contacts with status: Never Contacted, Contact for Appointment, or none.') %>">
+    <span><%= @counts[:contacts][:active] %></span>
+    <%= _('Active Contacts') %>
+  </span>
+  <span class="progress-category-stat">
+    <span><%= @counts[:contacts][:referrals] %></span>
+    <%= _('Referrals Gained') %>
+  </span>
+</div>
