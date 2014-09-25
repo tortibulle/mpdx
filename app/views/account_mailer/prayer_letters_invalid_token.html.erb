@@ -1,10 +1,11 @@
 <p>
-  The link between MPDX and your prayerletters.com account has stopped working. If you'd like to continue to have MPDX
-  automatically push changes over to prayerletters.com, please go to <%= link_to(integrations_settings_url, integrations_settings_url) %>
-  and click the 'Enable' button
+  <%= _("The link between MPDX and your prayerletters.com account has stopped working. If you'd like to continue to have MPDX
+  automatically push changes over to prayerletters.com, please go to
+  and click the 'Enable' button").localize % { link: link_to(integrations_settings_url, integrations_settings_url) } %>
 </p>
 
 <p>
-  Thanks!<br />
-  MPDX Support Team
+  <%= _('Thanks!') %>
+  <br />
+  <%= _('MPDX Support Team') %>
 </p>
