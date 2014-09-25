@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: version 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-19 09:04-0400\n"
+"POT-Creation-Date: 2014-09-25 04:50-0400\n"
 "PO-Revision-Date: 2012-10-10 17:24-0500\n"
 "Last-Translator: Josh Starcher <josh.starcher@gmail.com>\n"
 "Language-Team: Spanish\n"
@@ -52,6 +52,12 @@ msgid "%{contacts_count} referrals"
 msgstr "%{contacts_count} referencias"
 
 msgid "%{link} has given %{total} since %{since}"
+msgstr ""
+
+msgid ""
+"%{org_name} said we have the wrong password for your account.\n"
+"\n"
+"Please try updating it here: %{link}"
 msgstr ""
 
 msgid "(Cancel merging)"
@@ -673,6 +679,14 @@ msgstr ""
 msgid "First"
 msgstr ""
 
+msgid ""
+"For the MailChimp integration we recommend that you set up a new list on MailChimp to use\n"
+"  (not a new account, just a new list), and leave all the MailChimp defaults in place for that list.\n"
+"  If you set it up with a fresh list, everyone set to receive your newsletter will get copied over\n"
+"  automatically, and from then on you can manage all the updates from MPDX (i.e. when you change an email\n"
+"  address on MPDX it will update on mailchimp)."
+msgstr ""
+
 msgid "Fortnightly"
 msgstr ""
 
@@ -746,6 +760,11 @@ msgid ""
 msgstr ""
 
 msgid "If we let you delete that account you won't be able to log in anymore"
+msgstr ""
+
+msgid ""
+"If you do want to stick with your existing list, you will need to make that extra merge field not a\n"
+"  required field."
 msgstr ""
 
 msgid "If your problem is related to importing, please attach the file you are trying to upload."
@@ -841,6 +860,9 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
+msgid "MPDX Support Team"
+msgstr ""
+
 msgid ""
 "MPDX can automatically update your MPDX task history based on emails you've sent\n"
 "                or received to/from your contacts in your Gmail account."
@@ -853,6 +875,9 @@ msgid ""
 msgstr ""
 
 msgid "MPDX does not currently import any data from this source, but it will soon! Connect your account now to be ready for when it does"
+msgstr ""
+
+msgid "MPDX has finished importing your %{source} contacts."
 msgstr ""
 
 msgid "MPDX is currently downloading your data from the donation system. This message will go away when the download is complete."
@@ -1452,16 +1477,41 @@ msgstr ""
 msgid "Thanks!"
 msgstr ""
 
+msgid ""
+"The MailChimp mailing list that you have linked to your MPDX account has an extra merge field that you\n"
+"  created and marked as required. MPDX doesn't know how to populate your customer merge field, and is therefore\n"
+"  unable to sync your contacts to MailChimp."
+msgstr ""
+
 msgid "The connection to your LinkedIn account needs to be renewed."
 msgstr ""
 
 msgid "The file you uploaded is not a valid Tnt export. %{link}"
 msgstr ""
 
+msgid ""
+"The link between MPDX and your Google account has stopped working. If you'd like to continue to have MPDX\n"
+"  automatically sync with your Google account, please go to %{link}\n"
+"  and click the 'Refresh Google Account' button.  After that, you'll need to manually re-enable any integrations\n"
+"  that you had set already."
+msgstr ""
+
+msgid ""
+"The link between MPDX and your prayerletters.com account has stopped working. If you'd like to continue to have MPDX\n"
+"  automatically push changes over to prayerletters.com, please go to\n"
+"  and click the 'Enable' button"
+msgstr ""
+
 msgid "The link to your facebook account needs to be refreshed. <a href=\"/auth/facebook\">Click here to re-connect to facebook</a> then try your import again."
 msgstr ""
 
 msgid "The link to your facebook account needs to be refreshed. Click here to re-connect to facebook."
+msgstr ""
+
+msgid ""
+"The mailchimp API key associated with your MPDX account is no longer valid.\n"
+"If you would like Mailchimp syncronization to continue to work, please go to\n"
+" %{link} and update your API key."
 msgstr ""
 
 msgid "The more detail you are able to give us, the easier it will be for us to help you. Thanks!"
@@ -1543,6 +1593,12 @@ msgid "Visit Mobile Version"
 msgstr ""
 
 msgid "We couldn't find what you were looking for. Sorry!"
+msgstr ""
+
+msgid ""
+"We have temporarily disassociated your MailChimp list from MPDX to prevent further errors. Once you have\n"
+"  chosen one of the options above, please go back to %{link}\n"
+"  and update your MailChimp settings."
 msgstr ""
 
 msgid "We were unable to connect your account. Please try again."
@@ -1670,7 +1726,6 @@ msgstr ""
 
 #~ msgid "Add Person"
 #~ msgstr "Añadir persona"
-
 #~ msgid ""
 #~ "All <strong>%{this_page}</strong> conversations on this page are selected. <a "
 #~ "data-behavior=\"select_all\">Select all <strong>%{total}</strong> contacts</a>"
@@ -1678,14 +1733,12 @@ msgstr ""
 #~ "Las <strong>%{this_page}</strong> conversations de seta página son seleccionad"
 #~ "os. <a data-behavior=\"select_all\">Seleccionar todos <strong>%{total}</strong> "
 #~ "contacts</a>"
-
 #~ msgid ""
 #~ "All <strong>%{total}</strong> contacts are selected. <a data-behavior=\"clear_s"
 #~ "election\">Clear selection</a>"
 #~ msgstr ""
 #~ "Todos los <strong>%{total}</strong> contactos están seleccionados. <a data-beh"
 #~ "avior=\"clear_selection\">Borrar selección</a>"
-
 #~ msgid ""
 #~ "%{contacts_count:referrals} couldn't be added because they were missing the fi"
 #~ "rst and last name."

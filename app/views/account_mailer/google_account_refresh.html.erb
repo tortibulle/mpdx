@@ -1,11 +1,12 @@
 <p>
-  The link between MPDX and your Google account has stopped working. If you'd like to continue to have MPDX
-  automatically sync with your Google account, please go to <%= link_to(google_integration_url(@google_integration), google_integration_url(@google_integration)) %>
+  <%= _("The link between MPDX and your Google account has stopped working. If you'd like to continue to have MPDX
+  automatically sync with your Google account, please go to %{link}
   and click the 'Refresh Google Account' button.  After that, you'll need to manually re-enable any integrations
-  that you had set already.
+  that you had set already.").localize % { link: link_to(google_integration_url(@google_integration), google_integration_url(@google_integration)) } %>
 </p>
 
 <p>
-  Thanks!<br />
-  MPDX Support Team
+  <%= _('Thanks!') %>
+  <br />
+  <%= _('MPDX Support Team') %>
 </p>

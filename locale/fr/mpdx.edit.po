@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: version 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-19 09:04-0400\n"
+"POT-Creation-Date: 2014-09-25 04:50-0400\n"
 "PO-Revision-Date: 2014-09-16 16:48+0100\n"
 "Last-Translator: Josh Starcher <>\n"
 "Language-Team: French\n"
@@ -53,6 +53,12 @@ msgstr "%{contacts_count} références"
 
 msgid "%{link} has given %{total} since %{since}"
 msgstr "%{link} a donné %{total} depuis %{since}"
+
+msgid ""
+"%{org_name} said we have the wrong password for your account.\n"
+"\n"
+"Please try updating it here: %{link}"
+msgstr ""
 
 msgid "(Cancel merging)"
 msgstr "(Annuler la fusion)"
@@ -663,6 +669,14 @@ msgstr "Trouvez des doubles"
 msgid "First"
 msgstr "En premier"
 
+msgid ""
+"For the MailChimp integration we recommend that you set up a new list on MailChimp to use\n"
+"  (not a new account, just a new list), and leave all the MailChimp defaults in place for that list.\n"
+"  If you set it up with a fresh list, everyone set to receive your newsletter will get copied over\n"
+"  automatically, and from then on you can manage all the updates from MPDX (i.e. when you change an email\n"
+"  address on MPDX it will update on mailchimp)."
+msgstr ""
+
 msgid "Fortnightly"
 msgstr "Bimensuel"
 
@@ -737,6 +751,11 @@ msgstr ""
 
 msgid "If we let you delete that account you won't be able to log in anymore"
 msgstr "Si nous vous laissons supprimer ce compte, vous ne serez plus en mesure de vous connecter"
+
+msgid ""
+"If you do want to stick with your existing list, you will need to make that extra merge field not a\n"
+"  required field."
+msgstr ""
 
 msgid "If your problem is related to importing, please attach the file you are trying to upload."
 msgstr "Si votre problème est lié à l'importation, joignez s'il vous plaît le fichier que vous essayer de transmettre."
@@ -833,6 +852,9 @@ msgstr "Déconnexion"
 msgid "Login"
 msgstr "S'identifier"
 
+msgid "MPDX Support Team"
+msgstr ""
+
 msgid ""
 "MPDX can automatically update your MPDX task history based on emails you've sent\n"
 "                or received to/from your contacts in your Gmail account."
@@ -849,6 +871,10 @@ msgstr ""
 
 msgid "MPDX does not currently import any data from this source, but it will soon! Connect your account now to be ready for when it does"
 msgstr "MPDX ne peut pas importer actuellement de données provenant de cette source, mais il pourra bientôt ! Connectez votre compte maintenant pour être prêt quand il le fera"
+
+#, fuzzy
+msgid "MPDX has finished importing your %{source} contacts."
+msgstr "[MPDX] L'importation de vos contacts de %{source} a échouée"
 
 msgid "MPDX is currently downloading your data from the donation system. This message will go away when the download is complete."
 msgstr "MPDX est en train de télécharger vos données à partir du système de don. Ce message disparaîtra lorsque le téléchargement sera terminé."
@@ -1441,17 +1467,42 @@ msgstr "notes de remerciements :"
 msgid "Thanks!"
 msgstr "Merci !"
 
+msgid ""
+"The MailChimp mailing list that you have linked to your MPDX account has an extra merge field that you\n"
+"  created and marked as required. MPDX doesn't know how to populate your customer merge field, and is therefore\n"
+"  unable to sync your contacts to MailChimp."
+msgstr ""
+
 msgid "The connection to your LinkedIn account needs to be renewed."
 msgstr "La connexion à votre compte LinkedIn a besoin d'être renouvelée."
 
 msgid "The file you uploaded is not a valid Tnt export. %{link}"
 msgstr "Le fichier que vous avez téléchargé n'est pas un produit d'exportation Tnt valide. %{link}"
 
+msgid ""
+"The link between MPDX and your Google account has stopped working. If you'd like to continue to have MPDX\n"
+"  automatically sync with your Google account, please go to %{link}\n"
+"  and click the 'Refresh Google Account' button.  After that, you'll need to manually re-enable any integrations\n"
+"  that you had set already."
+msgstr ""
+
+msgid ""
+"The link between MPDX and your prayerletters.com account has stopped working. If you'd like to continue to have MPDX\n"
+"  automatically push changes over to prayerletters.com, please go to\n"
+"  and click the 'Enable' button"
+msgstr ""
+
 msgid "The link to your facebook account needs to be refreshed. <a href=\"/auth/facebook\">Click here to re-connect to facebook</a> then try your import again."
 msgstr "Le lien vers votre compte Facebook a besoin d'être rafraîchi. <a href=\"/auth/facebook\">Cliquez ici pour vous reconnecter à Facebook</a> puis essayer de nouveau l'importation."
 
 msgid "The link to your facebook account needs to be refreshed. Click here to re-connect to facebook."
 msgstr "Le lien vers votre compte Facebook a besoin d'être rafraîchi. Cliquez ici pour vous  reconnecter à Facebook."
+
+msgid ""
+"The mailchimp API key associated with your MPDX account is no longer valid.\n"
+"If you would like Mailchimp syncronization to continue to work, please go to\n"
+" %{link} and update your API key."
+msgstr ""
 
 msgid "The more detail you are able to give us, the easier it will be for us to help you. Thanks!"
 msgstr "Plus vous pouvez nous apportez de détails, plus ils sera facile pour nous de vous aider. Merci !"
@@ -1534,6 +1585,12 @@ msgstr "Visiter la version Mobile"
 
 msgid "We couldn't find what you were looking for. Sorry!"
 msgstr "Nous n'avons pas pu trouver ce que vous recherchez. Désolé!"
+
+msgid ""
+"We have temporarily disassociated your MailChimp list from MPDX to prevent further errors. Once you have\n"
+"  chosen one of the options above, please go back to %{link}\n"
+"  and update your MailChimp settings."
+msgstr ""
 
 msgid "We were unable to connect your account. Please try again."
 msgstr "Nous n'avons pas pu vous connecter à votre compte. Essayez de nouveau, s'il vous plaît."
@@ -1660,7 +1717,6 @@ msgstr "à"
 
 #~ msgid "Add Person"
 #~ msgstr "Ajouter une personne"
-
 #~ msgid ""
 #~ "All <strong>%{this_page}</strong> conversations on this page are selected. <a "
 #~ "data-behavior=\"select_all\">Select all <strong>%{total}</strong> contacts</a>"
@@ -1668,38 +1724,29 @@ msgstr "à"
 #~ "Toutes <strong>%{this_page}</strong> les conversations sur cette page sont sél"
 #~ "ectionnées.  <a data-behavior=\"select_all\">Sélectionner tous <strong>%{total}<"
 #~ "/strong> les contacts</a>"
-
 #~ msgid ""
 #~ "All <strong>%{total}</strong> contacts are selected. <a data-behavior=\"clear_s"
 #~ "election\">Clear selection</a>"
 #~ msgstr ""
 #~ "Tous <strong>%{total}</strong> les contacts sont selectionnés. <a data-behavio"
 #~ "r=\"clear_selection\">Effacer la selection</a>"
-
 #~ msgid ""
 #~ "Another contact on your accout already has the donor account number you've tri"
 #~ "ed to assign to this contact."
 #~ msgstr ""
 #~ "Un autre contact sur ​​votre compte d'utilisateur a déjà le numéro de compte d"
 #~ "u donneur que vous avez essayé d'attribuer à ce contact."
-
 #~ msgid "Attempted"
 #~ msgstr "Tentative"
-
 #~ msgid "Click here to add a phone number"
 #~ msgstr "Cliquer ici pour ajouter un numéro de téléphone"
-
 #~ msgid "Click here to add an email address"
 #~ msgstr "Cliquer ici pour ajouter une adresse e-mail"
-
 #~ msgid "Configure synchronization with this connection"
 #~ msgstr "Configurer la synchronisation avec cette connexion"
-
 #~ msgid "Download CSV"
 #~ msgstr "Télécharger CSV"
-
 #~ msgid "Search for..."
 #~ msgstr "Recherche..."
-
 #~ msgid "Select All Rows"
 #~ msgstr "Sélectionner toutes les lignes"
