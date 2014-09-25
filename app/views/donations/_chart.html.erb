@@ -20,6 +20,10 @@
   <% average =  (@by_month.values.collect {|v| v.sum(&:amount)}.reverse[0..11].sum / 12).round %>
   <% prior_average =  (@prior_year.values.collect {|v| v.sum(&:amount)}.reverse[0..11].sum / 12).round %>
 
+  <div class="donation-charts" id="donation_chart">
+    <%= _('No donations have been received from %{contact} in the past 13 months').localize % { contact: @contact || 'this person' } %>
+  </div>
+
   <script type="text/javascript" charset="utf-8">
     var chart;
     $(document).ready(function() {
@@ -40,16 +44,16 @@
           '#B5CA92'
         ],
         title: {
-          text: '<%= _('Donation History') %>'
+          text: '<%= j _('Donation History') %>'
         },
         subtitle: {
-          text: '<%== if prior_average > average 
+          text: '<%== j(if prior_average > average
                         _('Average donations down <span style="color:red">%{amount}</span> from last year').localize % { amount: number_to_current_currency(prior_average - average) }
                      elsif average > prior_average
                        _('Average donations up <span style="color:green">%{amount}</span> from last year').localize % { amount: number_to_current_currency(average - prior_average) }
                      else
                        ''
-                      end %>'
+                      end) %>'
         },
         xAxis: {
           categories: [
@@ -59,7 +63,7 @@
         yAxis: {
           min: 0,
           title: {
-            text: 'Amount (USD)'
+            text: <%= j _('Amount (USD)') %>
           }
         },
         tooltip: {
@@ -74,15 +78,15 @@
           }
         },
         series: [{
-          name: '<%= _('Donations') %>',
+          name: '<%= j _('Donations') %>',
           data: [<%= @by_month_index.collect {|month| @by_month[month] || []}.collect {|v| v.sum(&:amount)}.join(',') %>],
           type: 'column'
         },{
-          name: '<%= _('Last Year') %>',
+          name: '<%= j _('Last Year') %>',
           data: [<%= @prior_year_index.collect {|month| @prior_year[month] || []}.collect {|v| v.sum(&:amount)}.join(',') %>],
           type: 'column'
         },{
-  name: '<%= _('Average') %>',
+  name: '<%= j _('Average') %>',
         data: [<%= 0.upto(12).collect {|i| average}.join(',') %>],
           type: 'line'
         }]
@@ -90,6 +94,3 @@
     });
   </script>
 <% end %>
-<div class="donation-charts" id="donation_chart">
-  No donations have been received from <%= @contact || 'this person' %> in the past 13 months
-</div>
