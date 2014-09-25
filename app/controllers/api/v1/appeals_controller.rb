@@ -17,6 +17,15 @@ class Api::V1::AppealsController < Api::V1::BaseController
     #render json: task, callback: params[:callback]
   end
 
+  def create
+    appeal = appeal.new(appeal_params)
+    if appeal.save
+      render json: appeal, callback: params[:callback], status: :created
+    else
+      render json: { errors: task.errors.full_messages }, callback: params[:callback], status: :bad_request
+    end
+  end
+
   private
 
   def appeals

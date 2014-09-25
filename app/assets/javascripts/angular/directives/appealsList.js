@@ -109,6 +109,14 @@ angular.module('mpdxApp')
                     var sum = donations.reduce(function(pv, cv) { return pv + Number(cv); }, 0);
                     return parseInt((sum / total) * 100);
                 };
+
+                $scope.newAppeal = function(){
+                    api.call('post','appeals/?account_list_id=' + (window.current_account_list_id || ''), {
+                        name: 'New Appeal'
+                    }, function(data) {
+
+                    });
+                };
             }
         };
     });
