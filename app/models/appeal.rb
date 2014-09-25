@@ -6,9 +6,13 @@ class Appeal < ActiveRecord::Base
   has_many :appeal_donations
   has_many :donations, through: :appeal_donations
 
-  PERMITTED_ATTRIBUTES = [:id, :name, :amount, :description, :end_date, {
-      appeal_contacts_attributes: [:contact_id, :_destroy]
-  }]
+  PERMITTED_ATTRIBUTES = [:id, :name, :amount, :description, :end_date]
 
-  accepts_nested_attributes_for :appeal_contacts, reject_if: :all_blank, allow_destroy: true
+  def add_contacts(account_list, contact_ids)
+    valid_contact_ids = account_list.contacts.pluck(:id) & contact_ids
+    new_contact_ids = valid_contact_ids - contacts.pluck(:id)
+    new_contact_ids.each do |contact_id|
+      return false unless AppealContact.new(appeal_id: self.id, contact_id: contact_id).save
+    end
+  end
 end

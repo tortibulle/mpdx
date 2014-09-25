@@ -89,7 +89,7 @@ $ ->
 
       # Actions
       $(document).on 'click', '.actionbtn', ->
-        if $('.checks input:checked').length == 0
+        if $('.checks input:checked').length == 0 && !$(this).nextAll('.action_list').is(':visible')
           alert(__("You must select at least one contact you'd like to perform an action on."))
           return false
 
