@@ -24,7 +24,7 @@
                 <table style="width:100%;">
                     <thead style="font-weight: bold;">
                         <tr>
-                            <td></td>
+                            <td style="width: 5px;"></td>
                             <td style="text-align: center;">Contact</td>
                             <td style="width:18%; text-align: center;">Donation</td>
                             <td style="width:4%;"></td>
@@ -45,6 +45,14 @@
                     <select ng-model="newContact" ng-options="c.id as c.name for c in contacts">
                     </select>
                     <button ng-click="addContact(newContact)">Add</button>
+                </div>
+
+                <div style="margin-top: 5px;">
+                    With selected:  <select ng-model="task">
+                        <option value="letter">Create Send Ask Letter Task</option>
+                        <option value="thank">Create Thank You Task</option>
+                    </select>
+                    <button>Go</button>
                 </div>
             </div>
         </form>
