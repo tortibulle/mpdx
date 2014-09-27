@@ -294,6 +294,10 @@ div.right {
   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.7);
 }
 
+.btn {
+  margin-bottom: 8px;
+}
+
 
 /* ************************************************************** */
 .pagination {
@@ -1285,4 +1289,9 @@ body.google_integrations_controller {
 .progress-category-stat span {
   font-size: 18px;
   margin-bottom: 4px;
+}
+
+/* ********************* Layout Hacks ************************** */
+.gm-style .gm-style-iw {
+  width: inherit !important;
 }

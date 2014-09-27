@@ -138,7 +138,8 @@
             </div>
           </li>
           <li class="controls">
-            <a href="#" ng-click="resetFilters()" style="font-size: 11px;">Reset Filters</a>
+            <a href="#" ng-click="resetFilters()" class="btn">Reset Filters</a>
+            <a href="#" ng-click="mapContacts()" class="btn">Map These Contacts</a>
           </li>
         </ul>
       </form>
@@ -201,3 +202,4 @@
 <%= render 'task_modal' %>
 <%= render 'edit_modal' %>
 <%= render 'merge_modal' %>
+<%= render 'contacts_map_modal' %>

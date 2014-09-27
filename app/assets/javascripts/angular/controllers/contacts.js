@@ -289,6 +289,36 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
 
       return true;
     };
+
+    $scope.mapContacts = function() {
+      markers = [];
+      angular.forEach($scope.contacts, function(c, key) {
+        cc = contactCache.getFromCache(c.id)
+        if(cc && cc.addresses && cc.addresses.length > 0) {
+          geo = cc.addresses[0].geo
+          if(geo)
+            markers.push({
+              "lat": +geo.split(',')[0],
+              "lng": +geo.split(',')[1],
+              "infowindow": '<a href="/contacts/'+c.id+'">'+c.name+'</a>'
+            })
+        }
+      })
+      $('#contacts_map_modal').dialog({ width: 700, height: 500 })
+      map_options = { streetViewControl: false };
+      handler = Gmaps.build('Google');
+      handler.buildMap(
+        {
+          provider: map_options,
+          internal: {id: 'contacts-map'}
+        },
+        function(){
+          markers = handler.addMarkers(markers);
+          handler.bounds.extendWith(markers);
+          handler.fitMapToBounds();
+        }
+      );
+    };
 });
 
 
