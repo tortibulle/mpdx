@@ -300,45 +300,108 @@ describe GoogleContactsIntegrator do
   end
 
   describe 'sync_employer_and_title' do
-    it 'sets blank mpdx employer and occupation from google' do
-      @person.employer = ''
-      @person.occupation = nil
-      @g_contact['gd$organization'] = [{
-        'gd$orgName' => { '$t' => 'Company' },
-        'gd$orgTitle' => { '$t' => 'Worker' }
-      }]
+    describe 'first sync' do
+      before do
+        @g_contact_link = build(:google_contact, google_account: @account, person: @person, last_data: {})
+      end
 
-      @integrator.sync_employer_and_title(@g_contact, @person)
+      it 'sets blank mpdx employer and occupation from google' do
+        @person.employer = ''
+        @person.occupation = nil
+        @g_contact['gd$organization'] = [{
+          'gd$orgName' => { '$t' => 'Company' },
+          'gd$orgTitle' => { '$t' => 'Worker' }
+        }]
 
-      expect(@g_contact.prepped_changes).to eq({})
-      expect(@person.employer).to eq('Company')
-      expect(@person.occupation).to eq('Worker')
+        @integrator.sync_employer_and_title(@person, @g_contact, @g_contact_link)
+
+        expect(@g_contact.prepped_changes).to eq({})
+        expect(@person.employer).to eq('Company')
+        expect(@person.occupation).to eq('Worker')
+      end
+
+      it 'sets blank google employer and occupation from mpdx' do
+        @person.employer = 'Company'
+        @person.occupation = 'Worker'
+        @g_contact['gd$organization'] = []
+
+        @integrator.sync_employer_and_title(@person, @g_contact, @g_contact_link)
+
+        expect(@g_contact.prepped_changes).to eq(organizations: [{ org_name: 'Company', org_title: 'Worker',
+                                                                   primary: true }])
+        expect(@person.employer).to eq('Company')
+        expect(@person.occupation).to eq('Worker')
+      end
+
+      it 'prefers mpdx if both are present' do
+        @person.employer = 'Company'
+        @person.occupation = 'Worker'
+        @g_contact['gd$organization'] = [{
+          'gd$orgName' => { '$t' => 'Not-Company' },
+          'gd$orgTitle' => { '$t' => 'Not-Worker' }
+        }]
+
+        @integrator.sync_employer_and_title(@person, @g_contact, @g_contact_link)
+
+        expect(@g_contact.prepped_changes).to eq(organizations: [{ org_name: 'Company', org_title: 'Worker',
+                                                                   primary: true }])
+        expect(@person.employer).to eq('Company')
+        expect(@person.occupation).to eq('Worker')
+      end
     end
 
-    it 'sets blank google employer and occupation from mpdx' do
-      @person.employer = 'Company'
-      @person.occupation = 'Worker'
-      @g_contact['gd$organization'] = []
+    describe 'subsequent syncs' do
+      before do
+        @g_contact_link = build(:google_contact, google_account: @account, person: @person,
+                                last_data: { organizations: [{ org_name: 'Old Company', org_title: 'Old Title' }] })
+      end
 
-      @integrator.sync_employer_and_title(@g_contact, @person)
+      it 'syncs changes from mpdx to google' do
+        @person.employer = 'MPDX Company'
+        @person.occupation = 'MPDX Title'
+        @g_contact['gd$organization'] = [{
+          'gd$orgName' => { '$t' => 'Old Company' },
+          'gd$orgTitle' => { '$t' => 'Old Title' }
+        }]
 
-      expect(@g_contact.prepped_changes).to eq(organizations: [{ org_name: 'Company', org_title: 'Worker',
-                                                                 primary: true }])
-    end
+        @integrator.sync_employer_and_title(@person, @g_contact, @g_contact_link)
 
-    it 'leaves both as is if both are present' do
-      @person.employer = 'Company'
-      @person.occupation = 'Worker'
-      @g_contact['gd$organization'] = [{
-        'gd$orgName' => { '$t' => 'Not-Company' },
-        'gd$orgTitle' => { '$t' => 'Not-Worker' }
-      }]
+        expect(@g_contact.prepped_changes).to eq(organizations: [{ org_name: 'MPDX Company', org_title: 'MPDX Title',
+                                                                   primary: true }])
+        expect(@person.employer).to eq('MPDX Company')
+        expect(@person.occupation).to eq('MPDX Title')
+      end
 
-      @integrator.sync_employer_and_title(@g_contact, @person)
+      it 'syncs changes from google to mpdx' do
+        @person.employer = 'Old Company'
+        @person.occupation = 'Old Title'
+        @g_contact['gd$organization'] = [{
+          'gd$orgName' => { '$t' => 'Google Company' },
+          'gd$orgTitle' => { '$t' => 'Google Title' }
+        }]
 
-      expect(@g_contact.prepped_changes).to eq({})
-      expect(@person.employer).to eq('Company')
-      expect(@person.occupation).to eq('Worker')
+        @integrator.sync_employer_and_title(@person, @g_contact, @g_contact_link)
+
+        expect(@g_contact.prepped_changes).to eq({})
+        expect(@person.employer).to eq('Google Company')
+        expect(@person.occupation).to eq('Google Title')
+      end
+
+      it 'prefers mpdx if both changed' do
+        @person.employer = 'MPDX Company'
+        @person.occupation = 'MPDX Title'
+        @g_contact['gd$organization'] = [{
+          'gd$orgName' => { '$t' => 'Gogle Company' },
+          'gd$orgTitle' => { '$t' => 'Google Title' }
+        }]
+
+        @integrator.sync_employer_and_title(@person, @g_contact, @g_contact_link)
+
+        expect(@g_contact.prepped_changes).to eq(organizations: [{ org_name: 'MPDX Company', org_title: 'MPDX Title',
+                                                                   primary: true }])
+        expect(@person.employer).to eq('MPDX Company')
+        expect(@person.occupation).to eq('MPDX Title')
+      end
     end
   end
 

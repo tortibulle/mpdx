@@ -85,7 +85,7 @@ class GoogleContactsIntegrator
       name_suffix: person.suffix,
       emails: person.email_addresses.map(&method(:format_email_for_google)),
       phone_numbers: person.phone_numbers.map(&method(:format_phone_for_google)),
-      organizations: g_contact_organizations_for(person),
+      organizations: g_contact_organizations_for(person.employer, person.occupation),
       websites: person.websites.map(&method(:format_website_for_google))
     )
     g_contact
@@ -93,7 +93,7 @@ class GoogleContactsIntegrator
 
   def sync_with_g_contact(person, g_contact, g_contact_link)
     sync_basic_person_fields(person, g_contact, g_contact_link)
-    sync_employer_and_title(g_contact, person)
+    sync_employer_and_title(person, g_contact, g_contact_link)
     sync_emails(g_contact, person, g_contact_link)
     sync_numbers(g_contact, person, g_contact_link)
   end
@@ -110,37 +110,46 @@ class GoogleContactsIntegrator
 
   def sync_g_contact_and_record(record, g_contact, g_contact_link, field_map)
     field_map.each do |field, g_contact_field|
-      mpdx_val, g_contact_val =
-          sync_single_field(record[field], g_contact.send(g_contact_field), g_contact_link.last_data[g_contact_field])
+      synced_value = compare_field_for_sync(record[field], g_contact.send(g_contact_field),
+                                            g_contact_link.last_data[g_contact_field])
 
-      g_contact.prep_changes(g_contact_field => g_contact_val) if g_contact_val != g_contact.send(g_contact_field)
-      record[field] = mpdx_val
+      g_contact.prep_changes(g_contact_field => synced_value) if synced_value != g_contact.send(g_contact_field)
+      record[field] = synced_value
     end
   end
 
-  def sync_single_field(mpdx_val, g_contact_val, last_val)
+  def compare_field_for_sync(mpdx_val, g_contact_val, last_val)
     mpdx_changed = mpdx_val != last_val && (mpdx_val.present? || last_val.present?)
 
     if mpdx_changed
-      # Propage an MPDX change to Google even if Google changed as well (MPDX "wins" if both changed)
-      g_contact_val = mpdx_val
+      # If MPDX changed, the synced value is the MPDX field even if Google also changed (MPDX "wins" if both changed)
+      mpdx_val
     else
-      # Propage a possible change from Google to MPDX. If Google didn't change, the two values are the same anyway.
-      mpdx_val = g_contact_val
+      # Otherwise the synced value should be the Google value in case it changed.
+      g_contact_val
     end
-
-    [mpdx_val, g_contact_val]
   end
 
-  def sync_employer_and_title(g_contact, person)
-    person_orgs = g_contact_organizations_for(person)
+  def sync_employer_and_title(person, g_contact, g_contact_link)
     g_contact_orgs = g_contact.organizations
-    if person_orgs.empty?
-      first_org = g_contact_orgs.first
-      person.update(employer: first_org[:org_name], occupation: first_org[:org_title]) if first_org
-    else
-      g_contact.prep_changes(organizations: person_orgs) if g_contact_orgs.empty?
+    last_orgs = g_contact_link.last_data[:organizations] || []
+
+    # Since in the Google Contacts user interface you can only set the title and org name for a single organization
+    # it's a reasonable assumption to just look at the first organization for comparison
+    employer = compare_field_for_sync(person.employer, field_of_first(g_contact_orgs, :org_name),
+                                      field_of_first(last_orgs, :org_name))
+    occupation = compare_field_for_sync(person.occupation, field_of_first(g_contact_orgs, :org_title),
+                                        field_of_first(last_orgs, :org_title))
+
+    person.update(employer: employer, occupation: occupation)
+
+    if field_of_first(g_contact_orgs, :org_name) != employer || field_of_first(g_contact_orgs, :org_title) != occupation
+      g_contact.prep_changes(organizations: g_contact_organizations_for(employer, occupation))
     end
+  end
+
+  def field_of_first(hashes, field)
+    hashes.empty? ? nil : hashes.first[field]
   end
 
   def sync_emails(g_contact, person, g_contact_link)
@@ -342,9 +351,9 @@ class GoogleContactsIntegrator
     hashes_list.find { |hash| hash[key] == value }
   end
 
-  def g_contact_organizations_for(person)
-    if person.employer.present? || person.occupation.present?
-      [{ org_name: person.employer, org_title: person.occupation, primary: true }]
+  def g_contact_organizations_for(employer, occupation)
+    if employer.present? || occupation.present?
+      [{ org_name: employer, org_title: occupation, primary: true }]
     else
       []
     end
