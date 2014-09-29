@@ -26,7 +26,7 @@ class GoogleContactsIntegrator
 
     g_contacts_and_links.each do |g_contact_and_link|
       g_contact, g_contact_link = g_contact_and_link
-      sync_contact_fields(g_contact, contact)
+      sync_notes(contact, g_contact, g_contact_link)
 
       g_contact.create_or_update
       store_g_contact_link(g_contact_link, g_contact)
@@ -92,30 +92,44 @@ class GoogleContactsIntegrator
   end
 
   def sync_with_g_contact(person, g_contact, g_contact_link)
-    sync_basic_person_fields(g_contact, person)
+    sync_basic_person_fields(person, g_contact, g_contact_link)
     sync_employer_and_title(g_contact, person)
     sync_emails(g_contact, person, g_contact_link)
     sync_numbers(g_contact, person, g_contact_link)
   end
 
-  def sync_contact_fields(g_contact, contact)
-    sync_g_contact_and_record(g_contact, contact, notes: :content)
+  def sync_notes(contact, g_contact, g_contact_link)
+    sync_g_contact_and_record(contact, g_contact, g_contact_link, notes: :content)
   end
 
-  def sync_basic_person_fields(g_contact, person)
-    sync_g_contact_and_record(g_contact, person, title: :name_prefix, first_name: :given_name,
+  def sync_basic_person_fields(person, g_contact, g_contact_link)
+    sync_g_contact_and_record(person, g_contact, g_contact_link, title: :name_prefix, first_name: :given_name,
                               middle_name: :additional_name, last_name: :family_name,
                               suffix: :name_suffix)
   end
 
-  def sync_g_contact_and_record(g_contact, record, field_map)
+  def sync_g_contact_and_record(record, g_contact, g_contact_link, field_map)
     field_map.each do |field, g_contact_field|
-      if record[field].present?
-        g_contact.prep_changes(g_contact_field => record[field]) unless g_contact.send(g_contact_field).present?
-      else
-        record[field] = g_contact.send(g_contact_field)
-      end
+      mpdx_val, g_contact_val =
+          sync_single_field(record[field], g_contact.send(g_contact_field), g_contact_link.last_data[g_contact_field])
+
+      g_contact.prep_changes(g_contact_field => g_contact_val) if g_contact_val != g_contact.send(g_contact_field)
+      record[field] = mpdx_val
     end
+  end
+
+  def sync_single_field(mpdx_val, g_contact_val, last_val)
+    mpdx_changed = mpdx_val != last_val && (mpdx_val.present? || last_val.present?)
+
+    if mpdx_changed
+      # Propage an MPDX change to Google even if Google changed as well (MPDX "wins" if both changed)
+      g_contact_val = mpdx_val
+    else
+      # Propage a possible change from Google to MPDX. If Google didn't change, the two values are the same anyway.
+      mpdx_val = g_contact_val
+    end
+
+    [mpdx_val, g_contact_val]
   end
 
   def sync_employer_and_title(g_contact, person)

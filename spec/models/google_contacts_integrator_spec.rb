@@ -142,33 +142,82 @@ describe GoogleContactsIntegrator do
     end
   end
 
-  describe 'sync_contact_fields' do
-    it 'sets blank mpdx notes with google contact notes' do
-      @g_contact['content'] = { '$t' => 'google notes' }
-      @contact.notes = ''
-      @integrator.sync_contact_fields(@g_contact, @contact)
-      expect(@contact.notes).to eq('google notes')
-      expect(@g_contact.prepped_changes).to eq({})
+  describe 'sync_notes' do
+    describe 'first sync' do
+      before do
+        @g_contact_link = build(:google_contact, google_account: @account, person: @person, last_data: {})
+      end
+
+      it 'sets blank mpdx notes with google contact notes' do
+        @g_contact['content'] = { '$t' => 'google notes' }
+        @contact.notes = ''
+        @integrator.sync_notes(@contact, @g_contact, @g_contact_link)
+        expect(@contact.notes).to eq('google notes')
+        expect(@g_contact.prepped_changes).to eq({})
+      end
+
+      it 'sets blank google contact notes to mpdx notes' do
+        @g_contact['content'] = { '$t' => '' }
+        @contact.notes = 'mpdx notes'
+        @integrator.sync_notes(@contact, @g_contact, @g_contact_link)
+        expect(@contact.notes).to eq('mpdx notes')
+        expect(@g_contact.prepped_changes).to eq(content: 'mpdx notes')
+      end
+
+      it 'prefer mpdx if both are present' do
+        @g_contact['content'] = { '$t' => 'google notes' }
+        @contact.notes = 'mpdx notes'
+        @integrator.sync_notes(@contact, @g_contact, @g_contact_link)
+        expect(@contact.notes).to eq('mpdx notes')
+        expect(@g_contact.prepped_changes).to eq(content: 'mpdx notes')
+      end
     end
 
-    it 'sets blank google contact notes to mpdx notes' do
-      @g_contact['content'] = { '$t' => '' }
-      @contact.notes = 'mpdx notes'
-      @integrator.sync_contact_fields(@g_contact, @contact)
-      expect(@contact.notes).to eq('mpdx notes')
-      expect(@g_contact.prepped_changes).to eq(content: 'mpdx notes')
-    end
+    describe 'subsequent sync' do
+      before do
+        @g_contact_link = build(:google_contact, google_account: @account, person: @person,
+                                last_data: { content: 'old notes' })
+      end
 
-    it 'leaves both as is if both are present' do
-      @g_contact['content'] = { '$t' => 'google notes' }
-      @contact.notes = 'mpdx notes'
-      @integrator.sync_contact_fields(@g_contact, @contact)
-      expect(@contact.notes).to eq('mpdx notes')
-      expect(@g_contact.prepped_changes).to eq({})
+      it 'sets google to mpdx if only mpdx changed' do
+        @g_contact['content'] = { '$t' => 'old notes' }
+        @contact.notes = 'new mpdx notes'
+        @integrator.sync_notes(@contact, @g_contact, @g_contact_link)
+        expect(@contact.notes).to eq('new mpdx notes')
+        expect(@g_contact.prepped_changes).to eq(content: 'new mpdx notes')
+      end
+
+      it 'sets mpdx to google if only google changed' do
+        @g_contact['content'] = { '$t' => 'new google notes' }
+        @contact.notes = 'old notes'
+        @integrator.sync_notes(@contact, @g_contact, @g_contact_link)
+        expect(@contact.notes).to eq('new google notes')
+        expect(@g_contact.prepped_changes).to eq({})
+      end
+
+      it 'sets mpdx to google if both changed' do
+        @g_contact['content'] = { '$t' => 'new google notes' }
+        @contact.notes = 'new mpdx notes'
+        @integrator.sync_notes(@contact, @g_contact, @g_contact_link)
+        expect(@contact.notes).to eq('new mpdx notes')
+        expect(@g_contact.prepped_changes).to eq(content: 'new mpdx notes')
+      end
+
+      it 'sets google to blank if mpdx changed to blank' do
+        @g_contact['content'] = { '$t' => 'google notes' }
+        @contact.notes = ''
+        @integrator.sync_notes(@contact, @g_contact, @g_contact_link)
+        expect(@contact.notes).to eq('')
+        expect(@g_contact.prepped_changes).to eq(content: '')
+      end
     end
   end
 
   describe 'sync_basic_person_fields' do
+    before do
+      @g_contact_link = build(:google_contact, google_account: @account, person: @person, last_data: {})
+    end
+
     it 'sets blank mpdx fields with google contact fields' do
       @person.update(title: nil, first_name: '', middle_name: nil, last_name: '', suffix: '')
       @g_contact['gd$name'] = {
@@ -179,7 +228,7 @@ describe GoogleContactsIntegrator do
         'gd$nameSuffix' => { '$t' => 'III' }
       }
 
-      @integrator.sync_basic_person_fields(@g_contact, @person)
+      @integrator.sync_basic_person_fields(@person, @g_contact, @g_contact_link)
 
       expect(@g_contact.prepped_changes).to eq({})
 
@@ -194,13 +243,13 @@ describe GoogleContactsIntegrator do
       @person.update(title: 'Mr', middle_name: 'Henry', suffix: 'III')
       @g_contact['gd$name'] = {}
 
-      @integrator.sync_basic_person_fields(@g_contact, @person)
+      @integrator.sync_basic_person_fields(@person, @g_contact, @g_contact_link)
 
       expect(@g_contact.prepped_changes).to eq(name_prefix: 'Mr', given_name: 'John', additional_name: 'Henry',
                                                family_name: 'Doe', name_suffix: 'III')
     end
 
-    it 'leaves both as is if both are present' do
+    it 'prefers mpdx if both are present' do
       @g_contact['gd$name'] = {
         'gd$namePrefix' => { '$t' => 'Not-Mr' },
         'gd$givenName' => { '$t' => 'Not-John' },
@@ -210,14 +259,42 @@ describe GoogleContactsIntegrator do
       }
       @person.update(title: 'Mr', middle_name: 'Henry', suffix: 'III')
 
-      @integrator.sync_basic_person_fields(@g_contact, @person)
+      @integrator.sync_basic_person_fields(@person, @g_contact, @g_contact_link)
 
-      expect(@g_contact.prepped_changes).to eq({})
+      expect(@g_contact.prepped_changes).to eq(name_prefix: 'Mr', given_name: 'John', additional_name: 'Henry',
+                                               family_name: 'Doe', name_suffix: 'III')
 
       expect(@person.title).to eq('Mr')
       expect(@person.first_name).to eq('John')
       expect(@person.middle_name).to eq('Henry')
       expect(@person.last_name).to eq('Doe')
+      expect(@person.suffix).to eq('III')
+    end
+
+    it 'syncs changes between mpdx and google, but prefers mpdx if both changed' do
+      @g_contact_link = build(:google_contact, google_account: @account, person: @person,
+                              last_data: { name_prefix: 'Mr', given_name: 'John', additional_name: 'Henry',
+                                           family_name: 'Doe', name_suffix: 'III' })
+
+      @g_contact['gd$name'] = {
+        'gd$namePrefix' => { '$t' => 'Mr-Google' },
+        'gd$givenName' => { '$t' => 'John' },
+        'gd$additionalName' => { '$t' => 'Henry' },
+        'gd$familyName' => { '$t' => 'Doe-Google' },
+        'gd$nameSuffix' => { '$t' => 'III' }
+      }
+      @person.update(title: 'Mr', first_name: 'John-MPDX', middle_name: 'Henry-MPDX', last_name: 'Doe-MPDX',
+                     suffix: 'III')
+
+      @integrator.sync_basic_person_fields(@person, @g_contact, @g_contact_link)
+
+      expect(@g_contact.prepped_changes).to eq(given_name: 'John-MPDX', additional_name: 'Henry-MPDX',
+                                               family_name: 'Doe-MPDX')
+
+      expect(@person.title).to eq('Mr-Google')
+      expect(@person.first_name).to eq('John-MPDX')
+      expect(@person.middle_name).to eq('Henry-MPDX')
+      expect(@person.last_name).to eq('Doe-MPDX')
       expect(@person.suffix).to eq('III')
     end
   end
