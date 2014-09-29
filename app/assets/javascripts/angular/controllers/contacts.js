@@ -300,7 +300,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             markers.push({
               "lat": +geo.split(',')[0],
               "lng": +geo.split(',')[1],
-              "infowindow": '<a href="/contacts/'+contact.id+'">'+ccontact.name+'</a>'
+              "infowindow": '<a href="/contacts/'+contact.id+'">'+contact.name+'</a>'
             })
         }
       })
