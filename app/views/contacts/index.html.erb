@@ -139,7 +139,9 @@
           </li>
           <li class="controls">
             <a href="#" ng-click="resetFilters()" class="btn">Reset Filters</a>
-            <a href="#" ng-click="mapContacts()" class="btn">Map These Contacts</a>
+            <% if $rollout.active?(:contacts_map, current_account_list) %>
+              <a href="#" ng-click="mapContacts()" class="btn">Map These Contacts</a>
+            <% end %>
           </li>
         </ul>
       </form>

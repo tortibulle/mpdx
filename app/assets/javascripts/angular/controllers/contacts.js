@@ -292,15 +292,15 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
 
     $scope.mapContacts = function() {
       markers = [];
-      angular.forEach($scope.contacts, function(c, key) {
-        cc = contactCache.getFromCache(c.id)
+      angular.forEach($scope.contacts, function(contact) {
+        cc = contactCache.getFromCache(contact.id)
         if(cc && cc.addresses && cc.addresses.length > 0) {
           geo = cc.addresses[0].geo
           if(geo)
             markers.push({
               "lat": +geo.split(',')[0],
               "lng": +geo.split(',')[1],
-              "infowindow": '<a href="/contacts/'+c.id+'">'+c.name+'</a>'
+              "infowindow": '<a href="/contacts/'+contact.id+'">'+ccontact.name+'</a>'
             })
         }
       })
