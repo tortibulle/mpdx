@@ -25,15 +25,112 @@ describe GoogleContactsIntegrator do
   end
 
   describe 'sync_contacts' do
-    it "doesn't sync inactive contacts" do
-      @contact.update_column(:status, 'Not Interested')
-      expect(@integrator).to_not receive(:sync_contact)
+    it 'syncs contacts and records last synced time' do
+      expect(@integrator).to receive(:contacts_to_sync).and_return(['a'])
+      expect(@integrator).to receive(:sync_contact).with('a')
       @integrator.sync_contacts
+
+      now = Time.now
+      expect(Time).to receive(:now).at_least(:once).and_return(now)
+      expect(@integration.last_synced).to eq(now)
+    end
+  end
+
+  describe 'contacts_to_sync' do
+    it 'returns all active contacts if not synced yet' do
+      expect(@integration.account_list).to receive(:active_contacts).and_return(['contact'])
+      expect(@integrator.contacts_to_sync).to eq(['contact'])
     end
 
-    it 'syncs active contacts and their people' do
-      expect(@integrator).to receive(:sync_contact).with(@contact)
-      @integrator.sync_contacts
+    it 'returns queried contacts for subsequent sync' do
+      now = Time.now
+      @integration.update_column(:last_synced, now)
+      expect(@account.contacts_api_user).to receive(:contacts_updated_min).with(now).and_return([double(id: 'id_1')])
+      expect(@integrator).to receive(:contacts_to_sync_query).with(['id_1']).and_return(['contact'])
+      expect(@integrator.contacts_to_sync).to eq(['contact'])
+    end
+  end
+
+  describe 'contacts_to_sync_query' do
+    before do
+      @g_contact = create(:google_contact, google_account: @account, person: @person)
+    end
+
+    def contacts_to_sync_query(updated_remote_ids = [])
+      @integrator.contacts_to_sync_query(updated_remote_ids).reload.to_a
+    end
+
+    def expect_contact_sync_query(result)
+      expect(contacts_to_sync_query).to eq(result)
+    end
+
+    it 'returns active contacts and not inactive' do
+      expect_contact_sync_query([@contact])
+
+      @contact.update_column(:status, 'Not Interested')
+      expect_contact_sync_query([])
+    end
+
+    it 'only returns contacts that have been modified since last sync' do
+      @g_contact.update_column(:last_synced, 1.hour.since)
+      expect_contact_sync_query([])
+
+      @g_contact.update_column(:last_synced, 1.year.ago)
+      expect_contact_sync_query([@contact])
+    end
+
+    it 'detects modification of addresses, people, emails, phone numbers and websites' do
+      @g_contact.update_column(:last_synced, 1.hour.since)
+      expect_contact_sync_query([])
+
+      # Addresses
+      @contact.addresses_attributes = [{ street: '1 Way' }]
+      @contact.save
+      expect_contact_sync_query([])
+      @contact.addresses.first.update_column(:updated_at, 2.hours.since)
+      expect_contact_sync_query([@contact])
+      @contact.addresses.first.update_column(:updated_at, Time.now)
+      expect_contact_sync_query([])
+
+      # People
+      @person.update_column(:updated_at, 2.hours.since)
+      expect_contact_sync_query([@contact])
+      @person.update_column(:updated_at, Time.now)
+      expect_contact_sync_query([])
+
+      # Email
+      @person.email = 'test@example.com'
+      @person.save
+      expect_contact_sync_query([])
+      @person.email_addresses.first.update_column(:updated_at, 2.hours.since)
+      expect_contact_sync_query([@contact])
+      @person.email_addresses.first.update_column(:updated_at, Time.now)
+      expect_contact_sync_query([])
+
+      # Phone
+      @person.phone = '123-456-7890'
+      @person.save
+      expect(contacts_to_sync_query).to eq([])
+      @person.phone_numbers.first.update_column(:updated_at, 2.hours.since)
+      expect(contacts_to_sync_query).to eq([@contact])
+      @person.phone_numbers.first.update_column(:updated_at, Time.now)
+      expect(contacts_to_sync_query).to eq([])
+
+      # Website
+      @person.websites << Person::Website.new(url: 'example.com')
+      @person.save
+      expect(contacts_to_sync_query).to eq([])
+      @person.websites.first.update_column(:updated_at, 2.hours.since)
+      expect(contacts_to_sync_query).to eq([@contact])
+      @person.websites.first.update_column(:updated_at, Time.now)
+      expect(contacts_to_sync_query).to eq([])
+    end
+
+    it 'finds contacts whose google_contacts records match specified remotely updated ids' do
+      @g_contact.update_column(:last_synced, 1.hour.since)
+      @g_contact.update_column(:remote_id, 'a')
+      expect(contacts_to_sync_query([])).to eq([])
+      expect(contacts_to_sync_query(['a'])).to eq([@contact])
     end
   end
 
@@ -800,6 +897,18 @@ describe GoogleContactsIntegrator do
       stub_request(:get, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
         .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
         .to_return(body: { 'entry' => [@updated_g_contact_obj] }.to_json)
+
+      empty_contacts_body = {
+        'feed' => {
+          'entry' => [],
+          'openSearch$totalResults' => { '$t' => '0' },
+          'openSearch$startIndex' => { '$t' => '0' },
+          'openSearch$itemsPerPage' => { '$t' => '0' }
+        }
+      }
+      formatted_last_sync = GoogleContactsApi::Api.format_time_for_xml(@integration.last_synced)
+      stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&updated_min=#{formatted_last_sync}&v=3")
+        .to_return(body: empty_contacts_body.to_json)
     end
 
     def expect_second_sync_api_put

@@ -34,7 +34,7 @@ GIT
 
 GIT
   remote: https://github.com/CruGlobal/google_contacts_api
-  revision: e3e55c4e4bad8c29313e87305d252db780290cc1
+  revision: 48b5b26fca5abd26e4a6759193632eae8bac1f40
   specs:
     google_contacts_api (0.4.0)
       activesupport

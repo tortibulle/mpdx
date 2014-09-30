@@ -16,10 +16,9 @@ class GoogleContactsIntegrator
 
   def contacts_to_sync
     if @integration.last_synced
-      #updated_g_contacts = @account.contacts_api_user.contacts_updated_min(@integration.last_synced)
+      updated_g_contacts = @account.contacts_api_user.contacts_updated_min(@integration.last_synced)
       #cache_g_contacts(updated_g_contacts)
-      #contacts_to_sync_query(updated_g_contacts.map(&:id))
-      contacts_to_sync_query([])
+      contacts_to_sync_query(updated_g_contacts.map(&:id))
     else
       #cache_g_contacts(@account.contacts_api_user.contacts)
       @integration.account_list.active_contacts
@@ -45,7 +44,7 @@ class GoogleContactsIntegrator
       .joins('LEFT JOIN phone_numbers ON people.id = phone_numbers.person_id')
       .joins('LEFT JOIN person_websites ON people.id = person_websites.person_id')
       .joins('LEFT JOIN google_contacts ON google_contacts.person_id = people.id')
-      .where('(google_contacts.id IS NULL OR google_contacts.google_account_id = ?)', @account.id)
+      .where('google_contacts.id IS NULL OR google_contacts.google_account_id = ?', @account.id)
       .group('contacts.id, google_contacts.last_synced, google_contacts.remote_id')
       .having('google_contacts.last_synced IS NULL ' \
         'OR google_contacts.last_synced < ' \
