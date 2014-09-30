@@ -4,12 +4,14 @@ class GoogleContactsIntegrator
   def initialize(google_integration)
     @integration = google_integration
     @account = google_integration.google_account
+    clear_g_contact_cache
   end
 
   def sync_contacts
     contacts_to_sync.each(&method(:sync_contact))
     @integration.last_synced = Time.now
     @integration.save
+    clear_g_contact_cache
   rescue => e
     Airbrake.raise_or_notify(e)
   end
@@ -17,10 +19,12 @@ class GoogleContactsIntegrator
   def contacts_to_sync
     if @integration.last_synced
       updated_g_contacts = @account.contacts_api_user.contacts_updated_min(@integration.last_synced)
-      #cache_g_contacts(updated_g_contacts)
+      cache_g_contacts(updated_g_contacts)
       contacts_to_sync_query(updated_g_contacts.map(&:id))
     else
-      #cache_g_contacts(@account.contacts_api_user.contacts)
+      # For the first sync, we can cut down a lot of HTTP requests by caching the list of Google Contacts
+      cache_g_contacts(@account.contacts_api_user.contacts)
+
       @integration.account_list.active_contacts
     end
   end
@@ -56,8 +60,24 @@ class GoogleContactsIntegrator
       .readonly(false)
   end
 
+  def clear_g_contact_cache
+    @g_contact_by_id = {}
+    @g_contacts_by_name = {}
+  end
+
   def cache_g_contacts(g_contacts)
-    @g_contacts_by_remote_id = Hash[g_contacts.map { |g_contact| [g_contact.id, g_contact] }]
+    @g_contact_by_id = Hash[g_contacts.map { |g_contact| [g_contact.id, g_contact] }]
+
+    @g_contacts_by_name = {}
+    g_contacts.each do |g_contact|
+      name = "#{g_contact.given_name} #{g_contact.family_name}"
+      name_list = @g_contacts_by_name[name]
+      if name_list
+        name_list << g_contact
+      else
+        @g_contacts_by_name[name] = [g_contact]
+      end
+    end
   end
 
   def sync_contact(contact)
@@ -101,7 +121,7 @@ class GoogleContactsIntegrator
 
   def find_or_build_g_contact_link(person)
     person.google_contacts.where(google_account: @account)
-      .first_or_initialize(person: person, last_data: { emails: [], addresses: [], phone_numbers: [] })
+      .first_or_initialize(person: person, last_data: { emails: [], addresses: [], phone_numbers: [], websites: [] })
   end
 
   def get_or_query_g_contact(g_contact_link, person)
@@ -109,11 +129,16 @@ class GoogleContactsIntegrator
   end
 
   def get_g_contact(remote_id)
-    @account.contacts_api_user.get_contact(remote_id)
+    cached_g_contact = @g_contact_by_id[remote_id]
+    cached_g_contact ? cached_g_contact : @account.contacts_api_user.get_contact(remote_id)
   end
 
   def query_g_contact(person)
-    @account.contacts_api_user.query_contacts(person.first_name + ' ' + person.last_name).find do |g_contact|
+    name = person.first_name + ' ' + person.last_name
+    cached_g_contacts = @g_contacts_by_name[name]
+    g_contacts = cached_g_contacts ? cached_g_contacts : @account.contacts_api_user.query_contacts(name)
+
+    g_contacts.find do |g_contact|
       g_contact.given_name == person.first_name && g_contact.family_name == person.last_name
     end
   end
@@ -139,6 +164,7 @@ class GoogleContactsIntegrator
     sync_employer_and_title(person, g_contact, g_contact_link)
     sync_emails(g_contact, person, g_contact_link)
     sync_numbers(g_contact, person, g_contact_link)
+    sync_websites(g_contact, person, g_contact_link)
   end
 
   def sync_notes(contact, g_contact, g_contact_link)
@@ -248,6 +274,23 @@ class GoogleContactsIntegrator
     g_contacts.each { |g_contact| g_contact.prep_changes(addresses: g_contact_addresses.to_a) }
   end
 
+  def sync_websites(g_contact, person, g_contact_link)
+    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels = compare_websites_for_sync(g_contact, person, g_contact_link)
+
+    add_websites_from_g_contact(mpdx_adds, g_contact, person)
+    mpdx_dels.each { |url| person.websites.where(url: url).destroy_all }
+
+    g_contact_websites = g_contact.websites
+    g_contact_primary = g_contact_websites.find { |website| website[:primary] }
+    g_contact_websites += g_contact_adds.map { |url|
+      website = { href: url, rel: 'other' }
+      website[:primary] = false if g_contact_primary
+      website
+    }
+    g_contact_websites.delete_if { |website| g_contact_dels.include?(website[:href]) }
+    g_contact.prep_changes(websites: g_contact_websites)
+  end
+
   def remove_duplicate_addresses(addresses)
     addresses.map(&:master_address_id).to_set.map { |master_id| lookup_by_key(addresses, master_address_id: master_id) }
   end
@@ -295,6 +338,23 @@ class GoogleContactsIntegrator
       number_attrs[:primary] = false if had_primary
       person.phone_number = number_attrs
     end
+  end
+
+  def add_websites_from_g_contact(urls_to_add, g_contact, person)
+    had_primary = person.websites.where(primary: true).first
+    g_contact_websites = g_contact.websites
+
+    urls_to_add.each do |url|
+      g_contact_website = lookup_by_key(g_contact_websites, href: url)
+      website = Person::Website.new(url: url, primary: g_contact_website[:primary])
+      website[:primary] = false if had_primary
+      person.websites << website
+    end
+  end
+
+  def compare_websites_for_sync(g_contact, person, g_contact_link)
+    last_sync_websites = g_contact_link.last_data[:websites].map { |websites| websites[:href] }
+    compare_for_sync(last_sync_websites, person.websites.map(&:url), g_contact.websites.map { |w| w[:href] })
   end
 
   def compare_emails_for_sync(g_contact, person, g_contact_link)

@@ -28,10 +28,11 @@ describe GoogleContactsIntegrator do
     it 'syncs contacts and records last synced time' do
       expect(@integrator).to receive(:contacts_to_sync).and_return(['a'])
       expect(@integrator).to receive(:sync_contact).with('a')
-      @integrator.sync_contacts
-
       now = Time.now
       expect(Time).to receive(:now).at_least(:once).and_return(now)
+
+      @integrator.sync_contacts
+
       expect(@integration.last_synced).to eq(now)
     end
   end
@@ -39,14 +40,21 @@ describe GoogleContactsIntegrator do
   describe 'contacts_to_sync' do
     it 'returns all active contacts if not synced yet' do
       expect(@integration.account_list).to receive(:active_contacts).and_return(['contact'])
+      expect(@account.contacts_api_user).to receive(:contacts).and_return(['g_contact'])
+      expect(@integrator).to receive(:cache_g_contacts).with(['g_contact'])
+
       expect(@integrator.contacts_to_sync).to eq(['contact'])
     end
 
     it 'returns queried contacts for subsequent sync' do
       now = Time.now
       @integration.update_column(:last_synced, now)
-      expect(@account.contacts_api_user).to receive(:contacts_updated_min).with(now).and_return([double(id: 'id_1')])
+      g_contact = double(id: 'id_1', given_name: 'John', family_name: 'Doe')
+      expect(@account.contacts_api_user).to receive(:contacts_updated_min).with(now).and_return([g_contact])
+
       expect(@integrator).to receive(:contacts_to_sync_query).with(['id_1']).and_return(['contact'])
+      expect(@integrator).to receive(:cache_g_contacts).with([g_contact])
+
       expect(@integrator.contacts_to_sync).to eq(['contact'])
     end
   end
@@ -168,13 +176,44 @@ describe GoogleContactsIntegrator do
   end
 
   describe 'get_g_contact' do
-    it 'calls the api to get a contact' do
-      expect(@account.contacts_api_user).to receive(:get_contact).with('1').and_return('g contact')
-      expect(@integrator.get_g_contact('1')).to eq('g contact')
+    before do
+      @api_user = @account.contacts_api_user
+    end
+
+    it 'calls the api if there are no cached contacts' do
+      expect(@api_user).to receive(:get_contact).with('id').and_return('g_contact')
+      expect(@integrator.get_g_contact('id')).to eq('g_contact')
+    end
+
+    it 'uses the cache if there is a matching cached contact' do
+      g_contact = double(id: 'id', given_name: 'John', family_name: 'Doe')
+      @integrator.cache_g_contacts([g_contact])
+      expect(@api_user).to receive(:get_contact).exactly(0).times
+      expect(@integrator.get_g_contact('id')).to eq(g_contact)
+    end
+
+    it 'calls the api if there is no matching cached contact' do
+      g_contact = double(id: 'id', given_name: 'John', family_name: 'Doe')
+      @integrator.cache_g_contacts([g_contact])
+      expect(@api_user).to receive(:get_contact).with('non-cached-id').and_return('api_g_contact')
+      expect(@integrator.get_g_contact('non-cached-id')).to eq('api_g_contact')
+    end
+
+    it 'calls the api if the cache is cleared' do
+      g_contact = double(id: 'id', given_name: 'John', family_name: 'Doe')
+      @integrator.cache_g_contacts([g_contact])
+      @integrator.clear_g_contact_cache
+
+      expect(@api_user).to receive(:get_contact).with('id').and_return('api_g_contact')
+      expect(@integrator.get_g_contact('id')).to eq('api_g_contact')
     end
   end
 
   describe 'query_g_contact' do
+    before do
+      @api_user = @account.contacts_api_user
+    end
+
     it 'queries by first and last name returns nil if no results from api query' do
       expect(@account.contacts_api_user).to receive(:query_contacts).with('John Doe').and_return([])
       expect(@integrator.query_g_contact(@person)).to be_nil
@@ -190,6 +229,23 @@ describe GoogleContactsIntegrator do
       g_contact = double(given_name: 'John', family_name: 'Doe')
       expect(@account.contacts_api_user).to receive(:query_contacts).with('John Doe').and_return([g_contact])
       expect(@integrator.query_g_contact(@person)).to eq(g_contact)
+    end
+
+    it 'uses the cache if there is a matching cached contact' do
+      g_contact = double(id: 'id', given_name: 'John', family_name: 'Doe')
+      @integrator.cache_g_contacts([g_contact])
+
+      expect(@api_user).to receive(:query_contacts).exactly(0).times
+      expect(@integrator.query_g_contact(@person)).to eq(g_contact)
+    end
+
+    it 'calls the api if there is no matching cached contact' do
+      cached_g_contact = double(id: 'id', given_name: 'Not-John', family_name: 'Not-Doe')
+      @integrator.cache_g_contacts([cached_g_contact])
+
+      api_g_contact =  double(given_name: 'John', family_name: 'Doe')
+      expect(@api_user).to receive(:query_contacts).with('John Doe').and_return([api_g_contact])
+      expect(@integrator.query_g_contact(@person)).to eq(api_g_contact)
     end
   end
 
@@ -572,6 +628,28 @@ describe GoogleContactsIntegrator do
     end
   end
 
+  describe 'sync websites' do
+    it 'combines websites from mpdx and google' do
+      g_contact_link = build(:google_contact, google_account: @account, person: @person, last_data: { websites: [] })
+      @person.websites << Person::Website.new(url: 'mpdx.example.com', primary: false)
+      @g_contact['gContact$website'] = [{ 'href' => 'google.example.com', 'primary' => 'true', rel: 'blog' }]
+
+      @integrator.sync_websites(@g_contact, @person, g_contact_link)
+
+      expect(@g_contact.prepped_changes).to eq(websites: [
+        { href: 'google.example.com', primary: true, rel: 'blog' },
+        { href: 'mpdx.example.com', primary: false, rel: 'other' }
+      ])
+
+      expect(@person.websites.count).to eq(2)
+      websites = @person.websites.order(:url).to_a
+      expect(websites[0].url).to eq('google.example.com')
+      expect(websites[0].primary).to be_true
+      expect(websites[1].url).to eq('mpdx.example.com')
+      expect(websites[1].primary).to be_false
+    end
+  end
+
   describe 'sync addresses' do
     before do
       WebMock.reset!
@@ -724,8 +802,6 @@ describe GoogleContactsIntegrator do
     end
   end
 
-  #historic addresses and emails test
-
   describe 'overall first and subsequent sync' do
     it 'combines MPDX & Google data on first sync then propagates updates of email/phone/address on subsequent syncs' do
       setup_first_sync_data
@@ -742,7 +818,7 @@ describe GoogleContactsIntegrator do
     def setup_first_sync_data
       @g_contact_json_text = File.new(Rails.root.join('spec/fixtures/google_contacts.json')).read
       @api_url = 'https://www.google.com/m8/feeds/contacts'
-      stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&q=John%20Doe&v=3")
+      stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&v=3")
         .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
         .to_return(body: @g_contact_json_text)
 
@@ -771,6 +847,7 @@ describe GoogleContactsIntegrator do
 
       @person.email_address = { email: 'mpdx@example.com', location: 'home', primary: true }
       @person.phone_number = { number: '456-789-0123', primary: true, location: 'home' }
+      @person.websites << Person::Website.create(url: 'mpdx.example.com', primary: false)
 
       @contact.addresses_attributes = [
         { street: '100 Lake Hart Dr.', city: 'Orlando', state: 'FL', postal_code: '32832',
@@ -807,6 +884,15 @@ describe GoogleContactsIntegrator do
       expect(number2.number).to eq('+11233345158')
       expect(number2.location).to eq('mobile')
       expect(number2.primary).to be_false
+
+      expect(@person.websites.count).to eq(3)
+      websites = @person.websites.order(:url).to_a
+      expect(websites[0].url).to eq('blog.example.com')
+      expect(websites[0].primary).to be_false
+      expect(websites[1].url).to eq('mpdx.example.com')
+      expect(websites[1].primary).to be_false
+      expect(websites[2].url).to eq('www.example.com')
+      expect(websites[2].primary).to be_true
 
       g_contact_link = @person.google_contacts.first
       expect(g_contact_link.remote_id).to eq('http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/6b70f8bb0372c')
@@ -866,6 +952,10 @@ describe GoogleContactsIntegrator do
       first_address.street = 'MODIFIED 100 Lake Hart Dr.'
       first_address.save
 
+      website = @person.websites.where(url: 'mpdx.example.com').first
+      website.url = 'MODIFIED_mpdx.example.com'
+      website.save
+
       @account_list.reload
 
       WebMock.reset!
@@ -894,21 +984,22 @@ describe GoogleContactsIntegrator do
           'gd$region' => { '$t' => 'FL' }, 'gd$postcode' => { '$t' => '32832' },
           'gd$country' => { '$t' => 'United States of America' } }
       ]
-      stub_request(:get, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
-        .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
-        .to_return(body: { 'entry' => [@updated_g_contact_obj] }.to_json)
+      @updated_g_contact_obj['gContact$website'] = [
+        { 'href' => 'MODIFIED_blog.example.com', 'rel' => 'blog' },
+        { 'href' => 'www.example.com', 'rel' => 'profile', 'primary' => 'true' }
+      ]
 
-      empty_contacts_body = {
+      updated_contacts_body = {
         'feed' => {
-          'entry' => [],
-          'openSearch$totalResults' => { '$t' => '0' },
+          'entry' => [@updated_g_contact_obj],
+          'openSearch$totalResults' => { '$t' => '1' },
           'openSearch$startIndex' => { '$t' => '0' },
-          'openSearch$itemsPerPage' => { '$t' => '0' }
+          'openSearch$itemsPerPage' => { '$t' => '1' }
         }
       }
       formatted_last_sync = GoogleContactsApi::Api.format_time_for_xml(@integration.last_synced)
       stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&updated_min=#{formatted_last_sync}&v=3")
-        .to_return(body: empty_contacts_body.to_json)
+        .to_return(body: updated_contacts_body.to_json)
     end
 
     def expect_second_sync_api_put
@@ -938,7 +1029,14 @@ describe GoogleContactsIntegrator do
           '<gd:postcode>32832</gd:postcode>\s+'\
           '<gd:country>United States of America</gd:country>\s+'\
         '</gd:structuredPostalAddress>\s+'\
-        '<gd:organization'
+         '<gd:organization rel="http://schemas.google.com/g/2005#"\s+primary="true">\s+'\
+          '<gd:orgName>Company, Inc</gd:orgName>\s+'\
+          '<gd:orgTitle>Worker</gd:orgTitle>\s+'\
+        '</gd:organization>\s+'\
+        '<gContact:website\s+href="MODIFIED_blog.example.com"\s+rel="blog"\s+/>\s+'\
+        '<gContact:website\s+href="www.example.com"\s+rel="profile"\s+primary="true"\s+/>\s+'\
+        '<gContact:website\s+href="MODIFIED_mpdx.example.com"\s+rel="other"\s+/>\s+'\
+        '</entry>'
       stub_request(:put, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
         .with(body: /#{put_xml_regex_str}/m, headers: { 'Authorization' => "Bearer #{@account.token}" })
         .to_return(body: { 'entry' => [@updated_g_contact_obj] }.to_json)
@@ -966,6 +1064,15 @@ describe GoogleContactsIntegrator do
         { street: 'MODIFIED 123 Big Rd', city: 'Anywhere', state: 'MO', postal_code: '56789',
           country: 'United States', location: 'Business', primary_mailing_address: false }
       ])
+
+      expect(@person.websites.count).to eq(3)
+      websites = @person.websites.order(:url).to_a
+      expect(websites[0].url).to eq('MODIFIED_blog.example.com')
+      expect(websites[0].primary).to be_false
+      expect(websites[1].url).to eq('MODIFIED_mpdx.example.com')
+      expect(websites[1].primary).to be_false
+      expect(websites[2].url).to eq('www.example.com')
+      expect(websites[2].primary).to be_true
     end
   end
 end
