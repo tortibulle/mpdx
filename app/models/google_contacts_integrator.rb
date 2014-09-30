@@ -2,19 +2,63 @@ class GoogleContactsIntegrator
   attr_accessor :client
 
   def initialize(google_integration)
-    @google_integration = google_integration
+    @integration = google_integration
     @account = google_integration.google_account
   end
 
   def sync_contacts
-    @google_integration.account_list.active_contacts.each do |contact|
-      begin
-        sync_contact(contact)
-      rescue => e
-        Airbrake.raise_or_notify(e)
-        next
-      end
+    contacts_to_sync.each(&method(:sync_contact))
+    @integration.last_synced = Time.now
+    @integration.save
+  rescue => e
+    Airbrake.raise_or_notify(e)
+  end
+
+  def contacts_to_sync
+    if @integration.last_synced
+      #updated_g_contacts = @account.contacts_api_user.contacts_updated_min(@integration.last_synced)
+      #cache_g_contacts(updated_g_contacts)
+      #contacts_to_sync_query(updated_g_contacts.map(&:id))
+      contacts_to_sync_query([])
+    else
+      #cache_g_contacts(@account.contacts_api_user.contacts)
+      @integration.account_list.active_contacts
     end
+  end
+
+  # Queries all contacts that:
+  # - Have some associted records updated_at more recent than its google_contact.last_synced
+  # - Or contacts without associated google_contacts records (i.e. which haven't been synced before)
+  # - Or contacts whose google_contacts records have been updated remotely as specified by the updated_remote_ids
+  def contacts_to_sync_query(updated_remote_ids)
+    if updated_remote_ids.empty?
+      updated_having = ''
+    else
+      updated_having = " OR google_contacts.remote_id IN (#{
+        updated_remote_ids.map { |id| ActiveRecord::Base.sanitize(id) }.join(',') })"
+    end
+
+    @integration.account_list.active_contacts
+      .joins(:people)
+      .joins("LEFT JOIN addresses ON addresses.addressable_id = contacts.id AND addresses.addressable_type = 'Contact'")
+      .joins('LEFT JOIN email_addresses ON people.id = email_addresses.person_id')
+      .joins('LEFT JOIN phone_numbers ON people.id = phone_numbers.person_id')
+      .joins('LEFT JOIN person_websites ON people.id = person_websites.person_id')
+      .joins('LEFT JOIN google_contacts ON google_contacts.person_id = people.id')
+      .where('(google_contacts.id IS NULL OR google_contacts.google_account_id = ?)', @account.id)
+      .group('contacts.id, google_contacts.last_synced, google_contacts.remote_id')
+      .having('google_contacts.last_synced IS NULL ' \
+        'OR google_contacts.last_synced < ' \
+          'GREATEST(contacts.updated_at, MAX(contact_people.updated_at), MAX(people.updated_at), ' \
+                  'MAX(addresses.updated_at), MAX(email_addresses.updated_at), MAX(phone_numbers.updated_at), ' \
+                  'MAX(person_websites.updated_at))' +
+        updated_having)
+      .distinct
+      .readonly(false)
+  end
+
+  def cache_g_contacts(g_contacts)
+    @g_contacts_by_remote_id = Hash[g_contacts.map { |g_contact| [g_contact.id, g_contact] }]
   end
 
   def sync_contact(contact)

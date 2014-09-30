@@ -54,3 +54,5 @@
 
 //= require bootstrap-tagsinput
 //= require typeahead.jquery.js
+
+//= require gmaps/google
