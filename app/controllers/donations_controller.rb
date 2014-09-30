@@ -4,6 +4,8 @@ class DonationsController < ApplicationController
   before_action :find_donor_accounts, only: [:edit, :new]
 
   def index
+    @appeals = current_account_list.appeals
+
     if @contact
       if @contact.donor_account_ids.present?
         @all_donations = current_account_list.donations.where(donor_account_id: @contact.donor_account_ids)
