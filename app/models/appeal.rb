@@ -3,9 +3,6 @@ class Appeal < ActiveRecord::Base
   has_many :appeal_contacts
   has_many :contacts, through: :appeal_contacts
 
-  has_many :appeal_donations
-  has_many :donations, through: :appeal_donations
-
   PERMITTED_ATTRIBUTES = [:id, :name, :amount, :description, :end_date]
 
   def add_contacts(account_list, contact_ids)

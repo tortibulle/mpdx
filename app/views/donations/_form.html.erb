@@ -33,7 +33,7 @@
 
     <div class="field">
       <%= f.label :appeal_id, _('Appeal') %>
-      <%= f.select :appeal_id, @appeals %>
+      <%= f.select :appeal_id, options_from_collection_for_select(@appeals, 'id', 'name') %>
     </div>
 
     <% if current_account_list.multiple_designations %>
