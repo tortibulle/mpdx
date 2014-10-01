@@ -247,6 +247,13 @@ describe GoogleContactsIntegrator do
       expect(@api_user).to receive(:query_contacts).with('John Doe').and_return([api_g_contact])
       expect(@integrator.query_g_contact(@person)).to eq(api_g_contact)
     end
+
+    it "doesn't fail if no first or last name" do
+      expect(@api_user).to receive(:query_contacts).with(' ').and_return([])
+      @person.first_name = nil
+      @person.last_name = nil
+      expect(@integrator.query_g_contact(@person)).to be_nil
+    end
   end
 
   describe 'new_g_contact' do
@@ -1029,7 +1036,7 @@ describe GoogleContactsIntegrator do
           '<gd:postcode>32832</gd:postcode>\s+'\
           '<gd:country>United States of America</gd:country>\s+'\
         '</gd:structuredPostalAddress>\s+'\
-         '<gd:organization rel="http://schemas.google.com/g/2005#"\s+primary="true">\s+'\
+         '<gd:organization\s+primary="true">\s+'\
           '<gd:orgName>Company, Inc</gd:orgName>\s+'\
           '<gd:orgTitle>Worker</gd:orgTitle>\s+'\
         '</gd:organization>\s+'\

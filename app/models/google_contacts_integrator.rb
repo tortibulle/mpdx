@@ -134,7 +134,7 @@ class GoogleContactsIntegrator
   end
 
   def query_g_contact(person)
-    name = person.first_name + ' ' + person.last_name
+    name = "#{person.first_name} #{person.last_name}"
     cached_g_contacts = @g_contacts_by_name[name]
     g_contacts = cached_g_contacts ? cached_g_contacts : @account.contacts_api_user.query_contacts(name)
 
