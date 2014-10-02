@@ -41,7 +41,7 @@ describe GoogleContactsIntegrator do
     it 'returns all active contacts if not synced yet' do
       expect(@integration.account_list).to receive(:active_contacts).and_return(['contact'])
       expect(@account.contacts_api_user).to receive(:contacts).and_return(['g_contact'])
-      expect(@integrator).to receive(:cache_g_contacts).with(['g_contact'])
+      expect(@integrator).to receive(:cache_g_contacts).with(['g_contact'], true)
 
       expect(@integrator.contacts_to_sync).to eq(['contact'])
     end
@@ -53,7 +53,7 @@ describe GoogleContactsIntegrator do
       expect(@account.contacts_api_user).to receive(:contacts_updated_min).with(now).and_return([g_contact])
 
       expect(@integrator).to receive(:contacts_to_sync_query).with(['id_1']).and_return(['contact'])
-      expect(@integrator).to receive(:cache_g_contacts).with([g_contact])
+      expect(@integrator).to receive(:cache_g_contacts).with([g_contact], false)
 
       expect(@integrator.contacts_to_sync).to eq(['contact'])
     end
@@ -187,21 +187,21 @@ describe GoogleContactsIntegrator do
 
     it 'uses the cache if there is a matching cached contact' do
       g_contact = double(id: 'id', given_name: 'John', family_name: 'Doe')
-      @integrator.cache_g_contacts([g_contact])
+      @integrator.cache_g_contacts([g_contact], false)
       expect(@api_user).to receive(:get_contact).exactly(0).times
       expect(@integrator.get_g_contact('id')).to eq(g_contact)
     end
 
     it 'calls the api if there is no matching cached contact' do
       g_contact = double(id: 'id', given_name: 'John', family_name: 'Doe')
-      @integrator.cache_g_contacts([g_contact])
+      @integrator.cache_g_contacts([g_contact], false)
       expect(@api_user).to receive(:get_contact).with('non-cached-id').and_return('api_g_contact')
       expect(@integrator.get_g_contact('non-cached-id')).to eq('api_g_contact')
     end
 
     it 'calls the api if the cache is cleared' do
       g_contact = double(id: 'id', given_name: 'John', family_name: 'Doe')
-      @integrator.cache_g_contacts([g_contact])
+      @integrator.cache_g_contacts([g_contact], false)
       @integrator.clear_g_contact_cache
 
       expect(@api_user).to receive(:get_contact).with('id').and_return('api_g_contact')
@@ -233,7 +233,7 @@ describe GoogleContactsIntegrator do
 
     it 'uses the cache if there is a matching cached contact' do
       g_contact = double(id: 'id', given_name: 'John', family_name: 'Doe')
-      @integrator.cache_g_contacts([g_contact])
+      @integrator.cache_g_contacts([g_contact], false)
 
       expect(@api_user).to receive(:query_contacts).exactly(0).times
       expect(@integrator.query_g_contact(@person)).to eq(g_contact)
@@ -241,7 +241,7 @@ describe GoogleContactsIntegrator do
 
     it 'calls the api if there is no matching cached contact' do
       cached_g_contact = double(id: 'id', given_name: 'Not-John', family_name: 'Not-Doe')
-      @integrator.cache_g_contacts([cached_g_contact])
+      @integrator.cache_g_contacts([cached_g_contact], false)
 
       api_g_contact =  double(given_name: 'John', family_name: 'Doe')
       expect(@api_user).to receive(:query_contacts).with('John Doe').and_return([api_g_contact])

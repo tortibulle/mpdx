@@ -4,5 +4,4 @@ class GoogleContact < ActiveRecord::Base
   belongs_to :picture
 
   serialize :last_data, Hash
-  serialize :last_mappings, Hash
 end

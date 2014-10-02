@@ -1,3 +1,17 @@
+if Rails.env.development?
+  ActiveRecord::Base.logger = Logger.new(STDERR)
+
+  require 'http_logger'
+  HttpLogger.logger = Logger.new(STDERR)
+  HttpLogger.colorize = true # Default: true
+  HttpLogger.ignore = [/newrelic\.com/]
+  HttpLogger.log_headers = true  # Default: false
+  HttpLogger.log_request_body  = true # Default: true
+  HttpLogger.log_response_body = true  # Default: true
+  HttpLogger.level = :debug # Desired log level as a symbol. Default: :debug
+  HttpLogger.collapse_body_limit = 40_000
+end
+
 class GoogleContactsIntegrator
   attr_accessor :client
 
@@ -13,20 +27,25 @@ class GoogleContactsIntegrator
     @integration.save
     clear_g_contact_cache
   rescue => e
+    STDERR.puts "Encountered error: #{e}"
     Airbrake.raise_or_notify(e)
   end
 
   def contacts_to_sync
     if @integration.last_synced
       updated_g_contacts = @account.contacts_api_user.contacts_updated_min(@integration.last_synced)
-      cache_g_contacts(updated_g_contacts)
+      cache_g_contacts(updated_g_contacts, false)
       contacts_to_sync_query(updated_g_contacts.map(&:id))
     else
       # For the first sync, we can cut down a lot of HTTP requests by caching the list of Google Contacts
-      cache_g_contacts(@account.contacts_api_user.contacts)
+      cache_g_contacts(@account.contacts_api_user.contacts, true)
 
       @integration.account_list.active_contacts
     end
+  end
+
+  def quote_sql_list(list)
+    list.map { |item| ActiveRecord::Base.connection.quote(item) }.join(',')
   end
 
   # Queries all contacts that:
@@ -34,13 +53,6 @@ class GoogleContactsIntegrator
   # - Or contacts without associated google_contacts records (i.e. which haven't been synced before)
   # - Or contacts whose google_contacts records have been updated remotely as specified by the updated_remote_ids
   def contacts_to_sync_query(updated_remote_ids)
-    if updated_remote_ids.empty?
-      updated_having = ''
-    else
-      updated_having = " OR google_contacts.remote_id IN (#{
-        updated_remote_ids.map { |id| ActiveRecord::Base.sanitize(id) }.join(',') })"
-    end
-
     @integration.account_list.active_contacts
       .joins(:people)
       .joins("LEFT JOIN addresses ON addresses.addressable_id = contacts.id AND addresses.addressable_type = 'Contact'")
@@ -55,7 +67,7 @@ class GoogleContactsIntegrator
           'GREATEST(contacts.updated_at, MAX(contact_people.updated_at), MAX(people.updated_at), ' \
                   'MAX(addresses.updated_at), MAX(email_addresses.updated_at), MAX(phone_numbers.updated_at), ' \
                   'MAX(person_websites.updated_at))' +
-        updated_having)
+        (updated_remote_ids.empty? ? '' : " OR google_contacts.remote_id IN (#{ quote_sql_list(updated_remote_ids) })"))
       .distinct
       .readonly(false)
   end
@@ -63,9 +75,12 @@ class GoogleContactsIntegrator
   def clear_g_contact_cache
     @g_contact_by_id = {}
     @g_contacts_by_name = {}
+    @all_g_contacts_cached = false
   end
 
-  def cache_g_contacts(g_contacts)
+  def cache_g_contacts(g_contacts, all_cached)
+    @all_g_contacts_cached = all_cached
+
     @g_contact_by_id = Hash[g_contacts.map { |g_contact| [g_contact.id, g_contact] }]
 
     @g_contacts_by_name = {}
@@ -91,7 +106,15 @@ class GoogleContactsIntegrator
       g_contact, g_contact_link = g_contact_and_link
       sync_notes(contact, g_contact, g_contact_link)
 
-      g_contact.create_or_update
+      # Set the api as @account.contacts_api_user will refresh the auth token if needed
+      g_contact.api = @account.contacts_api_user.api
+
+      begin
+        g_contact.create_or_update
+      rescue => e
+        STDERR.puts "Encountered error on put: #{e}"
+        Airbrake.raise_or_notify(e)
+      end
       store_g_contact_link(g_contact_link, g_contact)
     end
 
@@ -108,6 +131,8 @@ class GoogleContactsIntegrator
 
   def sync_person(person)
     g_contact_link = find_or_build_g_contact_link(person)
+    #STDERR.puts 'g_contact_link.id: ' + g_contact_link.id.to_s
+    #STDERR.puts 'g_contact_link: ' + g_contact_link.inspect
     g_contact = get_or_query_g_contact(g_contact_link, person)
 
     if g_contact.nil?
@@ -133,18 +158,25 @@ class GoogleContactsIntegrator
     cached_g_contact ? cached_g_contact : @account.contacts_api_user.get_contact(remote_id)
   end
 
-  def query_g_contact(person)
-    name = "#{person.first_name} #{person.last_name}"
+  def lookup_g_contacts_for_name(name)
     cached_g_contacts = @g_contacts_by_name[name]
-    g_contacts = cached_g_contacts ? cached_g_contacts : @account.contacts_api_user.query_contacts(name)
+    if cached_g_contacts
+      cached_g_contacts
+    elsif @all_g_contacts_cached
+      []
+    else
+      @account.contacts_api_user.query_contacts(name)
+    end
+  end
 
-    g_contacts.find do |g_contact|
+  def query_g_contact(person)
+    lookup_g_contacts_for_name("#{person.first_name} #{person.last_name}").find do |g_contact|
       g_contact.given_name == person.first_name && g_contact.family_name == person.last_name
     end
   end
 
   def new_g_contact(person)
-    g_contact = GoogleContactsApi::Contact.new(nil, nil, @account.contacts_api_user.api)
+    g_contact = GoogleContactsApi::Contact.new(nil, nil, nil)
     g_contact.prep_changes(
       name_prefix: person.title,
       given_name: person.first_name,
