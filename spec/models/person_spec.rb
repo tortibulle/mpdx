@@ -76,7 +76,22 @@ describe Person do
         expect(contact.name).to_not include('Jack')
       end
 
-      it 'has no stack overflow if deceased person modified' do
+      it "keeps a single deceased person's greeting and name" do
+        contact = create(:contact)
+        person.first_name = 'Jack'
+        person.last_name = 'Smith'
+        contact.people << person
+        contact.name = 'Smith, Jack'
+        contact.save
+        person.reload
+        person.deceased = true
+        person.save!
+        contact.reload
+        expect(contact.name).to eq('Smith, Jack')
+        expect(contact.greeting).to eq('Jack')
+      end
+
+      it 'has no stack overflow if deceased person modified, and keeps single deceased person in greeting, etc.' do
         contact = create(:contact)
         person.first_name = 'Jack'
         contact.people << person
@@ -86,11 +101,33 @@ describe Person do
         person.deceased = true
         person.save!
         contact.reload
-        expect(contact.name).to_not include('Jack')
+
+        expect(contact.name).to eq('Smith, Jack')
+        expect(contact.greeting).to eq('Jack')
+        expect(contact.primary_person).to eq(person)
 
         person.reload
         person.occupation = 'random change'
         person.save # Used to cause a stack overflow
+      end
+
+      it 'has no stack overflow if person in deceased couple is modified' do
+        person.first_name = 'Jack'
+        person.last_name = 'Smith'
+        person.deceased = true
+        person.save!
+
+        contact = create(:contact)
+        contact.people << person
+        contact.people << create(:person, deceased: true, first_name: 'Jill', last_name: 'Smith')
+        contact.name = 'Smith, Jack and Jill'
+        contact.save
+
+        contact.update_column(:greeting, '')
+
+        person.reload
+        person.occupation = 'random change'
+        contact.save # Used to cause a stack overflow
       end
     end
   end
