@@ -33,11 +33,13 @@ class GoogleContactsIntegrator
 
   def contacts_to_sync
     if @integration.last_synced
-      updated_g_contacts = @account.contacts_api_user.contacts_updated_min(@integration.last_synced)
+      updated_g_contacts =
+        @account.contacts_api_user.contacts_updated_min(@integration.last_synced)
+
       cache_g_contacts(updated_g_contacts, false)
       contacts_to_sync_query(updated_g_contacts.map(&:id))
     else
-      # For the first sync, we can cut down a lot of HTTP requests by caching the list of Google Contacts
+      # For the first sync, we can down on HTTP requests by caching the list of Google Contacts
       cache_g_contacts(@account.contacts_api_user.contacts, true)
 
       @integration.account_list.active_contacts
@@ -51,11 +53,19 @@ class GoogleContactsIntegrator
   # Queries all contacts that:
   # - Have some associted records updated_at more recent than its google_contact.last_synced
   # - Or contacts without associated google_contacts records (i.e. which haven't been synced before)
-  # - Or contacts whose google_contacts records have been updated remotely as specified by the updated_remote_ids
+  # - Or contacts whose google_contacts records have been updated remotely
+  #   as specified by the updated_remote_ids
   def contacts_to_sync_query(updated_remote_ids)
+    if updated_remote_ids.empty?
+      updated_remote_having = ''
+    else
+      updated_remote_having =
+        " OR google_contacts.remote_id IN (#{ quote_sql_list(updated_remote_ids) })"
+    end
+
     @integration.account_list.active_contacts
       .joins(:people)
-      .joins("LEFT JOIN addresses ON addresses.addressable_id = contacts.id AND addresses.addressable_type = 'Contact'")
+      .joins("LEFT JOIN addresses ON addresses.addressable_id = contacts.id AND addresses.addressable_type = Contact")
       .joins('LEFT JOIN email_addresses ON people.id = email_addresses.person_id')
       .joins('LEFT JOIN phone_numbers ON people.id = phone_numbers.person_id')
       .joins('LEFT JOIN person_websites ON people.id = person_websites.person_id')
@@ -65,9 +75,9 @@ class GoogleContactsIntegrator
       .having('google_contacts.last_synced IS NULL ' \
         'OR google_contacts.last_synced < ' \
           'GREATEST(contacts.updated_at, MAX(contact_people.updated_at), MAX(people.updated_at), ' \
-                  'MAX(addresses.updated_at), MAX(email_addresses.updated_at), MAX(phone_numbers.updated_at), ' \
-                  'MAX(person_websites.updated_at))' +
-        (updated_remote_ids.empty? ? '' : " OR google_contacts.remote_id IN (#{ quote_sql_list(updated_remote_ids) })"))
+                  'MAX(addresses.updated_at), MAX(email_addresses.updated_at), '\
+                  'MAX(phone_numbers.updated_at), MAX(person_websites.updated_at))' +
+        updated_remote_having)
       .distinct
       .readonly(false)
   end
@@ -146,7 +156,8 @@ class GoogleContactsIntegrator
 
   def find_or_build_g_contact_link(person)
     person.google_contacts.where(google_account: @account)
-      .first_or_initialize(person: person, last_data: { emails: [], addresses: [], phone_numbers: [], websites: [] })
+      .first_or_initialize(person: person, last_data: { emails: [], addresses: [],
+                                                        phone_numbers: [], websites: [] })
   end
 
   def get_or_query_g_contact(g_contact_link, person)
@@ -204,9 +215,9 @@ class GoogleContactsIntegrator
   end
 
   def sync_basic_person_fields(person, g_contact, g_contact_link)
-    sync_g_contact_and_record(person, g_contact, g_contact_link, title: :name_prefix, first_name: :given_name,
-                              middle_name: :additional_name, last_name: :family_name,
-                              suffix: :name_suffix)
+    sync_g_contact_and_record(person, g_contact, g_contact_link, title: :name_prefix,
+                              first_name: :given_name, middle_name: :additional_name,
+                              last_name: :family_name, suffix: :name_suffix)
   end
 
   def sync_g_contact_and_record(record, g_contact, g_contact_link, field_map)
@@ -214,7 +225,9 @@ class GoogleContactsIntegrator
       synced_value = compare_field_for_sync(record[field], g_contact.send(g_contact_field),
                                             g_contact_link.last_data[g_contact_field])
 
-      g_contact.prep_changes(g_contact_field => synced_value) if synced_value != g_contact.send(g_contact_field)
+      if synced_value != g_contact.send(g_contact_field)
+        g_contact.prep_changes(g_contact_field => synced_value)
+      end
       record[field] = synced_value
     end
   end
@@ -223,7 +236,7 @@ class GoogleContactsIntegrator
     mpdx_changed = mpdx_val != last_val && (mpdx_val.present? || last_val.present?)
 
     if mpdx_changed
-      # If MPDX changed, the synced value is the MPDX field even if Google also changed (MPDX "wins" if both changed)
+      # If MPDX changed, the synced value is the MPDX "wins" if both MPDX and Google were changed
       mpdx_val
     else
       # Otherwise the synced value should be the Google value in case it changed.
@@ -235,16 +248,18 @@ class GoogleContactsIntegrator
     g_contact_orgs = g_contact.organizations
     last_orgs = g_contact_link.last_data[:organizations] || []
 
-    # Since in the Google Contacts user interface you can only set the title and org name for a single organization
-    # it's a reasonable assumption to just look at the first organization for comparison
+    # Since in the Google Contacts user interface you can only set the title and org name for a
+    # single organization it's a reasonable assumption to just look at the first organization
     employer = compare_field_for_sync(person.employer, field_of_first(g_contact_orgs, :org_name),
                                       field_of_first(last_orgs, :org_name))
-    occupation = compare_field_for_sync(person.occupation, field_of_first(g_contact_orgs, :org_title),
+    occupation = compare_field_for_sync(person.occupation,
+                                        field_of_first(g_contact_orgs, :org_title),
                                         field_of_first(last_orgs, :org_title))
 
     person.update(employer: employer, occupation: occupation)
 
-    if field_of_first(g_contact_orgs, :org_name) != employer || field_of_first(g_contact_orgs, :org_title) != occupation
+    if field_of_first(g_contact_orgs, :org_name) != employer ||
+        field_of_first(g_contact_orgs, :org_title) != occupation
       g_contact.prep_changes(organizations: g_contact_organizations_for(employer, occupation))
     end
   end
@@ -254,7 +269,8 @@ class GoogleContactsIntegrator
   end
 
   def sync_emails(g_contact, person, g_contact_link)
-    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels = compare_emails_for_sync(g_contact, person, g_contact_link)
+    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels =
+      compare_emails_for_sync(g_contact, person, g_contact_link)
 
     add_emails_from_g_contact(mpdx_adds, g_contact, person)
     mpdx_dels.each { |email| person.email_addresses.where(email: email).destroy_all }
@@ -271,7 +287,8 @@ class GoogleContactsIntegrator
   end
 
   def sync_numbers(g_contact, person, g_contact_link)
-    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels = compare_numbers_for_sync(g_contact, person, g_contact_link)
+    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels =
+      compare_numbers_for_sync(g_contact, person, g_contact_link)
 
     add_numbers_from_g_contact(mpdx_adds, g_contact, person)
     mpdx_dels.each { |number| person.phone_numbers.where(number: number).destroy_all }
@@ -283,13 +300,18 @@ class GoogleContactsIntegrator
       number_attrs[:primary] = false if g_contact_primary
       number_attrs
     }
-    g_contact_numbers.delete_if { |number| g_contact_dels.include?(normalize_number(number[:number])) }
+    g_contact_numbers.delete_if { |number|
+      g_contact_dels.include?(normalize_number(number[:number]))
+    }
     g_contact.prep_changes(phone_numbers: g_contact_numbers)
   end
 
   def sync_addresses(g_contacts, contact, g_contact_links)
     g_contact_addresses = g_contacts.flat_map(&:addresses).to_set
-    last_addresses = g_contact_links.flat_map { |g_contact_link| g_contact_link.last_data[:addresses] }.to_set
+
+    last_addresses = g_contact_links.flat_map { |g_contact_link|
+      g_contact_link.last_data[:addresses]
+    }.to_set
 
     mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels, g_contact_address_records =
       compare_addresses_for_sync(g_contact_addresses, contact, last_addresses)
@@ -299,15 +321,22 @@ class GoogleContactsIntegrator
     mpdx_dels.destroy_all
 
     # Build the Google Contact address list and assign it to all Google contacts
-    g_contact_address_records = remove_duplicate_addresses(g_contact_address_records) + g_contact_adds
-    g_contact_address_records.delete_if { |address| g_contact_dels.include?(address.master_address_id) }
+    g_contact_address_records =
+      remove_duplicate_addresses(g_contact_address_records) + g_contact_adds
+
+    g_contact_address_records.delete_if { |address|
+      g_contact_dels.include?(address.master_address_id)
+    }
     ensure_single_primary_address(g_contact_address_records)
-    g_contact_addresses = g_contact_address_records.map { |address| format_address_for_google(address) }
+    g_contact_addresses = g_contact_address_records.map { |address|
+      format_address_for_google(address)
+    }
     g_contacts.each { |g_contact| g_contact.prep_changes(addresses: g_contact_addresses.to_a) }
   end
 
   def sync_websites(g_contact, person, g_contact_link)
-    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels = compare_websites_for_sync(g_contact, person, g_contact_link)
+    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels =
+      compare_websites_for_sync(g_contact, person, g_contact_link)
 
     add_websites_from_g_contact(mpdx_adds, g_contact, person)
     mpdx_dels.each { |url| person.websites.where(url: url).destroy_all }
@@ -324,7 +353,9 @@ class GoogleContactsIntegrator
   end
 
   def remove_duplicate_addresses(addresses)
-    addresses.map(&:master_address_id).to_set.map { |master_id| lookup_by_key(addresses, master_address_id: master_id) }
+    addresses.map(&:master_address_id).to_set.map { |master_id|
+      lookup_by_key(addresses, master_address_id: master_id)
+    }
   end
 
   def ensure_single_primary_address(addresses)
@@ -386,19 +417,22 @@ class GoogleContactsIntegrator
 
   def compare_websites_for_sync(g_contact, person, g_contact_link)
     last_sync_websites = g_contact_link.last_data[:websites].map { |websites| websites[:href] }
-    compare_for_sync(last_sync_websites, person.websites.map(&:url), g_contact.websites.map { |w| w[:href] })
+    compare_for_sync(last_sync_websites, person.websites.map(&:url),
+                     g_contact.websites.map { |w| w[:href] })
   end
 
   def compare_emails_for_sync(g_contact, person, g_contact_link)
     last_sync_emails = g_contact_link.last_data[:emails].map { |email| email[:address] }
-    compare_considering_historic(last_sync_emails, person.email_addresses.where(historic: false).map(&:email),
-                                 g_contact.emails, person.email_addresses.where(historic: true).map(&:email))
+    compare_considering_historic(last_sync_emails,
+                                 person.email_addresses.where(historic: false).map(&:email),
+                                 g_contact.emails,
+                                 person.email_addresses.where(historic: true).map(&:email))
   end
 
   def compare_numbers_for_sync(g_contact, person, g_contact_link)
     last_sync_numbers = g_contact_link.last_data[:phone_numbers].map { |p| p[:number] }
-    compare_normalized_for_sync(last_sync_numbers, person.phone_numbers.map(&:number), g_contact.phone_numbers,
-                                method(:normalize_number))
+    compare_normalized_for_sync(last_sync_numbers, person.phone_numbers.map(&:number),
+                                g_contact.phone_numbers, method(:normalize_number))
   end
 
   def compare_addresses_for_sync(g_contact_addresses, contact, last_addresses)
@@ -413,9 +447,12 @@ class GoogleContactsIntegrator
                                     g_contact_address_records, method(:normalize_address),
                                     contact.addresses.where(historic: true))
 
-    # Convert back from the master_address_id to entries in the addresses lists (except for g_contact_dels)
+    # Convert from the master_address_id back to entries in addresses lists
+    # (except for g_contact_dels)
     [
-      mpdx_adds.map { |master_id| lookup_by_key(g_contact_address_records, master_address_id: master_id) },
+      mpdx_adds.map { |master_id|
+        lookup_by_key(g_contact_address_records, master_address_id: master_id)
+      },
       contact.addresses.where(master_address_id: mpdx_dels.to_a),
       contact.addresses.where(master_address_id: g_contact_adds.to_a),
       g_contact_dels,
@@ -428,11 +465,11 @@ class GoogleContactsIntegrator
     global ? global.international_string : number
   end
 
-  def new_address_for_g_address(g_address)
-    Address.new(street: g_address[:street], city: g_address[:city], state: g_address[:region],
-      postal_code: g_address[:postcode],
-      country: g_address[:country] == 'United States of America' ? 'United States' : g_address[:country],
-      location: address_rel_to_location(g_address[:rel]), primary_mailing_address: g_address[:primary])
+  def new_address_for_g_address(g_addr)
+    Address.new(street: g_addr[:street], city: g_addr[:city], state: g_addr[:region],
+      postal_code: g_addr[:postcode],
+      country: g_addr[:country] == 'United States of America' ? 'United States' : g_addr[:country],
+      location: address_rel_to_location(g_addr[:rel]), primary_mailing_address: g_addr[:primary])
   end
 
   def normalize_address(address)
@@ -441,17 +478,22 @@ class GoogleContactsIntegrator
     address.master_address_id
   end
 
-  def compare_normalized_for_sync(last_sync_list, mpdx_list, g_contact_list, normalize_fn, historic_list = [])
+  def compare_normalized_for_sync(last_sync_list, mpdx_list, g_contact_list, normalize_fn,
+                                  historic_list = [])
     compare_considering_historic(last_sync_list.map(&normalize_fn), mpdx_list.map(&normalize_fn),
-                                 g_contact_list.map(&normalize_fn), historic_list.map(&normalize_fn))
+                                 g_contact_list.map(&normalize_fn),
+                                 historic_list.map(&normalize_fn))
   end
 
   def compare_considering_historic(last_sync_list, mpdx_list, g_contact_list, historic_list)
     historic = historic_list.to_set
-    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels = compare_for_sync(last_sync_list, mpdx_list, g_contact_list)
+    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels =
+      compare_for_sync(last_sync_list, mpdx_list, g_contact_list)
 
-    # Don't add/delete MPDX's historic items, don't add them to Google, but do delete them from Google
-    [mpdx_adds - historic, mpdx_dels - historic, g_contact_adds - historic, g_contact_dels + historic]
+    # Don't add/delete MPDX's historic items, don't add them to Google,
+    # but do delete them from Google
+    [mpdx_adds - historic, mpdx_dels - historic, g_contact_adds - historic,
+     g_contact_dels + historic]
   end
 
   def compare_for_sync(last_sync_list, mpdx_list, g_contact_list)
@@ -466,12 +508,13 @@ class GoogleContactsIntegrator
     g_contact_deleleted = last_sync_set - g_contact_set
 
     # These sets represent what MPDX and Google Contacts need to add or delete to get in sync again
-    # Basically, you just propgate the added/deleted entries from one to the other, but we also subtract out the
-    # entries that system already added or deleted on its own.
+    # Basically, you just propgate the added/deleted entries from one to the other, but we also
+    # subtract out the entries that system already added or deleted on its own.
     #
-    # An update simply becomes an add and a delete and both are propagated. Thus a conflicting update will result in
-    # both systems preserving the two new values and deleting the old value. This preserves the user's intention across
-    # systems and allows them to then delete the incorrect conflicted value (or just keep both if they're both correct).
+    # An update simply becomes an add and a delete and both are propagated.
+    # Thus a conflicting update will result in both systems preserving the two new values and
+    # deleting the old value. This preserves the user's intention across systems and allows them to
+    # then delete the incorrect conflicted value (or just keep both if they're both correct).
     mpdx_to_add = g_contact_added - mpdx_added
     g_contact_to_add = mpdx_added - g_contact_added
     mpdx_to_delete = g_contact_deleleted - mpdx_deleleted
@@ -499,7 +542,9 @@ class GoogleContactsIntegrator
   end
 
   def format_email_for_google(email)
-    { primary: email.primary, rel: email.location.in?(%w(work home)) ? email.location : 'other', address: email.email }
+    { primary: email.primary,
+      rel: email.location.in?(%w(work home)) ? email.location : 'other',
+      address: email.email }
   end
 
   def format_phone_for_mpdx(phone)
@@ -515,7 +560,9 @@ class GoogleContactsIntegrator
 
     # From https://developers.google.com/gdata/docs/2.0/elements#gdPhoneNumber
     allowed_rels = %w(assistant callback car company_main fax home home_fax isdn main mobile other other_fax pager radio telex tty_tdd work work_fax work_mobile work_pager)
-    { number: number, primary: phone.primary, rel: phone.location.in?(allowed_rels) ? phone.location : 'other' }
+    { number: number,
+      primary: phone.primary,
+      rel: phone.location.in?(allowed_rels) ? phone.location : 'other' }
   end
 
   def format_website_for_google(website)
@@ -523,8 +570,12 @@ class GoogleContactsIntegrator
   end
 
   def format_address_for_google(address)
-    { rel: address_location_to_rel(address.location), primary: address.primary_mailing_address,
-      street: address.street, city: address.city, region: address.state, postcode: address.postal_code,
+    { rel: address_location_to_rel(address.location),
+      primary: address.primary_mailing_address,
+      street: address.street,
+      city: address.city,
+      region: address.state,
+      postcode: address.postal_code,
       country: address.country == 'United States' ? 'United States of America' : address.country }
   end
 
