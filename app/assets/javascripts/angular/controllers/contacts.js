@@ -290,34 +290,86 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
       return true;
     };
 
+    var generateContactMarker = function(contact) {
+      var cc = contactCache.getFromCache(contact.id);
+      var marker;
+      if(cc && cc.addresses && cc.addresses.length > 0) {
+        var geo = cc.addresses[0].geo;
+        if(geo) {
+          marker = {
+            'lat': +geo.split(',')[0],
+            'lng': +geo.split(',')[1],
+            'infowindow': '<a href="/contacts/'+contact.id+'">'+contact.name+'</a>',
+            'picture': {
+              'url': markerURL(contact.status),
+              'width':  20,
+              'height': 36
+            }
+          }
+        }
+      }
+      return marker;
+    }
+    var markerURL = function(status) {
+      var base = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|'
+      if(status == '' || status == 'Never Contacted')
+        return base + 'dcdcdc';
+      if(status == 'Ask in Future')
+        return base + 'F04141';
+      if(status == 'Contact for Appointment')
+        return base + 'F0D541';
+      if(status == 'Appointment Scheduled')
+        return base + '54DB1A';
+      if(status == 'Call for Decision')
+        return base + '41F0A1';
+      if(status == 'Partner - Financial')
+        return base + '41AAF0';
+      if(status == 'Partner - Special')
+        return base + '6C41F0';
+      if(status == 'Partner - Pray')
+        return base + 'F26FE5';
+      return base + '757575'
+    }
+
     $scope.mapContacts = function() {
-      markers = [];
+      var newMarkers = [];
+      var contacts_counts = {
+        noAddress: 0
+      }
       angular.forEach($scope.contacts, function(contact) {
-        cc = contactCache.getFromCache(contact.id)
-        if(cc && cc.addresses && cc.addresses.length > 0) {
-          geo = cc.addresses[0].geo
-          if(geo)
-            markers.push({
-              "lat": +geo.split(',')[0],
-              "lng": +geo.split(',')[1],
-              "infowindow": '<a href="/contacts/'+contact.id+'">'+contact.name+'</a>'
-            })
-        }
+        var marker = generateContactMarker(contact);
+        if(marker)
+          newMarkers.push(marker);
+        else
+          contacts_counts.noAddress++;
       })
-      $('#contacts_map_modal').dialog({ width: 700, height: 500 })
-      map_options = { streetViewControl: false };
-      handler = Gmaps.build('Google');
-      handler.buildMap(
-        {
-          provider: map_options,
-          internal: {id: 'contacts-map'}
-        },
-        function(){
-          markers = handler.addMarkers(markers);
-          handler.bounds.extendWith(markers);
-          handler.fitMapToBounds();
-        }
-      );
+      $('#contacts_map_modal').dialog({ width: 700, height: 570 })
+      var addMarkers = function(){
+        $scope.mapHandler.removeMarkers($scope.mapMarkers)
+        $scope.mapMarkers = $scope.mapHandler.addMarkers(newMarkers);
+        $scope.mapHandler.bounds.extendWith($scope.mapMarkers);
+        $scope.mapHandler.fitMapToBounds();
+      }
+      $scope.singleMap(addMarkers)
+    };
+    $scope.mapMarkers = [];
+
+    $scope.singleMap = function(methodToExec) {
+      if(methodToExec === undefined || typeof(methodToExec) != "function")
+        methodToExec = $.noop
+      var map_options = { streetViewControl: false };
+      if($scope.mapHandler === undefined) {
+        $scope.mapHandler = Gmaps.build('Google');
+        $scope.mapHandler.buildMap(
+          {
+            provider: map_options,
+            internal: {id: 'contacts-map'}
+          },
+          methodToExec
+        );
+      }
+      else
+        methodToExec()
     };
 });
 
