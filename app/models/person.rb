@@ -150,7 +150,7 @@ class Person < ActiveRecord::Base
         c.clear_primary_person
       end
 
-      next unless contact_updates != {}
+      next if contact_updates == {}
 
       contact_updates[:updated_at] = Time.now
       # Call update_columns instead of save because a save of a contact can trigger saving its people which
