@@ -96,7 +96,7 @@ class Contact < ActiveRecord::Base
   end
 
   assignable_values_for :send_newsletter, allow_blank: true do
-    ['Physical', 'Email', 'Both']
+    %w(Physical Email Both)
   end
 
   delegate :first_name, :last_name, :phone, :email, to: :primary_or_first_person
