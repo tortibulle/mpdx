@@ -64,13 +64,13 @@ class Contact < ActiveRecord::Base
 
   assignable_values_for :status, allow_blank: true do
     # Don't change these willy-nilly, they break the mobile app
-    [_('Never Contacted'), _('Ask in Future'), _('Contact for Appointment'), _('Appointment Scheduled'),
-     _('Call for Decision'), _('Partner - Financial'), _('Partner - Special'), _('Partner - Pray'),
-     _('Not Interested'), _('Unresponsive'), _('Never Ask'),
-     _('Research Abandoned'), _('Expired Referral')]
+    ['Never Contacted', 'Ask in Future', 'Contact for Appointment', 'Appointment Scheduled', 'Call for Decision',
+     'Partner - Financial', 'Partner - Special', 'Partner - Pray', 'Not Interested', 'Unresponsive', 'Never Ask',
+     'Research Abandoned', 'Expired Referral']
   end
 
-  IN_PROGRESS_STATUSES = [_('Never Contacted'), _('Ask in Future'), _('Contact for Appointment'), _('Appointment Scheduled'), _('Call for Decision')]
+  IN_PROGRESS_STATUSES = ['Never Contacted', 'Ask in Future', 'Contact for Appointment', 'Appointment Scheduled',
+                          'Call for Decision']
 
   TABS = {
     'details' => _('Details'),
@@ -92,11 +92,11 @@ class Contact < ActiveRecord::Base
   end
 
   assignable_values_for :likely_to_give, allow_blank: true do
-    [_('Least Likely'), _('Likely'), _('Most Likely')]
+    ['Least Likely', 'Likely', 'Most Likely']
   end
 
   assignable_values_for :send_newsletter, allow_blank: true do
-    [_('Physical'), _('Email'), _('Both')]
+    ['Physical', 'Email', 'Both']
   end
 
   delegate :first_name, :last_name, :phone, :email, to: :primary_or_first_person
