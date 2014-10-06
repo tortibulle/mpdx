@@ -127,31 +127,35 @@ class Person < ActiveRecord::Base
     return unless self.deceased?
 
     self.optout_enewsletter = true
+
     contacts.each do |c|
-      need_to_save = false
-      #remove name from greeting
+      # Only update the greeting, etc. if this contact has a non-deceased other person (e.g. a spouse)
+      next unless c.people.where(deceased: false).where('people.id <> ?', id).count > 0
+
+      contact_updates = {}
+
       # We need to access the field value directly via c[:greeting] because c.greeting defaults to the first name
       # even if the field is nil. That causes an infinite loop here where it keeps trying to remove the first name
       # from the greeting but it keeps getting defaulted back to having it.
       if c[:greeting].present? && c[:greeting].include?(first_name)
-        c.greeting = c.greeting.sub(first_name, '')
-        c.greeting = c.greeting.sub(' and ', ' ').strip
-        need_to_save = true
+        contact_updates[:greeting] = c.greeting.sub(first_name, '').sub(' and ', ' ').strip
       end
 
-      #remove name from contact name
       if c.name.include?(first_name)
-        c.name = c.name.sub(first_name, '')
-        c.name = c.name.sub(' and ', '').strip
-        need_to_save = true
+        contact_updates[:name] = c.name.sub(first_name, '').sub(' and ', '').strip
       end
 
       if c.primary_person_id == id && c.people.count > 1
+        # This only modifies associated people via update_column, so we can call it directly
         c.clear_primary_person
-        need_to_save = true
       end
-      return unless need_to_save
-      c.save
+
+      next if contact_updates == {}
+
+      contact_updates[:updated_at] = Time.now
+      # Call update_columns instead of save because a save of a contact can trigger saving its people which
+      # could eventually call this very deceased_check method and cause an infinite recursion.
+      c.update_columns(contact_updates)
     end
   end
 
