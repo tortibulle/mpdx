@@ -2,6 +2,7 @@ class Appeal < ActiveRecord::Base
   belongs_to :account_list
   has_many :appeal_contacts
   has_many :contacts, through: :appeal_contacts
+  has_many :donations
 
   PERMITTED_ATTRIBUTES = [:id, :name, :amount, :description, :end_date]
 

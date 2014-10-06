@@ -1,6 +1,10 @@
 class Api::V1::AppealsController < Api::V1::BaseController
   def index
-    render json: appeals, callback: params[:callback]
+    result = appeals
+    if params[:account_list_id]
+      result = Appeal.where(account_list_id: params[:account_list_id])
+    end
+    render json: result, callback: params[:callback]
   end
 
   def update
