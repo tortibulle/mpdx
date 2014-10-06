@@ -112,7 +112,7 @@ angular.module('mpdxApp')
 
                 $scope.newAppeal = function(){
                     api.call('post','appeals/?account_list_id=' + (window.current_account_list_id || ''), {
-                        name: 'New Appeal'
+                        name: 'New Appeal', account_list_id: (window.current_account_list_id || '')
                     }, function(data) {
 
                     });

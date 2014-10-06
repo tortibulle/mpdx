@@ -22,11 +22,11 @@ class Api::V1::AppealsController < Api::V1::BaseController
   end
 
   def create
-    appeal = appeal.new(appeal_params)
-    if appeal.save
-      render json: appeal, callback: params[:callback], status: :created
+    new_appeal = Appeal.new(appeal_params)
+    if new_appeal.save
+      render json: new_appeal, callback: params[:callback], status: :created
     else
-      render json: { errors: task.errors.full_messages }, callback: params[:callback], status: :bad_request
+      render json: { errors: new_appeal.errors.full_messages }, callback: params[:callback], status: :bad_request
     end
   end
 

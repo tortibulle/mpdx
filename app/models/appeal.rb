@@ -4,7 +4,9 @@ class Appeal < ActiveRecord::Base
   has_many :contacts, through: :appeal_contacts
   has_many :donations
 
-  PERMITTED_ATTRIBUTES = [:id, :name, :amount, :description, :end_date]
+  validates :account_list_id, presence: true
+
+  PERMITTED_ATTRIBUTES = [:id, :name, :amount, :description, :end_date, :account_list_id]
 
   def add_contacts(account_list, contact_ids)
     valid_contact_ids = account_list.contacts.pluck(:id) & contact_ids
