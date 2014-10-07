@@ -65,7 +65,7 @@ class GoogleContactsIntegrator
 
     @integration.account_list.active_contacts
       .joins(:people)
-      .joins("LEFT JOIN addresses ON addresses.addressable_id = contacts.id AND addresses.addressable_type = Contact")
+      .joins("LEFT JOIN addresses ON addresses.addressable_id = contacts.id AND addresses.addressable_type = 'Contact'")
       .joins('LEFT JOIN email_addresses ON people.id = email_addresses.person_id')
       .joins('LEFT JOIN phone_numbers ON people.id = phone_numbers.person_id')
       .joins('LEFT JOIN person_websites ON people.id = person_websites.person_id')
