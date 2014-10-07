@@ -73,7 +73,7 @@ class GoogleImport
     address = {
       street:  google_address[:street], city: google_address[:city], state: google_address[:region],
       postal_code: google_address[:postcode],
-      country: google_address[:country] == 'United States of America' ? 'United States' : google_address[:country],
+      country: format_g_contact_country(google_address[:country]),
       location: google_address_rel_to_location(google_address[:rel])
     }
 
@@ -83,6 +83,16 @@ class GoogleImport
     end
 
     address
+  end
+
+  def format_g_contact_country(country)
+    if country == 'United States of America'
+      'United States'
+    elsif country.nil? || country.is_a?(String)
+      country
+    else
+      fail "Unexpected country from Google Contacts import: #{country}"
+    end
   end
 
   def google_address_rel_to_location(rel)
