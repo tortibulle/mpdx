@@ -7,6 +7,10 @@ class Api::V1::AppealsController < Api::V1::BaseController
     render json: result, callback: params[:callback]
   end
 
+  def show
+    render json: appeal, callback: params[:callback]
+  end
+
   def update
     if appeal.update_attributes(appeal_params) && appeal.add_and_remove_contacts(current_account_list, params[:appeal][:contacts])
       render json: appeal, callback: params[:callback]
