@@ -4,8 +4,6 @@ class DonationsController < ApplicationController
   before_action :find_donor_accounts, only: [:edit, :new]
 
   def index
-    @appeals = current_account_list.appeals
-
     if @contact
       if @contact.donor_account_ids.present?
         @all_donations = current_account_list.donations.where(donor_account_id: @contact.donor_account_ids)
@@ -31,6 +29,7 @@ class DonationsController < ApplicationController
   end
 
   def edit
+    @appeals = current_account_list.appeals
   end
 
   def new
@@ -71,7 +70,7 @@ class DonationsController < ApplicationController
   end
 
   def donation_params
-    params.require(:donation).permit('donation_date(1i)', 'donation_date(2i)', 'donation_date(3i)', 'tendered_amount', 'donor_account_id', 'designation_account_id')
+    params.require(:donation).permit('donation_date(1i)', 'donation_date(2i)', 'donation_date(3i)', 'tendered_amount', 'donor_account_id', 'designation_account_id', 'appeal_id')
   end
 
   def find_contact
