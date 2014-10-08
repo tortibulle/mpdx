@@ -22,7 +22,7 @@ class Api::V1::AppealsController < Api::V1::BaseController
   def destroy
     appeal = appeals.find(params[:id])
     appeal.destroy
-    #render json: task, callback: params[:callback]
+    render json: appeal, callback: params[:callback]
   end
 
   def create
