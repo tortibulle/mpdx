@@ -27,6 +27,9 @@ class GoogleImport
     else
       import_contacts_batch(google_account.contacts, @import.tags)
     end
+  rescue Person::GoogleAccount::MissingRefreshToken
+    # This triggers an "import failed" email to the user but won't log the error in Errbit
+    raise Import::UnsurprisingImportError
   end
 
   def import_contacts_batch(google_contacts, tags)
