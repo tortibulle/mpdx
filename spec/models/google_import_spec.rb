@@ -177,6 +177,12 @@ describe GoogleImport do
       @google_import.send(:import)
       check_imported_data
     end
+
+    it 'handles the case when the Google auth token cannot be refreshed' do
+      expect_any_instance_of(Person::GoogleAccount).to receive(:contacts_api_user).at_least(1).times.and_return(false)
+      expect { @google_import.send(:import) }.to raise_error(Import::UnsurprisingImportError)
+      expect(@account_list.contacts.count).to eq(1)
+    end
   end
 
   describe 'import override/non-override behavior for primary contact info' do
@@ -337,6 +343,12 @@ describe GoogleImport do
       }.to change(Contact, :count).by(1)
 
       Contact.last.tag_list.sort.should == %w(hi mom more tags)
+    end
+
+    it 'handles the case when the Google auth token cannot be refreshed' do
+      expect_any_instance_of(Person::GoogleAccount).to receive(:contacts_api_user).at_least(1).times.and_return(false)
+      expect { @google_import.send(:import) }.to raise_error(Import::UnsurprisingImportError)
+      expect(@account_list.contacts.count).to eq(1)
     end
   end
 end

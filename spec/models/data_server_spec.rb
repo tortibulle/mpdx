@@ -203,13 +203,22 @@ describe DataServer do
     end
   end
 
-  describe 'add or update donor account' do
-    let(:line) { { 'PEOPLE_ID' => '17083', 'ACCT_NAME' => 'Rodrigue', 'ADDR1' => 'Ramon y Celeste (Moreno)', 'CITY' => 'Bahia Acapulco 379', 'STATE' => 'Chihuahua', 'ZIP' => 'CHH', 'PHONE' => '24555', 'COUNTRY' => '(376) 706-670', 'FIRST_NAME' => 'MEX', 'MIDDLE_NAME' => 'Ramon', 'TITLE' => '', 'SUFFIX' => 'Sr.', 'SP_LAST_NAME' => '', 'SP_FIRST_NAME' => 'Moreno', 'SP_MIDDLE_NAME' => 'Celeste', 'SP_TITLE' => 'Gonzalez', 'ADDR2' => 'Sra.', 'ADDR3' => '', 'ADDR4' => '', 'ADDR_CHANGED' => '', 'PHONE_CHANGED' => '4/4/2003', 'CNTRY_DESCR' => '4/4/2003', 'PERSON_TYPE' => '', 'LAST_NAME_ORG' => 'P', 'SP_SUFFIX' => 'Rodriguez' } }
+  context '#add_or_update_donor_account' do
+    let(:line) { { 'PEOPLE_ID' => '17083', 'ACCT_NAME' => 'Rodrigue', 'ADDR1' => 'Ramon y Celeste (Moreno)', 'CITY' => 'Bahia Acapulco 379', 'STATE' => 'Chihuahua', 'ZIP' => '24555', 'PHONE' => '(376) 706-670', 'COUNTRY' => 'CHH', 'FIRST_NAME' => 'Ramon', 'MIDDLE_NAME' => '', 'TITLE' => '', 'SUFFIX' => 'Sr.', 'SP_LAST_NAME' => '', 'SP_FIRST_NAME' => 'Moreno', 'SP_MIDDLE_NAME' => 'Celeste', 'SP_TITLE' => 'Gonzalez', 'ADDR2' => 'Sra.', 'ADDR3' => '', 'ADDR4' => '', 'ADDR_CHANGED' => '', 'PHONE_CHANGED' => '4/4/2003', 'CNTRY_DESCR' => '4/4/2003', 'PERSON_TYPE' => '', 'LAST_NAME_ORG' => 'P', 'SP_SUFFIX' => 'Rodriguez' } }
 
-    it 'should create a new contact' do
+    it 'creates a new contact' do
       expect {
         @data_server.send(:add_or_update_donor_account, line, profile)
       }.to change(Contact, :count)
+    end
+
+    it "doesn't add duplicate addresses" do
+      expect {
+        @data_server.send(:add_or_update_donor_account, line, profile)
+      }.to change(Address, :count).by(2)
+      expect {
+        @data_server.send(:add_or_update_donor_account, line, profile)
+      }.to change(Address, :count).by(0)
     end
   end
 

@@ -1,10 +1,18 @@
 class Api::V1::AppealsController < Api::V1::BaseController
   def index
-    render json: appeals, callback: params[:callback]
+    result = appeals
+    if params[:account_list_id]
+      result = Appeal.where(account_list_id: params[:account_list_id])
+    end
+    render json: result, callback: params[:callback]
+  end
+
+  def show
+    render json: appeal, callback: params[:callback]
   end
 
   def update
-    if appeal.update_attributes(appeal_params) && appeal.add_contacts(current_account_list, params[:appeal][:contacts])
+    if appeal.update_attributes(appeal_params) && appeal.add_and_remove_contacts(current_account_list, params[:appeal][:contacts])
       render json: appeal, callback: params[:callback]
     else
       render json: { errors: task.errors.full_messages }, callback: params[:callback], status: :bad_request
@@ -14,15 +22,15 @@ class Api::V1::AppealsController < Api::V1::BaseController
   def destroy
     appeal = appeals.find(params[:id])
     appeal.destroy
-    #render json: task, callback: params[:callback]
+    render json: appeal, callback: params[:callback]
   end
 
   def create
-    appeal = appeal.new(appeal_params)
-    if appeal.save
-      render json: appeal, callback: params[:callback], status: :created
+    new_appeal = Appeal.new(appeal_params)
+    if new_appeal.save
+      render json: new_appeal, callback: params[:callback], status: :created
     else
-      render json: { errors: task.errors.full_messages }, callback: params[:callback], status: :bad_request
+      render json: { errors: new_appeal.errors.full_messages }, callback: params[:callback], status: :bad_request
     end
   end
 

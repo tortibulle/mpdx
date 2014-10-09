@@ -118,7 +118,7 @@ class PrayerLettersAccount < ActiveRecord::Base
   rescue => e
     json = JSON.parse(e.message)
     case json['status']
-    when 410
+    when 410, 404
       contact.update_column(:prayer_letters_id, nil)
       create_contact(contact)
     else

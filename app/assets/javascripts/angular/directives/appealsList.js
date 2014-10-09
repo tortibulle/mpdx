@@ -15,7 +15,7 @@ angular.module('mpdxApp')
                             $scope.appeal = angular.copy(appeal);
                             console.log(appeal);
 
-                            api.call('get','contacts?filters[status]=*&per_page=250&account_list_id=' + (window.current_account_list_id || ''), {}, function(data) {
+                            api.call('get','contacts?filters[status]=*&per_page=250&include=Contact.id,Contact.name&account_list_id=' + (window.current_account_list_id || ''), {}, function(data) {
                                 $scope.contacts = data.contacts;
                                 $scope.newContact = data.contacts[0].id;
                             }, null, true);
@@ -112,7 +112,7 @@ angular.module('mpdxApp')
 
                 $scope.newAppeal = function(){
                     api.call('post','appeals/?account_list_id=' + (window.current_account_list_id || ''), {
-                        name: 'New Appeal'
+                        name: 'New Appeal', account_list_id: (window.current_account_list_id || '')
                     }, function(data) {
 
                     });

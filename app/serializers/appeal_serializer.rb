@@ -6,4 +6,8 @@ class AppealSerializer < ActiveModel::Serializer
 
   attribute :contact_ids, key: :contacts
   attribute :donations, key: :donations
+
+  def contact_ids
+    object.contacts.order(:name).pluck(:id)
+  end
 end
