@@ -18,6 +18,7 @@ gem 'angularjs-rails' #, '~> 1.2.16'
 gem 'lodash-rails' #, '~> 2.4.1'
 gem 'angular-ui-bootstrap-rails'
 gem 'ngmin-rails'
+gem 'momentjs-rails'
 # gem 'rails_karma'
 
 #gem 'activeadmin'

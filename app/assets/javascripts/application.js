@@ -52,6 +52,7 @@
 //= require_tree ./angular/services
 //= require_tree ./angular/filters
 //= require angular-ui-bootstrap-tpls
+//= require moment
 
 //= require bootstrap-tagsinput
 //= require typeahead.jquery.js

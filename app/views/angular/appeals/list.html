@@ -11,7 +11,7 @@
             <td style="width: 350px;">
                 <strong>{{appeal.name}}</strong>
             </td>
-            <td>${{donationTotal(appeal.donations)}}</td>
+            <td>${{formatNumber(donationTotal(appeal.donations))}}</td>
 
             <td>
                 <div class="appealThermometer">
@@ -19,7 +19,7 @@
                     </div>
                 </div>
             </td>
-            <td>${{appeal.amount}}</td>
+            <td>${{formatNumber(appeal.amount)}}</td>
         </tr>
     </tbody>
 </table>

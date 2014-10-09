@@ -4,16 +4,19 @@ angular.module('mpdxApp')
             restrict: 'E',
             templateUrl: '/templates/appeals/list.html',
             controller: function ($scope, $modal, api) {
-                api.call('get','appeals?account_list_id=' + (window.current_account_list_id || ''), {}, function(data) {
-                    $scope.appeals = data.appeals;
-                });
+                var refreshAppeals = function(){
+                    api.call('get','appeals?account_list_id=' + (window.current_account_list_id || ''), {}, function(data) {
+                        $scope.appeals = data.appeals;
+                    });
+                };
+                refreshAppeals();
 
                 $scope.editAppeal = function(id) {
                     var modalInstance = $modal.open({
                         templateUrl: '/templates/appeals/edit.html',
                         controller: function($scope, $modalInstance, appeal){
                             $scope.appeal = angular.copy(appeal);
-                            console.log(appeal);
+                            $scope.checkedContacts = {};
 
                             api.call('get','contacts?filters[status]=*&per_page=250&include=Contact.id,Contact.name&account_list_id=' + (window.current_account_list_id || ''), {}, function(data) {
                                 $scope.contacts = data.contacts;
@@ -72,7 +75,32 @@ angular.module('mpdxApp')
                                     });
                                     return str.join();
                                 }
-                            }
+                            };
+
+                            $scope.createTask = function(taskType, inputContactsObject){
+                                var contactsObject = [];
+                                angular.forEach(inputContactsObject, function(value, key) {
+                                    if(value){
+                                        contactsObject.push(_.zipObject(['contact_id'], [parseInt(key)]));
+                                    }
+                                });
+
+                                if(!contactsObject.length){
+                                    alert('You must check at least one contact.');
+                                    return;
+                                }
+
+                                api.call('post', 'tasks/?account_list_id=' + window.current_account_list_id, {
+                                    task: {
+                                        start_at: moment().add(7, 'days').format('YYYY-MM-DD HH:mm:ss'),
+                                        subject: 'Appeal (' + $scope.appeal.name + ')',
+                                        activity_type: taskType,
+                                        activity_contacts_attributes: contactsObject
+                                    }
+                                }, function () {
+                                    alert('Task created.');
+                                });
+                            };
                         },
                         resolve: {
                             appeal: function () {
@@ -84,8 +112,6 @@ angular.module('mpdxApp')
                     modalInstance.result.then(function (updatedAppeal) {
                         var index = _.findIndex($scope.appeals, { 'id': updatedAppeal.id });
                         $scope.appeals[index] = updatedAppeal;
-                    }, function () {
-                        //$log.info('Modal dismissed at: ' + new Date());
                     });
                 };
 
@@ -94,28 +120,37 @@ angular.module('mpdxApp')
                     if(!r){
                         return;
                     }
-                    api.call('delete','appeals/' + id + '?account_list_id=' + (window.current_account_list_id || ''), {}, function(data) {
-                        //$scope.contacts = data.contacts;
+                    api.call('delete', 'appeals/' + id + '?account_list_id=' + (window.current_account_list_id || ''), null, function() {
+                        refreshAppeals();
                     });
                 };
 
                 $scope.donationTotal = function(donations){
-                    var donations = _.flatten(donations, 'amount');
+                    donations = _.flatten(donations, 'amount');
                     return donations.reduce(function(pv, cv) { return pv + Number(cv); }, 0);
                 };
 
                 $scope.percentComplete = function(donations, total){
-                    var donations = _.flatten(donations, 'amount');
+                    total = Number(total);
+                    if(total === 0){
+                        return 0;
+                    }
+                    donations = _.flatten(donations, 'amount');
                     var sum = donations.reduce(function(pv, cv) { return pv + Number(cv); }, 0);
                     return parseInt((sum / total) * 100);
                 };
 
                 $scope.newAppeal = function(){
-                    api.call('post','appeals/?account_list_id=' + (window.current_account_list_id || ''), {
-                        name: 'New Appeal', account_list_id: (window.current_account_list_id || '')
-                    }, function(data) {
-
+                    api.call('post', 'appeals/?account_list_id=' + (window.current_account_list_id || ''), {
+                        name: 'New Appeal',
+                        account_list_id: (window.current_account_list_id || '')
+                    }, function() {
+                        refreshAppeals();
                     });
+                };
+
+                $scope.formatNumber = function(number){
+                  return Number(number).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
                 };
             }
         };

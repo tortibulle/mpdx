@@ -6,65 +6,66 @@
             <span class="ui-button-text">close</span>
         </button>
     </div>
-<div class="ui-dialog-content ui-widget-content">
-    <div class="form_wrapper">
+    <div class="ui-dialog-content ui-widget-content">
         <form>
-            <div class="field">
-                <label>Name</label>
-                <input autofocus="autofocus" type="text" ng-model="appeal.name">
-            </div>
-
-            <div class="field">
-                <label>Goal</label>
-                <input type="text" ng-model="appeal.amount">
-            </div>
-
-            <div class="field">
-                <label>Contacts</label>
-                <table style="width:100%;">
-                    <thead style="font-weight: bold;">
-                        <tr>
-                            <td style="width: 5px;"></td>
-                            <td style="text-align: center;">Contact</td>
-                            <td style="width:18%; text-align: center;">Donation</td>
-                            <td style="width:4%;"></td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="c in appeal.contacts">
-                            <td><input type="checkbox"></td>
-                            <td>{{contactName(c)}}</td>
-                            <td ng-bind="listDonations(c)"></td>
-                            <td><a class="ico ico_trash" href ng-click="deleteContact(c)">Delete</a></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <span ng-show="!contacts">Loading contacts...</span>
-                <div ng-show="contacts.length">
-                    <strong>Add contact</strong>
-                    <select ng-model="newContact" ng-options="c.id as c.name for c in contacts">
-                    </select>
-                    <button ng-click="addContact(newContact)">Add</button>
+            <div class="form_wrapper">
+                <div class="field">
+                    <label>Name</label>
+                    <input autofocus="autofocus" type="text" ng-model="appeal.name">
                 </div>
 
-                <div style="margin-top: 5px;">
-                    With selected:  <select ng-model="task">
-                        <option value="letter">Create Send Ask Letter Task</option>
-                        <option value="thank">Create Thank You Task</option>
-                    </select>
-                    <button>Go</button>
+                <div class="field">
+                    <label>Goal</label>
+                    <input type="text" ng-model="appeal.amount">
+                </div>
+
+                <div class="field">
+                    <label>Contacts</label>
+                    <table style="width:100%;">
+                        <thead style="font-weight: bold;">
+                            <tr>
+                                <td style="width: 5px;"></td>
+                                <td style="text-align: center;">Contact</td>
+                                <td style="width:18%; text-align: center;">Donation</td>
+                                <td style="width:4%;"></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="c in appeal.contacts">
+                                <td><input type="checkbox" ng-model="$parent.checkedContacts[c]"></td>
+                                <td>{{contactName(c)}}</td>
+                                <td ng-bind="listDonations(c)"></td>
+                                <td><a class="ico ico_trash" href ng-click="deleteContact(c)">Delete</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <span ng-show="!contacts">Loading contacts...</span>
+                    <div ng-show="contacts.length">
+                        <strong>Add contact</strong>
+                        <select ng-model="newContact" ng-options="c.id as c.name for c in contacts">
+                        </select>
+                        <button type="button" ng-click="addContact(newContact)">Add</button>
+                    </div>
+
+                    <div style="margin-top: 5px;">
+                        With selected:  <select ng-model="taskType">
+                            <option value="Letter">Create Send Ask Letter Task</option>
+                            <option value="Thank">Create Thank You Task</option>
+                        </select>
+                        <button type="button" ng-click="createTask(taskType, checkedContacts)" ng-show="taskType">Create</button>
+                    </div>
+                </div>
+            </div>
+            <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+                <div class="ui-dialog-buttonset">
+                    <button type="submit" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" ng-click="save()">
+                        <span class="ui-button-text">Save</span>
+                    </button>
+                    <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" ng-click="cancel()">
+                        <span class="ui-button-text">Cancel</span>
+                    </button>
                 </div>
             </div>
         </form>
-    </div>
-    <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
-        <div class="ui-dialog-buttonset">
-            <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" ng-click="save()">
-                <span class="ui-button-text">Save</span>
-            </button>
-            <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" ng-click="cancel()">
-                <span class="ui-button-text">Cancel</span>
-            </button>
-        </div>
     </div>
 </div>
