@@ -18,7 +18,7 @@ angular.module('mpdxApp')
                             $scope.appeal = angular.copy(appeal);
                             $scope.checkedContacts = {};
 
-                            api.call('get','contacts?filters[status]=*&per_page=250&include=Contact.id,Contact.name&account_list_id=' + (window.current_account_list_id || ''), {}, function(data) {
+                            api.call('get','contacts?filters[status]=*&per_page=250&include=Contact.id,Contact.name,Contact.donor_accounts&account_list_id=' + (window.current_account_list_id || ''), {}, function(data) {
                                 $scope.contacts = data.contacts;
                                 $scope.newContact = data.contacts[0].id;
                             }, null, true);
@@ -65,13 +65,13 @@ angular.module('mpdxApp')
                                 var donations = _.where(appeal.donations, function(d) {
                                     return _.contains(contactDonorIds, d.donor_account_id);
                                 });
-                                console.log(donations);
+
                                 if(!donations.length){
                                     return '-';
                                 }else{
                                     var str = [];
                                     angular.forEach(donations, function(d){
-                                        str.push(d.donation_date + ' - ' + d.amount);
+                                        str.push(d.donation_date + ' - $' + $scope.formatNumber(d.amount));
                                     });
                                     return str.join();
                                 }
@@ -127,7 +127,7 @@ angular.module('mpdxApp')
 
                 $scope.donationTotal = function(donations){
                     donations = _.flatten(donations, 'amount');
-                    return donations.reduce(function(pv, cv) { return pv + Number(cv); }, 0);
+                    return donations.reduce(function(pv, cv) { return Number(pv) + Number(cv); }, 0);
                 };
 
                 $scope.percentComplete = function(donations, total){
