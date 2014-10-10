@@ -14,6 +14,7 @@ end
 
 class GoogleContactsIntegrator
   attr_accessor :client
+  attr_accessor :assigned_remote_ids
 
   def initialize(google_integration)
     @integration = google_integration
@@ -26,23 +27,41 @@ class GoogleContactsIntegrator
     @integration.last_synced = Time.now
     @integration.save
     clear_g_contact_cache
+  rescue Person::GoogleAccount::MissingRefreshToken
+    # Don't log this exception as we expect it to happen from time to time.
+    # Person::GoogleAccount will turn off the contacts integration and send the user an email to refresh their Google login.
   rescue => e
     STDERR.puts "Encountered error: #{e}"
     Airbrake.raise_or_notify(e)
   end
 
   def contacts_to_sync
+    setup_assigned_remote_ids
+
     if @integration.last_synced
-      updated_g_contacts = @account.contacts_api_user.contacts_updated_min(@integration.last_synced)
+      updated_g_contacts = contacts_api_user.contacts_updated_min(@integration.last_synced)
 
       cache_g_contacts(updated_g_contacts, false)
+
       contacts_to_sync_query(updated_g_contacts.map(&:id))
     else
       # For the first sync, we can down on HTTP requests by caching the list of Google Contacts
-      cache_g_contacts(@account.contacts_api_user.contacts, true)
+      cache_g_contacts(contacts_api_user.contacts, true)
 
       @integration.account_list.active_contacts
     end
+  end
+
+  def contacts_api_user
+    api_user = @account.contacts_api_user
+    fail Person::GoogleAccount::MissingRefreshToken unless api_user
+    api_user
+  end
+
+  def setup_assigned_remote_ids
+    @assigned_remote_ids = @integration.account_list.contacts.joins(:people)
+      .joins('INNER JOIN google_contacts ON google_contacts.person_id = people.id')
+      .pluck('google_contacts.remote_id').to_set
   end
 
   def quote_sql_list(list)
@@ -108,19 +127,19 @@ class GoogleContactsIntegrator
       g_contact, g_contact_link = g_contact_and_link
       sync_notes(contact, g_contact, g_contact_link)
 
-      # Set the api as @account.contacts_api_user will refresh the auth token if needed
-      g_contact.api = @account.contacts_api_user.api
-
-      begin
-        g_contact.create_or_update
-      rescue => e
-        STDERR.puts "Encountered error on put: #{e}"
-        Airbrake.raise_or_notify(e)
-      end
+      create_or_update_g_contact(g_contact)
       store_g_contact_link(g_contact_link, g_contact)
     end
 
     contact.save
+  end
+
+  def create_or_update_g_contact(g_contact)
+    # Set the api for the g_contact again so that the token will be refreshed if needed
+    g_contact.api = contacts_api_user.api
+
+    g_contact.create_or_update
+    @assigned_remote_ids << g_contact.id
   end
 
   def store_g_contact_link(g_contact_link, g_contact)
@@ -133,13 +152,12 @@ class GoogleContactsIntegrator
 
   def sync_person(person)
     g_contact_link = find_or_build_g_contact_link(person)
-    #STDERR.puts 'g_contact_link.id: ' + g_contact_link.id.to_s
-    #STDERR.puts 'g_contact_link: ' + g_contact_link.inspect
     g_contact = get_or_query_g_contact(g_contact_link, person)
 
     if g_contact.nil?
       g_contact = new_g_contact(person)
     else
+      @assigned_remote_ids << g_contact.id
       sync_with_g_contact(person, g_contact, g_contact_link)
     end
 
@@ -157,7 +175,7 @@ class GoogleContactsIntegrator
 
   def get_g_contact(remote_id)
     cached_g_contact = @g_contact_by_id[remote_id]
-    cached_g_contact ? cached_g_contact : @account.contacts_api_user.get_contact(remote_id)
+    cached_g_contact ? cached_g_contact : contacts_api_user.get_contact(remote_id)
   end
 
   def lookup_g_contacts_for_name(name)
@@ -167,13 +185,14 @@ class GoogleContactsIntegrator
     elsif @all_g_contacts_cached
       []
     else
-      @account.contacts_api_user.query_contacts(name)
+      contacts_api_user.query_contacts(name)
     end
   end
 
   def query_g_contact(person)
     lookup_g_contacts_for_name("#{person.first_name} #{person.last_name}").find do |g_contact|
-      g_contact.given_name == person.first_name && g_contact.family_name == person.last_name
+      g_contact.given_name == person.first_name && g_contact.family_name == person.last_name &&
+        !@assigned_remote_ids.include?(g_contact.id)
     end
   end
 
@@ -395,13 +414,13 @@ class GoogleContactsIntegrator
 
   def compare_websites_for_sync(g_contact, person, g_contact_link)
     last_sync_websites = g_contact_link.last_data[:websites].map { |websites| websites[:href] }
-    compare_for_sync(last_sync_websites, person.websites.map(&:url), g_contact.websites.map { |w| w[:href] })
+    compare_for_sync(last_sync_websites, person.websites.pluck(:url), g_contact.websites.map { |w| w[:href] })
   end
 
   def compare_emails_for_sync(g_contact, person, g_contact_link)
     last_sync_emails = g_contact_link.last_data[:emails].map { |email| email[:address] }
-    compare_considering_historic(last_sync_emails, person.email_addresses.where(historic: false).map(&:email),
-                                 g_contact.emails, person.email_addresses.where(historic: true).map(&:email))
+    compare_considering_historic(last_sync_emails, person.email_addresses.where(historic: false).pluck(:email),
+                                 g_contact.emails, person.email_addresses.where(historic: true).pluck(:email))
   end
 
   def compare_numbers_for_sync(g_contact, person, g_contact_link)

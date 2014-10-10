@@ -24,6 +24,34 @@ describe GoogleContactsIntegrator do
     )
   end
 
+  describe 'create_or_update_g_contact' do
+    before do
+      @g_contact_id = 'http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/6b70f8bb0372c'
+      @g_contact = GoogleContactsApi::Contact.new(
+        'gd$etag' => 'a', 'id' => { '$t' => @g_contact_id }, 'gd$name' => { 'gd$givenName' => { '$t' => 'John' } }
+      )
+      @g_contact.prep_changes(family_name: 'Doe')
+      @integrator.assigned_remote_ids = [].to_set
+
+      @account.expires_at = 1.hour.ago
+    end
+
+    it 'handles the case when the Google auth token needs to be refreshed and can be' do
+      g_contact_response_body = { 'entry' => { 'id' => { '$t' => @g_contact_id } } }.to_json
+      stub_request(:put, "#{ @g_contact_id.sub('http', 'https') }?alt=json&v=3").to_return(body: g_contact_response_body)
+
+      stub_request(:post, 'https://accounts.google.com/o/oauth2/token').to_return(body: '{"access_token":"t"}')
+
+      @integrator.create_or_update_g_contact(@g_contact)
+      expect(@integrator.assigned_remote_ids).to eq([@g_contact_id].to_set)
+    end
+
+    it 'handles the case when the Google auth token cannot be refreshed' do
+      expect_any_instance_of(Person::GoogleAccount).to receive(:contacts_api_user).at_least(1).times.and_return(false)
+      expect { @integrator.create_or_update_g_contact(@g_contact) }.to raise_error(Person::GoogleAccount::MissingRefreshToken)
+    end
+  end
+
   describe 'sync_contacts' do
     it 'syncs contacts and records last synced time' do
       expect(@integrator).to receive(:contacts_to_sync).and_return(['a'])
@@ -34,6 +62,11 @@ describe GoogleContactsIntegrator do
       @integrator.sync_contacts
 
       expect(@integration.last_synced).to eq(now)
+    end
+
+    it 'does not re-raise a missing refresh token error' do
+      expect_any_instance_of(Person::GoogleAccount).to receive(:contacts_api_user).at_least(1).times.and_return(false)
+      expect { @integrator.sync_contacts }.not_to raise_error
     end
   end
 
@@ -147,7 +180,7 @@ describe GoogleContactsIntegrator do
       @g_contact_link = build(:google_contact)
       expect(@integrator).to receive(:find_or_build_g_contact_link).with(@person)
                                             .and_return(@g_contact_link)
-
+      @integrator.assigned_remote_ids = [].to_set
     end
 
     it 'creates a google contact if none retrieved/queried' do
@@ -212,6 +245,7 @@ describe GoogleContactsIntegrator do
   describe 'query_g_contact' do
     before do
       @api_user = @account.contacts_api_user
+      @integrator.assigned_remote_ids = [].to_set
     end
 
     it 'queries by first and last name returns nil if no results from api query' do
@@ -226,7 +260,7 @@ describe GoogleContactsIntegrator do
     end
 
     it 'queries by first and last name returns match if there are results with same name' do
-      g_contact = double(given_name: 'John', family_name: 'Doe')
+      g_contact = double(given_name: 'John', family_name: 'Doe', id: '1')
       expect(@account.contacts_api_user).to receive(:query_contacts).with('John Doe').and_return([g_contact])
       expect(@integrator.query_g_contact(@person)).to eq(g_contact)
     end
@@ -239,13 +273,28 @@ describe GoogleContactsIntegrator do
       expect(@integrator.query_g_contact(@person)).to eq(g_contact)
     end
 
-    it 'calls the api if there is no matching cached contact' do
+    it 'calls the api if there is no matching cached contact, and not all g_contacts are cached' do
       cached_g_contact = double(id: 'id', given_name: 'Not-John', family_name: 'Not-Doe')
       @integrator.cache_g_contacts([cached_g_contact], false)
 
-      api_g_contact =  double(given_name: 'John', family_name: 'Doe')
+      api_g_contact =  double(id: 'api_id', given_name: 'John', family_name: 'Doe')
       expect(@api_user).to receive(:query_contacts).with('John Doe').and_return([api_g_contact])
       expect(@integrator.query_g_contact(@person)).to eq(api_g_contact)
+    end
+
+    it "doesn't call the api if there is no matching cached contact and we specified that all g_contacts are cached" do
+      cached_g_contact = double(id: 'id', given_name: 'Not-John', family_name: 'Not-Doe')
+      @integrator.cache_g_contacts([cached_g_contact], true)
+      expect(@api_user).to receive(:query_contacts).exactly(0).times
+      expect(@integrator.query_g_contact(@person)).to be_nil
+    end
+
+    it "doesn't return a matching g_contact if that g_contact's remote_id is already assigned" do
+      @integrator.assigned_remote_ids = ['already_assigned'].to_set
+
+      g_contact =  double(id: 'already_assigned', given_name: 'John', family_name: 'Doe')
+      expect(@integrator).to receive(:lookup_g_contacts_for_name).with('John Doe').and_return([g_contact])
+      expect(@integrator.query_g_contact(@person)).to be_nil
     end
 
     it "doesn't fail if no first or last name" do
