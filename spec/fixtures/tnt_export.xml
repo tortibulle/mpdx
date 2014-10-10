@@ -13,6 +13,7 @@
     <Contact>
       <row id="1620699916">
         <LastEdit>2011-12-16 15:29:33</LastEdit>
+        <Region>State College</Region>
         <CreatedDate>2004-07-30</CreatedDate>
         <FileAs>Smith, John and Jane</FileAs>
         <FileAsIsCustom>false</FileAsIsCustom>
@@ -211,6 +212,7 @@ State, CA  12345</HomeAddressBlock>
         <ReferredBy>Steve and Lisa Moss</ReferredBy>
         <ReferredByList>Steve and Lisa Moss</ReferredByList>
         <MPDPhaseID>60</MPDPhaseID>
+        <Region>State College</Region>
         <NextAsk>1899-12-30</NextAsk>
         <NeverAsk>false</NeverAsk>
         <LikelyToGiveID>0</LikelyToGiveID>

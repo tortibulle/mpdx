@@ -109,6 +109,12 @@ describe TntImport do
       import.send(:update_contact, contact, contact_rows.first)
       expect(contact.send_newsletter).to eq('Physical')
     end
+
+    it 'sets the address region' do
+      contact = Contact.new
+      import.send(:update_contact, contact, contact_rows.first)
+      expect(contact.addresses.first.region).to eq('State College')
+    end
   end
 
   context '#update_person_attributes' do

@@ -433,6 +433,7 @@ class TntImport
         postal_code: postal_code,
         country: country,
         location: location,
+        region: row['Region'],
         primary_mailing_address: primary_address
       }
     end
