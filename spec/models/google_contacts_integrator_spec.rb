@@ -33,12 +33,12 @@ describe GoogleContactsIntegrator do
       @g_contact.prep_changes(family_name: 'Doe')
       @integrator.assigned_remote_ids = [].to_set
 
-      @account.expires_at = 1.hour.ago
+      @g_contact_response_body = { 'entry' => { 'id' => { '$t' => @g_contact_id } } }.to_json
     end
 
     it 'handles the case when the Google auth token needs to be refreshed and can be' do
-      g_contact_response_body = { 'entry' => { 'id' => { '$t' => @g_contact_id } } }.to_json
-      stub_request(:put, "#{ @g_contact_id.sub('http', 'https') }?alt=json&v=3").to_return(body: g_contact_response_body)
+      @account.expires_at = 1.hour.ago
+      stub_request(:put, "#{ @g_contact_id.sub('http', 'https') }?alt=json&v=3").to_return(body: @g_contact_response_body)
 
       stub_request(:post, 'https://accounts.google.com/o/oauth2/token').to_return(body: '{"access_token":"t"}')
 
@@ -47,8 +47,33 @@ describe GoogleContactsIntegrator do
     end
 
     it 'handles the case when the Google auth token cannot be refreshed' do
+      @account.expires_at = 1.hour.ago
+
       expect_any_instance_of(Person::GoogleAccount).to receive(:contacts_api_user).at_least(1).times.and_return(false)
       expect { @integrator.create_or_update_g_contact(@g_contact) }.to raise_error(Person::GoogleAccount::MissingRefreshToken)
+    end
+
+    it 'retries if Google API returns a 500 error initially' do
+      stub_request(:put, "#{ @g_contact_id.sub('http', 'https') }?alt=json&v=3").to_return(status: 500)
+        .then.to_return(body: @g_contact_response_body)
+      @integrator.create_or_update_g_contact(@g_contact)
+      expect(@integrator.assigned_remote_ids).to eq([@g_contact_id].to_set)
+    end
+
+    it 'fails if Google API returns 500 error twice' do
+      stub_request(:put, "#{ @g_contact_id.sub('http', 'https') }?alt=json&v=3").to_return(status: 500)
+      expect { @integrator.create_or_update_g_contact(@g_contact) }.to raise_error
+    end
+  end
+
+  describe 'g_contact_organizations_for' do
+    it 'gives a valid Google contacts organization with primary and rel for an employer and title' do
+      expect(@integrator.g_contact_organizations_for('Company', 'Worker')).to eq([{ org_name: 'Company', org_title: 'Worker',
+                                                                                 primary: true, rel: 'work' }])
+    end
+
+    it 'gives an empy list of both employer and title are blank' do
+      expect(@integrator.g_contact_organizations_for('', nil)).to eq([])
     end
   end
 
@@ -326,7 +351,7 @@ describe GoogleContactsIntegrator do
           { number: '(555) 222-4444', primary: false, rel: 'home' }
         ],
         organizations: [
-          { org_name: 'Company, Inc', org_title: 'Worker', primary: true }
+          { org_name: 'Company, Inc', org_title: 'Worker', primary: true, rel: 'work' }
         ],
         websites: [
           { href: 'www.example.com', primary: false, rel: 'other' },
@@ -379,6 +404,23 @@ describe GoogleContactsIntegrator do
         @integrator.sync_notes(@contact, @g_contact, @g_contact_link)
         expect(@contact.notes).to eq('mpdx notes')
         expect(@g_contact.prepped_changes).to eq(content: 'mpdx notes')
+      end
+
+      it 'removes vertical tabs (\v) from both mpdx and google because is an invalid and non-escapable for XML' do
+        @g_contact['content'] = { '$t' => '' }
+        @contact.notes = "notes with vertical tab initially then newline: \v"
+
+        @integrator.sync_notes(@contact, @g_contact, @g_contact_link)
+        expect(@contact.notes).to eq("notes with vertical tab initially then newline: \n")
+        expect(@g_contact.prepped_changes).to eq(content: "notes with vertical tab initially then newline: \n")
+      end
+
+      it 'handles nil values for MPDX and Google' do
+        @g_contact['content'] = {}
+        @contact.notes = nil
+        @integrator.sync_notes(@contact, @g_contact, @g_contact_link)
+        expect(@contact.notes).to be_nil
+        expect(@g_contact.prepped_changes).to eq({})
       end
     end
 
@@ -537,7 +579,7 @@ describe GoogleContactsIntegrator do
         @integrator.sync_employer_and_title(@person, @g_contact, @g_contact_link)
 
         expect(@g_contact.prepped_changes).to eq(organizations: [{ org_name: 'Company', org_title: 'Worker',
-                                                                   primary: true }])
+                                                                   primary: true, rel: 'work' }])
         expect(@person.employer).to eq('Company')
         expect(@person.occupation).to eq('Worker')
       end
@@ -553,7 +595,7 @@ describe GoogleContactsIntegrator do
         @integrator.sync_employer_and_title(@person, @g_contact, @g_contact_link)
 
         expect(@g_contact.prepped_changes).to eq(organizations: [{ org_name: 'Company', org_title: 'Worker',
-                                                                   primary: true }])
+                                                                   primary: true, rel: 'work' }])
         expect(@person.employer).to eq('Company')
         expect(@person.occupation).to eq('Worker')
       end
@@ -576,7 +618,7 @@ describe GoogleContactsIntegrator do
         @integrator.sync_employer_and_title(@person, @g_contact, @g_contact_link)
 
         expect(@g_contact.prepped_changes).to eq(organizations: [{ org_name: 'MPDX Company', org_title: 'MPDX Title',
-                                                                   primary: true }])
+                                                                   primary: true, rel: 'work' }])
         expect(@person.employer).to eq('MPDX Company')
         expect(@person.occupation).to eq('MPDX Title')
       end
@@ -607,7 +649,7 @@ describe GoogleContactsIntegrator do
         @integrator.sync_employer_and_title(@person, @g_contact, @g_contact_link)
 
         expect(@g_contact.prepped_changes).to eq(organizations: [{ org_name: 'MPDX Company', org_title: 'MPDX Title',
-                                                                   primary: true }])
+                                                                   primary: true, rel: 'work' }])
         expect(@person.employer).to eq('MPDX Company')
         expect(@person.occupation).to eq('MPDX Title')
       end
@@ -1085,7 +1127,7 @@ describe GoogleContactsIntegrator do
           '<gd:postcode>32832</gd:postcode>\s+'\
           '<gd:country>United States of America</gd:country>\s+'\
         '</gd:structuredPostalAddress>\s+'\
-         '<gd:organization\s+primary="true">\s+'\
+         '<gd:organization\s+rel="http://schemas.google.com/g/2005#work"\s+primary="true">\s+'\
           '<gd:orgName>Company, Inc</gd:orgName>\s+'\
           '<gd:orgTitle>Worker</gd:orgTitle>\s+'\
         '</gd:organization>\s+'\

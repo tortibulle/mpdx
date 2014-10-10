@@ -134,12 +134,18 @@ class GoogleContactsIntegrator
     contact.save
   end
 
-  def create_or_update_g_contact(g_contact)
+  def create_or_update_g_contact(g_contact, num_retries = 1)
     # Set the api for the g_contact again so that the token will be refreshed if needed
     g_contact.api = contacts_api_user.api
 
     g_contact.create_or_update
     @assigned_remote_ids << g_contact.id
+  rescue OAuth2::Error => e
+    if e.response.status == 500 && num_retries > 0
+      create_or_update_g_contact(g_contact, num_retries - 1)
+    else
+      raise e
+    end
   end
 
   def store_g_contact_link(g_contact_link, g_contact)
@@ -233,6 +239,11 @@ class GoogleContactsIntegrator
     field_map.each do |field, g_contact_field|
       synced_value = compare_field_for_sync(record[field], g_contact.send(g_contact_field),
                                             g_contact_link.last_data[g_contact_field])
+
+      # Replace vertical tabs with newlines in both MPDX and Google Contact as vertical tabs are invalid XML and
+      # will get escaped to newlines by  the google_contacts_api gem.
+      # By fixing them in MPDX as well, we make the values the same to simplify future syncs.
+      synced_value.gsub!("\v", "\n") if synced_value
 
       g_contact.prep_changes(g_contact_field => synced_value) if synced_value != g_contact.send(g_contact_field)
       record[field] = synced_value
@@ -520,7 +531,7 @@ class GoogleContactsIntegrator
 
   def g_contact_organizations_for(employer, occupation)
     if employer.present? || occupation.present?
-      [{ org_name: employer, org_title: occupation, primary: true }]
+      [{ org_name: employer, org_title: occupation, primary: true, rel: 'work' }]
     else
       []
     end
