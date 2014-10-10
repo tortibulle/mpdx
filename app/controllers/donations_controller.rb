@@ -2,6 +2,7 @@ class DonationsController < ApplicationController
   before_action :find_donation, only: [:edit, :destroy, :update]
   before_action :find_contact
   before_action :find_donor_accounts, only: [:edit, :new]
+  before_action :find_appeals, only: [:edit, :new]
 
   def index
     @appeals = current_account_list.appeals
@@ -31,7 +32,6 @@ class DonationsController < ApplicationController
   end
 
   def edit
-    @appeals = current_account_list.appeals
   end
 
   def new
@@ -77,6 +77,10 @@ class DonationsController < ApplicationController
 
   def find_contact
     @contact = current_account_list.contacts.where(id: params[:contact_id]).first if params[:contact_id]
+  end
+
+  def find_appeals
+    @appeals = current_account_list.appeals
   end
 
   def find_donor_accounts
