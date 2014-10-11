@@ -33,10 +33,14 @@ GIT
     emoji_spec (0.1)
 
 GIT
-  remote: https://github.com/railsware/http_logger.git
-  revision: 52babe9557ef29b0aee50707f0aa90612c3d8a2f
+  remote: https://github.com/CruGlobal/google_contacts_api
+  revision: d25570f88565664536944cda00023f267c7c92cf
   specs:
-    http_logger (0.4.3)
+    google_contacts_api (0.4.0)
+      activesupport
+      hashie
+      i18n
+      json
 
 GIT
   remote: https://github.com/sstephenson/global_phone.git
@@ -45,15 +49,6 @@ GIT
     global_phone (1.0.1)
     global_phone_dbgen (1.0.1)
       nokogiri (~> 1.5)
-
-PATH
-  remote: /home/dave/Dropbox/wmd/google_contacts_api
-  specs:
-    google_contacts_api (0.4.0)
-      activesupport
-      hashie
-      i18n
-      json
 
 GEM
   remote: http://rubygems.org/
@@ -649,7 +644,6 @@ DEPENDENCIES
   guard-rspec
   guard-rubocop
   guard-spork
-  http_logger!
   iniparse (~> 1.1.6)
   jquery-rails (~> 3.0.4)
   jquery-ui-rails (~> 4.2.1)

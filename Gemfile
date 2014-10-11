@@ -39,8 +39,7 @@ gem 'gettext_i18n_rails' #, '~> 1.0.3'
 gem 'gibberish', '~> 1.4.0'
 gem 'gibbon', '~> 0.4.2'
 gem 'google-api-client'
-#gem 'google_contacts_api', git: 'https://github.com/CruGlobal/google_contacts_api'
-gem 'google_contacts_api', path: '/home/dave/Dropbox/wmd/google_contacts_api'
+gem 'google_contacts_api', git: 'https://github.com/CruGlobal/google_contacts_api'
 gem 'gmail', git: 'http://github.com/90seconds/gmail.git'
 gem 'gmaps4rails', '~> 2.1.2'
 gem 'iniparse', '~> 1.1.6'
@@ -103,7 +102,9 @@ group :development do
   gem 'quiet_assets'
   gem 'better_errors'
   gem 'binding_of_caller'
-  gem 'http_logger', git: 'https://github.com/railsware/http_logger.git'
+
+  # Uncomment this if you want to log HTTP requests. Helps with debugging API related functionality.
+  #gem 'http_logger'
 end
 
 group :development, :test do

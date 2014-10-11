@@ -27,6 +27,7 @@ describe GoogleContactsIntegrator do
   describe 'create_or_update_g_contact' do
     before do
       @g_contact_id = 'http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/6b70f8bb0372c'
+      @g_contact_url = 'https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full/6b70f8bb0372c?alt=json&v=3'
       @g_contact = GoogleContactsApi::Contact.new(
         'gd$etag' => 'a', 'id' => { '$t' => @g_contact_id }, 'gd$name' => { 'gd$givenName' => { '$t' => 'John' } }
       )
@@ -38,7 +39,7 @@ describe GoogleContactsIntegrator do
 
     it 'handles the case when the Google auth token needs to be refreshed and can be' do
       @account.expires_at = 1.hour.ago
-      stub_request(:put, "#{ @g_contact_id.sub('http', 'https') }?alt=json&v=3").to_return(body: @g_contact_response_body)
+      stub_request(:put, @g_contact_url).to_return(body: @g_contact_response_body)
 
       stub_request(:post, 'https://accounts.google.com/o/oauth2/token').to_return(body: '{"access_token":"t"}')
 
@@ -53,15 +54,27 @@ describe GoogleContactsIntegrator do
       expect { @integrator.create_or_update_g_contact(@g_contact) }.to raise_error(Person::GoogleAccount::MissingRefreshToken)
     end
 
-    it 'retries if Google API returns a 500 error initially' do
-      stub_request(:put, "#{ @g_contact_id.sub('http', 'https') }?alt=json&v=3").to_return(status: 500)
-        .then.to_return(body: @g_contact_response_body)
-      @integrator.create_or_update_g_contact(@g_contact)
-      expect(@integrator.assigned_remote_ids).to eq([@g_contact_id].to_set)
+    describe 'retries if Google api returns an error response initially' do
+      def test_retry_on_error(status)
+        stub_request(:put, @g_contact_url).to_return(status: status)
+          .then.to_return(body: @g_contact_response_body)
+        expect(@integrator).to receive(:sleep).with(GoogleContactsIntegrator::RETRY_DELAY)
+        @integrator.create_or_update_g_contact(@g_contact)
+        expect(@integrator.assigned_remote_ids).to eq([@g_contact_id].to_set)
+      end
+
+      it 'for error 500' do
+        test_retry_on_error(500)
+      end
+
+      it 'for error 502' do
+        test_retry_on_error(502)
+      end
     end
 
-    it 'fails if Google API returns 500 error twice' do
-      stub_request(:put, "#{ @g_contact_id.sub('http', 'https') }?alt=json&v=3").to_return(status: 500)
+    it 'fails if Google API returns 500 error multiple times' do
+      expect(@integrator).to receive(:sleep).with(GoogleContactsIntegrator::RETRY_DELAY)
+      stub_request(:put, @g_contact_url).to_return(status: 500)
       expect { @integrator.create_or_update_g_contact(@g_contact) }.to raise_error
     end
   end
@@ -79,8 +92,10 @@ describe GoogleContactsIntegrator do
 
   describe 'sync_contacts' do
     it 'syncs contacts and records last synced time' do
-      expect(@integrator).to receive(:contacts_to_sync).and_return(['a'])
-      expect(@integrator).to receive(:sync_contact).with('a')
+      expect(@integrator).to receive(:contacts_to_sync).and_return(['contact'])
+      expect(@integrator).to receive(:find_or_create_mpdx_group).and_return('group')
+      expect(@integrator).to receive(:sync_contact).with('contact', 'group')
+
       now = Time.now
       expect(Time).to receive(:now).at_least(:once).and_return(now)
 
@@ -942,6 +957,12 @@ describe GoogleContactsIntegrator do
           'gd$region' => { '$t' => 'FL' }, 'gd$postcode' => { '$t' => '32832' },
           'gd$country' => { '$t' => 'United States of America' } }
       ]
+      @updated_g_contact_obj['gContact$groupMembershipInfo'] = [
+        { 'deleted' => 'false', 'href' => 'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/1b9d086d0a95e81a' },
+        { 'deleted' => 'false', 'href' => 'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/6' },
+        { 'deleted' => 'false', 'href' => 'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/33bfe364885eed6f' },
+        { 'deleted' => 'false', 'href' => 'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid' }
+      ]
 
       @person.email_address = { email: 'mpdx@example.com', location: 'home', primary: true }
       @person.phone_number = { number: '456-789-0123', primary: true, location: 'home' }
@@ -952,13 +973,84 @@ describe GoogleContactsIntegrator do
           country: 'United States', location: 'Business', primary_mailing_address: true }
       ]
       @contact.save
+
+      groups_body = {
+        'feed' => {
+          'entry' => [],
+          'openSearch$totalResults' => { '$t' => '0' },
+          'openSearch$startIndex' => { '$t' => '0' },
+          'openSearch$itemsPerPage' => { '$t' => '0' }
+        }
+      }
+      stub_request(:get, 'https://www.google.com/m8/feeds/groups/default/full?alt=json&max-results=100000&v=2')
+        .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
+        .to_return(body: groups_body.to_json)
+
+      create_group_request_regex_str =
+        '<atom:entry xmlns:gd="http://schemas.google.com/g/2005" xmlns:atom="http://www.w3.org/2005/Atom">\s*'\
+          '<atom:category scheme="http://schemas.google.com/g/2005#kind"\s+term="http://schemas.google.com/contact/2008#group"/>\s*'\
+          '<atom:title type="text">MPDx</atom:title>\s*'\
+        '</atom:entry>'
+
+      create_group_response = {
+        'entry' => {
+          'id' => { '$t' => 'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid' }
+        }
+      }
+      stub_request(:post, 'https://www.google.com/m8/feeds/groups/default/full?alt=json&v=3')
+        .with(body: /#{create_group_request_regex_str}/m, headers: { 'Authorization' => "Bearer #{@account.token}" })
+        .to_return(body: create_group_response.to_json)
     end
 
     def expect_first_sync_api_put
-      # Don't test the body of this first sync put as the fisrt sync combine case is already covered by the unit tests
-      stub_request(:put, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
-        .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
-        .to_return(body: { 'entry' => [@updated_g_contact_obj] }.to_json)
+      put_xml_regex_str =
+        '<gd:name>\s*'\
+          '<gd:namePrefix>Mr</gd:namePrefix>\s*'\
+          '<gd:givenName>John</gd:givenName>\s*'\
+          '<gd:additionalName>Henry</gd:additionalName>\s*'\
+          '<gd:familyName>Doe</gd:familyName>\s*'\
+          '<gd:nameSuffix>III</gd:nameSuffix>\s*'\
+        '</gd:name>\s*'\
+        '<atom:content>about</atom:content>\s*'\
+        '<gd:email\s+rel="http://schemas.google.com/g/2005#other"\s+primary="true"\s+address="johnsmith@example.com"/>\s+'\
+        '<gd:email\s+rel="http://schemas.google.com/g/2005#home"\s+address="mpdx@example.com"/>\s+'\
+        '<gd:phoneNumber\s+rel="http://schemas.google.com/g/2005#mobile"\s+primary="true"\s+>\(123\) 334-5158</gd:phoneNumber>\s+'\
+        '<gd:phoneNumber\s+rel="http://schemas.google.com/g/2005#home"\s+>\(456\) 789-0123</gd:phoneNumber>\s+'\
+        '<gd:structuredPostalAddress\s+rel="http://schemas.google.com/g/2005#home"\s+>\s+'\
+          '<gd:city>Somewhere</gd:city>\s+'\
+          '<gd:street>2345 Long Dr. #232</gd:street>\s+'\
+          '<gd:region>IL</gd:region>\s+'\
+          '<gd:postcode>12345</gd:postcode>\s+'\
+          '<gd:country>United States of America</gd:country>\s+'\
+        '</gd:structuredPostalAddress>\s+'\
+        '<gd:structuredPostalAddress\s+rel="http://schemas.google.com/g/2005#work"\s+>\s+'\
+          '<gd:city>Anywhere</gd:city>\s+'\
+          '<gd:street>123 Big Rd</gd:street>\s+'\
+          '<gd:region>MO</gd:region>\s+'\
+          '<gd:postcode>56789</gd:postcode>\s+'\
+          '<gd:country>United States of America</gd:country>\s+'\
+        '</gd:structuredPostalAddress>\s+'\
+          '<gd:structuredPostalAddress\s+rel="http://schemas.google.com/g/2005#work"\s+primary="true">\s+'\
+          '<gd:city>Orlando</gd:city>\s+'\
+          '<gd:street>100 Lake Hart Dr.</gd:street>\s+'\
+          '<gd:region>FL</gd:region>\s+'\
+          '<gd:postcode>32832</gd:postcode>\s+'\
+          '<gd:country>United States of America</gd:country>\s+'\
+        '</gd:structuredPostalAddress>\s+'\
+        '<gd:organization\s+rel="http://schemas.google.com/g/2005#work"\s+primary="true">\s+'\
+          '<gd:orgName>Company, Inc</gd:orgName>\s+'\
+          '<gd:orgTitle>Worker</gd:orgTitle>\s+'\
+        '</gd:organization>\s+'\
+        '<gContact:website\s+href="blog.example.com"\s+rel="blog"\s+/>\s+'\
+        '<gContact:website\s+href="www.example.com"\s+rel="profile"\s+primary="true"\s+/>\s+'\
+        '<gContact:website\s+href="mpdx.example.com"\s+rel="other"\s+/>\s+'\
+        '<gContact:groupMembershipInfo\s+deleted="false"\s+href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/1b9d086d0a95e81a"/>\s+'\
+        '<gContact:groupMembershipInfo\s+deleted="false"\s+href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/6"/>\s+'\
+        '<gContact:groupMembershipInfo\s+deleted="false"\s+href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/33bfe364885eed6f"/>\s+'\
+        '<gContact:groupMembershipInfo\s+deleted="false"\s+href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid"/>\s+'
+      stub_request(:put, "#{@api_url}/test.user@cru.org/full/6b70f8bb0372c?alt=json&v=3")
+      .with(body: /#{put_xml_regex_str}/m, headers: { 'Authorization' => "Bearer #{@account.token}" })
+      .to_return(body: { 'entry' => [@updated_g_contact_obj] }.to_json)
     end
 
     def first_sync_expectations
@@ -1033,7 +1125,14 @@ describe GoogleContactsIntegrator do
         ],
         organizations: [{ org_title: 'Worker Person', org_name: 'Example, Inc', rel: 'other', primary: false }],
         websites: [{ href: 'blog.example.com', rel: 'blog', primary: false },
-                   { href: 'www.example.com', rel: 'profile', primary: true }]
+                   { href: 'www.example.com', rel: 'profile', primary: true }],
+        group_memberships: [
+          'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/1b9d086d0a95e81a',
+          'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/6',
+          'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/33bfe364885eed6f',
+          'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid'
+        ],
+        deleted_group_memberships: []
       }
       expect(g_contact_link.last_data).to eq(last_data)
     end
@@ -1098,6 +1197,23 @@ describe GoogleContactsIntegrator do
       formatted_last_sync = GoogleContactsApi::Api.format_time_for_xml(@integration.last_synced)
       stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&updated_min=#{formatted_last_sync}&v=3")
         .to_return(body: updated_contacts_body.to_json)
+
+      groups_body = {
+        'feed' => {
+          'entry' => [
+            {
+              'id' => { '$t' => 'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid' },
+              'title' => { '$t' => 'MPDx' }
+            }
+          ],
+          'openSearch$totalResults' => { '$t' => '1' },
+          'openSearch$startIndex' => { '$t' => '0' },
+          'openSearch$itemsPerPage' => { '$t' => '1' }
+        }
+      }
+      stub_request(:get, 'https://www.google.com/m8/feeds/groups/default/full?alt=json&max-results=100000&v=2')
+      .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
+      .to_return(body: groups_body.to_json)
     end
 
     def expect_second_sync_api_put
@@ -1134,8 +1250,12 @@ describe GoogleContactsIntegrator do
         '<gContact:website\s+href="MODIFIED_blog.example.com"\s+rel="blog"\s+/>\s+'\
         '<gContact:website\s+href="www.example.com"\s+rel="profile"\s+primary="true"\s+/>\s+'\
         '<gContact:website\s+href="MODIFIED_mpdx.example.com"\s+rel="other"\s+/>\s+'\
-        '</entry>'
-      stub_request(:put, "#{@api_url}/test.user@cru.org/base/6b70f8bb0372c?alt=json&v=3")
+        '<gContact:groupMembershipInfo\s+deleted="false"\s+href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/1b9d086d0a95e81a"/>\s+'\
+        '<gContact:groupMembershipInfo\s+deleted="false"\s+href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/6"/>\s+'\
+        '<gContact:groupMembershipInfo\s+deleted="false"\s+href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/33bfe364885eed6f"/>\s+'\
+        '<gContact:groupMembershipInfo\s+deleted="false"\s+href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid"/>\s+'\
+      '</entry>'
+      stub_request(:put, "#{@api_url}/test.user@cru.org/full/6b70f8bb0372c?alt=json&v=3")
         .with(body: /#{put_xml_regex_str}/m, headers: { 'Authorization' => "Bearer #{@account.token}" })
         .to_return(body: { 'entry' => [@updated_g_contact_obj] }.to_json)
     end

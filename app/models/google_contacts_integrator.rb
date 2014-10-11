@@ -1,20 +1,9 @@
-if Rails.env.development?
-  ActiveRecord::Base.logger = Logger.new(STDERR)
-
-  require 'http_logger'
-  HttpLogger.logger = Logger.new(STDERR)
-  HttpLogger.colorize = true # Default: true
-  HttpLogger.ignore = [/newrelic\.com/]
-  HttpLogger.log_headers = true  # Default: false
-  HttpLogger.log_request_body  = true # Default: true
-  HttpLogger.log_response_body = true  # Default: true
-  HttpLogger.level = :debug # Desired log level as a symbol. Default: :debug
-  HttpLogger.collapse_body_limit = 40_000
-end
-
 class GoogleContactsIntegrator
   attr_accessor :client
   attr_accessor :assigned_remote_ids
+
+  RETRY_DELAY = 30
+  CONTACTS_GROUP_TITLE = 'MPDx'
 
   def initialize(google_integration)
     @integration = google_integration
@@ -23,7 +12,8 @@ class GoogleContactsIntegrator
   end
 
   def sync_contacts
-    contacts_to_sync.each(&method(:sync_contact))
+    mpdx_group = find_or_create_mpdx_group
+    contacts_to_sync.each { |c| sync_contact(c, mpdx_group)  }
     @integration.last_synced = Time.now
     @integration.save
     clear_g_contact_cache
@@ -31,8 +21,14 @@ class GoogleContactsIntegrator
     # Don't log this exception as we expect it to happen from time to time.
     # Person::GoogleAccount will turn off the contacts integration and send the user an email to refresh their Google login.
   rescue => e
-    STDERR.puts "Encountered error: #{e}"
     Airbrake.raise_or_notify(e)
+  end
+
+  def find_or_create_mpdx_group
+    mpdx_group = contacts_api_user.groups.find { |group| group.title == CONTACTS_GROUP_TITLE }
+    return mpdx_group if mpdx_group
+
+    GoogleContactsApi::Group.create({ title: CONTACTS_GROUP_TITLE }, contacts_api_user.api)
   end
 
   def contacts_to_sync
@@ -116,7 +112,7 @@ class GoogleContactsIntegrator
     end
   end
 
-  def sync_contact(contact)
+  def sync_contact(contact, mpdx_group)
     g_contacts_and_links = contact.people.map(&method(:sync_person))
 
     g_contacts = g_contacts_and_links.map(&:first)
@@ -126,6 +122,7 @@ class GoogleContactsIntegrator
     g_contacts_and_links.each do |g_contact_and_link|
       g_contact, g_contact_link = g_contact_and_link
       sync_notes(contact, g_contact, g_contact_link)
+      g_contact.prep_add_to_group(mpdx_group)
 
       create_or_update_g_contact(g_contact)
       store_g_contact_link(g_contact_link, g_contact)
@@ -141,7 +138,9 @@ class GoogleContactsIntegrator
     g_contact.create_or_update
     @assigned_remote_ids << g_contact.id
   rescue OAuth2::Error => e
-    if e.response.status == 500 && num_retries > 0
+    if e.response.status.in?([500, 502]) && num_retries > 0
+      # Google Contacts API somtimes returns temporary errors that are worth giving another try to a bit later.
+      sleep(RETRY_DELAY)
       create_or_update_g_contact(g_contact, num_retries - 1)
     else
       raise e
