@@ -19,6 +19,7 @@ class ContactsController < ApplicationController
     @page_title = _('Contacts')
 
     @filtered_contacts = filtered_contacts
+    @appeals = current_account_list.appeals
 
     respond_to do |wants|
 

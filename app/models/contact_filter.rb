@@ -132,6 +132,10 @@ class ContactFilter
         end
       end
 
+      if @filters[:appeal].present? && @filters[:appeal].first != ''
+        filtered_contacts = filtered_contacts.where('appeal_contacts.appeal_id' => @filters[:appeal]).includes(:appeals).uniq
+      end
+
       case @filters[:contact_type]
       when 'person'
         filtered_contacts = filtered_contacts.people

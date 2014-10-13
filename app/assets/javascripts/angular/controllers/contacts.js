@@ -22,6 +22,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         referrer: [''],
         timezone: [''],
         relatedTaskAction: [''],
+        appeal: [''],
         wildcardSearch: urlParameter.get('q'),
         viewPrefsLoaded: false
     };
@@ -49,6 +50,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         $scope.contactQuery.referrer = [''];
         $scope.contactQuery.timezone = [''];
         $scope.contactQuery.relatedTaskAction = [''];
+        $scope.contactQuery.appeal = [''];
         $scope.contactQuery.wildcardSearch = null;
         if(!_.isNull(document.getElementById('globalContactSearch'))) {
             document.getElementById('globalContactSearch').value = '';
@@ -156,6 +158,12 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
                 jQuery("#leftmenu #filter_relatedTaskAction").trigger("click");
             }
         }
+        if(angular.isDefined(prefs.appeal)){
+            $scope.contactQuery.appeal = prefs.appeal;
+            if(prefs.appeal[0]){
+                jQuery("#leftmenu #filter_appeal").trigger("click");
+            }
+        }
     });
 
     $scope.tagIsActive = function(tag){
@@ -219,6 +227,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
           '&filters[referrer][]=' + encodeURLarray(q.referrer).join('&filters[referrer][]=') +
           '&filters[timezone][]=' + encodeURLarray(q.timezone).join('&filters[timezone][]=') +
           '&filters[relatedTaskAction][]=' + encodeURLarray(q.relatedTaskAction).join('&filters[relatedTaskAction][]=') +
+          '&filters[appeal][]=' + encodeURLarray(q.appeal).join('&filters[appeal][]=') +
           '&filters[wildcard_search]=' + encodeURIComponent(q.wildcardSearch);
 
       api.call('get', requestUrl, {}, function (data) {
@@ -263,7 +272,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
           church: q.church,
           referrer: q.referrer,
           timezone: q.timezone,
-          relatedTaskAction: q.relatedTaskAction
+          relatedTaskAction: q.relatedTaskAction,
+          appeal: q.appeal
         };
         if (!isEmptyFilter(prefsToSave)) {
           viewPrefs['user']['preferences']['contacts_filter'][window.current_account_list_id] = prefsToSave;
@@ -279,7 +289,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
     }, true);
 
     var isEmptyFilter = function (q) {
-      if (!_.isEmpty(q.tags) || !_.isEmpty(q.name) || !_.isEmpty(q.type) || !_.isEmpty(_.without(q.city, '')) || !_.isEmpty(_.without(q.state, '')) || !_.isEmpty(_.without(q.region, '')) || !_.isEmpty(_.without(q.metro_area, '')) || !_.isEmpty(q.newsletter) || !_.isEmpty(_.without(q.likely, '')) || !_.isEmpty(_.without(q.church, '')) || !_.isEmpty(_.without(q.referrer, '')) || !_.isEmpty(_.without(q.relatedTaskAction, '')) || !_.isEmpty(_.without(q.timezone, ''))) {
+      if (!_.isEmpty(q.tags) || !_.isEmpty(q.name) || !_.isEmpty(q.type) || !_.isEmpty(_.without(q.city, '')) || !_.isEmpty(_.without(q.state, '')) || !_.isEmpty(_.without(q.region, '')) || !_.isEmpty(_.without(q.metro_area, '')) || !_.isEmpty(q.newsletter) || !_.isEmpty(_.without(q.likely, '')) || !_.isEmpty(_.without(q.church, '')) || !_.isEmpty(_.without(q.referrer, '')) || !_.isEmpty(_.without(q.relatedTaskAction, '')) || !_.isEmpty(_.without(q.timezone, '')) || !_.isEmpty(_.without(q.appeal, ''))) {
         return false;
       }
 

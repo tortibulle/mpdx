@@ -25,6 +25,8 @@ class Contact < ActiveRecord::Base
   has_many :tasks, through: :activity_contacts, source: :task
   has_many :notifications, inverse_of: :contact, dependent: :destroy
   has_many :messages
+  has_many :appeal_contacts
+  has_many :appeals, through: :appeal_contacts
 
   scope :people, -> { where('donor_accounts.master_company_id is null').includes(:donor_accounts).references('donor_accounts') }
   scope :companies, -> { where('donor_accounts.master_company_id is not null').includes(:donor_accounts).references('donor_accounts') }
