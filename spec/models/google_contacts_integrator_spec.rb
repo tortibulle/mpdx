@@ -35,6 +35,8 @@ describe GoogleContactsIntegrator do
       @integrator.assigned_remote_ids = [].to_set
 
       @g_contact_response_body = { 'entry' => { 'id' => { '$t' => @g_contact_id } } }.to_json
+
+      @g_contact_link = build(:google_contact, last_data: {})
     end
 
     it 'handles the case when the Google auth token needs to be refreshed and can be' do
@@ -43,7 +45,7 @@ describe GoogleContactsIntegrator do
 
       stub_request(:post, 'https://accounts.google.com/o/oauth2/token').to_return(body: '{"access_token":"t"}')
 
-      @integrator.create_or_update_g_contact(@g_contact)
+      @integrator.create_or_update_g_contact(@g_contact, @g_contact_link)
       expect(@integrator.assigned_remote_ids).to eq([@g_contact_id].to_set)
     end
 
@@ -51,7 +53,8 @@ describe GoogleContactsIntegrator do
       @account.expires_at = 1.hour.ago
 
       expect_any_instance_of(Person::GoogleAccount).to receive(:contacts_api_user).at_least(1).times.and_return(false)
-      expect { @integrator.create_or_update_g_contact(@g_contact) }.to raise_error(Person::GoogleAccount::MissingRefreshToken)
+      expect { @integrator.create_or_update_g_contact(@g_contact, @g_contact_link) }
+        .to raise_error(Person::GoogleAccount::MissingRefreshToken)
     end
 
     describe 'retries if Google api returns an error response initially' do
@@ -59,7 +62,7 @@ describe GoogleContactsIntegrator do
         stub_request(:put, @g_contact_url).to_return(status: status)
           .then.to_return(body: @g_contact_response_body)
         expect(@integrator).to receive(:sleep).with(GoogleContactsIntegrator::RETRY_DELAY)
-        @integrator.create_or_update_g_contact(@g_contact)
+        @integrator.create_or_update_g_contact(@g_contact, @g_contact_link)
         expect(@integrator.assigned_remote_ids).to eq([@g_contact_id].to_set)
       end
 
@@ -75,7 +78,7 @@ describe GoogleContactsIntegrator do
     it 'fails if Google API returns 500 error multiple times' do
       expect(@integrator).to receive(:sleep).with(GoogleContactsIntegrator::RETRY_DELAY)
       stub_request(:put, @g_contact_url).to_return(status: 500)
-      expect { @integrator.create_or_update_g_contact(@g_contact) }.to raise_error
+      expect { @integrator.create_or_update_g_contact(@g_contact, @g_contact_link) }.to raise_error
     end
   end
 
@@ -93,8 +96,7 @@ describe GoogleContactsIntegrator do
   describe 'sync_contacts' do
     it 'syncs contacts and records last synced time' do
       expect(@integrator).to receive(:contacts_to_sync).and_return(['contact'])
-      expect(@integrator).to receive(:find_or_create_mpdx_group).and_return('group')
-      expect(@integrator).to receive(:sync_contact).with('contact', 'group')
+      expect(@integrator).to receive(:sync_contact).with('contact')
 
       now = Time.now
       expect(Time).to receive(:now).at_least(:once).and_return(now)
@@ -1195,7 +1197,7 @@ describe GoogleContactsIntegrator do
         }
       }
       formatted_last_sync = GoogleContactsApi::Api.format_time_for_xml(@integration.last_synced)
-      stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&updated_min=#{formatted_last_sync}&v=3")
+      stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&updated-min=#{formatted_last_sync}&v=3")
         .to_return(body: updated_contacts_body.to_json)
 
       groups_body = {

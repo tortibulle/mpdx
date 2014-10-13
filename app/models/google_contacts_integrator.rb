@@ -12,8 +12,7 @@ class GoogleContactsIntegrator
   end
 
   def sync_contacts
-    mpdx_group = find_or_create_mpdx_group
-    contacts_to_sync.each { |c| sync_contact(c, mpdx_group)  }
+    contacts_to_sync.each(&method(:sync_contact))
     @integration.last_synced = Time.now
     @integration.save
     clear_g_contact_cache
@@ -22,6 +21,10 @@ class GoogleContactsIntegrator
     # Person::GoogleAccount will turn off the contacts integration and send the user an email to refresh their Google login.
   rescue => e
     Airbrake.raise_or_notify(e)
+  end
+
+  def mpdx_group
+    @mpdx_group ||= find_or_create_mpdx_group
   end
 
   def find_or_create_mpdx_group
@@ -112,7 +115,7 @@ class GoogleContactsIntegrator
     end
   end
 
-  def sync_contact(contact, mpdx_group)
+  def sync_contact(contact)
     g_contacts_and_links = contact.people.map(&method(:sync_person))
 
     g_contacts = g_contacts_and_links.map(&:first)
@@ -122,16 +125,19 @@ class GoogleContactsIntegrator
     g_contacts_and_links.each do |g_contact_and_link|
       g_contact, g_contact_link = g_contact_and_link
       sync_notes(contact, g_contact, g_contact_link)
+
       g_contact.prep_add_to_group(mpdx_group)
 
-      create_or_update_g_contact(g_contact)
+      create_or_update_g_contact(g_contact, g_contact_link)
       store_g_contact_link(g_contact_link, g_contact)
     end
 
     contact.save
   end
 
-  def create_or_update_g_contact(g_contact, num_retries = 1)
+  def create_or_update_g_contact(g_contact, g_contact_link, num_retries = 1)
+    return if g_contact.attrs_with_changes == g_contact_link.last_data
+
     # Set the api for the g_contact again so that the token will be refreshed if needed
     g_contact.api = contacts_api_user.api
 
@@ -141,7 +147,7 @@ class GoogleContactsIntegrator
     if e.response.status.in?([500, 502]) && num_retries > 0
       # Google Contacts API somtimes returns temporary errors that are worth giving another try to a bit later.
       sleep(RETRY_DELAY)
-      create_or_update_g_contact(g_contact, num_retries - 1)
+      create_or_update_g_contact(g_contact, g_contact_link, num_retries - 1)
     else
       raise e
     end
