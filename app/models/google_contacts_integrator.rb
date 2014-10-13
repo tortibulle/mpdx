@@ -144,7 +144,7 @@ class GoogleContactsIntegrator
     g_contact.create_or_update
     @assigned_remote_ids << g_contact.id
   rescue OAuth2::Error => e
-    if e.response.status.in?([500, 502]) && num_retries > 0
+    if e.response.status >= 500 && num_retries > 0
       # Google Contacts API somtimes returns temporary errors that are worth giving another try to a bit later.
       sleep(RETRY_DELAY)
       create_or_update_g_contact(g_contact, g_contact_link, num_retries - 1)
