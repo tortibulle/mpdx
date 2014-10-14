@@ -18,7 +18,7 @@ angular.module('mpdxApp')
                             $scope.appeal = angular.copy(appeal);
                             $scope.checkedContacts = {};
 
-                            api.call('get','contacts?filters[status]=*&per_page=250&include=Contact.id,Contact.name,Contact.donor_accounts&account_list_id=' + (window.current_account_list_id || ''), {}, function(data) {
+                            api.call('get','contacts?filters[status]=*&per_page=950&include=Contact.id,Contact.name,Contact.donor_accounts&account_list_id=' + (window.current_account_list_id || ''), {}, function(data) {
                                 $scope.contacts = data.contacts;
                                 $scope.newContact = data.contacts[0].id;
                             }, null, true);
@@ -101,6 +101,32 @@ angular.module('mpdxApp')
                                     alert('Task created.');
                                 });
                             };
+
+                            $scope.selectAll = function(type){
+                                if(type === 'all'){
+                                    angular.forEach($scope.appeal.contacts, function (c) {
+                                        $scope.checkedContacts[c] = true;
+                                    });
+                                }else if(type === 'none'){
+                                    $scope.checkedContacts = {};
+                                }else if(type === 'donated'){
+                                    angular.forEach($scope.appeal.contacts, function (c) {
+                                        if($scope.listDonations(c) === '-'){
+                                            $scope.checkedContacts[c] = false;
+                                        }else{
+                                            $scope.checkedContacts[c] = true;
+                                        }
+                                    });
+                                }else if(type === '!donated'){
+                                    angular.forEach($scope.appeal.contacts, function (c) {
+                                        if($scope.listDonations(c) === '-'){
+                                            $scope.checkedContacts[c] = true;
+                                        }else{
+                                            $scope.checkedContacts[c] = false;
+                                        }
+                                    });
+                                }
+                            };
                         },
                         resolve: {
                             appeal: function () {
@@ -141,11 +167,47 @@ angular.module('mpdxApp')
                 };
 
                 $scope.newAppeal = function(){
-                    api.call('post', 'appeals/?account_list_id=' + (window.current_account_list_id || ''), {
-                        name: 'New Appeal',
-                        account_list_id: (window.current_account_list_id || '')
-                    }, function() {
-                        refreshAppeals();
+                    var modalInstance = $modal.open({
+                        templateUrl: '/templates/appeals/wizard.html',
+                        controller: function($scope, $modalInstance){
+                            $scope.appeal = {};
+                            $scope.contactStatuses = window.railsConstants.contact.ACTIVE_STATUSES.concat(window.railsConstants.contact.INACTIVE_STATUSES).sort();
+
+                            $scope.cancel = function () {
+                                $modalInstance.dismiss('cancel');
+                            };
+
+                            $scope.save = function () {
+                                $modalInstance.close($scope.appeal);
+                            };
+                        }
+                    }).result.then(function (newAppeal) {
+                        var statusCount = 0;
+                        var strContactsUrl = 'contacts?per_page=950&include=Contact.id&account_list_id=' + (window.current_account_list_id || '');
+                        angular.forEach(newAppeal.validStatus, function(value, key) {
+                            if(value){
+                                strContactsUrl = strContactsUrl + '&filters[status]=' + encodeURIComponent(key);
+                                statusCount++;
+                            }
+                        });
+
+                        var contactsObject = [];
+                        api.call('get', strContactsUrl, {}, function(data) {
+                            if(statusCount > 0){
+                                angular.forEach(data.contacts, function(value, key) {
+                                    contactsObject.push(parseInt(key));
+                                });
+                            }
+
+                            api.call('post', 'appeals/?account_list_id=' + (window.current_account_list_id || ''), {
+                                name: newAppeal.name,
+                                amount: newAppeal.amount,
+                                contacts: contactsObject,
+                                account_list_id: (window.current_account_list_id || '')
+                            }, function() {
+                                refreshAppeals();
+                            });
+                        });
                     });
                 };
 

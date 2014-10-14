@@ -19,7 +19,7 @@
                     <input type="text" ng-model="appeal.amount">
                 </div>
 
-                <div class="field">
+                <div class="field" style="height: 400px; overflow-y: auto; display: block;">
                     <label>Contacts</label>
                     <table style="width:100%;">
                         <thead style="font-weight: bold;">
@@ -37,6 +37,12 @@
                                 <td ng-bind="listDonations(c)"></td>
                                 <td><a class="ico ico_trash" href ng-click="deleteContact(c)">Delete</a></td>
                             </tr>
+                            <tr><td colspan="4">
+                                <a href="" ng-click="selectAll('all')">Select all</a> |
+                                <a href="" ng-click="selectAll('none')">Select none</a> |
+                                <a href="" ng-click="selectAll('donated')">Select all that have donated</a> |
+                                <a href="" ng-click="selectAll('!donated')">Select all that have not donated</a>
+                            </td></tr>
                         </tbody>
                     </table>
                     <span ng-show="!contacts">Loading contacts...</span>

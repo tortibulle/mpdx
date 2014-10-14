@@ -28,6 +28,7 @@ class Api::V1::AppealsController < Api::V1::BaseController
   def create
     new_appeal = Appeal.new(appeal_params)
     if new_appeal.save
+      new_appeal.add_and_remove_contacts(current_account_list, params[:contacts])
       render json: new_appeal, callback: params[:callback], status: :created
     else
       render json: { errors: new_appeal.errors.full_messages }, callback: params[:callback], status: :bad_request
