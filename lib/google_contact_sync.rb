@@ -1,4 +1,6 @@
 module GoogleContactSync
+  module_function
+
   def sync_with_g_contact(person, g_contact, g_contact_link)
     sync_basic_person_fields(person, g_contact, g_contact_link)
     sync_employer_and_title(person, g_contact, g_contact_link)
@@ -42,7 +44,8 @@ module GoogleContactSync
     occupation = compare_field_for_sync(person.occupation, field_of_first(g_contact_orgs, :org_title),
                                         field_of_first(last_orgs, :org_title))
 
-    person.update(employer: employer, occupation: occupation)
+    person.employer = employer
+    person.occupation = occupation
 
     if field_of_first(g_contact_orgs, :org_name) != employer || field_of_first(g_contact_orgs, :org_title) != occupation
       g_contact.prep_changes(organizations: g_contact_organizations_for(employer, occupation))
@@ -69,12 +72,12 @@ module GoogleContactSync
     mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels = compare_emails_for_sync(g_contact, person, g_contact_link)
 
     add_emails_from_g_contact(mpdx_adds, g_contact, person)
-    mpdx_dels.each { |email| person.email_addresses.where(email: email).destroy_all }
+    person.email_addresses.each { |e| e.mark_for_destruction if mpdx_dels.include?(e.email) }
 
     g_contact_emails = g_contact.emails_full
     g_contact_primary = g_contact_emails.find { |email| email[:primary] }
     g_contact_emails += g_contact_adds.map { |email|
-      email_attrs = format_email_for_google(person.email_addresses.find_by_email(email))
+      email_attrs = format_email_for_google(person.email_addresses.find { |e| e.email == email })
       email_attrs[:primary] = false if g_contact_primary
       email_attrs
     }
@@ -86,12 +89,12 @@ module GoogleContactSync
     mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels = compare_numbers_for_sync(g_contact, person, g_contact_link)
 
     add_numbers_from_g_contact(mpdx_adds, g_contact, person)
-    mpdx_dels.each { |number| person.phone_numbers.where(number: number).destroy_all }
+    person.phone_numbers.each { |p| p.mark_for_destruction if mpdx_dels.include?(p.number) }
 
     g_contact_numbers = g_contact.phone_numbers_full
     g_contact_primary = g_contact_numbers.find { |number| number[:primary] }
     g_contact_numbers += g_contact_adds.map { |number|
-      number_attrs = format_phone_for_google(person.phone_numbers.find_by_number(number))
+      number_attrs = format_phone_for_google(person.phone_numbers.find { |p| p.number = number })
       number_attrs[:primary] = false if g_contact_primary
       number_attrs
     }
@@ -109,7 +112,7 @@ module GoogleContactSync
 
     # Add and delete MPDX address records
     add_addresses_from_g_contact(mpdx_adds, contact)
-    mpdx_dels.destroy_all
+    contact.addresses.each { |a| a.mark_for_destruction if mpdx_dels.include?(a.master_address_id) }
 
     # Build the Google Contact address list and assign it to all Google contacts
     g_contact_address_records = remove_duplicate_addresses(g_contact_address_records) + g_contact_adds
@@ -124,7 +127,7 @@ module GoogleContactSync
     mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels = compare_websites_for_sync(g_contact, person, g_contact_link)
 
     add_websites_from_g_contact(mpdx_adds, g_contact, person)
-    mpdx_dels.each { |url| person.websites.where(url: url).destroy_all }
+    person.websites.each { |w| w.mark_for_destruction if mpdx_dels.include?(w.url) }
 
     g_contact_websites = g_contact.websites
     g_contact_primary = g_contact_websites.find { |website| website[:primary] }
@@ -168,9 +171,9 @@ module GoogleContactSync
 
     g_contact_emails = g_contact.emails_full
     emails_to_add.each do |email|
-      email_address = format_email_for_mpdx(lookup_by_key(g_contact_emails, address: email))
-      email_address[:primary] = false if had_primary
-      person.email_address = email_address
+      email_attrs = format_email_for_mpdx(lookup_by_key(g_contact_emails, address: email))
+      email_attrs[:primary] = false if had_primary
+      person.email_addresses << EmailAddress.new(email_attrs)
     end
   end
 
@@ -184,7 +187,7 @@ module GoogleContactSync
     numbers_to_add.each do |number|
       number_attrs = format_phone_for_mpdx(g_contact_numbers_normalized_map[number])
       number_attrs[:primary] = false if had_primary
-      person.phone_number = number_attrs
+      person.phone_numbers << PhoneNumber.new(number_attrs)
     end
   end
 
@@ -229,11 +232,10 @@ module GoogleContactSync
                                   g_contact_address_records, method(:normalize_address),
                                   contact.addresses.where(historic: true))
 
-    # Convert from the master_address_id back to entries in addresses lists
-    # (except for g_contact_dels)
+    # Convert from the master_address_id back to entries in addresses lists (except for g_contact_dels)
     [
       mpdx_adds.map { |master_id| lookup_by_key(g_contact_address_records, master_address_id: master_id) },
-      contact.addresses.where(master_address_id: mpdx_dels.to_a),
+      mpdx_dels,
       contact.addresses.where(master_address_id: g_contact_adds.to_a),
       g_contact_dels,
       g_contact_address_records

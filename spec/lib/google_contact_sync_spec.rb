@@ -280,7 +280,6 @@ describe GoogleContactSync do
   describe 'sync numbers' do
     it 'combines and formats numbers from mpdx and google' do
       person.phone_number = { number: '+12223334444', location: 'mobile', primary: true }
-      person.save!
 
       g_contact.update('gd$phoneNumber' => [
         { '$t' => '(777) 888-9999', 'primary' => 'true', 'rel' => 'http://schemas.google.com/g/2005#other' }
@@ -292,6 +291,8 @@ describe GoogleContactSync do
         { number: '(777) 888-9999', primary: true, rel: 'other' },
         { number: '(222) 333-4444', primary: false, rel: 'mobile' }
       ])
+
+      person.save
 
       expect(person.phone_numbers.count).to eq(2)
       phone1 = person.phone_numbers.first

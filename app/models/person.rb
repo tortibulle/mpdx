@@ -39,7 +39,7 @@ class Person < ActiveRecord::Base
   has_many :activity_comments, dependent: :destroy
   has_many :messages_sent, class_name: 'Message', foreign_key: :from_id, dependent: :destroy
   has_many :messages_received, class_name: 'Message', foreign_key: :to_id, dependent: :destroy
-  has_many :google_contacts
+  has_many :google_contacts, autosave: true
 
   scope :alive, -> { where.not(deceased: true) }
 

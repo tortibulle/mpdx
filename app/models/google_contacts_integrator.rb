@@ -1,6 +1,6 @@
-class GoogleContactsIntegrator
-  include GoogleContactSync
+require 'google_contact_sync'
 
+class GoogleContactsIntegrator
   attr_accessor :client
   attr_accessor :assigned_remote_ids
 
@@ -122,11 +122,11 @@ class GoogleContactsIntegrator
 
     g_contacts = g_contacts_and_links.map(&:first)
     g_contact_links = g_contacts_and_links.map(&:second)
-    sync_addresses(g_contacts, contact, g_contact_links)
+    GoogleContactSync.sync_addresses(g_contacts, contact, g_contact_links)
 
     g_contacts_and_links.each do |g_contact_and_link|
       g_contact, g_contact_link = g_contact_and_link
-      sync_notes(contact, g_contact, g_contact_link)
+      GoogleContactSync.sync_notes(contact, g_contact, g_contact_link)
 
       g_contact.prep_add_to_group(mpdx_group)
 
@@ -167,12 +167,13 @@ class GoogleContactsIntegrator
     g_contact_link = find_or_build_g_contact_link(person)
     g_contact = get_or_query_g_contact(g_contact_link, person)
 
-    if g_contact.nil?
-      g_contact = new_g_contact(person)
-    else
+    if g_contact
       @assigned_remote_ids << g_contact.id
-      sync_with_g_contact(person, g_contact, g_contact_link)
+    else
+      g_contact = GoogleContactsApi::Contact.new(nil, nil, nil)
     end
+
+    GoogleContactSync.sync_with_g_contact(person, g_contact, g_contact_link)
 
     [g_contact, g_contact_link]
   end
@@ -207,21 +208,5 @@ class GoogleContactsIntegrator
       g_contact.given_name == person.first_name && g_contact.family_name == person.last_name &&
         !@assigned_remote_ids.include?(g_contact.id)
     end
-  end
-
-  def new_g_contact(person)
-    g_contact = GoogleContactsApi::Contact.new(nil, nil, nil)
-    g_contact.prep_changes(
-      name_prefix: person.title,
-      given_name: person.first_name,
-      additional_name: person.middle_name,
-      family_name: person.last_name,
-      name_suffix: person.suffix,
-      emails: person.email_addresses.map(&method(:format_email_for_google)),
-      phone_numbers: person.phone_numbers.map(&method(:format_phone_for_google)),
-      organizations: g_contact_organizations_for(person.employer, person.occupation),
-      websites: person.websites.map(&method(:format_website_for_google))
-    )
-    g_contact
   end
 end
