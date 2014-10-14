@@ -18,7 +18,7 @@ angular.module('mpdxApp')
                             $scope.appeal = angular.copy(appeal);
                             $scope.checkedContacts = {};
 
-                            api.call('get','contacts?filters[status]=*&per_page=950&include=Contact.id,Contact.name,Contact.donor_accounts&account_list_id=' + (window.current_account_list_id || ''), {}, function(data) {
+                            api.call('get','contacts?filters[status]=*&per_page=5000&include=Contact.id,Contact.name,Contact.donor_accounts&account_list_id=' + (window.current_account_list_id || ''), {}, function(data) {
                                 $scope.contacts = data.contacts;
                                 $scope.newContact = data.contacts[0].id;
                             }, null, true);
@@ -183,7 +183,7 @@ angular.module('mpdxApp')
                         }
                     }).result.then(function (newAppeal) {
                         var statusCount = 0;
-                        var strContactsUrl = 'contacts?per_page=950&include=Contact.id&account_list_id=' + (window.current_account_list_id || '');
+                        var strContactsUrl = 'contacts?per_page=5000&include=Contact.id&account_list_id=' + (window.current_account_list_id || '');
                         angular.forEach(newAppeal.validStatus, function(value, key) {
                             if(value){
                                 strContactsUrl = strContactsUrl + '&filters[status]=' + encodeURIComponent(key);
