@@ -118,23 +118,29 @@ class GoogleContactsIntegrator
   end
 
   def sync_contact(contact)
-    g_contacts_and_links = contact.people.map(&method(:sync_person))
+    g_contacts_and_links = contact.people.map(&method(:get_g_contact_and_link))
+    GoogleContactSync.sync_contact(contact, g_contacts_and_links)
+    g_contacts_and_links.map(&:first).each { |g_contact| g_contact.prep_add_to_group(mpdx_group) }
+    save_synced_changes(contact, g_contacts_and_links)
+  end
 
-    g_contacts = g_contacts_and_links.map(&:first)
-    g_contact_links = g_contacts_and_links.map(&:second)
-    GoogleContactSync.sync_addresses(g_contacts, contact, g_contact_links)
+  def save_synced_changes(contact, g_contacts_and_links)
+    g_contacts_and_links.each { |g_contact_and_link| create_or_update_g_contact(*g_contact_and_link) }
+    contact.save!
+    g_contacts_and_links.each { |g_contact_and_link| store_g_contact_link(*g_contact_and_link) }
+  end
 
-    g_contacts_and_links.each do |g_contact_and_link|
-      g_contact, g_contact_link = g_contact_and_link
-      GoogleContactSync.sync_notes(contact, g_contact, g_contact_link)
+  def get_g_contact_and_link(person)
+    g_contact_link = find_or_build_g_contact_link(person)
+    g_contact = get_or_query_g_contact(g_contact_link, person)
 
-      g_contact.prep_add_to_group(mpdx_group)
-
-      create_or_update_g_contact(g_contact, g_contact_link)
-      store_g_contact_link(g_contact_link, g_contact)
+    if g_contact
+      @assigned_remote_ids << g_contact.id
+    else
+      g_contact = GoogleContactsApi::Contact.new(nil, nil, nil)
     end
 
-    contact.save
+    [g_contact, g_contact_link]
   end
 
   def create_or_update_g_contact(g_contact, g_contact_link, num_retries = 1)
@@ -155,27 +161,12 @@ class GoogleContactsIntegrator
     end
   end
 
-  def store_g_contact_link(g_contact_link, g_contact)
+  def store_g_contact_link(g_contact, g_contact_link)
     g_contact_link.last_data = g_contact.formatted_attrs
     g_contact_link.remote_id = g_contact.id
     g_contact_link.last_etag = g_contact.etag
     g_contact_link.last_synced = Time.now
     g_contact_link.save
-  end
-
-  def sync_person(person)
-    g_contact_link = find_or_build_g_contact_link(person)
-    g_contact = get_or_query_g_contact(g_contact_link, person)
-
-    if g_contact
-      @assigned_remote_ids << g_contact.id
-    else
-      g_contact = GoogleContactsApi::Contact.new(nil, nil, nil)
-    end
-
-    GoogleContactSync.sync_with_g_contact(person, g_contact, g_contact_link)
-
-    [g_contact, g_contact_link]
   end
 
   def find_or_build_g_contact_link(person)

@@ -2,10 +2,7 @@ require 'spec_helper'
 require 'google_contact_sync'
 
 describe GoogleContactSync do
-  class IncludeGoogleContactSync
-    include GoogleContactSync
-  end
-  let(:sync) { IncludeGoogleContactSync.new }
+  let(:sync) { GoogleContactSync }
   let(:contact) { build(:contact) }
   let(:g_contact_link) { build(:google_contact, last_data: { emails: [], websites: [], phone_numbers: [] }) }
   let(:person) {

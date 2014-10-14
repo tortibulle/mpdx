@@ -1,6 +1,22 @@
 module GoogleContactSync
   module_function
 
+  def sync_contact(contact, g_contacts_and_links)
+    g_contacts = g_contacts_and_links.map(&:first)
+    g_contact_links = g_contacts_and_links.map(&:second)
+
+    contact.people.each_with_index do |person, index|
+      sync_with_g_contact(person, g_contacts[index], g_contact_links[index])
+    end
+
+    sync_addresses(g_contacts, contact, g_contact_links)
+
+    g_contacts_and_links.each do |g_contact_and_link|
+      g_contact, g_contact_link = g_contact_and_link
+      sync_notes(contact, g_contact, g_contact_link)
+    end
+  end
+
   def sync_with_g_contact(person, g_contact, g_contact_link)
     sync_basic_person_fields(person, g_contact, g_contact_link)
     sync_employer_and_title(person, g_contact, g_contact_link)
