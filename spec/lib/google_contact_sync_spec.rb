@@ -17,16 +17,6 @@ describe GoogleContactSync do
     )
   }
 
-  # before do
-  #   stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
-  #
-  #   contact = create(:contact, status: 'Partner - Pray', notes: 'about')
-  #
-  #   person = create(:person, last_name: 'Doe', middle_name: 'Henry', title: 'Mr', suffix: 'III',
-  #                    occupation: 'Worker', employer: 'Company, Inc')
-  #   contact.people << person
-  # end
-
   describe 'sync_notes' do
     describe 'first sync' do
       it 'sets blank mpdx notes with google contact notes' do

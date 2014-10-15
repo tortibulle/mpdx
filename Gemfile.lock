@@ -33,22 +33,21 @@ GIT
     emoji_spec (0.1)
 
 GIT
-  remote: https://github.com/CruGlobal/google_contacts_api
-  revision: f1c7cf9601e6f5d3a20d13775d241e157a75c561
-  specs:
-    google_contacts_api (0.4.0)
-      activesupport
-      hashie
-      i18n
-      json
-
-GIT
   remote: https://github.com/sstephenson/global_phone.git
   revision: 9b2772c4678dc9e323c58d9258663812bbd9fc73
   specs:
     global_phone (1.0.1)
     global_phone_dbgen (1.0.1)
       nokogiri (~> 1.5)
+
+PATH
+  remote: /home/dave/Dropbox/wmd/google_contacts_api
+  specs:
+    google_contacts_api (0.4.0)
+      activesupport
+      hashie
+      i18n
+      json
 
 GEM
   remote: http://rubygems.org/

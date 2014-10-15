@@ -149,7 +149,9 @@ class GoogleContactsIntegrator
     # Set the api for the g_contact again so that the token will be refreshed if needed
     g_contact.api = contacts_api_user.api
 
-    g_contact.create_or_update
+    status = contacts_api_user.batch_create_or_update([g_contact])[0]
+    fail(status) unless status[:code].in?([200, 201])
+
     @assigned_remote_ids << g_contact.id
   rescue OAuth2::Error => e
     if e.response.status >= 500 && num_retries > 0

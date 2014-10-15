@@ -27,21 +27,29 @@ describe GoogleContactsIntegrator do
   describe 'create_or_update_g_contact' do
     before do
       @g_contact_id = 'http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/6b70f8bb0372c'
-      @g_contact_url = 'https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full/6b70f8bb0372c?alt=json&v=3'
+      @batch_url = 'https://www.google.com/m8/feeds/contacts/default/full/batch?alt=&v=3'
       @g_contact = GoogleContactsApi::Contact.new(
         'gd$etag' => 'a', 'id' => { '$t' => @g_contact_id }, 'gd$name' => { 'gd$givenName' => { '$t' => 'John' } }
       )
       @g_contact.prep_changes(family_name: 'Doe')
       @integrator.assigned_remote_ids = [].to_set
 
-      @g_contact_response_body = { 'entry' => { 'id' => { '$t' => @g_contact_id } } }.to_json
+      @g_contact_response_body = <<-EOS
+        <feed>
+          <entry>
+            <batch:id>0</batch:id>
+            <batch:status code='200' reason='Success'/>
+            <id>#{@g_contact_id}</id>
+          </entry>
+        </feed>
+      EOS
 
       @g_contact_link = build(:google_contact, last_data: {})
     end
 
     it 'handles the case when the Google auth token needs to be refreshed and can be' do
       @account.expires_at = 1.hour.ago
-      stub_request(:put, @g_contact_url).to_return(body: @g_contact_response_body)
+      stub_request(:post, @batch_url).to_return(body: @g_contact_response_body)
 
       stub_request(:post, 'https://accounts.google.com/o/oauth2/token').to_return(body: '{"access_token":"t"}')
 
@@ -59,7 +67,7 @@ describe GoogleContactsIntegrator do
 
     describe 'retries if Google api returns an error response initially' do
       def test_retry_on_error(status)
-        stub_request(:put, @g_contact_url).to_return(status: status)
+        stub_request(:post, @batch_url).to_return(status: status)
           .then.to_return(body: @g_contact_response_body)
         expect(@integrator).to receive(:sleep).with(GoogleContactsIntegrator::RETRY_DELAY)
         @integrator.create_or_update_g_contact(@g_contact, @g_contact_link)
@@ -77,7 +85,7 @@ describe GoogleContactsIntegrator do
 
     it 'fails if Google API returns 500 error multiple times' do
       expect(@integrator).to receive(:sleep).with(GoogleContactsIntegrator::RETRY_DELAY)
-      stub_request(:put, @g_contact_url).to_return(status: 500)
+      stub_request(:post, @batch_url).to_return(status: 500)
       expect { @integrator.create_or_update_g_contact(@g_contact, @g_contact_link) }.to raise_error
     end
   end
@@ -403,7 +411,7 @@ describe GoogleContactsIntegrator do
     end
 
     def expect_first_sync_api_put
-      put_xml_regex_str =
+      xml_regex_str =
         '<gd:name>\s*'\
           '<gd:namePrefix>Mr</gd:namePrefix>\s*'\
           '<gd:givenName>John</gd:givenName>\s*'\
@@ -448,9 +456,9 @@ describe GoogleContactsIntegrator do
         '<gContact:groupMembershipInfo\s+deleted="false"\s+href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/6"/>\s+'\
         '<gContact:groupMembershipInfo\s+deleted="false"\s+href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/33bfe364885eed6f"/>\s+'\
         '<gContact:groupMembershipInfo\s+deleted="false"\s+href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid"/>\s+'
-      stub_request(:put, "#{@api_url}/test.user@cru.org/full/6b70f8bb0372c?alt=json&v=3")
-      .with(body: /#{put_xml_regex_str}/m, headers: { 'Authorization' => "Bearer #{@account.token}" })
-      .to_return(body: { 'entry' => [@updated_g_contact_obj] }.to_json)
+      stub_request(:post, 'https://www.google.com/m8/feeds/contacts/default/full/batch?alt=&v=3')
+        .with(body: /#{xml_regex_str}/m, headers: { 'Authorization' => "Bearer #{@account.token}" })
+        .to_return(body: File.new(Rails.root.join('spec/fixtures/google_contacts.xml')).read)
     end
 
     def first_sync_expectations
@@ -534,6 +542,7 @@ describe GoogleContactsIntegrator do
         ],
         deleted_group_memberships: []
       }
+
       expect(g_contact_link.last_data).to eq(last_data)
     end
 
@@ -617,7 +626,7 @@ describe GoogleContactsIntegrator do
     end
 
     def expect_second_sync_api_put
-      put_xml_regex_str = '</atom:content>\s+'\
+      xml_regex_str = '</atom:content>\s+'\
         '<gd:email\s+rel="http://schemas.google.com/g/2005#other"\s+primary="true"\s+address="johnsmith_MODIFIED@example.com"/>\s+'\
         '<gd:email\s+rel="http://schemas.google.com/g/2005#home"\s+address="mpdx_MODIFIED@example.com"/>\s+'\
         '<gd:phoneNumber\s+rel="http://schemas.google.com/g/2005#mobile"\s+primary="true"\s+>\(123\) 334-5555</gd:phoneNumber>\s+'\
@@ -655,9 +664,9 @@ describe GoogleContactsIntegrator do
         '<gContact:groupMembershipInfo\s+deleted="false"\s+href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/33bfe364885eed6f"/>\s+'\
         '<gContact:groupMembershipInfo\s+deleted="false"\s+href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid"/>\s+'\
       '</entry>'
-      stub_request(:put, "#{@api_url}/test.user@cru.org/full/6b70f8bb0372c?alt=json&v=3")
-        .with(body: /#{put_xml_regex_str}/m, headers: { 'Authorization' => "Bearer #{@account.token}" })
-        .to_return(body: { 'entry' => [@updated_g_contact_obj] }.to_json)
+      stub_request(:post, 'https://www.google.com/m8/feeds/contacts/default/full/batch?alt=&v=3')
+        .with(body: /#{xml_regex_str}/m, headers: { 'Authorization' => "Bearer #{@account.token}" })
+        .to_return(body: File.new(Rails.root.join('spec/fixtures/google_contacts.xml')).read)
     end
 
     def second_sync_expectations
