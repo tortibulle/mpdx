@@ -20,7 +20,7 @@
           <ul>
             <% person.phone_numbers.each do |pn| %>
               <li>
-                <%= GlobalPhone.parse(pn.number).national_format %>
+                <%= GlobalPhone.parse(pn.number).national_format if pn.number.present? %>
                 <%= "(#{pn.location})" if pn.location.present? %>
                 <% if person.phone_numbers.length > 1 && pn.primary? %>
                   <i class="fa fa-check green"></i>

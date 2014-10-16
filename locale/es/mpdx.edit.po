@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: version 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-25 04:50-0400\n"
+"POT-Creation-Date: 2014-10-16 06:25-0700\n"
 "PO-Revision-Date: 2012-10-10 17:24-0500\n"
 "Last-Translator: Josh Starcher <josh.starcher@gmail.com>\n"
 "Language-Team: Spanish\n"
@@ -123,6 +123,11 @@ msgstr "Acción"
 msgid "Actions"
 msgstr "Acciones"
 
+#, fuzzy
+#, fuzzy
+msgid "Active Contacts"
+msgstr "Añadir este contacto"
+
 msgid "Add %{network} Account"
 msgstr "Añadir %{network} Cuenta"
 
@@ -216,10 +221,16 @@ msgstr ""
 msgid "All"
 msgstr "Todos"
 
+msgid "Always current. Contacts with status: Never Contacted, Contact for Appointment, or none."
+msgstr ""
+
 msgid "Amount"
 msgstr ""
 
 msgid "Amount (%{currency})"
+msgstr ""
+
+msgid "Amount (USD)"
 msgstr ""
 
 msgid "Anniversaries"
@@ -247,8 +258,10 @@ msgstr "Llame para cita"
 msgid "Appointment Scheduled"
 msgstr ""
 
-msgid "Appointments:"
-msgstr ""
+#, fuzzy
+#, fuzzy
+msgid "Appointments"
+msgstr "Llame para cita"
 
 msgid "Are you sure you want to delete this task instead of marking it as completed?"
 msgstr ""
@@ -495,6 +508,9 @@ msgstr ""
 msgid "Contribution Report for %{start_date} through %{end_date}"
 msgstr ""
 
+msgid "Correspondence"
+msgstr ""
+
 msgid "Cousin (Female)"
 msgstr ""
 
@@ -614,6 +630,9 @@ msgstr ""
 msgid "Edit Task - %{task}"
 msgstr ""
 
+msgid "Electronic Contacts"
+msgstr ""
+
 msgid "Email"
 msgstr ""
 
@@ -628,7 +647,7 @@ msgstr "Añadir dirección de correo electrónico"
 msgid "Email me"
 msgstr ""
 
-msgid "Emails:"
+msgid "Email:"
 msgstr ""
 
 msgid "Enable"
@@ -658,10 +677,10 @@ msgstr ""
 msgid "Facebook Message"
 msgstr ""
 
-msgid "Facebook Message:"
+msgid "Facebook Url"
 msgstr ""
 
-msgid "Facebook Url"
+msgid "Facebook:"
 msgstr ""
 
 msgid "Father"
@@ -1062,6 +1081,12 @@ msgstr ""
 msgid "No Subject"
 msgstr ""
 
+msgid "No completed tasks found for this contact."
+msgstr ""
+
+msgid "No donations have been received from %{contact} in the past 13 months"
+msgstr ""
+
 msgid "No email addess on file"
 msgstr ""
 
@@ -1078,6 +1103,9 @@ msgstr ""
 #, fuzzy
 msgid "No phone number"
 msgstr "Agregar número de teléfono"
+
+msgid "No tasks found for this contact."
+msgstr ""
 
 msgid "None"
 msgstr ""
@@ -1113,6 +1141,9 @@ msgid "Other"
 msgstr ""
 
 msgid "Other Details"
+msgstr ""
+
+msgid "Outgoing Dials"
 msgstr ""
 
 msgid "Override existing contact fields with data in the uploaded file."
@@ -1217,7 +1248,7 @@ msgstr ""
 msgid "Pre Call Letter"
 msgstr ""
 
-msgid "Pre-call Letters:"
+msgid "Pre-call Letters"
 msgstr ""
 
 msgid "Preferences"
@@ -1264,6 +1295,9 @@ msgstr ""
 msgid "Referrals"
 msgstr ""
 
+msgid "Referrals Gained"
+msgstr ""
+
 #, fuzzy
 msgid "Referrals by this contact"
 msgstr "Añadir etiquetas a estos contactos"
@@ -1292,7 +1326,7 @@ msgstr ""
 msgid "Reminder Letter"
 msgstr ""
 
-msgid "Reminder Letters:"
+msgid "Reminder Letters"
 msgstr ""
 
 msgid "Remove"
@@ -1311,6 +1345,9 @@ msgid "Reset Filters"
 msgstr ""
 
 msgid "Result"
+msgstr ""
+
+msgid "Resulted in Appointments"
 msgstr ""
 
 msgid "Rev."
@@ -1349,13 +1386,10 @@ msgstr ""
 msgid "Send Message"
 msgstr ""
 
-msgid "Sent:"
+msgid "Sent"
 msgstr ""
 
 msgid "Separated"
-msgstr ""
-
-msgid "Set up:"
 msgstr ""
 
 msgid "Settings"
@@ -1377,9 +1411,6 @@ msgid "Single"
 msgstr ""
 
 msgid "Sister"
-msgstr ""
-
-msgid "Snail Mail:"
 msgstr ""
 
 msgid "Social"
@@ -1436,7 +1467,7 @@ msgstr ""
 msgid "Support Letter"
 msgstr ""
 
-msgid "Support Letters:"
+msgid "Support Letters"
 msgstr ""
 
 msgid "Sweet! Your Account is activated!"
@@ -1446,6 +1477,9 @@ msgid "Sync Now"
 msgstr ""
 
 msgid "Tags"
+msgstr ""
+
+msgid "Talked To"
 msgstr ""
 
 msgid "Task"
@@ -1466,12 +1500,12 @@ msgstr ""
 msgid "Thank"
 msgstr ""
 
+msgid "Thank You Notes"
+msgstr ""
+
 msgid ""
 "Thank you for suggesting ways we can make MPDX a better tool. We will take your suggestion into consideration\n"
 "    and add it to MPDX's project tool: %{link}"
-msgstr ""
-
-msgid "Thank you notes:"
 msgstr ""
 
 msgid "Thanks!"
@@ -1536,9 +1570,6 @@ msgid "This filter will search for people who are set to receive your physical n
 msgstr ""
 
 msgid "This will replace your prayerletters.com list with what you have in MPDX. Are you sure that's what you'd like to do?"
-msgstr ""
-
-msgid "Through Phone Calls"
 msgstr ""
 
 msgid "Time zone"
