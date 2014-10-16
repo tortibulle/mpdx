@@ -92,8 +92,8 @@ describe GoogleContactsIntegrator do
 
   describe 'sync_contacts' do
     it 'syncs contacts and records last synced time' do
-      expect(@integrator).to receive(:contacts_to_sync).and_return(['contact'])
-      expect(@integrator).to receive(:sync_contact).with('contact')
+      expect(@integrator).to receive(:contacts_to_sync).and_return([@contact])
+      expect(@integrator).to receive(:sync_contact).with(@contact)
 
       now = Time.now
       expect(Time).to receive(:now).at_least(:once).and_return(now)
@@ -124,10 +124,10 @@ describe GoogleContactsIntegrator do
       g_contact = double(id: 'id_1', given_name: 'John', family_name: 'Doe')
       expect(@account.contacts_api_user).to receive(:contacts_updated_min).with(now).and_return([g_contact])
 
-      expect(@integrator).to receive(:contacts_to_sync_query).with(['id_1']).and_return(['contact'])
+      expect(@integrator).to receive(:contacts_to_sync_query).with(['id_1']).and_return([@contact])
       expect(@integrator).to receive(:cache_g_contacts).with([g_contact], false)
 
-      expect(@integrator.contacts_to_sync).to eq(['contact'])
+      expect(@integrator.contacts_to_sync).to eq([@contact])
     end
   end
 

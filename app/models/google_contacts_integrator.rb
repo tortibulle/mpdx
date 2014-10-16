@@ -1,7 +1,9 @@
 require 'google_contact_sync'
 
-HttpLogger.collapse_body_limit = 20000
-HttpLogger.logger = Logger.new(STDOUT)
+if Rails.env.development?
+  HttpLogger.collapse_body_limit = 20_000
+  HttpLogger.logger = Logger.new(STDOUT)
+end
 
 class GoogleContactsIntegrator
   attr_accessor :client
@@ -38,13 +40,9 @@ class GoogleContactsIntegrator
 
     if @integration.contacts_last_synced
       updated_g_contacts = contacts_api_user.contacts_updated_min(@integration.contacts_last_synced)
-      puts "Num updated_g_contacts: #{updated_g_contacts.count}"
 
       queried_contacts_to_sync = contacts_to_sync_query(updated_g_contacts.map(&:id))
-      puts "Num contacts to sync: #{queried_contacts_to_sync.to_a.size}"
-      #return []
-
-      if num_g_contacts_to_create(queried_contacts_to_sync ) > CACHE_ALL_CONTACTS_THRESHOLD
+      if num_g_contacts_to_create(queried_contacts_to_sync) > CACHE_ALL_CONTACTS_THRESHOLD
         cache_g_contacts(contacts_api_user.contacts, true)
       else
         cache_g_contacts(updated_g_contacts, false)
@@ -125,9 +123,6 @@ class GoogleContactsIntegrator
   def sync_contact(contact)
     g_contacts_and_links = contact.people.map(&method(:get_g_contact_and_link))
 
-    #puts "g_contacts_and_links.size: #{g_contacts_and_links.size}"
-    #puts "@g_contacts_in_batch: #{@g_contacts_in_batch}"
-    #puts "Save batch? #{g_contacts_and_links.size + @g_contacts_in_batch > BATCH_SIZE}"
     save_batched_syncs if g_contacts_and_links.size + @g_contacts_in_batch > BATCH_SIZE
 
     GoogleContactSync.sync_contact(contact, g_contacts_and_links)
@@ -210,11 +205,6 @@ class GoogleContactsIntegrator
 
   def g_contact_needs_save(g_contact_and_link)
     g_contact, g_contact_link = g_contact_and_link
-
-    # TODO: Why is it re-saving g_contacts ??
-    #puts "attrs_with_changes: #{g_contact.attrs_with_changes}"
-    #puts "last_data: #{g_contact_link.last_data}"
-
     g_contact.attrs_with_changes != g_contact_link.last_data
   end
 
@@ -222,11 +212,6 @@ class GoogleContactsIntegrator
     return if @batched_saves.empty?
 
     batched_g_contacts_to_save = @batched_saves.flat_map(&:first)
-
-    puts "--------------------------------------------------"
-    puts "Num batched contacts to save #{batched_g_contacts_to_save.size}"
-    puts "--------------------------------------------------"
-
     statuses = contacts_api_user.batch_create_or_update(batched_g_contacts_to_save)
 
     @batched_saves.each do |batched_save|
@@ -249,11 +234,11 @@ class GoogleContactsIntegrator
   def finish_batched_save(statuses, contact, g_contacts_and_links)
     statuses.each do |status|
       case status[:code]
-      when [200, 201]
+      when 200..201
         # Do nothing on success or created.
       when 404
         # Contact not found, it was deleted since the last sync
-        
+
       when 412
         # Contact modified, it was changed since the sync was started
       else
@@ -266,15 +251,12 @@ class GoogleContactsIntegrator
   end
 
   def save_records(contact, g_contacts_and_links)
-    puts "Saving contact .."
-    contact.save(validate: false)
+    contact.save!
     g_contacts_and_links.each { |g_contact_and_link| save_g_contact_link(*g_contact_and_link) }
   end
 
   def save_g_contact_link(g_contact, g_contact_link)
     @assigned_remote_ids.add(g_contact.id)
-
-    puts "Saving g_contact_link.."
     g_contact_link.last_data = g_contact.formatted_attrs
     g_contact_link.remote_id = g_contact.id
     g_contact_link.last_etag = g_contact.etag

@@ -85,42 +85,89 @@ module GoogleContactSync
   end
 
   def sync_emails(g_contact, person, g_contact_link)
-    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels = compare_emails_for_sync(g_contact, person, g_contact_link)
-
-    add_emails_from_g_contact(mpdx_adds, g_contact, person)
-    person.email_addresses.each { |e| e.mark_for_destruction if mpdx_dels.include?(e.email) }
-
-    g_contact_emails = g_contact.emails_full
-    g_contact_primary = g_contact_emails.find { |email| email[:primary] }
-    g_contact_emails += g_contact_adds.map { |email|
-      email_attrs = format_email_for_google(person.email_addresses.find { |e| e.email == email })
-      email_attrs[:primary] = false if g_contact_primary
-      email_attrs
-    }
-    g_contact_emails.delete_if { |email| g_contact_dels.include?(email[:address]) }
-    g_contact.prep_changes(emails: g_contact_emails)
+    sync_items(g_contact, person, g_contact_link,
+               compare_fn: :compare_emails_for_sync,
+               mpdx_add_fn: :add_emails_from_g_contact,
+               google_format_fn: :format_email_for_google,
+               normalize_fn: :normalize_email,
+               person_items: :email_addresses,
+               person_item_key: :email,
+               g_contact_items:  :emails_full,
+               g_contact_item_key: :address,
+               g_contact_assign: :emails)
   end
 
   def sync_numbers(g_contact, person, g_contact_link)
-    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels = compare_numbers_for_sync(g_contact, person, g_contact_link)
+    sync_items(g_contact, person, g_contact_link,
+               compare_fn: :compare_numbers_for_sync,
+               mpdx_add_fn: :add_numbers_from_g_contact,
+               google_format_fn: :format_phone_for_google,
+               normalize_fn: :normalize_number,
+               person_items: :phone_numbers,
+               person_item_key: :number,
+               g_contact_items:  :phone_numbers_full,
+               g_contact_item_key: :number,
+               g_contact_assign: :phone_numbers)
+  end
 
-    add_numbers_from_g_contact(mpdx_adds, g_contact, person)
-    person.phone_numbers.each { |p| p.mark_for_destruction if mpdx_dels.include?(p.number) }
+  def sync_websites(g_contact, person, g_contact_link)
+    sync_items(g_contact, person, g_contact_link,
+               compare_fn: :compare_websites_for_sync,
+               mpdx_add_fn: :add_websites_from_g_contact,
+               google_format_fn: :format_website_for_google,
+               normalize_fn: :normalize_website,
+               person_items: :websites,
+               person_item_key: :url,
+               g_contact_items:  :websites,
+               g_contact_item_key: :href,
+               g_contact_assign: :websites)
+  end
 
-    g_contact_numbers = g_contact.phone_numbers_full
-    g_contact_primary_found = g_contact_numbers.any? { |number| number[:primary] }
-    g_contact_numbers += g_contact_adds.map { |number|
-      number_attrs = format_phone_for_google(person.phone_numbers.find { |p| p.number = number })
+  def normalize_website(website)
+    website.strip.downcase
+  end
 
-      if g_contact_primary_found
-        number_attrs[:primary] = false
+  def normalize_email(email)
+    email.strip.downcase
+  end
+
+  def sync_items(g_contact, person, g_contact_link, opts)
+    # Compare the items for sync
+    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels = send(opts[:compare_fn], g_contact, person, g_contact_link)
+
+    # Add and delete the MPDX items
+    send(opts[:mpdx_add_fn], mpdx_adds, g_contact, person)
+    person_items = person.send(opts[:person_items])
+    person_items.each do |item|
+      item.mark_for_destruction if mpdx_dels.include?(item.send(opts[:person_item_key]))
+    end
+
+    update_g_contact_items(g_contact, g_contact_adds, g_contact_dels, opts, person_items)
+  end
+
+  def update_g_contact_items(g_contact, g_contact_adds, g_contact_dels, opts, person_items)
+    g_contact_items = g_contact.send(opts[:g_contact_items])
+
+    g_contact_items += g_contact_adds.map do |item_key|
+      person_item = person_items.find { |p_i| p_i.send(opts[:person_item_key]) == item_key }
+      send(opts[:google_format_fn], person_item)
+    end
+    g_contact_items.delete_if do |item|
+      item_key = send(opts[:normalize_fn], item[opts[:g_contact_item_key]])
+      g_contact_dels.include?(item_key)
+    end
+    g_contact.prep_changes(opts[:g_contact_assign] => ensure_single_primary(g_contact_items))
+  end
+
+  def ensure_single_primary(items)
+    found_primary = false
+    items.each do |item|
+      if found_primary
+        item[:primary] = false
       else
-        g_contact_primary_found = number_attrs[:primary]
+        found_primary = item[:primary]
       end
-      number_attrs
-    }
-    g_contact_numbers.delete_if { |number| g_contact_dels.include?(normalize_number(number[:number])) }
-    g_contact.prep_changes(phone_numbers: g_contact_numbers)
+    end
   end
 
   def sync_addresses(g_contacts, contact, g_contact_links)
@@ -142,23 +189,6 @@ module GoogleContactSync
     ensure_single_primary_address(g_contact_address_records)
     g_contact_addresses = g_contact_address_records.map { |address| format_address_for_google(address) }
     g_contacts.each { |g_contact| g_contact.prep_changes(addresses: g_contact_addresses.to_a) }
-  end
-
-  def sync_websites(g_contact, person, g_contact_link)
-    mpdx_adds, mpdx_dels, g_contact_adds, g_contact_dels = compare_websites_for_sync(g_contact, person, g_contact_link)
-
-    add_websites_from_g_contact(mpdx_adds, g_contact, person)
-    person.websites.each { |w| w.mark_for_destruction if mpdx_dels.include?(w.url) }
-
-    g_contact_websites = g_contact.websites
-    g_contact_primary = g_contact_websites.find { |website| website[:primary] }
-    g_contact_websites += g_contact_adds.map { |url|
-      website = { href: url, rel: 'other' }
-      website[:primary] = false if g_contact_primary
-      website
-    }
-    g_contact_websites.delete_if { |website| g_contact_dels.include?(website[:href]) }
-    g_contact.prep_changes(websites: g_contact_websites)
   end
 
   def remove_duplicate_addresses(addresses)
@@ -194,21 +224,24 @@ module GoogleContactSync
     emails_to_add.each do |email|
       email_attrs = format_email_for_mpdx(lookup_by_key(g_contact_emails, address: email))
       email_attrs[:primary] = false if had_primary
-      person.email_addresses << EmailAddress.new(email_attrs)
+      person.email_address = email_attrs
     end
   end
 
   def add_numbers_from_g_contact(numbers_to_add, g_contact, person)
-    had_primary = person.primary_phone_number.present?
-
     g_contact_numbers_normalized_map = Hash[g_contact.phone_numbers_full.map { |number|
       [normalize_number(number[:number]), number]
     }]
 
+    had_primary = person.primary_phone_number.present?
     numbers_to_add.each do |number|
       number_attrs = format_phone_for_mpdx(g_contact_numbers_normalized_map[number])
-      number_attrs[:primary] = false if had_primary
-      person.phone_numbers << PhoneNumber.new(number_attrs)
+      if had_primary
+        number_attrs[:primary] = false
+      else
+        had_primary = number_attrs[:primary]
+      end
+      person.phone_number = number_attrs
     end
   end
 
@@ -219,7 +252,11 @@ module GoogleContactSync
     urls_to_add.each do |url|
       g_contact_website = lookup_by_key(g_contact_websites, href: url)
       website = Person::Website.new(url: url, primary: g_contact_website[:primary])
-      website[:primary] = false if had_primary
+      if had_primary
+        website[:primary] = false
+      else
+        had_primary = website[:primary]
+      end
       person.websites << website
     end
   end
