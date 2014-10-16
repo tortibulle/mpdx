@@ -258,6 +258,7 @@ GEM
     hashie (1.2.0)
     hike (1.2.3)
     hitimes (1.2.2)
+    http_logger (0.4.3)
     httparty (0.13.1)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
@@ -643,6 +644,7 @@ DEPENDENCIES
   guard-rspec
   guard-rubocop
   guard-spork
+  http_logger
   iniparse (~> 1.1.6)
   jquery-rails (~> 3.0.4)
   jquery-ui-rails (~> 4.2.1)

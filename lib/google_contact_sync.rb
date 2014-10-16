@@ -108,10 +108,15 @@ module GoogleContactSync
     person.phone_numbers.each { |p| p.mark_for_destruction if mpdx_dels.include?(p.number) }
 
     g_contact_numbers = g_contact.phone_numbers_full
-    g_contact_primary = g_contact_numbers.find { |number| number[:primary] }
+    g_contact_primary_found = g_contact_numbers.any? { |number| number[:primary] }
     g_contact_numbers += g_contact_adds.map { |number|
       number_attrs = format_phone_for_google(person.phone_numbers.find { |p| p.number = number })
-      number_attrs[:primary] = false if g_contact_primary
+
+      if g_contact_primary_found
+        number_attrs[:primary] = false
+      else
+        g_contact_primary_found = number_attrs[:primary]
+      end
       number_attrs
     }
     g_contact_numbers.delete_if { |number| g_contact_dels.include?(normalize_number(number[:number])) }

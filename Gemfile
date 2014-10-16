@@ -105,7 +105,7 @@ group :development do
   gem 'binding_of_caller'
 
   # Uncomment this if you want to log HTTP requests. Helps with debugging API related functionality.
-  #gem 'http_logger'
+  gem 'http_logger'
 end
 
 group :development, :test do
