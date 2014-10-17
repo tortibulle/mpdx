@@ -66,26 +66,49 @@ class GoogleImport
     end
 
     contact.notes = g_contact.content if @import.override? || contact.notes.blank?
-    contact.addresses_attributes = g_contact.addresses.map { |address| build_address(address, contact) }
+    contact.addresses_attributes = build_addresses(contact, g_contact)
     contact.tag_list.add(tags, parse: true) if tags.present?
     contact.save
     contact
   end
 
-  def build_address(google_address, contact)
-    address = {
-      street:  google_address[:street], city: google_address[:city], state: google_address[:region],
+  def build_addresses(contact, g_contact)
+    mpdx_had_no_primary = contact.addresses.where(primary_mailing_address: true).first.nil?
+
+    addresses = g_contact.addresses.map do |g_contact_address|
+      address_attrs = format_address_for_mpdx(g_contact_address)
+
+      if address_attrs[:primary_mailing_address] && (@import.override? || mpdx_had_no_primary)
+        contact.addresses.each { |non_primary| non_primary.update(primary_mailing_address: false) }
+      else
+        address_attrs[:primary_mailing_address] = false
+      end
+
+      address_attrs
+    end
+    ensure_one_primary(addresses, :primary_mailing_address) if mpdx_had_no_primary
+
+    addresses
+  end
+
+  def ensure_one_primary(items, primary_attribute = :primary)
+    found_primary = false
+    items.each do |item|
+      if found_primary
+        item[primary_attribute] = false
+      else
+        found_primary = item[primary_attribute]
+      end
+    end
+    items[0][primary_attribute] = true if items.size > 0 && !found_primary
+  end
+
+  def format_address_for_mpdx(google_address)
+    { street:  google_address[:street], city: google_address[:city], state: google_address[:region],
       postal_code: google_address[:postcode],
       country: format_g_contact_country(google_address[:country]),
-      location: google_address_rel_to_location(google_address[:rel])
-    }
-
-    if google_address[:primary] && (@import.override? || contact.addresses.count == 0)
-      contact.addresses.each { |non_primary| non_primary.update(primary_mailing_address: false) }
-      address[:primary_mailing_address] = true
-    end
-
-    address
+      location: google_address_rel_to_location(google_address[:rel]),
+      primary_mailing_address: google_address[:primary] }
   end
 
   def format_g_contact_country(country)

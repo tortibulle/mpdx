@@ -9,14 +9,24 @@ describe GoogleImport do
     @import = create(:import, source: 'google', source_account_id: @account.id, account_list: @account_list, user: @user)
     @google_import = GoogleImport.new(@import)
 
+    stub_g_contacts('spec/fixtures/google_contacts.json')
+    stub_g_contact_photo
+    stub_smarty_and_cloudinary
+  end
+
+  def stub_g_contacts(file)
     stub_request(:get, 'https://www.google.com/m8/feeds/contacts/default/full?alt=json&max-results=100000&v=3')
       .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
-      .to_return(body: File.new(Rails.root.join('spec/fixtures/google_contacts.json')).read)
+      .to_return(body: File.new(Rails.root.join(file)).read)
+  end
 
+  def stub_g_contact_photo
     stub_request(:get, 'https://www.google.com/m8/feeds/photos/media/test.user@cru.org/6b70f8bb0372c?v=3')
       .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
       .to_return(body: 'photo data', headers: { 'content-type' => 'image/jpeg' })
+  end
 
+  def stub_smarty_and_cloudinary
     stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
 
     # Based on sample from docs at http://cloudinary.com/documentation/upload_images
@@ -40,7 +50,7 @@ describe GoogleImport do
       @contact.people << person
       expect {
         @google_import.should_receive(:create_or_update_person).and_return(person)
-        @google_import.send(:import)
+        @google_import.import
       }.to_not change(Contact, :count)
     end
 
@@ -49,7 +59,7 @@ describe GoogleImport do
       expect {
         expect {
           @google_import.should_receive(:create_or_update_person).and_return(create(:person))
-          @google_import.send(:import)
+          @google_import.import
         }.to change(Person, :count).by(1)
       }.to change(Contact, :count).by(1)
     end
@@ -58,7 +68,7 @@ describe GoogleImport do
       @google_import.should_receive(:create_or_update_person).and_return(create(:person))
 
       @import.update_column(:tags, 'hi, mom')
-      @google_import.send(:import)
+      @google_import.import
       Contact.last.tag_list.sort.should == %w(hi mom)
     end
   end
@@ -170,17 +180,17 @@ describe GoogleImport do
     end
 
     it 'imports correct person data if no people exist and be the same for repeat imports' do
-      @google_import.send(:import)
+      @google_import.import
       check_imported_data
 
       # Repeat the import and make sure the data is the same
-      @google_import.send(:import)
+      @google_import.import
       check_imported_data
     end
 
     it 'handles the case when the Google auth token cannot be refreshed' do
       expect_any_instance_of(Person::GoogleAccount).to receive(:contacts_api_user).at_least(1).times.and_return(false)
-      expect { @google_import.send(:import) }.to raise_error(Import::UnsurprisingImportError)
+      expect { @google_import.import }.to raise_error(Import::UnsurprisingImportError)
       expect(@account_list.contacts.count).to eq(1)
     end
   end
@@ -202,7 +212,7 @@ describe GoogleImport do
 
     it 'makes imported phone/email/address primary if set to override (and marked as primary in imported data)' do
       @import.override = true
-      @google_import.send(:import)
+      @google_import.import
 
       @contact.reload
       expect(@contact.primary_address.street).to eq('2345 Long Dr. #232')
@@ -215,7 +225,7 @@ describe GoogleImport do
 
     it 'does not not make imported phone/email/address primary if not set to override' do
       @import.override = false
-      @google_import.send(:import)
+      @google_import.import
 
       @contact.reload
       expect(@contact.primary_address.street).to eq('1 Way')
@@ -256,7 +266,7 @@ describe GoogleImport do
 
     it 'updates fields if set to override' do
       @import.override = true
-      @google_import.send(:import)
+      @google_import.import
       @existing_person.reload
       @existing_contact.reload
       expect(@existing_contact.notes).to eq('Notes here')
@@ -274,7 +284,7 @@ describe GoogleImport do
 
     it 'does not not update fields if not set to override' do
       @import.override = false
-      @google_import.send(:import)
+      @google_import.import
       @existing_person.reload
       @existing_contact.reload
       expect(@existing_contact.notes).to eq('Original notes')
@@ -296,7 +306,7 @@ describe GoogleImport do
       @existing_contact.update notes: ''
       @existing_person.pictures.first.destroy
       @import.override = false
-      @google_import.send(:import)
+      @google_import.import
       @existing_person.reload
       @existing_contact.reload
       expect(@existing_contact.notes).to eq('Notes here')
@@ -310,7 +320,7 @@ describe GoogleImport do
     person = build(:person, last_name: 'Doe')
     @contact.people << person
     create(:facebook_account, person: person)
-    @google_import.send(:import)
+    @google_import.import
     expect(person.pictures.count).to eq(0)
   end
 
@@ -319,7 +329,7 @@ describe GoogleImport do
       @import.import_by_group = true
       @import.save
       expect {
-        @google_import.send(:import)
+        @google_import.import
       }.to_not change(Contact, :count)
     end
 
@@ -339,7 +349,7 @@ describe GoogleImport do
         .times(1)
 
       expect {
-        @google_import.send(:import)
+        @google_import.import
       }.to change(Contact, :count).by(1)
 
       Contact.last.tag_list.sort.should == %w(hi mom more tags)
@@ -347,8 +357,52 @@ describe GoogleImport do
 
     it 'handles the case when the Google auth token cannot be refreshed' do
       expect_any_instance_of(Person::GoogleAccount).to receive(:contacts_api_user).at_least(1).times.and_return(false)
-      expect { @google_import.send(:import) }.to raise_error(Import::UnsurprisingImportError)
+      expect { @google_import.import }.to raise_error(Import::UnsurprisingImportError)
       expect(@account_list.contacts.count).to eq(1)
+    end
+  end
+
+  describe 'import primary field default' do
+    it "'assigns one arbitrary address/email/phone/website as primary if MPDX and Google didn't specify primary" do
+      WebMock.reset!
+
+      stub_g_contacts('spec/fixtures/google_contacts_no_primary.json')
+      stub_g_contact_photo
+      stub_smarty_and_cloudinary
+
+      @import.override = false
+      @google_import.import
+
+      contact = @account_list.contacts.where(name: 'Doe, John').first
+      person = contact.people.first
+
+      expect(person.websites.to_a.count).to eq(2)
+      website1 = person.websites.order(:url).first
+      website2 = person.websites.order(:url).last
+      expect(website1.primary || website2.primary).to be_true
+      expect(website1.primary && website2.primary).to be_false
+
+      expect(contact.addresses.to_a.count).to eq(2)
+      address1 = contact.addresses.order(:postal_code).first
+      address2 = contact.addresses.order(:postal_code).last
+      expect(address1.primary_mailing_address || address1.primary_mailing_address).to be_true
+      expect(address2.primary_mailing_address && address2.primary_mailing_address).to be_false
+
+      expect(person.email_addresses.to_a.count).to eq(2)
+      email1 = person.email_addresses.order(:email).first
+      email2 = person.email_addresses.order(:email).last
+      expect(email1.primary || email1.primary).to be_true
+      expect(email2.primary && email2.primary).to be_false
+
+      expect(person.phone_numbers.to_a.count).to eq(2)
+      phone1 = person.phone_numbers.order(:number).first
+      phone2 = person.phone_numbers.order(:number).last
+      expect(phone1.primary || phone1.primary).to be_true
+      expect(phone2.primary && phone2.primary).to be_false
+
+      expect(person.pictures.count).to eq(1)
+      picture = person.pictures.first
+      expect(picture.primary).to be_true
     end
   end
 end
