@@ -1,17 +1,21 @@
 require 'google_contact_sync'
 
-if Rails.env.development?
-  HttpLogger.collapse_body_limit = 20_000
-  HttpLogger.logger = Logger.new(STDOUT)
-end
-
 class GoogleContactsIntegrator
   attr_accessor :client
   attr_accessor :assigned_remote_ids
 
-  BATCH_SIZE = 100 # Google Contacts API limits it to 100.
-  RETRY_DELAY = 30
+  # All of the created/updated Google Contacts will be assigned to this group (and the group created if needed)/
   CONTACTS_GROUP_TITLE = 'MPDx'
+
+  # Batching the API creates/updates significantly speeds up the sync by reducing the number of API HTTP requests.
+  # Google Contacts API limits it to 100.
+  BATCH_SIZE = 100
+
+  # Seconds of delay between retries of 500 errors from Google Contacts API
+  RETRY_DELAY = 30
+
+  # Caching the Google contacts from one big request speeds up the sync as we don't need separate HTTP get requests
+  # But is only worth it if we are syncing a number of contacts, so check the number against this threshold.
   CACHE_ALL_CONTACTS_THRESHOLD = 10
 
   def initialize(google_integration)
@@ -22,12 +26,18 @@ class GoogleContactsIntegrator
   end
 
   def sync_contacts
+    @contacts_to_retry_sync = []
     contacts_to_sync.each(&method(:sync_contact))
     save_batched_syncs
+
+    @contacts_to_retry_sync.each(&:reload)
+    @contacts_to_retry_sync.each(&method(:sync_contact))
+    save_batched_syncs
+
+    clear_g_contact_cache
+
     @integration.contacts_last_synced = Time.now
     @integration.save
-    clear_g_contact_cache
-    clear_save_batch
   rescue Person::GoogleAccount::MissingRefreshToken
     # Don't log this exception as we expect it to happen from time to time.
     # Person::GoogleAccount will turn off the contacts integration and send the user an email to refresh their Google login.
@@ -42,24 +52,18 @@ class GoogleContactsIntegrator
       updated_g_contacts = contacts_api_user.contacts_updated_min(@integration.contacts_last_synced)
 
       queried_contacts_to_sync = contacts_to_sync_query(updated_g_contacts.map(&:id))
-      if num_g_contacts_to_create(queried_contacts_to_sync) > CACHE_ALL_CONTACTS_THRESHOLD
+      if queried_contacts_to_sync.length > CACHE_ALL_CONTACTS_THRESHOLD
         cache_g_contacts(contacts_api_user.contacts, true)
       else
         cache_g_contacts(updated_g_contacts, false)
       end
+
       queried_contacts_to_sync
     else
+      # Cache all contacts for the initial sync as all active MPDX contacts will need to be synced so most likely worth it.
       cache_g_contacts(contacts_api_user.contacts, true)
       @integration.account_list.active_contacts
     end
-  end
-
-  def num_g_contacts_to_create(contacts)
-    return 0 if contacts.empty?
-    Person.all.joins(:contacts).joins('LEFT JOIN google_contacts ON google_contacts.person_id = people.id')
-      .where("contacts.id IN (#{ quote_sql_list(contacts.map(&:id)) })")
-      .where('google_contacts.id IS NULL')
-      .count
   end
 
   def setup_assigned_remote_ids
@@ -112,6 +116,12 @@ class GoogleContactsIntegrator
         @g_contacts_by_name[name] = [g_contact]
       end
     end
+  end
+
+  def remove_g_contact_from_cache(g_contact)
+    @g_contact_by_id.delete(g_contact.id)
+    @g_contacts_by_name["#{g_contact.given_name} #{g_contact.family_name}"].delete(g_contact)
+    @all_g_contacts_cached = false
   end
 
   def clear_g_contact_cache
@@ -235,12 +245,15 @@ class GoogleContactsIntegrator
     statuses.each do |status|
       case status[:code]
       when 200..201
-        # Do nothing on success or created.
-      when 404
-        # Contact not found, it was deleted since the last sync
-
-      when 412
-        # Contact modified, it was changed since the sync was started
+        # Do nothing on success or created, just go ahead and save the records (below) if all succeeded.
+      when 404, 412
+        # 404 Not found, the google contact was deleted since the last sync
+        # 412 ETag mismatch, the google contact was changed since the sync was started
+        # In both cases, just remove all the google contacts from the cache and queue them for a retry
+        # Return immediately and don't save the records
+        g_contacts_and_links.map(&:first).each(&method(:remove_g_contact_from_cache))
+        @contacts_to_retry_sync << contact
+        return
       else
         fail(status.inspect)
       end

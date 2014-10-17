@@ -33,21 +33,22 @@ GIT
     emoji_spec (0.1)
 
 GIT
-  remote: https://github.com/sstephenson/global_phone.git
-  revision: 9b2772c4678dc9e323c58d9258663812bbd9fc73
-  specs:
-    global_phone (1.0.1)
-    global_phone_dbgen (1.0.1)
-      nokogiri (~> 1.5)
-
-PATH
-  remote: /home/dave/Dropbox/wmd/google_contacts_api
+  remote: https://github.com/CruGlobal/google_contacts_api
+  revision: 35b01ee1055ed072eba938de2ed962de149a8577
   specs:
     google_contacts_api (0.4.0)
       activesupport
       hashie
       i18n
       json
+
+GIT
+  remote: https://github.com/sstephenson/global_phone.git
+  revision: 9b2772c4678dc9e323c58d9258663812bbd9fc73
+  specs:
+    global_phone (1.0.1)
+    global_phone_dbgen (1.0.1)
+      nokogiri (~> 1.5)
 
 GEM
   remote: http://rubygems.org/
@@ -258,7 +259,6 @@ GEM
     hashie (1.2.0)
     hike (1.2.3)
     hitimes (1.2.2)
-    http_logger (0.4.3)
     httparty (0.13.1)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
@@ -644,7 +644,6 @@ DEPENDENCIES
   guard-rspec
   guard-rubocop
   guard-spork
-  http_logger
   iniparse (~> 1.1.6)
   jquery-rails (~> 3.0.4)
   jquery-ui-rails (~> 4.2.1)
