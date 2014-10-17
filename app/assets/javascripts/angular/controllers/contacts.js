@@ -297,9 +297,9 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         var geo = cc.addresses[0].geo;
         if(geo) {
           marker = {
-            'lat': +geo.split(',')[0],
-            'lng': +geo.split(',')[1],
-            'infowindow': '<a href="/contacts/'+contact.id+'">'+contact.name+'</a>',
+            'lat': geo.split(',')[0],
+            'lng': geo.split(',')[1],
+            'infowindow': '<a href="/contacts/'+contact.id+'">' + contact.name + '</a>',
             'picture': {
               'url': markerURL(contact.status),
               'width':  20,
@@ -312,28 +312,31 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
     }
     var markerURL = function(status) {
       var base = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|'
-      if(status == '' || status == 'Never Contacted')
-        return base + 'dcdcdc';
-      if(status == 'Ask in Future')
-        return base + 'F04141';
-      if(status == 'Contact for Appointment')
-        return base + 'F0D541';
-      if(status == 'Appointment Scheduled')
-        return base + '54DB1A';
-      if(status == 'Call for Decision')
-        return base + '41F0A1';
-      if(status == 'Partner - Financial')
-        return base + '41AAF0';
-      if(status == 'Partner - Special')
-        return base + '6C41F0';
-      if(status == 'Partner - Pray')
-        return base + 'F26FE5';
+      switch(status) {
+        case '':
+        case 'Never Contacted':
+          return base + 'dcdcdc';
+        case 'Ask in Future':
+          return base + 'F04141';
+        case 'Contact for Appointment':
+          return base + 'F0D541';
+        case 'Appointment Scheduled':
+          return base + '54DB1A';
+        case 'Call for Decision':
+          return base + '41F0A1';
+        case 'Partner - Financial':
+          return base + '41AAF0';
+        case 'Partner - Special':
+          return base + '6C41F0';
+        case 'Partner - Pray':
+          return base + 'F26FE5';
+      }
       return base + '757575'
     }
 
     $scope.mapContacts = function() {
       var newMarkers = [];
-      var contacts_counts = {
+      var contactsCounts = {
         noAddress: 0
       }
       angular.forEach($scope.contacts, function(contact) {
@@ -341,7 +344,7 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         if(marker)
           newMarkers.push(marker);
         else
-          contacts_counts.noAddress++;
+          contactsCounts.noAddress++;
       })
       $('#contacts_map_modal').dialog({ width: 700, height: 570 })
       var addMarkers = function(){
@@ -351,18 +354,19 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
         $scope.mapHandler.fitMapToBounds();
       }
       $scope.singleMap(addMarkers)
+      $('.contacts_counts').text(contactsCounts.noAddress + '/' + $scope.contacts.length)
     };
     $scope.mapMarkers = [];
 
     $scope.singleMap = function(methodToExec) {
       if(methodToExec === undefined || typeof(methodToExec) != "function")
         methodToExec = $.noop
-      var map_options = { streetViewControl: false };
+      var mapOptions = { streetViewControl: false };
       if($scope.mapHandler === undefined) {
         $scope.mapHandler = Gmaps.build('Google');
         $scope.mapHandler.buildMap(
           {
-            provider: map_options,
+            provider: mapOptions,
             internal: {id: 'contacts-map'}
           },
           methodToExec
