@@ -73,7 +73,7 @@ class GoogleImport
   end
 
   def build_addresses(contact, g_contact)
-    mpdx_had_no_primary = contact.addresses.where(primary_mailing_address: true).first.nil?
+    mpdx_had_no_primary = contact.addresses.where(primary_mailing_address: true).empty?
 
     addresses = g_contact.addresses.map do |g_contact_address|
       address_attrs = format_address_for_mpdx(g_contact_address)
