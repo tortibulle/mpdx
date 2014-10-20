@@ -17,6 +17,7 @@ angular.module('mpdxApp')
                         controller: function($scope, $modalInstance, appeal){
                             $scope.appeal = angular.copy(appeal);
                             $scope.checkedContacts = {};
+                            $scope.taskTypes = window.railsConstants.task.ACTIONS;
 
                             api.call('get','contacts?filters[status]=*&per_page=5000&include=Contact.id,Contact.name,Contact.donor_accounts&account_list_id=' + (window.current_account_list_id || ''), {}, function(data) {
                                 $scope.contacts = data.contacts;
@@ -67,13 +68,13 @@ angular.module('mpdxApp')
                                 });
 
                                 if(!donations.length){
-                                    return '-';
+                                    return ['-'];
                                 }else{
                                     var str = [];
                                     angular.forEach(donations, function(d){
                                         str.push(d.donation_date + ' - $' + $scope.formatNumber(d.amount));
                                     });
-                                    return str.join();
+                                    return str;
                                 }
                             };
 
@@ -99,6 +100,7 @@ angular.module('mpdxApp')
                                     }
                                 }, function () {
                                     alert('Task created.');
+                                    $scope.taskType = '';
                                 });
                             };
 

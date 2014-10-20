@@ -26,15 +26,15 @@
                             <tr>
                                 <td style="width: 5px;"></td>
                                 <td style="text-align: center;">Contact</td>
-                                <td style="width:24%; text-align: center;">Donation</td>
+                                <td style="width:24%; text-align: center;">Donation(s)</td>
                                 <td style="width:4%;"></td>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="c in appeal.contacts">
+                            <tr ng-repeat="c in appeal.contacts | orderBy:contactName">
                                 <td><input type="checkbox" ng-model="$parent.checkedContacts[c]"></td>
                                 <td>{{contactName(c)}}</td>
-                                <td ng-bind="listDonations(c)"></td>
+                                <td><span ng-repeat="d in listDonations(c)" style="display:block;">{{d}}</span></td>
                                 <td><a class="ico ico_trash" href ng-click="deleteContact(c)">Delete</a></td>
                             </tr>
                             <tr><td colspan="4">
@@ -54,9 +54,7 @@
                     </div>
 
                     <div style="margin-top: 5px;">
-                        With selected:  <select ng-model="taskType">
-                            <option value="Letter">Create Send Ask Letter Task</option>
-                            <option value="Thank">Create Thank You Task</option>
+                        Create task with selected:  <select ng-model="taskType" ng-options="t as t for t in taskTypes">
                         </select>
                         <button type="button" ng-click="createTask(taskType, checkedContacts)" ng-show="taskType">Create</button>
                     </div>
