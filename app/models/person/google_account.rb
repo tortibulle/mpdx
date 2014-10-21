@@ -42,26 +42,19 @@ class Person::GoogleAccount < ActiveRecord::Base
   end
 
   def contacts
-    raise_if_needs_refresh
     @contacts ||= contacts_api_user.contacts
   end
 
   def contact_groups
-    raise_if_needs_refresh
     @contact_groups ||= contacts_api_user.groups
   end
 
   def contacts_for_group(group_id)
-    raise_if_needs_refresh
     GoogleContactsApi::Group.new({ 'id' => { '$t' => group_id } }, nil, contacts_api_user.api).contacts
   end
 
-  def raise_if_needs_refresh
-    fail MissingRefreshToken unless contacts_api_user
-  end
-
   def contacts_api_user
-    return false if token_expired? && !refresh_token!
+    fail Person::GoogleAccount::MissingRefreshToken if token_expired? && !refresh_token!
 
     unless @contact_api_user
       client = OAuth2::Client.new(APP_CONFIG['google_key'], APP_CONFIG['google_secret'])

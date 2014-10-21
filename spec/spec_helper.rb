@@ -14,11 +14,7 @@ Spork.prefork do
   require 'capybara/rspec'
   require 'sidekiq/testing'
 
-  require 'simplecov'
-  SimpleCov.start 'rails' do
-    add_filter 'vendor'
-    add_group 'Roles', 'app/roles'
-  end
+  start_simplecov unless ENV['DRB']
 
   # Requires supporting ruby files with custom matchers and macros, etc,
   # in spec/support/ and its subdirectories.
@@ -114,9 +110,18 @@ end
 
 Spork.each_run do
   # This code will be run each time you run your specs.
+  start_simplecov if ENV['DRB']
   Zonebie.set_random_timezone
   FactoryGirl.reload
   Dir[Rails.root.join('app/roles/**/*.rb')].each { |f| require f }
+end
+
+def start_simplecov
+  require 'simplecov'
+  SimpleCov.start 'rails' do
+    add_filter 'vendor'
+    add_group 'Roles', 'app/roles'
+  end
 end
 
 def login(user)

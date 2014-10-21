@@ -102,9 +102,6 @@ group :development do
   gem 'quiet_assets'
   gem 'better_errors'
   gem 'binding_of_caller'
-
-  # Uncomment this if you want to log HTTP requests. Helps with debugging API related functionality.
-  # gem 'http_logger'
 end
 
 group :development, :test do
