@@ -6,7 +6,12 @@ module GoogleContactSync
     g_contact_links = g_contacts_and_links.map(&:second)
 
     contact.people.each_with_index do |person, index|
-      sync_with_g_contact(person, g_contacts[index], g_contact_links[index])
+      g_contact_link = g_contact_links[index]
+      g_contact_link.last_data[:emails] ||= []
+      g_contact_link.last_data[:addresses] ||= []
+      g_contact_link.last_data[:phone_numbers] ||= []
+      g_contact_link.last_data[:websites] ||= []
+      sync_with_g_contact(person, g_contacts[index], g_contact_link)
     end
 
     sync_addresses(g_contacts, contact, g_contact_links)

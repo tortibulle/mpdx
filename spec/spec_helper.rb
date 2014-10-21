@@ -14,6 +14,9 @@ Spork.prefork do
   require 'capybara/rspec'
   require 'sidekiq/testing'
 
+  require 'rspec/matchers' # req by equivalent-xml custom matcher `be_equivalent_to`
+  require 'equivalent-xml'
+
   start_simplecov unless ENV['DRB']
 
   # Requires supporting ruby files with custom matchers and macros, etc,

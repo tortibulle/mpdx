@@ -22,48 +22,80 @@ describe GoogleContactsIntegrator do
       'id' => { '$t' => '1' },
       'gd$name' => { 'gd$givenName' => { '$t' => 'John' }, 'gd$familyName' => { '$t' => 'Doe' } }
     )
+
+    @api_url = 'https://www.google.com/m8/feeds/contacts'
   end
 
-  # describe 'sync_contacts' do
-  #   it 'syncs contacts and records last synced time' do
-  #     expect(@integrator).to receive(:contacts_to_sync).and_return([@contact])
-  #     expect(@integrator).to receive(:sync_contact).with(@contact)
-  #
-  #     now = Time.now
-  #     expect(Time).to receive(:now).at_least(:once).and_return(now)
-  #
-  #     @integrator.sync_contacts
-  #
-  #     expect(@integration.contacts_last_synced).to eq(now)
-  #   end
-  #
-  #   it 'does not re-raise a missing refresh token error' do
-  #     expect_any_instance_of(Person::GoogleAccount).to receive(:contacts_api_user).at_least(1).times.and_return(false)
-  #     expect { @integrator.sync_contacts }.not_to raise_error
-  #   end
-  # end
-  #
-  # describe 'contacts_to_sync' do
-  #   it 'returns all active contacts if not synced yet' do
-  #     expect(@integration.account_list).to receive(:active_contacts).and_return(['contact'])
-  #     expect(@account.contacts_api_user).to receive(:contacts).and_return(['g_contact'])
-  #     expect(@integrator).to receive(:cache_g_contacts).with(['g_contact'], true)
-  #
-  #     expect(@integrator.contacts_to_sync).to eq(['contact'])
-  #   end
-  #
-  #   it 'returns queried contacts for subsequent sync' do
-  #     now = Time.now
-  #     @integration.update_column(:contacts_last_synced, now)
-  #     g_contact = double(id: 'id_1', given_name: 'John', family_name: 'Doe')
-  #     expect(@account.contacts_api_user).to receive(:contacts_updated_min).with(now).and_return([g_contact])
-  #
-  #     expect(@integrator).to receive(:contacts_to_sync_query).with(['id_1']).and_return([@contact])
-  #     expect(@integrator).to receive(:cache_g_contacts).with([g_contact], false)
-  #
-  #     expect(@integrator.contacts_to_sync).to eq([@contact])
-  #   end
-  # end
+  describe 'sync_contacts basic function' do
+    it 'syncs contacts and records last synced time' do
+      expect(@integrator).to receive(:setup_assigned_remote_ids)
+
+      expect(@integrator).to receive(:contacts_to_sync).and_return([@contact])
+      expect(@integrator).to receive(:sync_contact).with(@contact)
+
+      now = Time.now
+      expect(Time).to receive(:now).at_least(:once).and_return(now)
+
+      @integrator.sync_contacts
+
+      expect(@integration.contacts_last_synced).to eq(now)
+    end
+
+    it 'does not re-raise a missing refresh token error' do
+      expect_any_instance_of(Person::GoogleAccount).to receive(:contacts_api_user)
+                                                       .and_raise(Person::GoogleAccount::MissingRefreshToken)
+      expect { @integrator.sync_contacts }.not_to raise_error
+    end
+  end
+
+  describe 'contacts_to_sync' do
+    before do
+      @integrator.cache = GoogleContactsCache.new(@account)
+    end
+
+    it 'returns all active contacts if not synced yet' do
+      expect(@integration.account_list).to receive(:active_contacts).and_return([@contact])
+      expect(@account.contacts_api_user).to receive(:contacts).and_return([@g_contact])
+
+      expect(@integrator.contacts_to_sync).to eq([@contact])
+    end
+
+    it 'returns queried contacts for subsequent sync' do
+      now = Time.now
+      @integration.update_column(:contacts_last_synced, now)
+      g_contact = double(id: 'id_1', given_name: 'John', family_name: 'Doe')
+      expect(@account.contacts_api_user).to receive(:contacts_updated_min).with(now).and_return([g_contact])
+
+      expect(@integrator).to receive(:contacts_to_sync_query).with(['id_1']).and_return([@contact])
+      expect(@integrator.contacts_to_sync).to eq([@contact])
+    end
+  end
+
+  describe 'mpdx_group' do
+    it 'searches for an existing group which matches the goal title, and caches it' do
+      mpdx_group = double(title: GoogleContactsIntegrator::CONTACTS_GROUP_TITLE)
+      expect(@integrator.api_user).to receive(:groups).exactly(:once).and_return([mpdx_group])
+      expect(@integrator.mpdx_group).to eq(mpdx_group)
+
+      # Test a second time to check that it caches it rather than calling the API again
+      expect(@integrator.mpdx_group).to eq(mpdx_group)
+    end
+
+    it 'creates a group if none match its title do' do
+      not_mpdx_group = double(title: 'not-mpdx-group-title')
+      mpdx_group = double
+      expect(@integrator.api_user).to receive(:groups).exactly(:once).and_return([not_mpdx_group])
+
+      expect(GoogleContactsApi::Group).to receive(:create).exactly(:once)
+                                          .with({ title: GoogleContactsIntegrator::CONTACTS_GROUP_TITLE }, @integrator.api_user.api)
+                                          .and_return(mpdx_group)
+
+      expect(@integrator.mpdx_group).to eq(mpdx_group)
+
+      # Test a second time to check that it caches it rather than calling the API again
+      expect(@integrator.mpdx_group).to eq(mpdx_group)
+    end
+  end
 
   describe 'contacts_to_sync_query' do
     before do
@@ -148,7 +180,248 @@ describe GoogleContactsIntegrator do
     end
   end
 
-  describe 'overall first and subsequent sync' do
+  describe 'logic for assigning each MPDX contact to a single Google contact' do
+    describe 'setup_assigned_remote_ids' do
+      it 'queries remote ids for the specific google account and account list' do
+        create(:google_contact, remote_id: 'not in account list or google account')
+        create(:google_contact, remote_id: 'id', person: @person, google_account: @account)
+        @integrator.setup_assigned_remote_ids
+        expect(@integrator.assigned_remote_ids).to eq(['id'].to_set)
+      end
+    end
+
+    describe 'get_or_query_g_contact' do
+      it 'returns nil if a remote id is already assigned' do
+        g_contact_link = double(remote_id: nil)
+        g_contact = double(id: 'id', given_name: 'John', family_name: 'Doe')
+        @integrator.cache = double
+        expect(@integrator.cache).to receive(:select_by_name).with('John', 'Doe').exactly(:twice).and_return([g_contact])
+
+        @integrator.assigned_remote_ids = [].to_set
+        expect(@integrator.get_or_query_g_contact(g_contact_link, @person)).to eq(g_contact)
+
+        # Return nil if the id is already taken
+        @integrator.assigned_remote_ids = ['id'].to_set
+        expect(@integrator.get_or_query_g_contact(g_contact_link, @person)).to be_nil
+      end
+    end
+
+    describe 'get_g_contact_and_link' do
+      it 'marks the remote id of a queried g_contact as assigned and adds the g_contact to the mpdx group' do
+        g_contact_link = create(:google_contact, remote_id: 'id', person: @person, google_account: @account)
+        g_contact = double(id: 'id', given_name: 'John', family_name: 'Doe')
+        expect(@integrator).to receive(:get_or_query_g_contact).with(g_contact_link, @person).and_return(g_contact)
+
+        mpdx_group = double
+        expect(@integrator).to receive(:mpdx_group).and_return(mpdx_group)
+        expect(g_contact).to receive(:prep_add_to_group).with(mpdx_group)
+
+        @integrator.assigned_remote_ids = [].to_set
+        expect(@integrator.get_g_contact_and_link(@person)).to eq([g_contact, g_contact_link])
+        expect(@integrator.assigned_remote_ids).to eq(['id'].to_set)
+      end
+
+      describe 'save_g_contact_links' do
+        it 'marks the remote id of a saved g_contact as assigned' do
+          g_contact_link = build(:google_contact, remote_id: 'id', person: @person, google_account: @account)
+          g_contact = double(id: 'id', formatted_attrs: {}, etag: '')
+
+          @integrator.assigned_remote_ids = [].to_set
+          @integrator.save_g_contact_links([[g_contact, g_contact_link]])
+          expect(@integrator.assigned_remote_ids).to eq(['id'].to_set)
+        end
+      end
+    end
+  end
+
+  describe 'sync_contact' do
+    it 'does not save a g_contact if it has not changed since the last sync' do
+      g_contact_link = double(last_data: { given_name: 'John' })
+      g_contact = double(attrs_with_changes:  { given_name: 'John' })
+
+      expect(@integrator).to receive(:get_g_contact_and_link).with(@person).and_return([g_contact, g_contact_link])
+      expect(GoogleContactSync).to receive(:sync_contact).with(@contact, [[g_contact, g_contact_link]])
+
+      expect(@integrator).to receive(:save_g_contact_links).with([[g_contact, g_contact_link]])
+      expect(@integrator).to receive(:save_g_contacts_then_links).exactly(0).times
+
+      @integrator.sync_contact(@contact)
+    end
+
+    it 'saves the g_contacts if they were modified' do
+      g_contact_link = double(last_data: { given_name: 'John' })
+      g_contact = double(attrs_with_changes:  { given_name: 'MODIFIED-John' })
+
+      expect(@integrator).to receive(:get_g_contact_and_link).with(@person).and_return([g_contact, g_contact_link])
+      expect(GoogleContactSync).to receive(:sync_contact).with(@contact, [[g_contact, g_contact_link]])
+
+      expect(@integrator).to receive(:save_g_contacts_then_links).with(@contact, [g_contact], [[g_contact, g_contact_link]])
+
+      @integrator.sync_contact(@contact)
+    end
+  end
+
+  def stub_mpdx_group_request
+    groups_body = {
+      'feed' => {
+        'entry' => [
+          {
+            'id' => { '$t' => 'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid' },
+            'title' => { '$t' => 'MPDx' }
+          }
+        ],
+        'openSearch$totalResults' => { '$t' => '1' },
+        'openSearch$startIndex' => { '$t' => '0' },
+        'openSearch$itemsPerPage' => { '$t' => '1' }
+      }
+    }
+    stub_request(:get, 'https://www.google.com/m8/feeds/groups/default/full?alt=json&max-results=100000&v=2')
+      .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
+      .to_return(body: groups_body.to_json)
+  end
+
+  def stub_empty_contacts_request
+    empty_feed_json = {
+      'feed' => {
+        'entry' => [],
+        'openSearch$totalResults' => { '$t' => '0' },
+        'openSearch$startIndex' => { '$t' => '0' },
+        'openSearch$itemsPerPage' => { '$t' => '0' }
+      }
+    }.to_json
+    stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&v=3")
+      .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
+      .to_return(body: empty_feed_json)
+  end
+
+  describe 'overall sync for creating a new google contact' do
+    it 'creates a new google contact and association for a contact to sync' do
+      stub_empty_contacts_request
+      stub_mpdx_group_request
+
+      contact_xml = <<-EOS
+        <gd:name>
+          <gd:namePrefix>Mr</gd:namePrefix>
+          <gd:givenName>John</gd:givenName>
+          <gd:additionalName>Henry</gd:additionalName>
+          <gd:familyName>Doe</gd:familyName>
+          <gd:nameSuffix>III</gd:nameSuffix>
+        </gd:name>
+        <content>about</content>
+        <gd:organization rel="http://schemas.google.com/g/2005#work"  primary="true">
+          <gd:orgName>Company, Inc</gd:orgName>
+          <gd:orgTitle>Worker</gd:orgTitle>
+        </gd:organization>
+        <gContact:groupMembershipInfo deleted="false" href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid"/>
+      EOS
+
+      create_contact_request_xml = <<-EOS
+      <feed xmlns='http://www.w3.org/2005/Atom' xmlns:gContact='http://schemas.google.com/contact/2008' xmlns:gd='http://schemas.google.com/g/2005' xmlns:batch='http://schemas.google.com/gdata/batch'>
+        <atom:entry xmlns:atom="http://www.w3.org/2005/Atom" xmlns:gd="http://schemas.google.com/g/2005" xmlns:gContact="http://schemas.google.com/contact/2008">
+          <atom:category scheme="http://schemas.google.com/g/2005#kind" term="http://schemas.google.com/contact/2008#contact"/>
+          <batch:id>0</batch:id>
+          <batch:operation type="insert"/>
+          #{contact_xml}
+        </atom:entry>
+      </feed>
+      EOS
+      create_contact_response_xml = <<-EOS
+      <feed>
+        <entry>
+          <batch:id>0</batch:id>
+          <batch:operation type='insert'/>
+          <batch:status code='201' reason='Created'/>
+          #{contact_xml}
+        </entry>
+      </feed>
+      EOS
+
+      stub_request(:post, 'https://www.google.com/m8/feeds/contacts/default/full/batch?alt=&v=3') { |request|
+        equivalent = EquivalentXml.equivalent?(request.body, create_contact_request_xml)
+        expect(equivalent).to be_true
+      }.to_return(body: create_contact_response_xml)
+
+      @integrator.sync_contacts
+
+      @person.reload
+      expect(@person.google_contacts.count).to eq(1)
+      last_data = {
+        name_prefix: 'Mr', given_name: 'John', additional_name: 'Henry', family_name: 'Doe', name_suffix: 'III',
+        content: 'about', emails: [], phone_numbers: [], addresses: [],
+        organizations: [{ rel: 'work', primary: true, org_name: 'Company, Inc', org_title: 'Worker' }],
+        websites: [], group_memberships: ['http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid'],
+        deleted_group_memberships: []
+      }
+      expect(@person.google_contacts.first.last_data).to eq(last_data)
+      expect(@person.google_contacts.first.last_synced.nil?).to be_false
+    end
+  end
+
+  describe 'sync behavior with 404 error and 412 error' do
+    it 'retries contacts which yield a 404 or 412 error' do
+      person2 = create(:person, first_name: 'Jane', last_name: 'Doe')
+      @contact.people << person2
+
+      create(:google_contact, google_account: @account, person: @person, remote_id: '1',
+             last_data: { given_name: 'John', family_name: 'Doe' }, last_synced: 1.hour.ago)
+      create(:google_contact, google_account: @account, person: person2, remote_id: '2',
+             last_data: { given_name: 'Jane', family_name: 'Doe' }, last_synced: 1.hour.ago)
+      @integration.update_column(:contacts_last_synced, 1.hour.ago)
+
+      g_contact2 = GoogleContactsApi::Contact.new(
+        'gd$etag' => 'a',
+        'id' => { '$t' => '2' },
+        'gd$name' => { 'gd$givenName' => { '$t' => 'Jane' }, 'gd$familyName' => { '$t' => 'Doe' } }
+      )
+      g_contact2_reloaded = GoogleContactsApi::Contact.new(
+        'gd$etag' => 'a',
+        'id' => { '$t' => '2' },
+        'gd$name' => { 'gd$givenName' => { '$t' => 'MODIFIED-Jane' }, 'gd$familyName' => { '$t' => 'Doe' } }
+      )
+
+      # Ensure the order of the people returned
+      expect(@contact).to receive(:people).and_return([@person, person2])
+
+      expect(@account.contacts_api_user).to receive(:get_contact).with('1').and_return(@g_contact)
+      expect(@account.contacts_api_user).to receive(:query_contacts).with('John Doe').and_return([])
+
+      expect(@account.contacts_api_user).to receive(:get_contact).with('2').and_return(g_contact2, g_contact2_reloaded)
+
+      expect(@account.contacts_api_user).to receive(:contacts_updated_min).and_return([])
+
+      new_contact = double
+      expect(GoogleContactsApi).to receive(:new).and_return(new_contact)
+
+      times_batch_create_or_update_called = 0
+      expect(@account.contacts_api_user).to receive(:batch_create_or_update)
+                                            .exactly(4).times.and_return do |g_contact, &block|
+        times_batch_create_or_update_called += 1
+
+        case times_batch_create_or_update_called
+        when 1
+          expect(g_contact).to eq(@g_contact)
+          block.call(code: 404)
+        when 2
+          expect(g_contact).to eq(g_contact2)
+          block.call(code: 412)
+        when 3
+          expect(g_contact).to eq(new_contact)
+          block.call(code: 201)
+        when 4
+          expect(g_contact).to eq(g_contact2_reloaded)
+          block.call(code: 200)
+        end
+      end
+
+      stub_mpdx_group_request
+
+      expect(times_batch_create_or_update_called).to eq(0)
+      @integrator.sync_contacts
+      expect(times_batch_create_or_update_called).to eq(4)
+    end
+  end
+
+  describe 'overall first and subsequent sync for modifed contact info' do
     it 'combines MPDX & Google data on first sync then propagates updates of email/phone/address on subsequent syncs' do
       setup_first_sync_data
       expect_first_sync_api_put
@@ -163,7 +436,6 @@ describe GoogleContactsIntegrator do
 
     def setup_first_sync_data
       @g_contact_json_text = File.new(Rails.root.join('spec/fixtures/google_contacts.json')).read
-      @api_url = 'https://www.google.com/m8/feeds/contacts'
       stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&v=3")
         .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
         .to_return(body: @g_contact_json_text)
@@ -207,17 +479,7 @@ describe GoogleContactsIntegrator do
       ]
       @contact.save
 
-      groups_body = {
-        'feed' => {
-          'entry' => [],
-          'openSearch$totalResults' => { '$t' => '0' },
-          'openSearch$startIndex' => { '$t' => '0' },
-          'openSearch$itemsPerPage' => { '$t' => '0' }
-        }
-      }
-      stub_request(:get, 'https://www.google.com/m8/feeds/groups/default/full?alt=json&max-results=100000&v=2')
-        .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
-        .to_return(body: groups_body.to_json)
+      stub_mpdx_group_request
 
       create_group_request_regex_str =
         '<atom:entry xmlns:gd="http://schemas.google.com/g/2005" xmlns:atom="http://www.w3.org/2005/Atom">\s*'\
@@ -446,8 +708,8 @@ describe GoogleContactsIntegrator do
         }
       }
       stub_request(:get, 'https://www.google.com/m8/feeds/groups/default/full?alt=json&max-results=100000&v=2')
-      .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
-      .to_return(body: groups_body.to_json)
+        .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
+        .to_return(body: groups_body.to_json)
     end
 
     def expect_second_sync_api_put

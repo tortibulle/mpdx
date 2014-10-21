@@ -53,7 +53,8 @@ class GoogleContactsCache
 
   def remove_g_contact(g_contact)
     @g_contact_by_id.delete(g_contact.id)
-    @g_contacts_by_name["#{g_contact.given_name} #{g_contact.family_name}"].delete(g_contact)
+    g_contacts_by_name = @g_contacts_by_name["#{g_contact.given_name} #{g_contact.family_name}"]
+    g_contacts_by_name.delete(g_contact) if g_contacts_by_name
     @all_g_contacts_cached = false
   end
 end

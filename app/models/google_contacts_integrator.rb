@@ -4,6 +4,7 @@ require 'google_contacts_cache'
 class GoogleContactsIntegrator
   attr_accessor :client
   attr_accessor :assigned_remote_ids
+  attr_accessor :cache
 
   CONTACTS_GROUP_TITLE = 'MPDx'
 
@@ -37,6 +38,16 @@ class GoogleContactsIntegrator
     Airbrake.raise_or_notify(e)
   end
 
+  def api_user
+    @account.contacts_api_user
+  end
+
+  def setup_assigned_remote_ids
+    @assigned_remote_ids = @integration.account_list.contacts.joins(:people)
+      .joins('INNER JOIN google_contacts ON google_contacts.person_id = people.id')
+      .pluck('google_contacts.remote_id').to_set
+  end
+
   def contacts_to_sync
     if @integration.contacts_last_synced
       updated_g_contacts = api_user.contacts_updated_min(@integration.contacts_last_synced)
@@ -54,12 +65,6 @@ class GoogleContactsIntegrator
       @cache.cache_all_g_contacts
       @integration.account_list.active_contacts
     end
-  end
-
-  def setup_assigned_remote_ids
-    @assigned_remote_ids = @integration.account_list.contacts.joins(:people)
-      .joins('INNER JOIN google_contacts ON google_contacts.person_id = people.id')
-      .pluck('google_contacts.remote_id').to_set
   end
 
   # Queries all contacts that:
@@ -87,6 +92,10 @@ class GoogleContactsIntegrator
       .readonly(false)
   end
 
+  def quote_sql_list(list)
+    list.map { |item| ActiveRecord::Base.connection.quote(item) }.join(',')
+  end
+
   def sync_contact(contact)
     g_contacts_and_links = contact.people.map(&method(:get_g_contact_and_link))
     GoogleContactSync.sync_contact(contact, g_contacts_and_links)
@@ -100,6 +109,39 @@ class GoogleContactsIntegrator
     end
   rescue => e
     Airbrake.raise_or_notify(e)
+  end
+
+  def get_g_contact_and_link(person)
+    g_contact_link = person.google_contacts.where(google_account: @account).first_or_initialize(person: person)
+    g_contact = get_or_query_g_contact(g_contact_link, person)
+
+    if g_contact
+      @assigned_remote_ids << g_contact.id
+    else
+      g_contact = GoogleContactsApi::Contact.new
+      g_contact_link.last_data = {}
+    end
+    g_contact.prep_add_to_group(mpdx_group)
+
+    [g_contact, g_contact_link]
+  end
+
+  def mpdx_group
+    @mpdx_group ||= api_user.groups.find { |group| group.title == CONTACTS_GROUP_TITLE } ||
+      GoogleContactsApi::Group.create({ title: CONTACTS_GROUP_TITLE }, api_user.api)
+  end
+
+  def get_or_query_g_contact(g_contact_link, person)
+    return @cache.find_by_id(g_contact_link.remote_id) if g_contact_link.remote_id
+
+    @cache.select_by_name(person.first_name, person.last_name).find do |g_contact|
+      !@assigned_remote_ids.include?(g_contact.id)
+    end
+  end
+
+  def g_contact_needs_save?(g_contact_and_link)
+    g_contact, g_contact_link = g_contact_and_link
+    g_contact.attrs_with_changes != g_contact_link.last_data
   end
 
   def save_g_contacts_then_links(contact, g_contacts_to_save, g_contacts_and_links)
@@ -127,6 +169,7 @@ class GoogleContactsIntegrator
   def failed_but_can_retry?(status, g_contact_saved, g_contact_link)
     case status[:code]
     when 200, 201
+      # Didn't fail, so by the method semantics, return false
       return false
     when 404, 412
       # 404 is Not found, the google contact was deleted since the last sync
@@ -142,40 +185,13 @@ class GoogleContactsIntegrator
       else
         # If the Google Contact was modified during the sync operation, set the last synced time to nul to force
         # re-comparing with the updated Google contact
-        g_contact_link.update_column(last_synced: nil)
+        g_contact_link.update(last_synced: nil)
       end
 
       return true
     else
+      # Failed but can't just fix by resyncing the contact, so raise an error
       fail(status.inspect)
-    end
-  end
-
-  def g_contact_needs_save?(g_contact_and_link)
-    g_contact, g_contact_link = g_contact_and_link
-    g_contact.attrs_with_changes != g_contact_link.last_data
-  end
-
-  def get_g_contact_and_link(person)
-    g_contact_link = person.google_contacts.where(google_account: @account).first_or_initialize(person: person)
-    g_contact = get_or_query_g_contact(g_contact_link, person)
-
-    if g_contact
-      @assigned_remote_ids << g_contact.id
-    else
-      g_contact = GoogleContactsApi::Contact.new
-      g_contact_link.last_data = { emails: [], addresses: [], phone_numbers: [], websites: [] }
-    end
-    g_contact.prep_add_to_group(mpdx_group)
-
-    [g_contact, g_contact_link]
-  end
-
-  def get_or_query_g_contact(g_contact_link, person)
-    return @cache.find_by_id(g_contact_link.remote_id) if g_contact_link.remote_id
-
-    @cache.select_by_name(person.first_name, person.last_name).find do |g_contact|
-      !@assigned_remote_ids.include?(g_contact.id)
     end
   end
 
@@ -185,18 +201,5 @@ class GoogleContactsIntegrator
       @assigned_remote_ids.add(g_contact.id)
       g_contact_link.update(last_data: g_contact.formatted_attrs, remote_id: g_contact.id, last_etag: g_contact.etag, last_synced: Time.now)
     end
-  end
-
-  def mpdx_group
-    @mpdx_group ||= api_user.groups.find { |group| group.title == CONTACTS_GROUP_TITLE } ||
-      GoogleContactsApi::Group.create({ title: CONTACTS_GROUP_TITLE }, api_user.api)
-  end
-
-  def api_user
-    @account.contacts_api_user
-  end
-
-  def quote_sql_list(list)
-    list.map { |item| ActiveRecord::Base.connection.quote(item) }.join(',')
   end
 end

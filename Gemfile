@@ -120,6 +120,7 @@ group :development, :test do
   gem 'fuubar'
   gem 'unicorn'
   gem 'zonebie'
+  gem 'equivalent-xml'
 end
 group :test do
   gem 'webmock', '~> 1.9.0'

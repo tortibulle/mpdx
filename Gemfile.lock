@@ -164,6 +164,8 @@ GEM
     diff-lcs (1.2.5)
     display_case (0.0.5)
     docile (1.1.5)
+    equivalent-xml (0.5.1)
+      nokogiri (>= 1.4.3)
     erubis (2.7.0)
     eventmachine (1.0.3)
     excon (0.39.5)
@@ -623,6 +625,7 @@ DEPENDENCIES
   devise (~> 3.2.2)
   display_case (= 0.0.5)
   emoji_spec!
+  equivalent-xml
   factory_girl_rails
   fb_graph (~> 2.6.0)
   fog (~> 1.23.0)
