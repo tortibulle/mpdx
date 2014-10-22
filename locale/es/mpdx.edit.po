@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: version 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-16 06:25-0700\n"
+"POT-Creation-Date: 2014-10-22 07:22-0700\n"
 "PO-Revision-Date: 2012-10-10 17:24-0500\n"
 "Last-Translator: Josh Starcher <josh.starcher@gmail.com>\n"
 "Language-Team: Spanish\n"
@@ -123,7 +123,6 @@ msgstr "Acción"
 msgid "Actions"
 msgstr "Acciones"
 
-#, fuzzy
 #, fuzzy
 msgid "Active Contacts"
 msgstr "Añadir este contacto"
@@ -258,7 +257,6 @@ msgstr "Llame para cita"
 msgid "Appointment Scheduled"
 msgstr ""
 
-#, fuzzy
 #, fuzzy
 msgid "Appointments"
 msgstr "Llame para cita"
@@ -894,6 +892,15 @@ msgid ""
 msgstr ""
 
 msgid "MPDX does not currently import any data from this source, but it will soon! Connect your account now to be ready for when it does"
+msgstr ""
+
+msgid ""
+"MPDX encountered errors while trying to import your %{source} contacts.\n"
+"\n"
+"%{explanation}\n"
+"\n"
+"Thanks!\n"
+"MPDX Support Team"
 msgstr ""
 
 msgid "MPDX has finished importing your %{source} contacts."

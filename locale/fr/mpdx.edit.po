@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: version 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-16 06:25-0700\n"
+"POT-Creation-Date: 2014-10-22 07:22-0700\n"
 "PO-Revision-Date: 2014-09-16 16:48+0100\n"
 "Last-Translator: Josh Starcher <>\n"
 "Language-Team: French\n"
@@ -892,6 +892,15 @@ msgstr ""
 msgid "MPDX does not currently import any data from this source, but it will soon! Connect your account now to be ready for when it does"
 msgstr "MPDX ne peut pas importer actuellement de données provenant de cette source, mais il pourra bientôt ! Connectez votre compte maintenant pour être prêt quand il le fera"
 
+msgid ""
+"MPDX encountered errors while trying to import your %{source} contacts.\n"
+"\n"
+"%{explanation}\n"
+"\n"
+"Thanks!\n"
+"MPDX Support Team"
+msgstr ""
+
 #, fuzzy
 msgid "MPDX has finished importing your %{source} contacts."
 msgstr "[MPDX] L'importation de vos contacts de %{source} a échouée"
@@ -1757,34 +1766,24 @@ msgstr "à"
 
 #~ msgid "Appointments:"
 #~ msgstr "Rendez-vous :"
-
 #~ msgid "Emails:"
 #~ msgstr "E-mails :"
-
 #~ msgid "Facebook Message:"
 #~ msgstr "Message Facebook :"
-
 #~ msgid "Pre-call Letters:"
 #~ msgstr "Lettre pré-appel :"
-
 #~ msgid "Reminder Letters:"
 #~ msgstr "Lettres de rappel :"
-
 #~ msgid "Sent:"
 #~ msgstr "Envoyés :"
-
 #~ msgid "Set up:"
 #~ msgstr "Effectué  :"
-
 #~ msgid "Snail Mail:"
 #~ msgstr "Courrier :"
-
 #~ msgid "Support Letters:"
 #~ msgstr "Lettres de soutien"
-
 #~ msgid "Thank you notes:"
 #~ msgstr "notes de remerciements :"
-
 #~ msgid "Add Person"
 #~ msgstr "Ajouter une personne"
 #~ msgid ""
