@@ -189,7 +189,8 @@ describe GoogleImport do
     end
 
     it 'handles the case when the Google auth token cannot be refreshed' do
-      expect_any_instance_of(Person::GoogleAccount).to receive(:contacts_api_user).at_least(1).times.and_return(false)
+      expect_any_instance_of(Person::GoogleAccount).to receive(:contacts_api_user)
+                                                       .at_least(1).times.and_raise(Person::GoogleAccount::MissingRefreshToken)
       expect { @google_import.import }.to raise_error(Import::UnsurprisingImportError)
       expect(@account_list.contacts.count).to eq(1)
     end
@@ -356,7 +357,8 @@ describe GoogleImport do
     end
 
     it 'handles the case when the Google auth token cannot be refreshed' do
-      expect_any_instance_of(Person::GoogleAccount).to receive(:contacts_api_user).at_least(1).times.and_return(false)
+      expect_any_instance_of(Person::GoogleAccount).to receive(:contacts_api_user)
+                                                       .at_least(1).times.and_raise(Person::GoogleAccount::MissingRefreshToken)
       expect { @google_import.import }.to raise_error(Import::UnsurprisingImportError)
       expect(@account_list.contacts.count).to eq(1)
     end

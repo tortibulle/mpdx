@@ -2,6 +2,14 @@ require 'spork'
 #uncomment the following line to use spork with the debugger
 #require 'spork/ext/ruby-debug'
 
+def start_simplecov
+  require 'simplecov'
+  SimpleCov.start 'rails' do
+    add_filter 'vendor'
+    add_group 'Roles', 'app/roles'
+  end
+end
+
 Spork.prefork do
   # Loading more in this block will cause your tests to run faster. However,
   # if you change any configuration or code from libraries loaded here, you'll
@@ -117,14 +125,6 @@ Spork.each_run do
   Zonebie.set_random_timezone
   FactoryGirl.reload
   Dir[Rails.root.join('app/roles/**/*.rb')].each { |f| require f }
-end
-
-def start_simplecov
-  require 'simplecov'
-  SimpleCov.start 'rails' do
-    add_filter 'vendor'
-    add_group 'Roles', 'app/roles'
-  end
 end
 
 def login(user)

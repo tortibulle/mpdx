@@ -357,44 +357,26 @@ describe GoogleContactsIntegrator do
     end
   end
 
-  describe 'sync behavior with 404 error and 412 error' do
-    it 'retries contacts which yield a 404 or 412 error' do
-      person2 = create(:person, first_name: 'Jane', last_name: 'Doe')
-      @contact.people << person2
-
+  describe 'sync behavior for HTTP errors' do
+    before do
+      stub_mpdx_group_request
+      @integration.update_column(:contacts_last_synced, 1.hour.ago)
       create(:google_contact, google_account: @account, person: @person, remote_id: '1',
              last_data: { given_name: 'John', family_name: 'Doe' }, last_synced: 1.hour.ago)
-      create(:google_contact, google_account: @account, person: person2, remote_id: '2',
-             last_data: { given_name: 'Jane', family_name: 'Doe' }, last_synced: 1.hour.ago)
-      @integration.update_column(:contacts_last_synced, 1.hour.ago)
+      expect(@account.contacts_api_user).to receive(:contacts_updated_min).and_return([])
+    end
 
-      g_contact2 = GoogleContactsApi::Contact.new(
-        'gd$etag' => 'a',
-        'id' => { '$t' => '2' },
-        'gd$name' => { 'gd$givenName' => { '$t' => 'Jane' }, 'gd$familyName' => { '$t' => 'Doe' } }
-      )
-      g_contact2_reloaded = GoogleContactsApi::Contact.new(
-        'gd$etag' => 'a',
-        'id' => { '$t' => '2' },
-        'gd$name' => { 'gd$givenName' => { '$t' => 'MODIFIED-Jane' }, 'gd$familyName' => { '$t' => 'Doe' } }
-      )
-
-      # Ensure the order of the people returned
-      expect(@contact).to receive(:people).and_return([@person, person2])
-
+    it 'retries the sync and creates a new contact on a 404 error' do
       expect(@account.contacts_api_user).to receive(:get_contact).with('1').and_return(@g_contact)
       expect(@account.contacts_api_user).to receive(:query_contacts).with('John Doe').and_return([])
 
-      expect(@account.contacts_api_user).to receive(:get_contact).with('2').and_return(g_contact2, g_contact2_reloaded)
-
-      expect(@account.contacts_api_user).to receive(:contacts_updated_min).and_return([])
-
-      new_contact = double
-      expect(GoogleContactsApi).to receive(:new).and_return(new_contact)
+      new_g_contact = GoogleContactsApi::Contact.new
+      expect(GoogleContactsApi::Contact).to receive(:new).and_return(new_g_contact)
 
       times_batch_create_or_update_called = 0
+
       expect(@account.contacts_api_user).to receive(:batch_create_or_update)
-                                            .exactly(4).times.and_return do |g_contact, &block|
+                                            .exactly(2).times.and_return do |g_contact, &block|
         times_batch_create_or_update_called += 1
 
         case times_batch_create_or_update_called
@@ -402,22 +384,60 @@ describe GoogleContactsIntegrator do
           expect(g_contact).to eq(@g_contact)
           block.call(code: 404)
         when 2
-          expect(g_contact).to eq(g_contact2)
-          block.call(code: 412)
-        when 3
-          expect(g_contact).to eq(new_contact)
+          expect(g_contact).to eq(new_g_contact)
           block.call(code: 201)
-        when 4
-          expect(g_contact).to eq(g_contact2_reloaded)
+        end
+      end
+
+      expect(times_batch_create_or_update_called).to eq(0)
+      @integrator.sync_contacts
+      expect(times_batch_create_or_update_called).to eq(2)
+    end
+
+    it 'retries the sync and reloads a contact on a 412 error' do
+      g_contact_reloaded = GoogleContactsApi::Contact.new('gd$etag' => 'a', 'id' => { '$t' => '2' },
+        'gd$name' => { 'gd$givenName' => { '$t' => 'MODIFIED-Jane' }, 'gd$familyName' => { '$t' => 'Doe' } })
+      expect(@account.contacts_api_user).to receive(:get_contact).with('1').exactly(:twice)
+                                            .and_return(@g_contact, g_contact_reloaded)
+
+      times_batch_create_or_update_called = 0
+      expect(@account.contacts_api_user).to receive(:batch_create_or_update)
+                                            .exactly(2).times.and_return do |g_contact, &block|
+        times_batch_create_or_update_called += 1
+
+        case times_batch_create_or_update_called
+        when 1
+          expect(g_contact).to eq(@g_contact)
+          block.call(code: 412)
+        when 2
+          expect(g_contact).to eq(g_contact_reloaded)
           block.call(code: 200)
         end
       end
 
-      stub_mpdx_group_request
-
       expect(times_batch_create_or_update_called).to eq(0)
       @integrator.sync_contacts
-      expect(times_batch_create_or_update_called).to eq(4)
+      expect(times_batch_create_or_update_called).to eq(2)
+    end
+
+    it 'raises an error for 500 errors returned on individual sync' do
+      expect(@account.contacts_api_user).to receive(:get_contact).with('1').and_return(@g_contact)
+
+      times_batch_create_or_update_called = 0
+      expect(@account.contacts_api_user).to receive(:batch_create_or_update)
+                                            .exactly(:once).and_return do |g_contact, &block|
+        times_batch_create_or_update_called += 1
+
+        case times_batch_create_or_update_called
+        when 1
+          expect(g_contact).to eq(@g_contact)
+          block.call(code: 500)
+        end
+      end
+
+      expect(times_batch_create_or_update_called).to eq(0)
+      expect { @integrator.sync_contacts }.to raise_error
+      expect(times_batch_create_or_update_called).to eq(1)
     end
   end
 
