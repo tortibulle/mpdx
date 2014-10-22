@@ -47,8 +47,8 @@ class Task < Activity
   ALL_RESULTS = STANDARD_RESULTS + APPOINTMENT_RESULTS + CALL_RESULTS + MESSAGE_RESULTS
 
   TASK_ACTIVITIES = ['Call', 'Appointment', 'Email', 'Text Message', 'Facebook Message',
-                    'Letter', 'Newsletter', 'Pre Call Letter', 'Reminder Letter',
-                    'Support Letter', 'Thank', 'To Do']
+                     'Letter', 'Newsletter', 'Pre Call Letter', 'Reminder Letter',
+                     'Support Letter', 'Thank', 'To Do']
 
   assignable_values_for :activity_type, allow_blank: true do
     TASK_ACTIVITIES
