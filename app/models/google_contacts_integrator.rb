@@ -22,14 +22,21 @@ class GoogleContactsIntegrator
     @cache = GoogleContactsCache.new(@account)
     @contacts_to_retry_sync = []
 
-    contacts_to_sync.each(&method(:sync_contact))
+    contacts = contacts_to_sync
+
+    # Each individual google_contact record also tracks a last synced time which will reflect when that particular person
+    # was synced as well, this integration overall sync time is used though for querying the Google Contacts API for
+    # updated google contacts, so setting the last synced time at the start of th sync would capture Google contacts
+    # changed during the sync in the next sync.
+    @integration.contacts_last_synced = Time.now
+
+    contacts.each(&method(:sync_contact))
     api_user.send_batched_requests
 
     @contacts_to_retry_sync.each(&:reload)
     @contacts_to_retry_sync.each(&method(:sync_contact))
     api_user.send_batched_requests
 
-    @integration.contacts_last_synced = Time.now
     @integration.save
   rescue Person::GoogleAccount::MissingRefreshToken
     # Don't log this exception as we expect it to happen from time to time.

@@ -299,7 +299,7 @@ describe GoogleContactsIntegrator do
       stub_empty_contacts_request
       stub_mpdx_group_request
 
-      contact_xml = <<-EOS
+      contact_name_info = <<-EOS
         <gd:name>
           <gd:namePrefix>Mr</gd:namePrefix>
           <gd:givenName>John</gd:givenName>
@@ -307,8 +307,10 @@ describe GoogleContactsIntegrator do
           <gd:familyName>Doe</gd:familyName>
           <gd:nameSuffix>III</gd:nameSuffix>
         </gd:name>
-        <content>about</content>
-        <gd:organization rel="http://schemas.google.com/g/2005#work"  primary="true">
+      EOS
+
+      contact_org_and_group_info = <<-EOS
+        <gd:organization rel="http://schemas.google.com/g/2005#work"   primary="true">
           <gd:orgName>Company, Inc</gd:orgName>
           <gd:orgTitle>Worker</gd:orgTitle>
         </gd:organization>
@@ -316,12 +318,14 @@ describe GoogleContactsIntegrator do
       EOS
 
       create_contact_request_xml = <<-EOS
-      <feed xmlns='http://www.w3.org/2005/Atom' xmlns:gContact='http://schemas.google.com/contact/2008' xmlns:gd='http://schemas.google.com/g/2005' xmlns:batch='http://schemas.google.com/gdata/batch'>
-        <atom:entry xmlns:atom="http://www.w3.org/2005/Atom" xmlns:gd="http://schemas.google.com/g/2005" xmlns:gContact="http://schemas.google.com/contact/2008">
-          <atom:category scheme="http://schemas.google.com/g/2005#kind" term="http://schemas.google.com/contact/2008#contact"/>
+      <feed  xmlns='http://www.w3.org/2005/Atom' xmlns:gContact='http://schemas.google.com/contact/2008'   xmlns:gd='http://schemas.google.com/g/2005'  xmlns:batch='http://schemas.google.com/gdata/batch'>
+        <atom:entry  xmlns:atom="http://www.w3.org/2005/Atom"  xmlns:gd="http://schemas.google.com/g/2005"  xmlns:gContact="http://schemas.google.com/contact/2008">
+          <atom:category  scheme="http://schemas.google.com/g/2005#kind"  term="http://schemas.google.com/contact/2008#contact"/>
           <batch:id>0</batch:id>
           <batch:operation type="insert"/>
-          #{contact_xml}
+          #{contact_name_info}
+          <atom:content>about</atom:content>
+          #{contact_org_and_group_info}
         </atom:entry>
       </feed>
       EOS
@@ -331,15 +335,17 @@ describe GoogleContactsIntegrator do
           <batch:id>0</batch:id>
           <batch:operation type='insert'/>
           <batch:status code='201' reason='Created'/>
-          #{contact_xml}
+          #{contact_name_info}
+          <content>about</content>
+          #{contact_org_and_group_info}
         </entry>
       </feed>
       EOS
 
-      stub_request(:post, 'https://www.google.com/m8/feeds/contacts/default/full/batch?alt=&v=3') { |request|
-        equivalent = EquivalentXml.equivalent?(request.body, create_contact_request_xml)
-        expect(equivalent).to be_true
-      }.to_return(body: create_contact_response_xml)
+      stub_request(:post, 'https://www.google.com/m8/feeds/contacts/default/full/batch?alt=&v=3')
+        .with(body: /#{create_contact_request_xml.strip.gsub(/\s\s*/,'\s+')}/m,
+              headers: { 'Authorization' => "Bearer #{@account.token}" })
+        .to_return(body: create_contact_response_xml)
 
       @integrator.sync_contacts
 
