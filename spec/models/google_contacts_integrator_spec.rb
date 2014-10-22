@@ -348,10 +348,15 @@ describe GoogleContactsIntegrator do
         </feed>
       EOS
 
-      stub_request(:post, 'https://www.google.com/m8/feeds/contacts/default/full/batch?alt=&v=3')
-        .with(body: /#{create_contact_request_xml.strip.gsub(/\s\s*/, '\s+')}/m,
-              headers: { 'Authorization' => "Bearer #{@account.token}" })
-        .to_return(body: create_contact_response_xml)
+      # stub_request(:post, 'https://www.google.com/m8/feeds/contacts/default/full/batch?alt=&v=3')
+      #   .with(body: /#{create_contact_request_xml.strip.gsub(/\s\s*/, '\s+')}/m,
+      #         headers: { 'Authorization' => "Bearer #{@account.token}" })
+      #   .to_return(body: create_contact_response_xml)
+
+      stub_request(:post, 'https://www.google.com/m8/feeds/contacts/default/full/batch?alt=&v=3').to_return do |request|
+        expect(EquivalentXml.equivalent?(request.body, create_contact_request_xml)).to be_true
+        { body: create_contact_response_xml }
+      end
 
       @integrator.sync_contacts
 
