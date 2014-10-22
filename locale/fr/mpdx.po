@@ -998,6 +998,15 @@ msgstr ""
 "ais il pourra bientôt ! Connectez votre compte maintenant pour être prêt quand"
 " il le fera"
 
+msgid ""
+"MPDX encountered errors while trying to import your %{source} contacts.\n"
+"\n"
+"%{explanation}\n"
+"\n"
+"Thanks!\n"
+"MPDX Support Team"
+msgstr ""
+
 #, fuzzy
 msgid "MPDX has finished importing your %{source} contacts."
 msgstr "[MPDX] L'importation de vos contacts de %{source} a échouée"
