@@ -318,9 +318,12 @@ describe GoogleContactsIntegrator do
       EOS
 
       create_contact_request_xml = <<-EOS
-      <feed  xmlns='http://www.w3.org/2005/Atom' xmlns:gContact='http://schemas.google.com/contact/2008'   xmlns:gd='http://schemas.google.com/g/2005'  xmlns:batch='http://schemas.google.com/gdata/batch'>
-        <atom:entry  xmlns:atom="http://www.w3.org/2005/Atom"  xmlns:gd="http://schemas.google.com/g/2005"  xmlns:gContact="http://schemas.google.com/contact/2008">
-          <atom:category  scheme="http://schemas.google.com/g/2005#kind"  term="http://schemas.google.com/contact/2008#contact"/>
+      <feed  xmlns='http://www.w3.org/2005/Atom' xmlns:gContact='http://schemas.google.com/contact/2008'
+                 xmlns:gd='http://schemas.google.com/g/2005'  xmlns:batch='http://schemas.google.com/gdata/batch'>
+        <atom:entry  xmlns:atom="http://www.w3.org/2005/Atom"  xmlns:gd="http://schemas.google.com/g/2005"
+                             xmlns:gContact="http://schemas.google.com/contact/2008">
+          <atom:category  scheme="http://schemas.google.com/g/2005#kind"
+                                     term="http://schemas.google.com/contact/2008#contact"/>
           <batch:id>0</batch:id>
           <batch:operation type="insert"/>
           #{contact_name_info}
@@ -330,20 +333,23 @@ describe GoogleContactsIntegrator do
       </feed>
       EOS
       create_contact_response_xml = <<-EOS
-      <feed>
-        <entry>
-          <batch:id>0</batch:id>
-          <batch:operation type='insert'/>
-          <batch:status code='201' reason='Created'/>
-          #{contact_name_info}
-          <content>about</content>
-          #{contact_org_and_group_info}
-        </entry>
-      </feed>
+        <feed gd:etag="&quot;QHg9eDVSLyt7I2A9XRdQE0QORQY.&quot;"
+                  xmlns="http://www.w3.org/2005/Atom" xmlns:batch="http://schemas.google.com/gdata/batch"
+                  xmlns:gContact="http://schemas.google.com/contact/2008" xmlns:gd="http://schemas.google.com/g/2005"
+                  xmlns:openSearch="http://a9.com/-/spec/opensearch/1.1/">
+          <entry>
+            <batch:id>0</batch:id>
+            <batch:operation type='insert'/>
+            <batch:status code='201' reason='Created'/>
+            #{contact_name_info}
+            <content>about</content>
+            #{contact_org_and_group_info}
+          </entry>
+        </feed>
       EOS
 
       stub_request(:post, 'https://www.google.com/m8/feeds/contacts/default/full/batch?alt=&v=3')
-        .with(body: /#{create_contact_request_xml.strip.gsub(/\s\s*/,'\s+')}/m,
+        .with(body: /#{create_contact_request_xml.strip.gsub(/\s\s*/, '\s+')}/m,
               headers: { 'Authorization' => "Bearer #{@account.token}" })
         .to_return(body: create_contact_response_xml)
 
