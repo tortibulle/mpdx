@@ -33,6 +33,8 @@ class GoogleIntegrationsController < ApplicationController
       notice = _('MPDX is now synchronizing your tasks with your Google calendar.')
     when 'email'
       notice = _('MPDX is now synchronizing your history with your Gmail account.')
+    when 'contacts'
+      notice = _('MPDX is now synchronizing your active contacts with your Google Contacts.')
     end
 
     redirect_to google_integration, notice: notice
@@ -45,7 +47,8 @@ class GoogleIntegrationsController < ApplicationController
   end
 
   def google_integration_params
-    params.require(:google_integration).permit([:calendar_integration, { calendar_integrations: [] }, :calendar_id, :calendar_name, :new_calendar, :email_integration])
+    params.require(:google_integration).permit([:calendar_integration, { calendar_integrations: [] }, :calendar_id,
+                                                :calendar_name, :new_calendar, :email_integration, :contacts_integration])
   end
 
   def missing_refresh_token

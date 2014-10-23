@@ -2,6 +2,14 @@ require 'spork'
 #uncomment the following line to use spork with the debugger
 #require 'spork/ext/ruby-debug'
 
+def start_simplecov
+  require 'simplecov'
+  SimpleCov.start 'rails' do
+    add_filter 'vendor'
+    add_group 'Roles', 'app/roles'
+  end
+end
+
 Spork.prefork do
   # Loading more in this block will cause your tests to run faster. However,
   # if you change any configuration or code from libraries loaded here, you'll
@@ -14,11 +22,10 @@ Spork.prefork do
   require 'capybara/rspec'
   require 'sidekiq/testing'
 
-  require 'simplecov'
-  SimpleCov.start 'rails' do
-    add_filter 'vendor'
-    add_group 'Roles', 'app/roles'
-  end
+  require 'rspec/matchers' # req by equivalent-xml custom matcher `be_equivalent_to`
+  require 'equivalent-xml'
+
+  start_simplecov unless ENV['DRB']
 
   # Requires supporting ruby files with custom matchers and macros, etc,
   # in spec/support/ and its subdirectories.
@@ -114,6 +121,7 @@ end
 
 Spork.each_run do
   # This code will be run each time you run your specs.
+  start_simplecov if ENV['DRB']
   Zonebie.set_random_timezone
   FactoryGirl.reload
   Dir[Rails.root.join('app/roles/**/*.rb')].each { |f| require f }
