@@ -2,11 +2,9 @@ require 'google_contact_sync'
 require 'google_contacts_cache'
 
 class GoogleContactsIntegrator
-  attr_accessor :client
-  attr_accessor :assigned_remote_ids
-  attr_accessor :cache
+  attr_accessor :assigned_remote_ids, :cache, :client
 
-  CONTACTS_GROUP_TITLE = 'MPDx'
+  CONTACTS_GROUP_TITLE = 'MPDX'
 
   # Caching the Google contacts from one big request speeds up the sync as we don't need separate HTTP get requests
   # But is only worth it if we are syncing a number of contacts, so check the number against this threshold.
@@ -33,6 +31,12 @@ class GoogleContactsIntegrator
     contacts.each(&method(:sync_contact))
     api_user.send_batched_requests
 
+    # For contacts syncs to the Google Conctacts API that were either deleted or modified during the sync
+    # and so caused a 404 Contact Not Found or a 412 Precondition Mismatch (i.e. ETag mismatch, i.e. contact changed),
+    # we can attempt to retry them by re-executing the sync logic which will pull down the Google Contacts information
+    # and re-compare with it. The save_g_contacts_then_links method below may populate @contacts_to_retry_sync.
+    # Only retry the sync once though in case one of those problems was caused by something that would be ongoing
+    # despite re-applying the sync logic.
     @contacts_to_retry_sync.each(&:reload)
     @contacts_to_retry_sync.each(&method(:sync_contact))
     api_user.send_batched_requests

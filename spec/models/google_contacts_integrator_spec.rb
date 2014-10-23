@@ -267,7 +267,7 @@ describe GoogleContactsIntegrator do
         'entry' => [
           {
             'id' => { '$t' => 'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid' },
-            'title' => { '$t' => 'MPDx' }
+            'title' => { '$t' => GoogleContactsIntegrator::CONTACTS_GROUP_TITLE }
           }
         ],
         'openSearch$totalResults' => { '$t' => '1' },
@@ -521,7 +521,7 @@ describe GoogleContactsIntegrator do
       create_group_request_regex_str =
         '<atom:entry xmlns:gd="http://schemas.google.com/g/2005" xmlns:atom="http://www.w3.org/2005/Atom">\s*'\
           '<atom:category scheme="http://schemas.google.com/g/2005#kind"\s+term="http://schemas.google.com/contact/2008#group"/>\s*'\
-          '<atom:title type="text">MPDx</atom:title>\s*'\
+          "<atom:title type=\"text\">#{ GoogleContactsIntegrator::CONTACTS_GROUP_TITLE }</atom:title>\s*"\
         '</atom:entry>'
 
       create_group_response = {
@@ -736,7 +736,7 @@ describe GoogleContactsIntegrator do
           'entry' => [
             {
               'id' => { '$t' => 'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid' },
-              'title' => { '$t' => 'MPDx' }
+              'title' => { '$t' => GoogleContactsIntegrator::CONTACTS_GROUP_TITLE }
             }
           ],
           'openSearch$totalResults' => { '$t' => '1' },
