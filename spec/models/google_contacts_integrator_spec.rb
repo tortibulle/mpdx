@@ -30,7 +30,7 @@ describe GoogleContactsIntegrator do
     it 'syncs contacts and records last synced time' do
       expect(@integrator).to receive(:setup_assigned_remote_ids)
 
-      expect(@integrator).to receive(:contacts_to_sync).and_return([@contact])
+      expect(@integrator).to receive(:contacts_to_sync).and_return([@contact], [])
       expect(@integrator).to receive(:sync_contact).with(@contact)
 
       now = Time.now
@@ -280,8 +280,8 @@ describe GoogleContactsIntegrator do
       .to_return(body: groups_body.to_json)
   end
 
-  def stub_empty_contacts_request
-    empty_feed_json = {
+  def empty_feed_json
+    {
       'feed' => {
         'entry' => [],
         'openSearch$totalResults' => { '$t' => '0' },
@@ -289,14 +289,23 @@ describe GoogleContactsIntegrator do
         'openSearch$itemsPerPage' => { '$t' => '0' }
       }
     }.to_json
+  end
+
+  def stub_empty_g_contacts
     stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&v=3")
       .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
       .to_return(body: empty_feed_json)
   end
 
+  def stub_empty_updated_g_contacts
+    stub_request(:get, %r{#{@api_url}/default/full\?alt=json&max-results=100000&updated-min=.*&v=3})
+      .to_return(body: empty_feed_json)
+  end
+
   describe 'overall sync for creating a new google contact' do
     it 'creates a new google contact and association for a contact to sync' do
-      stub_empty_contacts_request
+      stub_empty_g_contacts
+      stub_empty_updated_g_contacts
       stub_mpdx_group_request
 
       contact_name_info = <<-EOS
@@ -348,11 +357,6 @@ describe GoogleContactsIntegrator do
         </feed>
       EOS
 
-      # stub_request(:post, 'https://www.google.com/m8/feeds/contacts/default/full/batch?alt=&v=3')
-      #   .with(body: /#{create_contact_request_xml.strip.gsub(/\s\s*/, '\s+')}/m,
-      #         headers: { 'Authorization' => "Bearer #{@account.token}" })
-      #   .to_return(body: create_contact_response_xml)
-
       stub_request(:post, 'https://www.google.com/m8/feeds/contacts/default/full/batch?alt=&v=3').to_return do |request|
         expect(EquivalentXml.equivalent?(request.body, create_contact_request_xml)).to be_true
         { body: create_contact_response_xml }
@@ -380,7 +384,7 @@ describe GoogleContactsIntegrator do
       @integration.update_column(:contacts_last_synced, 1.hour.ago)
       create(:google_contact, google_account: @account, person: @person, remote_id: '1',
              last_data: { given_name: 'John', family_name: 'Doe' }, last_synced: 1.hour.ago)
-      expect(@account.contacts_api_user).to receive(:contacts_updated_min).and_return([])
+      expect(@account.contacts_api_user).to receive(:contacts_updated_min).at_least(:once).and_return([])
     end
 
     it 'retries the sync and creates a new contact on a 404 error' do
@@ -515,6 +519,8 @@ describe GoogleContactsIntegrator do
           country: 'United States', location: 'Business', primary_mailing_address: true }
       ]
       @contact.save
+
+      stub_empty_updated_g_contacts
 
       stub_mpdx_group_request
 
@@ -727,9 +733,9 @@ describe GoogleContactsIntegrator do
           'openSearch$itemsPerPage' => { '$t' => '1' }
         }
       }
-      formatted_last_sync = GoogleContactsApi::Api.format_time_for_xml(@integration.contacts_last_synced)
-      stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&updated-min=#{formatted_last_sync}&v=3")
-        .to_return(body: updated_contacts_body.to_json)
+
+      stub_request(:get, %r{#{@api_url}/default/full\?alt=json&max-results=100000&updated-min=.*&v=3})
+        .to_return(body: updated_contacts_body.to_json).then.to_return(body: empty_feed_json)
 
       groups_body = {
         'feed' => {
