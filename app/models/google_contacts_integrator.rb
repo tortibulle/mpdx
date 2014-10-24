@@ -10,7 +10,7 @@ class GoogleContactsIntegrator
   # But is only worth it if we are syncing a number of contacts, so check the number against this threshold.
   CACHE_ALL_G_CONTACTS_THRESHOLD = 10
 
-  MAX_CONTACTS_TO_SYNC_CHECKS = 10
+  MAX_CONTACTS_TO_SYNC_CHECKS = 3
 
   def initialize(google_integration)
     @integration = google_integration
