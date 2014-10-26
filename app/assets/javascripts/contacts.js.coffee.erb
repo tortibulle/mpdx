@@ -493,19 +493,27 @@ $.mpdx.loadDonations = ->
 
 $.mpdx.loadContactTasks = ->
   if $('#tasks').html() == ''
-    $.ajax {
-      url: '/tasks',
-      data: {filters: {contact_ids: $('#contentbody').attr('data-contact-id')}},
-      dataType: 'script'
-    }
+    $.mpdx.reloadContactTasks()
+
+$.mpdx.reloadContactTasks = ->
+  id = $('#contentbody').attr('data-contact-id')
+  if id
+    angular.element(jQuery('#tasks-tab')).scope().init('contact',id)
 
 $.mpdx.loadContactHistory = ->
   if $('#history').html() == ''
-    $.ajax {
-      url: '/tasks/history',
-      data: {filters: {date_range: 'all', contact_ids: $('#contentbody').attr('data-contact-id')}},
-      dataType: 'script'
-    }
+    $.mpdx.reloadContactHistory()
+
+$.mpdx.reloadContactHistory = ->
+  id = $('#contentbody').attr('data-contact-id')
+  if id
+    angular.element(jQuery('#history-tab')).scope().init('contactHistory',id)
+
+$.mpdx.reloadContactTasksAndHistory = ->
+  id = $('#contentbody').attr('data-contact-id')
+  if id
+    angular.element(jQuery('#tasks-tab')).scope().init('contact',id)
+    angular.element(jQuery('#history-tab')).scope().init('contactHistory',id)
 
 $.mpdx.loadReferrals = ->
   if $('#referrals').html() == ''
@@ -523,6 +531,7 @@ $.mpdx.loadSocialStream = ->
     }
 
 $.mpdx.reloadContact = ->
+  return if !$('#contentbody').attr('data-contact-id')
   $('#page_spinner').dialog({modal: true, closeOnEscape: false})
   $.ajax {
     url: '/contacts/' + $('#contentbody').attr('data-contact-id'),

@@ -112,6 +112,8 @@ angular.module('mpdxApp')
                             }
 
                             jQuery('#complete_task_followup_modal').dialog('close');
+                            $.mpdx.reloadContactTasksAndHistory();
+                            showContactStatus('Call for Decision');
                         };
 
                     }else if((strContains(taskResult, 'Appointment Scheduled') || strContains(taskResult, 'Reschedule')) && followUpTask.contacts.length > 0){
@@ -159,6 +161,8 @@ angular.module('mpdxApp')
                                 createGenericTask(contactsObject, 'Call');
                             }
                             jQuery('#complete_task_followup_modal').dialog('close');
+                            $.mpdx.reloadContactTasksAndHistory();
+                            showContactStatus('Appointment Scheduled');
                         };
 
                     }else if(strContains(taskResult, 'Partner - Financial') && followUpTask.contacts.length > 0){
@@ -223,6 +227,8 @@ angular.module('mpdxApp')
                                 createGivingTask(contactsObject);
                             }
                             jQuery('#complete_task_followup_modal').dialog('close');
+                            $.mpdx.reloadContactTasksAndHistory();
+                            showContactStatus('Partner - Financial');
                         };
 
                     }else if(strContains(taskResult, 'Partner - Special') && followUpTask.contacts.length > 0){
@@ -280,6 +286,8 @@ angular.module('mpdxApp')
                                 createGivingTask(contactsObject);
                             }
                             jQuery('#complete_task_followup_modal').dialog('close');
+                            $.mpdx.reloadContactTasksAndHistory();
+                            showContactStatus('Partner - Special');
                         };
 
                     }else if(strContains(taskResult, 'Partner - Pray') && followUpTask.contacts.length > 0){
@@ -317,6 +325,8 @@ angular.module('mpdxApp')
                                 }
                             });
                             jQuery('#complete_task_followup_modal').dialog('close');
+                            $.mpdx.reloadContactTasksAndHistory();
+                            showContactStatus('Partner - Pray');
                         };
 
                     }else if(strContains(taskResult, 'Ask in Future') && followUpTask.contacts.length > 0){
@@ -366,6 +376,8 @@ angular.module('mpdxApp')
                             }
 
                             jQuery('#complete_task_followup_modal').dialog('close');
+                            $.mpdx.reloadContactTasksAndHistory();
+                            showContactStatus('Ask in Future');
                         };
 
                     }else if(strContains(taskResult, 'Not Interested') && followUpTask.contacts.length > 0){
@@ -386,6 +398,8 @@ angular.module('mpdxApp')
                             });
 
                             jQuery('#complete_task_followup_modal').dialog('close');
+                            $.mpdx.reloadContactTasksAndHistory();
+                            showContactStatus('Not Interested');
                         };
 
                     }
@@ -489,6 +503,10 @@ angular.module('mpdxApp')
                         }
                     });
                 };
+
+                var showContactStatus = function(status){
+                    jQuery('.contact_status').text('Status: '+status);
+                }
 
                 var strContains = function(h, n){
                     return h.indexOf(n) > -1
