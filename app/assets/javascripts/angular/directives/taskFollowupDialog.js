@@ -181,6 +181,9 @@ angular.module('mpdxApp')
                                 date: dateTwoDaysFromToday,
                                 hour: ("0" + (new Date().getHours())).slice(-2),
                                 min: ("0" + (new Date().getMinutes())).slice(-2)
+                            },
+                            newsletter: {
+                              type: 'Both'
                             }
                         };
 
@@ -242,6 +245,9 @@ angular.module('mpdxApp')
                                 date: dateTwoDaysFromToday,
                                 hour: ("0" + (new Date().getHours())).slice(-2),
                                 min: ("0" + (new Date().getMinutes())).slice(-2)
+                            },
+                            newsletter: {
+                              type: 'Both'
                             }
                         };
 
@@ -286,6 +292,11 @@ angular.module('mpdxApp')
                             givingTask: false,
                             newsletter: true
                         };
+                        $scope.followUpDialogResult = {
+                          newsletter: {
+                            type: 'Both'
+                          }
+                        };
 
                         $scope.followUpSaveFunc = function(){
                             //Contact Updates
@@ -324,6 +335,9 @@ angular.module('mpdxApp')
                                 hour: ("0" + (new Date().getHours())).slice(-2),
                                 min: ("0" + (new Date().getMinutes())).slice(-2),
                                 tags: followUpTask.tag_list.join()
+                            },
+                            newsletter: {
+                              type: 'Both'
                             }
                         };
 
