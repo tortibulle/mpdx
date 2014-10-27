@@ -7,8 +7,17 @@ class GoogleIntegrationsController < ApplicationController
 
   def update
     if google_integration.update_attributes(google_integration_params)
+      redirect_options = {}
+      if google_integration.contacts_integration
+        # Start the Google Contacts sync after its first enabled since its not queued on a schedule but only when contacts
+        # are changed or when the user clicks "Sync Now". This way if they don't update a contact or click "Sync Now"
+        # for a while the sync will still get started.
+        google_integration.queue_sync_data('contacts')
+        redirect_options[:notice] = _('MPDX is now synchronizing your active contacts with your Google Contacts.')
+      end
+
       respond_to do |format|
-        format.html { redirect_to google_integration }
+        format.html { redirect_to google_integration, redirect_options }
         format.js { render nothing: true }
       end
     else

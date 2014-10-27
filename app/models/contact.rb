@@ -59,7 +59,7 @@ class Contact < ActiveRecord::Base
   accepts_nested_attributes_for :contact_referrals_to_me, reject_if: :all_blank, allow_destroy: true
 
   before_save :set_notes_saved_at
-  after_commit :sync_with_mail_chimp, :sync_with_prayer_letters
+  after_commit :sync_with_mail_chimp, :sync_with_prayer_letters, :sync_with_google_contacts
   before_destroy :delete_from_prayer_letters, :delete_people
 
   assignable_values_for :status, allow_blank: true do
@@ -443,6 +443,10 @@ class Contact < ActiveRecord::Base
     else
       delete_from_prayer_letters
     end
+  end
+
+  def sync_with_google_contacts
+    account_list.google_integrations.where(contacts_integration: true).each { |g_i| g_i.queue_sync_data('contacts') }
   end
 
   def delete_from_prayer_letters
