@@ -11,7 +11,10 @@
         </span>
         <div class="people">
             <div ng-repeat="i in contact.person_ids" ng-show="!getPerson(i).deceased">
-                <a href="/people/{{i}}">{{getPerson(i).name}}</a><span ng-show="getPrimaryPhone(getPerson(i).id)" style="display:inline;"> - {{getPrimaryPhone(getPerson(i).id).number}} - {{getPrimaryPhone(getPerson(i).id).location}}</span>
+              <a href="/people/{{i}}">{{getPerson(i).name}}</a>
+              <span ng-show="getPrimaryPhone(getPerson(i).id)" style="display:inline;"> - {{getPrimaryPhone(getPerson(i).id).number}} - {{getPrimaryPhone(getPerson(i).id).location}}</span>
+              <a ng-href="mailto:{{getEmailAddress(e).email}}" ng-repeat="e in getPerson(i).email_address_ids" ng-show="!getEmailAddress(e).historic"><i class="fa fa-envelope-square" title="Email"></i> </a>
+              <a ng-href="https://www.facebook.com/{{getFacebookId(fb).remote_id}}" target="_blank" ng-repeat="fb in getPerson(i).facebook_account_ids"><i class="fa fa-facebook-square" title="Facebook profile"></i> </a>
             </div>
         </div>
         <span class="address" ng-repeat="i in contact.address_ids" ng-bind-html="getAddress(i)"></span>
