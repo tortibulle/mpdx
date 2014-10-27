@@ -226,6 +226,8 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
           var people = _.filter(data.people, function (i) {
             return _.contains(contact.person_ids, i.id);
           });
+          var flattenedEmailAddresses = _.flatten(_.pluck(people, 'email_address_ids'));
+          var flattenedFacebookAccounts = _.flatten(_.pluck(people, 'facebook_account_ids'));
 
           contactCache.update(contact.id, {
             addresses: _.filter(data.addresses, function (addr) {
@@ -233,12 +235,12 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
             }),
             people: people,
             email_addresses: _.filter(data.email_addresses, function (email) {
-              return _.contains(_.flatten(_.pluck(people, 'email_address_ids')), email.id);
+              return _.contains(flattenedEmailAddresses, email.id);
             }),
             contact: _.find(data.contacts, { 'id': contact.id }),
             phone_numbers: data.phone_numbers,
             facebook_accounts: _.filter(data.facebook_accounts, function (fb) {
-              return _.contains(_.flatten(_.pluck(people, 'facebook_account_ids')), fb.id);
+              return _.contains(flattenedFacebookAccounts, fb.id);
             })
           });
         });
