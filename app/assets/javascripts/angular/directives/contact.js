@@ -20,6 +20,14 @@ angular.module('mpdxApp')
                     }
                 };
 
+                $scope.getFacebookId = function(id){
+                  return _.find(contactCache.getFromCache($scope.contact.id).facebook_accounts, { 'id': id });
+                };
+
+                $scope.getEmailAddress = function(id){
+                  return _.find(contactCache.getFromCache($scope.contact.id).email_addresses, { 'id': id });
+                };
+
                 $scope.getPerson = function(id){
                     var person = _.find(contactCache.getFromCache($scope.contact.id).people, { 'id': id });
                     person.name = person.first_name + ' ' + person.last_name;
