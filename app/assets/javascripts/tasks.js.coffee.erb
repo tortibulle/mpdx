@@ -183,11 +183,21 @@ $ ->
 
   $(document).on 'click', '#tasks_index .select_all', ->
     table = $(this).closest('table')
-
     $('input[type=checkbox]', table).prop('checked', $(this).prop('checked'))
-    if $(this).prop('checked') == true
+    if $(this).prop('checked')
       $('.taskgroup .actions', table).show()
     else
+      $('.taskgroup .actions', table).hide()
+
+  $(document).on 'click', '#tasks_index .check input[type=checkbox]', ->
+    table = $(this).closest('table')
+    showOptions = false
+    $('.check input[type=checkbox]', table).each ->
+      if $(this).prop('checked')
+        $('.taskgroup .actions', table).show()
+        showOptions = true
+        return
+    if !showOptions
       $('.taskgroup .actions', table).hide()
 
   $(document).on 'click', 'tr.task .fav', ->
@@ -218,7 +228,7 @@ $ ->
       form.submit()
       $('#task_' + id).fadeOut()
     else
-      if $(this).prop('checked') == true && !$('#tasks_completed')[0]?
+      #if $(this).prop('checked') == true && !$('#tasks_completed')[0]?
         row = $('#task_' + id)
         if $(this).attr("data-title")
           title = $(this).attr("data-title")
