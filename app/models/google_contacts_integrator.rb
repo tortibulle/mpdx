@@ -64,7 +64,7 @@ class GoogleContactsIntegrator
     contacts.each(&method(:sync_contact))
     api_user.send_batched_requests
 
-    # For contacts syncs to the Google Conctacts API that were either deleted or modified during the sync
+    # For contacts syncs to the Google Contacts API that were either deleted or modified during the sync
     # and so caused a 404 Contact Not Found or a 412 Precondition Mismatch (i.e. ETag mismatch, i.e. contact changed),
     # we can attempt to retry them by re-executing the sync logic which will pull down the Google Contacts information
     # and re-compare with it. The save_g_contacts_then_links method below may populate @contacts_to_retry_sync.
@@ -74,9 +74,29 @@ class GoogleContactsIntegrator
     @contacts_to_retry_sync.each(&method(:sync_contact))
     api_user.send_batched_requests
 
+    delete_g_contact_merge_losers
+
     @integration.save
 
     contacts.size
+  end
+
+  def delete_g_contact_merge_losers
+    g_contact_merge_losers.each do |g_contact_link|
+      api_user.delete_contact(g_contact_link.remote_id, g_contact_link.last_etag)
+      g_contact_link.destroy
+    end
+  rescue => e
+    Airbrake.raise_or_notify(e)
+  end
+
+  def g_contact_merge_losers
+    # Return the google_contacts record for this Google account that are no longer associated with a contact-person pair
+    # due to that contact or person being merged with another contact or person in MPDX.
+    @account.google_contacts
+      .joins('LEFT JOIN contact_people ON '\
+        'google_contacts.person_id = contact_people.person_id AND contact_people.contact_id = google_contacts.contact_id')
+      .where('contact_people.id IS NULL')
   end
 
   def api_user
@@ -138,9 +158,11 @@ class GoogleContactsIntegrator
   end
 
   def sync_contact(contact)
-    g_contacts_and_links = contact.people.map(&method(:get_g_contact_and_link))
+    STDERR.puts "Sync contact: #{contact}"
+
+    g_contacts_and_links = contact.contact_people.map(&method(:get_g_contact_and_link))
     GoogleContactSync.sync_contact(contact, g_contacts_and_links)
-    contact.save!
+    contact.save(validate: false)
 
     g_contacts_to_save = g_contacts_and_links.select(&method(:g_contact_needs_save?)).map(&:first)
     if g_contacts_to_save.empty?
@@ -152,9 +174,10 @@ class GoogleContactsIntegrator
     Airbrake.raise_or_notify(e)
   end
 
-  def get_g_contact_and_link(person)
-    g_contact_link = person.google_contacts.where(google_account: @account).first_or_initialize(person: person)
-    g_contact = get_or_query_g_contact(g_contact_link, person)
+  def get_g_contact_and_link(contact_person)
+    g_contact_link =
+      @account.google_contacts.where(person: contact_person.person, contact: contact_person.contact).first_or_initialize
+    g_contact = get_or_query_g_contact(g_contact_link, contact_person.person)
 
     if g_contact
       @assigned_remote_ids << g_contact.id
@@ -163,6 +186,9 @@ class GoogleContactsIntegrator
       g_contact_link.last_data = {}
     end
     g_contact.prep_add_to_group(mpdx_group)
+
+    STDERR.puts "get_g_contact_and_link for #{contact_person}: #{contact_person.contact}, #{contact_person.person}"
+    STDERR.puts "g_contact remote id: #{g_contact.id}, g_contact_link id: #{g_contact_link.id}"
 
     [g_contact, g_contact_link]
   end
@@ -194,14 +220,21 @@ class GoogleContactsIntegrator
       # The Google Contacts API batch requests significantly speed up the sync by reducing HTTP requests
       api_user.batch_create_or_update(g_contact) do |status|
         # This block is called for each saved g_contact once its batch completes
+        begin
+          # If any g_contact save failed but can be retried, then mark that we should queue the MPDX contact for a retry
+          # sync once we get to the last associated g_cotnact
+          retry_sync = true if failed_but_can_retry?(status, g_contact, g_contact_link)
 
-        retry_sync = true if failed_but_can_retry?(status, g_contact, g_contact_link)
-
-        next unless index == g_contacts_to_save.size - 1
-        if retry_sync
-          @contacts_to_retry_sync << contact
-        else
-          save_g_contact_links(g_contacts_and_links)
+          # When we get to last associated g_contact, then either save or queue for retry the MPDX contact
+          next unless index == g_contacts_to_save.size - 1
+          if retry_sync
+            @contacts_to_retry_sync << contact
+          else
+            save_g_contact_links(g_contacts_and_links)
+          end
+        rescue => e
+          # Rescue within this block so that the exception won't cause the response callbacks for the whole batch to break
+          Airbrake.raise_or_notify(e)
         end
       end
     end
