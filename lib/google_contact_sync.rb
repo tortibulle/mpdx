@@ -154,7 +154,7 @@ module GoogleContactSync
     g_contact_items = g_contact.send(opts[:g_contact_items])
 
     g_contact_items += g_contact_adds.map do |item_key|
-      person_item = person_items.find { |p_i| p_i.send(opts[:person_item_key]) == item_key }
+      person_item = person_items.find { |p_i| send(opts[:normalize_fn], p_i.send(opts[:person_item_key])) == item_key }
       unless person_item
         STDERR.puts "Cannot find person_item for key: #{item_key}"
         STDERR.puts "person_items: #{person_items}"
