@@ -114,7 +114,7 @@ class GoogleContactsIntegrator
     if @integration.contacts_last_synced
       updated_g_contacts = api_user.contacts_updated_min(@integration.contacts_last_synced)
 
-      queried_contacts_to_sync = contacts_to_sync_query(updated_g_contacts.map(&:id))
+      queried_contacts_to_sync = contacts_to_sync_query(updated_g_contacts)
       if queried_contacts_to_sync.length > CACHE_ALL_G_CONTACTS_THRESHOLD
         @cache.cache_all_g_contacts
       else
@@ -132,9 +132,9 @@ class GoogleContactsIntegrator
   # Queries all contacts that:
   # - Have some associted records updated_at more recent than its google_contact.contacts_last_synced
   # - Or contacts without associated google_contacts records (i.e. which haven't been synced before)
-  # - Or contacts whose google_contacts records have been updated remotely
-  #   as specified by the updated_remote_ids
-  def contacts_to_sync_query(updated_remote_ids)
+  # - Or contacts whose google_contacts records have been updated remotely since the last sync as specified by the
+  #   updated_g_contacts list
+  def contacts_to_sync_query(updated_g_contacts)
     @integration.account_list.active_contacts
       .joins(:people)
       .joins("LEFT JOIN addresses ON addresses.addressable_id = contacts.id AND addresses.addressable_type = 'Contact'")
@@ -142,20 +142,35 @@ class GoogleContactsIntegrator
       .joins('LEFT JOIN phone_numbers ON people.id = phone_numbers.person_id')
       .joins('LEFT JOIN person_websites ON people.id = person_websites.person_id')
       .joins('LEFT JOIN google_contacts ON google_contacts.person_id = people.id')
+      .joins("LEFT JOIN #{ remote_g_contacts_sql(updated_g_contacts) } ON remote_g_contacts.remote_id = google_contacts.remote_id")
       .where('google_contacts.id IS NULL OR google_contacts.google_account_id = ?', @account.id)
       .group('contacts.id, google_contacts.last_synced, google_contacts.remote_id')
       .having('google_contacts.last_synced IS NULL ' \
         'OR google_contacts.last_synced < ' \
-          'GREATEST(contacts.updated_at, MAX(contact_people.updated_at), MAX(people.updated_at), ' \
-                  'MAX(addresses.updated_at), MAX(email_addresses.updated_at), '\
-                  'MAX(phone_numbers.updated_at), MAX(person_websites.updated_at))' +
-          (updated_remote_ids.empty? ? '' : " OR google_contacts.remote_id IN (#{ quote_sql_list(updated_remote_ids) })"))
+          'GREATEST(contacts.updated_at, MAX(remote_g_contacts.updated_at), ' \
+                  'MAX(contact_people.updated_at), MAX(people.updated_at), MAX(addresses.updated_at), ' \
+                  'MAX(email_addresses.updated_at), MAX(phone_numbers.updated_at), MAX(person_websites.updated_at))')
       .distinct
       .readonly(false)
   end
 
-  def quote_sql_list(list)
-    list.map { |item| ActiveRecord::Base.connection.quote(item) }.join(',')
+  # Create a SELECT statement to represent the (remote_id, updated) pairs for remotely updated Google Contacts
+  # so that we can join to them via the remote_id and then compare with the updated in the query above.
+  # It's helpful to compare each remote Google Contact's updated field rather than just assume all that are updated
+  # since the overall last sync time, because we calculate the last sync time from the start of the sync to catch
+  # any Google Contacts that were updated during the sync. But the sync itself causes updated contacts since the
+  # start of it, so comparing each one will eliminate double syncing those that were changed by the sync itself,
+  # but will allow capture of remotely changed Google Contacts that were changed by the user during the sync.
+  def remote_g_contacts_sql(g_contacts)
+    sql_table = '(SELECT CAST(null as varchar) as remote_id, CAST(null as timestamp) as updated_at'
+    g_contacts.each do |g_contact|
+      sql_table += " UNION SELECT #{ quote_sql(g_contact.id) }, #{ quote_sql(g_contact.updated.to_s(:db)) }"
+    end
+    sql_table + ') as remote_g_contacts'
+  end
+
+  def quote_sql(sql)
+    ActiveRecord::Base.connection.quote(sql)
   end
 
   def sync_contact(contact)

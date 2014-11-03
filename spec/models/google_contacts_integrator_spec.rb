@@ -66,7 +66,7 @@ describe GoogleContactsIntegrator do
       g_contact = double(id: 'id_1', given_name: 'John', family_name: 'Doe')
       expect(@account.contacts_api_user).to receive(:contacts_updated_min).with(now).and_return([g_contact])
 
-      expect(@integrator).to receive(:contacts_to_sync_query).with(['id_1']).and_return([@contact])
+      expect(@integrator).to receive(:contacts_to_sync_query).with([g_contact]).and_return([@contact])
       expect(@integrator.contacts_to_sync).to eq([@contact])
     end
   end
@@ -172,11 +172,16 @@ describe GoogleContactsIntegrator do
       expect(contacts_to_sync_query).to eq([])
     end
 
-    it 'finds contacts whose google_contacts records match specified remotely updated ids' do
+    it 'finds contacts whose remote g_contacts have been updated since the matching google_contacts records' do
       @g_contact.update_column(:last_synced, 1.hour.since)
       @g_contact.update_column(:remote_id, 'a')
       expect(contacts_to_sync_query([])).to eq([])
-      expect(contacts_to_sync_query(['a'])).to eq([@contact])
+
+      previously_updated_g_contact = double(id: 'a', updated: 2.hours.ago)
+      expect(contacts_to_sync_query([previously_updated_g_contact])).to eq([])
+
+      since_sync_updated_g_contact = double(id: 'a', updated: 2.hours.since)
+      expect(contacts_to_sync_query([since_sync_updated_g_contact])).to eq([@contact])
     end
   end
 

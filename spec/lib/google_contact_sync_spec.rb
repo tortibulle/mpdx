@@ -291,6 +291,27 @@ describe GoogleContactSync do
       expect(phone2.location).to eq('other')
       expect(phone2.primary).to be_false
     end
+
+    it 'normalizes the numbers for comparison between mpdx and google' do
+      person.phone_number = { number: '+12223334444', location: 'mobile', primary: true }
+      person.save
+      person.phone_numbers.first.update_column(:number, '2223334444')
+
+      g_contact.update('gd$phoneNumber' => [
+        { '$t' => '(222) 333-4444', 'primary' => 'true', 'rel' => 'http://schemas.google.com/g/2005#other' }
+      ])
+
+      sync.sync_numbers(g_contact, person, g_contact_link)
+
+      expect(g_contact.prepped_changes).to eq(phone_numbers: [
+        { number: '(222) 333-4444', primary: true, rel: 'other' }
+      ])
+
+      person.save
+
+      expect(person.phone_numbers.count).to eq(1)
+      expect(person.phone_numbers.first.number).to eq('2223334444')
+    end
   end
 
   describe 'sync addresses' do
