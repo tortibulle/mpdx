@@ -5,4 +5,9 @@
   $('#edit_task_modal').dialog('close')
   $('#edit_task_modal .form_wrapper').html('<%= j(render('tasks/modal_form')) %>')
 <% end %>
-$.mpdx.reloadContactTasksAndHistory();
+if($('#tasks-tab')[0])
+<% if @task.completed %>
+  angular.element($('#history-tab')).scope().syncTask(<%== @task.to_json.gsub('/', '\/') %>)
+<% else %>
+  angular.element($('#tasks-tab')).scope().syncTask(<%== @task.to_json.gsub('/', '\/') %>)
+<% end %>

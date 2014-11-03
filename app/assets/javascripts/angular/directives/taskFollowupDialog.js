@@ -112,7 +112,6 @@ angular.module('mpdxApp')
                             }
 
                             jQuery('#complete_task_followup_modal').dialog('close');
-                            $.mpdx.reloadContactTasksAndHistory();
                             showContactStatus('Call for Decision');
                         };
 
@@ -161,7 +160,6 @@ angular.module('mpdxApp')
                                 createGenericTask(contactsObject, 'Call');
                             }
                             jQuery('#complete_task_followup_modal').dialog('close');
-                            $.mpdx.reloadContactTasksAndHistory();
                             showContactStatus('Appointment Scheduled');
                         };
 
@@ -227,7 +225,6 @@ angular.module('mpdxApp')
                                 createGivingTask(contactsObject);
                             }
                             jQuery('#complete_task_followup_modal').dialog('close');
-                            $.mpdx.reloadContactTasksAndHistory();
                             showContactStatus('Partner - Financial');
                         };
 
@@ -286,7 +283,6 @@ angular.module('mpdxApp')
                                 createGivingTask(contactsObject);
                             }
                             jQuery('#complete_task_followup_modal').dialog('close');
-                            $.mpdx.reloadContactTasksAndHistory();
                             showContactStatus('Partner - Special');
                         };
 
@@ -325,7 +321,6 @@ angular.module('mpdxApp')
                                 }
                             });
                             jQuery('#complete_task_followup_modal').dialog('close');
-                            $.mpdx.reloadContactTasksAndHistory();
                             showContactStatus('Partner - Pray');
                         };
 
@@ -376,7 +371,6 @@ angular.module('mpdxApp')
                             }
 
                             jQuery('#complete_task_followup_modal').dialog('close');
-                            $.mpdx.reloadContactTasksAndHistory();
                             showContactStatus('Ask in Future');
                         };
 
@@ -398,7 +392,6 @@ angular.module('mpdxApp')
                             });
 
                             jQuery('#complete_task_followup_modal').dialog('close');
-                            $.mpdx.reloadContactTasksAndHistory();
                             showContactStatus('Not Interested');
                         };
 
@@ -435,10 +428,12 @@ angular.module('mpdxApp')
                                 }
                             }
                         }
-                    }, function () {
+                    }, function (resp) {
                         if(angular.isDefined($scope.refreshVisibleTasks)){
                             $scope.refreshVisibleTasks();
                         }
+                        else if($('#tasks-tab')[0])
+                            angular.element($('#tasks-tab')).scope().syncTask(resp.task)
                     });
                 };
 
@@ -455,10 +450,12 @@ angular.module('mpdxApp')
                                 }
                             }
                         }
-                    }, function () {
+                    }, function (resp) {
                         if(angular.isDefined($scope.refreshVisibleTasks)){
                             $scope.refreshVisibleTasks();
                         }
+                        else if($('#tasks-tab')[0])
+                            angular.element($('#tasks-tab')).scope().syncTask(resp.task)
                     });
                 };
 
@@ -476,10 +473,12 @@ angular.module('mpdxApp')
                                 }
                             }
                         }
-                    }, function () {
+                    }, function (resp) {
                         if(angular.isDefined($scope.refreshVisibleTasks)){
                             $scope.refreshVisibleTasks();
                         }
+                        else if($('#tasks-tab')[0])
+                            angular.element($('#tasks-tab')).scope().syncTask(resp.task)
                     });
                 };
 
@@ -497,10 +496,12 @@ angular.module('mpdxApp')
                                 }
                             }
                         }
-                    }, function () {
+                    }, function (resp) {
                         if(angular.isDefined($scope.refreshVisibleTasks)){
                             $scope.refreshVisibleTasks();
                         }
+                        else if($('#tasks-tab')[0])
+                            angular.element($('#tasks-tab')).scope().syncTask(resp.task)
                     });
                 };
 
