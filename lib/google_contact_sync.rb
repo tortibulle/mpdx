@@ -5,13 +5,17 @@ module GoogleContactSync
     g_contacts = g_contacts_and_links.map(&:first)
     g_contact_links = g_contacts_and_links.map(&:second)
 
-    contact.people.each_with_index do |person, index|
+    contact.people.each do |person|
+      index = g_contact_links.find_index { |link| link.person_id == person.id }
       g_contact_link = g_contact_links[index]
+      g_contact = g_contacts[index]
+
       g_contact_link.last_data[:emails] ||= []
       g_contact_link.last_data[:addresses] ||= []
       g_contact_link.last_data[:phone_numbers] ||= []
       g_contact_link.last_data[:websites] ||= []
-      sync_with_g_contact(person, g_contacts[index], g_contact_link)
+
+      sync_with_g_contact(person, g_contact, g_contact_link)
     end
 
     sync_addresses(g_contacts, contact, g_contact_links)
@@ -142,9 +146,9 @@ module GoogleContactSync
 
     # Add and delete the MPDX items
     send(opts[:mpdx_add_fn], mpdx_adds, g_contact, person)
-    person_items = person.send(opts[:person_items])
+    person_items = person.send(opts[:person_items]).to_a
     person_items.each do |item|
-      item.mark_for_destruction if mpdx_dels.include?(item.send(opts[:person_item_key]))
+      item.mark_for_destruction if mpdx_dels.include?(send(opts[:normalize_fn], item.send(opts[:person_item_key])))
     end
 
     update_g_contact_items(g_contact, g_contact_adds, g_contact_dels, opts, person_items)
@@ -155,10 +159,6 @@ module GoogleContactSync
 
     g_contact_items += g_contact_adds.map do |item_key|
       person_item = person_items.find { |p_i| send(opts[:normalize_fn], p_i.send(opts[:person_item_key])) == item_key }
-      unless person_item
-        STDERR.puts "Cannot find person_item for key: #{item_key}"
-        STDERR.puts "person_items: #{person_items}"
-      end
       send(opts[:google_format_fn], person_item)
     end
     g_contact_items.delete_if do |item|
@@ -229,9 +229,12 @@ module GoogleContactSync
   def add_emails_from_g_contact(emails_to_add, g_contact, person)
     had_primary = person.primary_email_address.present?
 
-    g_contact_emails = g_contact.emails_full
+    g_contact_emails_normalized_map = Hash[g_contact.emails_full.map { |email|
+      [normalize_email(email[:address]), email]
+    }]
+
     emails_to_add.each do |email|
-      email_attrs = format_email_for_mpdx(lookup_by_key(g_contact_emails, address: email))
+      email_attrs = format_email_for_mpdx(g_contact_emails_normalized_map[email])
       email_attrs[:primary] = false if had_primary
       person.email_address = email_attrs
     end
@@ -256,11 +259,14 @@ module GoogleContactSync
 
   def add_websites_from_g_contact(urls_to_add, g_contact, person)
     had_primary = person.websites.where(primary: true).first
-    g_contact_websites = g_contact.websites
+
+    g_contact_websites_normalized_map = Hash[g_contact.websites.map { |website|
+      [normalize_website(website[:href]), website]
+    }]
 
     urls_to_add.each do |url|
-      g_contact_website = lookup_by_key(g_contact_websites, href: url)
-      website = Person::Website.new(url: url, primary: g_contact_website[:primary])
+      g_contact_website = g_contact_websites_normalized_map[url]
+      website = Person::Website.new(url: g_contact_website[:href], primary: g_contact_website[:primary])
       if had_primary
         website[:primary] = false
       else
@@ -272,13 +278,15 @@ module GoogleContactSync
 
   def compare_websites_for_sync(g_contact, person, g_contact_link)
     last_sync_websites = g_contact_link.last_data[:websites].map { |websites| websites[:href] }
-    compare_for_sync(last_sync_websites, person.websites.pluck(:url), g_contact.websites.map { |w| w[:href] })
+    compare_normalized_for_sync(last_sync_websites, person.websites.pluck(:url), g_contact.websites.map { |w| w[:href] },
+                                method(:normalize_website))
   end
 
   def compare_emails_for_sync(g_contact, person, g_contact_link)
     last_sync_emails = g_contact_link.last_data[:emails].map { |email| email[:address] }
-    compare_considering_historic(last_sync_emails, person.email_addresses.where(historic: false).pluck(:email),
-                                 g_contact.emails, person.email_addresses.where(historic: true).pluck(:email))
+    compare_normalized_for_sync(last_sync_emails, person.email_addresses.where(historic: false).pluck(:email),
+                                g_contact.emails, method(:normalize_email),
+                                person.email_addresses.where(historic: true).pluck(:email))
   end
 
   def compare_numbers_for_sync(g_contact, person, g_contact_link)

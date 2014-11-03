@@ -97,6 +97,7 @@ class GoogleContactsIntegrator
       .joins('LEFT JOIN contact_people ON '\
         'google_contacts.person_id = contact_people.person_id AND contact_people.contact_id = google_contacts.contact_id')
       .where('contact_people.id IS NULL')
+      .readonly(false)
   end
 
   def api_user
@@ -158,10 +159,10 @@ class GoogleContactsIntegrator
   end
 
   def sync_contact(contact)
-    STDERR.puts "Sync contact: #{contact}"
-
-    g_contacts_and_links = contact.contact_people.map(&method(:get_g_contact_and_link))
+    g_contacts_and_links = contact.contact_people.order('contact_people.primary::int desc').order(:person_id)
+      .map(&method(:get_g_contact_and_link))
     GoogleContactSync.sync_contact(contact, g_contacts_and_links)
+    #contact.people.each { |person| person.save(validate: false) }
     contact.save(validate: false)
 
     g_contacts_to_save = g_contacts_and_links.select(&method(:g_contact_needs_save?)).map(&:first)
@@ -186,9 +187,6 @@ class GoogleContactsIntegrator
       g_contact_link.last_data = {}
     end
     g_contact.prep_add_to_group(mpdx_group)
-
-    STDERR.puts "get_g_contact_and_link for #{contact_person}: #{contact_person.contact}, #{contact_person.person}"
-    STDERR.puts "g_contact remote id: #{g_contact.id}, g_contact_link id: #{g_contact_link.id}"
 
     [g_contact, g_contact_link]
   end
