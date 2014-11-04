@@ -10,6 +10,13 @@ class GoogleContactsIntegrator
   # But is only worth it if we are syncing a number of contacts, so check the number against this threshold.
   CACHE_ALL_G_CONTACTS_THRESHOLD = 10
 
+  # The Google sync will wait for any running Google and Facebook imports to finish first to reduce the chance of
+  # unexpected behavior of a sync and an import running at the same time. These constants configure how often to check
+  # for the imports being done and when to just cancel this queuing of the Google contacts sync due to an import
+  # not being finished. (The sync would get re-queued after another contact is saved though).
+  SECS_BETWEEN_CHECK_FOR_IMPORTS_DONE = 30
+  MAX_CHECKS_FOR_IMPORTS_DONE = 60
+
   MAX_CONTACTS_TO_SYNC_CHECKS = 3
 
   def initialize(google_integration)
@@ -18,8 +25,14 @@ class GoogleContactsIntegrator
   end
 
   def sync_contacts
-    # This sync_contacts method is queued when a user in MPDX modifies a contact. The contacts_to_sync will query
-    # the database for contacts that have been modified since they were last synced.
+    # This sync_contacts method is queued when a user in MPDX modifies a contact.
+
+    # That means the imports will also queue the Google Contacts sync, but don't run the sync while an import is
+    # going (especially an import from Google) to allow the import and sync to be more efficient and have less chance
+    # of unexpected interactions
+    return if wait_for_imports_timed_out
+
+    # The contacts_to_sync will query the database for contacts that have been modified since they were last synced.
     #
     # However, it's possible that after editing on contact, the user will then edit another contact before the sync has
     # finished. In that case, sidekiq would attempt to queue the contact sync job, but it would not queue the job because
@@ -45,6 +58,17 @@ class GoogleContactsIntegrator
     # Person::GoogleAccount will turn off the contacts integration and send the user an email to refresh their Google login.
   rescue => e
     Airbrake.raise_or_notify(e)
+  end
+
+  def wait_for_imports_timed_out
+    checks_for_imports_done = 0
+    loop do
+      return false if @integration.account_list.imports.where(importing: true).empty?
+      sleep(SECS_BETWEEN_CHECK_FOR_IMPORTS_DONE)
+      checks_for_imports_done += 1
+      break if checks_for_imports_done >= MAX_CHECKS_FOR_IMPORTS_DONE
+    end
+    true
   end
 
   def sync_and_return_num_synced

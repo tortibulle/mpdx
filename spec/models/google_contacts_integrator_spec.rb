@@ -438,6 +438,15 @@ describe GoogleContactsIntegrator do
     end
   end
 
+  describe 'sync behavior when an import is running' do
+    it 'waits for it to finish until a timeout is reached, then does not sync if import still importing' do
+      create(:import, account_list: @account_list, importing: true, source: 'google')
+      expect(@integrator).to receive(:sleep).at_least(:once)
+      expect(@integrator).to receive(:sync_and_return_num_synced).exactly(0).times
+      @integrator.sync_contacts
+    end
+  end
+
   describe 'sync behavior for merged MPDX contacts/people' do
     before do
       @contact.update_column(:notes, 'contact')
