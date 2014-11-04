@@ -66,7 +66,7 @@ describe GoogleContactsIntegrator do
       g_contact = double(id: 'id_1', given_name: 'John', family_name: 'Doe')
       expect(@account.contacts_api_user).to receive(:contacts_updated_min).with(now).and_return([g_contact])
 
-      expect(@integrator).to receive(:contacts_to_sync_query).with(['id_1']).and_return([@contact])
+      expect(@integrator).to receive(:contacts_to_sync_query).with([g_contact]).and_return([@contact])
       expect(@integrator.contacts_to_sync).to eq([@contact])
     end
   end
@@ -99,7 +99,7 @@ describe GoogleContactsIntegrator do
 
   describe 'contacts_to_sync_query' do
     before do
-      @g_contact = create(:google_contact, google_account: @account, person: @person)
+      @g_contact = create(:google_contact, google_account: @account, person: @person, contact: @contact)
     end
 
     def contacts_to_sync_query(updated_remote_ids = [])
@@ -172,11 +172,16 @@ describe GoogleContactsIntegrator do
       expect(contacts_to_sync_query).to eq([])
     end
 
-    it 'finds contacts whose google_contacts records match specified remotely updated ids' do
+    it 'finds contacts whose remote g_contacts have been updated since the matching google_contacts records' do
       @g_contact.update_column(:last_synced, 1.hour.since)
       @g_contact.update_column(:remote_id, 'a')
       expect(contacts_to_sync_query([])).to eq([])
-      expect(contacts_to_sync_query(['a'])).to eq([@contact])
+
+      previously_updated_g_contact = double(id: 'a', updated: 2.hours.ago)
+      expect(contacts_to_sync_query([previously_updated_g_contact])).to eq([])
+
+      since_sync_updated_g_contact = double(id: 'a', updated: 2.hours.since)
+      expect(contacts_to_sync_query([since_sync_updated_g_contact])).to eq([@contact])
     end
   end
 
@@ -184,7 +189,7 @@ describe GoogleContactsIntegrator do
     describe 'setup_assigned_remote_ids' do
       it 'queries remote ids for the specific google account and account list' do
         create(:google_contact, remote_id: 'not in account list or google account')
-        create(:google_contact, remote_id: 'id', person: @person, google_account: @account)
+        create(:google_contact, remote_id: 'id', person: @person, contact: @contact, google_account: @account)
         @integrator.setup_assigned_remote_ids
         expect(@integrator.assigned_remote_ids).to eq(['id'].to_set)
       end
@@ -208,7 +213,8 @@ describe GoogleContactsIntegrator do
 
     describe 'get_g_contact_and_link' do
       it 'marks the remote id of a queried g_contact as assigned and adds the g_contact to the mpdx group' do
-        g_contact_link = create(:google_contact, remote_id: 'id', person: @person, google_account: @account)
+        g_contact_link = create(:google_contact, remote_id: 'id', person: @person, contact: @contact,
+                                google_account: @account)
         g_contact = double(id: 'id', given_name: 'John', family_name: 'Doe')
         expect(@integrator).to receive(:get_or_query_g_contact).with(g_contact_link, @person).and_return(g_contact)
 
@@ -216,14 +222,17 @@ describe GoogleContactsIntegrator do
         expect(@integrator).to receive(:mpdx_group).and_return(mpdx_group)
         expect(g_contact).to receive(:prep_add_to_group).with(mpdx_group)
 
+        contact_person = @contact.contact_people.first
+
         @integrator.assigned_remote_ids = [].to_set
-        expect(@integrator.get_g_contact_and_link(@person)).to eq([g_contact, g_contact_link])
+        expect(@integrator.get_g_contact_and_link(contact_person)).to eq([g_contact, g_contact_link])
         expect(@integrator.assigned_remote_ids).to eq(['id'].to_set)
       end
 
       describe 'save_g_contact_links' do
         it 'marks the remote id of a saved g_contact as assigned' do
-          g_contact_link = build(:google_contact, remote_id: 'id', person: @person, google_account: @account)
+          g_contact_link = build(:google_contact, remote_id: 'id', person: @person, contact: @contact,
+                                  google_account: @account)
           g_contact = double(id: 'id', formatted_attrs: {}, etag: '')
 
           @integrator.assigned_remote_ids = [].to_set
@@ -239,7 +248,8 @@ describe GoogleContactsIntegrator do
       g_contact_link = double(last_data: { given_name: 'John' })
       g_contact = double(attrs_with_changes:  { given_name: 'John' })
 
-      expect(@integrator).to receive(:get_g_contact_and_link).with(@person).and_return([g_contact, g_contact_link])
+      contact_person = @contact.contact_people.first
+      expect(@integrator).to receive(:get_g_contact_and_link).with(contact_person).and_return([g_contact, g_contact_link])
       expect(GoogleContactSync).to receive(:sync_contact).with(@contact, [[g_contact, g_contact_link]])
 
       expect(@integrator).to receive(:save_g_contact_links).with([[g_contact, g_contact_link]])
@@ -252,7 +262,8 @@ describe GoogleContactsIntegrator do
       g_contact_link = double(last_data: { given_name: 'John' })
       g_contact = double(attrs_with_changes:  { given_name: 'MODIFIED-John' })
 
-      expect(@integrator).to receive(:get_g_contact_and_link).with(@person).and_return([g_contact, g_contact_link])
+      contact_person = @contact.contact_people.first
+      expect(@integrator).to receive(:get_g_contact_and_link).with(contact_person).and_return([g_contact, g_contact_link])
       expect(GoogleContactSync).to receive(:sync_contact).with(@contact, [[g_contact, g_contact_link]])
 
       expect(@integrator).to receive(:save_g_contacts_then_links).with(@contact, [g_contact], [[g_contact, g_contact_link]])
@@ -378,11 +389,133 @@ describe GoogleContactsIntegrator do
     end
   end
 
+  describe 'sync behavior for person in multiple contacts' do
+    before do
+      @contact2 = create(:contact, name: 'John Doe 2', account_list: @account_list, status: 'Partner - Pray', notes: 'about')
+      @contact2.people << @person
+
+      stub_empty_g_contacts
+      stub_empty_updated_g_contacts
+      stub_mpdx_group_request
+    end
+
+    it 'syncs each person-contact with its own Google contact' do
+      times_batch_create_or_update_called = 0
+      batch_time3_g_contact_id = ''
+      expect(@account.contacts_api_user).to receive(:batch_create_or_update).exactly(4).times
+                                            .and_return do |g_contact, &block|
+        times_batch_create_or_update_called += 1
+        case times_batch_create_or_update_called
+        when 1
+          g_contact['id'] = { '$t' => '1' }
+          block.call(code: 201)
+        when 2
+          g_contact['id'] = { '$t' => '2' }
+          block.call(code: 201)
+        when 3
+          batch_time3_g_contact_id = g_contact.id
+          block.call(code: 200)
+        when 4
+          # On the second sync, expect different ids for the different person-contacts
+          expect([g_contact.id, batch_time3_g_contact_id].to_set).to eq(%w(1 2).to_set)
+          block.call(code: 200)
+        end
+      end
+
+      # First sync will have it do creates
+      expect(times_batch_create_or_update_called).to eq(0)
+      @integrator.sync_contacts
+      expect(times_batch_create_or_update_called).to eq(2)
+
+      # Second sync have it do an update
+      @person.touch
+      g_contact1 = GoogleContactsApi::Contact.new('id' => { '$t' => '1' })
+      g_contact2 = GoogleContactsApi::Contact.new('id' => { '$t' => '2' })
+      expect(@account.contacts_api_user).to receive(:get_contact).with('1').and_return(g_contact1)
+      expect(@account.contacts_api_user).to receive(:get_contact).with('2').and_return(g_contact2)
+      @integrator.sync_contacts
+      expect(times_batch_create_or_update_called).to eq(4)
+    end
+  end
+
+  describe 'sync behavior for merged MPDX contacts/people' do
+    before do
+      @contact.update_column(:notes, 'contact')
+      @contact2 = create(:contact, name: 'John Doe 2', account_list: @account_list, status: 'Partner - Pray', notes: 'contact2')
+      @contact2.people << @person
+
+      @person2 = create(:person, first_name: 'Jane', last_name: 'Doe')
+      @contact.people << @person2
+      @contact2.people << @person2
+
+      stub_empty_g_contacts
+      stub_empty_updated_g_contacts
+      stub_mpdx_group_request
+    end
+
+    it 'deletes Google contacts for losing merged contacts/people' do
+      g_contact_ids = {}
+      g_contacts_for_ids = {}
+
+      batch_create_or_update_calls = 0
+      expect(@account.contacts_api_user).to receive(:batch_create_or_update).exactly(7).times
+                                            .and_return do |g_contact, &block|
+        batch_create_or_update_calls += 1
+        case batch_create_or_update_calls
+        when 1..4
+          g_contact_id = batch_create_or_update_calls.to_s
+          g_contact['id'] = { '$t' => g_contact_id }
+          g_contact['gd$etag'] = 'etag:' + g_contact_id
+          g_contact['content'] = { '$t' =>  g_contact.prepped_changes[:content] }
+          g_contact['gd$name'] = { 'gd$givenName' => { '$t' =>  g_contact.prepped_changes[:given_name] } }
+          notes_and_first_name = g_contact.content + ':' + g_contact.given_name
+          g_contact_ids[notes_and_first_name] = g_contact_id
+          g_contacts_for_ids[g_contact_id] = g_contact
+          block.call(code: 201)
+        else
+          block.call(code: 200)
+        end
+      end
+
+      expect(@account.contacts_api_user).to receive(:get_contact).at_least(:once).and_return { |id| g_contacts_for_ids[id] }
+
+      # The first sync should create four Google contacts for @contact-@person, @contact-@person2,
+      # @contact2-@person, and @contact2-@person2
+      @integrator.sync_contacts
+
+      expect(batch_create_or_update_calls).to eq(4)
+      expect(GoogleContact.all.count).to eq(4)
+      expect(GoogleContact.find_by(contact: @contact, person: @person).remote_id).to eq(g_contact_ids['contact:John'])
+      expect(GoogleContact.find_by(contact: @contact, person: @person2).remote_id).to eq(g_contact_ids['contact:Jane'])
+      expect(GoogleContact.find_by(contact: @contact2, person: @person).remote_id).to eq(g_contact_ids['contact2:John'])
+      expect(GoogleContact.find_by(contact: @contact2, person: @person2).remote_id).to eq(g_contact_ids['contact2:Jane'])
+
+      # Then we merge @contact with @contact2 (@contact wins), so we should delete the @contact2 g_contacts
+      @contact.merge(@contact2)
+      expect(@account.contacts_api_user).to receive(:delete_contact)
+                                            .with(g_contact_ids['contact2:John'], 'etag:' + g_contact_ids['contact2:John'])
+      expect(@account.contacts_api_user).to receive(:delete_contact)
+                                            .with(g_contact_ids['contact2:Jane'], 'etag:' + g_contact_ids['contact2:Jane'])
+      @integrator.sync_contacts
+      expect(GoogleContact.all.count).to eq(2)
+      expect(GoogleContact.find_by(contact: @contact, person: @person).remote_id).to eq(g_contact_ids['contact:John'])
+      expect(GoogleContact.find_by(contact: @contact, person: @person2).remote_id).to eq(g_contact_ids['contact:Jane'])
+
+      # Then we merge @person with @person2 (@person wins), so we should delete @person2 g_contact
+      @person.merge(@person2)
+      expect(@account.contacts_api_user).to receive(:delete_contact)
+                                            .with(g_contact_ids['contact:Jane'], 'etag:' + g_contact_ids['contact:Jane'])
+      @integrator.sync_contacts
+      expect(GoogleContact.all.count).to eq(1)
+      expect(GoogleContact.find_by(contact: @contact, person: @person).remote_id).to eq(g_contact_ids['contact:John'])
+    end
+  end
+
   describe 'sync behavior for HTTP errors' do
     before do
       stub_mpdx_group_request
       @integration.update_column(:contacts_last_synced, 1.hour.ago)
-      create(:google_contact, google_account: @account, person: @person, remote_id: '1',
+      create(:google_contact, google_account: @account, contact: @contact, person: @person, remote_id: '1',
              last_data: { given_name: 'John', family_name: 'Doe' }, last_synced: 1.hour.ago)
       expect(@account.contacts_api_user).to receive(:contacts_updated_min).at_least(:once).and_return([])
     end

@@ -64,7 +64,7 @@ class GoogleContactsIntegrator
     contacts.each(&method(:sync_contact))
     api_user.send_batched_requests
 
-    # For contacts syncs to the Google Conctacts API that were either deleted or modified during the sync
+    # For contacts syncs to the Google Contacts API that were either deleted or modified during the sync
     # and so caused a 404 Contact Not Found or a 412 Precondition Mismatch (i.e. ETag mismatch, i.e. contact changed),
     # we can attempt to retry them by re-executing the sync logic which will pull down the Google Contacts information
     # and re-compare with it. The save_g_contacts_then_links method below may populate @contacts_to_retry_sync.
@@ -74,9 +74,30 @@ class GoogleContactsIntegrator
     @contacts_to_retry_sync.each(&method(:sync_contact))
     api_user.send_batched_requests
 
+    delete_g_contact_merge_losers
+
     @integration.save
 
     contacts.size
+  end
+
+  def delete_g_contact_merge_losers
+    g_contact_merge_losers.each do |g_contact_link|
+      api_user.delete_contact(g_contact_link.remote_id, g_contact_link.last_etag)
+      g_contact_link.destroy
+    end
+  rescue => e
+    Airbrake.raise_or_notify(e)
+  end
+
+  def g_contact_merge_losers
+    # Return the google_contacts record for this Google account that are no longer associated with a contact-person pair
+    # due to that contact or person being merged with another contact or person in MPDX.
+    @account.google_contacts
+      .joins('LEFT JOIN contact_people ON '\
+        'google_contacts.person_id = contact_people.person_id AND contact_people.contact_id = google_contacts.contact_id')
+      .where('contact_people.id IS NULL')
+      .readonly(false)
   end
 
   def api_user
@@ -93,7 +114,7 @@ class GoogleContactsIntegrator
     if @integration.contacts_last_synced
       updated_g_contacts = api_user.contacts_updated_min(@integration.contacts_last_synced)
 
-      queried_contacts_to_sync = contacts_to_sync_query(updated_g_contacts.map(&:id))
+      queried_contacts_to_sync = contacts_to_sync_query(updated_g_contacts)
       if queried_contacts_to_sync.length > CACHE_ALL_G_CONTACTS_THRESHOLD
         @cache.cache_all_g_contacts
       else
@@ -111,9 +132,9 @@ class GoogleContactsIntegrator
   # Queries all contacts that:
   # - Have some associted records updated_at more recent than its google_contact.contacts_last_synced
   # - Or contacts without associated google_contacts records (i.e. which haven't been synced before)
-  # - Or contacts whose google_contacts records have been updated remotely
-  #   as specified by the updated_remote_ids
-  def contacts_to_sync_query(updated_remote_ids)
+  # - Or contacts whose google_contacts records have been updated remotely since the last sync as specified by the
+  #   updated_g_contacts list
+  def contacts_to_sync_query(updated_g_contacts)
     @integration.account_list.active_contacts
       .joins(:people)
       .joins("LEFT JOIN addresses ON addresses.addressable_id = contacts.id AND addresses.addressable_type = 'Contact'")
@@ -121,26 +142,42 @@ class GoogleContactsIntegrator
       .joins('LEFT JOIN phone_numbers ON people.id = phone_numbers.person_id')
       .joins('LEFT JOIN person_websites ON people.id = person_websites.person_id')
       .joins('LEFT JOIN google_contacts ON google_contacts.person_id = people.id')
+      .joins("LEFT JOIN #{ remote_g_contacts_sql(updated_g_contacts) } ON remote_g_contacts.remote_id = google_contacts.remote_id")
       .where('google_contacts.id IS NULL OR google_contacts.google_account_id = ?', @account.id)
       .group('contacts.id, google_contacts.last_synced, google_contacts.remote_id')
       .having('google_contacts.last_synced IS NULL ' \
         'OR google_contacts.last_synced < ' \
-          'GREATEST(contacts.updated_at, MAX(contact_people.updated_at), MAX(people.updated_at), ' \
-                  'MAX(addresses.updated_at), MAX(email_addresses.updated_at), '\
-                  'MAX(phone_numbers.updated_at), MAX(person_websites.updated_at))' +
-          (updated_remote_ids.empty? ? '' : " OR google_contacts.remote_id IN (#{ quote_sql_list(updated_remote_ids) })"))
+          'GREATEST(contacts.updated_at, MAX(remote_g_contacts.updated_at), ' \
+                  'MAX(contact_people.updated_at), MAX(people.updated_at), MAX(addresses.updated_at), ' \
+                  'MAX(email_addresses.updated_at), MAX(phone_numbers.updated_at), MAX(person_websites.updated_at))')
       .distinct
       .readonly(false)
   end
 
-  def quote_sql_list(list)
-    list.map { |item| ActiveRecord::Base.connection.quote(item) }.join(',')
+  # Create a SELECT statement to represent the (remote_id, updated) pairs for remotely updated Google Contacts
+  # so that we can join to them via the remote_id and then compare with the updated in the query above.
+  # It's helpful to compare each remote Google Contact's updated field rather than just assume all that are updated
+  # since the overall last sync time, because we calculate the last sync time from the start of the sync to catch
+  # any Google Contacts that were updated during the sync. But the sync itself causes updated contacts since the
+  # start of it, so comparing each one will eliminate double syncing those that were changed by the sync itself,
+  # but will allow capture of remotely changed Google Contacts that were changed by the user during the sync.
+  def remote_g_contacts_sql(g_contacts)
+    sql_table = '(SELECT CAST(null as varchar) as remote_id, CAST(null as timestamp) as updated_at'
+    g_contacts.each do |g_contact|
+      sql_table += " UNION SELECT #{ quote_sql(g_contact.id) }, #{ quote_sql(g_contact.updated.to_s(:db)) }"
+    end
+    sql_table + ') as remote_g_contacts'
+  end
+
+  def quote_sql(sql)
+    ActiveRecord::Base.connection.quote(sql)
   end
 
   def sync_contact(contact)
-    g_contacts_and_links = contact.people.map(&method(:get_g_contact_and_link))
+    g_contacts_and_links = contact.contact_people.order('contact_people.primary::int desc').order(:person_id)
+      .map(&method(:get_g_contact_and_link))
     GoogleContactSync.sync_contact(contact, g_contacts_and_links)
-    contact.save!
+    contact.save(validate: false)
 
     g_contacts_to_save = g_contacts_and_links.select(&method(:g_contact_needs_save?)).map(&:first)
     if g_contacts_to_save.empty?
@@ -152,9 +189,10 @@ class GoogleContactsIntegrator
     Airbrake.raise_or_notify(e)
   end
 
-  def get_g_contact_and_link(person)
-    g_contact_link = person.google_contacts.where(google_account: @account).first_or_initialize(person: person)
-    g_contact = get_or_query_g_contact(g_contact_link, person)
+  def get_g_contact_and_link(contact_person)
+    g_contact_link =
+      @account.google_contacts.where(person: contact_person.person, contact: contact_person.contact).first_or_initialize
+    g_contact = get_or_query_g_contact(g_contact_link, contact_person.person)
 
     if g_contact
       @assigned_remote_ids << g_contact.id
@@ -194,14 +232,21 @@ class GoogleContactsIntegrator
       # The Google Contacts API batch requests significantly speed up the sync by reducing HTTP requests
       api_user.batch_create_or_update(g_contact) do |status|
         # This block is called for each saved g_contact once its batch completes
+        begin
+          # If any g_contact save failed but can be retried, then mark that we should queue the MPDX contact for a retry
+          # sync once we get to the last associated g_cotnact
+          retry_sync = true if failed_but_can_retry?(status, g_contact, g_contact_link)
 
-        retry_sync = true if failed_but_can_retry?(status, g_contact, g_contact_link)
-
-        next unless index == g_contacts_to_save.size - 1
-        if retry_sync
-          @contacts_to_retry_sync << contact
-        else
-          save_g_contact_links(g_contacts_and_links)
+          # When we get to last associated g_contact, then either save or queue for retry the MPDX contact
+          next unless index == g_contacts_to_save.size - 1
+          if retry_sync
+            @contacts_to_retry_sync << contact
+          else
+            save_g_contact_links(g_contacts_and_links)
+          end
+        rescue => e
+          # Rescue within this block so that the exception won't cause the response callbacks for the whole batch to break
+          Airbrake.raise_or_notify(e)
         end
       end
     end
