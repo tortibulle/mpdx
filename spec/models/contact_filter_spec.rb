@@ -32,9 +32,11 @@ describe ContactFilter do
       expect(ContactFilter.new(wildcard_search: ' Doe,  John ').filter(Contact)).to include c
     end
 
-    it 'does not cause an error if wildcard search less than two words do' do
+    it 'does not cause an error if wildcard search less than two words with or without comma' do
       expect { ContactFilter.new(wildcard_search: 'john').filter(Contact) }.to_not raise_error
       expect { ContactFilter.new(wildcard_search: '').filter(Contact) }.to_not raise_error
+      expect { ContactFilter.new(wildcard_search: ',').filter(Contact) }.to_not raise_error
+      expect { ContactFilter.new(wildcard_search: 'doe,').filter(Contact) }.to_not raise_error
     end
   end
 end
