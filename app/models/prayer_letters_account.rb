@@ -168,6 +168,8 @@ class PrayerLettersAccount < ActiveRecord::Base
     else
       fail response.body
     end
+  rescue => e
+    Airbrake.raise_or_notify(e, parameters:  { method: method, path: path, params: params })
   end
 
   def handle_bad_token
