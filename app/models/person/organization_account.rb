@@ -68,7 +68,8 @@ class Person::OrganizationAccount < ActiveRecord::Base
         account_list.update_partner_statuses if last_download.nil? && account_list
 
         # Set the last download date to whenever the last donation was received
-        update_column(:last_download, user.donations.order('donation_date desc').first.donation_date)
+        update_column(:last_download,
+                      user.donations.where.not(remote_id: nil).order('donation_date desc').first.donation_date)
       end
     rescue OrgAccountInvalidCredentialsError
       update_column(:valid_credentials, false)
