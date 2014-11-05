@@ -6,11 +6,11 @@ Airbrake.configure do |config|
 end
 
 module Airbrake
-  def self.raise_or_notify(e)
+  def self.raise_or_notify(e, opts = {})
     if ::Rails.env.development? || ::Rails.env.test?
       raise e
     else
-      Airbrake.notify(e)
+      Airbrake.notify(e, opts)
     end
   end
 end
