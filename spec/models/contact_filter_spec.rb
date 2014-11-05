@@ -23,5 +23,18 @@ describe ContactFilter do
       filtered_contacts.should include nil_status
       filtered_contacts.should include has_status
     end
+
+    it 'filters by person name on wildcard search' do
+      c = create(:contact, name: 'Doe, John')
+      p = create(:person, first_name: 'John', last_name: 'Doe')
+      c.people << p
+      cf = ContactFilter.new(wildcard_search: 'john doe')
+      expect(cf.filter(Contact)).to include c
+    end
+
+    it 'does not cause an error if wildcard search less than two words do' do
+      expect { ContactFilter.new(wildcard_search: 'john').filter(Contact) }.to_not raise_error
+      expect { ContactFilter.new(wildcard_search: '').filter(Contact) }.to_not raise_error
+    end
   end
 end
