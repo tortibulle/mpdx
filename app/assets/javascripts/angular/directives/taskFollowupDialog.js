@@ -401,7 +401,8 @@ angular.module('mpdxApp')
                 };
 
                 var showContactStatus = function(status){
-                    jQuery('.contact_status').text('Status: '+status);
+                    status = __(status);
+                    jQuery('.contact_status').text(__('Status')+': '+status);
                 };
 
                 var saveContact = function(contact){
