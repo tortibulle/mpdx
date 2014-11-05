@@ -286,7 +286,7 @@ describe GoogleContactsIntegrator do
         'openSearch$itemsPerPage' => { '$t' => '1' }
       }
     }
-    stub_request(:get, 'https://www.google.com/m8/feeds/groups/default/full?alt=json&max-results=100000&v=2')
+    stub_request(:get, 'https://www.google.com/m8/feeds/groups/default/full?alt=json&max-results=100000&v=3')
       .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
       .to_return(body: groups_body.to_json)
   end
@@ -902,7 +902,7 @@ describe GoogleContactsIntegrator do
           'openSearch$itemsPerPage' => { '$t' => '1' }
         }
       }
-      stub_request(:get, 'https://www.google.com/m8/feeds/groups/default/full?alt=json&max-results=100000&v=2')
+      stub_request(:get, 'https://www.google.com/m8/feeds/groups/default/full?alt=json&max-results=100000&v=3')
         .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
         .to_return(body: groups_body.to_json)
     end
