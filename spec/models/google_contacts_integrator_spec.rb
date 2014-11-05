@@ -447,6 +447,16 @@ describe GoogleContactsIntegrator do
     end
   end
 
+  describe 'compatibility with previous import code' do
+    it 'does consider old google contacts associated by previously implemented Google contacts import' do
+      # The Google contacts import code would only associate a google_contact link record with the person, so just leave
+      # those old format records alone; they aren't person/contact merge losers. Those would have both a contact_id and
+      # person_id associated with it (but which no longer exists in the database due to the merge).
+      create(:google_contact, google_account: @account, person: @person)
+      expect(@integrator.g_contact_merge_losers).to be_empty
+    end
+  end
+
   describe 'sync behavior for merged MPDX contacts/people' do
     before do
       @contact.update_column(:notes, 'contact')

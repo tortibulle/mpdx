@@ -117,11 +117,12 @@ class GoogleContactsIntegrator
   def g_contact_merge_losers
     # Return the google_contacts record for this Google account that are no longer associated with a contact-person pair
     # due to that contact or person being merged with another contact or person in MPDX.
+    # Look for records that have both the contact_id and person_id set, because the Google Import uses an old method
+    #of just setting the person_id and we don't want to wrongly interpret imported Google contacts as merge losers.
     @account.google_contacts
       .joins('LEFT JOIN contact_people ON '\
         'google_contacts.person_id = contact_people.person_id AND contact_people.contact_id = google_contacts.contact_id')
-      .where('contact_people.id IS NULL')
-      .readonly(false)
+      .where('contact_people.id IS NULL').where.not(contact_id: nil).where.not(person_id: nil).readonly(false)
   end
 
   def api_user
