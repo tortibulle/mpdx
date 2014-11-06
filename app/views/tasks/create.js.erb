@@ -5,9 +5,11 @@
   $('#edit_task_modal').dialog('close')
   $('#edit_task_modal .form_wrapper').html('<%= j(render('tasks/modal_form')) %>')
 <% end %>
-if($('#tasks-tab')[0])
+if($('#tasks-tab')[0]){
 <% if @task.completed %>
-  angular.element($('#history-tab')).scope().syncTask(<%== @task.to_json.gsub('/', '\/') %>)
+  angular.element($('#history-tab'))
 <% else %>
-  angular.element($('#tasks-tab')).scope().syncTask(<%== @task.to_json.gsub('/', '\/') %>)
+  angular.element($('#tasks-tab'))
 <% end %>
+  .scope().syncTask(<%== TaskSerializer.new(@task).to_json.gsub('/', '\/') %>)
+}

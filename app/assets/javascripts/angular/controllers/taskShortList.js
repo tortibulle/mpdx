@@ -5,22 +5,23 @@ angular.module('mpdxApp').controller('taskShortListController', function ($scope
         $scope.people = {};
         $scope.history = page == 'contactHistory';
 
+        var taskUrl;
         if(page === 'contact') {
-            var taskUrl = 'tasks?account_list_id=' + window.current_account_list_id +
+            taskUrl = 'tasks?account_list_id=' + window.current_account_list_id +
                 '&filters[completed]=false' +
                 '&filters[contact_ids][]=' + contactId +
                 '&per_page=' + 500 +
                 '&page=' + 1 +
                 '&order=start_at';
         }else if(page === 'contactHistory'){
-            var taskUrl = 'tasks?account_list_id=' + window.current_account_list_id +
+            taskUrl = 'tasks?account_list_id=' + window.current_account_list_id +
                 '&filters[completed]=true' +
                 '&filters[contact_ids][]=' + contactId +
                 '&per_page=' + 500 +
                 '&page=' + 1 +
                 '&order=completed_at desc';
         }else{
-            var taskUrl = 'tasks?account_list_id=' + window.current_account_list_id +
+            taskUrl = 'tasks?account_list_id=' + window.current_account_list_id +
                 '&filters[completed]=false' +
                 '&per_page=' + 5 +
                 '&page=' + 1 +
@@ -57,25 +58,26 @@ angular.module('mpdxApp').controller('taskShortListController', function ($scope
         });
     };
 
-    $scope.syncTask = function(task) {
-        if(task.start_at)
-            task.due_date = task.start_at;
+    $scope.syncTask = function(resp) {
+        var task = resp.task || resp;
         var old_task = _.findWhere($scope.tasks, {id: task.id});
         if(!old_task)
-            $scope.addTask(task)
+            $scope.addTask(task);
         else if($scope.history == task.completed)
-            $scope.updateTask(old_task, task)
+            $scope.updateTask(old_task, task);
         else
-            $scope.removeTask(task)
+            $scope.removeTask(task);
         $scope.$digest();
     };
 
     $scope.addTask = function(newTask) {
-        $scope.tasks.push(task);
+        if($scope.history == newTask.completed)
+            $scope.tasks.push(newTask);
     };
 
     $scope.updateTask = function(oldTask, newTask) {
-        var fields_to_update = ['subject', 'due_date', 'starred', 'activity_type'];
+        var fields_to_update = ['subject', 'due_date', 'starred', 'activity_type',
+                                'tag_list', 'completed_at', 'result', 'next_action'];
         for(var i in fields_to_update) {
             oldTask[fields_to_update[i]] = newTask[fields_to_update[i]];
         }
