@@ -9,7 +9,7 @@ script:
 - bundle exec rake karma:run
 - bundle exec rubocop -R
 before_script:
-- npm install
+- PHANTOMJS_CDNURL=https://bitbucket.org/ariya/phantomjs/downloads npm install
 - psql -c 'create database mpdx_test;' -U postgres
 - cp config/database.travis.yml config/database.yml
 - cp config/config.travis.yml config/config.yml
