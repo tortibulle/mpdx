@@ -10,12 +10,12 @@ angular.module('mpdxApp')
                             subject: jQuery('#modal_task_subject', formData).val(),
                             activity_type: jQuery('#modal_task_activity_type', formData).val(),
                             completed: jQuery('#modal_task_completed', formData).val(),
-                            completed_at: jQuery('#modal_task_completed_at_1i', formData).val()
-                                + '-' + jQuery('#modal_task_completed_at_2i', formData).val()
-                                + '-' + jQuery('#modal_task_completed_at_3i', formData).val()
-                                + ' ' + jQuery('#modal_task_completed_at_4i', formData).val()
-                                + ':' + jQuery('#modal_task_completed_at_5i', formData).val()
-                                + ':00',
+                            completed_at: jQuery('#modal_task_completed_at_1i', formData).val() +
+                                '-' + jQuery('#modal_task_completed_at_2i', formData).val() +
+                                '-' + jQuery('#modal_task_completed_at_3i', formData).val() +
+                                ' ' + jQuery('#modal_task_completed_at_4i', formData).val() +
+                                ':' + jQuery('#modal_task_completed_at_5i', formData).val() +
+                                ':00',
                             result: jQuery('#modal_task_result', formData).val(),
                             next_action: jQuery('#modal_task_next_action', formData).val(),
                             activity_contacts_attributes:
@@ -98,11 +98,7 @@ angular.module('mpdxApp')
                             //Contact Updates
                             if(strContains(taskResult, 'Call for Decision')) {
                               angular.forEach(followUpTask.contacts, function (c) {
-                                api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
-                                  contact: {
-                                    status: 'Call for Decision'
-                                  }
-                                });
+                                saveContact({id: c, status: 'Call for Decision'});
                               });
                             }
 
@@ -112,6 +108,7 @@ angular.module('mpdxApp')
                             }
 
                             jQuery('#complete_task_followup_modal').dialog('close');
+                            showContactStatus('Call for Decision');
                         };
 
                     }else if((strContains(taskResult, 'Appointment Scheduled') || strContains(taskResult, 'Reschedule')) && followUpTask.contacts.length > 0){
@@ -142,11 +139,7 @@ angular.module('mpdxApp')
                         $scope.followUpSaveFunc = function(){
                             //Contact Updates
                             angular.forEach(followUpTask.contacts, function(c){
-                                api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
-                                    contact: {
-                                        status: 'Appointment Scheduled'
-                                    }
-                                });
+                                saveContact({id: c, status: 'Appointment Scheduled'});
                             });
 
                             //Create Appointment Task
@@ -159,6 +152,7 @@ angular.module('mpdxApp')
                                 createGenericTask(contactsObject, 'Call');
                             }
                             jQuery('#complete_task_followup_modal').dialog('close');
+                            showContactStatus('Appointment Scheduled');
                         };
 
                     }else if(strContains(taskResult, 'Partner - Financial') && followUpTask.contacts.length > 0){
@@ -194,23 +188,16 @@ angular.module('mpdxApp')
                             }
                             //Contact Updates
                             angular.forEach(followUpTask.contacts, function(c){
-                                api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
-                                    contact: {
-                                        status: 'Partner - Financial',
-                                        pledge_amount: $scope.followUpDialogResult.financialCommitment.amount,
-                                        pledge_frequency: $scope.followUpDialogResult.financialCommitment.frequency,
-                                        pledge_start_date: $scope.followUpDialogResult.financialCommitment.date
-                                    }
-                                });
-
-                                //Newsletter signup
-                                if($scope.followUpDialogResult.newsletterSignup){
-                                    api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
-                                        contact: {
-                                            send_newsletter: $scope.followUpDialogResult.newsletter.type
-                                        }
-                                    });
-                                }
+                                var contact = {
+                                    id: c,
+                                    status: 'Partner - Financial',
+                                    pledge_amount: $scope.followUpDialogResult.financialCommitment.amount,
+                                    pledge_frequency: $scope.followUpDialogResult.financialCommitment.frequency,
+                                    pledge_start_date: $scope.followUpDialogResult.financialCommitment.date
+                                };
+                                if($scope.followUpDialogResult.newsletterSignup)
+                                    contact.send_newsletter = $scope.followUpDialogResult.newsletter.type;
+                                saveContact(contact);
                             });
 
                             //Create Thank Task
@@ -223,6 +210,7 @@ angular.module('mpdxApp')
                                 createGivingTask(contactsObject);
                             }
                             jQuery('#complete_task_followup_modal').dialog('close');
+                            showContactStatus('Partner - Financial');
                         };
 
                     }else if(strContains(taskResult, 'Partner - Special') && followUpTask.contacts.length > 0){
@@ -254,20 +242,10 @@ angular.module('mpdxApp')
                         $scope.followUpSaveFunc = function(){
                             //Contact Updates
                             angular.forEach(followUpTask.contacts, function(c){
-                                api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
-                                    contact: {
-                                        status: 'Partner - Special'
-                                    }
-                                });
-
-                                //Newsletter signup
-                                if($scope.followUpDialogResult.newsletterSignup){
-                                    api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
-                                        contact: {
-                                            send_newsletter: $scope.followUpDialogResult.newsletter.type
-                                        }
-                                    });
-                                }
+                                var contact = {id: c, status: 'Partner - Special'};
+                                if($scope.followUpDialogResult.newsletterSignup)
+                                    contact.send_newsletter = $scope.followUpDialogResult.newsletter.type;
+                                saveContact(contact);
                             });
 
                             //Create Thank Task
@@ -280,6 +258,7 @@ angular.module('mpdxApp')
                                 createGivingTask(contactsObject);
                             }
                             jQuery('#complete_task_followup_modal').dialog('close');
+                            showContactStatus('Partner - Special');
                         };
 
                     }else if(strContains(taskResult, 'Partner - Pray') && followUpTask.contacts.length > 0){
@@ -301,22 +280,13 @@ angular.module('mpdxApp')
                         $scope.followUpSaveFunc = function(){
                             //Contact Updates
                             angular.forEach(followUpTask.contacts, function(c){
-                                api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
-                                    contact: {
-                                        status: 'Partner - Pray'
-                                    }
-                                });
-
-                                //Newsletter signup
-                                if($scope.followUpDialogResult.newsletterSignup){
-                                    api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
-                                        contact: {
-                                            send_newsletter: $scope.followUpDialogResult.newsletter.type
-                                        }
-                                    });
-                                }
+                                var contact = {id: c, status: 'Partner - Pray'};
+                                if($scope.followUpDialogResult.newsletterSignup)
+                                    contact.send_newsletter = $scope.followUpDialogResult.newsletter.type;
+                                saveContact(contact);
                             });
                             jQuery('#complete_task_followup_modal').dialog('close');
+                            showContactStatus('Partner - Pray');
                         };
 
                     }else if(strContains(taskResult, 'Ask in Future') && followUpTask.contacts.length > 0){
@@ -344,20 +314,10 @@ angular.module('mpdxApp')
                         $scope.followUpSaveFunc = function(){
                             //Contact Updates
                             angular.forEach(followUpTask.contacts, function(c){
-                                api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
-                                    contact: {
-                                        status: 'Ask in Future'
-                                    }
-                                });
-
-                                //Newsletter signup
-                                if($scope.followUpDialogResult.newsletterSignup){
-                                    api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
-                                        contact: {
-                                            send_newsletter: $scope.followUpDialogResult.newsletter.type
-                                        }
-                                    });
-                                }
+                                var contact = {id: c, status: 'Ask in Future'};
+                                if($scope.followUpDialogResult.newsletterSignup)
+                                    contact.send_newsletter = $scope.followUpDialogResult.newsletter.type;
+                                saveContact(contact);
                             });
 
                             //Create Call Task
@@ -366,6 +326,7 @@ angular.module('mpdxApp')
                             }
 
                             jQuery('#complete_task_followup_modal').dialog('close');
+                            showContactStatus('Ask in Future');
                         };
 
                     }else if(strContains(taskResult, 'Not Interested') && followUpTask.contacts.length > 0){
@@ -378,20 +339,13 @@ angular.module('mpdxApp')
                         $scope.followUpSaveFunc = function(){
                             //Contact Updates
                             angular.forEach(followUpTask.contacts, function(c){
-                                api.call('put', 'contacts/' + c + '?account_list_id=' + window.current_account_list_id, {
-                                    contact: {
-                                        status: 'Not Interested'
-                                    }
-                                });
+                                saveContact({id: c, status: 'Not Interested'});
                             });
-
                             jQuery('#complete_task_followup_modal').dialog('close');
+                            showContactStatus('Not Interested');
                         };
 
                     }
-
-
-
 
                     if(angular.isDefined($scope.followUpDialogData)){
                         $scope.followUpDialogResult.select = $scope.followUpDialogData.options[0];
@@ -407,92 +361,59 @@ angular.module('mpdxApp')
                     }
                 };
 
-
-                var createThankTask = function(contactsObject){
+                var createTask = function(task, contactsObject, taskType){
                     api.call('post', 'tasks/?account_list_id=' + window.current_account_list_id, {
                         task: {
-                            start_at: $scope.followUpDialogResult.thankTask.date + ' ' + $scope.followUpDialogResult.thankTask.hour + ':' + $scope.followUpDialogResult.thankTask.min + ':00',
-                            subject: $scope.followUpDialogResult.thankTask.subject,
-                            activity_type: 'Thank',
-                            activity_contacts_attributes: contactsObject,
-                            activity_comments_attributes: {
-                                "0": {
-                                    body: $scope.followUpDialogResult.thankTask.comments
-                                }
-                            }
-                        }
-                    }, function () {
-                        if(angular.isDefined($scope.refreshVisibleTasks)){
-                            $scope.refreshVisibleTasks();
-                        }
-                    });
-                };
-
-                var createGivingTask = function(contactsObject){
-                    api.call('post', 'tasks/?account_list_id=' + window.current_account_list_id, {
-                        task: {
-                            start_at: $scope.followUpDialogResult.givingTask.date + ' ' + $scope.followUpDialogResult.givingTask.hour + ':' + $scope.followUpDialogResult.givingTask.min + ':00',
-                            subject: $scope.followUpDialogResult.givingTask.subject,
-                            activity_type: $scope.followUpDialogResult.givingTask.type,
-                            activity_contacts_attributes: contactsObject,
-                            activity_comments_attributes: {
-                                "0": {
-                                    body: $scope.followUpDialogResult.givingTask.comments
-                                }
-                            }
-                        }
-                    }, function () {
-                        if(angular.isDefined($scope.refreshVisibleTasks)){
-                            $scope.refreshVisibleTasks();
-                        }
-                    });
-                };
-
-                var createGenericTask = function(contactsObject, taskType){
-                    api.call('post', 'tasks/?account_list_id=' + window.current_account_list_id, {
-                        task: {
-                            start_at: $scope.followUpDialogResult.callTask.date + ' ' + $scope.followUpDialogResult.callTask.hour + ':' + $scope.followUpDialogResult.callTask.min + ':00',
-                            subject: $scope.followUpDialogResult.callTask.subject,
-                            tag_list: $scope.followUpDialogResult.callTask.tags,
+                            start_at: task.date + ' ' + task.hour + ':' + task.min + ':00',
+                            subject: task.subject,
+                            tag_list: task.tags,
                             activity_type: taskType,
                             activity_contacts_attributes: contactsObject,
                             activity_comments_attributes: {
                                 "0": {
-                                    body: $scope.followUpDialogResult.callTask.comments
+                                    body: task.comments
                                 }
                             }
                         }
-                    }, function () {
+                    }, function (resp) {
                         if(angular.isDefined($scope.refreshVisibleTasks)){
                             $scope.refreshVisibleTasks();
                         }
+                        else if($('#tasks-tab')[0])
+                            angular.element($('#tasks-tab')).scope().syncTask(resp.task);
                     });
                 };
 
+                var createThankTask = function(contactsObject){
+                    createTask($scope.followUpDialogResult.thankTask, contactsObject, 'Thank');
+                };
+
+                var createGivingTask = function(contactsObject){
+                    createTask($scope.followUpDialogResult.givingTask, contactsObject, $scope.followUpDialogResult.givingTask.type);
+                };
+
+                var createGenericTask = function(contactsObject, taskType){
+                    createTask($scope.followUpDialogResult.callTask, contactsObject, taskType);
+                };
 
                 var createApptTask = function(contactsObject){
-                    api.call('post', 'tasks/?account_list_id=' + window.current_account_list_id, {
-                        task: {
-                            start_at: $scope.followUpDialogResult.apptTask.date + ' ' + $scope.followUpDialogResult.apptTask.hour + ':' + $scope.followUpDialogResult.apptTask.min + ':00',
-                            subject: $scope.followUpDialogResult.apptTask.subject,
-                            activity_type: 'Appointment',
-                            activity_contacts_attributes: contactsObject,
-                            activity_comments_attributes: {
-                                "0": {
-                                    body: $scope.followUpDialogResult.apptTask.comments
-                                }
-                            }
-                        }
-                    }, function () {
-                        if(angular.isDefined($scope.refreshVisibleTasks)){
-                            $scope.refreshVisibleTasks();
-                        }
+                    createTask($scope.followUpDialogResult.thankTask, contactsObject, 'Appointment');
+                };
+
+                var showContactStatus = function(status){
+                    status = __(status);
+                    jQuery('.contact_status').text(__('Status')+': '+status);
+                };
+
+                var saveContact = function(contact){
+                    api.call('put', 'contacts/' + contact.id + '?account_list_id=' + window.current_account_list_id, {
+                        contact: contact
                     });
                 };
 
                 var strContains = function(h, n){
-                    return h.indexOf(n) > -1
-                }
+                    return h.indexOf(n) > -1;
+                };
             }
         };
     });
