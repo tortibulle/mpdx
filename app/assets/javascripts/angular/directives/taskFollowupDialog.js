@@ -100,6 +100,7 @@ angular.module('mpdxApp')
                               angular.forEach(followUpTask.contacts, function (c) {
                                 saveContact({id: c, status: 'Call for Decision'});
                               });
+                              showContactStatus('Call for Decision');
                             }
 
                             //Create Call, Message, Email or Text Task
@@ -108,7 +109,6 @@ angular.module('mpdxApp')
                             }
 
                             jQuery('#complete_task_followup_modal').dialog('close');
-                            showContactStatus('Call for Decision');
                         };
 
                     }else if((strContains(taskResult, 'Appointment Scheduled') || strContains(taskResult, 'Reschedule')) && followUpTask.contacts.length > 0){
