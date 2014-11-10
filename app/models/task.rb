@@ -91,6 +91,40 @@ class Task < Activity
     end
   end
 
+  def result_options
+    case activity_type
+    when 'Call'
+      return CALL_RESULTS
+    when 'Appointment'
+      return APPOINTMENT_RESULTS
+    when 'Email'
+      return EMAIL_RESULTS
+    when 'Facebook Message'
+      return FACEBOOK_MESSAGE_RESULTS
+    when 'Text Message'
+      return TEXT_RESULTS
+    else
+      return STANDARD_RESULTS
+    end
+  end
+
+  def next_action_options
+    case activity_type
+    when 'Call'
+      return CALL_NEXT_ACTIONS
+    when 'Appointment'
+      return APPOINTMENT_NEXT_ACTIONS
+    when 'Email'
+      return EMAIL_NEXT_ACTIONS
+    when 'Facebook Message'
+      return FACEBOOK_MESSAGE_NEXT_ACTIONS
+    when 'Text Message'
+      return TEXT_NEXT_ACTIONS
+    else
+      return ['None']
+    end
+  end
+
   private
 
   def update_completed_at

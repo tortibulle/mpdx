@@ -28,12 +28,12 @@
 
   <div class="field">
     <%= f.label :result, _('Result') %>
-    <%= f.select :result, {} %>
+    <%= f.select :result, task.result_options %>
   </div>
 
   <div class="field">
     <%= f.label :next_action, _('Next Action') %>
-    <%= f.select :next_action, {} %>
+    <%= f.select :next_action, task.next_action_options %>
   </div>
 <% else %>
   <div class="field due_date">
