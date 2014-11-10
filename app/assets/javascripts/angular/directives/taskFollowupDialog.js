@@ -397,7 +397,7 @@ angular.module('mpdxApp')
                 };
 
                 var createApptTask = function(contactsObject){
-                    createTask($scope.followUpDialogResult.thankTask, contactsObject, 'Appointment');
+                    createTask($scope.followUpDialogResult.apptTask, contactsObject, 'Appointment');
                 };
 
                 var showContactStatus = function(status){
