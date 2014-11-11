@@ -2,7 +2,8 @@ class Api::V1::AppealsController < Api::V1::BaseController
   def index
     result = appeals
     if params[:account_list_id]
-      result = Appeal.where(account_list_id: params[:account_list_id])
+      account_list = current_user.account_lists.find(params[:account_list_id])
+      result = account_list.appeals.includes(:contacts) if account_list
     end
     render json: result, callback: params[:callback]
   end
@@ -12,7 +13,8 @@ class Api::V1::AppealsController < Api::V1::BaseController
   end
 
   def update
-    if appeal.update_attributes(appeal_params) && appeal.add_and_remove_contacts(current_account_list, params[:appeal][:contacts])
+    if appeal.update_attributes(appeal_params) &&
+        appeal.add_and_remove_contacts(current_account_list, params[:appeal][:contacts])
       render json: appeal, callback: params[:callback]
     else
       render json: { errors: appeal.errors.full_messages }, callback: params[:callback], status: :bad_request
