@@ -75,6 +75,29 @@
         <br/>
       <% end %>
 
+      <% if $rollout.active?(:google_contacts_sync, current_account_list) %>
+          <h2><%= _('Google Contacts integration') %></h2>
+
+          <%= _("<p>MPDx can sync your active contacts to Google so you only have to keep your contacts up to date in
+                     one place.  (Active contacts are those whose status field indicates that they are partners or in the
+                     MPD process.)</p>
+
+                     <p>This will synchronize existing contact information as well as future updates and deletions to your contact
+                     info to and from MPDx and Google. Once the sync is active, changes in either Google or MPDx will be
+                     reflected in the other system. If you make a change in both places between syncs, MPDx changes
+                     will take precedence.</p>") %>
+
+          <% if @google_integration.contacts_integration? %>
+              <%= _("Google Contacts sync has been enabled.") %>
+              <br/><br/>
+              <%= link_to(_('Disable Google Contacts integration'), google_integration_path(@google_integration, google_integration: { contacts_integration: false }), method: :put,
+                          class: 'btn', data: { confirm: _('Are you sure you want to disable Google Contacts sync?') }) %>
+              <%= link_to(_('Sync Now'), sync_google_integration_path(@google_integration, integration: 'contacts'), class: 'btn desired_action') %>
+          <% else %>
+              <%= link_to(_('Enable Google Contacts Integration'), google_integration_path(@google_integration, google_integration: { contacts_integration: true }), method: :put, class: 'btn desired_action') %>
+          <% end %>
+      <% end %>
+
       <div id='google_refresh'>
         <h2><%= _('Refresh Google Account') %></h2>
 

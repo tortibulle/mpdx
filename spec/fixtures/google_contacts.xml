@@ -1,0 +1,79 @@
+<feed gd:etag="&quot;QHg9eDVSLyt7I2A9XRdQE0QORQY.&quot;" xmlns="http://www.w3.org/2005/Atom" xmlns:batch="http://schemas.google.com/gdata/batch" xmlns:gContact="http://schemas.google.com/contact/2008" xmlns:gd="http://schemas.google.com/g/2005" xmlns:openSearch="http://a9.com/-/spec/opensearch/1.1/">
+  <id>test.user@cru.org</id>
+  <updated>2014-10-15T17:30:21.660Z</updated>
+  <category scheme="http://schemas.google.com/g/2005#kind" term="http://schemas.google.com/contact/2008#contact"/>
+  <title>Test User's Contacts</title>
+  <link rel="alternate" type="text/html" href="https://www.google.com/"/>
+  <link rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml" href="https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full?v=3"/>
+  <link rel="http://schemas.google.com/g/2005#post" type="application/atom+xml" href="https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full?v=3"/>
+  <link rel="http://schemas.google.com/g/2005#batch" type="application/atom+xml" href="https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full/batch?v=3"/>
+  <link rel="self" type="application/atom+xml" href="https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full?max-results=1&amp;v=3"/>
+  <link rel="next" type="application/atom+xml" href="https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full?max-results=1&amp;v=3&amp;start-index=2"/>
+  <author>
+    <name>Test User</name>
+    <email>test.user@cru.org</email>
+  </author>
+  <generator version="1.0" uri="http://www.google.com/m8/feeds">Contacts</generator>
+  <openSearch:totalResults>1</openSearch:totalResults>
+  <openSearch:startIndex>1</openSearch:startIndex>
+  <openSearch:itemsPerPage>1</openSearch:itemsPerPage>
+  <entry gd:etag="&quot;SXk6cDdXKit7I2A9Wh9VFUgORgE.&quot;">
+    <batch:id>0</batch:id>
+    <batch:operation type='insert'/>
+    <batch:status code='201' reason='Created'/>
+    <id>http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/6b70f8bb0372c</id>
+    <updated>2014-04-03T19:42:38.718Z</updated>
+    <app:edited xmlns:app="http://www.w3.org/2007/app">2014-04-03T19:42:38.718Z</app:edited>
+    <category scheme="http://schemas.google.com/g/2005#kind" term="http://schemas.google.com/contact/2008#contact"/>
+    <title>John Doe</title>
+    <content>Notes here</content>
+    <link rel="http://schemas.google.com/contacts/2008/rel#photo" type="image/*" href="https://www.google.com/m8/feeds/photos/media/test.user%40cru.org/0?v=3"/>
+    <link rel="self" type="application/atom+xml" href="https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full/0?v=3"/>
+    <link rel="edit" type="application/atom+xml" href="https://www.google.com/m8/feeds/contacts/test.user%40cru.org/full/0?v=3"/>
+    <gd:name>
+      <gd:fullName>John Doe</gd:fullName>
+      <gd:givenName>John</gd:givenName>
+      <gd:familyName>Doe</gd:familyName>
+      <gd:additionalName>Henry</gd:additionalName>
+      <gd:namePrefix>Mr</gd:namePrefix>
+      <gd:nameSuffix>III</gd:nameSuffix>
+    </gd:name>
+    <gd:email rel="http://schemas.google.com/g/2005#other" address="johnsmith@example.com" primary="true"/>
+    <gd:email rel="http://schemas.google.com/g/2005#home" address="mpdx@example.com"/>
+    <gd:phoneNumber rel="http://schemas.google.com/g/2005#mobile" primary="true">(123) 334-5158</gd:phoneNumber>
+    <gd:phoneNumber rel="http://schemas.google.com/g/2005#home">(456) 789-0123</gd:phoneNumber>
+    <gContact:website href="blog.example.com" rel="blog"/>
+    <gContact:website href="www.example.com" rel="profile" primary="true"/>
+    <gContact:groupMembershipInfo deleted="false" href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/1b9d086d0a95e81a"/>
+    <gContact:groupMembershipInfo deleted="false" href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/6"/>
+    <gContact:groupMembershipInfo deleted="false" href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/33bfe364885eed6f"/>
+    <gContact:groupMembershipInfo deleted="false" href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid"/>
+    <gd:structuredPostalAddress rel="home">
+      <gd:street>2345 Long Dr. #232</gd:street>
+      <gd:city>Somewhere</gd:city>
+      <gd:region>IL</gd:region>
+      <gd:postcode>12345</gd:postcode>
+      <gd:country>United States of America</gd:country>
+    </gd:structuredPostalAddress>
+    <gd:structuredPostalAddress>
+      <gd:street>123 Big Rd</gd:street>
+      <gd:city>Anywhere</gd:city>
+      <gd:region>MO</gd:region>
+      <gd:postcode>56789</gd:postcode>
+      <gd:country>United States of America</gd:country>
+    </gd:structuredPostalAddress>
+    <gd:structuredPostalAddress rel="http://schemas.google.com/g/2005#work" primary="true">
+      <gd:street>100 Lake Hart Dr.</gd:street>
+      <gd:city>Orlando</gd:city>
+      <gd:region>FL</gd:region>
+      <gd:postcode>32832</gd:postcode>
+      <gd:country>United States of America</gd:country>
+    </gd:structuredPostalAddress>
+    <gd:organization rel="http://schemas.google.com/g/2005#other">
+      <gd:orgName>Example, Inc</gd:orgName>
+      <gd:orgTitle>Worker Person</gd:orgTitle>
+    </gd:organization>
+    <gContact:relation rel="spouse">Jane</gContact:relation>
+    <gContact:birthday when='1988-05-12'/>
+  </entry>
+</feed>

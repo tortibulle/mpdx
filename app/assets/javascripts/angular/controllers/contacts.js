@@ -232,16 +232,25 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
 
       api.call('get', requestUrl, {}, function (data) {
         angular.forEach(data.contacts, function (contact) {
+          var people = _.filter(data.people, function (i) {
+            return _.contains(contact.person_ids, i.id);
+          });
+          var flattenedEmailAddresses = _.flatten(_.pluck(people, 'email_address_ids'));
+          var flattenedFacebookAccounts = _.flatten(_.pluck(people, 'facebook_account_ids'));
+
           contactCache.update(contact.id, {
             addresses: _.filter(data.addresses, function (addr) {
               return _.contains(contact.address_ids, addr.id);
             }),
-            people: _.filter(data.people, function (i) {
-              return _.contains(contact.person_ids, i.id);
+            people: people,
+            email_addresses: _.filter(data.email_addresses, function (email) {
+              return _.contains(flattenedEmailAddresses, email.id);
             }),
-            email_addresses: data.email_addresses,
             contact: _.find(data.contacts, { 'id': contact.id }),
-            phone_numbers: data.phone_numbers
+            phone_numbers: data.phone_numbers,
+            facebook_accounts: _.filter(data.facebook_accounts, function (fb) {
+              return _.contains(flattenedFacebookAccounts, fb.id);
+            })
           });
         });
         $scope.contacts = data.contacts;
@@ -300,34 +309,90 @@ angular.module('mpdxApp').controller('contactsController', function ($scope, $fi
       return true;
     };
 
+    var generateContactMarker = function(contact) {
+      var cc = contactCache.getFromCache(contact.id);
+      var marker;
+      if(cc && cc.addresses && cc.addresses.length > 0) {
+        var geo = cc.addresses[0].geo;
+        if(geo) {
+          marker = {
+            'lat': geo.split(',')[0],
+            'lng': geo.split(',')[1],
+            'infowindow': '<a href="/contacts/'+contact.id+'">' + contact.name + '</a>',
+            'picture': {
+              'url': markerURL(contact.status),
+              'width':  20,
+              'height': 36
+            }
+          }
+        }
+      }
+      return marker;
+    }
+    var markerURL = function(status) {
+      var base = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|'
+      switch(status) {
+        case '':
+        case 'Never Contacted':
+          return base + 'dcdcdc';
+        case 'Ask in Future':
+          return base + 'F04141';
+        case 'Contact for Appointment':
+          return base + 'F0D541';
+        case 'Appointment Scheduled':
+          return base + '54DB1A';
+        case 'Call for Decision':
+          return base + '41F0A1';
+        case 'Partner - Financial':
+          return base + '41AAF0';
+        case 'Partner - Special':
+          return base + '6C41F0';
+        case 'Partner - Pray':
+          return base + 'F26FE5';
+      }
+      return base + '757575'
+    }
+
     $scope.mapContacts = function() {
-      markers = [];
+      var newMarkers = [];
+      var contactsCounts = {
+        noAddress: 0
+      }
       angular.forEach($scope.contacts, function(contact) {
-        cc = contactCache.getFromCache(contact.id)
-        if(cc && cc.addresses && cc.addresses.length > 0) {
-          geo = cc.addresses[0].geo
-          if(geo)
-            markers.push({
-              "lat": +geo.split(',')[0],
-              "lng": +geo.split(',')[1],
-              "infowindow": '<a href="/contacts/'+contact.id+'">'+contact.name+'</a>'
-            })
-        }
+        var marker = generateContactMarker(contact);
+        if(marker)
+          newMarkers.push(marker);
+        else
+          contactsCounts.noAddress++;
       })
-      $('#contacts_map_modal').dialog({ width: 700, height: 500 })
-      map_options = { streetViewControl: false };
-      handler = Gmaps.build('Google');
-      handler.buildMap(
-        {
-          provider: map_options,
-          internal: {id: 'contacts-map'}
-        },
-        function(){
-          markers = handler.addMarkers(markers);
-          handler.bounds.extendWith(markers);
-          handler.fitMapToBounds();
-        }
-      );
+      $('#contacts_map_modal').dialog({ width: 700, height: 570 })
+      var addMarkers = function(){
+        $scope.mapHandler.removeMarkers($scope.mapMarkers)
+        $scope.mapMarkers = $scope.mapHandler.addMarkers(newMarkers);
+        $scope.mapHandler.bounds.extendWith($scope.mapMarkers);
+        $scope.mapHandler.fitMapToBounds();
+      }
+      $scope.singleMap(addMarkers)
+      $('.contacts_counts').text(contactsCounts.noAddress + '/' + $scope.contacts.length)
+    };
+    $scope.mapMarkers = [];
+
+    $scope.singleMap = function(methodToExec) {
+      if(methodToExec === undefined || typeof(methodToExec) != "function")
+        methodToExec = $.noop
+      var mapOptions = { streetViewControl: false };
+      if($scope.mapHandler === undefined) {
+        $scope.mapHandler = Gmaps.build('Google');
+        $scope.mapHandler.buildMap(
+          {
+            provider: mapOptions,
+            internal: {id: 'contacts-map'}
+          },
+          methodToExec
+        );
+      }
+      else
+        methodToExec()
     };
 });
 

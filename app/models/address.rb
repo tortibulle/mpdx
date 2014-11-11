@@ -84,8 +84,7 @@ class Address < ActiveRecord::Base
     meta['latitude'].to_s + ',' + meta['longitude'].to_s
   end
 
-  private
-
+  # Not private because Google Contacts sync uses it to normalize addresses without needing to create a record
   def find_or_create_master_address
     unless master_address_id
       master_address = find_master_address
@@ -100,6 +99,8 @@ class Address < ActiveRecord::Base
 
     true
   end
+
+  private
 
   def update_or_create_master_address
     if (changed & %w(street city state country postal_code)).present?

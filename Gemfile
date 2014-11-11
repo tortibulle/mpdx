@@ -7,9 +7,9 @@ gem 'rails', '~> 4.0.0'
 gem 'sass-rails',   '~> 4.0.1'
 gem 'coffee-rails', '~> 4.0.1'
 
-#gem 'execjs', '~> 1.4.0'
-gem 'therubyracer'
-#gem 'therubyrhino', '~> 2.0.2'
+gem 'execjs' #, '~> 1.4.0'
+# gem 'therubyracer'
+# gem 'therubyrhino', '~> 2.0.2'
 
 gem 'uglifier', '~> 2.4.0'
 gem 'jquery-ui-rails', '~> 4.2.1'
@@ -47,7 +47,6 @@ gem 'gmaps4rails', '~> 2.1.2'
 gem 'iniparse', '~> 1.1.6'
 gem 'jquery-rails', '~> 3.0.4'
 gem 'koala', '~> 1.9.0'
-gem 'libv8', '3.16.14.3'
 gem 'linkedin', '~> 0.3.7'
 gem 'newrelic_rpm', '~> 3.7.1'
 gem 'nokogiri', '~> 1.5.11'
@@ -122,6 +121,7 @@ group :development, :test do
   gem 'fuubar'
   gem 'unicorn'
   gem 'zonebie'
+  gem 'equivalent-xml'
 end
 group :test do
   gem 'webmock', '~> 1.9.0'

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: version 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-25 04:50-0400\n"
+"POT-Creation-Date: 2014-10-22 07:22-0700\n"
 "PO-Revision-Date: 2014-09-16 16:48+0100\n"
 "Last-Translator: Josh Starcher <>\n"
 "Language-Team: French\n"
@@ -121,6 +121,10 @@ msgstr "Activité"
 msgid "Actions"
 msgstr "Activités"
 
+#, fuzzy
+msgid "Active Contacts"
+msgstr "Cacher les contacts"
+
 msgid "Add %{network} Account"
 msgstr "Ajouter le compte %{network} "
 
@@ -206,11 +210,17 @@ msgstr "Age"
 msgid "All"
 msgstr "Tout"
 
+msgid "Always current. Contacts with status: Never Contacted, Contact for Appointment, or none."
+msgstr ""
+
 msgid "Amount"
 msgstr "Montant"
 
 msgid "Amount (%{currency})"
 msgstr "Montant (%{currency})"
+
+msgid "Amount (USD)"
+msgstr ""
 
 msgid "Anniversaries"
 msgstr "Anniversaires"
@@ -237,7 +247,8 @@ msgstr "Rendez-vous"
 msgid "Appointment Scheduled"
 msgstr "Rendez-vous établi"
 
-msgid "Appointments:"
+#, fuzzy
+msgid "Appointments"
 msgstr "Rendez-vous :"
 
 msgid "Are you sure you want to delete this task instead of marking it as completed?"
@@ -486,6 +497,9 @@ msgstr "Rapport de contribution :"
 msgid "Contribution Report for %{start_date} through %{end_date}"
 msgstr "Rapport de contribution du %{start_date} au %{end_date}"
 
+msgid "Correspondence"
+msgstr ""
+
 msgid "Cousin (Female)"
 msgstr "Cousine "
 
@@ -604,6 +618,10 @@ msgstr "Modifier les sélections"
 msgid "Edit Task - %{task}"
 msgstr "Modifier les tâches - %{task}"
 
+#, fuzzy
+msgid "Electronic Contacts"
+msgstr "Fusionner les contacts"
+
 msgid "Email"
 msgstr "E-mail"
 
@@ -616,7 +634,8 @@ msgstr "Adresse e-mail :"
 msgid "Email me"
 msgstr "Ecrivez-moi"
 
-msgid "Emails:"
+#, fuzzy
+msgid "Email:"
 msgstr "E-mails :"
 
 msgid "Enable"
@@ -648,10 +667,11 @@ msgstr "Importer"
 msgid "Facebook Message"
 msgstr "Message Facebook"
 
-msgid "Facebook Message:"
-msgstr "Message Facebook :"
-
 msgid "Facebook Url"
+msgstr "Url Facebook"
+
+#, fuzzy
+msgid "Facebook:"
 msgstr "Url Facebook"
 
 msgid "Father"
@@ -872,6 +892,15 @@ msgstr ""
 msgid "MPDX does not currently import any data from this source, but it will soon! Connect your account now to be ready for when it does"
 msgstr "MPDX ne peut pas importer actuellement de données provenant de cette source, mais il pourra bientôt ! Connectez votre compte maintenant pour être prêt quand il le fera"
 
+msgid ""
+"MPDX encountered errors while trying to import your %{source} contacts.\n"
+"\n"
+"%{explanation}\n"
+"\n"
+"Thanks!\n"
+"MPDX Support Team"
+msgstr ""
+
 #, fuzzy
 msgid "MPDX has finished importing your %{source} contacts."
 msgstr "[MPDX] L'importation de vos contacts de %{source} a échouée"
@@ -1056,6 +1085,13 @@ msgstr ""
 msgid "No Subject"
 msgstr "Sujet"
 
+#, fuzzy
+msgid "No completed tasks found for this contact."
+msgstr "Vous n'avez pas de tâches enregistrées pour ce contact."
+
+msgid "No donations have been received from %{contact} in the past 13 months"
+msgstr ""
+
 msgid "No email addess on file"
 msgstr "Aucune adresse e-mail dans le fichier"
 
@@ -1070,6 +1106,9 @@ msgstr "Aucune adresse e-mail ou postale dans le fichier"
 
 msgid "No phone number"
 msgstr "Aucun numéro de téléphone"
+
+msgid "No tasks found for this contact."
+msgstr ""
 
 msgid "None"
 msgstr "Aucun"
@@ -1107,6 +1146,9 @@ msgstr "Autre"
 #, fuzzy
 msgid "Other Details"
 msgstr "Coordonnées"
+
+msgid "Outgoing Dials"
+msgstr ""
 
 msgid "Override existing contact fields with data in the uploaded file."
 msgstr "Remplacer les champs de contact existants avec les données du fichier téléchargé."
@@ -1208,7 +1250,8 @@ msgstr "Code postal"
 msgid "Pre Call Letter"
 msgstr "Lettre pré-appel"
 
-msgid "Pre-call Letters:"
+#, fuzzy
+msgid "Pre-call Letters"
 msgstr "Lettre pré-appel :"
 
 msgid "Preferences"
@@ -1253,6 +1296,10 @@ msgstr "Reçu :"
 msgid "Referrals"
 msgstr "Références "
 
+#, fuzzy
+msgid "Referrals Gained"
+msgstr "Références disponibles"
+
 msgid "Referrals by this contact"
 msgstr "Références de ce contact"
 
@@ -1280,7 +1327,8 @@ msgstr ""
 msgid "Reminder Letter"
 msgstr "Lettre de rappel"
 
-msgid "Reminder Letters:"
+#, fuzzy
+msgid "Reminder Letters"
 msgstr "Lettres de rappel :"
 
 msgid "Remove"
@@ -1300,6 +1348,9 @@ msgstr "Réinitialiser les filtres"
 
 msgid "Result"
 msgstr "Résultat"
+
+msgid "Resulted in Appointments"
+msgstr ""
 
 msgid "Rev."
 msgstr "Pasteur"
@@ -1338,14 +1389,12 @@ msgstr "Semi-annuel"
 msgid "Send Message"
 msgstr "Envoyer un message"
 
-msgid "Sent:"
+#, fuzzy
+msgid "Sent"
 msgstr "Envoyés :"
 
 msgid "Separated"
 msgstr "Separé"
-
-msgid "Set up:"
-msgstr "Effectué  :"
 
 msgid "Settings"
 msgstr "Paramètres"
@@ -1367,9 +1416,6 @@ msgstr "Seul"
 
 msgid "Sister"
 msgstr "Soeur"
-
-msgid "Snail Mail:"
-msgstr "Courrier :"
 
 msgid "Social"
 msgstr "Social"
@@ -1425,7 +1471,8 @@ msgstr "Soutien"
 msgid "Support Letter"
 msgstr "Lettre de soutien"
 
-msgid "Support Letters:"
+#, fuzzy
+msgid "Support Letters"
 msgstr "Lettres de soutien"
 
 msgid "Sweet! Your Account is activated!"
@@ -1436,6 +1483,10 @@ msgstr "Synchroniser maintenant"
 
 msgid "Tags"
 msgstr "Libellés"
+
+#, fuzzy
+msgid "Talked To"
+msgstr "Lié à"
 
 msgid "Task"
 msgstr "Tâche"
@@ -1456,13 +1507,14 @@ msgstr "Message texte"
 msgid "Thank"
 msgstr "Remercier"
 
+#, fuzzy
+msgid "Thank You Notes"
+msgstr "notes de remerciements :"
+
 msgid ""
 "Thank you for suggesting ways we can make MPDX a better tool. We will take your suggestion into consideration\n"
 "    and add it to MPDX's project tool: %{link}"
 msgstr "Merci de nous suggérer vos avis pour que nous puissions faire de MPDX un meilleur outil. Nous prendrons en compte vos suggestions et les ajouterons à l'outil de projet de MPDX : %{link}"
-
-msgid "Thank you notes:"
-msgstr "notes de remerciements :"
 
 msgid "Thanks!"
 msgstr "Merci !"
@@ -1527,9 +1579,6 @@ msgstr "Ce filtre recherchera les personnes qui ont une configuration permettant
 
 msgid "This will replace your prayerletters.com list with what you have in MPDX. Are you sure that's what you'd like to do?"
 msgstr "Cela remplacera votre liste de prayerletters.com avec celle de MPDX. Etes-vous sûr que c'est ce que vous aimeriez  faire ?"
-
-msgid "Through Phone Calls"
-msgstr ""
 
 msgid "Time zone"
 msgstr "Fuseau horaire"
@@ -1715,6 +1764,26 @@ msgstr "Le compte prayerletters.com doit être rafraîchi"
 msgid "to"
 msgstr "à"
 
+#~ msgid "Appointments:"
+#~ msgstr "Rendez-vous :"
+#~ msgid "Emails:"
+#~ msgstr "E-mails :"
+#~ msgid "Facebook Message:"
+#~ msgstr "Message Facebook :"
+#~ msgid "Pre-call Letters:"
+#~ msgstr "Lettre pré-appel :"
+#~ msgid "Reminder Letters:"
+#~ msgstr "Lettres de rappel :"
+#~ msgid "Sent:"
+#~ msgstr "Envoyés :"
+#~ msgid "Set up:"
+#~ msgstr "Effectué  :"
+#~ msgid "Snail Mail:"
+#~ msgstr "Courrier :"
+#~ msgid "Support Letters:"
+#~ msgstr "Lettres de soutien"
+#~ msgid "Thank you notes:"
+#~ msgstr "notes de remerciements :"
 #~ msgid "Add Person"
 #~ msgstr "Ajouter une personne"
 #~ msgid ""

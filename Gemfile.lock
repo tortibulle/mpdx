@@ -34,7 +34,7 @@ GIT
 
 GIT
   remote: https://github.com/CruGlobal/google_contacts_api
-  revision: 4aefbb141785763d3f5a0b5fe5bf52ce8b73b99b
+  revision: 885bf580861265373321e829002ce862449caafe
   specs:
     google_contacts_api (0.4.0)
       activesupport
@@ -165,6 +165,8 @@ GEM
     diff-lcs (1.2.5)
     display_case (0.0.5)
     docile (1.1.5)
+    equivalent-xml (0.5.1)
+      nokogiri (>= 1.4.3)
     erubis (2.7.0)
     eventmachine (1.0.3)
     excon (0.39.5)
@@ -284,7 +286,6 @@ GEM
       multi_json
     launchy (2.4.2)
       addressable (~> 2.3)
-    libv8 (3.16.14.3)
     linkedin (0.3.7)
       hashie (~> 1.2)
       multi_json (~> 1.0)
@@ -443,7 +444,6 @@ GEM
       redis (~> 3.0, >= 3.0.4)
     redis-objects (0.6.1)
       redis (>= 3.0.2)
-    ref (1.0.5)
     resque (1.25.2)
       mono_logger (~> 1.0)
       multi_json (~> 1.0)
@@ -551,9 +551,6 @@ GEM
     state_machine (1.2.0)
     temple (0.6.8)
     text (1.3.0)
-    therubyracer (0.12.1)
-      libv8 (~> 3.16.14.0)
-      ref
     thin (1.5.1)
       daemons (>= 1.0.9)
       eventmachine (>= 0.12.6)
@@ -569,7 +566,7 @@ GEM
     twitter_cldr (2.4.3)
       json
       tzinfo
-    tzinfo (0.3.41)
+    tzinfo (0.3.42)
     uglifier (2.4.0)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
@@ -627,6 +624,8 @@ DEPENDENCIES
   devise (~> 3.2.2)
   display_case (= 0.0.5)
   emoji_spec!
+  equivalent-xml
+  execjs
   factory_girl_rails
   fb_graph (~> 2.6.0)
   fog (~> 1.23.0)
@@ -652,7 +651,6 @@ DEPENDENCIES
   jquery-rails (~> 3.0.4)
   jquery-ui-rails (~> 4.2.1)
   koala (~> 1.9.0)
-  libv8 (= 3.16.14.3)
   linkedin (~> 0.3.7)
   lodash-rails
   mailcatcher
@@ -706,7 +704,6 @@ DEPENDENCIES
   sinatra
   slim
   spork-rails
-  therubyracer
   twitter_cldr (~> 2.4.0)
   uglifier (~> 2.4.0)
   unicorn

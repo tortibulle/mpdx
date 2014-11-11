@@ -25,6 +25,8 @@ class GoogleIntegration < ActiveRecord::Base
       calendar_integrator.sync_tasks
     when 'email'
       email_integrator.sync_mail
+    when 'contacts'
+      contacts_integrator.sync_contacts
     end
   end
 
@@ -34,6 +36,10 @@ class GoogleIntegration < ActiveRecord::Base
 
   def email_integrator
     @email_integrator ||= GoogleEmailIntegrator.new(self)
+  end
+
+  def contacts_integrator
+    @contacts_integrator ||= GoogleContactsIntegrator.new(self)
   end
 
   def plus_api

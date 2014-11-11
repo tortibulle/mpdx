@@ -255,8 +255,8 @@ class DataServer
   end
 
   def get_response(url, params)
-    RestClient::Request.execute(method: :post, url: url, payload: params, timeout: -1, user: 'foo',
-                                password: 'bar') { |response, _request, _result, &_block|
+    RestClient::Request.execute(method: :post, url: url, payload: params, timeout: -1, user: @org_account.username,
+                                password: @org_account.password) { |response, _request, _result, &_block|
       # check for error response
       lines = response.split(/\n|\r/)
       first_line = lines.first.to_s.upcase
