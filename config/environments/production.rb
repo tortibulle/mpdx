@@ -88,7 +88,9 @@ Mpdx::Application.configure do
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_formatter = ::Logger::Formatter.new
 
-  config.action_mailer.default_url_options = {:host => 'mpdx.org'}
+  config.action_mailer.default_url_options = { host: 'mpdx.org' }
 
   #config.font_assets.origin = 'https://mpdx.org'
+
+  Rails.application.routes.default_url_options[:host] = 'mpdx.org'
 end
