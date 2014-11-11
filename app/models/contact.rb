@@ -202,7 +202,7 @@ class Contact < ActiveRecord::Base
   end
 
   def envelope_greeting
-    return name if siebel_organization?
+    return name if siebel_organization? || greeting.blank?
     greeting.include?(last_name.to_s) ? greeting : [greeting, last_name].compact.join(' ')
   end
 
