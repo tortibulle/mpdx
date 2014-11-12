@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141006182418) do
+ActiveRecord::Schema.define(version: 20141031142740) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -392,6 +392,10 @@ ActiveRecord::Schema.define(version: 20141006182418) do
     t.string   "picture_etag"
     t.integer  "picture_id"
     t.integer  "google_account_id"
+    t.datetime "last_synced"
+    t.string   "last_etag"
+    t.text     "last_data"
+    t.integer  "contact_id"
   end
 
   add_index "google_contacts", ["google_account_id"], name: "index_google_contacts_on_google_account_id", using: :btree
@@ -424,13 +428,15 @@ ActiveRecord::Schema.define(version: 20141006182418) do
   add_index "google_events", ["google_integration_id"], name: "index_google_events_on_google_integration_id", using: :btree
 
   create_table "google_integrations", force: true do |t|
-    t.integer "account_list_id"
-    t.integer "google_account_id"
-    t.boolean "calendar_integration",  default: false, null: false
-    t.text    "calendar_integrations"
-    t.string  "calendar_id"
-    t.string  "calendar_name"
-    t.boolean "email_integration",     default: false, null: false
+    t.integer  "account_list_id"
+    t.integer  "google_account_id"
+    t.boolean  "calendar_integration",  default: false, null: false
+    t.text     "calendar_integrations"
+    t.string   "calendar_id"
+    t.string   "calendar_name"
+    t.boolean  "email_integration",     default: false, null: false
+    t.boolean  "contacts_integration",  default: false, null: false
+    t.datetime "contacts_last_synced"
   end
 
   add_index "google_integrations", ["account_list_id"], name: "index_google_integrations_on_account_list_id", using: :btree
