@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141031142740) do
+ActiveRecord::Schema.define(version: 20141111222139) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -801,6 +801,7 @@ ActiveRecord::Schema.define(version: 20141031142740) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "account_list_id"
+    t.string   "oauth2_token"
   end
 
   add_index "prayer_letters_accounts", ["account_list_id"], name: "index_prayer_letters_accounts_on_account_list_id", using: :btree

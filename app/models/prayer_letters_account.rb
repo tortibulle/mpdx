@@ -1,4 +1,5 @@
 require 'async'
+require 'open-uri'
 
 class PrayerLettersAccount < ActiveRecord::Base
   include Async
@@ -10,7 +11,7 @@ class PrayerLettersAccount < ActiveRecord::Base
 
   after_create :queue_subscribe_contacts
 
-  validates :token, :secret, :account_list_id, presence: true
+  validates :oauth2_token, presence: true
 
   def queue_subscribe_contacts
     async(:subscribe_contacts)
@@ -156,6 +157,20 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def get_response(method, path, params = nil)
+    return oauth2_request(method, path, params) if oauth2_token.present?
+    oauth1_request(method, path, params)
+  end
+
+  def oauth2_request(method, path, params = nil)
+    RestClient::Request.execute(method: method, url: SERVICE_URL + path,
+                                headers: { 'Authorization' => "Bearer #{ URI::encode(oauth2_token) }" })
+  rescue RestClient::Unauthorized
+    handle_bad_token
+  rescue => e
+    Airbrake.raise_or_notify(e, parameters:  { method: method, path: path, params: params })
+  end
+
+  def oauth1_request(method, path, params = nil)
     consumer = OAuth::Consumer.new(APP_CONFIG['prayer_letters_key'], APP_CONFIG['prayer_letters_secret'],  site: SERVICE_URL, scheme: :query_string, oauth_version: '1.0')
     oauth_token = OAuth::Token.new(token, secret)
 
