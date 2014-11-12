@@ -1,0 +1,25 @@
+<button ng-click="newAppeal()">Create New Appeal</button>
+<table class="list">
+    <tbody>
+        <tr ng-repeat="appeal in appeals">
+            <td>
+                <div class="actions">
+                    <a class="ico ico_edit" href ng-click="editAppeal(appeal.id)">Edit</a>
+                    <a class="ico ico_trash" href ng-click="deleteAppeal(appeal.id)">Delete</a>
+                </div>
+            </td>
+            <td style="width: 350px;">
+                <strong>{{appeal.name}}</strong>
+            </td>
+            <td>${{formatNumber(donationTotal(appeal.donations))}}</td>
+
+            <td>
+                <div class="appealThermometer">
+                    <div class="level" ng-style="{'width': percentComplete(appeal.donations, appeal.amount) + '%'}">{{percentComplete(appeal.donations, appeal.amount)}}%
+                    </div>
+                </div>
+            </td>
+            <td>${{formatNumber(appeal.amount)}}</td>
+        </tr>
+    </tbody>
+</table>

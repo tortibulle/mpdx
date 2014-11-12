@@ -4,6 +4,7 @@ window.railsConstants = {
     INACTIVE_STATUSES: <%= Contact.inactive_statuses.inspect %>
   },
     task: {
+      ACTIONS: <%= Task::TASK_ACTIVITIES %>,
       CALL_RESULTS: <%= Task::CALL_RESULTS %>,
       CALL_NEXT_ACTIONS: <%= Task::CALL_NEXT_ACTIONS %>,
       APPOINTMENT_RESULTS: <%= Task::APPOINTMENT_RESULTS %>,

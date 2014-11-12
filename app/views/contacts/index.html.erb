@@ -137,6 +137,12 @@
               <%= select_tag 'filters[activity_type]', options_for_select([[_('-- Any --'), ''], [_('-- None --'), 'null']] + (Task.new.assignable_activity_types & current_account_list.tasks.select(:activity_type).uniq.collect(&:activity_type)).collect { |a| [_(a), a] }, filters_params[:activity_type]), multiple: true, size: 5, :'ng-model' => 'contactQuery.relatedTaskAction' %>
             </div>
           </li>
+          <li>
+            <label id="filter_appeal"><%= _('Appeal') %></label>
+            <div class="collapse" style="display:none;">
+              <%= select_tag 'filters[appeal]', options_from_collection_for_select(@appeals, 'id', 'name'), prompt: '-- Any --', multiple: true, size: 5, :'ng-model' => 'contactQuery.appeal' %>
+            </div>
+          </li>
           <li class="controls">
             <a href="#" ng-click="resetFilters()" class="btn">Reset Filters</a>
             <% if $rollout.active?(:contacts_map, current_account_list) %>
