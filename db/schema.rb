@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141031142740) do
+ActiveRecord::Schema.define(version: 20141006182418) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -122,23 +122,6 @@ ActiveRecord::Schema.define(version: 20141031142740) do
   add_index "addresses", ["master_address_id"], name: "index_addresses_on_master_address_id", using: :btree
   add_index "addresses", ["remote_id"], name: "index_addresses_on_remote_id", using: :btree
 
-  create_table "admin_users", force: true do |t|
-    t.string   "email",                default: "", null: false
-    t.string   "guid",                              null: false
-    t.integer  "sign_in_count",        default: 0
-    t.datetime "current_sign_in_at"
-    t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip"
-    t.string   "last_sign_in_ip"
-    t.string   "authentication_token"
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
-  end
-
-  add_index "admin_users", ["authentication_token"], name: "index_admin_users_on_authentication_token", unique: true, using: :btree
-  add_index "admin_users", ["email"], name: "index_admin_users_on_email", unique: true, using: :btree
-  add_index "admin_users", ["guid"], name: "index_admin_users_on_guid", unique: true, using: :btree
-
   create_table "appeal_contacts", force: true do |t|
     t.integer  "appeal_id"
     t.integer  "contact_id"
@@ -174,8 +157,8 @@ ActiveRecord::Schema.define(version: 20141031142740) do
 
   create_table "companies", force: true do |t|
     t.string   "name"
-    t.datetime "created_at",        null: false
-    t.datetime "updated_at",        null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.text     "street"
     t.string   "city"
     t.string   "state"
@@ -409,10 +392,6 @@ ActiveRecord::Schema.define(version: 20141031142740) do
     t.string   "picture_etag"
     t.integer  "picture_id"
     t.integer  "google_account_id"
-    t.datetime "last_synced"
-    t.string   "last_etag"
-    t.text     "last_data"
-    t.integer  "contact_id"
   end
 
   add_index "google_contacts", ["google_account_id"], name: "index_google_contacts_on_google_account_id", using: :btree
@@ -445,15 +424,13 @@ ActiveRecord::Schema.define(version: 20141031142740) do
   add_index "google_events", ["google_integration_id"], name: "index_google_events_on_google_integration_id", using: :btree
 
   create_table "google_integrations", force: true do |t|
-    t.integer  "account_list_id"
-    t.integer  "google_account_id"
-    t.boolean  "calendar_integration",  default: false, null: false
-    t.text     "calendar_integrations"
-    t.string   "calendar_id"
-    t.string   "calendar_name"
-    t.boolean  "email_integration",     default: false, null: false
-    t.boolean  "contacts_integration",  default: false, null: false
-    t.datetime "contacts_last_synced"
+    t.integer "account_list_id"
+    t.integer "google_account_id"
+    t.boolean "calendar_integration",  default: false, null: false
+    t.text    "calendar_integrations"
+    t.string  "calendar_id"
+    t.string  "calendar_name"
+    t.boolean "email_integration",     default: false, null: false
   end
 
   add_index "google_integrations", ["account_list_id"], name: "index_google_integrations_on_account_list_id", using: :btree
@@ -670,6 +647,7 @@ ActiveRecord::Schema.define(version: 20141031142740) do
     t.string   "profession"
     t.boolean  "deceased",                         default: false, null: false
     t.boolean  "subscribed_to_updates"
+    t.boolean  "optout_enewletter",                default: false
     t.boolean  "optout_enewsletter",               default: false
     t.string   "occupation"
     t.string   "employer"
@@ -888,7 +866,6 @@ ActiveRecord::Schema.define(version: 20141031142740) do
   end
 
   add_index "versions", ["item_type", "event", "related_object_type", "related_object_id", "created_at", "item_id"], name: "index_versions_on_item_type", using: :btree
-  add_index "versions", ["item_type", "item_id", "related_object_type", "related_object_id", "created_at"], name: "related_object_index", using: :btree
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
   add_index "versions", ["item_type", "related_object_type", "related_object_id", "created_at"], name: "related_object_index", using: :btree
 
