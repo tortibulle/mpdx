@@ -313,7 +313,7 @@ class DataServer
     donor_account.master_people << person.master_person unless donor_account.master_people.include?(person.master_person)
 
     contact = account_list.contacts.for_donor_account(donor_account).first
-    contact_person = contact.add_person(person)
+    contact_person = contact.add_person(person, donor_account)
 
     # create the master_person_source if needed
     unless master_person_from_source
