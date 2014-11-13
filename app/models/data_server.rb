@@ -295,7 +295,9 @@ class DataServer
   def add_or_update_person(account_list, line, donor_account, remote_id, prefix = '')
     organization = donor_account.organization
     master_person_from_source = organization.master_people.where('master_person_sources.remote_id' => remote_id.to_s).first
-    person = donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
+    person = donor_account.people.joins(:contacts).where(master_person_id: master_person_from_source.id)
+      .where('contacts.account_list_id' => account_list.id).readonly(false).first if master_person_from_source
+    person ||= donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
 
     person ||= Person.new(master_person: master_person_from_source)
     person.attributes = { first_name: line[prefix + 'FIRST_NAME'], last_name: line[prefix + 'LAST_NAME'], middle_name: line[prefix + 'MIDDLE_NAME'],
