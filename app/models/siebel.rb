@@ -246,12 +246,8 @@ class Siebel < DataServer
       end
     end
 
-    person = donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
-
-    unless person
-      person = contact.people.where(first_name: siebel_person.first_name, last_name: siebel_person.last_name).first
-    end
-
+    person = contact.people.where(first_name: siebel_person.first_name, last_name: siebel_person.last_name).first
+    person ||= donor_account.people.where(master_person_id: master_person_from_source.id).first if master_person_from_source
     person ||= Person.new(master_person: master_person_from_source)
 
     gender = case siebel_person.sex
@@ -279,7 +275,7 @@ class Siebel < DataServer
       donor_account.master_people << person.master_person unless donor_account.master_people.include?(person.master_person)
     end
 
-    contact_person = contact.add_person(person)
+    contact_person = contact.add_person(person, donor_account)
 
     # create the master_person_source if needed
     unless master_person_from_source
