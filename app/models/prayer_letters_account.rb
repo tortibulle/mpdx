@@ -155,12 +155,11 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def get_response(method, path, params = nil)
-    # Use OAuth2 if token present
-    return oauth2_request(method, path, params) if oauth2_token.present?
-
-    # Otherwise queue an overall upgrade of prayer letters accounts to OAuth2, but use OAuth1 for this request
-    PrayerLettersOAuthUpgrader.perform_async
-    oauth1_request(method, path, params)
+    if oauth2_token.blank?
+      PrayerLettersOAuthUpgrader.perform_async
+      return oauth1_request(method, path, params)
+    end
+    oauth2_request(method, path, params)
   end
 
   def oauth2_request(method, path, params = nil)
