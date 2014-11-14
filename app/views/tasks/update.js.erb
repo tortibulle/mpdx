@@ -1,0 +1,8 @@
+$('#edit_task_modal').dialog('close')
+$('#edit_task_modal .form_wrapper').html('<%= j(render('tasks/modal_form')) %>')
+var task_json = <%== TaskSerializer.new(@task).to_json.gsub('/', '\/') %>
+if($('#tasks-tab')[0]) {
+  angular.element($('#tasks-tab')).scope().syncTask(task_json);
+  angular.element($('#history-tab')).scope().syncTask(task_json);
+}
+delete task_json;

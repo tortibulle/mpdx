@@ -170,3 +170,19 @@ $leftmenuwidth: 200px;
 input:read-only{
   background-color: #d3d3d3;
 }
+
+.appealThermometer {
+  height: 15px;
+  width: 100px;
+  margin: 0 10px;
+  padding: 0;
+  border: #cccccc solid 1px;
+  .level {
+    height: 15px;
+    margin: 0;
+    padding: 0;
+    border-right: 1px solid #666666;
+    background: #ffcccc;
+    text-align: right;
+  }
+}

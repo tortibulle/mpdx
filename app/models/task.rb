@@ -46,10 +46,12 @@ class Task < Activity
 
   ALL_RESULTS = STANDARD_RESULTS + APPOINTMENT_RESULTS + CALL_RESULTS + MESSAGE_RESULTS
 
+  TASK_ACTIVITIES = ['Call', 'Appointment', 'Email', 'Text Message', 'Facebook Message',
+                     'Letter', 'Newsletter', 'Pre Call Letter', 'Reminder Letter',
+                     'Support Letter', 'Thank', 'To Do']
+
   assignable_values_for :activity_type, allow_blank: true do
-    ['Call', 'Appointment', 'Email', 'Text Message', 'Facebook Message',
-     'Letter', 'Newsletter', 'Pre Call Letter', 'Reminder Letter',
-     'Support Letter', 'Thank', 'To Do']
+    TASK_ACTIVITIES
   end
 
   # assignable_values_for :result, :allow_blank => true do
@@ -88,6 +90,40 @@ class Task < Activity
       numbers.compact.join("\n")
     else
       return AddressExhibit.new(contacts.first.address, nil).to_google if contacts.first && contacts.first.address
+    end
+  end
+
+  def result_options
+    case activity_type
+    when 'Call'
+      return CALL_RESULTS
+    when 'Appointment'
+      return APPOINTMENT_RESULTS
+    when 'Email'
+      return EMAIL_RESULTS
+    when 'Facebook Message'
+      return FACEBOOK_MESSAGE_RESULTS
+    when 'Text Message'
+      return TEXT_RESULTS
+    else
+      return STANDARD_RESULTS
+    end
+  end
+
+  def next_action_options
+    case activity_type
+    when 'Call'
+      return CALL_NEXT_ACTIONS
+    when 'Appointment'
+      return APPOINTMENT_NEXT_ACTIONS
+    when 'Email'
+      return EMAIL_NEXT_ACTIONS
+    when 'Facebook Message'
+      return FACEBOOK_MESSAGE_NEXT_ACTIONS
+    when 'Text Message'
+      return TEXT_NEXT_ACTIONS
+    else
+      return ['None']
     end
   end
 

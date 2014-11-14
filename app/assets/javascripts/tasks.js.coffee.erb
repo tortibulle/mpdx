@@ -93,7 +93,8 @@ $ ->
               return false
             $.rails.handleRemote(form)
             $('.form_wrapper', this).html('<%= image_tag("spinner.gif") %>')
-            angular.element(jQuery('#contentbody')).scope().refreshVisibleTasks()
+            if $('#tasks_index')[0]?
+              angular.element(jQuery('#contentbody')).scope().refreshVisibleTasks()
         },
         {
           text: __('Cancel'),
@@ -183,11 +184,21 @@ $ ->
 
   $(document).on 'click', '#tasks_index .select_all', ->
     table = $(this).closest('table')
-
     $('input[type=checkbox]', table).prop('checked', $(this).prop('checked'))
-    if $(this).prop('checked') == true
+    if $(this).prop('checked')
       $('.taskgroup .actions', table).show()
     else
+      $('.taskgroup .actions', table).hide()
+
+  $(document).on 'click', '#tasks_index .check input[type=checkbox]', ->
+    table = $(this).closest('table')
+    showOptions = false
+    $('.check input[type=checkbox]', table).each ->
+      if $(this).prop('checked')
+        $('.taskgroup .actions', table).show()
+        showOptions = true
+        return
+    if !showOptions
       $('.taskgroup .actions', table).hide()
 
   $(document).on 'click', 'tr.task .fav', ->
@@ -218,60 +229,59 @@ $ ->
       form.submit()
       $('#task_' + id).fadeOut()
     else
-      if $(this).prop('checked') == true && !$('#tasks_completed')[0]?
-        row = $('#task_' + id)
-        if $(this).attr("data-title")
-          title = $(this).attr("data-title")
-        else
-          title = $(".taskaction", row).html()
-          title += " - " + $(".tasktitle", row).html()
+      row = $('#task_' + id)
+      if $(this).attr("data-title")
+        title = $(this).attr("data-title")
+      else
+        title = $(".taskaction", row).html()
+        title += " - " + $(".tasktitle", row).html()
 
-        $("#task_result_select, #task_action_select").empty()
-        ops = $(this).attr("data-results").split(",")
-        actions = $(this).attr("data-actions").split(",")
-        $("<select></select>").appendTo "#task_result_select"
-        $.each ops, (key, value) ->
-          $("#task_result_select select").append $("<option></option>").attr("value", value).text(value)
+      $("#task_result_select, #task_action_select").empty()
+      ops = $(this).attr("data-results").split(",")
+      actions = $(this).attr("data-actions").split(",")
+      $("<select></select>").appendTo "#task_result_select"
+      $.each ops, (key, value) ->
+        $("#task_result_select select").append $("<option></option>").attr("value", value).text(value)
 
-        $("<select></select>").appendTo "#task_action_select"
-        $.each actions, (key, value) ->
-          $("#task_action_select select").append $("<option></option>").attr("value", value).text(value)
+      $("<select></select>").appendTo "#task_action_select"
+      $.each actions, (key, value) ->
+        $("#task_action_select select").append $("<option></option>").attr("value", value).text(value)
 
-        #hide result dropdown if only one option
-        if ops.length <= 1
-          $("#task_result_select").parent().hide()
-        else
-          $("#task_result_select").parent().show()
+      #hide result dropdown if only one option
+      if ops.length <= 1
+        $("#task_result_select").parent().hide()
+      else
+        $("#task_result_select").parent().show()
 
-        if actions.length <= 1
-          $("#task_action_select").parent().hide()
-        else
-          $("#task_action_select").parent().show()
+      if actions.length <= 1
+        $("#task_action_select").parent().hide()
+      else
+        $("#task_action_select").parent().show()
 
 
-        # Marking a task off, open the result modal
-        $('#task_result_modal').dialog
-          title: title,
-          resizable: false,
-          modal:'true'
-          buttons: [
-            {
-              text: __('Complete'),
-              click: (e) ->
-                $('#task_result_task_result').val($("#task_result_select select").val());
-                $('#task_result_task_next_action').val($("#task_action_select select").val());
-                $('#task_result_task_completed').val(true)
-                $('form', this).submit()
-                $('#task_' + id).fadeOut()
-                $(this).dialog("close")
-                angular.element('#task-followup-dialog').scope().followUpDialog(id, $("#task_action_select select").val())
-            },
-            {
-              text: __('Cancel'),
-              click: () ->
-                $(this).dialog("close")
-            }
-          ]
+      # Marking a task off, open the result modal
+      $('#task_result_modal').dialog
+        title: title,
+        resizable: false,
+        modal:'true'
+        buttons: [
+          {
+            text: __('Complete'),
+            click: (e) ->
+              $('#task_result_task_result').val($("#task_result_select select").val());
+              $('#task_result_task_next_action').val($("#task_action_select select").val());
+              $('#task_result_task_completed').val(true)
+              $('form', this).submit()
+              $('#task_' + id).fadeOut()
+              $(this).dialog("close")
+              angular.element('#task-followup-dialog').scope().followUpDialog(id, $("#task_action_select select").val())
+          },
+          {
+            text: __('Cancel'),
+            click: () ->
+              $(this).dialog("close")
+          }
+        ]
 
 $(document).on 'change', '[name="task[activity_type]"]', ->
   $.mpdx.setOptions($('[name="task[result]"]'), $.mpdx.getTaskResultOptions($(this).val()))

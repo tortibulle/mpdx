@@ -48,6 +48,7 @@ Mpdx::Application.routes.draw do
       resources :donations, only: [:index]
       resources :preferences
       resources :users
+      resources :appeals
     end
     match '*all' => 'v1/base#cors_preflight_check', via: 'OPTIONS'
   end

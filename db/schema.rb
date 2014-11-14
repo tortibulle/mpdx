@@ -122,6 +122,39 @@ ActiveRecord::Schema.define(version: 20141031142740) do
   add_index "addresses", ["master_address_id"], name: "index_addresses_on_master_address_id", using: :btree
   add_index "addresses", ["remote_id"], name: "index_addresses_on_remote_id", using: :btree
 
+  create_table "appeal_contacts", force: true do |t|
+    t.integer  "appeal_id"
+    t.integer  "contact_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "appeal_contacts", ["appeal_id", "contact_id"], name: "index_appeal_contacts_on_appeal_id_and_contact_id", using: :btree
+  add_index "appeal_contacts", ["appeal_id"], name: "index_appeal_contacts_on_appeal_id", using: :btree
+  add_index "appeal_contacts", ["contact_id"], name: "index_appeal_contacts_on_contact_id", using: :btree
+
+  create_table "appeal_donations", force: true do |t|
+    t.integer  "appeal_id"
+    t.integer  "donation_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "appeal_donations", ["appeal_id", "donation_id"], name: "index_appeal_donations_on_appeal_id_and_donation_id", using: :btree
+  add_index "appeal_donations", ["donation_id"], name: "index_appeal_donations_on_donation_id", using: :btree
+
+  create_table "appeals", force: true do |t|
+    t.string   "name"
+    t.integer  "account_list_id"
+    t.decimal  "amount",          precision: 8, scale: 2
+    t.text     "description"
+    t.date     "end_date"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "appeals", ["account_list_id"], name: "index_appeals_on_account_list_id", using: :btree
+
   create_table "companies", force: true do |t|
     t.string   "name"
     t.datetime "created_at"
@@ -289,8 +322,10 @@ ActiveRecord::Schema.define(version: 20141031142740) do
     t.datetime "updated_at"
     t.string   "payment_type"
     t.string   "channel"
+    t.integer  "appeal_id"
   end
 
+  add_index "donations", ["appeal_id"], name: "index_donations_on_appeal_id", using: :btree
   add_index "donations", ["designation_account_id", "remote_id"], name: "unique_donation_designation", unique: true, using: :btree
   add_index "donations", ["donation_date"], name: "index_donations_on_donation_date", using: :btree
   add_index "donations", ["donor_account_id"], name: "index_donations_on_donor_account_id", using: :btree
@@ -618,6 +653,7 @@ ActiveRecord::Schema.define(version: 20141031142740) do
     t.string   "profession"
     t.boolean  "deceased",                         default: false, null: false
     t.boolean  "subscribed_to_updates"
+    t.boolean  "optout_enewletter",                default: false
     t.boolean  "optout_enewsletter",               default: false
     t.string   "occupation"
     t.string   "employer"

@@ -1,6 +1,5 @@
 <td class="check" ng-show="!task.completed">
-    <a name="task_{{task.id}}"/>
-    <input type="checkbox" name="task_ids[]" value="{{task.id}}" data-behavior="complete_task" data-results="{{completeResultOptions.join()}}"  data-actions="{{completeActionOptions.join()}}" data-id="{{task.id}}" data-title="{{task.activity_type + ' ' + task.subject}}" />
+    <i class="fa fa-lg fa-square-o complete_task" data-behavior="complete_task" data-results="{{completeResultOptions.join()}}"  data-actions="{{completeActionOptions.join()}}" data-id="{{task.id}}" data-title="{{task.activity_type + ' ' + task.subject}}"></i>
 </td>
 <td class="data">
     <div class="primary">
@@ -102,4 +101,7 @@
             </form>
         </div>
     </div>
+</td>
+<td class="check" ng-show="!task.completed">
+  <input type="checkbox" name="task_ids[]" value="{{task.id}}" />
 </td>
