@@ -11,7 +11,11 @@ class PrayerLettersAccount < ActiveRecord::Base
 
   after_create :queue_subscribe_contacts
 
-  validates :oauth2_token, presence: true
+  validates :oauth1_or_2_tokens, :account_list_id,  presence: true
+
+  def oauth1_or_2_tokens
+    oauth2_token.present? || (token.present? & secret.present?)
+  end
 
   def queue_subscribe_contacts
     async(:subscribe_contacts)
@@ -62,18 +66,6 @@ class PrayerLettersAccount < ActiveRecord::Base
     end
   end
 
-  def validate_token
-    return false unless token.present? && secret.present?
-    begin
-      contacts(limit: 1) # If this works, the tokens are valid
-      self.valid_token = true
-    rescue RestClient::Unauthorized
-      self.valid_token = false
-    end
-    update_column(:valid_token, valid_token) unless new_record?
-    valid_token
-  end
-
   def active?
     valid_token?
   end
@@ -96,27 +88,26 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def create_contact(contact)
-    begin
-      json = JSON.parse(get_response(:post, '/api/v1/contacts', contact_params(contact)))
-    rescue AccessError
-      # do nothing
-    rescue => error_from_request
-      begin
-        json = JSON.parse(error_from_request.message)
-        case json['status']
-        when 400
-          # A contact must have a name or company.
-        else
-          raise error_from_request.message
-        end
-      rescue => err_message_parse_err
-        # This code will help us better identify the root cause of certain errors that were causing JSON parse errors
-        # for the line above json = JSON.parse(error_from_request.message)
-        Airbrake.raise_or_notify(error_from_request)
-        Airbrake.raise_or_notify(err_message_parse_err)
-      end
-    end
+    json = JSON.parse(get_response(:post, '/api/v1/contacts', contact_params(contact)))
     contact.update_column(:prayer_letters_id, json['contact_id'])
+  rescue AccessError
+    # do nothing
+  rescue => error_from_request
+    begin
+      json = JSON.parse(error_from_request.message)
+      case json['status']
+      when 400
+        # A contact must have a name or company.
+      else
+        fail error_from_request.message
+      end
+    rescue => err_message_parse_err
+      # This code will help us better identify the root cause of certain errors that were causing JSON parse errors
+      # for the line above json = JSON.parse(error_from_request.message)
+      Airbrake.raise_or_notify(error_from_request)
+      Airbrake.raise_or_notify(err_message_parse_err)
+      raise error_from_request
+    end
   end
 
   def update_contact(contact)
@@ -167,14 +158,14 @@ class PrayerLettersAccount < ActiveRecord::Base
     # Use OAuth2 if token present
     return oauth2_request(method, path, params) if oauth2_token.present?
 
-    # Otherwise use OAuth1 and queue an overall upgrade of prayer letters accounts that still use OAuth1
+    # Otherwise queue an overall upgrade of prayer letters accounts to OAuth2, but use OAuth1 for this request
+    PrayerLettersOAuthUpgrader.perform_async
     oauth1_request(method, path, params)
-    Sidekiq::Client.enqueue(PrayerLettersOAuthUpgrader)
   end
 
   def oauth2_request(method, path, params = nil)
-    RestClient::Request.execute(method: method, url: SERVICE_URL + path, payload: params,
-                                headers: { 'Authorization' => "Bearer #{ URI::encode(oauth2_token) }" })
+    RestClient::Request.execute(method: method, url: SERVICE_URL + path, payload: params.to_json,
+                                headers: { 'Authorization' => "Bearer #{ URI.encode(oauth2_token) }" })
   rescue RestClient::Unauthorized
     handle_bad_token
   rescue => e
@@ -184,7 +175,6 @@ class PrayerLettersAccount < ActiveRecord::Base
   def oauth1_request(method, path, params = nil)
     consumer = OAuth::Consumer.new(APP_CONFIG['prayer_letters_key'], APP_CONFIG['prayer_letters_secret'],  site: SERVICE_URL, scheme: :query_string, oauth_version: '1.0')
     oauth_token = OAuth::Token.new(token, secret)
-
     response = consumer.request(method, path, oauth_token, {}, params)
     case response.code.to_i
     when 200, 201, 202, 204
@@ -200,7 +190,7 @@ class PrayerLettersAccount < ActiveRecord::Base
 
   def upgrade_to_oauth2
     return if oauth2_token.present?
-    json = JSON.parse(oauth1_request(:get, 'api/oauth1/v2migration'))
+    json = JSON.parse(oauth1_request(:get, '/api/oauth1/v2migration'))
     update(oauth2_token: json['access_token'])
   rescue => e
     Airbrake.raise_or_notify(e)

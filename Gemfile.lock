@@ -43,19 +43,21 @@ GIT
       json
 
 GIT
+  remote: https://github.com/draffensperger/omniauth-prayer-letters
+  revision: 2c2d8a2b8fe18a5c930bff2a13dd798d1909b8b1
+  branch: update-to-auth2
+  specs:
+    omniauth-prayer-letters (0.0.3)
+      multi_json
+      omniauth-oauth2
+
+GIT
   remote: https://github.com/sstephenson/global_phone.git
   revision: 9b2772c4678dc9e323c58d9258663812bbd9fc73
   specs:
     global_phone (1.0.1)
     global_phone_dbgen (1.0.1)
       nokogiri (~> 1.5)
-
-PATH
-  remote: /home/dave/Dropbox/wmd/omniauth-prayer-letters
-  specs:
-    omniauth-prayer-letters (0.0.3)
-      multi_json
-      omniauth-oauth2
 
 GEM
   remote: http://rubygems.org/

@@ -125,6 +125,7 @@ Spork.each_run do
   Zonebie.set_random_timezone
   FactoryGirl.reload
   Dir[Rails.root.join('app/roles/**/*.rb')].each { |f| require f }
+  ActiveSupport::Dependencies.clear
 end
 
 def login(user)
