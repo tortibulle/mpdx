@@ -6,6 +6,10 @@ class GoogleContactsIntegrator
 
   CONTACTS_GROUP_TITLE = 'MPDX'
 
+  # If a contact in MPDX gets marked as inactive, e.g. 'Not Interested', then they won't be synced with Google anymore
+  # but they will be assigned to this Google group so the user can delete it if they want to.
+  INACTIVE_GROUP_TITLE = 'Inactive'
+
   # Caching the Google contacts from one big request speeds up the sync as we don't need separate HTTP get requests
   # But is only worth it if we are syncing a number of contacts, so check the number against this threshold.
   CACHE_ALL_G_CONTACTS_THRESHOLD = 10
@@ -96,6 +100,7 @@ class GoogleContactsIntegrator
     # despite re-applying the sync logic.
     @contacts_to_retry_sync.each(&:reload)
     @contacts_to_retry_sync.each(&method(:sync_contact))
+    cleanup_inactive_g_contacts
     api_user.send_batched_requests
 
     delete_g_contact_merge_losers
@@ -108,6 +113,25 @@ class GoogleContactsIntegrator
   def delete_g_contact_merge_losers
     g_contact_merge_losers.each do |g_contact_link|
       api_user.delete_contact(g_contact_link.remote_id, g_contact_link.last_etag)
+      g_contact_link.destroy
+    end
+  rescue => e
+    Airbrake.raise_or_notify(e)
+  end
+
+  def cleanup_inactive_g_contacts
+    inactive_g_contact_links = GoogleContact.joins(:contact).where(contacts: { account_list_id: @integration.account_list.id })
+      .where(Contact.inactive_conditions).readonly(false)
+
+    inactive_g_contact_links.each do |g_contact_link|
+      g_contact = @cache.find_by_id(g_contact_link.remote_id)
+      if g_contact
+        g_contact.prep_add_to_group(inactive_group)
+        api_user.batch_create_or_update(g_contact) do |status|
+          # Raise an exception unless updating the group succeeded, or the contact was already deleted (404 not found)
+          fail status.inspect unless status[:code].in?(200, 404)
+        end
+      end
       g_contact_link.destroy
     end
   rescue => e
@@ -230,8 +254,17 @@ class GoogleContactsIntegrator
     [g_contact, g_contact_link]
   end
 
+  def groups
+    @groups ||= api_user.groups
+  end
+
+  def inactive_group
+    @mpdx_group ||= groups.find { |group| group.title == INACTIVE_GROUP_TITLE } ||
+      GoogleContactsApi::Group.create({ title: INACTIVE_GROUP_TITLE }, api_user.api)
+  end
+
   def mpdx_group
-    @mpdx_group ||= api_user.groups.find { |group| group.title == CONTACTS_GROUP_TITLE } ||
+    @mpdx_group ||= groups.find { |group| group.title == CONTACTS_GROUP_TITLE } ||
       GoogleContactsApi::Group.create({ title: CONTACTS_GROUP_TITLE }, api_user.api)
   end
 

@@ -271,18 +271,18 @@ describe GoogleContactsIntegrator do
     end
   end
 
-  def stub_mpdx_group_request
+  def stub_groups_request
     groups_body = {
       'feed' => {
         'entry' => [
-          {
-            'id' => { '$t' => 'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid' },
-            'title' => { '$t' => GoogleContactsIntegrator::CONTACTS_GROUP_TITLE }
-          }
+          { 'id' => { '$t' => 'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid' },
+            'title' => { '$t' => GoogleContactsIntegrator::CONTACTS_GROUP_TITLE } },
+          { 'id' => { '$t' => 'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/inactivegroupid' },
+            'title' => { '$t' => GoogleContactsIntegrator::INACTIVE_GROUP_TITLE } }
         ],
-        'openSearch$totalResults' => { '$t' => '1' },
+        'openSearch$totalResults' => { '$t' => '2' },
         'openSearch$startIndex' => { '$t' => '0' },
-        'openSearch$itemsPerPage' => { '$t' => '1' }
+        'openSearch$itemsPerPage' => { '$t' => '2' }
       }
     }
     stub_request(:get, 'https://www.google.com/m8/feeds/groups/default/full?alt=json&max-results=100000&v=3')
@@ -316,7 +316,7 @@ describe GoogleContactsIntegrator do
     it 'creates a new google contact and association for a contact to sync' do
       stub_empty_g_contacts
       stub_empty_updated_g_contacts
-      stub_mpdx_group_request
+      stub_groups_request
 
       contact_name_info = <<-EOS
         <gd:name>
@@ -392,7 +392,7 @@ describe GoogleContactsIntegrator do
 
       stub_empty_g_contacts
       stub_empty_updated_g_contacts
-      stub_mpdx_group_request
+      stub_groups_request
     end
 
     it 'syncs each person-contact with its own Google contact' do
@@ -465,7 +465,7 @@ describe GoogleContactsIntegrator do
 
       stub_empty_g_contacts
       stub_empty_updated_g_contacts
-      stub_mpdx_group_request
+      stub_groups_request
     end
 
     it 'deletes Google contacts for losing merged contacts/people' do
@@ -528,7 +528,7 @@ describe GoogleContactsIntegrator do
 
   describe 'sync behavior for HTTP errors' do
     before do
-      stub_mpdx_group_request
+      stub_groups_request
       @integration.update_column(:contacts_last_synced, 1.hour.ago)
       create(:google_contact, google_account: @account, contact: @contact, person: @person, remote_id: '1',
              last_data: { given_name: 'John', family_name: 'Doe' }, last_synced: 1.hour.ago)
@@ -610,6 +610,17 @@ describe GoogleContactsIntegrator do
     end
   end
 
+  describe 'when a contact was synced but then made inactive' do
+    it 'deletes the link and puts the google contact in the group "Inactive"' do
+      stub_groups_request
+
+      @g_contact_link = create(:google_contact, google_account: @account, person: @person, contact: @contact,
+                               remote_id: 'http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/abc')
+      @contact.status = 'Not Interested'
+      @integrator.sync_contacts
+    end
+  end
+
   describe 'overall first and subsequent sync for modifed contact info' do
     it 'combines MPDX & Google data on first sync then propagates updates of email/phone/address on subsequent syncs' do
       setup_first_sync_data
@@ -670,7 +681,7 @@ describe GoogleContactsIntegrator do
 
       stub_empty_updated_g_contacts
 
-      stub_mpdx_group_request
+      stub_groups_request
 
       create_group_request_regex_str =
         '<atom:entry xmlns:gd="http://schemas.google.com/g/2005" xmlns:atom="http://www.w3.org/2005/Atom">\s*'\
