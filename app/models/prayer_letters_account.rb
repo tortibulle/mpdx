@@ -100,13 +100,20 @@ class PrayerLettersAccount < ActiveRecord::Base
       json = JSON.parse(get_response(:post, '/api/v1/contacts', contact_params(contact)))
     rescue AccessError
       # do nothing
-    rescue => e
-      json = JSON.parse(e.message)
-      case json['status']
-      when 400
-        # A contact must have a name or company.
-      else
-        raise e.message
+    rescue => error_from_request
+      begin
+        json = JSON.parse(error_from_request.message)
+        case json['status']
+        when 400
+          # A contact must have a name or company.
+        else
+          raise error_from_request.message
+        end
+      rescue => err_message_parse_err
+        # This code will help us better identify the root cause of certain errors that were causing JSON parse errors
+        # for the line above json = JSON.parse(error_from_request.message)
+        Airbrake.raise_or_notify(error_from_request)
+        Airbrake.raise_or_notify(err_message_parse_err)
       end
     end
     contact.update_column(:prayer_letters_id, json['contact_id'])
@@ -162,7 +169,7 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def oauth2_request(method, path, params = nil)
-    RestClient::Request.execute(method: method, url: SERVICE_URL + path,
+    RestClient::Request.execute(method: method, url: SERVICE_URL + path, payload: params,
                                 headers: { 'Authorization' => "Bearer #{ URI::encode(oauth2_token) }" })
   rescue RestClient::Unauthorized
     handle_bad_token
