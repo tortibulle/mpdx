@@ -8,7 +8,7 @@ class ContactSerializer < ActiveModel::Serializer
   ATTRIBUTES = [:id, :name, :pledge_amount, :pledge_frequency, :pledge_start_date, :status, :deceased,
                 :notes, :notes_saved_at, :next_ask, :never_ask, :likely_to_give, :church_name, :send_newsletter,
                 :magazine, :last_activity, :last_appointment, :last_letter, :last_phone_call, :last_pre_call,
-                :last_thank, :avatar, :square_avatar, :referrals_to_me_ids, :tag_list, :uncompleted_tasks_count, :timezone]
+                :last_thank, :avatar, :square_avatar, :referrals_to_me_ids, :tag_list, :uncompleted_tasks_count, :timezone, :donor_accounts]
 
   attributes(*ATTRIBUTES)
 

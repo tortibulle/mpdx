@@ -18,19 +18,19 @@
       <table>
         <thead>
         <tr class="taskgroup" ng-class="g.class">
-          <td><input type="checkbox" class="select_all" /></td>
-          <td>
+          <td colspan="2">
             <div style="float:right">Show: <select ng-model="filter.tasksPerGroup" ng-options="i as i for i in [10, 25, 50, 100, 500]"></select></div>
-            <%= render 'actions' %>
             {{g.title}}
+            <%= render 'actions' %>
           </td>
+          <td><input type="checkbox" class="select_all" /></td>
         </tr>
         </thead>
 
         <tbody class="tablelist tasks">
           <tr task="task" ng-repeat="task in tasks[g.filter]" id="task_{{task.id}}"></tr>
           <tr>
-            <td colspan="2">
+            <td colspan="3">
                 <span style="float:right;">Displaying <b>{{g.meta.from}}&nbsp;-&nbsp;{{g.meta.to}}</b> of <b>{{g.meta.total}}</b></span>
                 <div class="pagination">
                   <span class="previous_page disabled" ng-show="g.currentPage === 1">← Previous</span>

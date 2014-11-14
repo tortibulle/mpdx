@@ -25,6 +25,9 @@
         <li class="killround"><a href="#dash-care"><%= _('Care') %></a></li>
         <li class="killround"><a href="#dash-cultivate"><%= _('Cultivate') %></a></li>
         <li class="killround"><a href="#dash-progress"><%= _('Progress') %></a></li>
+        <% if $rollout.active?(:fund_appeals, current_account_list) %>
+          <li class="killround"><a href="#dash-appeals"><%= _('Appeals') %></a></li>
+        <% end %>
       </ul>
 
       <div id="dash-connect" ng-controller="taskShortListController" ng-init="init('top5','')">
@@ -38,6 +41,9 @@
       <div id="dash-care"></div>
       <div id="dash-cultivate"></div>
       <div id="dash-progress"></div>
+      <% if $rollout.active?(:fund_appeals, current_account_list) %>
+        <div id="dash-appeals"><p><appeals-list></appeals-list></div>
+      <% end %>
 
     </div>
 
