@@ -43,15 +43,6 @@ GIT
       json
 
 GIT
-  remote: https://github.com/draffensperger/omniauth-prayer-letters
-  revision: 2c2d8a2b8fe18a5c930bff2a13dd798d1909b8b1
-  branch: update-to-auth2
-  specs:
-    omniauth-prayer-letters (0.0.3)
-      multi_json
-      omniauth-oauth2
-
-GIT
   remote: https://github.com/sstephenson/global_phone.git
   revision: 9b2772c4678dc9e323c58d9258663812bbd9fc73
   specs:
@@ -364,6 +355,9 @@ GEM
     omniauth-oauth2 (1.1.1)
       oauth2 (~> 0.8.0)
       omniauth (~> 1.0)
+    omniauth-prayer-letters (0.0.3)
+      multi_json
+      omniauth-oauth2
     omniauth-twitter (1.0.1)
       multi_json (~> 1.3)
       omniauth-oauth (~> 1.0)
@@ -670,7 +664,7 @@ DEPENDENCIES
   omniauth-facebook (~> 1.6.0)
   omniauth-google-oauth2
   omniauth-linkedin (~> 0.1.0)
-  omniauth-prayer-letters!
+  omniauth-prayer-letters
   omniauth-twitter (~> 1.0.1)
   paper_trail (~> 3.0.0)
   passenger
