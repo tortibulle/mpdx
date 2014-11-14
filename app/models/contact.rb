@@ -106,13 +106,14 @@ class Contact < ActiveRecord::Base
 
   def to_s() name; end
 
-  def add_person(person)
+  def add_person(person, donor_account = nil)
     # Nothing to do if this person is already on the contact
     new_person = people.where(master_person_id: person.master_person_id).first
 
     unless new_person
       new_person = Person.clone(person)
       people << new_person
+      donor_account.people << new_person if donor_account
     end
 
     new_person
