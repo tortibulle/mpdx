@@ -164,8 +164,12 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def get_response(method, path, params = nil)
+    # Use OAuth2 if token present
     return oauth2_request(method, path, params) if oauth2_token.present?
+
+    # Otherwise use OAuth1 and queue an overall upgrade of prayer letters accounts that still use OAuth1
     oauth1_request(method, path, params)
+    Sidekiq::Client.enqueue(PrayerLettersOAuthUpgrader)
   end
 
   def oauth2_request(method, path, params = nil)
@@ -192,6 +196,14 @@ class PrayerLettersAccount < ActiveRecord::Base
     end
   rescue => e
     Airbrake.raise_or_notify(e, parameters:  { method: method, path: path, params: params })
+  end
+
+  def upgrade_to_oauth2
+    return if oauth2_token.present?
+    json = JSON.parse(oauth1_request(:get, 'api/oauth1/v2migration'))
+    update(oauth2_token: json['access_token'])
+  rescue => e
+    Airbrake.raise_or_notify(e)
   end
 
   def handle_bad_token
