@@ -13,8 +13,7 @@ describe GoogleContactsIntegrator do
 
     @contact = create(:contact, account_list: @account_list, status: 'Partner - Pray', notes: 'about')
 
-    @person = create(:person, last_name: 'Doe', middle_name: 'Henry', title: 'Mr', suffix: 'III',
-                              occupation: 'Worker', employer: 'Company, Inc')
+    @person = create(:person, last_name: 'Doe', occupation: 'Worker', employer: 'Company, Inc')
     @contact.people << @person
 
     @g_contact = GoogleContactsApi::Contact.new(
@@ -321,11 +320,8 @@ describe GoogleContactsIntegrator do
 
       contact_name_info = <<-EOS
         <gd:name>
-          <gd:namePrefix>Mr</gd:namePrefix>
           <gd:givenName>John</gd:givenName>
-          <gd:additionalName>Henry</gd:additionalName>
           <gd:familyName>Doe</gd:familyName>
-          <gd:nameSuffix>III</gd:nameSuffix>
         </gd:name>
       EOS
 
@@ -378,7 +374,7 @@ describe GoogleContactsIntegrator do
       @person.reload
       expect(@person.google_contacts.count).to eq(1)
       last_data = {
-        name_prefix: 'Mr', given_name: 'John', additional_name: 'Henry', family_name: 'Doe', name_suffix: 'III',
+        name_prefix: nil, given_name: 'John', additional_name: nil, family_name: 'Doe', name_suffix: nil,
         content: 'about', emails: [], phone_numbers: [], addresses: [],
         organizations: [{ rel: 'work', primary: true, org_name: 'Company, Inc', org_title: 'Worker' }],
         websites: [], group_memberships: ['http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid'],
@@ -792,11 +788,7 @@ describe GoogleContactsIntegrator do
       ])
 
       last_data = {
-        name_prefix: 'Mr',
-        given_name: 'John',
-        additional_name: 'Henry',
-        family_name: 'Doe',
-        name_suffix: 'III',
+        name_prefix: 'Mr', given_name: 'John', additional_name: 'Henry', family_name: 'Doe', name_suffix: 'III',
         content: 'Notes here',
         emails: [{ primary: true, rel: 'other', address: 'johnsmith@example.com' },
                  { primary: false, rel: 'home', address: 'mpdx@example.com' }],

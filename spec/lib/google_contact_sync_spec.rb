@@ -113,11 +113,8 @@ describe GoogleContactSync do
 
       expect(g_contact.prepped_changes).to eq({})
 
-      expect(person.title).to eq('Mr')
       expect(person.first_name).to eq('John')
-      expect(person.middle_name).to eq('Henry')
       expect(person.last_name).to eq('Doe')
-      expect(person.suffix).to eq('III')
     end
 
     it 'sets blank google fields to mpdx fields' do
@@ -126,8 +123,7 @@ describe GoogleContactSync do
 
       sync.sync_basic_person_fields(person, g_contact, g_contact_link)
 
-      expect(g_contact.prepped_changes).to eq(name_prefix: 'Mr', given_name: 'John', additional_name: 'Henry',
-                                               family_name: 'Doe', name_suffix: 'III')
+      expect(g_contact.prepped_changes).to eq(given_name: 'John', family_name: 'Doe')
     end
 
     it 'prefers mpdx if both are present' do
@@ -142,14 +138,10 @@ describe GoogleContactSync do
 
       sync.sync_basic_person_fields(person, g_contact, g_contact_link)
 
-      expect(g_contact.prepped_changes).to eq(name_prefix: 'Mr', given_name: 'John', additional_name: 'Henry',
-                                               family_name: 'Doe', name_suffix: 'III')
+      expect(g_contact.prepped_changes).to eq(given_name: 'John', family_name: 'Doe')
 
-      expect(person.title).to eq('Mr')
       expect(person.first_name).to eq('John')
-      expect(person.middle_name).to eq('Henry')
       expect(person.last_name).to eq('Doe')
-      expect(person.suffix).to eq('III')
     end
 
     it 'syncs changes between mpdx and google, but prefers mpdx if both changed' do
@@ -167,14 +159,10 @@ describe GoogleContactSync do
 
       sync.sync_basic_person_fields(person, g_contact, g_contact_link)
 
-      expect(g_contact.prepped_changes).to eq(given_name: 'John-MPDX', additional_name: 'Henry-MPDX',
-                                               family_name: 'Doe-MPDX')
+      expect(g_contact.prepped_changes).to eq(given_name: 'John-MPDX', family_name: 'Doe-MPDX')
 
-      expect(person.title).to eq('Mr-Google')
       expect(person.first_name).to eq('John-MPDX')
-      expect(person.middle_name).to eq('Henry-MPDX')
       expect(person.last_name).to eq('Doe-MPDX')
-      expect(person.suffix).to eq('III')
     end
   end
 
