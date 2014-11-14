@@ -108,17 +108,22 @@ describe DataServer do
       @account_list2 = create(:account_list)
       profile = create(:designation_profile, user: @org_account.user, account_list: @account_list2)
       @org_account.user.account_lists = [@account_list1, @account_list2]
-      donor_account = create(:donor_account, organization: @org_account.organization, account_number: "17083")
+      donor_account = create(:donor_account, organization: @org_account.organization, account_number: '17083')
       expect {
         @data_server.import_donors(profile)
       }.to change(Person, :count)
       new_person = @account_list2.contacts.last.people.last
       new_person.last_name.should == 'Rodriguez'
+      new_person.middle_name.should == ''
       new_person.donor_accounts.last.should == donor_account
 
-      stub_request(:post, /.*addresses/).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodrigues, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\",\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\",\"\",\"P\",\"Rodrigues\",\"\"\r\n")
+      people = donor_account.people.to_a
+
+      stub_request(:post, /.*addresses/).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodrigues, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\",\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"C\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\",\"\",\"P\",\"Rodrigues\",\"\"\r\n")
       @data_server.import_donors(profile)
+      people = donor_account.people.reload.to_a
       new_person.reload.last_name.should == 'Rodrigues'
+      new_person.middle_name.should == 'C'
     end
 
     it "should notify Airbrake if PERSON_TYPE is not 'O' or 'P'" do
