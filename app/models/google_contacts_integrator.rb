@@ -52,11 +52,14 @@ class GoogleContactsIntegrator
     # synced after the next contact was modified).
     #
     # Because due to unforseen circumstances, I could imagine that turning into a wasteful infinite loop, I cut off
-    # the number of checks at a constant value of 10.
+    # the number of checks at a constant value.
     contacts_to_sync_checks = 0
     until sync_and_return_num_synced == 0 || contacts_to_sync_checks >= MAX_CONTACTS_TO_SYNC_CHECKS
       contacts_to_sync_checks += 1
     end
+
+    cleanup_inactive_g_contacts
+    api_user.send_batched_requests
   rescue Person::GoogleAccount::MissingRefreshToken
     # Don't log this exception as we expect it to happen from time to time.
     # Person::GoogleAccount will turn off the contacts integration and send the user an email to refresh their Google login.
@@ -100,8 +103,6 @@ class GoogleContactsIntegrator
     # despite re-applying the sync logic.
     @contacts_to_retry_sync.each(&:reload)
     @contacts_to_retry_sync.each(&method(:sync_contact))
-    cleanup_inactive_g_contacts
-    api_user.send_batched_requests
 
     delete_g_contact_merge_losers
 
@@ -121,21 +122,23 @@ class GoogleContactsIntegrator
 
   def cleanup_inactive_g_contacts
     inactive_g_contact_links = GoogleContact.joins(:contact).where(contacts: { account_list_id: @integration.account_list.id })
-      .where(Contact.inactive_conditions).readonly(false)
+      .where(Contact.inactive_conditions).where(google_account: @account).readonly(false)
 
     inactive_g_contact_links.each do |g_contact_link|
       g_contact = @cache.find_by_id(g_contact_link.remote_id)
-      if g_contact
-        g_contact.prep_add_to_group(inactive_group)
-        api_user.batch_create_or_update(g_contact) do |status|
-          # Raise an exception unless updating the group succeeded, or the contact was already deleted (404 not found)
-          fail status.inspect unless status[:code].in?(200, 404)
-        end
-      end
+      cleanup_inactive_g_contact(g_contact) if g_contact
       g_contact_link.destroy
     end
   rescue => e
     Airbrake.raise_or_notify(e)
+  end
+
+  def cleanup_inactive_g_contact(g_contact)
+    g_contact.prep_add_to_group(inactive_group)
+    api_user.batch_create_or_update(g_contact) do |status|
+      # Raise an exception unless updating the group succeeded, or the contact was already deleted (404 not found)
+      fail status.inspect unless status[:code].in?([200, 404])
+    end
   end
 
   def g_contact_merge_losers

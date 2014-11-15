@@ -312,6 +312,16 @@ describe GoogleContactsIntegrator do
       .to_return(body: empty_feed_json)
   end
 
+  def g_contact_fixture_json
+    @g_contact_fixture_json ||= File.new(Rails.root.join('spec/fixtures/google_contacts.json')).read
+  end
+
+  def stub_g_contact_from_fixture
+    stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&v=3")
+      .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
+      .to_return(body: g_contact_fixture_json)
+  end
+
   describe 'overall sync for creating a new google contact' do
     it 'creates a new google contact and association for a contact to sync' do
       stub_empty_g_contacts
@@ -614,10 +624,66 @@ describe GoogleContactsIntegrator do
     it 'deletes the link and puts the google contact in the group "Inactive"' do
       stub_groups_request
 
-      @g_contact_link = create(:google_contact, google_account: @account, person: @person, contact: @contact,
-                               remote_id: 'http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/abc')
-      @contact.status = 'Not Interested'
+      contact_feed = {
+        'feed' => {
+          'entry' => [
+            { 'id' => { '$t' => 'http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/test' } }
+          ],
+          'openSearch$totalResults' => { '$t' => '1' },
+          'openSearch$startIndex' => { '$t' => '0' },
+          'openSearch$itemsPerPage' => { '$t' => '1' }
+        }
+      }
+      stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&v=3")
+        .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
+        .to_return(body: contact_feed.to_json)
+
+      now = Time.now
+      expect(Time).to receive(:now).at_least(:once).and_return(now)
+      update_request_xml = <<-EOS
+       <feed xmlns='http://www.w3.org/2005/Atom'
+          xmlns:gContact='http://schemas.google.com/contact/2008'
+          xmlns:gd='http://schemas.google.com/g/2005'
+          xmlns:batch='http://schemas.google.com/gdata/batch'>
+        <entry xmlns="http://www.w3.org/2005/Atom" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:gd="http://schemas.google.com/g/2005" gd:etag="">
+          <id>http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/test</id>
+          <updated>#{ GoogleContactsApi::Api.format_time_for_xml(now) }</updated>
+          <category scheme="http://schemas.google.com/g/2005#kind" term="http://schemas.google.com/contact/2008#contact"/>
+          <batch:id>0</batch:id>
+          <batch:operation type="update"/>
+          <gd:name></gd:name>
+          <gContact:groupMembershipInfo deleted="false"
+            href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/inactivegroupid"/>
+        </entry>
+      </feed>
+      EOS
+
+      update_response_xml = <<-EOS
+        <feed gd:etag="&quot;QHg9eDVSLyt7I2A9XRdQE0QORQY.&quot;"
+                  xmlns="http://www.w3.org/2005/Atom" xmlns:batch="http://schemas.google.com/gdata/batch"
+                  xmlns:gContact="http://schemas.google.com/contact/2008" xmlns:gd="http://schemas.google.com/g/2005"
+                  xmlns:openSearch="http://a9.com/-/spec/opensearch/1.1/">
+          <entry>
+            <batch:id>0</batch:id>
+            <batch:operation type='update'/>
+            <batch:status code='200' reason='Success'/>
+          </entry>
+        </feed>
+      EOS
+
+      update_stub = stub_request(:post, 'https://www.google.com/m8/feeds/contacts/default/full/batch?alt=&v=3').to_return do |request|
+        expect(EquivalentXml.equivalent?(request.body, update_request_xml)).to be_true
+        { body: update_response_xml }
+      end
+
+      create(:google_contact, google_account: @account, person: @person, contact: @contact,
+             remote_id: 'http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/test')
+
+      @contact.update_column :status, 'Not Interested'
       @integrator.sync_contacts
+
+      expect(update_stub).to have_been_requested
+      expect(GoogleContact.count).to eq(0)
     end
   end
 
@@ -635,12 +701,9 @@ describe GoogleContactsIntegrator do
     end
 
     def setup_first_sync_data
-      @g_contact_json_text = File.new(Rails.root.join('spec/fixtures/google_contacts.json')).read
-      stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&v=3")
-        .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
-        .to_return(body: @g_contact_json_text)
+      stub_g_contact_from_fixture
 
-      @updated_g_contact_obj = JSON.parse(@g_contact_json_text)['feed']['entry'][0]
+      @updated_g_contact_obj = JSON.parse(g_contact_fixture_json)['feed']['entry'][0]
       @updated_g_contact_obj['gd$email'] = [
         { primary: true, rel: 'http://schemas.google.com/g/2005#other', address: 'johnsmith@example.com' },
         { primary: false, rel: 'http://schemas.google.com/g/2005#home', address: 'mpdx@example.com' }
@@ -853,7 +916,7 @@ describe GoogleContactsIntegrator do
 
       stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
 
-      @updated_g_contact_obj = JSON.parse(@g_contact_json_text)['feed']['entry'][0]
+      @updated_g_contact_obj = JSON.parse(g_contact_fixture_json)['feed']['entry'][0]
       @updated_g_contact_obj['gd$email'] = [
         { primary: true, rel: 'http://schemas.google.com/g/2005#other', address: 'johnsmith_MODIFIED@example.com' },
         { primary: false, rel: 'http://schemas.google.com/g/2005#home', address: 'mpdx@example.com' }
