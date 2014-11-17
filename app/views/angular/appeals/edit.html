@@ -31,18 +31,24 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="c in appeal.contacts | orderBy:contactName">
-                                <td><input type="checkbox" ng-model="$parent.checkedContacts[c]"></td>
-                                <td>{{contactName(c)}}</td>
-                                <td><span ng-repeat="d in listDonations(c)" style="display:block;">{{d}}</span></td>
-                                <td><a class="ico ico_trash" href ng-click="deleteContact(c)">Delete</a></td>
-                            </tr>
-                            <tr><td colspan="4">
-                                <a href="" ng-click="selectAll('all')">Select all</a> |
-                                <a href="" ng-click="selectAll('none')">Select none</a> |
-                                <a href="" ng-click="selectAll('donated')">Select all that have donated</a> |
-                                <a href="" ng-click="selectAll('!donated')">Select all that have not donated</a>
-                            </td></tr>
+                          <tr><td colspan="4">
+                            <a href="" ng-click="selectAll('all')">Select all</a> |
+                            <a href="" ng-click="selectAll('none')">Select none</a> |
+                            <a href="" ng-click="selectAll('donated')">Select all that have donated</a> |
+                            <a href="" ng-click="selectAll('!donated')">Select all that have not donated</a>
+                          </td></tr>
+                          <tr ng-repeat="c in appeal.contacts | orderBy:contactName">
+                              <td><input type="checkbox" ng-model="$parent.checkedContacts[c]"></td>
+                              <td>{{contactName(c)}}</td>
+                              <td><span ng-repeat="d in listDonations(c)" style="display:block;">{{d}}</span></td>
+                              <td><a class="ico ico_trash" href ng-click="deleteContact(c)">Delete</a></td>
+                          </tr>
+                          <tr><td colspan="4">
+                              <a href="" ng-click="selectAll('all')">Select all</a> |
+                              <a href="" ng-click="selectAll('none')">Select none</a> |
+                              <a href="" ng-click="selectAll('donated')">Select all that have donated</a> |
+                              <a href="" ng-click="selectAll('!donated')">Select all that have not donated</a>
+                          </td></tr>
                         </tbody>
                     </table>
                     <span ng-show="!contacts">Loading contacts...</span>
