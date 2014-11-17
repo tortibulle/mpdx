@@ -687,6 +687,50 @@ describe GoogleContactsIntegrator do
     end
   end
 
+  describe 'cleanup inactive contacts errors' do
+    before do
+      stub_groups_request
+      @remote_id = 'http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/test'
+      @g_contact_link = create(:google_contact, google_account: @account, person: @person, contact: @contact,
+                               remote_id: @remote_id)
+      @contact.update_column :status, 'Not Interested'
+
+      @cache = GoogleContactsCache.new(@account)
+      @cache.cache_g_contacts([])
+      @integrator.cache = @cache
+    end
+
+    it 'deletes the associated link record in the case of a 404 error' do
+      expect(@cache).to receive(:find_by_id).with(@remote_id).and_return(@g_contact)
+
+      expect(@account.contacts_api_user).to receive(:batch_create_or_update).exactly(:once)
+                                            .and_return { |_g_contact, &block| block.call(code: 404) }
+
+      @integrator.cleanup_inactive_g_contacts
+      expect(GoogleContact.all.count).to eq(0)
+    end
+
+    it 'reloads the g_contact then retries the update in the case of a 412 error' do
+      expect(@cache).to receive(:remove_g_contact).with(@g_contact)
+      expect(@cache).to receive(:find_by_id).exactly(:twice).with(@remote_id).and_return(@g_contact)
+
+      times_batch_create_or_update_called = 0
+      expect(@account.contacts_api_user).to receive(:batch_create_or_update).exactly(:twice)
+                                            .and_return do |_g_contact, &block|
+        times_batch_create_or_update_called += 1
+        case times_batch_create_or_update_called
+        when 1
+          block.call(code: 412)
+        when 2
+          block.call(code: 200)
+        end
+      end
+
+      @integrator.cleanup_inactive_g_contacts
+      expect(GoogleContact.all.count).to eq(0)
+    end
+  end
+
   describe 'overall first and subsequent sync for modifed contact info' do
     it 'combines MPDX & Google data on first sync then propagates updates of email/phone/address on subsequent syncs' do
       setup_first_sync_data

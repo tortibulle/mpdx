@@ -59,7 +59,6 @@ class GoogleContactsIntegrator
     end
 
     cleanup_inactive_g_contacts
-    api_user.send_batched_requests
   rescue Person::GoogleAccount::MissingRefreshToken
     # Don't log this exception as we expect it to happen from time to time.
     # Person::GoogleAccount will turn off the contacts integration and send the user an email to refresh their Google login.
@@ -104,48 +103,11 @@ class GoogleContactsIntegrator
     @contacts_to_retry_sync.each(&:reload)
     @contacts_to_retry_sync.each(&method(:sync_contact))
 
-    delete_g_contact_merge_losers
+    g_contact_merge_losers.each(&method(:delete_g_contact_merge_loser))
 
     @integration.save
 
     contacts.size
-  end
-
-  def delete_g_contact_merge_losers
-    g_contact_merge_losers.each do |g_contact_link|
-      api_user.delete_contact(g_contact_link.remote_id, g_contact_link.last_etag)
-      g_contact_link.destroy
-    end
-  rescue => e
-    Airbrake.raise_or_notify(e)
-  end
-
-  def cleanup_inactive_g_contacts
-    GoogleContact.joins(:contact).where(contacts: { account_list_id: @integration.account_list.id })
-      .where(Contact.inactive_conditions).where(google_account: @account).readonly(false)
-      .each(&method(:cleanup_inactive_g_contact))
-  rescue => e
-    Airbrake.raise_or_notify(e)
-  end
-
-  def cleanup_inactive_g_contact(g_contact_link)
-    g_contact = @cache.find_by_id(g_contact_link.remote_id)
-    unless g_contact
-      g_contact_link.destroy
-      return
-    end
-
-    g_contact.prep_add_to_group(inactive_group)
-    api_user.batch_create_or_update(g_contact) do |status|
-      begin
-        # Raise an exception unless updating the group succeeded, or the contact was already deleted (404 not found)
-        fail status.inspect unless status[:code].in?([200, 404])
-        g_contact_link.destroy
-      rescue => e
-        # Catch the exception within the callback so it doesn't interrupt the other batched operation callbacks
-        Airbrake.raise_or_notify(e)
-      end
-    end
   end
 
   def g_contact_merge_losers
@@ -157,6 +119,57 @@ class GoogleContactsIntegrator
       .joins('LEFT JOIN contact_people ON '\
         'google_contacts.person_id = contact_people.person_id AND contact_people.contact_id = google_contacts.contact_id')
       .where('contact_people.id IS NULL').where.not(contact_id: nil).where.not(person_id: nil).readonly(false)
+  end
+
+  def delete_g_contact_merge_loser(g_contact_link)
+    api_user.delete_contact(g_contact_link.remote_id, g_contact_link.last_etag)
+    g_contact_link.destroy
+  rescue => e
+    if defined(e.response) && GoogleContactsApi::Api.parse_response_code(e.response) == 404
+      # If a 404 error occurred it means the remote Google contact was already deleted, so just delete the link
+      g_contact_link.destroy
+    else
+      # Otherwise we couldn't successfully delete the remote Google Contact, so keep the link to try deleting again later
+      Airbrake.raise_or_notify(e)
+    end
+  end
+
+  def cleanup_inactive_g_contacts
+    GoogleContact.joins(:contact).where(contacts: { account_list_id: @integration.account_list.id })
+      .where(Contact.inactive_conditions).where(google_account: @account).readonly(false)
+      .each(&method(:cleanup_inactive_g_contact))
+    api_user.send_batched_requests
+  end
+
+  def cleanup_inactive_g_contact(g_contact_link, num_tries = 2)
+    return if num_tries <= 0
+
+    g_contact = @cache.find_by_id(g_contact_link.remote_id)
+    unless g_contact
+      g_contact_link.destroy
+      return
+    end
+
+    g_contact.prep_add_to_group(inactive_group)
+    api_user.batch_create_or_update(g_contact) do |status|
+      inactive_cleanup_response(status, g_contact, g_contact_link, num_tries)
+    end
+  end
+
+  def inactive_cleanup_response(status, g_contact, g_contact_link, num_tries)
+    case status[:code]
+    when 200, 404
+      # For success or contact not found, just go ahead and delete the link
+      g_contact_link.destroy
+    when 412
+      # For 412 Etags Mismatch, remove the cached Google contact and retry the operation one time
+      @cache.remove_g_contact(g_contact)
+      cleanup_inactive_g_contact(g_contact_link, num_tries - 1)
+    else
+      fail status.inspect
+    end
+  rescue => e
+    Airbrake.raise_or_notify(e)
   end
 
   def api_user
