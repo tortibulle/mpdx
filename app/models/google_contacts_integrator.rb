@@ -103,15 +103,19 @@ class GoogleContactsIntegrator
     @contacts_to_retry_sync.each(&:reload)
     @contacts_to_retry_sync.each(&method(:sync_contact))
 
-    g_contact_merge_losers.each(&method(:delete_g_contact_merge_loser))
+    delete_g_contact_merge_losers
 
     @integration.save
 
     contacts.size
   end
 
+  def delete_g_contact_merge_losers
+    g_contact_merge_losers.each(&method(:delete_g_contact_merge_loser))
+  end
+
   def g_contact_merge_losers
-    # Return the google_contacts record for this Google account that are no longer associated with a contact-person pair
+    # Return the google_contacts for this Google account that are no longer associated with a contact-person pair
     # due to that contact or person being merged with another contact or person in MPDX.
     # Look for records that have both the contact_id and person_id set, because the Google Import uses an old method
     #of just setting the person_id and we don't want to wrongly interpret imported Google contacts as merge losers.
@@ -122,10 +126,10 @@ class GoogleContactsIntegrator
   end
 
   def delete_g_contact_merge_loser(g_contact_link)
-    api_user.delete_contact(g_contact_link.remote_id, g_contact_link.last_etag)
+    api_user.delete_contact(g_contact_link.remote_id)
     g_contact_link.destroy
   rescue => e
-    if defined(e.response) && GoogleContactsApi::Api.parse_response_code(e.response) == 404
+    if defined?(e.response) && GoogleContactsApi::Api.parse_response_code(e.response) == 404
       # If a 404 error occurred it means the remote Google contact was already deleted, so just delete the link
       g_contact_link.destroy
     else
@@ -141,9 +145,7 @@ class GoogleContactsIntegrator
     api_user.send_batched_requests
   end
 
-  def cleanup_inactive_g_contact(g_contact_link, num_tries = 2)
-    return if num_tries <= 0
-
+  def cleanup_inactive_g_contact(g_contact_link, num_retries = 1)
     g_contact = @cache.find_by_id(g_contact_link.remote_id)
     unless g_contact
       g_contact_link.destroy
@@ -152,19 +154,20 @@ class GoogleContactsIntegrator
 
     g_contact.prep_add_to_group(inactive_group)
     api_user.batch_create_or_update(g_contact) do |status|
-      inactive_cleanup_response(status, g_contact, g_contact_link, num_tries)
+      inactive_cleanup_response(status, g_contact, g_contact_link, num_retries)
     end
   end
 
-  def inactive_cleanup_response(status, g_contact, g_contact_link, num_tries)
+  def inactive_cleanup_response(status, g_contact, g_contact_link, num_retries)
     case status[:code]
     when 200, 404
       # For success or contact not found, just go ahead and delete the link
       g_contact_link.destroy
     when 412
-      # For 412 Etags Mismatch, remove the cached Google contact and retry the operation one time
+      fail status.inspect if num_retries < 1
+      # For 412 Etags Mismatch, remove the cached Google contact and retry the operation again
       @cache.remove_g_contact(g_contact)
-      cleanup_inactive_g_contact(g_contact_link, num_tries - 1)
+      cleanup_inactive_g_contact(g_contact_link, num_retries - 1)
     else
       fail status.inspect
     end

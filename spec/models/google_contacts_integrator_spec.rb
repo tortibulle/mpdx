@@ -517,10 +517,8 @@ describe GoogleContactsIntegrator do
 
       # Then we merge @contact with @contact2 (@contact wins), so we should delete the @contact2 g_contacts
       @contact.merge(@contact2)
-      expect(@account.contacts_api_user).to receive(:delete_contact)
-                                            .with(g_contact_ids['contact2:John'], 'etag:' + g_contact_ids['contact2:John'])
-      expect(@account.contacts_api_user).to receive(:delete_contact)
-                                            .with(g_contact_ids['contact2:Jane'], 'etag:' + g_contact_ids['contact2:Jane'])
+      expect(@account.contacts_api_user).to receive(:delete_contact).with(g_contact_ids['contact2:John'])
+      expect(@account.contacts_api_user).to receive(:delete_contact).with(g_contact_ids['contact2:Jane'])
       @integrator.sync_contacts
       expect(GoogleContact.all.count).to eq(2)
       expect(GoogleContact.find_by(contact: @contact, person: @person).remote_id).to eq(g_contact_ids['contact:John'])
@@ -528,8 +526,7 @@ describe GoogleContactsIntegrator do
 
       # Then we merge @person with @person2 (@person wins), so we should delete @person2 g_contact
       @person.merge(@person2)
-      expect(@account.contacts_api_user).to receive(:delete_contact)
-                                            .with(g_contact_ids['contact:Jane'], 'etag:' + g_contact_ids['contact:Jane'])
+      expect(@account.contacts_api_user).to receive(:delete_contact).with(g_contact_ids['contact:Jane'])
       @integrator.sync_contacts
       expect(GoogleContact.all.count).to eq(1)
       expect(GoogleContact.find_by(contact: @contact, person: @person).remote_id).to eq(g_contact_ids['contact:John'])
@@ -727,6 +724,20 @@ describe GoogleContactsIntegrator do
       end
 
       @integrator.cleanup_inactive_g_contacts
+      expect(GoogleContact.all.count).to eq(0)
+    end
+  end
+
+  describe 'delete merge loser 404 contact not found error (already deleted)' do
+    it 'destroys the local g_contact_link anyway' do
+      create(:google_contact, google_account: @account, person: @person, contact: @contact,
+             remote_id: 'http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/test')
+      ContactPerson.all.destroy_all
+
+      stub_request(:delete, 'https://www.google.com/m8/feeds/contacts/test.user@cru.org/base/test?alt=json&v=3')
+        .to_return(status: 404)
+
+      @integrator.delete_g_contact_merge_losers
       expect(GoogleContact.all.count).to eq(0)
     end
   end
