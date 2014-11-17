@@ -300,6 +300,7 @@ $ ->
             {
               text: __('Save'),
               click: ->
+                window.onbeforeunload = undefined
                 $('form', this).submit()
                 $('.form_wrapper', this).html('<%= image_tag('spinner.gif') %>')
                 $(this).dialog( "option", "buttons", [])
