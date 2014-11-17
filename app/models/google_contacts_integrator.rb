@@ -121,23 +121,30 @@ class GoogleContactsIntegrator
   end
 
   def cleanup_inactive_g_contacts
-    inactive_g_contact_links = GoogleContact.joins(:contact).where(contacts: { account_list_id: @integration.account_list.id })
+    GoogleContact.joins(:contact).where(contacts: { account_list_id: @integration.account_list.id })
       .where(Contact.inactive_conditions).where(google_account: @account).readonly(false)
-
-    inactive_g_contact_links.each do |g_contact_link|
-      g_contact = @cache.find_by_id(g_contact_link.remote_id)
-      cleanup_inactive_g_contact(g_contact) if g_contact
-      g_contact_link.destroy
-    end
+      .each(&method(:cleanup_inactive_g_contact))
   rescue => e
     Airbrake.raise_or_notify(e)
   end
 
-  def cleanup_inactive_g_contact(g_contact)
+  def cleanup_inactive_g_contact(g_contact_link)
+    g_contact = @cache.find_by_id(g_contact_link.remote_id)
+    unless g_contact
+      g_contact_link.destroy
+      return
+    end
+
     g_contact.prep_add_to_group(inactive_group)
     api_user.batch_create_or_update(g_contact) do |status|
-      # Raise an exception unless updating the group succeeded, or the contact was already deleted (404 not found)
-      fail status.inspect unless status[:code].in?([200, 404])
+      begin
+        # Raise an exception unless updating the group succeeded, or the contact was already deleted (404 not found)
+        fail status.inspect unless status[:code].in?([200, 404])
+        g_contact_link.destroy
+      rescue => e
+        # Catch the exception within the callback so it doesn't interrupt the other batched operation callbacks
+        Airbrake.raise_or_notify(e)
+      end
     end
   end
 
