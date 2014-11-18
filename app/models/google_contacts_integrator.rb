@@ -187,7 +187,7 @@ class GoogleContactsIntegrator
 
   def contacts_to_sync
     if @integration.contacts_last_synced
-      updated_g_contacts = api_user.contacts_updated_min(@integration.contacts_last_synced)
+      updated_g_contacts = api_user.contacts_updated_min(@integration.contacts_last_synced, showdeleted: false)
 
       queried_contacts_to_sync = contacts_to_sync_query(updated_g_contacts)
       if queried_contacts_to_sync.length > CACHE_ALL_G_CONTACTS_THRESHOLD
@@ -295,7 +295,10 @@ class GoogleContactsIntegrator
   end
 
   def get_or_query_g_contact(g_contact_link, person)
-    return @cache.find_by_id(g_contact_link.remote_id) if g_contact_link.remote_id
+    if g_contact_link.remote_id
+      retrieved_g_contact = @cache.find_by_id(g_contact_link.remote_id)
+      return retrieved_g_contact if retrieved_g_contact
+    end
 
     @cache.select_by_name(person.first_name, person.last_name).find do |g_contact|
       !@assigned_remote_ids.include?(g_contact.id)

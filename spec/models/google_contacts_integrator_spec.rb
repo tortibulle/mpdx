@@ -63,7 +63,8 @@ describe GoogleContactsIntegrator do
       now = Time.now
       @integration.update_column(:contacts_last_synced, now)
       g_contact = double(id: 'id_1', given_name: 'John', family_name: 'Doe')
-      expect(@account.contacts_api_user).to receive(:contacts_updated_min).with(now).and_return([g_contact])
+      expect(@account.contacts_api_user).to receive(:contacts_updated_min)
+                                            .with(now, showdeleted: false).and_return([g_contact])
 
       expect(@integrator).to receive(:contacts_to_sync_query).with([g_contact]).and_return([@contact])
       expect(@integrator.contacts_to_sync).to eq([@contact])
@@ -302,13 +303,13 @@ describe GoogleContactsIntegrator do
   end
 
   def stub_empty_g_contacts
-    stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&v=3")
+    stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&showdeleted=false&v=3")
       .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
       .to_return(body: empty_feed_json)
   end
 
   def stub_empty_updated_g_contacts
-    stub_request(:get, %r{#{@api_url}/default/full\?alt=json&max-results=100000&updated-min=.*&v=3})
+    stub_request(:get, %r{#{@api_url}/default/full\?alt=json&max-results=100000&showdeleted=false&updated-min=.*&v=3})
       .to_return(body: empty_feed_json)
   end
 
@@ -317,7 +318,7 @@ describe GoogleContactsIntegrator do
   end
 
   def stub_g_contact_from_fixture
-    stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&v=3")
+    stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&showdeleted=false&v=3")
       .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
       .to_return(body: g_contact_fixture_json)
   end
@@ -544,7 +545,7 @@ describe GoogleContactsIntegrator do
 
     it 'retries the sync and creates a new contact on a 404 error' do
       expect(@account.contacts_api_user).to receive(:get_contact).with('1').and_return(@g_contact)
-      expect(@account.contacts_api_user).to receive(:query_contacts).with('John Doe').and_return([])
+      expect(@account.contacts_api_user).to receive(:query_contacts).with('John Doe', showdeleted: false).and_return([])
 
       new_g_contact = GoogleContactsApi::Contact.new
       expect(GoogleContactsApi::Contact).to receive(:new).and_return(new_g_contact)
@@ -631,7 +632,7 @@ describe GoogleContactsIntegrator do
           'openSearch$itemsPerPage' => { '$t' => '1' }
         }
       }
-      stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&v=3")
+      stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&showdeleted=false&v=3")
         .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
         .to_return(body: contact_feed.to_json)
 
@@ -1007,7 +1008,7 @@ describe GoogleContactsIntegrator do
         }
       }
 
-      stub_request(:get, %r{#{@api_url}/default/full\?alt=json&max-results=100000&updated-min=.*&v=3})
+      stub_request(:get, %r{#{@api_url}/default/full\?alt=json&max-results=100000&showdeleted=false&updated-min=.*&v=3})
         .to_return(body: updated_contacts_body.to_json).then.to_return(body: empty_feed_json)
 
       groups_body = {
