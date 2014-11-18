@@ -188,7 +188,7 @@ angular.module('mpdxApp')
                         var strContactsUrl = 'contacts?per_page=5000&include=Contact.id&account_list_id=' + (window.current_account_list_id || '');
                         angular.forEach(newAppeal.validStatus, function(value, key) {
                             if(value){
-                                strContactsUrl = strContactsUrl + '&filters[status]=' + encodeURIComponent(key);
+                                strContactsUrl = strContactsUrl + '&filters[status][]=' + encodeURIComponent(key);
                                 statusCount++;
                             }
                         });
