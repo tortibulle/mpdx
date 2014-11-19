@@ -210,6 +210,8 @@ class GoogleContactsIntegrator
   # - Or contacts whose google_contacts records have been updated remotely since the last sync as specified by the
   #   updated_g_contacts list
   def contacts_to_sync_query(updated_g_contacts)
+    updated_link_ids = updated_g_contact_links(updated_g_contacts).map(&:id)
+
     @integration.account_list.active_contacts
       .joins(:people)
       .joins("LEFT JOIN addresses ON addresses.addressable_id = contacts.id AND addresses.addressable_type = 'Contact'")
@@ -218,30 +220,34 @@ class GoogleContactsIntegrator
       .joins('LEFT JOIN person_websites ON people.id = person_websites.person_id')
       .joins('LEFT JOIN google_contacts ON google_contacts.person_id = people.id AND google_contacts.contact_id = contacts.id '\
           "AND google_contacts.google_account_id = #{ quote_sql(@account.id) }")
-      .joins("LEFT JOIN #{ remote_g_contacts_sql(updated_g_contacts) } ON remote_g_contacts.remote_id = google_contacts.remote_id")
-      .group('contacts.id, google_contacts.last_synced, google_contacts.remote_id')
+      .group('contacts.id, google_contacts.last_synced, google_contacts.id')
       .having('google_contacts.last_synced IS NULL ' \
-          'OR google_contacts.last_synced < ' \
-            'GREATEST(contacts.updated_at, MAX(remote_g_contacts.updated_at), ' \
-                    'MAX(contact_people.updated_at), MAX(people.updated_at), MAX(addresses.updated_at), ' \
-                    'MAX(email_addresses.updated_at), MAX(phone_numbers.updated_at), MAX(person_websites.updated_at))')
+        'OR google_contacts.last_synced < ' \
+            'GREATEST(contacts.updated_at, MAX(contact_people.updated_at), MAX(people.updated_at), MAX(addresses.updated_at), ' \
+                'MAX(email_addresses.updated_at), MAX(phone_numbers.updated_at), MAX(person_websites.updated_at))' +
+        (updated_link_ids.empty? ? '' : " OR google_contacts.id IN (#{ quote_sql_list(updated_link_ids) })"))
       .distinct
       .readonly(false)
   end
 
-  # Create a SELECT statement to represent the (remote_id, updated) pairs for remotely updated Google Contacts
-  # so that we can join to them via the remote_id and then compare with the updated in the query above.
-  # It's helpful to compare each remote Google Contact's updated field rather than just assume all that are updated
-  # since the overall last sync time, because we calculate the last sync time from the start of the sync to catch
-  # any Google Contacts that were updated during the sync. But the sync itself causes updated contacts since the
-  # start of it, so comparing each one will eliminate double syncing those that were changed by the sync itself,
-  # but will allow capture of remotely changed Google Contacts that were changed by the user during the sync.
-  def remote_g_contacts_sql(g_contacts)
-    sql_table = '(SELECT CAST(null as varchar) as remote_id, CAST(null as timestamp) as updated_at'
-    g_contacts.each do |g_contact|
-      sql_table += " UNION SELECT #{ quote_sql(g_contact.id) }, #{ quote_sql(g_contact.updated.to_s(:db)) }"
+  # Finds Google contact link record that have been remotely modified since their last sync given a list of recently
+  # modified remote Google contacts
+  def updated_g_contact_links(updated_g_contacts)
+    updated_remote_ids = updated_g_contacts.map(&:id)
+    return [] if updated_remote_ids.empty? # Need to check after map as updated_g_contacts is GoogleContactsApi::ResultSet
+
+    g_contacts_by_id = Hash[updated_g_contacts.map { |g_contact| [g_contact.id, g_contact] }]
+    g_contact_links = GoogleContact.select(:id, :remote_id, :last_synced)
+      .where(google_account: @account).where(remote_id: updated_remote_ids).where.not(last_synced: nil).to_a
+
+    g_contact_links.select do |g_contact_link|
+      g_contact = g_contacts_by_id[g_contact_link.remote_id]
+      g_contact.updated > g_contact_link.last_synced
     end
-    sql_table + ') as remote_g_contacts'
+  end
+
+  def quote_sql_list(list)
+    list.map { |item| ActiveRecord::Base.connection.quote(item) }.join(',')
   end
 
   def quote_sql(sql)
