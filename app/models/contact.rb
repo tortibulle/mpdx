@@ -132,10 +132,9 @@ class Contact < ActiveRecord::Base
   end
 
   def late_by?(min_days, max_days = nil)
-    return false unless status == 'Partner - Financial' && pledge_frequency.present? &&
-      (last_donation_date.present? || pledge_start_date.present?)
-
     date_to_check = last_donation_date || pledge_start_date
+    return false unless status == 'Partner - Financial' && pledge_frequency.present? && date_to_check.present?
+
     case
     when pledge_frequency >= 1.0
       late_date = date_to_check + pledge_frequency.to_i.months
