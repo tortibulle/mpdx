@@ -41,11 +41,12 @@ describe GoogleContactsCache do
       expect(account).to receive(:contacts_api_user).and_return(api_user)
       api_john = double
       expect(api_user).to receive(:get_contact).with('api_john').and_return(api_john)
+      expect(api_john).to receive(:deleted?).and_return(false)
       expect(cache.find_by_id('api_john')).to eq(api_john)
 
       expect(account).to receive(:contacts_api_user).and_return(api_user)
       api_john_query = double
-      expect(api_user).to receive(:query_contacts).with('Api John').and_return([api_john_query])
+      expect(api_user).to receive(:query_contacts).with('Api John', showdeleted: false).and_return([api_john_query])
       expect(cache.query_by_full_name('Api John')).to eq([api_john_query])
     end
   end
@@ -70,6 +71,7 @@ describe GoogleContactsCache do
       expect(account).to receive(:contacts_api_user).and_return(api_user)
       api_john1 = double
       expect(api_user).to receive(:get_contact).with('john1').and_return(api_john1)
+      expect(api_john1).to receive(:deleted?).and_return(false)
       expect(cache.find_by_id('john1')).to eq(api_john1)
     end
   end

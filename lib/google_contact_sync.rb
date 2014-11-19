@@ -39,8 +39,7 @@ module GoogleContactSync
   end
 
   def sync_basic_person_fields(person, g_contact, g_contact_link)
-    sync_g_contact_and_record(person, g_contact, g_contact_link, title: :name_prefix, first_name: :given_name,
-                              middle_name: :additional_name, last_name: :family_name, suffix: :name_suffix)
+    sync_g_contact_and_record(person, g_contact, g_contact_link, first_name: :given_name, last_name: :family_name)
   end
 
   def sync_g_contact_and_record(record, g_contact, g_contact_link, field_map)
