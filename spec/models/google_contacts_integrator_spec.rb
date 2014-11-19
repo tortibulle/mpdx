@@ -183,6 +183,13 @@ describe GoogleContactsIntegrator do
       since_sync_updated_g_contact = double(id: 'a', updated: 2.hours.since)
       expect(contacts_to_sync_query([since_sync_updated_g_contact])).to eq([@contact])
     end
+
+    it 'finds a contact to sync if there is a Google contact record in a different account and none for its account' do
+      other_account = create(:google_account)
+      create(:google_contact, google_account: other_account, person: @person, contact: nil)
+      @g_contact.destroy
+      expect_contact_sync_query([@contact])
+    end
   end
 
   describe 'logic for assigning each MPDX contact to a single Google contact' do
