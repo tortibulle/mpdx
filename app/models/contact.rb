@@ -38,7 +38,7 @@ class Contact < ActiveRecord::Base
   scope :with_referrals, -> { joins(:contact_referrals_by_me).uniq }
   scope :active, -> { where(active_conditions) }
   scope :inactive, -> { where(inactive_conditions) }
-  scope :late_by, -> (min_days, max_days = nil) { financial_partners.where('last_donation_date BETWEEN ? AND ?', max_days ? Date.today - max_days : Date.new(1951, 1, 1), Date.today - min_days) }
+  scope :late_by, -> (min_days, max_days = nil) { financial_partners.order(:name).keep_if { |c| c.late_by?(min_days, max_days) } }
   scope :created_between, -> (start_date, end_date) { where('contacts.created_at BETWEEN ? and ?', start_date.in_time_zone, (end_date + 1.day).in_time_zone) }
 
   PERMITTED_ATTRIBUTES = [
@@ -129,6 +129,24 @@ class Contact < ActiveRecord::Base
 
   def active?
     !Contact.inactive_statuses.include?(status)
+  end
+
+  def late_by?(min_days, max_days = nil)
+    date_to_check = last_donation_date || pledge_start_date
+    return false unless status == 'Partner - Financial' && pledge_frequency.present? && date_to_check.present?
+
+    case
+    when pledge_frequency >= 1.0
+      late_date = date_to_check + pledge_frequency.to_i.months
+    when pledge_frequency >= 0.4
+      late_date = date_to_check + 2.weeks
+    else
+      late_date = date_to_check + 1.week
+    end
+
+    min_late_date = Date.today - min_days
+    max_late_date = max_days ? Date.today - max_days : Date.new(1951, 1, 1)
+    late_date > max_late_date && late_date < min_late_date
   end
 
   def self.active_conditions
