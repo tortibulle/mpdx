@@ -285,7 +285,7 @@ class GoogleContactsIntegrator
   end
 
   def inactive_group
-    @mpdx_group ||= groups.find { |group| group.title == INACTIVE_GROUP_TITLE } ||
+    @inactive_group ||= groups.find { |group| group.title == INACTIVE_GROUP_TITLE } ||
       GoogleContactsApi::Group.create({ title: INACTIVE_GROUP_TITLE }, api_user.api)
   end
 
