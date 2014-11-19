@@ -163,7 +163,7 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def oauth2_request(method, path, params = nil)
-    RestClient::Request.execute(method: method, url: SERVICE_URL + path, payload: params.to_json,
+    RestClient::Request.execute(method: method, url: SERVICE_URL + path, payload: params,
                                 headers: { 'Authorization' => "Bearer #{ URI.encode(oauth2_token) }" })
   rescue RestClient::Unauthorized
     handle_bad_token
