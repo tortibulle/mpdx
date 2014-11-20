@@ -78,14 +78,21 @@
       <% if $rollout.active?(:google_contacts_sync, current_account_list) %>
           <h2><%= _('Google Contacts integration') %></h2>
 
-          <%= _("<p>MPDx can sync your active contacts to Google so you only have to keep your contacts up to date in
+          <%= _("<p>MPDX can sync your active contacts to Google so you only have to keep your contacts up to date in
                      one place.  (Active contacts are those whose status field indicates that they are partners or in the
                      MPD process.)</p>
 
                      <p>This will synchronize existing contact information as well as future updates and deletions to your contact
-                     info to and from MPDx and Google. Once the sync is active, changes in either Google or MPDx will be
+                     info to and from MPDX and Google. Once the sync is active, changes in either Google or MPDX will be
                      reflected in the other system. If you make a change in both places between syncs, MPDx changes
-                     will take precedence.</p>") %>
+                     will take precedence.</p>
+
+                     <p>If make a contact inactive in MPDX e.g. by selecting \"Not Interested\" for its status, the contact info will not
+                     be deleted in Google, but will be labeled \"Inactive\" so you can easily find those no-longer-synced contacts
+                     and delete them if you choose.</p>
+
+                     <p>If you delete a contact in Google contacts that is active in MPDX, you must also go in to MPDX and hide
+                     the contact, making it inactive in MPDX. Otherwise, it will get regenerated in Google once it syncs again.</p>") %>
 
           <% if @google_integration.contacts_integration? %>
               <%= _("Google Contacts sync has been enabled.") %>
