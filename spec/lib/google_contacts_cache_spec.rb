@@ -5,7 +5,7 @@ describe GoogleContactsCache do
   let(:john2) { double(id: 'john2', given_name: 'John', family_name: 'Doe') }
   let(:jane1) { double(id: 'jane1', given_name: 'Jane', family_name: 'Doe') }
   let(:jane2) { double(id: 'jane2', given_name: 'Jane Doe', family_name: '') }
-  let(:account) { double }
+  let(:account) { build(:google_account) }
   let(:cache) { GoogleContactsCache.new(account) }
 
   describe 'cache_all_g_contacts' do
@@ -73,6 +73,66 @@ describe GoogleContactsCache do
       expect(api_user).to receive(:get_contact).with('john1').and_return(api_john1)
       expect(api_john1).to receive(:deleted?).and_return(false)
       expect(cache.find_by_id('john1')).to eq(api_john1)
+    end
+  end
+
+  describe 'behavior with 500 errors' do
+    describe 'find_by_id_api' do
+      before do
+        @g_contact_id = 'http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/test'
+        @g_contact_json = <<-EOS
+        {
+          "entry": [
+            {
+              "gd$name": {"gd$givenName": {"$t": "John"}},
+              "id": {"$t": "#{@g_contact_id}"}
+            }
+          ]
+        }
+        EOS
+      end
+
+      it 'retries the request after a timeout' do
+        stub_request(:get, 'https://www.google.com/m8/feeds/contacts/test.user@cru.org/full/test?alt=json&v=3')
+          .to_return(status: 500).then.to_return(status: 200, body: @g_contact_json)
+
+        expect(cache).to receive(:sleep).with(GoogleContactsCache::SECONDS_BETWEEN_500_ERR_RETRIES)
+
+        g_contact = cache.find_by_id_api(@g_contact_id)
+        expect(g_contact.given_name).to eq('John')
+      end
+
+      it 'causes an error if the 500 error is persistent' do
+        stub_request(:get, 'https://www.google.com/m8/feeds/contacts/test.user@cru.org/full/test?alt=json&v=3')
+          .to_return(status: 500)
+
+        expect(cache).to receive(:sleep).at_least(:once).with(GoogleContactsCache::SECONDS_BETWEEN_500_ERR_RETRIES)
+
+        expect { cache.find_by_id_api(@g_contact_id) }.to raise_error
+      end
+    end
+
+    describe 'query_by_name_api' do
+      it 'retries the request after a timeout' do
+        g_contacts_json = File.new(Rails.root.join('spec/fixtures/google_contacts.json')).read
+        stub_request(:get, 'https://www.google.com/m8/feeds/contacts/default/full?alt=json&max-results=100000&q=John&showdeleted=false&v=3')
+          .to_return(status: 500).then.to_return(status: 200, body: g_contacts_json)
+
+        expect(cache).to receive(:sleep).with(GoogleContactsCache::SECONDS_BETWEEN_500_ERR_RETRIES)
+
+        g_contacts = cache.query_by_full_name_api('John')
+        expect(g_contacts.total_results).to eq(1)
+        expect(g_contacts.first.given_name).to eq('John')
+      end
+
+      it 'causes an error if the 500 error is persistent' do
+        stub_request(:get, 'https://www.google.com/m8/feeds/contacts/default/full?alt=json&max-results=100000&q=John&showdeleted=false&v=3')
+          .to_return(status: 500)
+
+        expect(cache).to receive(:sleep).at_least(:once).with(GoogleContactsCache::SECONDS_BETWEEN_500_ERR_RETRIES)
+
+        expect { cache.query_by_full_name_api('John') }.to raise_error
+      end
     end
   end
 end
