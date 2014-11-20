@@ -165,7 +165,20 @@ describe Contact do
       expect { contact.destroy }
         .to change(Address, :count).by(-1)
     end
+  end
 
+  describe '#late_by?' do
+    it 'should tell if a monthly donor is late on their donation' do
+      contact.late_by?(2.days, 30.days).should be true
+      contact.late_by?(30.days, 60.days).should be false
+      contact.late_by?(60.days).should be false
+    end
+
+    it 'should tell if an annual donor is late on their donation' do
+      contact = create(:contact, pledge_frequency: 12.0, last_donation_date: 14.months.ago)
+      contact.late_by?(30.days, 45.days).should be false
+      contact.late_by?(45.days).should be true
+    end
   end
 
   context '#primary_person_id=' do

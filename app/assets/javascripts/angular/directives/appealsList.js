@@ -113,7 +113,7 @@ angular.module('mpdxApp')
                                     $scope.checkedContacts = {};
                                 }else if(type === 'donated'){
                                     angular.forEach($scope.appeal.contacts, function (c) {
-                                        if($scope.listDonations(c) === '-'){
+                                        if(_.first($scope.listDonations(c)) === '-'){
                                             $scope.checkedContacts[c] = false;
                                         }else{
                                             $scope.checkedContacts[c] = true;
@@ -121,7 +121,7 @@ angular.module('mpdxApp')
                                     });
                                 }else if(type === '!donated'){
                                     angular.forEach($scope.appeal.contacts, function (c) {
-                                        if($scope.listDonations(c) === '-'){
+                                        if(_.first($scope.listDonations(c)) === '-'){
                                             $scope.checkedContacts[c] = true;
                                         }else{
                                             $scope.checkedContacts[c] = false;
@@ -188,7 +188,7 @@ angular.module('mpdxApp')
                         var strContactsUrl = 'contacts?per_page=5000&include=Contact.id&account_list_id=' + (window.current_account_list_id || '');
                         angular.forEach(newAppeal.validStatus, function(value, key) {
                             if(value){
-                                strContactsUrl = strContactsUrl + '&filters[status]=' + encodeURIComponent(key);
+                                strContactsUrl = strContactsUrl + '&filters[status][]=' + encodeURIComponent(key);
                                 statusCount++;
                             }
                         });
@@ -196,8 +196,8 @@ angular.module('mpdxApp')
                         var contactsObject = [];
                         api.call('get', strContactsUrl, {}, function(data) {
                             if(statusCount > 0){
-                                angular.forEach(data.contacts, function(value, key) {
-                                    contactsObject.push(parseInt(key));
+                                angular.forEach(data.contacts, function(c) {
+                                    contactsObject.push(c.id);
                                 });
                             }
 

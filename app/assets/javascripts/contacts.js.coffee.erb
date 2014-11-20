@@ -300,6 +300,7 @@ $ ->
             {
               text: __('Save'),
               click: ->
+                window.onbeforeunload = undefined
                 $('form', this).submit()
                 $('.form_wrapper', this).html('<%= image_tag('spinner.gif') %>')
                 $(this).dialog( "option", "buttons", [])
@@ -309,8 +310,13 @@ $ ->
               click: ->
                 $(this).dialog('close')
             }
-          ]
+          ],
+          close: ->
+            window.onbeforeunload = undefined
         }
+        window.onbeforeunload = ->
+          return 'It looks like you were adding some referrals. If you leave before submitting your changes will be lost.'
+
 
       # Filter contact list
       $(document).on 'keyup', '#contact_name', ->

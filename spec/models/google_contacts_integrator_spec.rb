@@ -13,8 +13,7 @@ describe GoogleContactsIntegrator do
 
     @contact = create(:contact, account_list: @account_list, status: 'Partner - Pray', notes: 'about')
 
-    @person = create(:person, last_name: 'Doe', middle_name: 'Henry', title: 'Mr', suffix: 'III',
-                              occupation: 'Worker', employer: 'Company, Inc')
+    @person = create(:person, last_name: 'Doe', occupation: 'Worker', employer: 'Company, Inc')
     @contact.people << @person
 
     @g_contact = GoogleContactsApi::Contact.new(
@@ -64,7 +63,8 @@ describe GoogleContactsIntegrator do
       now = Time.now
       @integration.update_column(:contacts_last_synced, now)
       g_contact = double(id: 'id_1', given_name: 'John', family_name: 'Doe')
-      expect(@account.contacts_api_user).to receive(:contacts_updated_min).with(now).and_return([g_contact])
+      expect(@account.contacts_api_user).to receive(:contacts_updated_min)
+                                            .with(now, showdeleted: false).and_return([g_contact])
 
       expect(@integrator).to receive(:contacts_to_sync_query).with([g_contact]).and_return([@contact])
       expect(@integrator.contacts_to_sync).to eq([@contact])
@@ -183,6 +183,13 @@ describe GoogleContactsIntegrator do
       since_sync_updated_g_contact = double(id: 'a', updated: 2.hours.since)
       expect(contacts_to_sync_query([since_sync_updated_g_contact])).to eq([@contact])
     end
+
+    it 'finds a contact to sync if there is a Google contact record in a different account and none for its account' do
+      other_account = create(:google_account)
+      create(:google_contact, google_account: other_account, person: @person, contact: nil)
+      @g_contact.destroy
+      expect_contact_sync_query([@contact])
+    end
   end
 
   describe 'logic for assigning each MPDX contact to a single Google contact' do
@@ -272,21 +279,21 @@ describe GoogleContactsIntegrator do
     end
   end
 
-  def stub_mpdx_group_request
+  def stub_groups_request
     groups_body = {
       'feed' => {
         'entry' => [
-          {
-            'id' => { '$t' => 'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid' },
-            'title' => { '$t' => GoogleContactsIntegrator::CONTACTS_GROUP_TITLE }
-          }
+          { 'id' => { '$t' => 'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid' },
+            'title' => { '$t' => GoogleContactsIntegrator::CONTACTS_GROUP_TITLE } },
+          { 'id' => { '$t' => 'http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/inactivegroupid' },
+            'title' => { '$t' => GoogleContactsIntegrator::INACTIVE_GROUP_TITLE } }
         ],
-        'openSearch$totalResults' => { '$t' => '1' },
+        'openSearch$totalResults' => { '$t' => '2' },
         'openSearch$startIndex' => { '$t' => '0' },
-        'openSearch$itemsPerPage' => { '$t' => '1' }
+        'openSearch$itemsPerPage' => { '$t' => '2' }
       }
     }
-    stub_request(:get, 'https://www.google.com/m8/feeds/groups/default/full?alt=json&max-results=100000&v=2')
+    stub_request(:get, 'https://www.google.com/m8/feeds/groups/default/full?alt=json&max-results=100000&v=3')
       .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
       .to_return(body: groups_body.to_json)
   end
@@ -303,29 +310,36 @@ describe GoogleContactsIntegrator do
   end
 
   def stub_empty_g_contacts
-    stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&v=3")
+    stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&showdeleted=false&v=3")
       .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
       .to_return(body: empty_feed_json)
   end
 
   def stub_empty_updated_g_contacts
-    stub_request(:get, %r{#{@api_url}/default/full\?alt=json&max-results=100000&updated-min=.*&v=3})
+    stub_request(:get, %r{#{@api_url}/default/full\?alt=json&max-results=100000&showdeleted=false&updated-min=.*&v=3})
       .to_return(body: empty_feed_json)
+  end
+
+  def g_contact_fixture_json
+    @g_contact_fixture_json ||= File.new(Rails.root.join('spec/fixtures/google_contacts.json')).read
+  end
+
+  def stub_g_contact_from_fixture
+    stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&showdeleted=false&v=3")
+      .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
+      .to_return(body: g_contact_fixture_json)
   end
 
   describe 'overall sync for creating a new google contact' do
     it 'creates a new google contact and association for a contact to sync' do
       stub_empty_g_contacts
       stub_empty_updated_g_contacts
-      stub_mpdx_group_request
+      stub_groups_request
 
       contact_name_info = <<-EOS
         <gd:name>
-          <gd:namePrefix>Mr</gd:namePrefix>
           <gd:givenName>John</gd:givenName>
-          <gd:additionalName>Henry</gd:additionalName>
           <gd:familyName>Doe</gd:familyName>
-          <gd:nameSuffix>III</gd:nameSuffix>
         </gd:name>
       EOS
 
@@ -378,7 +392,7 @@ describe GoogleContactsIntegrator do
       @person.reload
       expect(@person.google_contacts.count).to eq(1)
       last_data = {
-        name_prefix: 'Mr', given_name: 'John', additional_name: 'Henry', family_name: 'Doe', name_suffix: 'III',
+        name_prefix: nil, given_name: 'John', additional_name: nil, family_name: 'Doe', name_suffix: nil,
         content: 'about', emails: [], phone_numbers: [], addresses: [],
         organizations: [{ rel: 'work', primary: true, org_name: 'Company, Inc', org_title: 'Worker' }],
         websites: [], group_memberships: ['http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid'],
@@ -396,7 +410,7 @@ describe GoogleContactsIntegrator do
 
       stub_empty_g_contacts
       stub_empty_updated_g_contacts
-      stub_mpdx_group_request
+      stub_groups_request
     end
 
     it 'syncs each person-contact with its own Google contact' do
@@ -438,6 +452,25 @@ describe GoogleContactsIntegrator do
     end
   end
 
+  describe 'sync behavior when an import is running' do
+    it 'waits for it to finish until a timeout is reached, then does not sync if import still importing' do
+      create(:import, account_list: @account_list, importing: true, source: 'google')
+      expect(@integrator).to receive(:sleep).at_least(:once)
+      expect(@integrator).to receive(:sync_and_return_num_synced).exactly(0).times
+      @integrator.sync_contacts
+    end
+  end
+
+  describe 'compatibility with previous import code' do
+    it 'does consider old google contacts associated by previously implemented Google contacts import' do
+      # The Google contacts import code would only associate a google_contact link record with the person, so just leave
+      # those old format records alone; they aren't person/contact merge losers. Those would have both a contact_id and
+      # person_id associated with it (but which no longer exists in the database due to the merge).
+      create(:google_contact, google_account: @account, person: @person)
+      expect(@integrator.g_contact_merge_losers).to be_empty
+    end
+  end
+
   describe 'sync behavior for merged MPDX contacts/people' do
     before do
       @contact.update_column(:notes, 'contact')
@@ -450,7 +483,7 @@ describe GoogleContactsIntegrator do
 
       stub_empty_g_contacts
       stub_empty_updated_g_contacts
-      stub_mpdx_group_request
+      stub_groups_request
     end
 
     it 'deletes Google contacts for losing merged contacts/people' do
@@ -492,10 +525,8 @@ describe GoogleContactsIntegrator do
 
       # Then we merge @contact with @contact2 (@contact wins), so we should delete the @contact2 g_contacts
       @contact.merge(@contact2)
-      expect(@account.contacts_api_user).to receive(:delete_contact)
-                                            .with(g_contact_ids['contact2:John'], 'etag:' + g_contact_ids['contact2:John'])
-      expect(@account.contacts_api_user).to receive(:delete_contact)
-                                            .with(g_contact_ids['contact2:Jane'], 'etag:' + g_contact_ids['contact2:Jane'])
+      expect(@account.contacts_api_user).to receive(:delete_contact).with(g_contact_ids['contact2:John'])
+      expect(@account.contacts_api_user).to receive(:delete_contact).with(g_contact_ids['contact2:Jane'])
       @integrator.sync_contacts
       expect(GoogleContact.all.count).to eq(2)
       expect(GoogleContact.find_by(contact: @contact, person: @person).remote_id).to eq(g_contact_ids['contact:John'])
@@ -503,8 +534,7 @@ describe GoogleContactsIntegrator do
 
       # Then we merge @person with @person2 (@person wins), so we should delete @person2 g_contact
       @person.merge(@person2)
-      expect(@account.contacts_api_user).to receive(:delete_contact)
-                                            .with(g_contact_ids['contact:Jane'], 'etag:' + g_contact_ids['contact:Jane'])
+      expect(@account.contacts_api_user).to receive(:delete_contact).with(g_contact_ids['contact:Jane'])
       @integrator.sync_contacts
       expect(GoogleContact.all.count).to eq(1)
       expect(GoogleContact.find_by(contact: @contact, person: @person).remote_id).to eq(g_contact_ids['contact:John'])
@@ -513,7 +543,7 @@ describe GoogleContactsIntegrator do
 
   describe 'sync behavior for HTTP errors' do
     before do
-      stub_mpdx_group_request
+      stub_groups_request
       @integration.update_column(:contacts_last_synced, 1.hour.ago)
       create(:google_contact, google_account: @account, contact: @contact, person: @person, remote_id: '1',
              last_data: { given_name: 'John', family_name: 'Doe' }, last_synced: 1.hour.ago)
@@ -522,7 +552,7 @@ describe GoogleContactsIntegrator do
 
     it 'retries the sync and creates a new contact on a 404 error' do
       expect(@account.contacts_api_user).to receive(:get_contact).with('1').and_return(@g_contact)
-      expect(@account.contacts_api_user).to receive(:query_contacts).with('John Doe').and_return([])
+      expect(@account.contacts_api_user).to receive(:query_contacts).with('John Doe', showdeleted: false).and_return([])
 
       new_g_contact = GoogleContactsApi::Contact.new
       expect(GoogleContactsApi::Contact).to receive(:new).and_return(new_g_contact)
@@ -595,6 +625,131 @@ describe GoogleContactsIntegrator do
     end
   end
 
+  describe 'when a contact was synced but then made inactive' do
+    it 'deletes the link and puts the google contact in the group "Inactive"' do
+      stub_groups_request
+
+      contact_feed = {
+        'feed' => {
+          'entry' => [
+            { 'id' => { '$t' => 'http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/test' } }
+          ],
+          'openSearch$totalResults' => { '$t' => '1' },
+          'openSearch$startIndex' => { '$t' => '0' },
+          'openSearch$itemsPerPage' => { '$t' => '1' }
+        }
+      }
+      stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&showdeleted=false&v=3")
+        .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
+        .to_return(body: contact_feed.to_json)
+
+      now = Time.now
+      expect(Time).to receive(:now).at_least(:once).and_return(now)
+      update_request_xml = <<-EOS
+       <feed xmlns='http://www.w3.org/2005/Atom'
+          xmlns:gContact='http://schemas.google.com/contact/2008'
+          xmlns:gd='http://schemas.google.com/g/2005'
+          xmlns:batch='http://schemas.google.com/gdata/batch'>
+        <entry xmlns="http://www.w3.org/2005/Atom" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:gd="http://schemas.google.com/g/2005" gd:etag="">
+          <id>http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/test</id>
+          <updated>#{ GoogleContactsApi::Api.format_time_for_xml(now) }</updated>
+          <category scheme="http://schemas.google.com/g/2005#kind" term="http://schemas.google.com/contact/2008#contact"/>
+          <batch:id>0</batch:id>
+          <batch:operation type="update"/>
+          <gd:name></gd:name>
+          <gContact:groupMembershipInfo deleted="false"
+            href="http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/inactivegroupid"/>
+        </entry>
+      </feed>
+      EOS
+
+      update_response_xml = <<-EOS
+        <feed gd:etag="&quot;QHg9eDVSLyt7I2A9XRdQE0QORQY.&quot;"
+                  xmlns="http://www.w3.org/2005/Atom" xmlns:batch="http://schemas.google.com/gdata/batch"
+                  xmlns:gContact="http://schemas.google.com/contact/2008" xmlns:gd="http://schemas.google.com/g/2005"
+                  xmlns:openSearch="http://a9.com/-/spec/opensearch/1.1/">
+          <entry>
+            <batch:id>0</batch:id>
+            <batch:operation type='update'/>
+            <batch:status code='200' reason='Success'/>
+          </entry>
+        </feed>
+      EOS
+
+      update_stub = stub_request(:post, 'https://www.google.com/m8/feeds/contacts/default/full/batch?alt=&v=3').to_return do |request|
+        expect(EquivalentXml.equivalent?(request.body, update_request_xml)).to be_true
+        { body: update_response_xml }
+      end
+
+      create(:google_contact, google_account: @account, person: @person, contact: @contact,
+             remote_id: 'http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/test')
+
+      @contact.update_column :status, 'Not Interested'
+      @integrator.sync_contacts
+
+      expect(update_stub).to have_been_requested
+      expect(GoogleContact.count).to eq(0)
+    end
+  end
+
+  describe 'cleanup inactive contacts errors' do
+    before do
+      stub_groups_request
+      @remote_id = 'http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/test'
+      @g_contact_link = create(:google_contact, google_account: @account, person: @person, contact: @contact,
+                               remote_id: @remote_id)
+      @contact.update_column :status, 'Not Interested'
+
+      @cache = GoogleContactsCache.new(@account)
+      @cache.cache_g_contacts([])
+      @integrator.cache = @cache
+    end
+
+    it 'deletes the associated link record in the case of a 404 error' do
+      expect(@cache).to receive(:find_by_id).with(@remote_id).and_return(@g_contact)
+
+      expect(@account.contacts_api_user).to receive(:batch_create_or_update).exactly(:once)
+                                            .and_return { |_g_contact, &block| block.call(code: 404) }
+
+      @integrator.cleanup_inactive_g_contacts
+      expect(GoogleContact.all.count).to eq(0)
+    end
+
+    it 'reloads the g_contact then retries the update in the case of a 412 error' do
+      expect(@cache).to receive(:remove_g_contact).with(@g_contact)
+      expect(@cache).to receive(:find_by_id).exactly(:twice).with(@remote_id).and_return(@g_contact)
+
+      times_batch_create_or_update_called = 0
+      expect(@account.contacts_api_user).to receive(:batch_create_or_update).exactly(:twice)
+                                            .and_return do |_g_contact, &block|
+        times_batch_create_or_update_called += 1
+        case times_batch_create_or_update_called
+        when 1
+          block.call(code: 412)
+        when 2
+          block.call(code: 200)
+        end
+      end
+
+      @integrator.cleanup_inactive_g_contacts
+      expect(GoogleContact.all.count).to eq(0)
+    end
+  end
+
+  describe 'delete merge loser 404 contact not found error (already deleted)' do
+    it 'destroys the local g_contact_link anyway' do
+      create(:google_contact, google_account: @account, person: @person, contact: @contact,
+             remote_id: 'http://www.google.com/m8/feeds/contacts/test.user%40cru.org/base/test')
+      ContactPerson.all.destroy_all
+
+      stub_request(:delete, 'https://www.google.com/m8/feeds/contacts/test.user@cru.org/base/test?alt=json&v=3')
+        .to_return(status: 404)
+
+      @integrator.delete_g_contact_merge_losers
+      expect(GoogleContact.all.count).to eq(0)
+    end
+  end
+
   describe 'overall first and subsequent sync for modifed contact info' do
     it 'combines MPDX & Google data on first sync then propagates updates of email/phone/address on subsequent syncs' do
       setup_first_sync_data
@@ -609,12 +764,9 @@ describe GoogleContactsIntegrator do
     end
 
     def setup_first_sync_data
-      @g_contact_json_text = File.new(Rails.root.join('spec/fixtures/google_contacts.json')).read
-      stub_request(:get, "#{@api_url}/default/full?alt=json&max-results=100000&v=3")
-        .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
-        .to_return(body: @g_contact_json_text)
+      stub_g_contact_from_fixture
 
-      @updated_g_contact_obj = JSON.parse(@g_contact_json_text)['feed']['entry'][0]
+      @updated_g_contact_obj = JSON.parse(g_contact_fixture_json)['feed']['entry'][0]
       @updated_g_contact_obj['gd$email'] = [
         { primary: true, rel: 'http://schemas.google.com/g/2005#other', address: 'johnsmith@example.com' },
         { primary: false, rel: 'http://schemas.google.com/g/2005#home', address: 'mpdx@example.com' }
@@ -655,7 +807,7 @@ describe GoogleContactsIntegrator do
 
       stub_empty_updated_g_contacts
 
-      stub_mpdx_group_request
+      stub_groups_request
 
       create_group_request_regex_str =
         '<atom:entry xmlns:gd="http://schemas.google.com/g/2005" xmlns:atom="http://www.w3.org/2005/Atom">\s*'\
@@ -773,11 +925,7 @@ describe GoogleContactsIntegrator do
       ])
 
       last_data = {
-        name_prefix: 'Mr',
-        given_name: 'John',
-        additional_name: 'Henry',
-        family_name: 'Doe',
-        name_suffix: 'III',
+        name_prefix: 'Mr', given_name: 'John', additional_name: 'Henry', family_name: 'Doe', name_suffix: 'III',
         content: 'Notes here',
         emails: [{ primary: true, rel: 'other', address: 'johnsmith@example.com' },
                  { primary: false, rel: 'home', address: 'mpdx@example.com' }],
@@ -831,7 +979,7 @@ describe GoogleContactsIntegrator do
 
       stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
 
-      @updated_g_contact_obj = JSON.parse(@g_contact_json_text)['feed']['entry'][0]
+      @updated_g_contact_obj = JSON.parse(g_contact_fixture_json)['feed']['entry'][0]
       @updated_g_contact_obj['gd$email'] = [
         { primary: true, rel: 'http://schemas.google.com/g/2005#other', address: 'johnsmith_MODIFIED@example.com' },
         { primary: false, rel: 'http://schemas.google.com/g/2005#home', address: 'mpdx@example.com' }
@@ -867,7 +1015,7 @@ describe GoogleContactsIntegrator do
         }
       }
 
-      stub_request(:get, %r{#{@api_url}/default/full\?alt=json&max-results=100000&updated-min=.*&v=3})
+      stub_request(:get, %r{#{@api_url}/default/full\?alt=json&max-results=100000&showdeleted=false&updated-min=.*&v=3})
         .to_return(body: updated_contacts_body.to_json).then.to_return(body: empty_feed_json)
 
       groups_body = {
@@ -883,7 +1031,7 @@ describe GoogleContactsIntegrator do
           'openSearch$itemsPerPage' => { '$t' => '1' }
         }
       }
-      stub_request(:get, 'https://www.google.com/m8/feeds/groups/default/full?alt=json&max-results=100000&v=2')
+      stub_request(:get, 'https://www.google.com/m8/feeds/groups/default/full?alt=json&max-results=100000&v=3')
         .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
         .to_return(body: groups_body.to_json)
     end
