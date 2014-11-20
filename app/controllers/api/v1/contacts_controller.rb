@@ -72,6 +72,10 @@ class Api::V1::ContactsController < Api::V1::BaseController
     render json: { total: filtered_contacts.count }, callback: params[:callback]
   end
 
+  def tags
+    render json: { tags: current_account_list.contact_tags }, callback: params[:callback]
+  end
+
   protected
 
   def contacts

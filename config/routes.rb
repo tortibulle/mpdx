@@ -38,6 +38,7 @@ Mpdx::Application.routes.draw do
       resources :contacts do
         collection do
           get :count
+          get :tags
         end
       end
       resources :tasks do
