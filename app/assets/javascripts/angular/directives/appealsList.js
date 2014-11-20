@@ -174,6 +174,7 @@ angular.module('mpdxApp')
                         controller: function($scope, $modalInstance){
                             $scope.appeal = {};
                             $scope.contactStatuses = window.railsConstants.contact.ACTIVE_STATUSES.concat(window.railsConstants.contact.INACTIVE_STATUSES).sort();
+                            //$scope.contactTags = window.railsConstants.contact.ACTIVE_STATUSES.sort();
 
                             $scope.cancel = function () {
                                 $modalInstance.dismiss('cancel');
