@@ -12,6 +12,18 @@ describe Api::V1::ContactsController do
       end
     end
 
+    context '#tags' do
+      it 'succeeds' do
+        contact.tag_list << 'test tag'
+        contact.save!
+
+        get :tags, access_token: user.access_token
+        response.should be_success
+        json = JSON.parse(response.body)
+        json['tags'].length.should == 1
+      end
+    end
+
     context '#index' do
       it 'filters address out' do
         get :index, access_token: user.access_token, include: 'Contact.name,Contact.id,Contact.avatar'
