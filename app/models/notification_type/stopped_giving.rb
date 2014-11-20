@@ -4,24 +4,24 @@ class NotificationType::StoppedGiving < NotificationType
     account_list.contacts.financial_partners.where(['pledge_start_date is NULL OR pledge_start_date < ?', 30.days.ago]).each do |contact|
       next unless contact.pledge_received?
 
-      date = ((contact.pledge_frequency.to_i > 0 ? contact.pledge_frequency.to_i : 1) + 1).months.ago
+      late = contact.late_by?(30.days)
 
       prior_notification = Notification.active.where(contact_id: contact.id, notification_type_id: id).first
 
-      if contact.donations.since(date).first
-        # Clear a prior notification if there was one
-        if prior_notification
-          prior_notification.update_attributes(cleared: true)
-          # Remove any tasks associated with this notification
-          prior_notification.tasks.destroy_all
-        end
-      else
+      if late
         unless prior_notification
           # If they've never given, they haven't missed a gift
           if contact.donations.first
             notification = contact.notifications.create!(notification_type_id: id, event_date: Date.today)
             notifications << notification
           end
+        end
+      else
+        # Clear a prior notification if there was one
+        if prior_notification
+          prior_notification.update_attributes(cleared: true)
+          # Remove any tasks associated with this notification
+          prior_notification.tasks.destroy_all
         end
       end
     end
