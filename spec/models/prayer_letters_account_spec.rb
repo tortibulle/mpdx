@@ -22,14 +22,12 @@ describe PrayerLettersAccount do
         .to_return(body: '{}')
       pla_oauth2 = create(:prayer_letters_account_oauth2)
       pla_oauth2.contacts
-      expect(PrayerLettersOAuthUpgrader).to receive(:perform_async).exactly(0).times
     end
 
-    it 'uses OAuth1 and queues upgrade if no oauth2_token present' do
+    it 'uses OAuth1 if no oauth2_token present' do
       stub_request(:get, %r{https://www.prayerletters.com/api/v1/contacts\?oauth_nonce=.*&oauth_signature=.*&oauth_signature_method=HMAC-SHA1&oauth_timestamp=.*&oauth_token=MyString&oauth_version=1.0})
         .to_return(body: '{}')
       pla_oauth1 = create(:prayer_letters_account)
-      expect(PrayerLettersOAuthUpgrader).to receive(:perform_async)
       pla_oauth1.contacts
     end
   end
