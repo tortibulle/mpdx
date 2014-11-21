@@ -172,8 +172,14 @@ angular.module('mpdxApp')
                     var modalInstance = $modal.open({
                         templateUrl: '/templates/appeals/wizard.html',
                         controller: function($scope, $modalInstance){
-                            $scope.appeal = {};
+                            $scope.appeal = {
+                              validStatus: {},
+                              validTags: {}
+                            };
                             $scope.contactStatuses = window.railsConstants.contact.ACTIVE_STATUSES.concat(window.railsConstants.contact.INACTIVE_STATUSES).sort();
+                            api.call('get', 'contacts/tags?account_list_id=' + (window.current_account_list_id || ''), null, function(data) {
+                              $scope.contactTags = data.tags.sort();
+                            }, null, true);
 
                             $scope.cancel = function () {
                                 $modalInstance.dismiss('cancel');
@@ -184,32 +190,69 @@ angular.module('mpdxApp')
                             };
                         }
                     }).result.then(function (newAppeal) {
-                        var statusCount = 0;
-                        var strContactsUrl = 'contacts?per_page=5000&include=Contact.id&account_list_id=' + (window.current_account_list_id || '');
-                        angular.forEach(newAppeal.validStatus, function(value, key) {
-                            if(value){
-                                strContactsUrl = strContactsUrl + '&filters[status][]=' + encodeURIComponent(key);
-                                statusCount++;
-                            }
-                        });
-
                         var contactsObject = [];
-                        api.call('get', strContactsUrl, {}, function(data) {
-                            if(statusCount > 0){
-                                angular.forEach(data.contacts, function(c) {
-                                    contactsObject.push(c.id);
-                                });
-                            }
-
-                            api.call('post', 'appeals/?account_list_id=' + (window.current_account_list_id || ''), {
-                                name: newAppeal.name,
-                                amount: newAppeal.amount,
-                                contacts: contactsObject,
-                                account_list_id: (window.current_account_list_id || '')
-                            }, function() {
-                                refreshAppeals();
-                            });
+                        //remove false values
+                        angular.forEach(newAppeal.validStatus, function(value, key) {
+                          if(!value){ delete newAppeal.validStatus[key]; }
                         });
+                        angular.forEach(newAppeal.validTags, function(value, key) {
+                          if(!value){ delete newAppeal.validTags[key]; }
+                        });
+
+                        var getContactsByStatus = function(){
+                          if(!Object.keys(newAppeal.validStatus).length){
+                            //skip and go to tags
+                            getContactsByTag();
+                            return;
+                          }
+                          var strContactsUrl = 'contacts?per_page=5000&include=Contact.id&account_list_id=' + (window.current_account_list_id || '');
+                          angular.forEach(newAppeal.validStatus, function(value, key) {
+                            strContactsUrl = strContactsUrl + '&filters[status][]=' + encodeURIComponent(key);
+                          });
+
+                          api.call('get', strContactsUrl, {}, function(data) {
+                            angular.forEach(data.contacts, function(c) {
+                              contactsObject.push(c.id);
+                            });
+
+                            getContactsByTag();
+                          });
+                        };
+
+                        var getContactsByTag = function(){
+                          if(!Object.keys(newAppeal.validTags).length){
+                            //go to create appeal
+                            createAppeal();
+                            return;
+                          }
+                          var firstKey = _.first(Object.keys(newAppeal.validTags));
+                          var strContactsUrl = 'contacts?per_page=5000&include=Contact.id&account_list_id=' + (window.current_account_list_id || '');
+                          strContactsUrl = strContactsUrl + '&filters[tags][]=' + encodeURIComponent(firstKey);
+
+                          api.call('get', strContactsUrl, {}, function(data) {
+                            angular.forEach(data.contacts, function(c) {
+                              contactsObject.push(c.id);
+                            });
+
+                            delete newAppeal.validTags[firstKey];
+                            getContactsByTag();
+                          });
+                        };
+
+                        var createAppeal = function(){
+                          api.call('post', 'appeals', {
+                            name: newAppeal.name,
+                            amount: newAppeal.amount,
+                            contacts: _.uniq(contactsObject),
+                            account_list_id: (window.current_account_list_id || '')
+                          }, function() {
+                            refreshAppeals();
+                          });
+                        };
+
+
+                        //start with contacts by status
+                        getContactsByStatus();
                     });
                 };
 

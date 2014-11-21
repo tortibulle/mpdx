@@ -1,7 +1,7 @@
 <button ng-click="newAppeal()">Create New Appeal</button>
 <table class="list">
     <tbody>
-        <tr ng-repeat="appeal in appeals">
+        <tr ng-repeat="appeal in appeals | orderBy: 'name'">
             <td>
                 <div class="actions">
                     <a class="ico ico_edit" href ng-click="editAppeal(appeal.id)">Edit</a>
