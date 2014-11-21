@@ -155,10 +155,7 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def get_response(method, path, params = nil)
-    if oauth2_token.blank?
-      PrayerLettersOAuthUpgrader.perform_async
-      return oauth1_request(method, path, params)
-    end
+    return oauth1_request(method, path, params) if oauth2_token.blank?
     oauth2_request(method, path, params)
   end
 
