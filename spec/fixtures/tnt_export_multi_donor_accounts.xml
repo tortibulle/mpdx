@@ -1,0 +1,214 @@
+<Database>
+  <Application>TntMPD</Application>
+  <Version>3.0</Version>
+  <Name>Z:\home\dave\Downloads\empty_tnt.mpddb</Name>
+  <Tables>
+  <Contact>
+    <row id="1148825210">
+      <LastEdit>2014-03-03 14:25:39</LastEdit>
+      <CreatedDate>2011-11-22</CreatedDate>
+      <FileAs>Doe, John and Jane</FileAs>
+      <FileAsIsCustom>false</FileAsIsCustom>
+      <FullName>John and Jane Doe</FullName>
+      <FullNameIsCustom>false</FullNameIsCustom>
+      <Greeting>John and Jane</Greeting>
+      <GreetingIsCustom>false</GreetingIsCustom>
+      <Salutation>Dear John and Jane,</Salutation>
+      <SalutationIsCustom>false</SalutationIsCustom>
+      <ShortName>John and Jane Doe</ShortName>
+      <ShortNameIsCustom>false</ShortNameIsCustom>
+      <MailingAddressBlock>John and Jane Doe
+        123 Lenox New Lyme Rd.
+        Jefferson, OH  44047</MailingAddressBlock>
+      <MailingAddressIsDeliverable>true</MailingAddressIsDeliverable>
+      <Phone>4401112222</Phone>
+      <PhoneIsValid>true</PhoneIsValid>
+      <Email>John.Doe@example.com</Email>
+      <EmailIsValid>false</EmailIsValid>
+      <IsOrganization>false</IsOrganization>
+      <Title>Mr</Title>
+      <FirstName>John</FirstName>
+      <LastName>Doe</LastName>
+      <SpouseFirstName>Jane</SpouseFirstName>
+      <Deceased>false</Deceased>
+      <MailingAddressType>1</MailingAddressType>
+      <MailingStreetAddress>123 Lenox New Lyme Rd.</MailingStreetAddress>
+      <MailingCity>Jefferson</MailingCity>
+      <MailingState>OH</MailingState>
+      <MailingPostalCode>44047</MailingPostalCode>
+      <HomeStreetAddress>123 Lenox New Lyme Rd.</HomeStreetAddress>
+      <HomeCity>Jefferson</HomeCity>
+      <HomeState>OH</HomeState>
+      <HomePostalCode>44047</HomePostalCode>
+      <HomeCountryID>840</HomeCountryID>
+      <HomeCountry>United States of America</HomeCountry>
+      <HomeAddressIsDeliverable>true</HomeAddressIsDeliverable>
+      <HomeAddressBlock>John and Jane Doe
+        123 Lenox New Lyme Rd.
+        Jefferson, OH  44047</HomeAddressBlock>
+      <HomeAddressBlockIsCustom>false</HomeAddressBlockIsCustom>
+      <OtherCountryID>840</OtherCountryID>
+      <OtherCountry>United States of America</OtherCountry>
+      <OtherAddressIsDeliverable>false</OtherAddressIsDeliverable>
+      <OtherAddressBlockIsCustom>false</OtherAddressBlockIsCustom>
+      <BusinessCountryID>840</BusinessCountryID>
+      <BusinessCountry>United States of America</BusinessCountry>
+      <BusinessAddressIsDeliverable>false</BusinessAddressIsDeliverable>
+      <BusinessAddressBlockIsCustom>false</BusinessAddressBlockIsCustom>
+      <SpouseBusinessCountryID>840</SpouseBusinessCountryID>
+      <SpouseBusinessCountry>United States of America</SpouseBusinessCountry>
+      <SpouseBusinessAddressIsDeliverable>false</SpouseBusinessAddressIsDeliverable>
+      <SpouseBusinessAddressBlockIsCustom>false</SpouseBusinessAddressBlockIsCustom>
+      <PreferredPhoneType>0</PreferredPhoneType>
+      <PhoneIsValidMask>1</PhoneIsValidMask>
+      <PhoneCountryIDs>0=840</PhoneCountryIDs>
+      <HomePhone>4401112222</HomePhone>
+      <PreferredEmailTypes>2</PreferredEmailTypes>
+      <Email1>John.Doe@example.com</Email1>
+      <Email1IsValid>false</Email1IsValid>
+      <Email2IsValid>false</Email2IsValid>
+      <Email3IsValid>false</Email3IsValid>
+      <SpouseEmail1IsValid>false</SpouseEmail1IsValid>
+      <SpouseEmail2IsValid>false</SpouseEmail2IsValid>
+      <SpouseEmail3IsValid>false</SpouseEmail3IsValid>
+      <NotesAsRTF></NotesAsRTF>
+      <Notes></Notes>
+      <FamilySideID>0</FamilySideID>
+      <FamilyLevelID>0</FamilyLevelID>
+      <User1>EFT</User1>
+      <MapAddressType>0</MapAddressType>
+      <MapLat>41.730061</MapLat>
+      <MapLng>-80.765071</MapLng>
+      <MapStatus>CRC=303748135
+        NumberResults=1
+        FormattedAddress0=123 Lenox-New Lyme Road, Jefferson, OH 44047, USA
+        Type=ROOFTOP</MapStatus>
+      <PledgeAmount>20</PledgeAmount>
+      <PledgeFrequencyID>1</PledgeFrequencyID>
+      <PledgeReceived>true</PledgeReceived>
+      <PledgeStartDate>2014-02-24</PledgeStartDate>
+      <MPDPhaseID>60</MPDPhaseID>
+      <NextAsk>1899-12-30</NextAsk>
+      <NeverAsk>false</NeverAsk>
+      <LikelyToGiveID>0</LikelyToGiveID>
+      <SendNewsletter>true</SendNewsletter>
+      <NewsletterMediaPref>+P-E</NewsletterMediaPref>
+      <DirectDeposit>false</DirectDeposit>
+      <Magazine>false</Magazine>
+      <MonthlyPledge>20</MonthlyPledge>
+      <FirstGiftDate>2011-02-25</FirstGiftDate>
+      <LastGiftDate>2014-07-05</LastGiftDate>
+      <LastGiftAmount>20</LastGiftAmount>
+      <LastGiftOrganizationID>925479547</LastGiftOrganizationID>
+      <LastGiftOrgDonorCode>555555555</LastGiftOrgDonorCode>
+      <LastGiftPaymentMethod>EFT</LastGiftPaymentMethod>
+      <PrevYearTotal>0</PrevYearTotal>
+      <YearTotal>140</YearTotal>
+      <LifetimeTotal>1040</LifetimeTotal>
+      <LifetimeNumberOfGifts>23</LifetimeNumberOfGifts>
+      <LargestGift>100</LargestGift>
+      <GoodUntil>2014-08-04</GoodUntil>
+      <AveMonthlyGift>23.3333</AveMonthlyGift>
+      <LastDateInAve>2014-08-31</LastDateInAve>
+      <TwelveMonthTotal>140</TwelveMonthTotal>
+      <LastActivity>2014-03-06</LastActivity>
+      <LastAppointment>1899-12-30</LastAppointment>
+      <LastCall>1899-12-30</LastCall>
+      <LastPreCall>1899-12-30</LastPreCall>
+      <LastLetter>2013-12-10</LastLetter>
+      <LastVisit>1899-12-30</LastVisit>
+      <LastThank>2014-03-06</LastThank>
+      <LastChallenge>1899-12-30</LastChallenge>
+      <AppealsSinceLastGift>0</AppealsSinceLastGift>
+      <ChallengesSinceLastGift>0</ChallengesSinceLastGift>
+      <OrgDonorCodes>444444444,555555555</OrgDonorCodes>
+    </row>
+  </Contact>
+
+  <Donor>
+    <row id="132402006">
+      <LastEdit>2013-02-15 09:08:14</LastEdit>
+      <ContactID>1148825210</ContactID>
+      <IsSpouse>false</IsSpouse>
+      <OrganizationID>925479547</OrganizationID>
+      <OrgDonorCode>444444444</OrgDonorCode>
+      <OrgDonorName>Doe, John</OrgDonorName>
+      <Deceased>false</Deceased>
+      <IsOrganization>false</IsOrganization>
+      <Title>Mr</Title>
+      <FirstName>John</FirstName>
+      <MiddleName>P</MiddleName>
+      <LastName>Doe</LastName>
+      <NameLastUpdate>1899-12-30</NameLastUpdate>
+      <StreetAddress>1111 Sunnyslope Dr</StreetAddress>
+      <City>Pottstown</City>
+      <State>PA</State>
+      <PostalCode>19464-2665</PostalCode>
+      <CountryID>840</CountryID>
+      <AddressLastUpdate>2011-02-23</AddressLastUpdate>
+      <AddressReviewed>true</AddressReviewed>
+      <AddressAutoAccepted>false</AddressAutoAccepted>
+      <PhoneLastUpdate>1899-12-30</PhoneLastUpdate>
+      <PhoneReviewed>true</PhoneReviewed>
+      <PhoneAutoAccepted>false</PhoneAutoAccepted>
+      <MobilePhoneLastUpdate>1899-12-30</MobilePhoneLastUpdate>
+      <MobilePhoneReviewed>true</MobilePhoneReviewed>
+      <MobilePhoneAutoAccepted>false</MobilePhoneAutoAccepted>
+      <SpouseMobilePhoneLastUpdate>1899-12-30</SpouseMobilePhoneLastUpdate>
+      <SpouseMobilePhoneReviewed>true</SpouseMobilePhoneReviewed>
+      <SpouseMobilePhoneAutoAccepted>false</SpouseMobilePhoneAutoAccepted>
+      <EmailLastUpdate>1899-12-30</EmailLastUpdate>
+      <EmailReviewed>true</EmailReviewed>
+      <EmailAutoAccepted>false</EmailAutoAccepted>
+      <SpouseEmailLastUpdate>1899-12-30</SpouseEmailLastUpdate>
+      <SpouseEmailReviewed>true</SpouseEmailReviewed>
+      <SpouseEmailAutoAccepted>false</SpouseEmailAutoAccepted>
+      <MemoLastUpdate>1899-12-30</MemoLastUpdate>
+    </row>
+    <row id="511548010">
+      <LastEdit>2014-03-03 14:25:39</LastEdit>
+      <RefGuid>D0F94285-555555555</RefGuid>
+      <ContactID>1148825210</ContactID>
+      <IsSpouse>false</IsSpouse>
+      <OrganizationID>925479547</OrganizationID>
+      <OrgDonorCode>555555555</OrgDonorCode>
+      <OrgDonorName>Doe, John and Roberts, Rebekah</OrgDonorName>
+      <Deceased>false</Deceased>
+      <IsOrganization>false</IsOrganization>
+      <Title>Mr</Title>
+      <FirstName>John</FirstName>
+      <LastName>Doe</LastName>
+      <SpouseTitle>Mrs</SpouseTitle>
+      <SpouseFirstName>Jane</SpouseFirstName>
+      <SpouseLastName>Doe</SpouseLastName>
+      <NameLastUpdate>1899-12-30</NameLastUpdate>
+      <StreetAddress>123 Lenox New Lyme Rd</StreetAddress>
+      <City>Jefferson</City>
+      <State>OH</State>
+      <PostalCode>44047-9570</PostalCode>
+      <CountryID>840</CountryID>
+      <AddressLastUpdate>2013-12-02</AddressLastUpdate>
+      <AddressReviewed>false</AddressReviewed>
+      <AddressAutoAccepted>false</AddressAutoAccepted>
+      <Phone>4401112222</Phone>
+      <PhoneLastUpdate>2013-12-02</PhoneLastUpdate>
+      <PhoneReviewed>true</PhoneReviewed>
+      <PhoneAutoAccepted>true</PhoneAutoAccepted>
+      <MobilePhoneLastUpdate>1899-12-30</MobilePhoneLastUpdate>
+      <MobilePhoneReviewed>true</MobilePhoneReviewed>
+      <MobilePhoneAutoAccepted>false</MobilePhoneAutoAccepted>
+      <SpouseMobilePhoneLastUpdate>1899-12-30</SpouseMobilePhoneLastUpdate>
+      <SpouseMobilePhoneReviewed>true</SpouseMobilePhoneReviewed>
+      <SpouseMobilePhoneAutoAccepted>false</SpouseMobilePhoneAutoAccepted>
+      <Email>janedoe@example.com</Email>
+      <EmailLastUpdate>2013-12-02</EmailLastUpdate>
+      <EmailReviewed>false</EmailReviewed>
+      <EmailAutoAccepted>false</EmailAutoAccepted>
+      <SpouseEmailLastUpdate>1899-12-30</SpouseEmailLastUpdate>
+      <SpouseEmailReviewed>true</SpouseEmailReviewed>
+      <SpouseEmailAutoAccepted>false</SpouseEmailAutoAccepted>
+      <MemoLastUpdate>1899-12-30</MemoLastUpdate>
+    </row>
+  </Donor>
+  </Tables>
+</Database>

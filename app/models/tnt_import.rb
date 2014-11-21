@@ -128,6 +128,8 @@ class TntImport
         primary_contact_person.add_spouse(contact_spouse)
       end
 
+      merge_dups_by_donor_accts(contact, donor_accounts) if @import.override?
+
       @tnt_contacts[row['id']] = contact
 
       next unless true?(row['IsOrganization'])
@@ -151,6 +153,16 @@ class TntImport
     end
 
     @tnt_contacts
+  end
+
+  # If the user had two donor accounts in the same contact in Tnt, then  merge different contacts with those in MPDX.
+  def merge_dups_by_donor_accts(tnt_contact, donor_accounts)
+    @account_list.contacts.where.not(id: tnt_contact.id).joins(:donor_accounts)
+      .where(donor_accounts: { id: donor_accounts.map(&:id) }).readonly(false)
+      .each do |dup_contact_matching_donor_account|
+
+      tnt_contact.reload.merge(dup_contact_matching_donor_account)
+    end
   end
 
   def import_tasks(tnt_contacts = {})
@@ -420,9 +432,9 @@ class TntImport
       donor_accounts = row['OrgDonorCodes'].to_s.split(',').map do |account_number|
         donor_account = Retryable.retryable do
           da = designation_profile.organization.donor_accounts
-          .where('account_number = :account_number OR account_number = :padded_account_number',
-                 account_number: account_number,
-                 padded_account_number: account_number.rjust(DONOR_NUMBER_NORMAL_LEN, '0')).first
+            .where('account_number = :account_number OR account_number = :padded_account_number',
+                   account_number: account_number,
+                   padded_account_number: account_number.rjust(DONOR_NUMBER_NORMAL_LEN, '0')).first
 
           unless da
             da = designation_profile.organization.donor_accounts.new(account_number: account_number, name: row['FileAs'])
