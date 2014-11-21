@@ -240,7 +240,7 @@ angular.module('mpdxApp')
                         };
 
                         var createAppeal = function(){
-                          api.call('post', 'appeals/?account_list_id=' + (window.current_account_list_id || ''), {
+                          api.call('post', 'appeals', {
                             name: newAppeal.name,
                             amount: newAppeal.amount,
                             contacts: _.uniq(contactsObject),
