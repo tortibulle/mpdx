@@ -146,7 +146,7 @@ Mpdx::Application.routes.draw do
   developer_user_constraint = lambda { |request| request.env["rack.session"] and
                                   request.env["rack.session"]["warden.user.user.key"] and
                                   request.env["rack.session"]["warden.user.user.key"][0] and
-                                  ['Starcher','Sabelko','Oberstadt','Meyer'].include?(User.find(request.env["rack.session"]["warden.user.user.key"][0].first).last_name) }
+                                  User.find(request.env["rack.session"]["warden.user.user.key"][0].first).developer }
   constraints developer_user_constraint do
     mount Sidekiq::Web => '/sidekiq'
   end
