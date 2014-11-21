@@ -1,6 +1,4 @@
 class GoogleContactsCache
-  SECONDS_BETWEEN_500_ERR_RETRIES = 30
-
   def initialize(google_account)
     @account = google_account
   end
@@ -30,15 +28,11 @@ class GoogleContactsCache
     cached_g_contact = @g_contact_by_id[remote_id]
     return cached_g_contact if cached_g_contact
     return nil if @all_g_contacts_cached
-    g_contact = find_by_id_api(remote_id)
+    g_contact = Retryable.retryable { @account.contacts_api_user.get_contact(remote_id) }
     g_contact unless g_contact.deleted?
   rescue OAuth2::Error => e
     # Just return nil for a 404 Contact Not Found error, otherwise raise the error
     raise e unless e.response.status == 404
-  end
-
-  def find_by_id_api(remote_id)
-    retry_on_500_errors { @account.contacts_api_user.get_contact(remote_id) }
   end
 
   def select_by_name(first_name, last_name)
@@ -54,12 +48,8 @@ class GoogleContactsCache
     elsif @all_g_contacts_cached
       []
     else
-      query_by_full_name_api(name)
+      Retryable.retryable { @account.contacts_api_user.query_contacts(name, showdeleted: false) }
     end
-  end
-
-  def query_by_full_name_api(name)
-    retry_on_500_errors { @account.contacts_api_user.query_contacts(name, showdeleted: false) }
   end
 
   def remove_g_contact(g_contact)
@@ -67,16 +57,5 @@ class GoogleContactsCache
     g_contacts_by_name = @g_contacts_by_name["#{g_contact.given_name} #{g_contact.family_name}"]
     g_contacts_by_name.delete(g_contact) if g_contacts_by_name
     @all_g_contacts_cached = false
-  end
-
-  def retry_on_500_errors(num_retries = 2, &block)
-    yield
-  rescue OAuth2::Error => e
-    if e.response.status == 500 && num_retries > 0
-      sleep(SECONDS_BETWEEN_500_ERR_RETRIES)
-      retry_on_500_errors(num_retries - 1, &block)
-    else
-      raise e
-    end
   end
 end
