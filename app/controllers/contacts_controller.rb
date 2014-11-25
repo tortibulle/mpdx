@@ -207,9 +207,9 @@ class ContactsController < ApplicationController
           attributes[:first_name] = _('Unknown') if attributes[:first_name].blank?
           attributes[:last_name] = _('Unknown') if attributes[:last_name].blank?
           contact_name = "#{attributes[:last_name]}, #{attributes[:first_name]}"
-          contact_name += " & #{attributes[:spouse_name]}" if attributes[:spouse_name].present?
+          contact_name += " & #{attributes[:spouse_first_name]}" if attributes[:spouse_first_name].present?
           contact_greeting = "#{attributes[:first_name]}"
-          contact_greeting += " & #{attributes[:spouse_name]}" if attributes[:spouse_name].present?
+          contact_greeting += " & #{attributes[:spouse_first_name]}" if attributes[:spouse_first_name].present?
           contact = current_account_list.contacts.create(name: contact_name, greeting: contact_greeting, notes: attributes[:notes])
 
           begin
@@ -218,8 +218,8 @@ class ContactsController < ApplicationController
             contact.people << person
 
             # create spouse
-            if attributes[:spouse_name].present?
-              spouse = Person.create(first_name: attributes[:spouse_name], last_name: attributes[:last_name], phone: attributes[:spouse_phone], email: attributes[:spouse_email])
+            if attributes[:spouse_first_name].present?
+              spouse = Person.create(first_name: attributes[:spouse_first_name], last_name: attributes[:last_name], phone: attributes[:spouse_phone], email: attributes[:spouse_email])
               contact.people << spouse
             end
 

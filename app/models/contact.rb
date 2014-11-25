@@ -202,8 +202,12 @@ class Contact < ActiveRecord::Base
     person_id
   end
 
-  def spouse_name
+  def spouse_first_name
     spouse.try(:first_name)
+  end
+
+  def spouse_last_name
+    spouse.try(:last_name)
   end
 
   def spouse_phone
@@ -218,13 +222,17 @@ class Contact < ActiveRecord::Base
     return name if siebel_organization?
     return self[:greeting] if self[:greeting].present?
     return first_name if spouse.try(:deceased)
-    return spouse_name if primary_or_first_person.deceased && spouse
-    [first_name, spouse_name].compact.join(_(' and '))
+    return spouse_first_name if primary_or_first_person.deceased && spouse
+    [first_name, spouse_first_name].compact.join(" #{_('and')} ")
   end
 
   def envelope_greeting
-    return name if siebel_organization? || greeting.blank?
-    greeting.include?(last_name.to_s) ? greeting : [greeting, last_name].compact.join(' ')
+    return name if siebel_organization?
+    if spouse_last_name.nil? || last_name == spouse_last_name
+      [[first_name, spouse_first_name].compact.join(" #{_('and')} "), last_name].compact.join(' ')
+    else
+      [[first_name, last_name].compact.join(' '), [spouse_first_name, spouse_last_name].compact.join(' ')].join(" #{_('and')} ")
+    end
   end
 
   def siebel_organization?
