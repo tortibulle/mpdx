@@ -461,6 +461,10 @@ $ ->
     <%#$(document).on 'blur', '[data-behavior*=social-field]', ->%>
       <%#$('[data-behavior=suggestions]', this).hide()%>
 
+  $('#new_contact, .edit_contact').areYouSure({
+    message: 'It looks like you were editting a contact. If you leave before submitting, your changes will be lost.'
+  })
+
 $.mpdx.updateSelectedContactIds = ->
   ids = []
   $('[name="contact_ids[]"]:checked').each ->
