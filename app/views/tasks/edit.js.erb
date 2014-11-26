@@ -28,3 +28,7 @@ if($('#modal_task_start_at_1i').length) {
 if($('#modal_task_completed_at_1i').length) {
   $('[data-calendar]').datepicker('setDate', $('#modal_task_completed_at_1i').val() + '-' + $('#modal_task_completed_at_2i').val() + '-' + $('#modal_task_completed_at_3i').val());
 }
+
+$('#task_modal_form').areYouSure({
+  message: '<%= _('It looks like you were editting a task. If you leave before submitting, your changes will be lost.') %>'
+})

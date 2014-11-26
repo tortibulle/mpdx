@@ -180,7 +180,9 @@ $ ->
               click: ->
                 $(this).dialog("close")
             }
-          ]
+          ],
+          close: ->
+            $('#task_modal_form').removeClass('dirty')
         }
         false
 
@@ -312,10 +314,8 @@ $ ->
             }
           ],
           close: ->
-            window.onbeforeunload = undefined
+            $('#referrals_modal form').removeClass('dirty')
         }
-        window.onbeforeunload = ->
-          return 'It looks like you were adding some referrals. If you leave before submitting your changes will be lost.'
 
 
       # Filter contact list
