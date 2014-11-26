@@ -21,7 +21,7 @@ module ApplicationHelper
     fields = f.fields_for(association, new_object, child_index: "new_#{association}") do |builder|
       render(partial, builder: builder, object: f.object)
     end
-    link_to_function(name, raw("addFields(this, \"#{association}\", \"#{escape_javascript(fields)}\")"), class: 'add_field')
+    link_to(name, 'javascript:void(0)', onclick: "addFields(this, \"#{association}\", \"#{escape_javascript(fields).html_safe}\")", class: 'add_field')
   end
 
   def link_to_clear_contact_filters(f)

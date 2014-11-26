@@ -19,7 +19,7 @@ describe Contact do
       contact.addresses_attributes = [{ id: address.id, _destroy: '1' }]
       contact.save!
 
-      address.reload.deleted.should == true
+      expect { address.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it 'should update an address' do

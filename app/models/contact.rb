@@ -11,7 +11,7 @@ class Contact < ActiveRecord::Base
   has_many :donations, through: :donor_accounts
   belongs_to :account_list
   has_many :contact_people, dependent: :destroy
-  has_many :people, -> { order('contact_people.primary::int desc') }, through: :contact_people
+  has_many :people, through: :contact_people
   has_one :primary_contact_person, -> { where(primary: true) }, class_name: 'ContactPerson'
   has_one :primary_person, through: :primary_contact_person, source: :person
   has_one :spouse_contact_person, -> { where(['"primary" = ? OR "primary" is NULL', false]) }, class_name: 'ContactPerson'

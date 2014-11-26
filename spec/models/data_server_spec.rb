@@ -112,7 +112,7 @@ describe DataServer do
       expect {
         @data_server.import_donors(profile)
       }.to change(Person, :count)
-      new_person = @account_list2.contacts.last.people.last
+      new_person = @account_list2.contacts.last.people.order('contact_people.primary::int desc').references(:contact_people).last
       new_person.last_name.should == 'Rodriguez'
       new_person.middle_name.should == ''
       new_person.donor_accounts.last.should == donor_account
