@@ -530,8 +530,4 @@ $.mpdx.loadSocialStream = ->
 
 $.mpdx.reloadContact = ->
   return if !$('#contentbody').attr('data-contact-id')
-  $('#page_spinner').dialog({modal: true, closeOnEscape: false})
-  $.ajax {
-    url: '/contacts/' + $('#contentbody').attr('data-contact-id'),
-    dataType: 'script'
-  }
+  location.reload()
