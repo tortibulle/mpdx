@@ -123,7 +123,7 @@ class MailChimpAccount < ActiveRecord::Base
     case
     when e.message.include?('code 232') || e.message.include?('code 215')
       # do nothing
-    when e.message.include?('code 232') || e.message.include?('code 200')
+    when e.message.include?('code 200')
       # Invalid MailChimp List ID
       update_column(:primary_list_id, nil)
     else
@@ -166,7 +166,9 @@ class MailChimpAccount < ActiveRecord::Base
       when e.message.include?('code 200') # Invalid MailChimp List ID (code 200)
         # TODO: Notify user and nulify primary_list_id until they fix the problem
         update_column(:primary_list_id, nil)
-      when e.message.include?('code 502') # Invalid Email Address: "Rajah Tony" <amrajah@gmail.com> (code 502)
+      when e.message.include?('code 502') || e.message.include?('code 220')
+        # Invalid Email Address: "Rajah Tony" <amrajah@gmail.com> (code 502)
+        # "jake.adams.photo@gmail.cm" has been banned (code 220) - This is usually a typo in an email address
       else
         raise e
       end
