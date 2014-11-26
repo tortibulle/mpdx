@@ -92,7 +92,7 @@ class MailChimpAccount < ActiveRecord::Base
     send(method, *args)
   rescue Gibbon::MailChimpError => e
     case
-    when e.message.include?('API Key Disabled')
+    when e.message.include?('API Key Disabled') || e.message.include?('code 104')
       update_column(:active, false)
       AccountMailer.invalid_mailchimp_key(account_list).deliver
     when e.message.include?('code -91') # A backend database error has occurred. Please try again later or report this issue. (code -91)
