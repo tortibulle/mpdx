@@ -26,9 +26,12 @@ class PrayerLettersAccount < ActiveRecord::Base
 
     account_list.contacts.includes([:primary_address, { primary_person: :companies }]).each do |contact|
       next unless contact.send_physical_letter? &&
-                  contact.addresses.present? &&
+                  contact.mailing_address.present? &&
                   contact.active? &&
-                  contact.mailing_address.valid_mailing_address?
+                  contact.mailing_address.valid_mailing_address? &&
+                  contact.primary_person.present? &&
+                  contact.envelope_greeting.present? &&
+                  contact.name.present?
       params = {
         name: contact.envelope_greeting,
         greeting: contact.greeting,
@@ -160,12 +163,15 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def oauth2_request(method, path, params = nil)
+    return unless active?
+
     RestClient::Request.execute(method: method, url: SERVICE_URL + path, payload: params,
                                 headers: { 'Authorization' => "Bearer #{ URI.encode(oauth2_token) }" })
   rescue RestClient::Unauthorized
     handle_bad_token
   rescue => e
     Airbrake.raise_or_notify(e, parameters:  { method: method, path: path, params: params })
+    raise
   end
 
   def oauth1_request(method, path, params = nil)
