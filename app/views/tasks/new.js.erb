@@ -18,3 +18,6 @@ $('[data-calendar]').datepicker({
     $('#task_modal_form [id$=_3i]').val(day);
   }
 });
+$('#task_modal_form').areYouSure({
+  message: '<%= _('It looks like you were adding a task. If you leave before submitting, your changes will be lost.') %>'
+})

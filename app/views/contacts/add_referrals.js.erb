@@ -1,3 +1,6 @@
 $('#referrals_modal').html('<%= j(render('add_referrals')) %>')
 $('#referrals_modal').dialog({width: 900, maxHeight: 600, modal: true})
 $('#referrals_modal').dialog('option', 'position', { my: "center", at: "center", of: window })
+$('#referrals_modal form').areYouSure({
+  message: '<%= _('It looks like you were adding some referrals. If you leave before submitting, your changes will be lost.') %>'
+})

@@ -23,6 +23,7 @@
 //= require jquery.browser.min
 //= require jquery.select-to-autocomplete
 //= require jquery.hoverIntent.minified
+//= require jquery.are-you-sure
 //= require highcharts
 //= require tooltipsy.min
 //= require mpdx
