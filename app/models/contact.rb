@@ -228,7 +228,7 @@ class Contact < ActiveRecord::Base
 
   def envelope_greeting
     return name if siebel_organization?
-    if spouse_last_name.nil? || last_name == spouse_last_name
+    if spouse_last_name.blank? || last_name == spouse_last_name
       [[first_name, spouse_first_name].compact.join(" #{_('and')} "), last_name].compact.join(' ')
     else
       [[first_name, last_name].compact.join(' '), [spouse_first_name, spouse_last_name].compact.join(' ')].join(" #{_('and')} ")
