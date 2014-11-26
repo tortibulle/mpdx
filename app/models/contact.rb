@@ -38,7 +38,7 @@ class Contact < ActiveRecord::Base
   scope :with_referrals, -> { joins(:contact_referrals_by_me).uniq }
   scope :active, -> { where(active_conditions) }
   scope :inactive, -> { where(inactive_conditions) }
-  scope :late_by, -> (min_days, max_days = nil) { financial_partners.order(:name).keep_if { |c| c.late_by?(min_days, max_days) } }
+  scope :late_by, -> (min_days, max_days = nil) { financial_partners.order(:name).to_a.keep_if { |c| c.late_by?(min_days, max_days) } }
   scope :created_between, -> (start_date, end_date) { where('contacts.created_at BETWEEN ? and ?', start_date.in_time_zone, (end_date + 1.day).in_time_zone) }
 
   PERMITTED_ATTRIBUTES = [
