@@ -171,7 +171,6 @@ class PrayerLettersAccount < ActiveRecord::Base
     handle_bad_token
   rescue => e
     Airbrake.raise_or_notify(e, parameters:  { method: method, path: path, params: params })
-    raise
   end
 
   def oauth1_request(method, path, params = nil)
