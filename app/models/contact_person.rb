@@ -5,8 +5,6 @@ class ContactPerson < ActiveRecord::Base
   belongs_to :contact, touch: true
   belongs_to :person
 
-  validates :contact_id, :person_id, presence: true
-
   after_commit :delete_orphaned_person, on: :destroy
   before_create :set_primary_contact
 
