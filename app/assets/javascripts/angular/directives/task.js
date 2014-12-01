@@ -4,7 +4,8 @@ angular.module('mpdxApp')
             restrict: 'A',
             templateUrl: '/templates/tasks/task.html',
             scope: {
-                task: '='
+                task: '=',
+                multiselect: '@'
             },
             link: function (scope, element, attrs){
             },
