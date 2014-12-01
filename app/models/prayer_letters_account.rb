@@ -160,8 +160,6 @@ class PrayerLettersAccount < ActiveRecord::Base
                                 headers: { 'Authorization' => "Bearer #{ URI.encode(oauth2_token) }" })
   rescue RestClient::Unauthorized
     handle_bad_token
-  rescue => e
-    Airbrake.raise_or_notify(e, parameters:  { method: method, path: path, params: params })
   end
 
   def handle_bad_token
