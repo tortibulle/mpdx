@@ -55,12 +55,15 @@ class Person::GmailAccount
   end
 
   def log_email(gmail_message, account_list, contact, person, result)
-    if gmail_message.message.multipart?
-      message = gmail_message.message.text_part.body.decoded
-    else
-      message = gmail_message.message.body.decoded
-    end
-    message = message.to_s.unpack('C*').pack('U*').force_encoding('UTF-8').encode!
+    message =
+      if gmail_message.message.multipart?
+        gmail_message.message.text_part
+      else
+        gmail_message.message
+      end
+    return unless message
+
+    message = message.body.decoded.to_s.unpack('C*').pack('U*').force_encoding('UTF-8').encode!
     return unless message.strip.present?
     google_email = @google_account.google_emails.find_or_create_by!(google_email_id: gmail_message.msg_id)
     return unless contact.tasks.where(id: google_email.activities.pluck(:id)).empty?
