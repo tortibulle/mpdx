@@ -54,6 +54,7 @@ module GoogleContactSync
 
       g_contact.prep_changes(g_contact_field => synced_value) if synced_value != g_contact.send(g_contact_field)
       record[field] = synced_value
+      record[field] ||= 'Unknown' if field == :first_name # MPDX doesn't allow blank first names
     end
   end
 
