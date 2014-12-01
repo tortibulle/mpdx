@@ -11,11 +11,7 @@ class PrayerLettersAccount < ActiveRecord::Base
 
   after_create :queue_subscribe_contacts
 
-  validates :oauth1_or_2_tokens, :account_list_id,  presence: true
-
-  def oauth1_or_2_tokens
-    oauth2_token.present? || (token.present? & secret.present?)
-  end
+  validates :oauth2_token, :account_list_id,  presence: true
 
   def queue_subscribe_contacts
     async(:subscribe_contacts)
@@ -158,11 +154,6 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def get_response(method, path, params = nil)
-    return oauth1_request(method, path, params) if oauth2_token.blank?
-    oauth2_request(method, path, params)
-  end
-
-  def oauth2_request(method, path, params = nil)
     return unless active?
 
     RestClient::Request.execute(method: method, url: SERVICE_URL + path, payload: params, timeout: 20,
@@ -171,30 +162,6 @@ class PrayerLettersAccount < ActiveRecord::Base
     handle_bad_token
   rescue => e
     Airbrake.raise_or_notify(e, parameters:  { method: method, path: path, params: params })
-  end
-
-  def oauth1_request(method, path, params = nil)
-    consumer = OAuth::Consumer.new(APP_CONFIG['prayer_letters_key'], APP_CONFIG['prayer_letters_secret'],  site: SERVICE_URL, scheme: :query_string, oauth_version: '1.0')
-    oauth_token = OAuth::Token.new(token, secret)
-    response = consumer.request(method, path, oauth_token, {}, params)
-    case response.code.to_i
-    when 200, 201, 202, 204
-      response.body
-    when 401
-      handle_bad_token
-    else
-      fail response.body
-    end
-  rescue => e
-    Airbrake.raise_or_notify(e, parameters:  { method: method, path: path, params: params })
-  end
-
-  def upgrade_to_oauth2
-    return if oauth2_token.present?
-    json = JSON.parse(oauth1_request(:get, '/api/oauth1/v2migration'))
-    update(oauth2_token: json['access_token'])
-  rescue => e
-    Airbrake.raise_or_notify(e)
   end
 
   def handle_bad_token
