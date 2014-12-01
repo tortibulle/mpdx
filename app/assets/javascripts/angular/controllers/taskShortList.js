@@ -4,6 +4,7 @@ angular.module('mpdxApp').controller('taskShortListController', function ($scope
         $scope.comments = {};
         $scope.people = {};
         $scope.history = page == 'contactHistory';
+        $scope.loading = true;
 
         var taskUrl;
         if(page === 'contact') {
@@ -30,6 +31,7 @@ angular.module('mpdxApp').controller('taskShortListController', function ($scope
 
         api.call('get', taskUrl, {}, function(tData) {
             if (tData.tasks.length === 0) {
+                $scope.loading = false;
                 return;
             }
 
@@ -54,6 +56,7 @@ angular.module('mpdxApp').controller('taskShortListController', function ($scope
                 $scope.tasks = tData.tasks;
                 $scope.comments = _.union(tData.comments, $scope.comments);
                 $scope.people = _.union(tData.people, $scope.people);
+                $scope.loading = false;
             }, null, true);
         });
     };
@@ -87,5 +90,9 @@ angular.module('mpdxApp').controller('taskShortListController', function ($scope
         var index = $scope.tasks.indexOf(oldTask);
         if(index != -1)
             $scope.tasks.splice(index, 1);
+    };
+
+    $scope.noContacts = function() {
+        return !$scope.tasks.length && !$scope.loading;
     };
 });

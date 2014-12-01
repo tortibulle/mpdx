@@ -151,7 +151,8 @@
               <tr task="task" ng-repeat="task in tasks" id="task_{{task.id}}"></tr>
             </tbody>
           </table>
-          <p ng-hide="tasks.length"><%= _('No tasks found for this contact.') %></p>
+          <p ng-show="loading"><%= _('Loading contact tasks...') %></p>
+          <p ng-show="noContacts()"><%= _('No tasks found for this contact.') %></p>
         </div>
         <div id="history-tab" ng-controller="taskShortListController" ng-init="init('contactHistory','<%= contact.id %>')">
           <table class="list tasklist">
@@ -159,7 +160,8 @@
               <tr task="task" ng-repeat="task in tasks" id="task_{{task.id}}"></tr>
             </tbody>
           </table>
-          <p ng-hide="tasks.length"><%= _('No completed tasks found for this contact.') %></p>
+          <p ng-show="loading"><%= _('Loading contact history...') %></p>
+          <p ng-show="noContacts()"><%= _('No completed tasks found for this contact.') %></p>
         </div>
         <div id="referrals-tab">
           <%= spinner(extra: 'referrals', visible: true) %>
