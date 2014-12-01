@@ -36,16 +36,21 @@ class Person::GmailAccount
             next if email_addresses.include?(email)
             email_addresses << email
 
-            # sent emails
-            sent = g.mailbox('[Gmail]/Sent Mail')
-            sent.emails(to: email, after: since).each do |gmail_message|
-              log_email(gmail_message, account_list, contact, person, 'Done')
-            end
+            begin
+              # sent emails
+              sent = g.mailbox('[Gmail]/Sent Mail')
+              sent.emails(to: email, after: since).each do |gmail_message|
+                log_email(gmail_message, account_list, contact, person, 'Done')
+              end
 
-            # received emails
-            all = g.mailbox('[Gmail]/All Mail')
-            all.emails(from: email, after: since).each do |gmail_message|
-              log_email(gmail_message, account_list, contact, person, 'Received')
+              # received emails
+              all = g.mailbox('[Gmail]/All Mail')
+              all.emails(from: email, after: since).each do |gmail_message|
+                log_email(gmail_message, account_list, contact, person, 'Received')
+              end
+            rescue Net::IMAP::NoResponseError => e
+              # swallow it if the user doesn't have those mailboxes
+              raise unless e.message.include?('Unknown Mailbox')
             end
           end
         end
