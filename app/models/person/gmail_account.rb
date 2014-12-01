@@ -14,7 +14,10 @@ class Person::GmailAccount
       client = Gmail.connect(:xoauth2, @google_account.email, @google_account.token)
       yield client
     ensure
-      client.logout
+      begin
+        client.logout
+      rescue
+      end
     end
   end
 
