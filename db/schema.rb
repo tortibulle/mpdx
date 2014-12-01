@@ -389,6 +389,7 @@ ActiveRecord::Schema.define(version: 20141201142757) do
     t.string   "remote_id"
     t.string   "location",   limit: 50
     t.boolean  "historic",              default: false
+    t.boolean  "bad",                   default: false, null: false
   end
 
   add_index "email_addresses", ["email", "person_id"], name: "index_email_addresses_on_email_and_person_id", unique: true, using: :btree
