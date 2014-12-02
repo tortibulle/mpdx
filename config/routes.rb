@@ -1,5 +1,5 @@
 require 'sidekiq/web'
-Mpdx::Application.routes.draw do
+Rails.application.routes.draw do
 
   resources :google_integrations, only: [:show, :edit, :update, :create] do
     member do
