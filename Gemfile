@@ -5,11 +5,11 @@ gem 'rails', '~> 4.1.0'
 
 # Gems used only for assets and not required
 # in production environments by default.
-gem 'sass-rails',   '~> 4.0.1'
+gem 'sass-rails',   '~> 4.0.3'
 gem 'coffee-rails', '~> 4.0.1'
 
 gem 'execjs' #, '~> 1.4.0'
-# gem 'therubyracer'
+# gem 'therubyracer', platforms: :ruby
 # gem 'therubyrhino', '~> 2.0.2'
 
 gem 'uglifier', '~> 2.4.0'
@@ -135,4 +135,8 @@ group :test do
   gem 'resque_spec'
   gem 'emoji_spec', git: 'https://gist.github.com/6112257.git'
   gem 'rubocop'
+end
+
+group :doc do
+  gem 'sdoc', '~> 0.4.0'
 end
