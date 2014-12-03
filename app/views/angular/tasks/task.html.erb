@@ -84,7 +84,7 @@
 
                 <div class="body">
                     <strong>{{getPerson(getComment(comment).person_id).name}}</strong>
-                    <p class="preformatted" ng-bind="getComment(comment).body"></p>
+                    <p ng-bind="getComment(comment).body"></p>
                 </div>
                 <span class="time">{{getComment(comment).created_at | date:'MM/dd/yyyy, h:mma'}}</span>
             </div>
