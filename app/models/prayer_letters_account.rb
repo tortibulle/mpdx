@@ -113,15 +113,15 @@ class PrayerLettersAccount < ActiveRecord::Base
     get_response(:post, "/api/v1/contacts/#{contact.prayer_letters_id}", contact_params(contact))
   rescue AccessError
     # do nothing
-  rescue => e
-    json = JSON.parse(e.message)
-    case json['status']
-    when 410, 404
-      contact.update_column(:prayer_letters_id, nil)
-      create_contact(contact)
-    else
-      raise e.message
-    end
+  rescue RestClient::Gone
+    handle_missing_contact(contact)
+  rescue RestClient::ResourceNotFound
+    handle_missing_contact(contact)
+  end
+
+  def handle_missing_contact(contact)
+    contact.update_column(:prayer_letters_id, nil)
+    subscribe_contacts
   end
 
   def delete_contact(contact)
