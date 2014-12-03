@@ -243,6 +243,26 @@ class TntImport
   end
 
   def update_contact(contact, row)
+    update_contact_basic_fields(contact, row)
+
+    if (@import.override? || contact.send_newsletter.blank?) && true?(row['SendNewsletter'])
+      case row['NewsletterMediaPref']
+      when '+E', '+E-P'
+        contact.send_newsletter = 'Email'
+      when '+P', '+P-E'
+        contact.send_newsletter = 'Physical'
+      else
+        contact.send_newsletter = 'Both'
+      end
+    end
+
+    tags = @tags_by_contact_id[row['id']]
+    tags.each { |tag| contact.tag_list.add(tag) } if tags
+
+    contact.save
+  end
+
+  def update_contact_basic_fields(contact, row)
     contact.name = row['FileAs'] if @import.override? || contact.name.blank?
     contact.full_name = row['FullName'] if @import.override? || contact.full_name.blank?
     contact.greeting = row['Greeting'] if @import.override? || contact.greeting.blank?
@@ -260,17 +280,6 @@ class TntImport
     contact.never_ask = true?(row['NeverAsk']) if @import.override? || contact.never_ask.blank?
     contact.church_name = row['ChurchName'] if @import.override? || contact.church_name.blank?
 
-    if (@import.override? || contact.send_newsletter.blank?) && true?(row['SendNewsletter'])
-      case row['NewsletterMediaPref']
-      when '+E', '+E-P'
-        contact.send_newsletter = 'Email'
-      when '+P', '+P-E'
-        contact.send_newsletter = 'Physical'
-      else
-        contact.send_newsletter = 'Both'
-      end
-    end
-
     contact.direct_deposit = true?(row['DirectDeposit']) if @import.override? || contact.direct_deposit.blank?
     contact.magazine = true?(row['Magazine']) if @import.override? || contact.magazine.blank?
     contact.last_activity = parse_date(row['LastActivity']) if (@import.override? || contact.last_activity.blank?) && row['LastActivity'].present?
@@ -282,11 +291,6 @@ class TntImport
     contact.tag_list.add(@import.tags, parse: true) if @import.tags.present?
     contact.tnt_id = row['id']
     contact.addresses_attributes = build_address_array(row, contact, @import.override)
-
-    tags = @tags_by_contact_id[row['id']]
-    tags.each { |tag| contact.tag_list.add(tag) } if tags
-
-    contact.save
   end
 
   def true?(val)
