@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe PrayerLettersAccount do
+  let(:pla) { create(:prayer_letters_account) }
+
   context '#get_response' do
 
     it 'marks token as invalid if response is a 401 for OAuth2' do
@@ -27,8 +29,6 @@ describe PrayerLettersAccount do
   end
 
   context '#handle_bad_token' do
-    let(:pla) { create(:prayer_letters_account) }
-
     it 'sends an email to the account users' do
       AccountMailer.should_receive(:prayer_letters_invalid_token).with(an_instance_of(AccountList)).and_return(double(deliver: true))
 
@@ -45,6 +45,26 @@ describe PrayerLettersAccount do
       }.to raise_exception(PrayerLettersAccount::AccessError)
 
       expect(pla.valid_token).to be_false
+    end
+  end
+
+  context 'handle 410 and 404 errors' do
+    let(:contact) { create(:contact) }
+
+    def stub_update_error(code)
+      stub_request(:post,  'https://www.prayerletters.com/api/v1/contacts/').to_return(status: code)
+    end
+
+    it 're-subscribes the contact list on 410' do
+      stub_update_error(410)
+      expect(pla).to receive(:subscribe_contacts)
+      pla.update_contact(contact)
+    end
+
+    it 're-subscribes the contact list on 404' do
+      stub_update_error(404)
+      expect(pla).to receive(:subscribe_contacts)
+      pla.update_contact(contact)
     end
   end
 end
