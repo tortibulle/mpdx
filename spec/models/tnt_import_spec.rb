@@ -260,6 +260,18 @@ describe TntImport do
 
   end
 
+  context '#import groups' do
+    it 'imports groups as tags' do
+      account_list = build(:account_list)
+      import = TntImport.new(create(:tnt_import_groups, account_list: account_list))
+      import.send(:import_contacts)
+
+      expect(Contact.all.count).to eq(1)
+      contact = Contact.all.first
+      expect(contact.tag_list).to eq(%w(testers category-1 group-with-dave))
+    end
+  end
+
   context '#import' do
     it 'performs an import' do
       import.should_receive(:xml).and_return('foo')

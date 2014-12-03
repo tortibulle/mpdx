@@ -7,6 +7,7 @@ class TntImport
     @account_list = @import.account_list
     @user = @import.user
     @designation_profile = @account_list.designation_profiles.first || @user.designation_profiles.first
+    @tags_by_contact_id = {}
   end
 
   def read_xml(import_file)
@@ -66,8 +67,33 @@ class TntImport
 
   private
 
+  def load_contact_group_tags
+    @tags_by_contact_id = {}
+
+    return unless xml['Group']
+
+    groups = Array.wrap(xml['Group']['row']).map do |row|
+      { id: row['id'], category: row['Category'],
+        description: row['Category'] ? row['Description'].sub("#{row['Category']}\\", '') : row['Description'] }
+    end
+    groups_by_id = Hash[groups.map { |group| [group[:id], group] }]
+
+    Array.wrap(xml['GroupContact']['row']).each do |row|
+      group = groups_by_id[row['GroupID']]
+      tags = [group[:description].gsub(' ', '-')]
+      tags << group[:category].gsub(' ', '-') if group[:category]
+
+      tags_list = @tags_by_contact_id[row['ContactID']]
+      tags_list ||= []
+      tags_list += tags
+      @tags_by_contact_id[row['ContactID']] = tags_list
+    end
+  end
+
   def import_contacts
     @tnt_contacts = {}
+
+    load_contact_group_tags
 
     rows = Array.wrap(xml['Contact']['row'])
 
@@ -256,6 +282,10 @@ class TntImport
     contact.tag_list.add(@import.tags, parse: true) if @import.tags.present?
     contact.tnt_id = row['id']
     contact.addresses_attributes = build_address_array(row, contact, @import.override)
+
+    tags = @tags_by_contact_id[row['id']]
+    tags.each { |tag| contact.tag_list.add(tag) } if tags
+
     contact.save
   end
 
