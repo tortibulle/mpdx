@@ -252,10 +252,9 @@ class AccountList < ActiveRecord::Base
     organization = org_account.organization
     designation_numbers = profile.designation_accounts.map(&:designation_number)
     # look for an existing account list with the same designation numbers in it
-    unless account_list = AccountList.find_with_designation_numbers(designation_numbers, organization)
-      # create a new list for this profile
-      account_list = AccountList.where(name: profile.name, creator_id: user.id).first_or_create!
-    end
+    account_list = AccountList.find_with_designation_numbers(designation_numbers, organization)
+    # otherwise create a new account list for this profile
+    account_list ||= AccountList.where(name: profile.name, creator_id: user.id).first_or_create!
 
     # Add designation accounts to account_list
     profile.designation_accounts.each do |da|
