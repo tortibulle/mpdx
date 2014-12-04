@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141201142757) do
+ActiveRecord::Schema.define(version: 20141203174739) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -279,8 +279,9 @@ ActiveRecord::Schema.define(version: 20141201142757) do
     t.integer  "tnt_id"
     t.string   "not_duplicated_with",     limit: 2000
     t.integer  "uncompleted_tasks_count",                                       default: 0,     null: false
-    t.string   "prayer_letters_id",       limit: 100
+    t.integer  "prayer_letters_id"
     t.string   "timezone"
+    t.string   "envelope_greeting"
   end
 
   add_index "contacts", ["account_list_id"], name: "index_contacts_on_account_list_id", using: :btree
@@ -290,10 +291,10 @@ ActiveRecord::Schema.define(version: 20141201142757) do
 
   create_table "designation_accounts", force: true do |t|
     t.string   "designation_number"
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
     t.integer  "organization_id"
-    t.decimal  "balance",            precision: 19, scale: 2
+    t.decimal  "balance",            precision: 8, scale: 2
     t.datetime "balance_updated_at"
     t.string   "name"
     t.string   "staff_account_id"
@@ -313,13 +314,13 @@ ActiveRecord::Schema.define(version: 20141201142757) do
 
   create_table "designation_profiles", force: true do |t|
     t.string   "remote_id"
-    t.integer  "user_id",                                     null: false
-    t.integer  "organization_id",                             null: false
+    t.integer  "user_id",                                    null: false
+    t.integer  "organization_id",                            null: false
     t.string   "name"
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
     t.string   "code"
-    t.decimal  "balance",            precision: 19, scale: 2
+    t.decimal  "balance",            precision: 8, scale: 2
     t.datetime "balance_updated_at"
     t.integer  "account_list_id"
   end
@@ -376,7 +377,6 @@ ActiveRecord::Schema.define(version: 20141201142757) do
   end
 
   add_index "donor_accounts", ["last_donation_date"], name: "index_donor_accounts_on_last_donation_date", using: :btree
-  add_index "donor_accounts", ["organization_id", "account_number"], name: "index_donor_accounts_on_organization_id_and_account_number", unique: true, using: :btree
   add_index "donor_accounts", ["organization_id"], name: "index_donor_accounts_on_organization_id", using: :btree
   add_index "donor_accounts", ["total_donations"], name: "index_donor_accounts_on_total_donations", using: :btree
 
@@ -389,7 +389,6 @@ ActiveRecord::Schema.define(version: 20141201142757) do
     t.string   "remote_id"
     t.string   "location",   limit: 50
     t.boolean  "historic",              default: false
-    t.boolean  "bad",                   default: false, null: false
   end
 
   add_index "email_addresses", ["email", "person_id"], name: "index_email_addresses_on_email_and_person_id", unique: true, using: :btree
@@ -399,7 +398,7 @@ ActiveRecord::Schema.define(version: 20141201142757) do
   create_table "family_relationships", force: true do |t|
     t.integer  "person_id"
     t.integer  "related_person_id"
-    t.string   "relationship"
+    t.string   "relationship",      null: false
     t.datetime "created_at",        null: false
     t.datetime "updated_at",        null: false
   end
@@ -897,7 +896,7 @@ ActiveRecord::Schema.define(version: 20141201142757) do
   end
 
   add_index "versions", ["item_type", "event", "related_object_type", "related_object_id", "created_at", "item_id"], name: "index_versions_on_item_type", using: :btree
-  add_index "versions", ["item_type", "item_id", "related_object_type", "related_object_id", "created_at"], name: "related_object_index", using: :btree
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
+  add_index "versions", ["item_type", "related_object_type", "related_object_id", "created_at"], name: "related_object_index", using: :btree
 
 end
