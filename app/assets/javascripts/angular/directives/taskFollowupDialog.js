@@ -377,6 +377,7 @@ angular.module('mpdxApp')
                             start_at: task.date + ' ' + task.hour + ':' + task.min + ':00',
                             subject: task.subject,
                             tag_list: task.tags,
+                            location: task.location,
                             activity_type: taskType,
                             activity_contacts_attributes: contactsObject,
                             activity_comments_attributes: {
