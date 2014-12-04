@@ -85,7 +85,7 @@ class MailChimpAccount < ActiveRecord::Base
     api_key.to_s.split('-').last
   end
 
-  private
+  #private
 
   def call_mailchimp(method, *args)
     return if !active? || primary_list_id.blank?
