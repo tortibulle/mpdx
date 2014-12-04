@@ -48,7 +48,10 @@ class Contact < ActiveRecord::Base
     {
       contact_referrals_to_me_attributes: [:referred_by_id, :_destroy, :id],
       donor_accounts_attributes: [:account_number, :organization_id, :_destroy, :id],
-      addresses_attributes: [:remote_id, :master_address_id, :location, :street, :city, :state, :postal_code, :region, :metro_area, :country, :historic, :primary_mailing_address, :_destroy, :id],
+      addresses_attributes: [
+        :remote_id, :master_address_id, :location, :street, :city, :state, :postal_code, :region, :metro_area,
+        :country, :historic, :primary_mailing_address, :_destroy, :id
+      ],
       people_attributes: Person::PERMITTED_ATTRIBUTES
     }
   ]
@@ -73,15 +76,6 @@ class Contact < ActiveRecord::Base
 
   IN_PROGRESS_STATUSES = ['Never Contacted', 'Ask in Future', 'Contact for Appointment', 'Appointment Scheduled',
                           'Call for Decision']
-
-  TABS = {
-    'details' => _('Details'),
-    'tasks' => _('Tasks'),
-    'history' => _('History'),
-    'referrals' => _('Referrals'),
-    'notes' => _('Notes'),
-    'social' => _('Social')
-  }
 
   def status=(val)
     # handle deprecated values
@@ -219,8 +213,7 @@ class Contact < ActiveRecord::Base
   end
 
   def greeting
-    return self[:greeting] if self[:greeting].present?
-    generated_greeting
+    self[:greeting].present? ? self[:greeting] : generated_greeting
   end
 
   def generated_greeting
@@ -231,8 +224,7 @@ class Contact < ActiveRecord::Base
   end
 
   def envelope_greeting
-    return self[:envelope_greeting] if self[:envelope_greeting].present?
-    generated_envelope_greeting
+    self[:envelope_greeting].present? ? self[:envelope_greeting] : generated_envelope_greeting
   end
 
   def generated_envelope_greeting

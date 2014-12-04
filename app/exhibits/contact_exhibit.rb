@@ -2,6 +2,15 @@ class ContactExhibit < DisplayCase::Exhibit
   include DisplayCase::ExhibitsHelper
   include ApplicationHelper
 
+  TABS = {
+    'details' => _('Details'),
+    'tasks' => _('Tasks'),
+    'history' => _('History'),
+    'referrals' => _('Referrals'),
+    'notes' => _('Notes'),
+    'social' => _('Social')
+  }
+
   def self.applicable_to?(object)
     object.class.name == 'Contact'
   end

@@ -134,8 +134,8 @@
 
       <div id="contact" class="tabgroup">
         <ul>
-          <% (current_user.tab_order_by_location('contact') | Contact::TABS.keys).each do |tab_name| %>
-            <li id="tabs_<%= tab_name %>"><a href="#<%= tab_name %>-tab"><%= _(Contact::TABS[tab_name]) %></a></li>
+          <% (current_user.tab_order_by_location('contact') | ContactExhibit::TABS.keys).each do |tab_name| %>
+            <li id="tabs_<%= tab_name %>"><a href="#<%= tab_name %>-tab"><%= _(ContactExhibit::TABS[tab_name]) %></a></li>
           <% end %>
         </ul>
         <div class="clr"></div>
