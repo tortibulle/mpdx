@@ -383,5 +383,19 @@ describe Contact do
       contact.reload
       expect(contact.envelope_greeting).to eq('Bob Jones and Jen Fidel')
     end
+
+    it 'can be overwriten' do
+      contact = create(:contact, name: 'Fredrick & Loraine Doe')
+      primary = create(:person, first_name: 'Bob', last_name: 'Jones')
+      contact.people << primary
+      spouse = create(:person, first_name: 'Jen', last_name: 'Jones')
+      contact.people << spouse
+      contact.reload
+      expect(contact.envelope_greeting).to eq('Bob and Jen Jones')
+
+      contact.update_attributes(envelope_greeting: 'Mr and Mrs Jones')
+      contact.reload
+      expect(contact.envelope_greeting).to eq('Mr and Mrs Jones')
+    end
   end
 end

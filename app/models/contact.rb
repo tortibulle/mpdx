@@ -42,13 +42,16 @@ class Contact < ActiveRecord::Base
   scope :created_between, -> (start_date, end_date) { where('contacts.created_at BETWEEN ? and ?', start_date.in_time_zone, (end_date + 1.day).in_time_zone) }
 
   PERMITTED_ATTRIBUTES = [
-    :name, :pledge_amount, :status, :notes, :full_name, :greeting, :website, :pledge_frequency,
+    :name, :pledge_amount, :status, :notes, :full_name, :greeting, :envelope_greeting, :website, :pledge_frequency,
     :pledge_start_date, :next_ask, :never_ask, :likely_to_give, :church_name, :send_newsletter,
     :direct_deposit, :magazine, :pledge_received, :not_duplicated_with, :tag_list, :primary_person_id, :timezone,
     {
       contact_referrals_to_me_attributes: [:referred_by_id, :_destroy, :id],
       donor_accounts_attributes: [:account_number, :organization_id, :_destroy, :id],
-      addresses_attributes: [:remote_id, :master_address_id, :location, :street, :city, :state, :postal_code, :region, :metro_area, :country, :historic, :primary_mailing_address, :_destroy, :id],
+      addresses_attributes: [
+        :remote_id, :master_address_id, :location, :street, :city, :state, :postal_code, :region, :metro_area,
+        :country, :historic, :primary_mailing_address, :_destroy, :id
+      ],
       people_attributes: Person::PERMITTED_ATTRIBUTES
     }
   ]
@@ -73,15 +76,6 @@ class Contact < ActiveRecord::Base
 
   IN_PROGRESS_STATUSES = ['Never Contacted', 'Ask in Future', 'Contact for Appointment', 'Appointment Scheduled',
                           'Call for Decision']
-
-  TABS = {
-    'details' => _('Details'),
-    'tasks' => _('Tasks'),
-    'history' => _('History'),
-    'referrals' => _('Referrals'),
-    'notes' => _('Notes'),
-    'social' => _('Social')
-  }
 
   def status=(val)
     # handle deprecated values
@@ -219,14 +213,21 @@ class Contact < ActiveRecord::Base
   end
 
   def greeting
+    self[:greeting].present? ? self[:greeting] : generated_greeting
+  end
+
+  def generated_greeting
     return name if siebel_organization?
-    return self[:greeting] if self[:greeting].present?
     return first_name if spouse.try(:deceased)
     return spouse_first_name if primary_or_first_person.deceased && spouse
     [first_name, spouse_first_name].compact.join(" #{_('and')} ")
   end
 
   def envelope_greeting
+    self[:envelope_greeting].present? ? self[:envelope_greeting] : generated_envelope_greeting
+  end
+
+  def generated_envelope_greeting
     return name if siebel_organization?
     if spouse_last_name.blank? || last_name == spouse_last_name
       [[first_name, spouse_first_name].compact.join(" #{_('and')} "), last_name].compact.join(' ')
