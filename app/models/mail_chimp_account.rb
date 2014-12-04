@@ -202,7 +202,7 @@ class MailChimpAccount < ActiveRecord::Base
       contact.status = 'Partner - Pray' if contact.status.blank?
 
       contact.people.each do |person|
-        next unless person.primary_email_address.present? && !person.optout_enewsletter?
+        next if person.primary_email_address.blank? || person.optout_enewsletter?
         batch << { EMAIL: person.primary_email_address.email, FNAME: person.first_name,
                    LNAME: person.last_name }
       end
