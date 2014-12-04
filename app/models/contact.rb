@@ -219,7 +219,6 @@ class Contact < ActiveRecord::Base
   end
 
   def greeting
-    return name if siebel_organization?
     return self[:greeting] if self[:greeting].present?
     generated_greeting
   end
@@ -232,7 +231,6 @@ class Contact < ActiveRecord::Base
   end
 
   def envelope_greeting
-    return name if siebel_organization?
     return self[:envelope_greeting] if self[:envelope_greeting].present?
     generated_envelope_greeting
   end
