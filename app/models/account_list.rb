@@ -391,22 +391,24 @@ class AccountList < ActiveRecord::Base
   end
 
   def subscribe_tester_to_mailchimp
-    if changes.keys.include?('settings') && changes['settings'][0]['tester'] != changes['settings'][1]['tester']
-      if changes['settings'][1]['tester']
-        async(:mc_subscribe_users, 'Testers')
-      else
-        async(:mc_unsubscribe_users, 'Testers')
-      end
+    return unless changes.keys.include?('settings') &&
+      changes['settings'][0]['tester'] != changes['settings'][1]['tester']
+
+    if changes['settings'][1]['tester']
+      async(:mc_subscribe_users, 'Testers')
+    else
+      async(:mc_unsubscribe_users, 'Testers')
     end
   end
 
   def subscribe_owners_to_mailchimp
-    if changes.keys.include?('settings') && changes['settings'][0]['owner'] != changes['settings'][1]['owner']
-      if changes['settings'][1]['owner']
-        async(:mc_subscribe_users, 'Owners')
-      else
-        async(:mc_unsubscribe_users, 'Owners')
-      end
+    return unless changes.keys.include?('settings') &&
+      changes['settings'][0]['owner'] != changes['settings'][1]['owner']
+
+    if changes['settings'][1]['owner']
+      async(:mc_subscribe_users, 'Owners')
+    else
+      async(:mc_unsubscribe_users, 'Owners')
     end
   end
 
@@ -417,7 +419,7 @@ class AccountList < ActiveRecord::Base
       vars = { EMAIL: u.email.email, FNAME: u.first_name, LNAME: u.last_name,
                GROUPINGS: [{ id: APP_CONFIG['mailchimp_grouping_id'], groups: group }] }
       gb.list_subscribe(id: APP_CONFIG['mailchimp_list'], email_address: vars[:EMAIL], update_existing: true,
-                        double_optin: false, merge_vars: vars, send_welcome: false, replace_interests: false,
+                        double_optin: false, merge_vars: vars, send_welcome: false, replace_interests: false
       )
     end
   end
@@ -425,19 +427,18 @@ class AccountList < ActiveRecord::Base
   def mc_unsubscribe_users(group)
     gb = Gibbon.new(APP_CONFIG['mailchimp_key'])
     users.each do |u|
-      next unless u.email
+      next if u.email.blank?
       # subtract this group from the list of groups this email is subscribed to
       result = gb.list_member_info(id: APP_CONFIG['mailchimp_list'], email_address: [u.email.email])
-      if result['success'] > 0
-        result['data'].each do |row|
-          next unless row['email']
-          groups = row['merges']['GROUPINGS'].detect { |g| g['id'] == APP_CONFIG['mailchimp_grouping_id'] }['groups'].split(', ')
-          groups -= [group]
-          vars = { GROUPINGS: [{ id: APP_CONFIG['mailchimp_grouping_id'], groups: groups.join(', ') }] }
-          gb.list_update_member(id: APP_CONFIG['mailchimp_list'], email_address: row['email'], merge_vars: vars,
-                                replace_interests: true
-          )
-        end
+      next unless result['success'] > 0
+      result['data'].each do |row|
+        next unless row['email']
+        groups = row['merges']['GROUPINGS'].detect { |g| g['id'] == APP_CONFIG['mailchimp_grouping_id'] }['groups'].split(', ')
+        groups -= [group]
+        vars = { GROUPINGS: [{ id: APP_CONFIG['mailchimp_grouping_id'], groups: groups.join(', ') }] }
+        gb.list_update_member(id: APP_CONFIG['mailchimp_list'], email_address: row['email'], merge_vars: vars,
+                              replace_interests: true
+        )
       end
     end
   end
