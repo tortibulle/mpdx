@@ -19,7 +19,7 @@
         <%= link_to(_('Add Referrals'), add_referrals_contact_path(contact), remote: true, :class=> "btn smallbtn add_referrals no-new-tab") %>
         <%= link_to(_('Log Task'), new_task_path(contact_id: contact.id, completed: true), class: "btn smallbtn add_task", remote: true, data: {completed: true}) %>
         <%= link_to(_('Add Task'), new_task_path(contact_id: contact.id), class: "btn smallbtn add_task", data: {contact_id: contact.id}, remote: true) %>
-        <%= link_to(_('Hide'), contact_path(contact), class: "btn smallbtn", method: :delete, data: { confirm: _("This contact will be set to 'Never Ask'. Is that what you want to do?") }) %>
+        <%= link_to(_('Hide Contact'), contact_path(contact), class: "btn smallbtn", method: :delete, data: { confirm: _("This contact will be set to 'Never Ask'. Is that what you want to do?") }) %>
       </div>
     </div>
     <div class="wpp">
