@@ -395,9 +395,9 @@ class AccountList < ActiveRecord::Base
       changes['settings'][0]['tester'] != changes['settings'][1]['tester']
 
     if changes['settings'][1]['tester']
-      async(:mc_subscribe_users, 'Testers')
+      MailChimpWorker.perform_async('AccountList', id, :mc_subscribe_users, 'Testers')
     else
-      async(:mc_unsubscribe_users, 'Testers')
+      MailChimpWorker.perform_async('AccountList', id, :mc_unsubscribe_users, 'Testers')
     end
   end
 
@@ -406,9 +406,9 @@ class AccountList < ActiveRecord::Base
       changes['settings'][0]['owner'] != changes['settings'][1]['owner']
 
     if changes['settings'][1]['owner']
-      async(:mc_subscribe_users, 'Owners')
+      MailChimpWorker.perform_async('AccountList', id, :mc_subscribe_users, 'Owners')
     else
-      async(:mc_unsubscribe_users, 'Owners')
+      MailChimpWorker.perform_async('AccountList', id, :mc_unsubscribe_users, 'Owners')
     end
   end
 
@@ -432,7 +432,7 @@ class AccountList < ActiveRecord::Base
       result = gb.list_member_info(id: APP_CONFIG['mailchimp_list'], email_address: [u.email.email])
       next unless result['success'] > 0
       result['data'].each do |row|
-        next unless row['email']
+        next unless row['email'] && row['merges']
         groups = row['merges']['GROUPINGS'].detect { |g| g['id'] == APP_CONFIG['mailchimp_grouping_id'] }['groups'].split(', ')
         groups -= [group]
         vars = { GROUPINGS: [{ id: APP_CONFIG['mailchimp_grouping_id'], groups: groups.join(', ') }] }
