@@ -290,6 +290,7 @@ $ ->
 $(document).on 'change', '[name="task[activity_type]"]', ->
   $.mpdx.setOptions($('[name="task[result]"]'), $.mpdx.getTaskResultOptions($(this).val()))
   $.mpdx.setOptions($('[name="task[next_action]"]'), $.mpdx.getTaskNextActionOptions($(this).val()))
+  $('.task_location').toggle($(this).val() == 'Appointment')
 
 $.mpdx.getTaskResultOptions = (activity_type) ->
   switch activity_type

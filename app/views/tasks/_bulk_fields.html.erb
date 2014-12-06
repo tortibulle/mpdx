@@ -48,6 +48,12 @@
   <%= f.text_field :tag_list %>
 </div>
 
+<div class="field task_location" <% if task.activity_type != 'Appointment' %>style="display: none;"<% end %>>
+  <%= f.label :location, _('Location') %>
+  <%= f.text_field :location, { placeholder: task.calculated_location } %>
+  <p><%= _("Defaults to contact's primary address") %></p>
+</div>
+
 <div class="field">
 
   <% comment = task.activity_comments.build %>

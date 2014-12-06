@@ -12,7 +12,7 @@ form, .formstyles {
   .field {
     margin-bottom: .5em;
   }
-  label {
+  label, .field p {
     display: block;
     font-size: 11px;
     color: $gray_dark;

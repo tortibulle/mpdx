@@ -78,9 +78,12 @@ class Task < Activity
     end
   end
 
-  def calculated_location
-    return location if location.present?
+  def location
+    return self[:location] unless self[:location].blank?
+    calculated_location
+  end
 
+  def calculated_location
     case activity_type
     when 'Call'
       numbers = contacts.map(&:people).flatten.map do |person|
