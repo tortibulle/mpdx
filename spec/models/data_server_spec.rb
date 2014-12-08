@@ -4,6 +4,14 @@ describe DataServer do
   let(:account_list) { create(:account_list) }
   let(:profile) { create(:designation_profile, organization: @org, user: @person.to_user, account_list: account_list) }
 
+  let(:raw_data1) {
+    "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\","\
+    "\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\","\
+    "\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodriguez, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\","\
+    "\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\","\
+    "\"\",\"P\",\"Rodriguez\",\"\"\r\n"
+  }
+
   before(:each) do
     @org = create(:organization)
     @person = create(:person)
@@ -30,7 +38,7 @@ describe DataServer do
     profiles = [{ name: 'Profile 1', code: 'Profile 1' }, { name: 'Profile 2', code: '' }]
     @data_server.stub(:designation_numbers).and_return(designation_numbers)
     @data_server.stub(:profiles).and_return(profiles)
-    @data_server.profiles_with_designation_numbers.first[:name].should == 'Profile 1'
+    @data_server.profiles_with_designation_numbers.first[:name].should eq 'Profile 1'
     @data_server.profiles_with_designation_numbers.first[:designation_numbers].should == designation_numbers
   end
 
@@ -47,7 +55,8 @@ describe DataServer do
       }.to change(DesignationProfile, :count).by(1)
     end
     it 'in DataServer format' do
-      stub_request(:post, /.*profiles/).to_return(body: "\xEF\xBB\xBF\"PROFILE_CODE\",\"PROFILE_DESCRIPTION\"\r\n\"1769360689\",\"MPD Coach (All Staff Donations)\"\r\n\"1769360688\",\"My Campus Accounts\"\r\n\"\",\"My Staff Account\"\r\n")
+      stub_request(:post, /.*profiles/).to_return(body: "\xEF\xBB\xBF\"PROFILE_CODE\",\"PROFILE_DESCRIPTION\"\r\n\"1769360689\",\"MPD Coach (All Staff Donations)\"\r\n"\
+                                                        "\"1769360688\",\"My Campus Accounts\"\r\n\"\",\"My Staff Account\"\r\n")
       stub_request(:post, /.*accounts/).to_return(body: "\"EMPLID\",\"EFFDT\",\"BALANCE\",\"ACCT_NAME\"\n\"0000000\",\"2012-03-23 16:01:39.0\",\"123.45\",\"Test Account\"\n")
       expect {
         data_server.import_profiles
@@ -73,14 +82,18 @@ describe DataServer do
     end
 
     it 'should import a company' do
-      stub_request(:post, /.*addresses/).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"19238\",\"ACorporation\",\"123 mi casa blvd.\",\"Colima\",\"COL\",\"456788\",\"(52) 45 456-5678\",\"MEX\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"8/15/2003\",\"8/15/2003\",\"\",\"O\",\"ACorporation\",\"\"\r\n")
+      stub_request(:post, /.*addresses/).to_return(body:
+        "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\","\
+        "\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\","\
+        "\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"19238\",\"ACorporation\",\"123 mi casa blvd.\",\"Colima\",\"COL\",\"456788\",\"(52) 45 456-5678\","\
+        "\"MEX\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"8/15/2003\",\"8/15/2003\",\"\",\"O\",\"ACorporation\",\"\"\r\n")
       @data_server.should_receive(:add_or_update_donor_account)
       @data_server.should_receive(:add_or_update_company)
       @data_server.import_donors(profile)
     end
 
     it 'should import an individual' do
-      stub_request(:post, /.*addresses/).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodriguez, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\",\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\",\"\",\"P\",\"Rodriguez\",\"\"\r\n")
+      stub_request(:post, /.*addresses/).to_return(body: raw_data1)
       primary_contact = double('person')
       other_person = double('person')
       @data_server.should_receive(:add_or_update_primary_contact).and_return([primary_contact, other_person])
@@ -91,7 +104,7 @@ describe DataServer do
     end
 
     it 'should create a new contact in the right account list' do
-      stub_request(:post, /.*addresses/).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodriguez, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\",\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\",\"\",\"P\",\"Rodriguez\",\"\"\r\n")
+      stub_request(:post, /.*addresses/).to_return(body: raw_data1)
       @account_list1 = create(:account_list)
       @account_list2 = create(:account_list)
       profile = create(:designation_profile, user: @org_account.user, account_list: @account_list2)
@@ -103,7 +116,7 @@ describe DataServer do
     end
 
     it 'should create a new person in the right account list and donor account' do
-      stub_request(:post, /.*addresses/).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodriguez, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\",\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\",\"\",\"P\",\"Rodriguez\",\"\"\r\n")
+      stub_request(:post, /.*addresses/).to_return(body: raw_data1)
       @account_list1 = create(:account_list)
       @account_list2 = create(:account_list)
       profile = create(:designation_profile, user: @org_account.user, account_list: @account_list2)
@@ -113,18 +126,28 @@ describe DataServer do
         @data_server.import_donors(profile)
       }.to change(Person, :count)
       new_person = @account_list2.contacts.last.people.order('contact_people.primary::int desc').references(:contact_people).last
-      new_person.last_name.should == 'Rodriguez'
-      new_person.middle_name.should == ''
-      new_person.donor_accounts.last.should == donor_account
+      new_person.last_name.should eq 'Rodriguez'
+      new_person.middle_name.should eq ''
+      new_person.donor_accounts.last.should eq donor_account
 
-      stub_request(:post, /.*addresses/).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodrigues, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\",\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"C\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\",\"\",\"P\",\"Rodrigues\",\"\"\r\n")
+      stub_request(:post, /.*addresses/).to_return(body:
+        "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\","\
+        "\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\","\
+        "\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodrigues, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\","\
+        "\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"C\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\","\
+        "\"\",\"P\",\"Rodrigues\",\"\"\r\n")
       @data_server.import_donors(profile)
-      new_person.reload.last_name.should == 'Rodrigues'
-      new_person.middle_name.should == 'C'
+      new_person.reload.last_name.should eq 'Rodrigues'
+      new_person.middle_name.should eq 'C'
     end
 
     it "should notify Airbrake if PERSON_TYPE is not 'O' or 'P'" do
-      stub_request(:post, /.*addresses/).to_return(body: "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\",\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\",\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodriguez, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\",\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\",\"\",\"BAD_PERSON_TYPE\",\"Rodriguez\",\"\"\r\n")
+      stub_request(:post, /.*addresses/).to_return(body:
+        "\"PEOPLE_ID\",\"ACCT_NAME\",\"ADDR1\",\"CITY\",\"STATE\",\"ZIP\",\"PHONE\",\"COUNTRY\",\"FIRST_NAME\",\"MIDDLE_NAME\",\"TITLE\",\"SUFFIX\","\
+        "\"SP_LAST_NAME\",\"SP_FIRST_NAME\",\"SP_MIDDLE_NAME\",\"SP_TITLE\",\"ADDR2\",\"ADDR3\",\"ADDR4\",\"ADDR_CHANGED\",\"PHONE_CHANGED\",\"CNTRY_DESCR\","\
+        "\"PERSON_TYPE\",\"LAST_NAME_ORG\",\"SP_SUFFIX\"\r\n\"17083\",\"Rodriguez, Ramon y Celeste (Moreno)\",\"Bahia Acapulco 379\",\"Chihuahua\",\"CHH\","\
+        "\"24555\",\"(376) 706-670\",\"MEX\",\"Ramon\",\"\",\"Sr.\",\"\",\"Moreno\",\"Celeste\",\"Gonzalez\",\"Sra.\",\"\",\"\",\"\",\"4/4/2003\",\"4/4/2003\","\
+        "\"\",\"BAD_PERSON_TYPE\",\"Rodriguez\",\"\"\r\n")
       Airbrake.should_receive(:notify)
       @data_server.import_donors(profile)
     end
@@ -138,7 +161,13 @@ describe DataServer do
     end
 
     describe 'add or update a company' do
-      let(:line) { { 'PEOPLE_ID' => '19238', 'ACCT_NAME' => 'ACorporation', 'ADDR1' => '123 mi casa blvd.', 'CITY' => 'Colima', 'STATE' => 'COL', 'ZIP' => '456788', 'PHONE' => '(52) 45 456-5678', 'COUNTRY' => 'MEX', 'FIRST_NAME' => '', 'MIDDLE_NAME' => '', 'TITLE' => '', 'SUFFIX' => '', 'SP_LAST_NAME' => '', 'SP_FIRST_NAME' => '', 'SP_MIDDLE_NAME' => '', 'SP_TITLE' => '', 'ADDR2' => '', 'ADDR3' => '', 'ADDR4' => '', 'ADDR_CHANGED' => '8/15/2003', 'PHONE_CHANGED' => '8/15/2003', 'CNTRY_DESCR' => '', 'PERSON_TYPE' => 'O', 'LAST_NAME_ORG' => 'ACorporation', 'SP_SUFFIX' => '' } }
+      let(:line) {
+        { 'PEOPLE_ID' => '19238', 'ACCT_NAME' => 'ACorporation', 'ADDR1' => '123 mi casa blvd.', 'CITY' => 'Colima', 'STATE' => 'COL',
+          'ZIP' => '456788', 'PHONE' => '(52) 45 456-5678', 'COUNTRY' => 'MEX', 'FIRST_NAME' => '', 'MIDDLE_NAME' => '', 'TITLE' => '',
+          'SUFFIX' => '', 'SP_LAST_NAME' => '', 'SP_FIRST_NAME' => '', 'SP_MIDDLE_NAME' => '', 'SP_TITLE' => '', 'ADDR2' => '', 'ADDR3' => '',
+          'ADDR4' => '', 'ADDR_CHANGED' => '8/15/2003', 'PHONE_CHANGED' => '8/15/2003', 'CNTRY_DESCR' => '', 'PERSON_TYPE' => 'O',
+          'LAST_NAME_ORG' => 'ACorporation', 'SP_SUFFIX' => '' }
+      }
 
       before(:each) do
         @account_list = create(:account_list)
@@ -172,7 +201,14 @@ describe DataServer do
     end
 
     describe 'add or update contact' do
-      let(:line) { { 'PEOPLE_ID' => '17083', 'ACCT_NAME' => 'Rodrigue', 'ADDR1' => 'Ramon y Celeste (Moreno)', 'CITY' => 'Bahia Acapulco 379', 'STATE' => 'Chihuahua', 'ZIP' => 'CHH', 'PHONE' => '24555', 'COUNTRY' => '(376) 706-670', 'FIRST_NAME' => 'MEX', 'MIDDLE_NAME' => 'Ramon', 'TITLE' => '', 'SUFFIX' => 'Sr.', 'SP_LAST_NAME' => '', 'SP_FIRST_NAME' => 'Moreno', 'SP_MIDDLE_NAME' => 'Celeste', 'SP_TITLE' => 'Gonzalez', 'ADDR2' => 'Sra.', 'ADDR3' => '', 'ADDR4' => '', 'ADDR_CHANGED' => '', 'PHONE_CHANGED' => '4/4/2003', 'CNTRY_DESCR' => '4/4/2003', 'PERSON_TYPE' => '', 'LAST_NAME_ORG' => 'P', 'SP_SUFFIX' => 'Rodriguez' } }
+      let(:line) {
+        { 'PEOPLE_ID' => '17083', 'ACCT_NAME' => 'Rodrigue', 'ADDR1' => 'Ramon y Celeste (Moreno)', 'CITY' => 'Bahia Acapulco 379',
+          'STATE' => 'Chihuahua', 'ZIP' => 'CHH', 'PHONE' => '24555', 'COUNTRY' => '(376) 706-670', 'FIRST_NAME' => 'MEX',
+          'MIDDLE_NAME' => 'Ramon', 'TITLE' => '', 'SUFFIX' => 'Sr.', 'SP_LAST_NAME' => '', 'SP_FIRST_NAME' => 'Moreno',
+          'SP_MIDDLE_NAME' => 'Celeste', 'SP_TITLE' => 'Gonzalez', 'ADDR2' => 'Sra.', 'ADDR3' => '', 'ADDR4' => '',
+          'ADDR_CHANGED' => '', 'PHONE_CHANGED' => '4/4/2003', 'CNTRY_DESCR' => '4/4/2003', 'PERSON_TYPE' => '',
+          'LAST_NAME_ORG' => 'P', 'SP_SUFFIX' => 'Rodriguez' }
+      }
 
       before(:each) do
         @account_list = create(:account_list)
@@ -225,7 +261,14 @@ describe DataServer do
   end
 
   context '#add_or_update_donor_account' do
-    let(:line) { { 'PEOPLE_ID' => '17083', 'ACCT_NAME' => 'Rodrigue', 'ADDR1' => 'Ramon y Celeste (Moreno)', 'CITY' => 'Bahia Acapulco 379', 'STATE' => 'Chihuahua', 'ZIP' => '24555', 'PHONE' => '(376) 706-670', 'COUNTRY' => 'CHH', 'FIRST_NAME' => 'Ramon', 'MIDDLE_NAME' => '', 'TITLE' => '', 'SUFFIX' => 'Sr.', 'SP_LAST_NAME' => '', 'SP_FIRST_NAME' => 'Moreno', 'SP_MIDDLE_NAME' => 'Celeste', 'SP_TITLE' => 'Gonzalez', 'ADDR2' => 'Sra.', 'ADDR3' => '', 'ADDR4' => '', 'ADDR_CHANGED' => '', 'PHONE_CHANGED' => '4/4/2003', 'CNTRY_DESCR' => '4/4/2003', 'PERSON_TYPE' => '', 'LAST_NAME_ORG' => 'P', 'SP_SUFFIX' => 'Rodriguez' } }
+    let(:line) {
+      { 'PEOPLE_ID' => '17083', 'ACCT_NAME' => 'Rodrigue', 'ADDR1' => 'Ramon y Celeste (Moreno)', 'CITY' => 'Bahia Acapulco 379',
+        'STATE' => 'Chihuahua', 'ZIP' => '24555', 'PHONE' => '(376) 706-670', 'COUNTRY' => 'CHH', 'FIRST_NAME' => 'Ramon',
+        'MIDDLE_NAME' => '', 'TITLE' => '', 'SUFFIX' => 'Sr.', 'SP_LAST_NAME' => '', 'SP_FIRST_NAME' => 'Moreno',
+        'SP_MIDDLE_NAME' => 'Celeste', 'SP_TITLE' => 'Gonzalez', 'ADDR2' => 'Sra.', 'ADDR3' => '', 'ADDR4' => '',
+        'ADDR_CHANGED' => '', 'PHONE_CHANGED' => '4/4/2003', 'CNTRY_DESCR' => '4/4/2003', 'PERSON_TYPE' => '',
+        'LAST_NAME_ORG' => 'P', 'SP_SUFFIX' => 'Rodriguez' }
+    }
 
     it 'creates a new contact' do
       expect {
@@ -324,10 +367,17 @@ describe DataServer do
   end
 
   describe 'import donations' do
-    let(:line) { { 'DONATION_ID' => '1062', 'PEOPLE_ID' => '12271', 'ACCT_NAME' => 'Garci, Reynaldo', 'DESIGNATION' => '10640', 'MOTIVATION' => '', 'PAYMENT_METHOD' => 'EFECTIVO', 'TENDERED_CURRENCY' => 'MXN', 'MEMO' => '', 'DISPLAY_DATE' => '4/23/2003', 'AMOUNT' => '1000.0000', 'TENDERED_AMOUNT' => '1000.0000' } }
+    let(:line) {
+      { 'DONATION_ID' => '1062', 'PEOPLE_ID' => '12271', 'ACCT_NAME' => 'Garci, Reynaldo', 'DESIGNATION' => '10640', 'MOTIVATION' => '',
+        'PAYMENT_METHOD' => 'EFECTIVO', 'TENDERED_CURRENCY' => 'MXN', 'MEMO' => '', 'DISPLAY_DATE' => '4/23/2003', 'AMOUNT' => '1000.0000',
+        'TENDERED_AMOUNT' => '1000.0000' }
+    }
 
     it 'should create a donation' do
-      stub_request(:post, /.*donations/).to_return(body: "\xEF\xBB\xBF\"DONATION_ID\",\"PEOPLE_ID\",\"ACCT_NAME\",\"DESIGNATION\",\"MOTIVATION\",\"PAYMENT_METHOD\",\"TENDERED_CURRENCY\",\"MEMO\",\"DISPLAY_DATE\",\"AMOUNT\",\"TENDERED_AMOUNT\"\r\n\"1062\",\"12271\",\"Garcia, Reynaldo\",\"10640\",\"\",\"EFECTIVO\",\"MXN\",\"\",\"4/23/2003\",\"1000.0000\",\"1000.0000\"\r\n")
+      stub_request(:post, /.*donations/).to_return(body:
+        "\xEF\xBB\xBF\"DONATION_ID\",\"PEOPLE_ID\",\"ACCT_NAME\",\"DESIGNATION\",\"MOTIVATION\",\"PAYMENT_METHOD\",\"TENDERED_CURRENCY\",\"MEMO\","\
+        "\"DISPLAY_DATE\",\"AMOUNT\",\"TENDERED_AMOUNT\"\r\n\"1062\",\"12271\",\"Garcia, Reynaldo\",\"10640\",\"\",\"EFECTIVO\",\"MXN\",\"\",\"4/23/2003\","\
+        "\"1000.0000\",\"1000.0000\"\r\n")
       @data_server.should_receive(:check_credentials!)
       @data_server.should_receive(:find_or_create_designation_account)
       @data_server.should_receive(:add_or_update_donation)

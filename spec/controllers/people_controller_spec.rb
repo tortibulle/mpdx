@@ -10,7 +10,9 @@ describe PeopleController do
   end
 
   def valid_attributes
-    @valid_attributes ||= build(:person).attributes.except(*%w(id created_at updated_at sign_in_count current_sign_in_at last_sign_in_at current_sign_in_ip last_sign_in_ip master_person_id access_token))
+    @valid_attributes ||= build(:person).attributes.except(*%w(id created_at updated_at sign_in_count current_sign_in_at
+                                                               last_sign_in_at current_sign_in_ip last_sign_in_ip
+                                                               master_person_id access_token))
   end
 
   describe 'GET show' do

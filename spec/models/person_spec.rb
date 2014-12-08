@@ -25,7 +25,9 @@ describe Person do
     end
     it 'should update a family relationship' do
       family_relationship = create(:family_relationship, person: person)
-      person.family_relationships_attributes = { '0' => family_relationship.attributes.merge!(relationship: family_relationship.relationship + 'boo').with_indifferent_access.except(:person_id, :updated_at, :created_at) }
+      family_relationship_attributes = family_relationship.attributes.merge!(relationship: family_relationship.relationship + 'boo')
+                                                                     .with_indifferent_access.except(:person_id, :updated_at, :created_at)
+      person.family_relationships_attributes = { '0' => family_relationship_attributes }
       person.family_relationships.first.relationship.should == family_relationship.relationship + 'boo'
     end
   end

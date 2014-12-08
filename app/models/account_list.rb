@@ -50,7 +50,8 @@ class AccountList < ActiveRecord::Base
 
   def self.find_with_designation_numbers(numbers, organization)
     designation_account_ids = DesignationAccount.where(designation_number: numbers, organization_id: organization.id).pluck(:id).sort
-    results = AccountList.connection.select_all("select account_list_id,array_to_string(array_agg(designation_account_id), ',') as designation_account_ids from account_list_entries group by account_list_id")
+    query = "select account_list_id,array_to_string(array_agg(designation_account_id), ',') as designation_account_ids from account_list_entries group by account_list_id"
+    results = AccountList.connection.select_all(query)
     results.each do |hash|
       if hash['designation_account_ids'].split(',').map(&:to_i).sort == designation_account_ids
         return AccountList.find(hash['account_list_id'])
@@ -72,12 +73,14 @@ class AccountList < ActiveRecord::Base
   end
 
   def contact_tags
-    @contact_tags ||= ActiveRecord::Base.connection.select_values("select distinct(tags.name) from account_lists al inner join contacts c on c.account_list_id = al.id inner join taggings t on t.taggable_id = c.id AND t.taggable_type = 'Contact'
+    @contact_tags ||= ActiveRecord::Base.connection.select_values("select distinct(tags.name) from account_lists al inner join contacts c on c.account_list_id = al.id
+                                            inner join taggings t on t.taggable_id = c.id AND t.taggable_type = 'Contact'
                                             inner join tags on t.tag_id = tags.id where al.id = #{id} order by tags.name")
   end
 
   def activity_tags
-    @contact_tags ||= ActiveRecord::Base.connection.select_values("select distinct(tags.name) from account_lists al inner join activities a on a.account_list_id = al.id inner join taggings t on t.taggable_id = a.id AND t.taggable_type = 'Activity'
+    @contact_tags ||= ActiveRecord::Base.connection.select_values("select distinct(tags.name) from account_lists al inner join activities a on a.account_list_id = al.id
+                                            inner join taggings t on t.taggable_id = a.id AND t.taggable_type = 'Activity'
                                             inner join tags on t.tag_id = tags.id where al.id = #{id} order by tags.name")
   end
 

@@ -2,7 +2,12 @@ require 'spec_helper'
 
 describe Person::KeyAccount do
   before(:each) do
-    @auth_hash = Hashie::Mash.new(uid: 'john.doe@example.com', extra: { attributes: [{ firstName: 'John', lastName: 'Doe', email: 'johnnydoe@example.com', ssoGuid: 'F167605D-94A4-7121-2A58-8D0F2CA6E024' }] })
+    @auth_hash = Hashie::Mash.new(uid: 'john.doe@example.com', extra: {
+                                    attributes: [{
+                                      firstName: 'John', lastName: 'Doe', email: 'johnnydoe@example.com',
+                                      ssoGuid: 'F167605D-94A4-7121-2A58-8D0F2CA6E024'
+                                    }]
+                                  })
   end
   describe 'create from auth' do
     it 'should create an account linked to a person' do
@@ -18,8 +23,8 @@ describe Person::KeyAccount do
     it 'should create a user with a first and last name' do
       expect {
         user = Person::KeyAccount.create_user_from_auth(@auth_hash)
-        user.first_name.should == @auth_hash.extra.attributes.first.firstName
-        user.last_name.should == @auth_hash.extra.attributes.first.lastName
+        user.first_name.should eq @auth_hash.extra.attributes.first.firstName
+        user.last_name.should eq @auth_hash.extra.attributes.first.lastName
       }.to change(User, :count).from(0).to(1)
     end
   end

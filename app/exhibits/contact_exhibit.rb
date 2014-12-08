@@ -35,7 +35,8 @@ class ContactExhibit < DisplayCase::Exhibit
   def contact_info
     people.order('contact_people.primary::int desc').references(:contact_people).map {|p|
       person_exhibit = exhibit(p, @context)
-      [@context.link_to(person_exhibit, @context.contact_person_path(to_model, p)), [person_exhibit.phone_number, person_exhibit.email].compact.map { |e| exhibit(e, @context) }.join('<br />')].select(&:present?).join(':<br />')
+      phone_and_email_exhibits = [person_exhibit.phone_number, person_exhibit.email].compact.map { |e| exhibit(e, @context) }.join('<br />')
+      [@context.link_to(person_exhibit, @context.contact_person_path(to_model, p)), phone_and_email_exhibits].select(&:present?).join(':<br />')
     }.join('<br />').html_safe
   end
 
