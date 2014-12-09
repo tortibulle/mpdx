@@ -45,9 +45,10 @@ class Person::FacebookAccount < ActiveRecord::Base
   def url=(value)
     return nil unless value.present?
     self.remote_id ||= get_id_from_url(value)
-    if remote_id.blank? && person_id.present?
-      fail Errors::FacebookLink, _('We were unable to link this person to the facebook url you provided. Check the url you entered and try again. If you are currently running the "Import contacts from facebook" process, please wait until you get the email saying the import finished before trying again.')
-    end
+    return unless remote_id.blank? && person_id.present?
+    fail Errors::FacebookLink, _('We were unable to link this person to the facebook url you provided. '\
+      'Check the url you entered and try again. If you are currently running the "Import contacts from '\
+      'facebook" process, please wait until you get the email saying the import finished before trying again.')
   end
 
   def get_id_from_url(url)
@@ -74,7 +75,9 @@ class Person::FacebookAccount < ActiveRecord::Base
       end
     rescue RestClient::ResourceNotFound, URI::InvalidURIError, RestClient::Forbidden, RestClient::ServiceUnavailable
     rescue RestClient::BadRequest
-      raise Errors::FacebookLink, _('We were unable to link this person to the facebook url you provided. This is likely due to facebook privacy settings this person has set. If they are your friend on facebook, try using the "Import contacts from facebook" feature instead of manually pasting the link in.')
+      raise Errors::FacebookLink, _('We were unable to link this person to the facebook url you provided. '\
+        'This is likely due to facebook privacy settings this person has set. If they are your friend on '\
+        'facebook, try using the "Import contacts from facebook" feature instead of manually pasting the link in.')
     end
   end
 

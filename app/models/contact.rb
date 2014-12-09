@@ -157,7 +157,7 @@ class Contact < ActiveRecord::Base
 
   def self.create_from_donor_account(donor_account, account_list)
     contact = account_list.contacts.new(name: donor_account.name)
-    contact.addresses_attributes = Hash[donor_account.addresses.collect.with_index { |address, i| [i, address.attributes.slice(*%w(street city state country postal_code))] }]
+    contact.addresses_attributes = donor_account.addresses_attributes
     contact.save!
     contact.donor_accounts << donor_account
     contact
@@ -310,7 +310,7 @@ class Contact < ActiveRecord::Base
       merge_addresses
 
       ContactReferral.where(referred_to_id: other.id).each do |contact_referral|
-        contact_referral.update_column(:referred_to_id, id) unless contact_referrals_to_me.find { |crtm| crtm.referred_by_id == contact_referral.referred_by_id }
+        contact_referral.update_column(:referred_to_id, id) unless contact_referrals_to_me.find_by_referred_by_id(contact_referral.referred_by_id)
       end
 
       ContactReferral.where(referred_by_id: other.id).update_all(referred_by_id: id)

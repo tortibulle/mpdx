@@ -35,7 +35,8 @@ namespace :mpdx do
 
   task merge_donor_accounts: :environment do
     def merge_donor_accounts
-      account_numbers = DonorAccount.connection.select_values("select account_number, organization_id from donor_accounts where account_number <> '' group by account_number, organization_id having count(*) > 1")
+      account_numbers_query = "select account_number, organization_id from donor_accounts where account_number <> '' group by account_number, organization_id having count(*) > 1"
+      account_numbers = DonorAccount.connection.select_values(account_numbers_query)
       DonorAccount.where(account_number: account_numbers).order('created_at').each do |al|
         other_account = DonorAccount.where(account_number: al.account_number, organization_id: al.organization_id).where("id <> #{al.id}").first
         next unless other_account
@@ -64,7 +65,8 @@ namespace :mpdx do
       end
     end
 
-    Contact.includes(:addresses).where("addresses.id is not null AND (addresses.country is null or addresses.country = 'United States' or addresses.country = '' or addresses.country = 'United States of America')").find_each do |c|
+    address_query = "addresses.id is not null AND (addresses.country is null or addresses.country = 'United States' or addresses.country = '' or addresses.country = 'United States of America')"
+    Contact.includes(:addresses).where(address_query).find_each do |c|
       merge_addresses(c)
     end
   end
