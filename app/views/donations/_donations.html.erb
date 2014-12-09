@@ -17,6 +17,9 @@
 <table class="tablelist donations" id="donations_table">
   <thead>
     <tr>
+      <% if @contact %>
+        <th>Donor</th>
+      <% end %>
       <th class="date">Date</th>
       <% unless @contact %>
         <th>Donor</th>
