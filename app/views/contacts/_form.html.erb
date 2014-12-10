@@ -34,7 +34,12 @@
 
         <div class="field">
           <%= f.label :greeting, _('Greeting (used in csv download)') %>
-          <%= f.text_field :greeting %>
+          <%= f.text_field :greeting, {placeholder: contact.generated_greeting} %>
+        </div>
+
+        <div class="field">
+          <%= f.label :envelope_greeting, _('Envelope Name Line') %>
+          <%= f.text_field :envelope_greeting, {placeholder: contact.generated_envelope_greeting} %>
         </div>
 
         <div class="field">

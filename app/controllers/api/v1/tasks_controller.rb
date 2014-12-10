@@ -1,7 +1,8 @@
 class Api::V1::TasksController < Api::V1::BaseController
   def index
     if params[:since]
-      meta = { deleted: Version.where(item_type: 'Activity', event: 'destroy', related_object_type: 'AccountList', related_object_id: current_account_list.id).where('created_at > ?', Time.at(params[:since].to_i)).pluck(:item_id) }
+      meta = { deleted: Version.where(item_type: 'Activity', event: 'destroy', related_object_type: 'AccountList', related_object_id: current_account_list.id)
+                               .where('created_at > ?', Time.at(params[:since].to_i)).pluck(:item_id) }
     else
       meta = {}
     end

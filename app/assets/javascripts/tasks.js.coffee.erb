@@ -73,7 +73,9 @@ $ ->
           click: ->
             $(this).dialog("close")
         }
-      ]
+      ],
+      close: ->
+        $('#task_modal_form').removeClass('dirty')
     false
 
   # Edit task button
@@ -101,7 +103,9 @@ $ ->
           click: ->
             $(this).dialog("close")
         }
-      ]
+      ],
+      close: ->
+        $('#task_modal_form').removeClass('dirty')
 
   if $('#tasks_index')[0]?
     $(document).on 'click', '[data-behavior=bulk_complete]', ->
@@ -286,6 +290,7 @@ $ ->
 $(document).on 'change', '[name="task[activity_type]"]', ->
   $.mpdx.setOptions($('[name="task[result]"]'), $.mpdx.getTaskResultOptions($(this).val()))
   $.mpdx.setOptions($('[name="task[next_action]"]'), $.mpdx.getTaskNextActionOptions($(this).val()))
+  $('.task_location').toggle($(this).val() == 'Appointment')
 
 $.mpdx.getTaskResultOptions = (activity_type) ->
   switch activity_type

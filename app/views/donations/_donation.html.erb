@@ -1,5 +1,8 @@
 <% exhibit(donation, self).tap do |donation_exhibit| %>
 <tr id="<%= dom_id(donation) %>">
+  <% if @contact %>
+    <td><%= donation.donor_account.name %></td>
+  <% end %>
   <td class="date"><%= l donation_exhibit.donation_date %></td>
   <% unless @contact %>
     <td><%= link_to(donation.donor_account.contacts.first.name, donation.donor_account.contacts.first) %></td>

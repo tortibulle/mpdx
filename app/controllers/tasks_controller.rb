@@ -90,7 +90,7 @@ class TasksController < ApplicationController
       # First validate the task fields
       if @task.valid?
         # Create a copy of the task for each contact selected
-        contacts = current_account_list.contacts.find_all_by_id(params[:add_task_contact_ids].split(/[, ]/))
+        contacts = current_account_list.contacts.where(id: params[:add_task_contact_ids].split(/[, ]/))
         contacts.each do |c|
           @task = current_account_list.tasks.create(task_params)
           ActivityContact.create(activity_id: @task.id, contact_id: c.id)

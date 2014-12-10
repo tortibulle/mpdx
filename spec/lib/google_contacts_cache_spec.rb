@@ -5,7 +5,7 @@ describe GoogleContactsCache do
   let(:john2) { double(id: 'john2', given_name: 'John', family_name: 'Doe') }
   let(:jane1) { double(id: 'jane1', given_name: 'Jane', family_name: 'Doe') }
   let(:jane2) { double(id: 'jane2', given_name: 'Jane Doe', family_name: '') }
-  let(:account) { double }
+  let(:account) { build(:google_account) }
   let(:cache) { GoogleContactsCache.new(account) }
 
   describe 'cache_all_g_contacts' do

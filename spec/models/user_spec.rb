@@ -4,7 +4,10 @@ describe User do
   describe 'user role' do
     describe 'from omniauth' do
       before(:each) do
-        @auth_hash = Hashie::Mash.new(uid: 'JOHN.DOE@EXAMPLE.COM', extra: { attributes: [{ firstName: 'John', lastName: 'Doe', username: 'JOHN.DOE@EXAMPLE.COM', email: 'johnnydoe@example.com', designation: '0000000', emplid: '000000000', ssoGuid: 'F167605D-94A4-7121-2A58-8D0F2CA6E024' }] })
+        user_attributes = [{ firstName: 'John', lastName: 'Doe', username: 'JOHN.DOE@EXAMPLE.COM',
+          email: 'johnnydoe@example.com', designation: '0000000', emplid: '000000000',
+          ssoGuid: 'F167605D-94A4-7121-2A58-8D0F2CA6E024' }]
+        @auth_hash = Hashie::Mash.new(uid: 'JOHN.DOE@EXAMPLE.COM', extra: { attributes: user_attributes })
       end
 
       it 'should create a new user from omniauth' do

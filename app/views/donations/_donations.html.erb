@@ -17,6 +17,9 @@
 <table class="tablelist donations" id="donations_table">
   <thead>
     <tr>
+      <% if @contact %>
+        <th>Donor</th>
+      <% end %>
       <th class="date">Date</th>
       <% unless @contact %>
         <th>Donor</th>
@@ -43,7 +46,7 @@
       <tr class="sum">
         <td></td>
         <td class="right"><strong><%= _('Total Donations (%{count}):').localize % {count: donations.length} %></strong></td>
-        <td class="right"><%= number_to_current_currency(donations.sum(&:amount)) %></td>
+        <td class="right"><%= number_to_current_currency(donations.to_a.sum(&:amount)) %></td>
         <td colspan="4"></td>
       </tr>
     </tfoot>

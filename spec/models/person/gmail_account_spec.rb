@@ -97,9 +97,14 @@ describe Person::GmailAccount do
 
     it "creates a task even if the email doesn't have a subject" do
       expect(gmail_message).to receive(:subject).and_return('')
-      expect {
-        gmail_account.log_email(gmail_message, account_list, contact, person, 'Done')
-      }.to change(Task, :count).by(1)
+      task = gmail_account.log_email(gmail_message, account_list, contact, person, 'Done')
+      expect(task.subject).to eq('No Subject')
+    end
+
+    it 'truncates the subject if the subject is more than 2000 chars' do
+      expect(gmail_message).to receive(:subject).twice.and_return('x' * 2001)
+      task = gmail_account.log_email(gmail_message, account_list, contact, person, 'Done')
+      expect(task.subject).to eq('x' * 2000)
     end
 
     it "doesn't create a duplicate task" do

@@ -70,7 +70,7 @@ class DonorAccount < ActiveRecord::Base
     self.name = other.name if name.blank?
 
     other.master_person_donor_accounts.each do |mpda|
-      mpda.update_column(:donor_account_id, id) unless master_person_donor_accounts.find { |master_person_donor_account| master_person_donor_account.master_person_id == mpda.master_person_id }
+      mpda.update_column(:donor_account_id, id) unless master_person_donor_accounts.find_by_master_person_id(mpda.master_person_id)
     end
     other.donations.update_all(donor_account_id: id)
     other.contact_donor_accounts.each do |cda|
@@ -81,5 +81,9 @@ class DonorAccount < ActiveRecord::Base
     other.destroy
 
     true
+  end
+
+  def addresses_attributes
+    Hash[addresses.collect.with_index { |address, i| [i, address.attributes.slice(*%w(street city state country postal_code))] }]
   end
 end

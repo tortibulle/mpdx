@@ -11,7 +11,7 @@ class Contact < ActiveRecord::Base
   has_many :donations, through: :donor_accounts
   belongs_to :account_list
   has_many :contact_people, dependent: :destroy
-  has_many :people, -> { order('contact_people.primary::int desc') }, through: :contact_people
+  has_many :people, through: :contact_people
   has_one :primary_contact_person, -> { where(primary: true) }, class_name: 'ContactPerson'
   has_one :primary_person, through: :primary_contact_person, source: :person
   has_one :spouse_contact_person, -> { where(['"primary" = ? OR "primary" is NULL', false]) }, class_name: 'ContactPerson'
@@ -38,17 +38,20 @@ class Contact < ActiveRecord::Base
   scope :with_referrals, -> { joins(:contact_referrals_by_me).uniq }
   scope :active, -> { where(active_conditions) }
   scope :inactive, -> { where(inactive_conditions) }
-  scope :late_by, -> (min_days, max_days = nil) { financial_partners.order(:name).keep_if { |c| c.late_by?(min_days, max_days) } }
+  scope :late_by, -> (min_days, max_days = nil) { financial_partners.order(:name).to_a.keep_if { |c| c.late_by?(min_days, max_days) } }
   scope :created_between, -> (start_date, end_date) { where('contacts.created_at BETWEEN ? and ?', start_date.in_time_zone, (end_date + 1.day).in_time_zone) }
 
   PERMITTED_ATTRIBUTES = [
-    :name, :pledge_amount, :status, :notes, :full_name, :greeting, :website, :pledge_frequency,
+    :name, :pledge_amount, :status, :notes, :full_name, :greeting, :envelope_greeting, :website, :pledge_frequency,
     :pledge_start_date, :next_ask, :never_ask, :likely_to_give, :church_name, :send_newsletter,
     :direct_deposit, :magazine, :pledge_received, :not_duplicated_with, :tag_list, :primary_person_id, :timezone,
     {
       contact_referrals_to_me_attributes: [:referred_by_id, :_destroy, :id],
       donor_accounts_attributes: [:account_number, :organization_id, :_destroy, :id],
-      addresses_attributes: [:remote_id, :master_address_id, :location, :street, :city, :state, :postal_code, :region, :metro_area, :country, :historic, :primary_mailing_address, :_destroy, :id],
+      addresses_attributes: [
+        :remote_id, :master_address_id, :location, :street, :city, :state, :postal_code, :region, :metro_area,
+        :country, :historic, :primary_mailing_address, :_destroy, :id
+      ],
       people_attributes: Person::PERMITTED_ATTRIBUTES
     }
   ]
@@ -73,15 +76,6 @@ class Contact < ActiveRecord::Base
 
   IN_PROGRESS_STATUSES = ['Never Contacted', 'Ask in Future', 'Contact for Appointment', 'Appointment Scheduled',
                           'Call for Decision']
-
-  TABS = {
-    'details' => _('Details'),
-    'tasks' => _('Tasks'),
-    'history' => _('History'),
-    'referrals' => _('Referrals'),
-    'notes' => _('Notes'),
-    'social' => _('Social')
-  }
 
   def status=(val)
     # handle deprecated values
@@ -163,7 +157,7 @@ class Contact < ActiveRecord::Base
 
   def self.create_from_donor_account(donor_account, account_list)
     contact = account_list.contacts.new(name: donor_account.name)
-    contact.addresses_attributes = Hash[donor_account.addresses.collect.with_index { |address, i| [i, address.attributes.slice(*%w(street city state country postal_code))] }]
+    contact.addresses_attributes = donor_account.addresses_attributes
     contact.save!
     contact.donor_accounts << donor_account
     contact
@@ -202,8 +196,12 @@ class Contact < ActiveRecord::Base
     person_id
   end
 
-  def spouse_name
+  def spouse_first_name
     spouse.try(:first_name)
+  end
+
+  def spouse_last_name
+    spouse.try(:last_name)
   end
 
   def spouse_phone
@@ -215,16 +213,27 @@ class Contact < ActiveRecord::Base
   end
 
   def greeting
+    self[:greeting].present? ? self[:greeting] : generated_greeting
+  end
+
+  def generated_greeting
     return name if siebel_organization?
-    return self[:greeting] if self[:greeting].present?
     return first_name if spouse.try(:deceased)
-    return spouse_name if primary_or_first_person.deceased && spouse
-    [first_name, spouse_name].compact.join(_(' and '))
+    return spouse_first_name if primary_or_first_person.deceased && spouse
+    [first_name, spouse_first_name].compact.join(" #{_('and')} ")
   end
 
   def envelope_greeting
-    return name if siebel_organization? || greeting.blank?
-    greeting.include?(last_name.to_s) ? greeting : [greeting, last_name].compact.join(' ')
+    self[:envelope_greeting].present? ? self[:envelope_greeting] : generated_envelope_greeting
+  end
+
+  def generated_envelope_greeting
+    return name if siebel_organization?
+    if spouse_last_name.blank? || last_name == spouse_last_name
+      [[first_name, spouse_first_name].compact.join(" #{_('and')} "), last_name].compact.join(' ')
+    else
+      [[first_name, last_name].compact.join(' '), [spouse_first_name, spouse_last_name].compact.join(' ')].join(" #{_('and')} ")
+    end
   end
 
   def siebel_organization?
@@ -301,7 +310,7 @@ class Contact < ActiveRecord::Base
       merge_addresses
 
       ContactReferral.where(referred_to_id: other.id).each do |contact_referral|
-        contact_referral.update_column(:referred_to_id, id) unless contact_referrals_to_me.find { |crtm| crtm.referred_by_id == contact_referral.referred_by_id }
+        contact_referral.update_column(:referred_to_id, id) unless contact_referrals_to_me.find_by_referred_by_id(contact_referral.referred_by_id)
       end
 
       ContactReferral.where(referred_by_id: other.id).update_all(referred_by_id: id)

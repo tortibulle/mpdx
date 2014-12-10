@@ -19,11 +19,17 @@
                     <input type="text" ng-model="appeal.amount">
                 </div>
 
-                <div class="field">
-                    <label>Add contacts with the follow status(es):</label>
+                <div class="field appealFilterCol">
+                    <label>Add contacts with the following status(es):</label>
                     <div style="margin-top: 5px;" ng-repeat="status in contactStatuses">
                         <label><input type="checkbox" ng-model="appeal.validStatus[status]"> {{status}}</label>
                     </div>
+                </div>
+                <div class="field appealFilterCol">
+                  <label>Add contacts with the following tag(s):</label>
+                  <div style="margin-top: 5px;" ng-repeat="tag in contactTags">
+                    <label><input type="checkbox" ng-model="appeal.validTags[tag]"> {{tag}}</label>
+                  </div>
                 </div>
             </div>
             <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">

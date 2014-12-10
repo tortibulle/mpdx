@@ -3,8 +3,7 @@ class PrayerLettersAccountsController < ApplicationController
     auth_hash = request.env['omniauth.auth']
 
     prayer_letters_account.attributes = {
-      token: auth_hash.credentials.token,
-      secret: auth_hash.credentials.secret,
+      oauth2_token: auth_hash.credentials.token,
       valid_token: true
     }
     prayer_letters_account.save

@@ -279,6 +279,13 @@
             </div>
 
             <div style="padding-top:10px;">
+                <label for="follow-up-task_location">Location</label><br>
+                <input type="text" id="follow-up-task_location"
+                       placeholder="Defaults to contact's address" size="30"
+                       ng-model="followUpDialogResult.apptTask.location">
+            </div>
+
+            <div style="padding-top:10px;">
                 <label>Comments</label><br>
                 <textarea ng-model="followUpDialogResult.apptTask.comments"></textarea>
             </div>

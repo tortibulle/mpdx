@@ -19,7 +19,7 @@
         <%= link_to(_('Add Referrals'), add_referrals_contact_path(contact), remote: true, :class=> "btn smallbtn add_referrals no-new-tab") %>
         <%= link_to(_('Log Task'), new_task_path(contact_id: contact.id, completed: true), class: "btn smallbtn add_task", remote: true, data: {completed: true}) %>
         <%= link_to(_('Add Task'), new_task_path(contact_id: contact.id), class: "btn smallbtn add_task", data: {contact_id: contact.id}, remote: true) %>
-        <%= link_to(_('Delete'), contact_path(contact), class: "btn smallbtn", method: :delete, data: { confirm: _("This contact will be set to 'Never Ask'. Is that what you want to do?") }) %>
+        <%= link_to(_('Hide Contact'), contact_path(contact), class: "btn smallbtn", method: :delete, data: { confirm: _("This contact will be set to 'Never Ask'. Is that what you want to do?") }) %>
       </div>
     </div>
     <div class="wpp">
@@ -134,8 +134,8 @@
 
       <div id="contact" class="tabgroup">
         <ul>
-          <% (current_user.tab_order_by_location('contact') | Contact::TABS.keys).each do |tab_name| %>
-            <li id="tabs_<%= tab_name %>"><a href="#<%= tab_name %>-tab"><%= _(Contact::TABS[tab_name]) %></a></li>
+          <% (current_user.tab_order_by_location('contact') | ContactExhibit::TABS.keys).each do |tab_name| %>
+            <li id="tabs_<%= tab_name %>"><a href="#<%= tab_name %>-tab"><%= _(ContactExhibit::TABS[tab_name]) %></a></li>
           <% end %>
         </ul>
         <div class="clr"></div>
@@ -151,7 +151,8 @@
               <tr task="task" ng-repeat="task in tasks" id="task_{{task.id}}"></tr>
             </tbody>
           </table>
-          <p ng-hide="tasks.length"><%= _('No tasks found for this contact.') %></p>
+          <p ng-show="loading"><%= _('Loading contact tasks...') %></p>
+          <p ng-show="noContacts()"><%= _('No tasks found for this contact.') %></p>
         </div>
         <div id="history-tab" ng-controller="taskShortListController" ng-init="init('contactHistory','<%= contact.id %>')">
           <table class="list tasklist">
@@ -159,7 +160,8 @@
               <tr task="task" ng-repeat="task in tasks" id="task_{{task.id}}"></tr>
             </tbody>
           </table>
-          <p ng-hide="tasks.length"><%= _('No completed tasks found for this contact.') %></p>
+          <p ng-show="loading"><%= _('Loading contact history...') %></p>
+          <p ng-show="noContacts()"><%= _('No completed tasks found for this contact.') %></p>
         </div>
         <div id="referrals-tab">
           <%= spinner(extra: 'referrals', visible: true) %>

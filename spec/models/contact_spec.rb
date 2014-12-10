@@ -19,7 +19,7 @@ describe Contact do
       contact.addresses_attributes = [{ id: address.id, _destroy: '1' }]
       contact.save!
 
-      address.reload.deleted.should == true
+      expect { address.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it 'should update an address' do
@@ -357,4 +357,45 @@ describe Contact do
     end
   end
 
+  context '#envelope_greeting' do
+    it 'uses first_name, spouse first_name and same last_name' do
+      contact = create(:contact, greeting: 'Fred and Lori Doe', name: 'Fredrick & Loraine Doe')
+      primary = create(:person, first_name: 'Bob', last_name: 'Jones', legal_first_name: 'Robert')
+      contact.people << primary
+
+      expect(contact.envelope_greeting).to eq('Bob Jones')
+
+      spouse = create(:person, first_name: 'Jen', last_name: 'Jones', legal_first_name: 'Jennifer')
+      contact.people << spouse
+      contact.reload
+      expect(contact.envelope_greeting).to eq('Bob and Jen Jones')
+    end
+
+    it 'uses first_name, spouse first_name and different last_name' do
+      contact = create(:contact, greeting: 'Fred and Lori Doe', name: 'Fredrick & Loraine Doe')
+      primary = create(:person, first_name: 'Bob', last_name: 'Jones', legal_first_name: 'Robert')
+      contact.people << primary
+
+      expect(contact.envelope_greeting).to eq('Bob Jones')
+
+      spouse = create(:person, first_name: 'Jen', last_name: 'Fidel', legal_first_name: 'Jennifer')
+      contact.people << spouse
+      contact.reload
+      expect(contact.envelope_greeting).to eq('Bob Jones and Jen Fidel')
+    end
+
+    it 'can be overwriten' do
+      contact = create(:contact, name: 'Fredrick & Loraine Doe')
+      primary = create(:person, first_name: 'Bob', last_name: 'Jones')
+      contact.people << primary
+      spouse = create(:person, first_name: 'Jen', last_name: 'Jones')
+      contact.people << spouse
+      contact.reload
+      expect(contact.envelope_greeting).to eq('Bob and Jen Jones')
+
+      contact.update_attributes(envelope_greeting: 'Mr and Mrs Jones')
+      contact.reload
+      expect(contact.envelope_greeting).to eq('Mr and Mrs Jones')
+    end
+  end
 end

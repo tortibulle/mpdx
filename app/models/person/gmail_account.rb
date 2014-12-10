@@ -14,7 +14,10 @@ class Person::GmailAccount
       client = Gmail.connect(:xoauth2, @google_account.email, @google_account.token)
       yield client
     ensure
-      client.logout
+      begin
+        client.logout
+      rescue
+      end
     end
   end
 
@@ -36,16 +39,21 @@ class Person::GmailAccount
             next if email_addresses.include?(email)
             email_addresses << email
 
-            # sent emails
-            sent = g.mailbox('[Gmail]/Sent Mail')
-            sent.emails(to: email, after: since).each do |gmail_message|
-              log_email(gmail_message, account_list, contact, person, 'Done')
-            end
+            begin
+              # sent emails
+              sent = g.mailbox('[Gmail]/Sent Mail')
+              sent.emails(to: email, after: since).each do |gmail_message|
+                log_email(gmail_message, account_list, contact, person, 'Done')
+              end
 
-            # received emails
-            all = g.mailbox('[Gmail]/All Mail')
-            all.emails(from: email, after: since).each do |gmail_message|
-              log_email(gmail_message, account_list, contact, person, 'Received')
+              # received emails
+              all = g.mailbox('[Gmail]/All Mail')
+              all.emails(from: email, after: since).each do |gmail_message|
+                log_email(gmail_message, account_list, contact, person, 'Received')
+              end
+            rescue Net::IMAP::NoResponseError => e
+              # swallow it if the user doesn't have those mailboxes
+              raise unless e.message.include?('Unknown Mailbox')
             end
           end
         end
@@ -55,16 +63,20 @@ class Person::GmailAccount
   end
 
   def log_email(gmail_message, account_list, contact, person, result)
-    if gmail_message.message.multipart?
-      message = gmail_message.message.text_part.body.decoded
-    else
-      message = gmail_message.message.body.decoded
-    end
-    message = message.to_s.unpack('C*').pack('U*').force_encoding('UTF-8').encode!
+    message =
+      if gmail_message.message.multipart?
+        gmail_message.message.text_part
+      else
+        gmail_message.message
+      end
+    return unless message
+
+    message = message.body.decoded.to_s.unpack('C*').pack('U*').force_encoding('UTF-8').encode!
     return unless message.strip.present?
     google_email = @google_account.google_emails.find_or_create_by!(google_email_id: gmail_message.msg_id)
     return unless contact.tasks.where(id: google_email.activities.pluck(:id)).empty?
-    task = contact.tasks.create!(subject: gmail_message.subject.present? ? gmail_message.subject : _('No Subject'),
+    subject = gmail_message.subject.present? ? gmail_message.subject.truncate(2000, omission: '') : _('No Subject')
+    task = contact.tasks.create!(subject: subject,
                                  start_at: gmail_message.envelope.date,
                                  completed: true,
                                  completed_at: gmail_message.envelope.date,
@@ -77,5 +89,6 @@ class Person::GmailAccount
     task.activity_comments.create!(body: message, person: person)
     google_email.activities << task
     google_email.save!
+    task
   end
 end

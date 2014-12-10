@@ -61,6 +61,8 @@ class GoogleIntegrationsController < ApplicationController
   end
 
   def missing_refresh_token
-    redirect_to google_integration_path(google_integration), alert: "<a href=\"#{new_account_path(provider: :google, redirect: google_integration_path(google_integration))}\">#{_('The link to your google account needs to be refreshed. Click here to re-connect to google.')}</a>"
+    alert_notice = _('The link to your google account needs to be refreshed. Click here to re-connect to google.')
+    redirect_to google_integration_path(google_integration),
+                alert: "<a href='#{new_account_path(provider: :google, redirect: google_integration_path(google_integration))}'>#{alert_notice}</a>"
   end
 end

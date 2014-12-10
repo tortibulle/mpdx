@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe GoogleIntegration do
   let(:google_integration) { build(:google_integration) }
-  let(:calendar_data) { Hashie::Mash.new(JSON.parse(%q({"kind":"calendar#calendarList","etag":"\"brXLH9dIsANhw0fUafNoxUtvJn8/z-s-EUrs3E9y8jAlApPmQlV5S88\"","items":[{"kind":"calendar#calendarListEntry","etag":"\"brXLH9dIsANhw0fUafNoxUtvJn8/wj94O5gU621uu4faAu06IKOk9jk\"","id":"f4r590q526okeq1osnv5bt6fd8@group.calendar.google.com","summary":"WebandMobileDevelopmentTeam","description":"Thiscalendarcanbeusedtotrackteammembers'vacation/leaverequests","timeZone":"America/New_York","colorId":"12","backgroundColor":"#fad165","foregroundColor":"#000000","selected":true,"accessRole":"owner"}]}))) }
+  let(:calendar_data) { Hashie::Mash.new(JSON.parse(File.new(Rails.root.join('spec/fixtures/google_calendar_data.json')).read)) }
 
   context '#queue_sync_data' do
     it 'queues a data sync when an integration type is passed in' do
@@ -43,7 +43,7 @@ describe GoogleIntegration do
       client.should_receive(:execute).with(api_method: calendar_list_api,
                                            parameters: { 'userId' => 'me' })
 
-      google_integration.calendars.should == [calendar_data.items.first]
+      google_integration.calendars.should == calendar_data.items
     end
   end
 
@@ -69,14 +69,12 @@ describe GoogleIntegration do
   end
 
   context '#set_default_calendar' do
-    let(:multiple_calendars_data) { Hashie::Mash.new(JSON.parse(%q({"kind":"calendar#calendarList","etag":"\"brXLH9dIsANhw0fUafNoxUtvJn8/z-s-EUrs3E9y8jAlApPmQlV5S88\"","items":[{"kind":"calendar#calendarListEntry","etag":"\"brXLH9dIsANhw0fUafNoxUtvJn8/wj94O5gU621uu4faAu06IKOk9jk\"","id":"f4r590q526okeq1osnv5bt6fd8@group.calendar.google.com","summary":"WebandMobileDevelopmentTeam","description":"Thiscalendarcanbeusedtotrackteammembers'vacation/leaverequests","timeZone":"America/New_York","colorId":"12","backgroundColor":"#fad165","foregroundColor":"#000000","selected":true,"accessRole":"owner"},{"kind":"calendar#calendarListEntry","etag":"\"brXLH9dIsANhw0fUafNoxUtvJn9/wj94O5gU621uu4faAu06IKOk9jk\"","id":"f4r590q526okeq1osnv5bt6fd9@group.calendar.google.com","summary":"WebandMobileDevelopmentTeam2","description":"Thiscalendarcanbeusedtotrackteammembers'vacation/leaverequests2","timeZone":"America/New_York","colorId":"12","backgroundColor":"#fad165","foregroundColor":"#000000","selected":false,"accessRole":"owner"}]}))) }
-
     before do
       google_integration.calendar_id = nil
     end
 
     it 'defaults to the first calendar if this google account only has 1' do
-      google_integration.stub(:calendars).and_return(calendar_data.items)
+      google_integration.stub(:calendars).and_return([calendar_data.items.first])
       first_calendar = calendar_data.items.first
 
       google_integration.set_default_calendar
@@ -92,7 +90,7 @@ describe GoogleIntegration do
     end
 
     it 'returns nil if this google account has more than one calendar' do
-      google_integration.stub(:calendars).and_return(multiple_calendars_data.items)
+      google_integration.stub(:calendars).and_return(calendar_data.items)
 
       expect(google_integration.set_default_calendar).to eq(nil)
     end

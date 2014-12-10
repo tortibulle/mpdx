@@ -60,14 +60,24 @@ angular.module('mpdxApp')
 
                     var dateTwoDaysFromToday = new Date();
                     dateTwoDaysFromToday.setDate(dateTwoDaysFromToday.getDate() + 2);
-                    dateTwoDaysFromToday = dateTwoDaysFromToday.getFullYear() + '-' + ("0" + (dateTwoDaysFromToday.getMonth() + 1)).slice(-2) + '-' + ("0" + dateTwoDaysFromToday.getDate()).slice(-2);
+                    dateTwoDaysFromToday = dateTwoDaysFromToday.getFullYear() + '-' +
+                                           ("0" + (dateTwoDaysFromToday.getMonth() + 1)).slice(-2) + '-' +
+                                           ("0" + dateTwoDaysFromToday.getDate()).slice(-2);
 
-                    if(strContains(taskResult, 'Call Again') || strContains(taskResult, 'Call for Decision') || strContains(taskResult, 'Email Again') || strContains(taskResult, 'Message Again') || strContains(taskResult, 'Text Again')) {
+                    if(strContains(taskResult, 'Call Again') ||
+                       strContains(taskResult, 'Call for Decision') ||
+                       strContains(taskResult, 'Email Again') ||
+                       strContains(taskResult, 'Message Again') ||
+                       strContains(taskResult, 'Text Again')) {
 
                         //generic followup task type
                         var taskType;
-                        if(strContains(taskResult, 'Call Again') || strContains(taskResult, 'Call for Decision')){
+                        var taskSubject;
+                        if(strContains(taskResult, 'Call Again')){
                             taskType = 'Call';
+                        }else if(strContains(taskResult, 'Call for Decision')){
+                            taskType = 'Call';
+                            taskSubject = 'Call for Decision - ' + followUpTask.subject;
                         }else if(strContains(taskResult, 'Email Again')){
                             taskType = 'Email';
                         }else if(strContains(taskResult, 'Message Again')){
@@ -86,7 +96,7 @@ angular.module('mpdxApp')
                             createCallTask: true,
                             callTask: {
                                 type: taskType,
-                                subject: followUpTask.subject,
+                                subject: taskSubject || followUpTask.subject,
                                 date: dateTwoDaysFromToday,
                                 hour: ("0" + (new Date().getHours())).slice(-2),
                                 min: ("0" + (new Date().getMinutes())).slice(-2),
@@ -367,6 +377,7 @@ angular.module('mpdxApp')
                             start_at: task.date + ' ' + task.hour + ':' + task.min + ':00',
                             subject: task.subject,
                             tag_list: task.tags,
+                            location: task.location,
                             activity_type: taskType,
                             activity_contacts_attributes: contactsObject,
                             activity_comments_attributes: {

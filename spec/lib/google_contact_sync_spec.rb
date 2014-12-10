@@ -306,16 +306,28 @@ describe GoogleContactSync do
     it 'combines addresses from mpdx and google by master address comparison which uses SmartyStreets' do
       WebMock.reset!
 
-      richmond_smarty = '[{"input_index":0,"candidate_index":0,"delivery_line_1":"7229 Forest Ave Ste 208","last_line":"Richmond VA 23226-3765","delivery_point_barcode":"232263765581","components":{"primary_number":"7229","street_name":"Forest","street_suffix":"Ave","secondary_number":"208","secondary_designator":"Ste","city_name":"Richmond","state_abbreviation":"VA","zipcode":"23226","plus4_code":"3765","delivery_point":"58","delivery_point_check_digit":"1"},"metadata":{"record_type":"H","zip_type":"Standard","county_fips":"51087","county_name":"Henrico","carrier_route":"C023","congressional_district":"07","rdi":"Commercial","elot_sequence":"0206","elot_sort":"A","latitude":37.60519,"longitude":-77.52963,"precision":"Zip9","time_zone":"Eastern","utc_offset":-5.0,"dst":true},"analysis":{"dpv_match_code":"Y","dpv_footnotes":"AABB","dpv_cmra":"N","dpv_vacant":"N","active":"Y","footnotes":"N#"}}]'
-      anchorage_smary = '[{"input_index":0,"candidate_index":0,"delivery_line_1":"2421 E Tudor Rd Ste 102","last_line":"Anchorage AK 99507-1166","delivery_point_barcode":"995071166277","components":{"primary_number":"2421","street_predirection":"E","street_name":"Tudor","street_suffix":"Rd","secondary_number":"102","secondary_designator":"Ste","city_name":"Anchorage","state_abbreviation":"AK","zipcode":"99507","plus4_code":"1166","delivery_point":"27","delivery_point_check_digit":"7"},"metadata":{"record_type":"H","zip_type":"Standard","county_fips":"02020","county_name":"Anchorage","carrier_route":"C024","congressional_district":"AL","rdi":"Commercial","elot_sequence":"0106","elot_sort":"D","latitude":61.18135,"longitude":-149.83548,"precision":"Zip9","time_zone":"Alaska","utc_offset":-9.0,"dst":true},"analysis":{"dpv_match_code":"Y","dpv_footnotes":"AABB","dpv_cmra":"N","dpv_vacant":"N","active":"Y","footnotes":"N#"}}]'
+      richmond_smarty = '[{"input_index":0,"candidate_index":0,"delivery_line_1":"7229 Forest Ave Ste 208","last_line":"Richmond VA 23226-3765",'\
+        '"delivery_point_barcode":"232263765581","components":{"primary_number":"7229","street_name":"Forest","street_suffix":"Ave","secondary_number":"208",'\
+        '"secondary_designator":"Ste","city_name":"Richmond","state_abbreviation":"VA","zipcode":"23226","plus4_code":"3765","delivery_point":"58",'\
+        '"delivery_point_check_digit":"1"},"metadata":{"record_type":"H","zip_type":"Standard","county_fips":"51087","county_name":"Henrico",'\
+        '"carrier_route":"C023","congressional_district":"07","rdi":"Commercial","elot_sequence":"0206","elot_sort":"A","latitude":37.60519,'\
+        '"longitude":-77.52963,"precision":"Zip9","time_zone":"Eastern","utc_offset":-5.0,"dst":true},"analysis":{"dpv_match_code":"Y","dpv_footnotes":"AABB",'\
+        '"dpv_cmra":"N","dpv_vacant":"N","active":"Y","footnotes":"N#"}}]'
+      anchorage_smarty = '[{"input_index":0,"candidate_index":0,"delivery_line_1":"2421 E Tudor Rd Ste 102","last_line":"Anchorage AK 99507-1166",'\
+        '"delivery_point_barcode":"995071166277","components":{"primary_number":"2421","street_predirection":"E","street_name":"Tudor","street_suffix":"Rd",'\
+        '"secondary_number":"102","secondary_designator":"Ste","city_name":"Anchorage","state_abbreviation":"AK","zipcode":"99507","plus4_code":"1166",'\
+        '"delivery_point":"27","delivery_point_check_digit":"7"},"metadata":{"record_type":"H","zip_type":"Standard","county_fips":"02020",'\
+        '"county_name":"Anchorage","carrier_route":"C024","congressional_district":"AL","rdi":"Commercial","elot_sequence":"0106","elot_sort":"D",'\
+        '"latitude":61.18135,"longitude":-149.83548,"precision":"Zip9","time_zone":"Alaska","utc_offset":-9.0,"dst":true},"analysis":{"dpv_match_code":"Y",'\
+        '"dpv_footnotes":"AABB","dpv_cmra":"N","dpv_vacant":"N","active":"Y","footnotes":"N#"}}]'
       {
         'city=orlando&state=fl&street=100%20lake%20hart%20dr.&zipcode=32832' => '[]',
         'city=springfield&state=il&street=1025%20south%206th%20street&zipcode=62703' => '[]',
         'city=richmond&state=va&street=7229%20forest%20avenue%20%23208&zipcode=23226' => richmond_smarty,
         'city=richmond&state=va&street=7229%20forest%20ave.&street2=apt%20208&zipcode=23226' => richmond_smarty,
         'city=richmond&state=va&street=7229%20forest%20ave%20suite%20208&zipcode=23226-3765' => richmond_smarty,
-        'city=anchorage&state=ak&street=2421%20east%20tudor%20road%20%23102&zipcode=99507-1166' => anchorage_smary,
-        'city=anchorage&state=ak&street=2421%20e.%20tudor%20rd.&street2=apt%20102&zipcode=99507' => anchorage_smary
+        'city=anchorage&state=ak&street=2421%20east%20tudor%20road%20%23102&zipcode=99507-1166' => anchorage_smarty,
+        'city=anchorage&state=ak&street=2421%20e.%20tudor%20rd.&street2=apt%20102&zipcode=99507' => anchorage_smarty
       }.each do |query, result|
         stub_request(:get, "http://api.smartystreets.com/street-address/?auth-id=&auth-token=&candidates=2&#{query}")
         .to_return(body: result)

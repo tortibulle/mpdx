@@ -186,3 +186,11 @@ input:read-only{
     text-align: right;
   }
 }
+
+.appealFilterCol {
+  width: 49%;
+  display: inline-block;
+  vertical-align: top;
+  height: 310px;
+  overflow-y: auto;
+}

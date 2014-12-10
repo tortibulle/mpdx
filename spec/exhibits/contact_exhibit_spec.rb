@@ -18,13 +18,14 @@ describe ContactExhibit do
 
   it 'should show contact_info' do
     context.stub(:contact_person_path)
+    contact = create(:contact)
     person = create(:person)
     contact.people << person
+
+    exhib = ContactExhibit.new(contact, context)
     email = build(:email_address, person: person)
     phone_number = build(:phone_number, person: person)
     context.stub(:link_to).and_return("#{phone_number.number}<br />#{email.email}")
-    exhib.stub(:phone_number).and_return(email)
-    exhib.stub(:email).and_return(phone_number)
     exhib.contact_info.should == "#{phone_number.number}<br />#{email.email}"
   end
 

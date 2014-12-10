@@ -7,9 +7,9 @@
       <%= "#{@page_title} - " if @page_title %> Mpdx
     </title>
     <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
-    <%= stylesheet_link_tag    "jquery-ui", :media => "all" %>
-    <%= stylesheet_link_tag    "application", :media => "all" %>
-    <%= javascript_include_tag "application" %>
+    <%= stylesheet_link_tag    'jquery-ui', media: 'all' %>
+    <%= stylesheet_link_tag    'application', media: 'all' %>
+    <%= javascript_include_tag 'application' %>
     <%= csrf_meta_tags %>
     <%= render 'google_analytics' %>
     <script type="text/javascript">

@@ -85,14 +85,14 @@ class MailChimpAccount < ActiveRecord::Base
     api_key.to_s.split('-').last
   end
 
-  private
+  #private
 
   def call_mailchimp(method, *args)
     return if !active? || primary_list_id.blank?
     send(method, *args)
   rescue Gibbon::MailChimpError => e
     case
-    when e.message.include?('API Key Disabled')
+    when e.message.include?('API Key Disabled') || e.message.include?('code 104')
       update_column(:active, false)
       AccountMailer.invalid_mailchimp_key(account_list).deliver
     when e.message.include?('code -91') # A backend database error has occurred. Please try again later or report this issue. (code -91)
@@ -123,7 +123,7 @@ class MailChimpAccount < ActiveRecord::Base
     case
     when e.message.include?('code 232') || e.message.include?('code 215')
       # do nothing
-    when e.message.include?('code 232') || e.message.include?('code 200')
+    when e.message.include?('code 200')
       # Invalid MailChimp List ID
       update_column(:primary_list_id, nil)
     else
@@ -166,7 +166,9 @@ class MailChimpAccount < ActiveRecord::Base
       when e.message.include?('code 200') # Invalid MailChimp List ID (code 200)
         # TODO: Notify user and nulify primary_list_id until they fix the problem
         update_column(:primary_list_id, nil)
-      when e.message.include?('code 502') # Invalid Email Address: "Rajah Tony" <amrajah@gmail.com> (code 502)
+      when e.message.include?('code 502') || e.message.include?('code 220')
+        # Invalid Email Address: "Rajah Tony" <amrajah@gmail.com> (code 502)
+        # "jake.adams.photo@gmail.cm" has been banned (code 220) - This is usually a typo in an email address
       else
         raise e
       end
@@ -200,7 +202,7 @@ class MailChimpAccount < ActiveRecord::Base
       contact.status = 'Partner - Pray' if contact.status.blank?
 
       contact.people.each do |person|
-        next unless person.primary_email_address
+        next if person.primary_email_address.blank? || person.optout_enewsletter?
         batch << { EMAIL: person.primary_email_address.email, FNAME: person.first_name,
                    LNAME: person.last_name }
       end

@@ -46,9 +46,12 @@ class AccountList < ActiveRecord::Base
 
   accepts_nested_attributes_for :contacts, reject_if: :all_blank, allow_destroy: true
 
+  after_update :subscribe_tester_to_mailchimp, :subscribe_owners_to_mailchimp
+
   def self.find_with_designation_numbers(numbers, organization)
     designation_account_ids = DesignationAccount.where(designation_number: numbers, organization_id: organization.id).pluck(:id).sort
-    results = AccountList.connection.select_all("select account_list_id,array_to_string(array_agg(designation_account_id), ',') as designation_account_ids from account_list_entries group by account_list_id")
+    query = "select account_list_id,array_to_string(array_agg(designation_account_id), ',') as designation_account_ids from account_list_entries group by account_list_id"
+    results = AccountList.connection.select_all(query)
     results.each do |hash|
       if hash['designation_account_ids'].split(',').map(&:to_i).sort == designation_account_ids
         return AccountList.find(hash['account_list_id'])
@@ -70,12 +73,14 @@ class AccountList < ActiveRecord::Base
   end
 
   def contact_tags
-    @contact_tags ||= ActiveRecord::Base.connection.select_values("select distinct(tags.name) from account_lists al inner join contacts c on c.account_list_id = al.id inner join taggings t on t.taggable_id = c.id AND t.taggable_type = 'Contact'
+    @contact_tags ||= ActiveRecord::Base.connection.select_values("select distinct(tags.name) from account_lists al inner join contacts c on c.account_list_id = al.id
+                                            inner join taggings t on t.taggable_id = c.id AND t.taggable_type = 'Contact'
                                             inner join tags on t.tag_id = tags.id where al.id = #{id} order by tags.name")
   end
 
   def activity_tags
-    @contact_tags ||= ActiveRecord::Base.connection.select_values("select distinct(tags.name) from account_lists al inner join activities a on a.account_list_id = al.id inner join taggings t on t.taggable_id = a.id AND t.taggable_type = 'Activity'
+    @contact_tags ||= ActiveRecord::Base.connection.select_values("select distinct(tags.name) from account_lists al inner join activities a on a.account_list_id = al.id
+                                            inner join taggings t on t.taggable_id = a.id AND t.taggable_type = 'Activity'
                                             inner join tags on t.tag_id = tags.id where al.id = #{id} order by tags.name")
   end
 
@@ -252,10 +257,9 @@ class AccountList < ActiveRecord::Base
     organization = org_account.organization
     designation_numbers = profile.designation_accounts.map(&:designation_number)
     # look for an existing account list with the same designation numbers in it
-    unless account_list = AccountList.find_with_designation_numbers(designation_numbers, organization)
-      # create a new list for this profile
-      account_list = AccountList.where(name: profile.name, creator_id: user.id).first_or_create!
-    end
+    account_list = AccountList.find_with_designation_numbers(designation_numbers, organization)
+    # otherwise create a new account list for this profile
+    account_list ||= AccountList.where(name: profile.name, creator_id: user.id).first_or_create!
 
     # Add designation accounts to account_list
     profile.designation_accounts.each do |da|
@@ -386,6 +390,59 @@ class AccountList < ActiveRecord::Base
     # Send email if necessary
     if notifications_to_email.present?
       NotificationMailer.notify(self, notifications_to_email).deliver
+    end
+  end
+
+  def subscribe_tester_to_mailchimp
+    return unless changes.keys.include?('settings') &&
+      changes['settings'][0]['tester'] != changes['settings'][1]['tester']
+
+    if changes['settings'][1]['tester']
+      MailChimpWorker.perform_async('AccountList', id, :mc_subscribe_users, 'Testers')
+    else
+      MailChimpWorker.perform_async('AccountList', id, :mc_unsubscribe_users, 'Testers')
+    end
+  end
+
+  def subscribe_owners_to_mailchimp
+    return unless changes.keys.include?('settings') &&
+      changes['settings'][0]['owner'] != changes['settings'][1]['owner']
+
+    if changes['settings'][1]['owner']
+      MailChimpWorker.perform_async('AccountList', id, :mc_subscribe_users, 'Owners')
+    else
+      MailChimpWorker.perform_async('AccountList', id, :mc_unsubscribe_users, 'Owners')
+    end
+  end
+
+  def mc_subscribe_users(group)
+    gb = Gibbon.new(APP_CONFIG['mailchimp_key'])
+    users.each do |u|
+      next unless u.email
+      vars = { EMAIL: u.email.email, FNAME: u.first_name, LNAME: u.last_name,
+               GROUPINGS: [{ id: APP_CONFIG['mailchimp_grouping_id'], groups: group }] }
+      gb.list_subscribe(id: APP_CONFIG['mailchimp_list'], email_address: vars[:EMAIL], update_existing: true,
+                        double_optin: false, merge_vars: vars, send_welcome: false, replace_interests: false
+      )
+    end
+  end
+
+  def mc_unsubscribe_users(group)
+    gb = Gibbon.new(APP_CONFIG['mailchimp_key'])
+    users.each do |u|
+      next if u.email.blank?
+      # subtract this group from the list of groups this email is subscribed to
+      result = gb.list_member_info(id: APP_CONFIG['mailchimp_list'], email_address: [u.email.email])
+      next unless result['success'] > 0
+      result['data'].each do |row|
+        next unless row['email'] && row['merges']
+        groups = row['merges']['GROUPINGS'].detect { |g| g['id'] == APP_CONFIG['mailchimp_grouping_id'] }['groups'].split(', ')
+        groups -= [group]
+        vars = { GROUPINGS: [{ id: APP_CONFIG['mailchimp_grouping_id'], groups: groups.join(', ') }] }
+        gb.list_update_member(id: APP_CONFIG['mailchimp_list'], email_address: row['email'], merge_vars: vars,
+                              replace_interests: true
+        )
+      end
     end
   end
 end
