@@ -247,6 +247,13 @@ class Contact < ActiveRecord::Base
     save(validate: false)
   end
 
+  def update_all_donation_totals
+    return unless donor_account_ids.present?
+    donation_sum = account_list.donations.where(donor_account_id: donor_account_ids).sum(:amount)
+    self.total_donations = donation_sum
+    save(validate: false)
+  end
+
   def monthly_pledge
     pledge_amount.to_f / (pledge_frequency || 1)
   end
@@ -319,14 +326,24 @@ class Contact < ActiveRecord::Base
       [:name, :pledge_amount, :status, :greeting, :website,
        :pledge_frequency, :pledge_start_date, :next_ask, :never_ask, :likely_to_give,
        :church_name, :send_newsletter, :direct_deposit, :magazine, :last_activity, :last_appointment,
-       :last_letter, :last_phone_call, :last_pre_call, :last_thank, :prayer_letters_id].each do |field|
+       :last_letter, :last_phone_call, :last_pre_call, :last_thank, :prayer_letters_id,
+       :last_donation_date, :first_donation_date, :full_name,
+       :pledge_received, :tnt_id, :timezone, :envelope_greeting].each do |field|
          next unless send(field).blank? && other.send(field).present?
          send("#{field}=".to_sym, other.send(field))
        end
 
-       # If one of these is marked as a finanical partner, we want that status
+      # If one of these is marked as a finanical partner, we want that status
       if status != 'Partner - Financial' && other.status == 'Partner - Financial'
         self.status = 'Partner - Financial'
+      end
+
+      # Make sure first and last donation dates are correct
+      if first_donation_date && first_donation_date > other.first_donation_date
+        self.first_donation_date = other.first_donation_date
+      end
+      if last_donation_date && last_donation_date < other.last_donation_date
+        self.last_donation_date = other.last_donation_date
       end
 
       self.notes = [notes, other.notes].compact.join("\n").strip if other.notes.present?
@@ -345,6 +362,9 @@ class Contact < ActiveRecord::Base
     reload
     merge_people
     merge_donor_accounts
+
+    # Update donation total after donor account ids are all assigned correctly
+    update_all_donation_totals
   end
 
   def deceased
