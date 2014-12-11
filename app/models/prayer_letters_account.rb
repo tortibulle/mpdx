@@ -144,7 +144,7 @@ class PrayerLettersAccount < ActiveRecord::Base
   def get_response(method, path, params = nil)
     return unless active?
 
-    RestClient::Request.execute(method: method, url: SERVICE_URL + path, payload: params, timeout: 120,
+    RestClient::Request.execute(method: method, url: SERVICE_URL + path, payload: params, timeout: 480,
                                 headers: { 'Authorization' => "Bearer #{ URI.encode(oauth2_token) }" })
   rescue RestClient::Unauthorized
     handle_bad_token
