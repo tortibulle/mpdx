@@ -5,7 +5,7 @@ class PrayerLettersAccount < ActiveRecord::Base
   include Async
   include Sidekiq::Worker
   sidekiq_options unique: true
-  SERVICE_URL = 'https://www.prayerletters.com'
+  SERVICE_URL = 'https://pls.herokuapp.com'
 
   belongs_to :account_list
 
