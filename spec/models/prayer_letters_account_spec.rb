@@ -67,4 +67,22 @@ describe PrayerLettersAccount do
       pla.update_contact(contact)
     end
   end
+
+  context 'handle 400 error in create contact' do
+    let(:contact) { create(:contact) }
+
+    it 'does not raise an error on a 400 bad request code but logs it via Airbrake' do
+      missing_name_body = <<-EOS
+        {
+            "status": 400,
+            "error": "contacts.missing_name",
+            "message": "A contact must have a name or company."
+        }
+      EOS
+      stub_request(:post, 'https://www.prayerletters.com/api/v1/contacts').to_return(body: missing_name_body, status: 400)
+
+      expect(Airbrake).to receive(:raise_or_notify)
+      pla.create_contact(contact)
+    end
+  end
 end

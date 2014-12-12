@@ -87,26 +87,14 @@ class PrayerLettersAccount < ActiveRecord::Base
   end
 
   def create_contact(contact)
-    json = JSON.parse(get_response(:post, '/api/v1/contacts', contact_params(contact)))
+    contact_params = contact_params(contact)
+    json = JSON.parse(get_response(:post, '/api/v1/contacts', contact_params))
     contact.update_column(:prayer_letters_id, json['contact_id'])
   rescue AccessError
     # do nothing
-  rescue => error_from_request
-    begin
-      json = JSON.parse(error_from_request.message)
-      case json['status']
-      when 400
-        # A contact must have a name or company.
-      else
-        fail error_from_request.message
-      end
-    rescue => err_message_parse_err
-      # This code will help us better identify the root cause of certain errors that were causing JSON parse errors
-      # for the line above json = JSON.parse(error_from_request.message)
-      Airbrake.raise_or_notify(error_from_request)
-      Airbrake.raise_or_notify(err_message_parse_err)
-      raise error_from_request
-    end
+  rescue RestClient::BadRequest => e
+    # BadRequest: A contact must have a name or company. Monitor those cases for pattern / underlying causes.
+    Airbrake.raise_or_notify(e, parameters: contact_params)
   end
 
   def update_contact(contact)
@@ -156,7 +144,7 @@ class PrayerLettersAccount < ActiveRecord::Base
   def get_response(method, path, params = nil)
     return unless active?
 
-    RestClient::Request.execute(method: method, url: SERVICE_URL + path, payload: params, timeout: 120,
+    RestClient::Request.execute(method: method, url: SERVICE_URL + path, payload: params, timeout: 480,
                                 headers: { 'Authorization' => "Bearer #{ URI.encode(oauth2_token) }" })
   rescue RestClient::Unauthorized
     handle_bad_token
