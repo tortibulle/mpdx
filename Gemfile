@@ -124,6 +124,7 @@ group :development, :test do
   gem 'unicorn'
   gem 'zonebie'
   gem 'equivalent-xml'
+  gem 'http_logger'
 end
 
 group :test do
