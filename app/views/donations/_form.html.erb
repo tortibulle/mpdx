@@ -33,7 +33,8 @@
 
     <div class="field">
       <%= f.label :appeal_id, _('Appeal') %>
-      <%= f.select :appeal_id, options_from_collection_for_select(@appeals, 'id', 'name'), prompt: '', :include_blank => true %>
+      <%= f.select :appeal_id, options_from_collection_for_select(@appeals, 'id', 'name', donation.appeal.present? ? donation.appeal.id : ''),
+                   :include_blank => true %>
     </div>
 
     <% if current_account_list.multiple_designations %>
