@@ -130,10 +130,10 @@ class TntImport
 
   # If the user had two donor accounts in the same contact in Tnt, then  merge different contacts with those in MPDX.
   def merge_dups_by_donor_accts(tnt_contact, donor_accounts)
-    @account_list.contacts.where.not(id: tnt_contact.id).joins(:donor_accounts)
+    dups_by_donor_accts = @account_list.contacts.where.not(id: tnt_contact.id).joins(:donor_accounts)
       .where(donor_accounts: { id: donor_accounts.map(&:id) }).readonly(false)
-      .each do |dup_contact_matching_donor_account|
 
+    dups_by_donor_accts.each do |dup_contact_matching_donor_account|
       tnt_contact.reload.merge(dup_contact_matching_donor_account)
     end
   end
