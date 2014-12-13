@@ -148,7 +148,7 @@ class PrayerLettersAccount < ActiveRecord::Base
 
   def get_response(method, path, params = nil)
     return unless active?
-    
+
     headers = {
       'Authorization' => "Bearer #{ URI.encode(oauth2_token) }",
       'Content-Type' => 'application/json'
