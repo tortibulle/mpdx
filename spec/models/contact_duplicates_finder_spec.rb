@@ -30,13 +30,23 @@ describe ContactDuplicatesFinder do
     end
   end
 
-  describe '#dup_people_by_same_name' do
-    it 'finds duplicates with exactly matching name' do
-      dups = dups_finder.dup_people_by_same_name
-      expect(dups.size).to eq(1)
-      dup_id_pair = dups.first.split(',')
-      expect(dup_id_pair).to include(john_doe1.id.to_s)
-      expect(dup_id_pair).to include(john_doe2.id.to_s)
+  def expect_john_1_2_dup(dups)
+    expect(dups.size).to eq(1)
+    expect(dups.first).to include(john_doe1.id)
+    expect(dups.first).to include(john_doe2.id)
+  end
+
+  describe '#dup_people_by_same_name ' do
+    it 'find dups by exactly matching name' do
+      expect_john_1_2_dup(dups_finder.dup_people_by_same_name)
+    end
+  end
+
+  describe '#dup_people_by_nickname' do
+    it 'finds dups by nicknames' do
+      Nickname.create(name: 'john', nickname: 'johnny', suggest_duplicates: true)
+      john_doe1.update_column(:first_name, 'Johnny')
+      expect_john_1_2_dup(dups_finder.dup_people_by_nickname)
     end
   end
 end

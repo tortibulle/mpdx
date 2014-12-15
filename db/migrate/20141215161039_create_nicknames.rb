@@ -5,6 +5,7 @@ class CreateNicknames < ActiveRecord::Migration
       t.string "nickname", null: false
       t.string "source"
       t.integer "num_merges", default: 0
+      t.integer "num_times_offered", default: 0
       t.boolean  "suggest_duplicates", default: false
       t.timestamps
     end

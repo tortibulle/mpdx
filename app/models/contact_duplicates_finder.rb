@@ -18,20 +18,29 @@ class ContactDuplicatesFinder
                AND first_name not like '%nknow%'
                GROUP BY first_name, last_name
                HAVING count(*) > 1"
-    Person.connection.select_values(sql)
+    dup_pairs = Person.connection.select_values(sql)
+    dup_pairs.map { |pair| pair.split(',').map(&:to_i).sort }
   end
 
   def dup_people_by_nickname
+    dup_people_results =
+      @account_list.people.select('people.id, people_dups.id AS dup_person_id, nicknames.id AS nickname_id')
+        .joins('INNER JOIN nicknames ON LOWER(people.first_name) = nicknames.name')
+        .joins('INNER JOIN people AS people_dups ON LOWER(people_dups.first_name) = nicknames.nickname')
+        .where("nicknames.suggest_duplicates = 'true'").where('people.last_name = people_dups.last_name')
 
+    # Update the nickname times offered counts to help track which nicknames are most helpful and which are not
+    #nickname_ids = dup_people_results.map(&:nickname_id)
+    #Nickname.connection.exec("UPDATE nicknames SET num_times_offered += 1 WHERE id IN (#{nickname_ids.join(',')})")
+
+    dup_people_results.map { |result| [result.id, result.dup_person_id].sort }
   end
 
   def find_duplicate_contacts
     contact_sets = []
     contacts_checked = []
     find_duplicate_people_pairs.each do |pair|
-      contacts = @account_list.contacts.people.includes(:people)
-                   .where('people.id' => pair.split(','))
-                   .references('people')[0..1]
+      contacts = @account_list.contacts.people.includes(:people).where('people.id' => pair).references('people')[0..1]
       next if contacts.length <= 1
       already_included = false
       contacts.each { |c| already_included = true if contacts_checked.include?(c) }
