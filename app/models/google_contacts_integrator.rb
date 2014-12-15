@@ -339,7 +339,7 @@ class GoogleContactsIntegrator
           end
         rescue => e
           # Rescue within this block so that the exception won't cause the response callbacks for the whole batch to break
-          Airbrake.raise_or_notify(e)
+          Airbrake.raise_or_notify(e, parameters: { g_contact_attrs: g_contact.formatted_attrs })
         end
       end
     end
