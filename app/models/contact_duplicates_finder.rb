@@ -3,11 +3,11 @@ class ContactDuplicatesFinder
     @account_list = account_list
   end
 
-  def find_duplicate_people
-
+  def find_duplicate_people_pairs
+    dup_people_by_same_name
   end
 
-  def find_duplicate_contacts
+  def dup_people_by_same_name
     # Find sets of people with the same name
     sql = "SELECT array_to_string(array_agg(people.id), ',')
                FROM people
@@ -18,10 +18,17 @@ class ContactDuplicatesFinder
                AND first_name not like '%nknow%'
                GROUP BY first_name, last_name
                HAVING count(*) > 1"
-    people_with_duplicate_names = Person.connection.select_values(sql)
+    Person.connection.select_values(sql)
+  end
+
+  def dup_people_by_nickname
+
+  end
+
+  def find_duplicate_contacts
     contact_sets = []
     contacts_checked = []
-    people_with_duplicate_names.each do |pair|
+    find_duplicate_people_pairs.each do |pair|
       contacts = @account_list.contacts.people.includes(:people)
                    .where('people.id' => pair.split(','))
                    .references('people')[0..1]
