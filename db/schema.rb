@@ -549,10 +549,11 @@ ActiveRecord::Schema.define(version: 20141215161039) do
   add_index "messages", ["to_id"], name: "index_messages_on_to_id", using: :btree
 
   create_table "nicknames", force: true do |t|
-    t.string   "name"
-    t.string   "nickname"
+    t.string   "name",                               null: false
+    t.string   "nickname",                           null: false
     t.string   "source"
-    t.integer  "num_merges"
+    t.integer  "num_merges",         default: 0
+    t.boolean  "suggest_duplicates", default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

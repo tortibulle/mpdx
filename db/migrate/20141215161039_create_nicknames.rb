@@ -1,10 +1,11 @@
 class CreateNicknames < ActiveRecord::Migration
   def change
     create_table :nicknames do |t|
-      t.string "name"
-      t.string "nickname"
+      t.string "name", null: false
+      t.string "nickname", null: false
       t.string "source"
-      t.integer "num_merges"
+      t.integer "num_merges", default: 0
+      t.boolean  "suggest_duplicates", default: false
       t.timestamps
     end
 
