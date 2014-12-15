@@ -150,9 +150,9 @@ class PrayerLettersAccount < ActiveRecord::Base
     return unless active?
 
     headers = {
-      'Authorization' => "Bearer #{ URI.encode(oauth2_token) }",
-      'Content-Type' => 'application/json'
+      'Authorization' => "Bearer #{ URI.encode(oauth2_token) }"
     }
+    headers['Content-Type'] = 'application/json' if method == :put
     RestClient::Request.execute(method: method, url: SERVICE_URL + path, payload: params, timeout: 480, headers: headers)
   rescue RestClient::Unauthorized
     handle_bad_token
