@@ -354,6 +354,10 @@ class Person < ActiveRecord::Base
     self
   end
 
+  def not_same_as?(other)
+    not_duplicated_with.to_s.split(',').include?(other.id.to_s) || other.not_duplicated_with.to_s.split(',').include?(id.to_s)
+  end
+
   private
 
   def find_master_person
