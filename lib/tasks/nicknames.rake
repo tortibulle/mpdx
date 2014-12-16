@@ -1,5 +1,8 @@
 require 'csv'
 
+# Load the db/nicknames.csv file which was taken from
+# https://code.google.com/p/nickname-and-diminutive-names-lookup
+
 namespace :nicknames do
   task load: :environment do
     nicknames = {}

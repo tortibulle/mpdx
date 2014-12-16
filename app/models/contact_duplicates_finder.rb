@@ -4,7 +4,7 @@ class ContactDuplicatesFinder
   end
 
   def find_duplicate_people_pairs
-    dup_people_by_same_name
+    dup_people_by_same_name + dup_people_by_nickname
   end
 
   def dup_people_by_same_name
