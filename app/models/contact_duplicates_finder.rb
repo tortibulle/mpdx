@@ -8,8 +8,6 @@ class ContactDuplicatesFinder
   def dup_contacts_and_people
     nickname_dups = dup_people_by_nickname
 
-    increment_nicknames_offered(nickname_dups.map(&:nickname_id))
-
     dup_people_pairs = dup_people_by_same_name + nickname_dups.map { |dup| [dup.person.id, dup.dup_person.id] }
     contact_sets = dup_contacts(dup_people_pairs)
 
@@ -19,12 +17,6 @@ class ContactDuplicatesFinder
     people_sets = nickname_dups.select { |dup| dup.shared_contact.present? }
 
     [contact_sets, people_sets]
-  end
-
-  def increment_nicknames_offered(nickname_ids)
-    return if nickname_ids.empty?
-    sql = "UPDATE nicknames SET num_times_offered = num_times_offered + 1 WHERE id IN (#{nickname_ids.join(',')})"
-    ActiveRecord::Base.connection.execute(sql)
   end
 
   def dup_people_by_same_name

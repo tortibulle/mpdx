@@ -93,19 +93,6 @@ describe ContactDuplicatesFinder do
     end
   end
 
-  describe '#increment_nicknames_offered' do
-    it 'increments the num_times_offered for specified nickname ids' do
-      expect(nickname.num_times_offered).to eq(0)
-      dups_finder.increment_nicknames_offered([nickname.id])
-      nickname.reload
-      expect(nickname.num_times_offered).to eq(1)
-    end
-
-    it 'does not cause an error if no nickname ids specified' do
-      expect { dups_finder.increment_nicknames_offered([]) }.to_not raise_error
-    end
-  end
-
   describe '#dup_people_by_same_name' do
     it 'finds people in the account list with the same name' do
       dups = dups_finder.dup_people_by_same_name
