@@ -552,9 +552,10 @@ ActiveRecord::Schema.define(version: 20141216133726) do
     t.string   "name",                               null: false
     t.string   "nickname",                           null: false
     t.string   "source"
-    t.integer  "num_merges",         default: 0
-    t.integer  "num_times_offered",  default: 0
-    t.boolean  "suggest_duplicates", default: false
+    t.integer  "num_merges",         default: 0,     null: false
+    t.integer  "num_not_duplicates", default: 0,     null: false
+    t.integer  "num_times_offered",  default: 0,     null: false
+    t.boolean  "suggest_duplicates", default: false, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
