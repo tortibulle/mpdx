@@ -1,5 +1,6 @@
 <div class="contact_sets">
   <% if @contact_sets.present? %>
+  <h2><%=  _('Step 1 of 2: Merge duplicate contacts (i.e. duplicate giving units)') %></h2>
   <%= form_tag merge_contacts_path do %>
     <%= link_to(_('Select all duplicates'), '#', class: 'select_all') %>
     <% @contact_sets.each do |set| %>
@@ -11,12 +12,25 @@
         <% end %>
         <%= check_box_tag 'merge_sets[]', set.collect(&:id).join(',') %>
         <%= _('Merge these contacts') %><br />
-        <%= link_to(_('These are not duplicates'), not_duplicates_contacts_path(ids: set.collect(&:id).join(',')), remote: true, method: :put, data: {behavior: 'not_duplicates'}) %>
+        <%= link_to(_('These are not duplicates'), not_duplicates_contacts_path(ids: set.collect(&:id).join(',')),
+                    remote: true, method: :put, data: {behavior: 'not_duplicates'}) %>
       </div>
     <% end %>
     <%= submit_tag _('Merge selected contacts'), class: 'btn desired_action' %>
   <% end %>
+  <% elsif @people_sets.present? %>
+      <% @people_sets.each do |dup| %>
+          <div class="people_dup_set">
+            <div class="contact"><%= dup.shared_contact %></div>
+            <div class="person"><%= dup.person %></div>
+            <div class="person"><%= dup.dup_person %></div>
+            <%= check_box_tag 'merge_sets[]', set.collect(&:id).join(',') %>
+            <%= _('Merge these people') %><br />
+            <%= link_to(_('These are not duplicates'), not_duplicates_contacts_path(ids: [dup.person.id, dup.dup_person.id].join(',')),
+                        remote: true, method: :put, data: {behavior: 'not_duplicates'}) %>
+          </div>
+      <% end %>
   <% else %>
-    <%= _("We weren't able to detect any duplicates on your account.") %>
+      <%= _("We weren't able to detect any duplicates on your account.") %>
   <% end %>
 </div>
