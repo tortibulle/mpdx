@@ -1,5 +1,5 @@
 source 'http://rubygems.org'
-source 'https://fe25782d:2b14c6ee@www.mikeperham.com/rubygems/'
+source 'https://fe25782d:2b14c6ee@gems.contribsys.com/'
 
 gem 'rails', '~> 4.1.0'
 

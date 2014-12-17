@@ -45,7 +45,7 @@ GIT
 
 GEM
   remote: http://rubygems.org/
-  remote: https://fe25782d:2b14c6ee@www.mikeperham.com/rubygems/
+  remote: https://fe25782d:2b14c6ee@gems.contribsys.com/
   specs:
     actionmailer (4.1.8)
       actionpack (= 4.1.8)
