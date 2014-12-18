@@ -358,11 +358,14 @@ describe Contact do
   end
 
   context '#envelope_greeting' do
-    it 'uses first_name, spouse first_name and same last_name' do
-      contact = create(:contact, greeting: 'Fred and Lori Doe', name: 'Fredrick & Loraine Doe')
-      primary = create(:person, first_name: 'Bob', last_name: 'Jones', legal_first_name: 'Robert')
-      contact.people << primary
+    let(:primary) { create(:person, first_name: 'Bob', last_name: 'Jones', legal_first_name: 'Robert') }
 
+    before do
+      contact.update_attributes(greeting: 'Fred and Lori Doe', name: 'Fredrick & Loraine Doe')
+      contact.people << primary
+    end
+
+    it 'uses first_name, spouse first_name and same last_name' do
       expect(contact.envelope_greeting).to eq('Bob Jones')
 
       spouse = create(:person, first_name: 'Jen', last_name: 'Jones', legal_first_name: 'Jennifer')
@@ -372,12 +375,6 @@ describe Contact do
     end
 
     it 'uses first_name, spouse first_name and different last_name' do
-      contact = create(:contact, greeting: 'Fred and Lori Doe', name: 'Fredrick & Loraine Doe')
-      primary = create(:person, first_name: 'Bob', last_name: 'Jones', legal_first_name: 'Robert')
-      contact.people << primary
-
-      expect(contact.envelope_greeting).to eq('Bob Jones')
-
       spouse = create(:person, first_name: 'Jen', last_name: 'Fidel', legal_first_name: 'Jennifer')
       contact.people << spouse
       contact.reload
@@ -385,9 +382,6 @@ describe Contact do
     end
 
     it 'can be overwriten' do
-      contact = create(:contact, name: 'Fredrick & Loraine Doe')
-      primary = create(:person, first_name: 'Bob', last_name: 'Jones')
-      contact.people << primary
       spouse = create(:person, first_name: 'Jen', last_name: 'Jones')
       contact.people << spouse
       contact.reload
@@ -396,6 +390,12 @@ describe Contact do
       contact.update_attributes(envelope_greeting: 'Mr and Mrs Jones')
       contact.reload
       expect(contact.envelope_greeting).to eq('Mr and Mrs Jones')
+    end
+
+    it "will add last name if person doesn't have it set" do
+      primary.update_attributes(last_name: '')
+      contact.reload
+      expect(contact.envelope_greeting).to eq('Bob Doe')
     end
   end
 end
