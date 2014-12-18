@@ -319,7 +319,7 @@ describe Contact do
     end
   end
 
-  context 'without set greeting' do
+  context 'without set greeting or envelope_greeting' do
     let(:person) { create(:person) }
     let(:spouse) { create(:person, first_name: 'Jill') }
 
@@ -337,16 +337,18 @@ describe Contact do
       expect(contact.greeting).to eq(person.first_name + ' and ' + spouse.first_name)
     end
 
-    it 'excludes deceased person from greeting' do
+    it 'excludes deceased person from greetings' do
       person.deceased = true
       person.save
       expect(contact.greeting).to eq spouse.first_name
+      expect(contact.envelope_greeting).to eq(spouse.first_name + ' ' + spouse.last_name)
     end
 
     it 'excludes deceased spouse from greeting' do
       spouse.deceased = true
       spouse.save
       expect(contact.greeting).to eq person.first_name
+      expect(contact.envelope_greeting).to eq(person.first_name + ' ' + person.last_name)
     end
 
     it 'still gives name with single deceased' do
@@ -354,6 +356,7 @@ describe Contact do
       contact.reload
       expect(contact.people.count).to be 1
       expect(contact.greeting).to eq person.first_name
+      expect(contact.envelope_greeting).to eq(person.first_name + ' ' + person.last_name)
     end
   end
 

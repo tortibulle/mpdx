@@ -141,6 +141,9 @@ class Person < ActiveRecord::Base
       if c[:greeting].present? && c[:greeting].include?(first_name)
         contact_updates[:greeting] = c.greeting.sub(first_name, '').sub(' and ', ' ').strip
       end
+      if c[:envelope_greeting].present? && c[:envelope_greeting].include?(first_name)
+        contact_updates[:envelope_greeting] = ''
+      end
 
       if c.name.include?(first_name)
         contact_updates[:name] = c.name.sub(first_name, '').sub(' and ', '').strip

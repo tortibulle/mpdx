@@ -229,16 +229,29 @@ class Contact < ActiveRecord::Base
 
   def generated_envelope_greeting
     return name if siebel_organization?
-    if last_name.blank?
-      last_name_guess = spouse_last_name
+    if primary_or_first_person.deceased == (spouse.try(:deceased) || false)
+      alive_people = [primary_or_first_person, spouse].compact
+    elsif primary_or_first_person.deceased?
+      alive_people = [spouse]
+    else
+      alive_people = [primary_or_first_person]
+    end
+
+    if alive_people[0].last_name.blank?
+      last_name_guess = alive_people[1].try(:last_name)
       last_name_guess ||= name.split(',')[1].try(:strip)
       last_name_guess ||= name.split(' ').last
     end
-    if last_name_guess || spouse_last_name.blank? || last_name == spouse_last_name
-      last_name_guess ||= last_name
-      [[first_name, spouse_first_name].compact.join(" #{_('and')} "), last_name_guess].compact.join(' ')
+    if last_name_guess || alive_people[1].try(:last_name).blank? ||
+       alive_people[0].last_name == alive_people[1].try(:last_name)
+      last_name_guess ||= alive_people[0].last_name
+      first_names_string = [alive_people[0].first_name, alive_people[1].try(:first_name)].compact.join(" #{_('and')} ")
+      return first_names_string unless last_name_guess
+      first_names_string + ' ' + last_name_guess.to_s
     else
-      [[first_name, last_name].compact.join(' '), [spouse_first_name, spouse_last_name].compact.join(' ')].join(" #{_('and')} ")
+      first = [alive_people[0].first_name, alive_people[0].last_name].compact.join(' ')
+      second = [alive_people[1].first_name, alive_people[1].last_name].compact.join(' ')
+      [first, second].join(" #{_('and')} ")
     end
   end
 
