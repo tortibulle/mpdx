@@ -41,12 +41,7 @@ class ContactMerge
       ContactReferral.where(referred_by_id: @other.id).update_all(referred_by_id: @winner.id)
 
       # Copy fields over updating any field that's blank on the winner
-      [:name, :pledge_amount, :status, :greeting, :website,
-       :pledge_frequency, :pledge_start_date, :next_ask, :never_ask, :likely_to_give,
-       :church_name, :send_newsletter, :direct_deposit, :magazine, :last_activity, :last_appointment,
-       :last_letter, :last_phone_call, :last_pre_call, :last_thank, :prayer_letters_id,
-       :last_donation_date, :first_donation_date, :full_name,
-       :pledge_received, :tnt_id, :timezone, :envelope_greeting].each do |field|
+      Contact::MERGE_COPY_ATTRIBUTES.each do |field|
         next unless @winner.send(field).blank? && @other.send(field).present?
         @winner.send("#{field}=".to_sym, @other.send(field))
       end
