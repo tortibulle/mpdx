@@ -56,6 +56,13 @@ class Contact < ActiveRecord::Base
     }
   ]
 
+  MERGE_COPY_ATTRIBUTES = [
+    :name, :pledge_amount, :status, :full_name, :greeting, :envelope_greeting, :website, :pledge_frequency,
+    :pledge_start_date, :next_ask, :never_ask, :likely_to_give, :church_name, :send_newsletter,
+    :direct_deposit, :magazine, :pledge_received, :timezone, :last_activity, :last_appointment, :last_letter,
+    :last_phone_call, :last_pre_call, :last_thank, :prayer_letters_id, :last_donation_date, :first_donation_date, :tnt_id
+  ]
+
   validates :name, presence: true
 
   accepts_nested_attributes_for :people, reject_if: :all_blank, allow_destroy: true
@@ -247,6 +254,13 @@ class Contact < ActiveRecord::Base
     save(validate: false)
   end
 
+  def update_all_donation_totals
+    return unless donor_account_ids.present?
+    donation_sum = account_list.donations.where(donor_account_id: donor_account_ids).sum(:amount)
+    self.total_donations = donation_sum
+    save(validate: false)
+  end
+
   def monthly_pledge
     pledge_amount.to_f / (pledge_frequency || 1)
   end
@@ -279,74 +293,6 @@ class Contact < ActiveRecord::Base
     end
   end
 
-  def merge(other)
-    Contact.transaction do
-      # Update related records
-      other.messages.update_all(contact_id: id)
-
-      other.contact_people.each do |r|
-        next if contact_people.where(person_id: r.person_id).first
-        r.update_attributes(contact_id: id)
-      end
-
-      other.contact_donor_accounts.each do |other_contact_donor_account|
-        next if donor_accounts.map(&:account_number).include?(other_contact_donor_account.donor_account.account_number)
-        other_contact_donor_account.update_column(:contact_id, id)
-      end
-
-      other.activity_contacts.each do |other_activity_contact|
-        next if activities.include?(other_activity_contact.activity)
-        other_activity_contact.update_column(:contact_id, id)
-      end
-      update_uncompleted_tasks_count
-
-      other.addresses.each do |other_address|
-        next if addresses.find { |address| address.equal_to? other_address }
-        other_address.update_column(:addressable_id, id)
-      end
-
-      other.notifications.update_all(contact_id: id)
-
-      merge_addresses
-
-      ContactReferral.where(referred_to_id: other.id).each do |contact_referral|
-        contact_referral.update_column(:referred_to_id, id) unless contact_referrals_to_me.find_by_referred_by_id(contact_referral.referred_by_id)
-      end
-
-      ContactReferral.where(referred_by_id: other.id).update_all(referred_by_id: id)
-
-      # Copy fields over updating any field that's blank on the winner
-      [:name, :pledge_amount, :status, :greeting, :website,
-       :pledge_frequency, :pledge_start_date, :next_ask, :never_ask, :likely_to_give,
-       :church_name, :send_newsletter, :direct_deposit, :magazine, :last_activity, :last_appointment,
-       :last_letter, :last_phone_call, :last_pre_call, :last_thank, :prayer_letters_id].each do |field|
-         next unless send(field).blank? && other.send(field).present?
-         send("#{field}=".to_sym, other.send(field))
-       end
-
-       # If one of these is marked as a finanical partner, we want that status
-      if status != 'Partner - Financial' && other.status == 'Partner - Financial'
-        self.status = 'Partner - Financial'
-      end
-
-      self.notes = [notes, other.notes].compact.join("\n").strip if other.notes.present?
-
-      self.tag_list += other.tag_list
-
-      save(validate: false)
-    end
-
-    # Delete the losing record
-    begin
-      other.reload
-      other.destroy
-    rescue ActiveRecord::RecordNotFound; end
-
-    reload
-    merge_people
-    merge_donor_accounts
-  end
-
   def deceased
     people.all?(&:deceased)
   end
@@ -367,6 +313,10 @@ class Contact < ActiveRecord::Base
       (12.0).to_d => _('Annual'),
       (24.0).to_d => _('Biennial')
     }
+  end
+
+  def merge(other)
+    ContactMerge.new(self, other).merge
   end
 
   def merge_addresses
