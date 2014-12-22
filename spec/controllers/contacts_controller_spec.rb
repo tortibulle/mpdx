@@ -153,8 +153,32 @@ describe ContactsController do
         xhr :put, :bulk_update,  'bulk_edit_contact_ids' => contact.id, 'contact' => { 'next_ask(3i)' => '3', 'next_ask(1i)' => '2012' }
         contact.reload.next_ask.should.nil?
       end
-
     end
 
+    describe '#find_duplicates' do
+      it 'does not assign people_sets if contact_sets has items' do
+        contact_sets = [[contact, build(:contact)]]
+        people_sets = [double]
+        expect(ContactDuplicatesFinder).to receive(:new).with(user.account_lists.first)
+                                             .and_return(double(dup_contact_sets: contact_sets, dup_people_sets: people_sets))
+
+        xhr :get, :find_duplicates, format: :js
+        expect(response).to be_success
+        expect(assigns(:contact_sets)).to eq(contact_sets)
+        expect(assigns(:people_sets)).to be_nil
+      end
+
+      it 'assigns people_sets if contact_sets is empty' do
+        contact_sets = []
+        people_sets = [double]
+        expect(ContactDuplicatesFinder).to receive(:new).with(user.account_lists.first)
+                                             .and_return(double(dup_contact_sets: contact_sets, dup_people_sets: people_sets))
+
+        xhr :get, :find_duplicates, format: :js
+        expect(response).to be_success
+        expect(assigns(:contact_sets)).to eq([])
+        expect(assigns(:people_sets)).to eq(people_sets)
+      end
+    end
   end
 end

@@ -259,13 +259,9 @@ class ContactsController < ApplicationController
     respond_to do |wants|
       wants.html {}
       wants.js do
-        @contact_sets, @people_sets = ContactDuplicatesFinder.new(current_account_list).dup_contacts_and_people
-
-        # Update the number of times we offer a nickname to the user so we can track which ones are most useful
-        if @contact_sets.empty?
-          nickname_ids = @people_sets.map(&:nickname_id)
-          Nickname.update_counters(nickname_ids, num_times_offered: 1) unless nickname_ids.empty?
-        end
+        dups_finder = ContactDuplicatesFinder.new(current_account_list)
+        @contact_sets = dups_finder.dup_contact_sets
+        @people_sets = dups_finder.dup_people_sets if @contact_sets.empty?
       end
     end
   end

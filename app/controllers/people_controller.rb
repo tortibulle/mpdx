@@ -67,6 +67,19 @@ class PeopleController < ApplicationController
     end
   end
 
+  def not_duplicates
+    people = current_account_list.people.where(id: params[:ids])
+    people.each do |person|
+      not_duplicated_with = (person.not_duplicated_with.to_s.split(',') + params[:ids].split(',') - [person.id.to_s]).uniq.join(',')
+      person.update(not_duplicated_with: not_duplicated_with)
+    end
+
+    respond_to do |wants|
+      wants.html { redirect_to :back }
+      wants.js { render nothing: true }
+    end
+  end
+
   private
 
   def find_person

@@ -40,7 +40,7 @@ $ ->
         false
 
       $(document).on 'click', '[data-behavior=not_duplicates]', ->
-        div = $(this).closest('.contact_set')
+        div = $(this).closest('.duplicate_set')
         div.fadeOut('fast')
         $('input', div).remove()
 

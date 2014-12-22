@@ -1106,17 +1106,25 @@ table.meta {
 }
 
 /* duplicate merge page */
-.contact_sets {
+.duplicate_contacts {
   margin-top: 10px;
-  .contact_set {
+
+  .duplicate_set {
     margin: 10px 10px 0 0;
     padding: 5px;
     border: solid 1px $blue;
     .contact {
       margin: 3px;
     }
+    .contact-header {
+      font-weight: bold;
+    }
+    .person {
+      margin: 3px;
+    }
   }
 }
+
 
 /* ************************************************************** */
 .qtip {

@@ -104,7 +104,11 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :people
+  resources :people do
+    collection do
+      put :not_duplicates
+    end
+  end
 
   resources :research, only: [:index] do
     member do

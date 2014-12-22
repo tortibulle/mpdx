@@ -5,18 +5,23 @@ class ContactDuplicatesFinder
     @account_list = account_list
   end
 
-  def dup_contacts_and_people
-    nickname_dups = dup_people_by_nickname
+  def dup_contact_sets
+    dup_people_pairs = dup_people_by_same_name +
+      dup_people_by_nickname_cached.map { |dup| [dup.person.id, dup.dup_person.id] }
 
-    dup_people_pairs = dup_people_by_same_name + nickname_dups.map { |dup| [dup.person.id, dup.dup_person.id] }
-    contact_sets = dup_contacts(dup_people_pairs)
+    dup_contacts_by_dup_people(dup_people_pairs)
+  end
 
-    # Only show duplicated people if they are in the same contact. If they're in different contacts, the user should consider
+  def dup_people_sets
+    # Only return duplicated people if they are in the same contact. If they're in different contacts, the user should consider
     # merging the whole contacts first, then they can merge the duplicated people within them (and those with the
     # same name would be automatically merged anyway).
-    people_sets = nickname_dups.select { |dup| dup.shared_contact.present? }
+    people_sets = dup_people_by_nickname_cached.select { |dup| dup.shared_contact.present? }
 
-    [contact_sets, people_sets]
+    # Update the number of times we offer a nickname to the user so we can track which ones are most useful
+    Nickname.update_counters(people_sets.map(&:nickname_id), num_times_offered: 1)
+
+    people_sets.sort_by! { |s| s.shared_contact.name }
   end
 
   def dup_people_by_same_name
@@ -31,6 +36,12 @@ class ContactDuplicatesFinder
                GROUP BY first_name, last_name
                HAVING count(*) > 1"
     Person.connection.select_values(sql).map { |dup_person_ids| dup_person_ids.split(',').map(&:to_i) }
+  end
+
+  # Cache it in this instance so that both dup_contact_sets and dup_people_sets (both called by the same
+  # controller method) can share the query results.
+  def dup_people_by_nickname_cached
+    @dup_people_by_nickname ||= dup_people_by_nickname
   end
 
   def dup_people_by_nickname
@@ -57,7 +68,7 @@ class ContactDuplicatesFinder
       .group('people.id, dup_person_id, nickname_id')
   end
 
-  def dup_contacts(dup_people_pairs)
+  def dup_contacts_by_dup_people(dup_people_pairs)
     contact_sets = []
     contacts_checked = []
     dup_people_pairs.each do |pair|

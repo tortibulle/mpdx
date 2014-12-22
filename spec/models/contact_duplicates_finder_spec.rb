@@ -18,7 +18,7 @@ describe ContactDuplicatesFinder do
 
   describe 'dup_contacts' do
     it 'finds duplicate contacts given pairs of duplicate people' do
-      contact_dups = dups_finder.dup_contacts([[john_doe1.id, john_doe2.id]])
+      contact_dups = dups_finder.dup_contacts_by_dup_people([[john_doe1.id, john_doe2.id]])
       expect(contact_dups.size).to eq(1)
       contact_dup_set = contact_dups.first
       expect(contact_dup_set.size).to eq(2)
@@ -28,7 +28,7 @@ describe ContactDuplicatesFinder do
 
     it 'does not find duplicates if a contact is marked as not duplicated with the other' do
       john_contact1.update_column(:not_duplicated_with, john_contact2.id)
-      expect(dups_finder.dup_contacts([[john_doe1.id, john_doe2.id]])).to eq([])
+      expect(dups_finder.dup_contacts_by_dup_people([[john_doe1.id, john_doe2.id]])).to eq([])
     end
   end
 
