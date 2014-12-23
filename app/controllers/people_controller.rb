@@ -89,11 +89,20 @@ class PeopleController < ApplicationController
   end
 
   def not_duplicates
-    people = current_account_list.people.where(id: params[:ids].split(','))
+    ids = params[:ids].split(',')
+    people = current_account_list.people.where(id: ids)
 
     people.each do |person|
       not_duplicated_with = (person.not_duplicated_with.to_s.split(',') + params[:ids].split(',') - [person.id.to_s]).uniq.join(',')
       person.update(not_duplicated_with: not_duplicated_with)
+    end
+
+    # Increment counters for the nicknames to track which nicknames are useful. We assume the first id is the nickname,
+    # which is how the find duplicates page does it.
+    first_person = people.find { |person| person.id == ids[0].to_i }
+    other_people = people.select { |person| person.id != first_person.id }
+    other_people.each do |other_person|
+      Nickname.increment_not_duplicates(other_person.first_name, first_person.first_name)
     end
 
     respond_to do |wants|
