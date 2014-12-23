@@ -6,10 +6,10 @@ class ContactDuplicatesFinder
   end
 
   def dup_contact_sets
-    dup_people_pairs = dup_people_by_same_name +
+    dup_people_sets = dup_people_by_same_name + dup_people_by_email +
       dup_people_by_nickname_cached.map { |dup| [dup.person.id, dup.dup_person.id] }
 
-    dup_contacts_by_dup_people(dup_people_pairs)
+    dup_contacts_by_dup_people(dup_people_sets)
   end
 
   def dup_people_sets
@@ -34,6 +34,20 @@ class ContactDuplicatesFinder
                AND name not like '%nonymous%'
                AND first_name not like '%nknow%'
                GROUP BY first_name, last_name
+               HAVING count(*) > 1"
+    Person.connection.select_values(sql).map { |dup_person_ids| dup_person_ids.split(',').map(&:to_i) }
+  end
+
+  def dup_people_by_email
+    sql = "SELECT array_to_string(array_agg(email_addresses.person_id), ',')
+               FROM email_addresses
+               INNER JOIN people ON email_addresses.person_id = people.id
+               INNER JOIN contact_people ON contact_people.person_id = people.id
+               INNER JOIN contacts ON contact_people.contact_id = contacts.id
+               WHERE contacts.account_list_id = #{@account_list.id}
+               AND name not like '%nonymous%'
+               AND first_name not like '%nknow%'
+               GROUP BY email
                HAVING count(*) > 1"
     Person.connection.select_values(sql).map { |dup_person_ids| dup_person_ids.split(',').map(&:to_i) }
   end
