@@ -52,10 +52,10 @@ class ContactMerge
       end
 
       # Make sure first and last donation dates are correct
-      if @winner.first_donation_date && @winner.first_donation_date > @other.first_donation_date
+      if @winner.first_donation_date && @other.first_donation_date && @winner.first_donation_date > @other.first_donation_date
         @winner.first_donation_date = @other.first_donation_date
       end
-      if @winner.last_donation_date && @winner.last_donation_date < @other.last_donation_date
+      if @winner.last_donation_date && @other.last_donation_date && @winner.last_donation_date < @other.last_donation_date
         @winner.last_donation_date = @other.last_donation_date
       end
 
