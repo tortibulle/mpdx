@@ -5,13 +5,6 @@ class ContactDuplicatesFinder
     @account_list = account_list
   end
 
-  def dup_contact_sets
-    dup_people_sets = dup_people_by_same_name + dup_people_by_email +
-      dup_people_by_nickname_cached.map { |dup| [dup.person.id, dup.dup_person.id] }
-
-    dup_contacts_by_dup_people(dup_people_sets)
-  end
-
   def dup_people_sets
     # Only return duplicated people if they are in the same contact. If they're in different contacts, the user should consider
     # merging the whole contacts first, then they can merge the duplicated people within them (and those with the
@@ -30,7 +23,7 @@ class ContactDuplicatesFinder
                FROM people
                INNER JOIN contact_people ON people.id = contact_people.person_id
                INNER JOIN contacts ON contact_people.contact_id = contacts.id
-               WHERE contacts.account_list_id = #{@account_list.id}
+               WHERE contacts.account_list_id = :account_list_id
                AND name not like '%nonymous%'
                AND first_name not like '%nknow%'
                GROUP BY first_name, last_name
@@ -44,10 +37,24 @@ class ContactDuplicatesFinder
                INNER JOIN people ON email_addresses.person_id = people.id
                INNER JOIN contact_people ON contact_people.person_id = people.id
                INNER JOIN contacts ON contact_people.contact_id = contacts.id
-               WHERE contacts.account_list_id = #{@account_list.id}
+               WHERE contacts.account_list_id = :account_list_id
                AND name not like '%nonymous%'
                AND first_name not like '%nknow%'
                GROUP BY email
+               HAVING count(*) > 1"
+    Person.connection.select_values(sql).map { |dup_person_ids| dup_person_ids.split(',').map(&:to_i) }
+  end
+
+  def dup_people_by_phone
+    sql = "SELECT array_to_string(array_agg(phone_numbers.person_id), ',')
+               FROM phone_numbers
+               INNER JOIN people ON phone_numbers.person_id = people.id
+               INNER JOIN contact_people ON contact_people.person_id = people.id
+               INNER JOIN contacts ON contact_people.contact_id = contacts.id
+               WHERE contacts.account_list_id = :account_list_id
+               AND name not like '%nonymous%'
+               AND first_name not like '%nknow%'
+               GROUP BY number
                HAVING count(*) > 1"
     Person.connection.select_values(sql).map { |dup_person_ids| dup_person_ids.split(',').map(&:to_i) }
   end
@@ -82,18 +89,89 @@ class ContactDuplicatesFinder
       .group('people.id, dup_person_id, nickname_id')
   end
 
-  def dup_contacts_by_dup_people(dup_people_pairs)
-    contact_sets = []
-    contacts_checked = []
-    dup_people_pairs.each do |pair|
-      contacts = @account_list.contacts.people.includes(:people).where('people.id' => pair).references('people')[0..1]
-      next if contacts.length <= 1
-      already_included = false
-      contacts.each { |c| already_included = true if contacts_checked.include?(c) }
-      next if already_included
-      contacts_checked += contacts
-      contact_sets << contacts unless contacts.first.not_same_as?(contacts.last)
-    end
-    contact_sets.sort_by! { |s| s.first.name }
+  # The reason this is a large query and not Ruby code with loops is that as I introduced more duplicate
+  # search options, that code got painfully slow and so I pull it into a single query. The reason for multiple different
+  # queries for different sorts of searches was that when I tried to combine them into a single query they weren't
+  # efficient. I believe the separate queries are easier for Postgres to digest and optimize.
+  def dup_contact_sets
+    sql = "#{DUP_CONTACTS_BY_NAMES_SQL}
+        UNION #{DUP_CONTACTS_BY_EMAILS_SQL}
+        UNION #{DUP_CONTACTS_BY_PHONE_SQL}
+        UNION #{DUP_CONTACTS_BY_ADDRESS_SQL}"
+    sql.gsub!(':account_list_id', Contact.connection.quote(@account_list.id))
+    contact_id_pairs = Contact.connection.exec_query(sql).rows
+
+    contacts = Contact.select(:id, :name, :not_duplicated_with).where(id: contact_id_pairs.flatten.uniq)
+    contact_by_id = Hash[contacts.map { |contact| [contact.id, contact] }]
+    contact_sets = contact_id_pairs.map { |pair| [contact_by_id[pair.first.to_i], contact_by_id[pair.second.to_i]] }
+    contact_sets.reject { |pair| pair.first.not_same_as?(pair.second) }
   end
+
+  DUP_CONTACTS_BY_NAMES_SQL =
+    "SELECT contacts.id, dup_contacts.id
+    FROM people
+      INNER JOIN people AS dup_people ON people.id < dup_people.id
+      INNER JOIN contact_people ON contact_people.person_id = people.id
+      INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
+      INNER JOIN contacts ON contacts.id = contact_people.contact_id
+      INNER JOIN contacts AS dup_contacts ON dup_contacts.id = dup_contact_people.contact_id
+    LEFT JOIN nicknames
+      ON LOWER(people.first_name) = nicknames.nickname AND LOWER(dup_people.first_name) = nicknames.name
+    WHERE contacts.account_list_id = :account_list_id
+      AND dup_contacts.account_list_id = :account_list_id
+      AND contacts.id < dup_contacts.id
+      AND contacts.name not like '%nonymous%' AND dup_contacts.name not like '%nonymous%'
+      AND people.first_name not like '%nknow%' AND dup_people.first_name not like '%nknow%'
+      AND LOWER(dup_people.last_name) = LOWER(people.last_name)
+      AND (LOWER(dup_people.first_name) = LOWER(people.first_name) OR nicknames.id IS NOT NULL)"
+
+  DUP_CONTACTS_BY_EMAILS_SQL =
+    "SELECT contacts.id, dup_contacts.id
+    FROM people
+      INNER JOIN email_addresses ON email_addresses.person_id = people.id
+      INNER JOIN email_addresses AS dup_email_addresses
+        ON dup_email_addresses.person_id <> people.id
+          AND LOWER(dup_email_addresses.email) = LOWER(email_addresses.email)
+      INNER JOIN people AS dup_people ON dup_people.id = dup_email_addresses.person_id
+      INNER JOIN contact_people ON contact_people.person_id = people.id
+      INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
+      INNER JOIN contacts ON contacts.id = contact_people.contact_id
+      INNER JOIN contacts AS dup_contacts ON dup_contacts.id = dup_contact_people.contact_id
+    WHERE contacts.account_list_id = :account_list_id
+      AND dup_contacts.account_list_id = :account_list_id
+      AND contacts.name not like '%nonymous%' AND dup_contacts.name not like '%nonymous%'
+      AND people.first_name not like '%nknow%' AND dup_people.first_name not like '%nknow%'
+      AND contacts.id < dup_contacts.id"
+
+  DUP_CONTACTS_BY_PHONE_SQL =
+    "SELECT contacts.id, dup_contacts.id
+    FROM people
+      INNER JOIN phone_numbers ON phone_numbers.person_id = people.id
+      INNER JOIN phone_numbers AS dup_phone_numbers
+        ON dup_phone_numbers.person_id <> people.id
+          AND dup_phone_numbers.number = phone_numbers.number
+      INNER JOIN people AS dup_people ON dup_people.id = dup_phone_numbers.person_id
+      INNER JOIN contact_people ON contact_people.person_id = people.id
+      INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
+      INNER JOIN contacts ON contacts.id = contact_people.contact_id
+      INNER JOIN contacts AS dup_contacts ON dup_contacts.id = dup_contact_people.contact_id
+    WHERE contacts.account_list_id = :account_list_id
+      AND dup_contacts.account_list_id = :account_list_id
+      AND contacts.name not like '%nonymous%' AND dup_contacts.name not like '%nonymous%'
+      AND people.first_name not like '%nknow%' AND dup_people.first_name not like '%nknow%'
+      AND contacts.id < dup_contacts.id"
+
+  DUP_CONTACTS_BY_ADDRESS_SQL =
+    "SELECT contacts.id, dup_contacts.id
+    FROM contacts
+      INNER JOIN addresses ON addresses.addressable_type = 'Contact' AND addresses.addressable_id = contacts.id
+      INNER JOIN addresses AS dup_addresses
+        ON dup_addresses.addressable_type = 'Contact' AND addresses.addressable_id < dup_addresses.addressable_id
+          AND addresses.master_address_id = dup_addresses.master_address_id
+      INNER JOIN contacts AS dup_contacts ON dup_contacts.id = dup_addresses.addressable_id
+    WHERE contacts.account_list_id = :account_list_id
+      AND dup_contacts.account_list_id = :account_list_id
+      AND contacts.name not like '%nonymous%' AND dup_contacts.name not like '%nonymous%'
+      AND addresses.primary_mailing_address = 't'
+      AND dup_addresses.primary_mailing_address = 't'"
 end
