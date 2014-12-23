@@ -176,4 +176,19 @@ describe PeopleController do
       expect(person2.not_duplicated_with.split(',')).to include(person1.id.to_s)
     end
   end
+
+  describe 'POST merge_sets' do
+    it 'merges the passed in sets of people' do
+      person1 = @contact.people.create! valid_attributes
+      person2 = @contact.people.create! valid_attributes
+      person2.email = 'test_merge@example.com'
+      person2.save
+
+      request.env['HTTP_REFERER'] = '/'
+      post :merge_sets, merge_sets: ["#{person1.id},#{person2.id}"]
+
+      expect(Person.find_by_id(person2.id)).to be_nil
+      expect(person1.email.email).to eq('test_merge@example.com')
+    end
+  end
 end
