@@ -155,4 +155,25 @@ describe PeopleController do
     end
   end
 
+  describe 'PUT not_duplicates' do
+    it 'adds the passed in ids to each persons not_duplicated_with field' do
+      person1 = @contact.people.create! valid_attributes
+      person2 = @contact.people.create! valid_attributes
+      person3 = @contact.people.create! valid_attributes
+
+      person1.update_column(:not_duplicated_with, person3.id.to_s)
+      person2.update_column(:not_duplicated_with, person3.id.to_s)
+
+      put :not_duplicates, ids: "#{person1.id},#{person2.id}", format: :js
+
+      person1.reload
+      person2.reload
+
+      expect(person1.not_duplicated_with.split(',')).to include(person3.id.to_s)
+      expect(person1.not_duplicated_with.split(',')).to include(person2.id.to_s)
+
+      expect(person2.not_duplicated_with.split(',')).to include(person3.id.to_s)
+      expect(person2.not_duplicated_with.split(',')).to include(person1.id.to_s)
+    end
+  end
 end

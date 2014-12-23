@@ -67,8 +67,12 @@ class PeopleController < ApplicationController
     end
   end
 
+  def merge_sets
+  end
+
   def not_duplicates
-    people = current_account_list.people.where(id: params[:ids])
+    people = current_account_list.people.where(id: params[:ids].split(','))
+
     people.each do |person|
       not_duplicated_with = (person.not_duplicated_with.to_s.split(',') + params[:ids].split(',') - [person.id.to_s]).uniq.join(',')
       person.update(not_duplicated_with: not_duplicated_with)

@@ -102,36 +102,43 @@ describe ContactDuplicatesFinder do
     end
   end
 
-  describe '#dup_contacts_and_people' do
+  describe '#dup_contacts' do
     it 'finds pairs of duplicated contacts by people with same name' do
-      contact_sets, people_sets = dups_finder.dup_contacts_and_people
+      contact_sets = dups_finder.dup_contact_sets
       expect(contact_sets.size).to eq(1)
       expect(contact_sets.first).to include(john_contact1)
       expect(contact_sets.first).to include(john_contact2)
-
-      expect(people_sets).to be_empty
     end
+  end
 
+  describe '#dup_people' do
     it 'finds pairs of duplicated contacts by people with nickname match' do
       nickname
       john_doe1.update_column(:first_name, 'Johnny')
 
-      contact_sets, people_sets = dups_finder.dup_contacts_and_people
+      contact_sets = dups_finder.dup_contact_sets
       expect(contact_sets.size).to eq(1)
       expect(contact_sets.first).to include(john_contact1)
       expect(contact_sets.first).to include(john_contact2)
 
-      expect(people_sets).to be_empty
+    end
+  end
+
+  describe '#dup_contacts_and_people' do
+    before do
+      nickname
+      john_doe1.update_column(:first_name, 'Johnny')
+    end
+
+    it 'does not find duplicate people who do not have a contact in common' do
+      expect(dups_finder.dup_people_sets).to be_empty
     end
 
     it 'finds duplicate people who have a contact in common' do
-      nickname
-      john_doe1.update_column(:first_name, 'Johnny')
       john_contact1.people << john_doe2
       john_contact2.destroy
 
-      contact_sets, people_sets = dups_finder.dup_contacts_and_people
-      expect(contact_sets).to be_empty
+      people_sets = dups_finder.dup_people_sets
 
       expect(people_sets.size).to eq(1)
       dup = people_sets.first

@@ -107,6 +107,7 @@ Rails.application.routes.draw do
   resources :people do
     collection do
       put :not_duplicates
+      post :merge_sets
     end
   end
 
