@@ -1,4 +1,6 @@
 class TntImport
+  include TntImportUtil
+
   # Donation Services seems to pad donor accounts with zeros up to length 9. TntMPD does not though.
   DONOR_NUMBER_NORMAL_LEN = 9
 
@@ -8,35 +10,6 @@ class TntImport
     @user = @import.user
     @designation_profile = @account_list.designation_profiles.first || @user.designation_profiles.first
     @tags_by_contact_id = {}
-  end
-
-  def read_xml(import_file)
-    xml = {}
-    begin
-      File.open(import_file, 'r:utf-8') do |file|
-        @contents = file.read
-        begin
-          xml = Hash.from_xml(@contents)
-        rescue => e
-          # If the document contains characters that we don't know how to parse
-          # just strip them out.
-          # The eval is dirty, but it was all I could come up with at the time
-          # to unescape a unicode character.
-          begin
-            bad_char = e.message.match(/"([^"]*)"/)[1]
-            @contents.gsub!(eval(%("#{bad_char}")), ' ') # rubocop:disable Eval
-          rescue
-            raise e
-          end
-          retry
-        end
-      end
-    rescue ArgumentError
-      File.open(import_file, 'r:windows-1251:utf-8') do |file|
-        xml = Hash.from_xml(file.read)
-      end
-    end
-    xml
   end
 
   def xml
@@ -128,6 +101,8 @@ class TntImport
         primary_contact_person.add_spouse(contact_spouse)
       end
 
+      merge_dups_by_donor_accts(contact, donor_accounts)
+
       @tnt_contacts[row['id']] = contact
 
       next unless true?(row['IsOrganization'])
@@ -151,6 +126,16 @@ class TntImport
     end
 
     @tnt_contacts
+  end
+
+  # If the user had two donor accounts in the same contact in Tnt, then  merge different contacts with those in MPDX.
+  def merge_dups_by_donor_accts(tnt_contact, donor_accounts)
+    dups_by_donor_accts = @account_list.contacts.where.not(id: tnt_contact.id).joins(:donor_accounts)
+      .where(donor_accounts: { id: donor_accounts.map(&:id) }).readonly(false)
+
+    dups_by_donor_accts.each do |dup_contact_matching_donor_account|
+      tnt_contact.reload.merge(dup_contact_matching_donor_account)
+    end
   end
 
   def import_tasks(tnt_contacts = {})
@@ -302,47 +287,6 @@ class TntImport
   rescue
   end
 
-  def lookup_mpd_phase(phase)
-    case phase.to_i
-    when 10 then 'Never Contacted'
-    when 20 then 'Ask in Future'
-    when 30 then 'Contact for Appointment'
-    when 40 then 'Appointment Scheduled'
-    when 50 then 'Call for Decision'
-    when 60 then 'Partner - Financial'
-    when 70 then 'Partner - Special'
-    when 80 then 'Partner - Pray'
-    when 90 then 'Not Interested'
-    when 95 then 'Unresponsive'
-    when 100 then 'Never Ask'
-    when 110 then 'Research Abandoned'
-    when 130 then 'Expired Referral'
-    end
-  end
-
-  def lookup_task_type(task_type_id)
-    case task_type_id.to_i
-    when 1 then 'Appointment'
-    when 2 then 'Thank'
-    when 3 then 'To Do'
-    when 20 then 'Call'
-    when 30 then 'Reminder Letter'
-    when 40 then 'Support Letter'
-    when 50 then 'Letter'
-    when 60 then 'Newsletter'
-    when 70 then 'Pre Call Letter'
-    when 100 then 'Email'
-    end
-  end
-
-  def lookup_history_result(history_result_id)
-    case history_result_id.to_i
-    when 1 then 'Done'
-    when 2 then 'Received'
-    when 3 then 'Attempted'
-    end
-  end
-
   def add_or_update_company(row, donor_account)
     master_company = MasterCompany.find_by_name(row['OrganizationName'])
     company = @user.partner_companies.where(master_company_id: master_company.id).first if master_company
@@ -424,9 +368,9 @@ class TntImport
       donor_accounts = row['OrgDonorCodes'].to_s.split(',').map do |account_number|
         donor_account = Retryable.retryable do
           da = designation_profile.organization.donor_accounts
-          .where('account_number = :account_number OR account_number = :padded_account_number',
-                 account_number: account_number,
-                 padded_account_number: account_number.rjust(DONOR_NUMBER_NORMAL_LEN, '0')).first
+            .where('account_number = :account_number OR account_number = :padded_account_number',
+                   account_number: account_number,
+                   padded_account_number: account_number.rjust(DONOR_NUMBER_NORMAL_LEN, '0')).first
 
           unless da
             da = designation_profile.organization.donor_accounts.new(account_number: account_number, name: row['FileAs'])
