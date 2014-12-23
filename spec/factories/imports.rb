@@ -29,4 +29,9 @@ FactoryGirl.define do
     association :account_list, factory: :account_list_with_designation_profile
     file { File.new(Rails.root.join('spec/fixtures/tnt_export_groups.xml')) }
   end
+
+  factory :tnt_import_multi_donor_accounts, parent: :tnt_import do
+    association :account_list, factory: :account_list_with_designation_profile
+    file { File.new(Rails.root.join('spec/fixtures/tnt_export_multi_donor_accounts.xml')) }
+  end
 end

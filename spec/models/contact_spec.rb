@@ -294,6 +294,28 @@ describe Contact do
       expect(contact.notes).to eq('fdsa')
     end
 
+    it 'should total the donations of the contacts' do
+      loser_contact.donor_accounts << create(:donor_account, account_number: '1')
+      loser_contact.donor_accounts.first.donations << create(:donation, amount: 500.00)
+      contact.donor_accounts << create(:donor_account, account_number: '2')
+      contact.donor_accounts.first.donations << create(:donation, amount: 300.00)
+      contact.merge(loser_contact)
+      expect(contact.total_donations).to eq(800.00)
+    end
+
+    it 'should keep the least recent first donation date' do
+      loser_contact.first_donation_date = '2009-01-01'
+      contact.first_donation_date = '2010-01-01'
+      contact.merge(loser_contact)
+      expect(contact.first_donation_date).to eq(Date.parse('2009-01-01'))
+    end
+
+    it 'should keep the most recent last donation date' do
+      loser_contact.last_donation_date = '2010-01-01'
+      contact.last_donation_date = '2009-01-01'
+      contact.merge(loser_contact)
+      expect(contact.last_donation_date).to eq(Date.parse('2010-01-01'))
+    end
   end
 
   context '#destroy' do

@@ -18,6 +18,43 @@ describe TntImport do
       .to_return(status: 200, body: '{}', headers: {})
   end
 
+  context '#import contacts with multiple donor accounts in multiple existing contacts' do
+    before do
+      account_list = create(:account_list)
+      designation_profile = create(:designation_profile)
+      organization = create(:organization)
+      designation_profile.organization = organization
+      account_list.designation_profiles << designation_profile
+
+      john = create(:contact, name: 'Doe, John')
+      john_donor = create(:donor_account, account_number: '444444444')
+      john.donor_accounts << john_donor
+      organization.donor_accounts << john_donor
+      account_list.contacts << john
+
+      john_and_jane = create(:contact, name: 'Doe, John and Jane')
+      john_and_jane_donor = create(:donor_account, account_number: '555555555')
+      john_and_jane.donor_accounts << john_and_jane_donor
+      organization.donor_accounts << john_and_jane_donor
+      account_list.contacts << john_and_jane
+
+      @import = create(:tnt_import_multi_donor_accounts, account_list: account_list)
+      @tnt_import = TntImport.new(@import)
+    end
+
+    it 'imports and merges existing contacts by donor accounts if set to override' do
+      @import.update_column(:override, true)
+      @tnt_import.send(:import_contacts)
+      expect(Contact.all.count).to eq(1)
+    end
+
+    # it 'imports and does not merge existing contacts by donor accounts if not set to override' do
+    #   @import.update_column(:override, false)
+    #   @import.send(:import_contacts)
+    #   expect(Contact.all.count).to eq(2)
+    # end
+  end
+
   context '#import_contacts' do
     it 'associates referrals' do
       import.should_receive(:add_or_update_donor_accounts).and_return([create(:donor_account)])
