@@ -229,7 +229,7 @@ class Contact < ActiveRecord::Base
 
   def generated_envelope_greeting
     return name if siebel_organization?
-    return name unless name.include? ','
+    return name unless name.to_s.include? ','
     last_name = name.split(',')[0].strip
     first_names = name.split(',')[1].strip
     return first_names + ' ' + last_name unless first_names =~ /\(*\)/
