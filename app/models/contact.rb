@@ -229,30 +229,13 @@ class Contact < ActiveRecord::Base
 
   def generated_envelope_greeting
     return name if siebel_organization?
-    if primary_or_first_person.deceased == (spouse.try(:deceased) || false)
-      alive_people = [primary_or_first_person, spouse].compact
-    elsif primary_or_first_person.deceased?
-      alive_people = [spouse]
-    else
-      alive_people = [primary_or_first_person]
-    end
-
-    if alive_people[0].last_name.blank?
-      last_name_guess = alive_people[1].try(:last_name)
-      last_name_guess ||= name.split(',')[1].try(:strip)
-      last_name_guess ||= name.split(' ').last
-    end
-    if last_name_guess || alive_people[1].try(:last_name).blank? ||
-       alive_people[0].last_name == alive_people[1].try(:last_name)
-      last_name_guess ||= alive_people[0].last_name
-      first_names_string = [alive_people[0].first_name, alive_people[1].try(:first_name)].compact.join(" #{_('and')} ")
-      return first_names_string unless last_name_guess
-      first_names_string + ' ' + last_name_guess.to_s
-    else
-      first = [alive_people[0].first_name, alive_people[0].last_name].compact.join(' ')
-      second = [alive_people[1].first_name, alive_people[1].last_name].compact.join(' ')
-      [first, second].join(" #{_('and')} ")
-    end
+    return name unless name.include? ','
+    last_name = name.split(',')[0].strip
+    first_names = name.split(',')[1].strip
+    return first_names + ' ' + last_name unless first_names =~ /\(*\)/
+    first_names = first_names.split(/ & | #{_('and')} /)
+    first_names[1].delete!('()')
+    "#{first_names[0]} #{last_name} #{_('and')} #{first_names[1]}"
   end
 
   def siebel_organization?

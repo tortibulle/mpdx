@@ -125,7 +125,7 @@ class Person < ActiveRecord::Base
   end
 
   def deceased_check
-    return unless self.deceased?
+    return unless deceased_changed? && self.deceased?
 
     self.optout_enewsletter = true
 
@@ -139,14 +139,14 @@ class Person < ActiveRecord::Base
       # even if the field is nil. That causes an infinite loop here where it keeps trying to remove the first name
       # from the greeting but it keeps getting defaulted back to having it.
       if c[:greeting].present? && c[:greeting].include?(first_name)
-        contact_updates[:greeting] = c.greeting.sub(first_name, '').sub(' and ', ' ').strip
+        contact_updates[:greeting] = c.greeting.sub(first_name, '').sub(/ #{_('and')} /, ' ').strip
       end
       if c[:envelope_greeting].present? && c[:envelope_greeting].include?(first_name)
         contact_updates[:envelope_greeting] = ''
       end
 
       if c.name.include?(first_name)
-        contact_updates[:name] = c.name.sub(first_name, '').sub(' and ', '').strip
+        contact_updates[:name] = c.name.sub(first_name, '').sub(/ & | #{_('and')} /, '').strip
       end
 
       if c.primary_person_id == id && c.people.count > 1
