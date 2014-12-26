@@ -39,50 +39,83 @@ class ContactDuplicatesFinder
     #{DUP_CONTACTS_WHERE}
     AND people.first_name not like '%nknow%' AND dup_people.first_name not like '%nknow%'"
 
+  PEOPLE_COMBINED_NAME_FIELDS = "
+    (
+      SELECT first_name, id, last_name, gender FROM people
+      UNION SELECT legal_first_name, id, last_name, gender FROM people
+      UNION SELECT middle_name, id, last_name, gender FROM people
+    ) AS people"
+
   PEOPLE_EXPANDED_NAMES = "
     (
       SELECT * FROM
       (
-        SELECT first_name, id, last_name, gender
-        FROM people
-        WHERE first_name NOT SIMILAR TO '%[\\. -]%'
-
+          SELECT first_name, id, last_name, gender
+          FROM people
         UNION
-
-        SELECT regexp_split_to_table(first_name, '[\\. -]'), id, last_name, gender
-        FROM people
-        WHERE first_name SIMILAR TO '%[\\. -]%'
-
+          SELECT regexp_split_to_table(first_name, '[. -]'), id, last_name, gender
+          FROM people
+          WHERE first_name SIMILAR TO '%[. -]%'
         UNION
-
-        SELECT regexp_split_to_table(regexp_replace(first_name, '([A-Z])', '\1 '), ' '), id, last_name, gender
-        FROM people
-        WHERE first_name SIMILAR TO '%[A-Z]{2}%'
+          SELECT regexp_split_to_table(regexp_replace(first_name, '([A-Z])([A-Z])', ' \\1 \\2'), ' '), id, last_name, gender
+          FROM people
+          WHERE first_name SIMILAR TO '[A-Z]{2}%' AND first_name NOT SIMILAR TO '%[A-Z]{3}%'
+        UNION
+          SELECT regexp_split_to_table(regexp_replace(first_name, '([a-z])([A-Z])', '\\1 \\2'), ' '), id, last_name, gender
+          FROM people
+          WHERE first_name SIMILAR TO '%[a-z][A-Z]%'
+        UNION
+          SELECT replace(people.first_name, ' ', ''), id, last_name, gender
+          FROM people
+          WHERE first_name LIKE '% %'
       ) AS expanded_names_with_blanks
       WHERE first_name IS NOT NULL AND first_name <> ''
     )"
 
+  PEOPLE_EXPANDED_NAMES_ALL_FIELDS =
+    PEOPLE_EXPANDED_NAMES.gsub('FROM people', "FROM #{PEOPLE_COMBINED_NAME_FIELDS}")
+
+  PEOPLE_NAME_MALE_RATIOS = "
+    (
+      SELECT people.id, AVG(name_male_ratios.male_ratio) AS male_ratio
+      FROM #{PEOPLE_EXPANDED_NAMES} AS people
+      LEFT JOIN name_male_ratios ON LOWER(people.first_name) = name_male_ratios.name
+      GROUP BY people.id
+    )"
+
   DUP_CONTACTS_BY_NAME_SQL = "
-    SELECT contacts.id, dup_contacts.id
-    FROM #{PEOPLE_EXPANDED_NAMES} AS people
-      INNER JOIN #{PEOPLE_EXPANDED_NAMES} AS dup_people ON people.id <> dup_people.id
-      INNER JOIN contact_people ON contact_people.person_id = people.id
-      INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
-      INNER JOIN contacts ON contacts.id = contact_people.contact_id
-      INNER JOIN contacts AS dup_contacts ON dup_contacts.id = dup_contact_people.contact_id
-      LEFT JOIN nicknames
-        ON nicknames.suggest_duplicates = 't' AND LOWER(people.first_name) = nicknames.nickname
-    WHERE #{DUPS_COMMON_WHERE}
-      AND LOWER(dup_people.last_name) = LOWER(people.last_name)
-      AND contacts.id <> dup_contacts.id
-      AND (
-        (LOWER(dup_people.first_name) = LOWER(people.first_name) AND contacts.id < dup_contacts.id)
-        OR LOWER(dup_people.first_name) = nicknames.name
-        OR (
-          char_length(dup_people.first_name) = 1
-          AND LOWER(dup_people.first_name) = LOWER(substring(people.first_name from 1 for 1))
+    SELECT contact_id, dup_contact_id
+    FROM
+    (
+      SELECT contacts.id AS contact_id, dup_contacts.id AS dup_contact_id,
+        people.id AS people_id, dup_people.id AS dup_people_id,
+        people.first_name, dup_people.first_name as dup_first_name
+      FROM #{PEOPLE_EXPANDED_NAMES} AS people
+        INNER JOIN #{PEOPLE_EXPANDED_NAMES} AS dup_people ON people.id <> dup_people.id
+        INNER JOIN contact_people ON contact_people.person_id = people.id
+        INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
+        INNER JOIN contacts ON contacts.id = contact_people.contact_id
+        INNER JOIN contacts AS dup_contacts ON dup_contacts.id = dup_contact_people.contact_id
+        LEFT JOIN nicknames
+          ON nicknames.suggest_duplicates = 't' AND LOWER(people.first_name) = nicknames.nickname
+      WHERE #{DUPS_COMMON_WHERE}
+        AND LOWER(dup_people.last_name) = LOWER(people.last_name)
+        AND contacts.id <> dup_contacts.id
+        AND (
+          (LOWER(dup_people.first_name) = LOWER(people.first_name) AND contacts.id < dup_contacts.id)
+          OR LOWER(dup_people.first_name) = nicknames.name
+          OR (
+            char_length(dup_people.first_name) = 1
+            AND LOWER(dup_people.first_name) = LOWER(substring(people.first_name from 1 for 1))
+          )
         )
-      )"
+    ) AS all_dups
+    INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS name_male_ratios ON people_id = name_male_ratios.id
+    INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS dup_name_male_ratios ON dup_people_id = dup_name_male_ratios.id
+    WHERE
+      name_male_ratios.male_ratio IS NULL OR dup_name_male_ratios.male_ratio IS NULL
+      OR (name_male_ratios.male_ratio < 0.1 AND dup_name_male_ratios.male_ratio < 0.1)
+      OR (name_male_ratios.male_ratio > 0.9 AND dup_name_male_ratios.male_ratio > 0.9)"
 
   DUP_CONTACTS_BY_EMAILS_SQL = "
     SELECT contacts.id, dup_contacts.id
@@ -168,8 +201,8 @@ class ContactDuplicatesFinder
 
   DUP_PEOPLE_BY_NAME_SQL = "
     SELECT people.id as person_id, dup_people.id AS dup_person_id, contacts.id AS contact_id, nicknames.id AS nickname_id
-    FROM #{PEOPLE_EXPANDED_NAMES} AS people
-      INNER JOIN #{PEOPLE_EXPANDED_NAMES} AS dup_people ON people.id <> dup_people.id
+    FROM #{PEOPLE_EXPANDED_NAMES_ALL_FIELDS} AS people
+      INNER JOIN #{PEOPLE_EXPANDED_NAMES_ALL_FIELDS} AS dup_people ON people.id <> dup_people.id
       INNER JOIN contact_people ON people.id = contact_people.person_id
       INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
       INNER JOIN contacts ON contact_people.contact_id = contacts.id

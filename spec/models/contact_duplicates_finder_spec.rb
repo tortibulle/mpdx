@@ -41,6 +41,8 @@ describe ContactDuplicatesFinder do
     'CC' => 'Charlie',
     'C' => 'Charlie',
     'Hoo-Tee' => 'Hoo Tee',
+    'HooTee' => 'Hoo Tee',
+    'Mary Beth' => 'Marybeth',
     'JW' => 'john wilson'
   }
 
@@ -50,7 +52,8 @@ describe ContactDuplicatesFinder do
     'Grable B' => 'Andy',
     'G B' => 'Andy',
     'Andrew' => 'Andrea',
-    'CCC NEHQ' => 'Charlie'
+    'CCC NEHQ' => 'Charlie',
+    'Dad US' => 'Scott'
   }
 
   before do
@@ -184,6 +187,23 @@ describe ContactDuplicatesFinder do
         MATCHING_FIRST_NAMES.each(&method(:expect_matching_people))
         NON_MATCHING_FIRST_NAMES.each(&method(:expect_non_matching_people))
       end
+
+      it 'finds duplicate contacts by middle_name field' do
+        nickname
+        john_doe1.update_columns(first_name: 'Notjohn', middle_name: 'Johnny')
+        expect_johns_people_set
+      end
+
+      it 'finds duplicate contacts by middle_name field with name expansion' do
+        nickname
+        john_doe1.update_columns(first_name: 'Notjohn', middle_name: 'JT')
+        expect_johns_people_set
+      end
+
+      it 'finds duplicate contacts by legal_first_name field' do
+        john_doe1.update_columns(first_name: 'Notjohn', legal_first_name: 'John')
+        expect_johns_people_set
+      end
     end
   end
 
@@ -277,6 +297,17 @@ describe ContactDuplicatesFinder do
       nickname_andy
       MATCHING_FIRST_NAMES.each(&method(:expect_matching_contacts))
       NON_MATCHING_FIRST_NAMES.each(&method(:expect_non_matching_contacts))
+    end
+
+    it 'does not find duplicate contacts by middle_name field (too aggressive for contact match)' do
+      nickname
+      john_doe1.update_columns(first_name: 'Notjohn', middle_name: 'Johnny')
+      expect(dups_finder.dup_contact_sets).to be_empty
+    end
+
+    it 'does not finds duplicate contacts by legal_first_name field (too aggressive for contact match)' do
+      john_doe1.update_columns(first_name: 'Notjohn', legal_first_name: 'John')
+      expect(dups_finder.dup_contact_sets).to be_empty
     end
   end
 end
