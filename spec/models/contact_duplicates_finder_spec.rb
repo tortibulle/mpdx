@@ -10,6 +10,48 @@ describe ContactDuplicatesFinder do
   let(:john_contact2) { create(:contact, name: 'Doe, John 2', account_list: account_list) }
 
   let(:nickname) { create(:nickname, name: 'john', nickname: 'johnny', suggest_duplicates: true) }
+  let(:nickname_andy) { create(:nickname, name: 'andrew', nickname: 'andy', suggest_duplicates: true) }
+
+  # Assumes nickname_andy
+  MATCHING_FIRST_NAMES = {
+    'Grable A' => 'Andy',
+    'Grable A' => 'G Andrew',
+    'G Andrew' => 'Andy',
+    'G Andrew' => 'G Andy',
+    'A' => 'Andy',
+    'A' => 'Andrew',
+    'Andy' => 'Andrew',
+    'GA' => 'Andrew',
+    'GA' => 'Andy',
+    'GA' => 'Grable A',
+    'G.A.' => 'Grable A',
+    'G.A.' => 'G A',
+    'G.A.' => 'Andy',
+    'G.A.' => 'Grable',
+    'G A.' => 'Andy',
+    'G A.' => 'Grable',
+    'G A.' => 'Andy',
+    'G A.' => 'Grable',
+    'A G' => 'Grable',
+    'A G' => 'Andrew',
+    'Grable Andy' => 'Andrew',
+    'Grable Andrew' => 'Andy',
+    'Grable Andy' => 'G Andrew',
+    'Grable Andrew' => 'G Andy',
+    'CC' => 'Charlie',
+    'C' => 'Charlie',
+    'Hoo-Tee' => 'Hoo Tee',
+    'JW' => 'john wilson'
+  }
+
+  NON_MATCHING_FIRST_NAMES = {
+    'G' => 'Andy',
+    'Grable' => 'Andy',
+    'Grable B' => 'Andy',
+    'G B' => 'Andy',
+    'Andrew' => 'Andrea',
+    'CCC NEHQ' => 'Charlie'
+  }
 
   before do
     john_contact1.people << john_doe1
@@ -40,7 +82,7 @@ describe ContactDuplicatesFinder do
       end
 
       it 'does not find duplicates if no matching info' do
-        john_doe1.update_column(:first_name, 'Not-John')
+        john_doe1.update_column(:first_name, 'Notjohn')
         expect(dups_finder.dup_people_sets).to be_empty
       end
 
@@ -91,7 +133,7 @@ describe ContactDuplicatesFinder do
       end
 
       it 'finds duplicates by email' do
-        john_doe1.update_column(:first_name, 'Not-John')
+        john_doe1.update_column(:first_name, 'Notjohn')
         john_doe1.email = 'same@example.com'
         john_doe1.save
         john_doe2.email = 'Same@Example.com'
@@ -101,7 +143,7 @@ describe ContactDuplicatesFinder do
       end
 
       it 'finds duplicates by phone' do
-        john_doe1.update_column(:first_name, 'Not-John')
+        john_doe1.update_column(:first_name, 'Notjohn')
         john_doe1.phone = '123-456-7890'
         john_doe1.save
         john_doe2.phone = '(123) 456-7890'
@@ -111,7 +153,7 @@ describe ContactDuplicatesFinder do
       end
 
       it 'does not find duplicates by phone or email if the people have different genders' do
-        john_doe1.update_column(:first_name, 'Not-John')
+        john_doe1.update_column(:first_name, 'Notjohn')
         john_doe1.update_column(:gender, 'female')
         john_doe2.update_column(:gender, 'male')
 
@@ -125,62 +167,23 @@ describe ContactDuplicatesFinder do
         expect(dups_finder.dup_people_sets).to be_empty
       end
 
-      def expect_matching_pair(first_names)
-        puts first_names
+      def expect_matching_people(first_names)
         john_doe1.update_column(:first_name, first_names[0])
         john_doe2.update_column(:first_name, first_names[1])
         expect_johns_people_set
       end
 
-      def expect_non_matching_pair(first_names)
+      def expect_non_matching_people(first_names)
         john_doe1.update_column(:first_name, first_names[0])
         john_doe2.update_column(:first_name, first_names[1])
         expect(dups_finder.dup_people_sets).to be_empty
       end
 
-      # it 'finds people by matching initials and middle names' do
-      #   create(:nickname, name: 'andrew', nickname: 'andy', suggest_duplicates: true)
-      #
-      #   [
-      #     ['Grable A', 'Andy'],
-      #     ['Grable A', 'G Andrew'],
-      #     ['G Andrew', 'Andy'],
-      #     ['G Andrew', 'G Andy'],
-      #     ['A', 'Andy'],
-      #     ['A', 'Andrew'],
-      #     ['Andy', 'Andrew'],
-      #     ['GA', 'Andrew'],
-      #     ['GA', 'Andy'],
-      #     ['GA', 'Grable A'],
-      #     ['G.A.', 'Grable A'],
-      #     ['G.A.', 'G A'],
-      #     ['G.A.', 'Andy'],
-      #     ['G.A.', 'Grable'],
-      #     ['G A.', 'Andy'],
-      #     ['G A.', 'Grable'],
-      #     ['G A.', 'Andy'],
-      #     ['G A.', 'Grable'],
-      #     ['A G', 'Grable'],
-      #     ['A G', 'Andrew'],
-      #     ['Grable Andy', 'Andrew'],
-      #     ['Grable Andrew', 'Andy'],
-      #     ['Grable Andy', 'G Andrew'],
-      #     ['Grable Andrew', 'G Andy'],
-      #     ['CC', 'Charlie'],
-      #     ['C', 'Charlie']
-      #   ].each(&method(:expect_matching_pair))
-      #
-      #   [
-      #     ['G', 'Andy'],
-      #     ['Grable', 'Andy'],
-      #     ['Grable B', 'Andy'],
-      #     ['G B', 'Andy'],
-      #     ['A G', 'Grable Andrew'],
-      #     ['A G', 'Grable Andy'],
-      #     ['Andrew', 'Andrea'],
-      #     ['CCC NEHQ', 'Charlie']
-      #   ].each(&method(:expect_non_matching_pair))
-      # end
+      it 'finds people by matching initials and middle names in the first name field' do
+        nickname_andy
+        MATCHING_FIRST_NAMES.each(&method(:expect_matching_people))
+        NON_MATCHING_FIRST_NAMES.each(&method(:expect_non_matching_people))
+      end
     end
   end
 
@@ -199,7 +202,7 @@ describe ContactDuplicatesFinder do
     end
 
     it 'does not find duplicates if contacts have no matching info' do
-      john_doe1.update_column(:first_name, 'Not-John')
+      john_doe1.update_column(:first_name, 'Notjohn')
       expect(dups_finder.dup_contact_sets).to be_empty
     end
 
@@ -217,7 +220,7 @@ describe ContactDuplicatesFinder do
     end
 
     it 'finds duplicates by people with matching email' do
-      john_doe1.update_column(:first_name, 'Not-John')
+      john_doe1.update_column(:first_name, 'Notjohn')
       john_doe1.email = 'same@example.com'
       john_doe1.save
       john_doe2.email = 'Same@Example.com'
@@ -227,7 +230,7 @@ describe ContactDuplicatesFinder do
     end
 
     it 'finds duplicates by people with matching phone' do
-      john_doe1.update_column(:first_name, 'Not-John')
+      john_doe1.update_column(:first_name, 'Notjohn')
       john_doe1.phone = '123-456-7890'
       john_doe1.save
       john_doe2.phone = '(123) 456-7890'
@@ -239,7 +242,7 @@ describe ContactDuplicatesFinder do
     it 'finds duplicates by matching primary address' do
       stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
 
-      john_doe1.update_column(:first_name, 'Not-John')
+      john_doe1.update_column(:first_name, 'Notjohn')
 
       john_contact1.addresses_attributes = [{ street: '1 Road', primary_mailing_address: true, master_address_id: 1 }]
       john_contact1.save
@@ -247,6 +250,33 @@ describe ContactDuplicatesFinder do
       john_contact2.save
 
       expect_johns_contact_set
+    end
+
+    it 'does not find the same contact as a duplicate if the persons name would match itself' do
+      john_doe1.update_column(:first_name, 'John B')
+      john_doe2.update_column(:first_name, 'Brian')
+      john_contact1.people << john_doe2
+      john_contact2.destroy
+
+      expect(dups_finder.dup_contact_sets).to be_empty
+    end
+
+    def expect_matching_contacts(first_names)
+      john_doe1.update_column(:first_name, first_names[0])
+      john_doe2.update_column(:first_name, first_names[1])
+      expect_johns_contact_set
+    end
+
+    def expect_non_matching_contacts(first_names)
+      john_doe1.update_column(:first_name, first_names[0])
+      john_doe2.update_column(:first_name, first_names[1])
+      expect(dups_finder.dup_contact_sets).to be_empty
+    end
+
+    it 'finds people by matching initials and middle names in the first name field' do
+      nickname_andy
+      MATCHING_FIRST_NAMES.each(&method(:expect_matching_contacts))
+      NON_MATCHING_FIRST_NAMES.each(&method(:expect_non_matching_contacts))
     end
   end
 end
