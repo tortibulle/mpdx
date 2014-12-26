@@ -109,6 +109,78 @@ describe ContactDuplicatesFinder do
 
         expect_johns_people_set
       end
+
+      it 'does not find duplicates by phone or email if the people have different genders' do
+        john_doe1.update_column(:first_name, 'Not-John')
+        john_doe1.update_column(:gender, 'female')
+        john_doe2.update_column(:gender, 'male')
+
+        john_doe1.phone = '123-456-7890'
+        john_doe1.email = 'same@example.com'
+        john_doe1.save
+        john_doe2.phone = '(123) 456-7890'
+        john_doe2.email = 'Same@Example.com'
+        john_doe2.save
+
+        expect(dups_finder.dup_people_sets).to be_empty
+      end
+
+      def expect_matching_pair(first_names)
+        puts first_names
+        john_doe1.update_column(:first_name, first_names[0])
+        john_doe2.update_column(:first_name, first_names[1])
+        expect_johns_people_set
+      end
+
+      def expect_non_matching_pair(first_names)
+        john_doe1.update_column(:first_name, first_names[0])
+        john_doe2.update_column(:first_name, first_names[1])
+        expect(dups_finder.dup_people_sets).to be_empty
+      end
+
+      # it 'finds people by matching initials and middle names' do
+      #   create(:nickname, name: 'andrew', nickname: 'andy', suggest_duplicates: true)
+      #
+      #   [
+      #     ['Grable A', 'Andy'],
+      #     ['Grable A', 'G Andrew'],
+      #     ['G Andrew', 'Andy'],
+      #     ['G Andrew', 'G Andy'],
+      #     ['A', 'Andy'],
+      #     ['A', 'Andrew'],
+      #     ['Andy', 'Andrew'],
+      #     ['GA', 'Andrew'],
+      #     ['GA', 'Andy'],
+      #     ['GA', 'Grable A'],
+      #     ['G.A.', 'Grable A'],
+      #     ['G.A.', 'G A'],
+      #     ['G.A.', 'Andy'],
+      #     ['G.A.', 'Grable'],
+      #     ['G A.', 'Andy'],
+      #     ['G A.', 'Grable'],
+      #     ['G A.', 'Andy'],
+      #     ['G A.', 'Grable'],
+      #     ['A G', 'Grable'],
+      #     ['A G', 'Andrew'],
+      #     ['Grable Andy', 'Andrew'],
+      #     ['Grable Andrew', 'Andy'],
+      #     ['Grable Andy', 'G Andrew'],
+      #     ['Grable Andrew', 'G Andy'],
+      #     ['CC', 'Charlie'],
+      #     ['C', 'Charlie']
+      #   ].each(&method(:expect_matching_pair))
+      #
+      #   [
+      #     ['G', 'Andy'],
+      #     ['Grable', 'Andy'],
+      #     ['Grable B', 'Andy'],
+      #     ['G B', 'Andy'],
+      #     ['A G', 'Grable Andrew'],
+      #     ['A G', 'Grable Andy'],
+      #     ['Andrew', 'Andrea'],
+      #     ['CCC NEHQ', 'Charlie']
+      #   ].each(&method(:expect_non_matching_pair))
+      # end
     end
   end
 
