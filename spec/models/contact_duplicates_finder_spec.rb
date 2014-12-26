@@ -16,14 +16,119 @@ describe ContactDuplicatesFinder do
     john_contact2.people << john_doe2
   end
 
-  describe 'dup_contact_sets' do
-    it 'finds duplicate contacts given for people with the same name' do
+  describe '#dup_people_sets ' do
+    it 'does not find duplicates with no shared contact' do
+      expect(dups_finder.dup_people_sets).to be_empty
+    end
+
+    describe 'finding duplicates with a shared contact' do
+      before do
+        john_contact1.people << john_doe2
+      end
+
+      def expect_johns_people_set
+        dups = dups_finder.dup_people_sets
+        expect(dups.size).to eq(1)
+        dup = dups.first
+        expect([dup.person, dup.dup_person]).to include(john_doe1)
+        expect([dup.person, dup.dup_person]).to include(john_doe2)
+        expect(dup.shared_contact).to eq(john_contact1)
+      end
+
+      it 'finds duplicates by same name' do
+        expect_johns_people_set
+      end
+
+      it 'does not find duplicates if no matching info' do
+        john_doe1.update_column(:first_name, 'Not-John')
+        expect(dups_finder.dup_people_sets).to be_empty
+      end
+
+      it 'does not find duplicates if people marked as not duplicated with each other' do
+        john_doe1.update_column(:not_duplicated_with, john_doe2.id.to_s)
+        expect(dups_finder.dup_people_sets).to be_empty
+      end
+
+      it 'finds duplicates by nickname' do
+        nickname
+        john_doe1.update_column(:first_name, 'johnny')
+
+        dups = dups_finder.dup_people_sets
+        expect(dups.size).to eq(1)
+        dup = dups.first
+
+        # Expect the person with the nickname to be dup.person, while the full name to be dup_person
+        # That will cause the default merged person to have the nickname.
+        expect(dup.person).to eq(john_doe1)
+        expect(dup.dup_person).to eq(john_doe2)
+
+        expect(dup.shared_contact).to eq(john_contact1)
+      end
+
+      it 'finds duplicates by nickname in correct order and without extra rows if other matching info there' do
+        john_doe1.email = 'same@example.com'
+        john_doe1.save
+        john_doe2.email = 'Same@Example.com'
+        john_doe2.save
+
+        # Make john_doe2 the one with the nickname. Even though he has a bigger id, he should come first
+        # in the pairing because he has the nickname. The duplicate pair from the email which would prefer a lower
+        # id to be unique i.e. with john_doe1 as the person and john_doe2 as the dup person should be eliminated.
+        expect(john_doe2.id > john_doe1.id).to be_true
+        john_doe2.update_column(:first_name, 'johnny')
+        nickname
+
+        dups = dups_finder.dup_people_sets
+        expect(dups.size).to eq(1)
+        dup = dups.first
+
+        # Expect the person with the nickname to be dup.person, while the full name to be dup_person
+        # That will cause the default merged person to have the nickname.
+        expect(dup.person).to eq(john_doe2)
+        expect(dup.dup_person).to eq(john_doe1)
+
+        expect(dup.shared_contact).to eq(john_contact1)
+      end
+
+      it 'finds duplicates by email' do
+        john_doe1.update_column(:first_name, 'Not-John')
+        john_doe1.email = 'same@example.com'
+        john_doe1.save
+        john_doe2.email = 'Same@Example.com'
+        john_doe2.save
+
+        expect_johns_people_set
+      end
+
+      it 'finds duplicates by phone' do
+        john_doe1.update_column(:first_name, 'Not-John')
+        john_doe1.phone = '123-456-7890'
+        john_doe1.save
+        john_doe2.phone = '(123) 456-7890'
+        john_doe2.save
+
+        expect_johns_people_set
+      end
+    end
+  end
+
+  describe '#dup_contact_sets' do
+    def expect_johns_contact_set
       dups = dups_finder.dup_contact_sets
       expect(dups.size).to eq(1)
       dup = dups.first
       expect(dup.size).to eq(2)
       expect(dup).to include(john_contact1)
       expect(dup).to include(john_contact2)
+    end
+
+    it 'finds duplicate contacts given for people with the same name' do
+      expect_johns_contact_set
+    end
+
+    it 'does not find duplicates if contacts have no matching info' do
+      john_doe1.update_column(:first_name, 'Not-John')
+      expect(dups_finder.dup_contact_sets).to be_empty
     end
 
     it 'does not find duplicates if a contact is marked as not duplicated with the other' do
@@ -36,7 +141,7 @@ describe ContactDuplicatesFinder do
     it 'finds duplicates by people with matching nickname' do
       nickname # create the nickname in the let expression above
       john_doe1.update_column(:first_name, 'Johnny')
-      expect(dups_finder.dup_contact_sets).to_not be_empty
+      expect_johns_contact_set
     end
 
     it 'finds duplicates by people with matching email' do
@@ -46,7 +151,7 @@ describe ContactDuplicatesFinder do
       john_doe2.email = 'Same@Example.com'
       john_doe2.save
 
-      expect(dups_finder.dup_contact_sets).to_not be_empty
+      expect_johns_contact_set
     end
 
     it 'finds duplicates by people with matching phone' do
@@ -56,7 +161,7 @@ describe ContactDuplicatesFinder do
       john_doe2.phone = '(123) 456-7890'
       john_doe2.save
 
-      expect(dups_finder.dup_contact_sets).to_not be_empty
+      expect_johns_contact_set
     end
 
     it 'finds duplicates by matching primary address' do
@@ -69,124 +174,7 @@ describe ContactDuplicatesFinder do
       john_contact2.addresses_attributes = [{ street: '1 Rd', primary_mailing_address: true, master_address_id: 1 }]
       john_contact2.save
 
-      expect(dups_finder.dup_contact_sets).to_not be_empty
+      expect_johns_contact_set
     end
   end
-
-  # describe '#dup_people_by_same_name ' do
-  #   it 'find dups by exactly matching name' do
-  #     dups = dups_finder.dup_people_by_same_name
-  #     expect(dups.size).to eq(1)
-  #     expect(dups.first).to include(john_doe1.id)
-  #     expect(dups.first).to include(john_doe2.id)
-  #   end
-  # end
-  #
-  # describe '#dup_people_by_nickname_query' do
-  #   before do
-  #     nickname # create the nickname in the let expression above
-  #     john_doe1.update_column(:first_name, 'Johnny')
-  #   end
-  #
-  #   def expect_john_1_2_dup(dup)
-  #     expect(dup.person_id).to eq(john_doe1.id)
-  #     expect(dup.dup_person_id).to eq(john_doe2.id)
-  #     expect(dup.nickname_id).to eq(nickname.id)
-  #   end
-  #
-  #   it 'finds dups by nicknames' do
-  #     dups = dups_finder.dup_people_by_nickname_query.to_a
-  #     expect(dups.size).to eq(1)
-  #     expect(dups.first.shared_contact_id).to be_nil
-  #     expect_john_1_2_dup(dups.first)
-  #   end
-  #
-  #   it 'finds dups by nicknames and returns the shared contact_id if it exists' do
-  #     john_contact1.people << john_doe2
-  #
-  #     dups = dups_finder.dup_people_by_nickname_query.to_a
-  #     expect(dups.size).to eq(1)
-  #     expect(dups.first.shared_contact_id).to eq(john_contact1.id)
-  #     expect_john_1_2_dup(dups.first)
-  #   end
-  # end
-  #
-  # describe '#dup_people_by_nickname' do
-  #   before do
-  #     expect(dups_finder).to receive(:dup_people_by_nickname_query)
-  #                              .and_return([double(person_id: john_doe1.id, dup_person_id: john_doe2.id,
-  #                                                  shared_contact_id: john_contact1.id, nickname_id: nickname.id)])
-  #   end
-  #
-  #   it 'looks up the records for the person, dup_peron and shared contact' do
-  #     dups = dups_finder.dup_people_by_nickname
-  #     expect(dups.size).to eq(1)
-  #     dup = dups.first
-  #     expect(dup.person).to eq(john_doe1)
-  #     expect(dup.dup_person).to eq(john_doe2)
-  #     expect(dup.shared_contact).to eq(john_contact1)
-  #     expect(dup.nickname_id).to eq(nickname.id)
-  #   end
-  #
-  #   it 'does not return a person pair if marked as not duplicated to each other' do
-  #     john_doe1.update_column(:not_duplicated_with, john_doe2.id.to_s)
-  #     expect(dups_finder.dup_people_by_nickname).to eq([])
-  #   end
-  # end
-  #
-  # describe '#dup_people_by_same_name' do
-  #   it 'finds people in the account list with the same name' do
-  #     dups = dups_finder.dup_people_by_same_name
-  #     expect(dups.size).to eq(1)
-  #     expect(dups.first).to include(john_doe1.id)
-  #     expect(dups.first).to include(john_doe2.id)
-  #   end
-  # end
-  #
-  # describe '#dup_contacts' do
-  #   it 'finds pairs of duplicated contacts by people with same name' do
-  #     contact_sets = dups_finder.dup_contact_sets
-  #     expect(contact_sets.size).to eq(1)
-  #     expect(contact_sets.first).to include(john_contact1)
-  #     expect(contact_sets.first).to include(john_contact2)
-  #   end
-  # end
-  #
-  # describe '#dup_people' do
-  #   it 'finds pairs of duplicated contacts by people with nickname match' do
-  #     nickname
-  #     john_doe1.update_column(:first_name, 'Johnny')
-  #
-  #     contact_sets = dups_finder.dup_contact_sets
-  #     expect(contact_sets.size).to eq(1)
-  #     expect(contact_sets.first).to include(john_contact1)
-  #     expect(contact_sets.first).to include(john_contact2)
-  #
-  #   end
-  # end
-  #
-  # describe '#dup_contacts_and_people' do
-  #   before do
-  #     nickname
-  #     john_doe1.update_column(:first_name, 'Johnny')
-  #   end
-  #
-  #   it 'does not find duplicate people who do not have a contact in common' do
-  #     expect(dups_finder.dup_people_sets).to be_empty
-  #   end
-  #
-  #   it 'finds duplicate people who have a contact in common' do
-  #     john_contact1.people << john_doe2
-  #     john_contact2.destroy
-  #
-  #     people_sets = dups_finder.dup_people_sets
-  #
-  #     expect(people_sets.size).to eq(1)
-  #     dup = people_sets.first
-  #     expect(dup.person).to eq(john_doe1)
-  #     expect(dup.dup_person).to eq(john_doe2)
-  #     expect(dup.shared_contact).to eq(john_contact1)
-  #     expect(dup.nickname_id).to eq(nickname.id)
-  #   end
-  # end
 end
