@@ -222,7 +222,8 @@ class ContactDuplicatesFinder
   end
 
   DUP_PEOPLE_BY_NAME_SQL = "
-    SELECT people.id as person_id, dup_people.id AS dup_person_id, contacts.id AS contact_id, nicknames.id AS nickname_id
+    SELECT people.id as person_id, dup_people.id AS dup_person_id, contacts.id AS contact_id,
+      nicknames.id AS nickname_id, 0 as priority
     FROM #{PEOPLE_EXPANDED_NAMES_ALL_FIELDS} AS people
       INNER JOIN #{PEOPLE_EXPANDED_NAMES_ALL_FIELDS} AS dup_people ON people.id <> dup_people.id
       INNER JOIN contact_people ON people.id = contact_people.person_id
@@ -235,7 +236,7 @@ class ContactDuplicatesFinder
     WHERE #{DUPS_COMMON_WHERE}
       AND contacts.id = dup_contacts.id
       AND lower(people.last_name) = lower(dup_people.last_name)
-      AND (people.name_source <> 'middle' OR dup_people.name_source <> 'middle')
+      AND (people.name_source = 'first' OR dup_people.name_source = 'first')
       AND (
         (
           lower(dup_people.name_part) = lower(people.name_part)
@@ -257,7 +258,7 @@ class ContactDuplicatesFinder
         )
       )
       AND (
-        (people.name_source = 'first' AND dup_people.name_source = 'first')
+        (dup_people.name_source = 'first' AND people.name_source = 'first')
         OR
         (
           (name_male_ratios.male_ratio IS NULL OR dup_name_male_ratios.male_ratio IS NULL)
@@ -270,7 +271,8 @@ class ContactDuplicatesFinder
 
   # This was split into an inner and outer query because joining to name_male_ratios inside the query was super slow
   DUP_PEOPLE_BY_EMAIL_SQL = "
-    SELECT people.id as person_id, dup_people.id AS dup_person_id, contacts.id AS contact_id, NULL AS nickname_id
+    SELECT people.id as person_id, dup_people.id AS dup_person_id, contacts.id AS contact_id,
+      NULL AS nickname_id, 1 as priority
     FROM people
       INNER JOIN people AS dup_people ON people.id < dup_people.id
       INNER JOIN email_addresses ON email_addresses.person_id = people.id
@@ -294,7 +296,8 @@ class ContactDuplicatesFinder
 
   # This was split into an inner and outer query because joining to name_male_ratios inside the query was super slow
   DUP_PEOPLE_BY_PHONE_SQL = "
-    SELECT people.id as person_id, dup_people.id AS dup_person_id, contacts.id AS contact_id, NULL AS nickname_id
+    SELECT people.id as person_id, dup_people.id AS dup_person_id, contacts.id AS contact_id,
+      NULL AS nickname_id, 1 as priority
     FROM people
       INNER JOIN people AS dup_people ON people.id < dup_people.id
       INNER JOIN phone_numbers ON phone_numbers.person_id = people.id
@@ -324,5 +327,5 @@ class ContactDuplicatesFinder
       #{DUP_PEOPLE_BY_EMAIL_SQL}
       UNION
       #{DUP_PEOPLE_BY_PHONE_SQL}
-      ORDER BY nickname_id"
+      ORDER BY priority, nickname_id"
 end

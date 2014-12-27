@@ -115,7 +115,7 @@ describe ContactDuplicatesFinder do
         expect(dup.shared_contact).to eq(contact1)
       end
 
-      it 'finds duplicates by nickname in correct order and without extra rows if other matching info there' do
+      it 'finds duplicates by nickname, nickname first, and without extra rows if other matching info there' do
         person1.email = 'same@example.com'
         person1.save
         person2.email = 'Same@Example.com'
@@ -138,6 +138,38 @@ describe ContactDuplicatesFinder do
         expect(dup.dup_person).to eq(person1)
 
         expect(dup.shared_contact).to eq(contact1)
+      end
+
+      it 'finds duplicates by middle & first name, first name first, and without extra rows if other matching info there' do
+        person1.email = 'same@example.com'
+        person1.save
+        person2.email = 'Same@Example.com'
+        person2.save
+
+        expect(person2.id > person1.id).to be_true
+
+        person1.update_column(:first_name, 'George')
+        person1.update_column(:middle_name, 'J')
+
+        dups = dups_finder.dup_people_sets
+        expect(dups.size).to eq(1)
+        dup = dups.first
+
+        # The person should be the one with the first name matching the others middle initial (i.e. John)
+        # The duplicate is the one with the middle initial matching the other (i.e. Goerge J )
+        expect(dup.person).to eq(person2)
+        expect(dup.dup_person).to eq(person1)
+
+        expect(dup.shared_contact).to eq(contact1)
+
+        # Check that it works in reverse as well
+        person1.update_column(:first_name, 'John')
+        person2.update_column(:first_name, 'George')
+        person2.update_column(:middle_name, 'J')
+        dups = dups_finder.dup_people_sets
+        expect(dups.size).to eq(1)
+        expect(dups.first.person).to eq(person1)
+        expect(dups.first.dup_person).to eq(person2)
       end
 
       it 'finds duplicates by email' do
