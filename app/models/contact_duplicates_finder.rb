@@ -41,14 +41,14 @@ class ContactDuplicatesFinder
 
   PEOPLE_COMBINED_NAME_FIELDS = "
     (
-      SELECT first_name, id, last_name, gender FROM people
-      UNION SELECT legal_first_name, id, last_name, gender FROM people
-      UNION SELECT middle_name, id, last_name, gender FROM people
+      SELECT first_name, id, last_name, gender, 'first' as name_source FROM people
+      UNION SELECT legal_first_name, id, last_name, gender, 'first' as name_source FROM people
+      UNION SELECT middle_name, id, last_name, gender, 'middle' as name_source FROM people
     ) AS people"
 
   PEOPLE_EXPANDED_NAMES = "
     (
-      SELECT * FROM
+      SELECT first_name, id, last_name, gender FROM
       (
           SELECT first_name, id, last_name, gender
           FROM people
@@ -73,7 +73,9 @@ class ContactDuplicatesFinder
     )"
 
   PEOPLE_EXPANDED_NAMES_ALL_FIELDS =
-    PEOPLE_EXPANDED_NAMES.gsub('FROM people', "FROM #{PEOPLE_COMBINED_NAME_FIELDS}")
+    PEOPLE_EXPANDED_NAMES
+      .gsub(', gender', ', gender, name_source')
+      .gsub('FROM people', "FROM #{PEOPLE_COMBINED_NAME_FIELDS}")
 
   PEOPLE_NAME_MALE_RATIOS = "
     (
@@ -208,6 +210,7 @@ class ContactDuplicatesFinder
     WHERE #{DUPS_COMMON_WHERE}
       AND contacts.id = dup_contacts.id
       AND lower(people.last_name) = lower(dup_people.last_name)
+      AND (people.name_source <> 'middle' OR dup_people.name_source <> 'middle')
       AND (
         (
           lower(dup_people.first_name) = lower(people.first_name)
@@ -219,7 +222,10 @@ class ContactDuplicatesFinder
           char_length(dup_people.first_name) = 1
           AND lower(dup_people.first_name) = lower(substring(people.first_name from 1 for 1))
           AND (
-            name_male_ratios.male_ratio IS NULL OR dup_name_male_ratios.male_ratio IS NULL
+            (
+              (name_male_ratios.male_ratio IS NULL OR dup_name_male_ratios.male_ratio IS NULL)
+              AND (people.gender = dup_people.gender OR people.gender IS NULL OR dup_people.gender IS NULL)
+            )
             OR (name_male_ratios.male_ratio < 0.1 AND dup_name_male_ratios.male_ratio < 0.1)
             OR (name_male_ratios.male_ratio > 0.9 AND dup_name_male_ratios.male_ratio > 0.9)
           )
