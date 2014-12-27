@@ -203,6 +203,7 @@ describe ContactDuplicatesFinder do
         person1.save
 
         person2.first_name = 'Lara'
+
         person2.phone = '(123) 456-7890'
         person2.gender = 'male' # sometimes the gender field data is wrong, simulate that
         person2.email = 'Same@Example.com'
@@ -245,6 +246,37 @@ describe ContactDuplicatesFinder do
       it 'does not report duplicates by middle name only' do
         person1.update_columns(first_name: 'Notjohn', middle_name: 'George')
         person2.update_column(:middle_name, 'George')
+
+        expect(dups_finder.dup_people_sets).to be_empty
+      end
+
+      it 'does not report duplicates if "first1 and first2" are in the contact name' do
+        contact1.update_column(:name, 'Doe, John and Jane')
+
+        person1.first_name = 'John'
+        person1.phone = '123-456-7890'
+        person1.email = 'same@example.com'
+        person1.save
+
+        person2.first_name = 'Jane'
+        person2.phone = '(123) 456-7890'
+        person2.email = 'Same@Example.com'
+        person2.save
+
+        expect(dups_finder.dup_people_sets).to be_empty
+      end
+
+      it 'does not report duplicates if middle name matches first name but name genders are off' do
+        create(:name_male_ratio, name: 'david', male_ratio: 0.996)
+        create(:name_male_ratio, name: 'lara', male_ratio: 0.001)
+
+        person1.first_name = 'David'
+        person1.middle_name = 'Lara'
+        person1.save
+
+        person2.first_name = 'Lara'
+        person2.middle_name = 'M'
+        person2.save
 
         expect(dups_finder.dup_people_sets).to be_empty
       end

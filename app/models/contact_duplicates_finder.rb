@@ -33,55 +33,80 @@ class ContactDuplicatesFinder
   DUP_CONTACTS_WHERE = "
     contacts.account_list_id = :account_list_id
     AND dup_contacts.account_list_id = :account_list_id
-    AND contacts.name not like '%nonymous%' AND dup_contacts.name not like '%nonymous%'"
+    AND contacts.name not like '%nonymous%' AND dup_contacts.name not like '%nonymous%'
+    "
 
   DUPS_COMMON_WHERE = "
     #{DUP_CONTACTS_WHERE}
-    AND people.first_name not like '%nknow%' AND dup_people.first_name not like '%nknow%'"
+    AND people.first_name not like '%nknow%' AND dup_people.first_name not like '%nknow%'
+    AND contacts.name NOT ilike ('%' || people.first_name || ' and ' || dup_people.first_name || '%')
+    AND contacts.name NOT ilike ('%' || dup_people.first_name || ' and ' || people.first_name || '%')"
 
   PEOPLE_COMBINED_NAME_FIELDS = "
     (
-      SELECT first_name, id, last_name, gender, 'first' as name_source FROM people
-      UNION SELECT legal_first_name, id, last_name, gender, 'first' as name_source FROM people
-      UNION SELECT middle_name, id, last_name, gender, 'middle' as name_source FROM people
+      SELECT first_name AS name_part, id, first_name, last_name, gender, 'first' as name_source FROM people
+      UNION SELECT legal_first_name, id, first_name,last_name, gender, 'first' as name_source FROM people
+      UNION SELECT middle_name, id, first_name,last_name, gender, 'middle' as name_source FROM people
     ) AS people"
 
   PEOPLE_EXPANDED_NAMES = "
     (
-      SELECT first_name, id, last_name, gender FROM
+      SELECT name_part, id, first_name, last_name, gender FROM
       (
-          SELECT first_name, id, last_name, gender
+          SELECT first_name AS name_part, id, first_name, last_name, gender
           FROM people
         UNION
-          SELECT regexp_split_to_table(first_name, '[. -]'), id, last_name, gender
+          SELECT regexp_split_to_table(first_name, '[. -]'), id, first_name, last_name, gender
           FROM people
           WHERE first_name SIMILAR TO '%[. -]%'
         UNION
-          SELECT regexp_split_to_table(regexp_replace(first_name, '([A-Z])([A-Z])', ' \\1 \\2'), ' '), id, last_name, gender
+          SELECT regexp_split_to_table(regexp_replace(first_name, '([A-Z])([A-Z])', ' \\1 \\2'), ' '), id, first_name, last_name, gender
           FROM people
           WHERE first_name SIMILAR TO '[A-Z]{2}%' AND first_name NOT SIMILAR TO '%[A-Z]{3}%'
         UNION
-          SELECT regexp_split_to_table(regexp_replace(first_name, '([a-z])([A-Z])', '\\1 \\2'), ' '), id, last_name, gender
+          SELECT regexp_split_to_table(regexp_replace(first_name, '([a-z])([A-Z])', '\\1 \\2'), ' '), id, first_name, last_name, gender
           FROM people
           WHERE first_name SIMILAR TO '%[a-z][A-Z]%'
         UNION
-          SELECT replace(people.first_name, ' ', ''), id, last_name, gender
+          SELECT replace(people.first_name, ' ', ''), id, first_name, last_name, gender
           FROM people
           WHERE first_name LIKE '% %'
       ) AS expanded_names_with_blanks
-      WHERE first_name IS NOT NULL AND first_name <> ''
+      WHERE name_part IS NOT NULL AND name_part <> ''
     )"
 
   PEOPLE_EXPANDED_NAMES_ALL_FIELDS =
-    PEOPLE_EXPANDED_NAMES
-      .gsub(', gender', ', gender, name_source')
-      .gsub('FROM people', "FROM #{PEOPLE_COMBINED_NAME_FIELDS}")
+    "
+    (
+      SELECT name_part, id, first_name, last_name, gender, name_source FROM
+      (
+          SELECT name_part AS name_part, id, first_name, last_name, gender, name_source
+          FROM #{PEOPLE_COMBINED_NAME_FIELDS}
+        UNION
+          SELECT regexp_split_to_table(name_part, '[. -]'), id, first_name, last_name, gender, name_source
+          FROM #{PEOPLE_COMBINED_NAME_FIELDS}
+          WHERE name_part SIMILAR TO '%[. -]%'
+        UNION
+          SELECT regexp_split_to_table(regexp_replace(name_part, '([A-Z])([A-Z])', ' \\1 \\2'), ' '), id, first_name, last_name, gender, name_source
+          FROM #{PEOPLE_COMBINED_NAME_FIELDS}
+          WHERE name_part SIMILAR TO '[A-Z]{2}%' AND name_part NOT SIMILAR TO '%[A-Z]{3}%'
+        UNION
+          SELECT regexp_split_to_table(regexp_replace(name_part, '([a-z])([A-Z])', '\\1 \\2'), ' '), id, first_name, last_name, gender, name_source
+          FROM #{PEOPLE_COMBINED_NAME_FIELDS}
+          WHERE name_part SIMILAR TO '%[a-z][A-Z]%'
+        UNION
+          SELECT replace(people.name_part, ' ', ''), id, first_name, last_name, gender, name_source
+          FROM #{PEOPLE_COMBINED_NAME_FIELDS}
+          WHERE name_part LIKE '% %'
+      ) AS expanded_names_with_blanks
+      WHERE name_part IS NOT NULL AND name_part <> ''
+    )"
 
   PEOPLE_NAME_MALE_RATIOS = "
     (
       SELECT people.id, AVG(name_male_ratios.male_ratio) AS male_ratio
       FROM #{PEOPLE_EXPANDED_NAMES} AS people
-      LEFT JOIN name_male_ratios ON lower(people.first_name) = name_male_ratios.name
+      LEFT JOIN name_male_ratios ON lower(people.name_part) = name_male_ratios.name
       GROUP BY people.id
     )"
 
@@ -96,16 +121,20 @@ class ContactDuplicatesFinder
       INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS name_male_ratios ON people.id = name_male_ratios.id
       INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS dup_name_male_ratios ON dup_people.id = dup_name_male_ratios.id
       LEFT JOIN nicknames
-        ON nicknames.suggest_duplicates = 't' AND lower(people.first_name) = nicknames.nickname
+        ON nicknames.suggest_duplicates = 't' AND lower(people.name_part) = nicknames.nickname
     WHERE #{DUPS_COMMON_WHERE}
       AND lower(dup_people.last_name) = lower(people.last_name)
       AND contacts.id <> dup_contacts.id
       AND (
-        (lower(dup_people.first_name) = lower(people.first_name) AND contacts.id < dup_contacts.id)
-        OR lower(dup_people.first_name) = nicknames.name
+        (
+            lower(dup_people.name_part) = lower(people.name_part)
+            AND char_length(people.name_part) > 1
+            AND contacts.id < dup_contacts.id
+        )
+        OR lower(dup_people.name_part) = nicknames.name
         OR (
-          char_length(dup_people.first_name) = 1
-          AND lower(dup_people.first_name) = lower(substring(people.first_name from 1 for 1))
+          char_length(dup_people.name_part) = 1
+          AND lower(dup_people.name_part) = lower(substring(people.name_part from 1 for 1))
           AND (
             name_male_ratios.male_ratio IS NULL OR dup_name_male_ratios.male_ratio IS NULL
             OR (name_male_ratios.male_ratio < 0.1 AND dup_name_male_ratios.male_ratio < 0.1)
@@ -177,13 +206,7 @@ class ContactDuplicatesFinder
   end
 
   def dup_people_rows
-    # Order by the nickname_id to get the duplicate with nicknames first since we want to preserve their ordering
-    # to make the default merge prefer the nickname person
-    sql = "#{DUP_PEOPLE_BY_NAME_SQL}
-      UNION #{DUP_PEOPLE_BY_EMAIL_SQL}
-      UNION #{DUP_PEOPLE_BY_PHONE_SQL}
-      ORDER BY nickname_id"
-    sql.gsub!(':account_list_id', Contact.connection.quote(@account_list.id))
+    sql = DUP_PEOPLE_SQL.gsub(':account_list_id', Contact.connection.quote(@account_list.id))
     dup_rows = Person.connection.exec_query(sql).to_hash.map(&:symbolize_keys)
 
     # Eliminate duplicates but keep the rows which are first
@@ -191,7 +214,9 @@ class ContactDuplicatesFinder
     dup_rows.reject do |row|
       dup_set = [row[:person_id], row[:dup_person_id]].sort
       already_included = dup_pairs_so_far.include?(dup_set)
+
       dup_pairs_so_far << dup_set
+
       already_included
     end
   end
@@ -204,7 +229,7 @@ class ContactDuplicatesFinder
       INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
       INNER JOIN contacts ON contact_people.contact_id = contacts.id
       INNER JOIN contacts AS dup_contacts ON dup_contacts.id = dup_contact_people.contact_id
-      LEFT JOIN nicknames ON nicknames.suggest_duplicates = 't' AND lower(people.first_name) = nicknames.nickname
+      LEFT JOIN nicknames ON nicknames.suggest_duplicates = 't' AND lower(people.name_part) = nicknames.nickname
       INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS name_male_ratios ON people.id = name_male_ratios.id
       INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS dup_name_male_ratios ON dup_people.id = dup_name_male_ratios.id
     WHERE #{DUPS_COMMON_WHERE}
@@ -213,14 +238,14 @@ class ContactDuplicatesFinder
       AND (people.name_source <> 'middle' OR dup_people.name_source <> 'middle')
       AND (
         (
-          lower(dup_people.first_name) = lower(people.first_name)
+          lower(dup_people.name_part) = lower(people.name_part)
           AND people.id < dup_people.id
-          AND char_length(people.first_name) > 1
+          AND char_length(people.name_part) > 1
         )
-        OR lower(dup_people.first_name) = nicknames.name
+        OR lower(dup_people.name_part) = nicknames.name
         OR (
-          char_length(dup_people.first_name) = 1
-          AND lower(dup_people.first_name) = lower(substring(people.first_name from 1 for 1))
+          char_length(dup_people.name_part) = 1
+          AND lower(dup_people.name_part) = lower(substring(people.name_part from 1 for 1))
           AND (
             (
               (name_male_ratios.male_ratio IS NULL OR dup_name_male_ratios.male_ratio IS NULL)
@@ -230,7 +255,18 @@ class ContactDuplicatesFinder
             OR (name_male_ratios.male_ratio > 0.9 AND dup_name_male_ratios.male_ratio > 0.9)
           )
         )
-      )"
+      )
+      AND (
+        (people.name_source = 'first' AND dup_people.name_source = 'first')
+        OR
+        (
+          (name_male_ratios.male_ratio IS NULL OR dup_name_male_ratios.male_ratio IS NULL)
+          AND (people.gender = dup_people.gender OR people.gender IS NULL OR dup_people.gender IS NULL)
+        )
+        OR (name_male_ratios.male_ratio < 0.1 AND dup_name_male_ratios.male_ratio < 0.1)
+        OR (name_male_ratios.male_ratio > 0.9 AND dup_name_male_ratios.male_ratio > 0.9)
+      )
+      "
 
   # This was split into an inner and outer query because joining to name_male_ratios inside the query was super slow
   DUP_PEOPLE_BY_EMAIL_SQL = "
@@ -279,4 +315,14 @@ class ContactDuplicatesFinder
         OR (name_male_ratios.male_ratio < 0.1 AND dup_name_male_ratios.male_ratio < 0.1)
         OR (name_male_ratios.male_ratio > 0.9 AND dup_name_male_ratios.male_ratio > 0.9)
       )"
+
+  # Order by the nickname_id to get the duplicate with nicknames first since we want to preserve their ordering
+  # to make the default merge prefer the nickname person
+  DUP_PEOPLE_SQL =
+    "#{DUP_PEOPLE_BY_NAME_SQL}
+      UNION
+      #{DUP_PEOPLE_BY_EMAIL_SQL}
+      UNION
+      #{DUP_PEOPLE_BY_PHONE_SQL}
+      ORDER BY nickname_id"
 end
