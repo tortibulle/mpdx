@@ -79,43 +79,38 @@ class ContactDuplicatesFinder
     (
       SELECT people.id, AVG(name_male_ratios.male_ratio) AS male_ratio
       FROM #{PEOPLE_EXPANDED_NAMES} AS people
-      LEFT JOIN name_male_ratios ON LOWER(people.first_name) = name_male_ratios.name
+      LEFT JOIN name_male_ratios ON lower(people.first_name) = name_male_ratios.name
       GROUP BY people.id
     )"
 
   DUP_CONTACTS_BY_NAME_SQL = "
-    SELECT contact_id, dup_contact_id
-    FROM
-    (
-      SELECT contacts.id AS contact_id, dup_contacts.id AS dup_contact_id,
-        people.id AS people_id, dup_people.id AS dup_people_id,
-        people.first_name, dup_people.first_name as dup_first_name
-      FROM #{PEOPLE_EXPANDED_NAMES} AS people
-        INNER JOIN #{PEOPLE_EXPANDED_NAMES} AS dup_people ON people.id <> dup_people.id
-        INNER JOIN contact_people ON contact_people.person_id = people.id
-        INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
-        INNER JOIN contacts ON contacts.id = contact_people.contact_id
-        INNER JOIN contacts AS dup_contacts ON dup_contacts.id = dup_contact_people.contact_id
-        LEFT JOIN nicknames
-          ON nicknames.suggest_duplicates = 't' AND LOWER(people.first_name) = nicknames.nickname
-      WHERE #{DUPS_COMMON_WHERE}
-        AND LOWER(dup_people.last_name) = LOWER(people.last_name)
-        AND contacts.id <> dup_contacts.id
-        AND (
-          (LOWER(dup_people.first_name) = LOWER(people.first_name) AND contacts.id < dup_contacts.id)
-          OR LOWER(dup_people.first_name) = nicknames.name
-          OR (
-            char_length(dup_people.first_name) = 1
-            AND LOWER(dup_people.first_name) = LOWER(substring(people.first_name from 1 for 1))
+    SELECT contacts.id AS contact_id, dup_contacts.id AS dup_contact_id
+    FROM #{PEOPLE_EXPANDED_NAMES} AS people
+      INNER JOIN #{PEOPLE_EXPANDED_NAMES} AS dup_people ON people.id <> dup_people.id
+      INNER JOIN contact_people ON contact_people.person_id = people.id
+      INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
+      INNER JOIN contacts ON contacts.id = contact_people.contact_id
+      INNER JOIN contacts AS dup_contacts ON dup_contacts.id = dup_contact_people.contact_id
+      INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS name_male_ratios ON people.id = name_male_ratios.id
+      INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS dup_name_male_ratios ON dup_people.id = dup_name_male_ratios.id
+      LEFT JOIN nicknames
+        ON nicknames.suggest_duplicates = 't' AND lower(people.first_name) = nicknames.nickname
+    WHERE #{DUPS_COMMON_WHERE}
+      AND lower(dup_people.last_name) = lower(people.last_name)
+      AND contacts.id <> dup_contacts.id
+      AND (
+        (lower(dup_people.first_name) = lower(people.first_name) AND contacts.id < dup_contacts.id)
+        OR lower(dup_people.first_name) = nicknames.name
+        OR (
+          char_length(dup_people.first_name) = 1
+          AND lower(dup_people.first_name) = lower(substring(people.first_name from 1 for 1))
+          AND (
+            name_male_ratios.male_ratio IS NULL OR dup_name_male_ratios.male_ratio IS NULL
+            OR (name_male_ratios.male_ratio < 0.1 AND dup_name_male_ratios.male_ratio < 0.1)
+            OR (name_male_ratios.male_ratio > 0.9 AND dup_name_male_ratios.male_ratio > 0.9)
           )
         )
-    ) AS all_dups
-    INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS name_male_ratios ON people_id = name_male_ratios.id
-    INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS dup_name_male_ratios ON dup_people_id = dup_name_male_ratios.id
-    WHERE
-      name_male_ratios.male_ratio IS NULL OR dup_name_male_ratios.male_ratio IS NULL
-      OR (name_male_ratios.male_ratio < 0.1 AND dup_name_male_ratios.male_ratio < 0.1)
-      OR (name_male_ratios.male_ratio > 0.9 AND dup_name_male_ratios.male_ratio > 0.9)"
+      )"
 
   DUP_CONTACTS_BY_EMAILS_SQL = "
     SELECT contacts.id, dup_contacts.id
@@ -123,7 +118,7 @@ class ContactDuplicatesFinder
       INNER JOIN email_addresses ON email_addresses.person_id = people.id
       INNER JOIN email_addresses AS dup_email_addresses
         ON dup_email_addresses.person_id <> people.id
-          AND LOWER(dup_email_addresses.email) = LOWER(email_addresses.email)
+          AND lower(dup_email_addresses.email) = lower(email_addresses.email)
       INNER JOIN people AS dup_people ON dup_people.id = dup_email_addresses.person_id
       INNER JOIN contact_people ON contact_people.person_id = people.id
       INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
@@ -207,76 +202,75 @@ class ContactDuplicatesFinder
       INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
       INNER JOIN contacts ON contact_people.contact_id = contacts.id
       INNER JOIN contacts AS dup_contacts ON dup_contacts.id = dup_contact_people.contact_id
-      LEFT JOIN nicknames ON nicknames.suggest_duplicates = 't' AND LOWER(people.first_name) = nicknames.nickname
+      LEFT JOIN nicknames ON nicknames.suggest_duplicates = 't' AND lower(people.first_name) = nicknames.nickname
+      INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS name_male_ratios ON people.id = name_male_ratios.id
+      INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS dup_name_male_ratios ON dup_people.id = dup_name_male_ratios.id
     WHERE #{DUPS_COMMON_WHERE}
       AND contacts.id = dup_contacts.id
-      AND LOWER(people.last_name) = LOWER(dup_people.last_name)
-     AND (
-        (LOWER(dup_people.first_name) = LOWER(people.first_name) AND people.id < dup_people.id)
-        OR LOWER(dup_people.first_name) = nicknames.name
+      AND lower(people.last_name) = lower(dup_people.last_name)
+      AND (
+        (
+          lower(dup_people.first_name) = lower(people.first_name)
+          AND people.id < dup_people.id
+          AND char_length(people.first_name) > 1
+        )
+        OR lower(dup_people.first_name) = nicknames.name
         OR (
           char_length(dup_people.first_name) = 1
-          AND LOWER(dup_people.first_name) = LOWER(substring(people.first_name from 1 for 1))
+          AND lower(dup_people.first_name) = lower(substring(people.first_name from 1 for 1))
+          AND (
+            name_male_ratios.male_ratio IS NULL OR dup_name_male_ratios.male_ratio IS NULL
+            OR (name_male_ratios.male_ratio < 0.1 AND dup_name_male_ratios.male_ratio < 0.1)
+            OR (name_male_ratios.male_ratio > 0.9 AND dup_name_male_ratios.male_ratio > 0.9)
+          )
         )
       )"
 
   # This was split into an inner and outer query because joining to name_male_ratios inside the query was super slow
   DUP_PEOPLE_BY_EMAIL_SQL = "
-    SELECT person_id, dup_person_id, contact_id, nickname_id FROM
-      (
-        SELECT people.first_name, dup_people.first_name AS dup_first_name,
-          people.gender, dup_people.gender AS dup_gender,
-          people.id as person_id, dup_people.id AS dup_person_id, contacts.id AS contact_id, NULL AS nickname_id
-        FROM people
-          INNER JOIN people AS dup_people ON people.id < dup_people.id
-          INNER JOIN email_addresses ON email_addresses.person_id = people.id
-          INNER JOIN email_addresses AS dup_email_addresses ON dup_email_addresses.person_id = dup_people.id
-          INNER JOIN contact_people ON people.id = contact_people.person_id
-          INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
-          INNER JOIN contacts ON contact_people.contact_id = contacts.id
-          INNER JOIN contacts AS dup_contacts ON dup_contacts.id = dup_contact_people.contact_id
-        WHERE #{DUPS_COMMON_WHERE}
-          AND LOWER(email_addresses.email) = LOWER(dup_email_addresses.email)
-      ) AS all_dups
-    LEFT JOIN name_male_ratios
-      ON LOWER(all_dups.first_name) = name_male_ratios.name
-    LEFT JOIN name_male_ratios AS dup_name_male_ratios
-      ON LOWER(all_dups.dup_first_name) = dup_name_male_ratios.name
-    WHERE
-      (
-        (name_male_ratios.male_ratio IS NULL OR dup_name_male_ratios.male_ratio IS NULL)
-        AND (gender = dup_gender OR gender IS NULL OR dup_gender IS NULL)
-      )
-      OR (name_male_ratios.male_ratio < 0.1 AND dup_name_male_ratios.male_ratio < 0.1)
-      OR (name_male_ratios.male_ratio > 0.9 AND dup_name_male_ratios.male_ratio > 0.9)"
+    SELECT people.id as person_id, dup_people.id AS dup_person_id, contacts.id AS contact_id, NULL AS nickname_id
+    FROM people
+      INNER JOIN people AS dup_people ON people.id < dup_people.id
+      INNER JOIN email_addresses ON email_addresses.person_id = people.id
+      INNER JOIN email_addresses AS dup_email_addresses ON dup_email_addresses.person_id = dup_people.id
+      INNER JOIN contact_people ON people.id = contact_people.person_id
+      INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
+      INNER JOIN contacts ON contact_people.contact_id = contacts.id
+      INNER JOIN contacts AS dup_contacts ON dup_contacts.id = dup_contact_people.contact_id
+      INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS name_male_ratios ON people.id = name_male_ratios.id
+      INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS dup_name_male_ratios ON dup_people.id = dup_name_male_ratios.id
+    WHERE #{DUPS_COMMON_WHERE}
+      AND lower(email_addresses.email) = lower(dup_email_addresses.email)
+      AND (
+        (
+          (name_male_ratios.male_ratio IS NULL OR dup_name_male_ratios.male_ratio IS NULL)
+          AND (people.gender = dup_people.gender OR people.gender IS NULL OR dup_people.gender IS NULL)
+        )
+        OR (name_male_ratios.male_ratio < 0.1 AND dup_name_male_ratios.male_ratio < 0.1)
+        OR (name_male_ratios.male_ratio > 0.9 AND dup_name_male_ratios.male_ratio > 0.9)
+      )"
 
   # This was split into an inner and outer query because joining to name_male_ratios inside the query was super slow
   DUP_PEOPLE_BY_PHONE_SQL = "
-    SELECT person_id, dup_person_id, contact_id, nickname_id FROM
-      (
-        SELECT people.first_name, dup_people.first_name AS dup_first_name,
-          people.gender, dup_people.gender AS dup_gender,
-          people.id as person_id, dup_people.id AS dup_person_id, contacts.id AS contact_id, NULL AS nickname_id
-        FROM people
-          INNER JOIN people AS dup_people ON people.id < dup_people.id
-          INNER JOIN phone_numbers ON phone_numbers.person_id = people.id
-          INNER JOIN phone_numbers AS dup_phone_numbers ON dup_phone_numbers.person_id = dup_people.id
-          INNER JOIN contact_people ON people.id = contact_people.person_id
-          INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
-          INNER JOIN contacts ON contact_people.contact_id = contacts.id
-          INNER JOIN contacts AS dup_contacts ON dup_contacts.id = dup_contact_people.contact_id
-        WHERE #{DUPS_COMMON_WHERE}
-          AND phone_numbers.number = dup_phone_numbers.number
-      ) AS all_dups
-      LEFT JOIN name_male_ratios
-        ON LOWER(all_dups.first_name) = name_male_ratios.name
-      LEFT JOIN name_male_ratios AS dup_name_male_ratios
-        ON LOWER(all_dups.dup_first_name) = dup_name_male_ratios.name
-      WHERE
+    SELECT people.id as person_id, dup_people.id AS dup_person_id, contacts.id AS contact_id, NULL AS nickname_id
+    FROM people
+      INNER JOIN people AS dup_people ON people.id < dup_people.id
+      INNER JOIN phone_numbers ON phone_numbers.person_id = people.id
+      INNER JOIN phone_numbers AS dup_phone_numbers ON dup_phone_numbers.person_id = dup_people.id
+      INNER JOIN contact_people ON people.id = contact_people.person_id
+      INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
+      INNER JOIN contacts ON contact_people.contact_id = contacts.id
+      INNER JOIN contacts AS dup_contacts ON dup_contacts.id = dup_contact_people.contact_id
+      INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS name_male_ratios ON people.id = name_male_ratios.id
+      INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS dup_name_male_ratios ON dup_people.id = dup_name_male_ratios.id
+    WHERE #{DUPS_COMMON_WHERE}
+      AND phone_numbers.number = dup_phone_numbers.number
+      AND (
         (
           (name_male_ratios.male_ratio IS NULL OR dup_name_male_ratios.male_ratio IS NULL)
-          AND (gender = dup_gender OR gender IS NULL OR dup_gender IS NULL)
+          AND (people.gender = dup_people.gender OR people.gender IS NULL OR dup_people.gender IS NULL)
         )
         OR (name_male_ratios.male_ratio < 0.1 AND dup_name_male_ratios.male_ratio < 0.1)
-        OR (name_male_ratios.male_ratio > 0.9 AND dup_name_male_ratios.male_ratio > 0.9)"
+        OR (name_male_ratios.male_ratio > 0.9 AND dup_name_male_ratios.male_ratio > 0.9)
+      )"
 end
