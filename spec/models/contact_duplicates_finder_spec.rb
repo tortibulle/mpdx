@@ -40,6 +40,7 @@ describe ContactDuplicatesFinder do
     'C' => 'Charlie',
     'Hoo-Tee' => 'Hoo Tee',
     'HooTee' => 'Hoo Tee',
+    'Hootee' => 'Hoo Tee',
     'Mary Beth' => 'Marybeth',
     'JW' => 'john wilson'
   }
