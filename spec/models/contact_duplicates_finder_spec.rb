@@ -134,11 +134,15 @@ describe ContactDuplicatesFinder do
           { first_name: 'AnnMarie' } => { first_name: 'Annmarie' },
           { first_name: 'Andy' } => { first_name: 'Grable A' },
           { first_name: 'JW' } => { first_name: 'John' },
+          { first_name: 'C. S.' } => { first_name: 'Clive' },
           { first_name: 'A.J.' } => { first_name: 'Andrew' },
           { first_name: 'John' } => { first_name: 'john' },
           { first_name: 'John' } => { first_name: 'John.' },
           { first_name: 'David' } => { first_name: 'J David' },
-          { first_name: 'Andy' } => { first_name: 'A A' }
+          { first_name: 'Andy' } => { first_name: 'A A' },
+          { first_name: 'Somebody', last_name: 'Doe' } => { first_name: 'Match by contact info', last_name: 'Notdoe' },
+          { first_name: 'Somebody', last_name: 'doe' } => { first_name: 'Match by contact info', last_name: 'Notdoe' },
+          { first_name: 'Somebody', last_name: 'Notdoe' } => { first_name: 'Match by contact info', last_name: nil }
         }
         nickname
 

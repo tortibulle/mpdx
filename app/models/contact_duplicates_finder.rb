@@ -228,16 +228,14 @@ class ContactDuplicatesFinder
     SELECT people.id as person_id, dup_people.id AS dup_person_id, contacts.id AS contact_id,
       nicknames.id AS nickname_id,
       CASE
-        WHEN LOWER(people.name_part) = nicknames.nickname THEN 900
-        WHEN dup_people.name_source = 'middle' THEN 800
-        WHEN people.first_name ~ '^[A-Z][a-z]+[A-Z][a-z].*' THEN 700
-        WHEN people.first_name ~ '^[A-Z][A-Z]$' THEN 600
-        WHEN people.first_name ~ '^[A-Z]\\.[A-Z]\\.$' THEN 500
-        WHEN people.first_name ~ '^[A-Z]\\. [A-Z]\\.$' THEN 400
-        WHEN people.first_name ~ '^[A-Z][a-z]+ [A-Z][a-z]' THEN 300
-        WHEN dup_people.first_name ~ '([. ]|^)[A-Za-z]([. ]|$)' THEN 200
-        WHEN dup_people.first_name ~ '.*\\.' THEN 100
-        WHEN dup_people.id > people.id THEN 50
+        WHEN LOWER(people.name_part) = nicknames.nickname THEN 800
+        WHEN dup_people.name_source = 'middle' THEN 700
+        WHEN people.first_name ~ '^[A-Z][a-z]+[A-Z][a-z].*' THEN 600
+        WHEN people.first_name ~ '^[A-Z][A-Z]$|^[A-Z]\\.\s?[A-Z]\\.$' THEN 500
+        WHEN people.first_name ~ '^[A-Z][a-z]+ [A-Z][a-z]' THEN 400
+        WHEN dup_people.first_name ~ '([. ]|^)[A-Za-z]([. ]|$)' THEN 300
+        WHEN dup_people.first_name ~ '.*\\.' THEN 200
+        WHEN dup_people.id > people.id THEN 100
         ELSE 50
       END as priority
     FROM #{PEOPLE_EXPANDED_NAMES_ALL_FIELDS} AS people
@@ -294,9 +292,15 @@ class ContactDuplicatesFinder
   # This was split into an inner and outer query because joining to name_male_ratios inside the query was super slow
   DUP_PEOPLE_BY_EMAIL_SQL = "
     SELECT people.id as person_id, dup_people.id AS dup_person_id, contacts.id AS contact_id,
-      NULL AS nickname_id, 1 as priority
+      NULL AS nickname_id,
+      CASE
+        WHEN contacts.name ILIKE people.last_name || ',%' THEN 10
+        WHEN people.last_name IS NOT NULL AND people.last_name <> '' THEN 5
+        WHEN people.id < dup_people.id THEN 3
+        ELSE 1
+      END as priority
     FROM people
-      INNER JOIN people AS dup_people ON people.id < dup_people.id
+      INNER JOIN people AS dup_people ON people.id <> dup_people.id
       INNER JOIN email_addresses ON email_addresses.person_id = people.id
       INNER JOIN email_addresses AS dup_email_addresses ON dup_email_addresses.person_id = dup_people.id
       INNER JOIN contact_people ON people.id = contact_people.person_id
@@ -306,6 +310,7 @@ class ContactDuplicatesFinder
       INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS name_male_ratios ON people.id = name_male_ratios.id
       INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS dup_name_male_ratios ON dup_people.id = dup_name_male_ratios.id
     WHERE #{DUPS_PEOPLE_WHERE}
+      AND contacts.id = dup_contacts.id
       AND lower(email_addresses.email) = lower(dup_email_addresses.email)
       AND (
         (
@@ -319,9 +324,15 @@ class ContactDuplicatesFinder
   # This was split into an inner and outer query because joining to name_male_ratios inside the query was super slow
   DUP_PEOPLE_BY_PHONE_SQL = "
     SELECT people.id as person_id, dup_people.id AS dup_person_id, contacts.id AS contact_id,
-      NULL AS nickname_id, 1 as priority
+      NULL AS nickname_id,
+      CASE
+        WHEN contacts.name ILIKE people.last_name || ',%' THEN 10
+        WHEN people.last_name IS NOT NULL AND people.last_name <> '' THEN 5
+        WHEN people.id < dup_people.id THEN 3
+        ELSE 1
+      END as priority
     FROM people
-      INNER JOIN people AS dup_people ON people.id < dup_people.id
+      INNER JOIN people AS dup_people ON people.id <> dup_people.id
       INNER JOIN phone_numbers ON phone_numbers.person_id = people.id
       INNER JOIN phone_numbers AS dup_phone_numbers ON dup_phone_numbers.person_id = dup_people.id
       INNER JOIN contact_people ON people.id = contact_people.person_id
@@ -331,6 +342,7 @@ class ContactDuplicatesFinder
       INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS name_male_ratios ON people.id = name_male_ratios.id
       INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS dup_name_male_ratios ON dup_people.id = dup_name_male_ratios.id
     WHERE #{DUPS_PEOPLE_WHERE}
+      AND contacts.id = dup_contacts.id
       AND phone_numbers.number = dup_phone_numbers.number
       AND (
         (
