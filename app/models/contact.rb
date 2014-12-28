@@ -234,6 +234,10 @@ class Contact < ActiveRecord::Base
     first_names = name.split(',')[1].strip
     return first_names + ' ' + last_name unless first_names =~ /\(*\)/
     first_names = first_names.split(/ & | #{_('and')} /)
+    if first_names[0] =~ /\(*\)/
+      first_names[0].delete!('()')
+      return "#{first_names[0]} #{_('and')} #{first_names[1]} #{last_name}"
+    end
     first_names[1].delete!('()')
     "#{first_names[0]} #{last_name} #{_('and')} #{first_names[1]}"
   end

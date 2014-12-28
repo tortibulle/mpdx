@@ -381,6 +381,8 @@ describe Contact do
       expect(contact.envelope_greeting).to eq 'John T and Jane F Smith'
       contact.name = 'Doe, John and Jane (Smith)'
       expect(contact.envelope_greeting).to eq 'John Doe and Jane Smith'
+      contact.name = 'Doe, John (Smith) and Jane'
+      expect(contact.envelope_greeting).to eq 'John Smith and Jane Doe'
       contact.name = 'New Life Church'
       expect(contact.envelope_greeting).to eq 'New Life Church'
     end
