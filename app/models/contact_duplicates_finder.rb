@@ -68,80 +68,64 @@ class ContactDuplicatesFinder
   end
 
   def dup_contacts_where
-    "
-    contacts.account_list_id = :account_list_id
-    AND dup_contacts.account_list_id = :account_list_id
-    AND contacts.name not like '%nonymous%' AND dup_contacts.name not like '%nonymous%'
-    "
+    "contacts.account_list_id = :account_list_id AND dup_contacts.account_list_id = :account_list_id
+    AND contacts.name not like '%nonymous%' AND dup_contacts.name not like '%nonymous%'"
   end
 
   def dup_common_where
-    "
-    #{dup_contacts_where}
+    "#{dup_contacts_where}
     AND people.first_name not like '%nknow%' AND dup_people.first_name not like '%nknow%'"
   end
 
   def dup_people_where
-    "
-    #{dup_common_where}
+    "#{dup_common_where}
     AND contacts.name NOT ilike ('%' || people.first_name || '% and %' || dup_people.first_name || '%')
     AND contacts.name NOT ilike ('%' || dup_people.first_name || '% and %' || people.first_name || '%')"
   end
 
   def people_combined_name_fields
-    "
-    (
-      SELECT first_name AS name_part, id, first_name, last_name, gender, 'first' as name_source FROM people
-      UNION SELECT legal_first_name, id, first_name,last_name, gender, 'first' as name_source FROM people
-      UNION SELECT middle_name, id, first_name,last_name, gender, 'middle' as name_source FROM people
-    ) AS people"
+    # Combine the various person name fields into a single column but track their origin in a field
+    sql = '('
+    [
+      { field: 'first_name', source: 'first' },  { field: 'legal_first_name', source: 'first' }, { field: 'middle_name', source: 'middle' }
+    ].each_with_index do |field_info, index|
+      sql +=  ' UNION ' if index > 0
+      sql += "SELECT #{field_info[:field]} AS name_multi_field, '#{field_info[:source]}' AS name_source, * FROM people\n"
+    end
+    sql + ') AS people'
   end
 
-  def people_expanded_names
-    "
-    (
-      SELECT first_name AS name_part, id, first_name, last_name, gender FROM people
-      UNION SELECT regexp_split_to_table(regexp_replace(first_name, '[\\. -]+$', ''), '([\\. -]+|$)+'), id, first_name, last_name, gender
-        FROM people WHERE first_name ~ '.*[\\. -].*'
-      UNION SELECT regexp_split_to_table(regexp_replace(first_name, '([A-Za-z])([A-Z])', '\\1 \\2'), ' '), id, first_name, last_name, gender
-        FROM people WHERE first_name ~ '^[A-Za-z][A-Z]' AND first_name !~ '^[A-Z]{3}'
-      UNION SELECT replace(people.first_name, ' ', ''), id, first_name, last_name, gender FROM people WHERE first_name ~ ' '
-    )"
-  end
+  def people_expanded_names(all_fields)
+    table = all_fields ? people_combined_name_fields : 'people'
+    name_field = all_fields ? 'name_multi_field' : 'first_name'
 
-  def people_expanded_names_all_fields
-    "
-    (
-      SELECT name_part, id, first_name, last_name, gender, name_source FROM
-      (
-          SELECT name_part AS name_part, id, first_name, last_name, gender, name_source
-          FROM #{people_combined_name_fields}
-        UNION
-          SELECT regexp_split_to_table(name_part, '[. -]'), id, first_name, last_name, gender, name_source
-          FROM #{people_combined_name_fields}
-          WHERE name_part SIMILAR TO '%[. -]%'
-        UNION
-          SELECT regexp_split_to_table(regexp_replace(name_part, '([A-Z])([A-Z])', ' \\1 \\2'), ' '), id, first_name, last_name, gender, name_source
-          FROM #{people_combined_name_fields}
-          WHERE name_part SIMILAR TO '[A-Z]{2}%' AND name_part NOT SIMILAR TO '%[A-Z]{3}%'
-        UNION
-          SELECT regexp_split_to_table(regexp_replace(name_part, '([a-z])([A-Z])', '\\1 \\2'), ' '), id, first_name, last_name, gender, name_source
-          FROM #{people_combined_name_fields}
-          WHERE name_part SIMILAR TO '%[a-z][A-Z]%'
-        UNION
-          SELECT replace(people.name_part, ' ', ''), id, first_name, last_name, gender, name_source
-          FROM #{people_combined_name_fields}
-          WHERE name_part LIKE '% %'
-      ) AS expanded_names_with_blanks
-      WHERE name_part IS NOT NULL AND name_part <> ''
-    )"
+    sql = '('
+    [
+      # Split names like "Mary Beth", "Mary-Beth", "M Beth", "M.B." into multiple rows by period, space and dash.
+      # If the regexp doesn't match, it just returns the whole name
+      # The regexp_replace inside is to get rid of a "." or "-" at the end of the name and so prevent empty name_part entries
+      { name_part: "regexp_split_to_table(regexp_replace(#{name_field}, '[\\.-]+$', ''), '([\\. -]+|$)+')",
+        where: '' },
+
+      # Split names like "MaryBeth" or "JW". Only do a single replacement (by default regexp_replace isn't global),
+      # because we don't want to split apart organization acronyms like "CCC NEHQ"
+      { name_part: "regexp_split_to_table(regexp_replace(#{name_field}, '(^[A-Z]|[a-z])([A-Z])', '\\1 \\2'), ' ')",
+        where: " WHERE #{name_field} !~ '[A-Z]{3}'" },
+
+      # Try removing the spaces in a name, to match examples like "Marybeth" and "Mary Beth"
+      { name_part: "replace(#{name_field}, ' ', '')", where: '' }
+    ].each_with_index do |split_info, index|
+      sql +=  ' UNION ' if index > 0
+      sql += "SELECT #{split_info[:name_part]} AS name_part, * FROM #{table}#{split_info[:where]}\n"
+    end
+    sql + ')'
   end
 
   def people_name_male_ratios
     "
     (
       SELECT people.id, AVG(name_male_ratios.male_ratio) AS male_ratio
-      FROM #{people_expanded_names} AS people
+      FROM #{people_expanded_names(false)} AS people
       LEFT JOIN name_male_ratios ON lower(people.name_part) = name_male_ratios.name
       GROUP BY people.id
     )"
@@ -150,8 +134,8 @@ class ContactDuplicatesFinder
   def dup_contacts_by_name_sql
     "
     SELECT contacts.id AS contact_id, dup_contacts.id AS dup_contact_id
-    FROM #{people_expanded_names} AS people
-      INNER JOIN #{people_expanded_names} AS dup_people ON people.id <> dup_people.id
+    FROM #{people_expanded_names(false)} AS people
+      INNER JOIN #{people_expanded_names(false)} AS dup_people ON people.id <> dup_people.id
       INNER JOIN contact_people ON contact_people.person_id = people.id
       INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
       INNER JOIN contacts ON contacts.id = contact_people.contact_id
@@ -246,8 +230,8 @@ class ContactDuplicatesFinder
         WHEN dup_people.id > people.id THEN 100
         ELSE 50
       END as priority
-    FROM #{people_expanded_names_all_fields} AS people
-      INNER JOIN #{people_expanded_names_all_fields} AS dup_people ON people.id <> dup_people.id
+    FROM #{people_expanded_names(true)} AS people
+      INNER JOIN #{people_expanded_names(true)} AS dup_people ON people.id <> dup_people.id
       INNER JOIN contact_people ON people.id = contact_people.person_id
       INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
       INNER JOIN contacts ON contact_people.contact_id = contacts.id

@@ -325,12 +325,14 @@ describe ContactDuplicatesFinder do
       end
 
       def expect_matching_people(first_names)
+        puts "match: #{first_names}"
         person1.update_column(:first_name, first_names[0])
         person2.update_column(:first_name, first_names[1])
         expect_people_set
       end
 
       def expect_non_matching_people(first_names)
+        puts "non-match: #{first_names}"
         person1.update_column(:first_name, first_names[0])
         person2.update_column(:first_name, first_names[1])
         expect(dups_finder.dup_people_sets).to be_empty
@@ -436,12 +438,14 @@ describe ContactDuplicatesFinder do
     end
 
     def expect_matching_contacts(first_names)
+      puts "match: #{first_names}"
       person1.update_column(:first_name, first_names[0])
       person2.update_column(:first_name, first_names[1])
       expect_contact_set
     end
 
     def expect_non_matching_contacts(first_names)
+      puts "non-match: #{first_names}"
       person1.update_column(:first_name, first_names[0])
       person2.update_column(:first_name, first_names[1])
       expect(dups_finder.dup_contact_sets).to be_empty
