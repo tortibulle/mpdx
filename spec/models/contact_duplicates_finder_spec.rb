@@ -115,61 +115,51 @@ describe ContactDuplicatesFinder do
         expect(dup.shared_contact).to eq(contact1)
       end
 
-      it 'finds duplicates by nickname, nickname first, and without extra rows if other matching info there' do
+      it 'finds duplicates but uses common conventions to guess which the user would pick as a winner' do
+        # Set the contact info to verify that the contact info matching doesn't mess with the ordering below
+        person1.phone = '123-456-7890'
         person1.email = 'same@example.com'
         person1.save
+        person2.phone = '(123) 456-7890'
         person2.email = 'Same@Example.com'
         person2.save
 
-        # Make person2 the one with the nickname. Even though he has a bigger id, he should come first
-        # in the pairing because he has the nickname. The duplicate pair from the email which would prefer a lower
-        # id to be unique i.e. with person1 as the person and person2 as the dup person should be eliminated.
-        expect(person2.id > person1.id).to be_true
-        person2.update_column(:first_name, 'johnny')
+        # Prefer nicknames, matched middle names, two letter initials (common nickname), two word names, and
+        # trying to preserve capitalization. Don't preference names that are just an initial or include an initial and a name.
+        order_preserving_matches = {
+          { first_name: 'johnny' } => { first_name: 'John' },
+          { first_name: 'John' } => { first_name: 'George', middle_name: 'J' },
+          { first_name: 'John' } => { first_name: 'J' },
+          { first_name: 'Mary Beth' } => { first_name: 'Mary' },
+          { first_name: 'AnnMarie' } => { first_name: 'Annmarie' },
+          { first_name: 'Andy' } => { first_name: 'Grable A' },
+          { first_name: 'JW' } => { first_name: 'John' },
+          { first_name: 'A.J.' } => { first_name: 'Andrew' },
+          { first_name: 'John' } => { first_name: 'john' },
+          { first_name: 'John' } => { first_name: 'John.' },
+          { first_name: 'David' } => { first_name: 'J David' },
+          { first_name: 'Andy' } => { first_name: 'A A' }
+        }
         nickname
 
-        dups = dups_finder.dup_people_sets
-        expect(dups.size).to eq(1)
-        dup = dups.first
+        order_preserving_matches.each do |first_fields, second_fields|
+          person1.update_columns(first_fields)
+          person2.update_columns(second_fields)
+          dups = dups_finder.dup_people_sets
+          expect(dups.size).to eq(1)
+          expect(dups.first.person).to eq(person1)
+          expect(dups.first.dup_person).to eq(person2)
+          expect(dups.first.shared_contact).to eq(contact1)
 
-        # Expect the person with the nickname to be dup.person, while the full name to be dup_person
-        # That will cause the default merged person to have the nickname.
-        expect(dup.person).to eq(person2)
-        expect(dup.dup_person).to eq(person1)
-
-        expect(dup.shared_contact).to eq(contact1)
-      end
-
-      it 'finds duplicates by middle & first name, first name first, and without extra rows if other matching info there' do
-        person1.email = 'same@example.com'
-        person1.save
-        person2.email = 'Same@Example.com'
-        person2.save
-
-        expect(person2.id > person1.id).to be_true
-
-        person1.update_column(:first_name, 'George')
-        person1.update_column(:middle_name, 'J')
-
-        dups = dups_finder.dup_people_sets
-        expect(dups.size).to eq(1)
-        dup = dups.first
-
-        # The person should be the one with the first name matching the others middle initial (i.e. John)
-        # The duplicate is the one with the middle initial matching the other (i.e. Goerge J )
-        expect(dup.person).to eq(person2)
-        expect(dup.dup_person).to eq(person1)
-
-        expect(dup.shared_contact).to eq(contact1)
-
-        # Check that it works in reverse as well
-        person1.update_column(:first_name, 'John')
-        person2.update_column(:first_name, 'George')
-        person2.update_column(:middle_name, 'J')
-        dups = dups_finder.dup_people_sets
-        expect(dups.size).to eq(1)
-        expect(dups.first.person).to eq(person1)
-        expect(dups.first.dup_person).to eq(person2)
+          # Reverse the order of person 1 and 2 and make sure it still works
+          person2.update_columns(first_fields)
+          person1.update_columns(second_fields)
+          dups = dups_finder.dup_people_sets
+          expect(dups.size).to eq(1)
+          expect(dups.first.person).to eq(person2)
+          expect(dups.first.dup_person).to eq(person1)
+          expect(dups.first.shared_contact).to eq(contact1)
+        end
       end
 
       it 'finds duplicates by email' do
@@ -284,6 +274,22 @@ describe ContactDuplicatesFinder do
 
       it 'does not report duplicates if "first1 and first2" are in the contact name' do
         contact1.update_column(:name, 'Doe, John and Jane')
+
+        person1.first_name = 'John'
+        person1.phone = '123-456-7890'
+        person1.email = 'same@example.com'
+        person1.save
+
+        person2.first_name = 'Jane'
+        person2.phone = '(123) 456-7890'
+        person2.email = 'Same@Example.com'
+        person2.save
+
+        expect(dups_finder.dup_people_sets).to be_empty
+      end
+
+      it 'does not report duplicates if "first1 and first2" are in the contact name with extra names' do
+        contact1.update_column(:name, 'Doe, John Henry and Jane Mae')
 
         person1.first_name = 'John'
         person1.phone = '123-456-7890'

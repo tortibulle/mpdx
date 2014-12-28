@@ -38,9 +38,12 @@ class ContactDuplicatesFinder
 
   DUPS_COMMON_WHERE = "
     #{DUP_CONTACTS_WHERE}
-    AND people.first_name not like '%nknow%' AND dup_people.first_name not like '%nknow%'
-    AND contacts.name NOT ilike ('%' || people.first_name || ' and ' || dup_people.first_name || '%')
-    AND contacts.name NOT ilike ('%' || dup_people.first_name || ' and ' || people.first_name || '%')"
+    AND people.first_name not like '%nknow%' AND dup_people.first_name not like '%nknow%'"
+
+  DUPS_PEOPLE_WHERE = "
+    #{DUPS_COMMON_WHERE}
+    AND contacts.name NOT ilike ('%' || people.first_name || '% and %' || dup_people.first_name || '%')
+    AND contacts.name NOT ilike ('%' || dup_people.first_name || '% and %' || people.first_name || '%')"
 
   PEOPLE_COMBINED_NAME_FIELDS = "
     (
@@ -223,30 +226,49 @@ class ContactDuplicatesFinder
 
   DUP_PEOPLE_BY_NAME_SQL = "
     SELECT people.id as person_id, dup_people.id AS dup_person_id, contacts.id AS contact_id,
-      nicknames.id AS nickname_id, 0 as priority
+      nicknames.id AS nickname_id,
+      CASE
+        WHEN LOWER(people.name_part) = nicknames.nickname THEN 900
+        WHEN dup_people.name_source = 'middle' THEN 800
+        WHEN people.first_name ~ '^[A-Z][a-z]+[A-Z][a-z].*' THEN 700
+        WHEN people.first_name ~ '^[A-Z][A-Z]$' THEN 600
+        WHEN people.first_name ~ '^[A-Z]\\.[A-Z]\\.$' THEN 500
+        WHEN people.first_name ~ '^[A-Z]\\. [A-Z]\\.$' THEN 400
+        WHEN people.first_name ~ '^[A-Z][a-z]+ [A-Z][a-z]' THEN 300
+        WHEN dup_people.first_name ~ '([. ]|^)[A-Za-z]([. ]|$)' THEN 200
+        WHEN dup_people.first_name ~ '.*\\.' THEN 100
+        WHEN dup_people.id > people.id THEN 50
+        ELSE 50
+      END as priority
     FROM #{PEOPLE_EXPANDED_NAMES_ALL_FIELDS} AS people
       INNER JOIN #{PEOPLE_EXPANDED_NAMES_ALL_FIELDS} AS dup_people ON people.id <> dup_people.id
       INNER JOIN contact_people ON people.id = contact_people.person_id
       INNER JOIN contact_people AS dup_contact_people ON dup_contact_people.person_id = dup_people.id
       INNER JOIN contacts ON contact_people.contact_id = contacts.id
       INNER JOIN contacts AS dup_contacts ON dup_contacts.id = dup_contact_people.contact_id
-      LEFT JOIN nicknames ON nicknames.suggest_duplicates = 't' AND lower(people.name_part) = nicknames.nickname
+      LEFT JOIN nicknames ON nicknames.suggest_duplicates = 't'
+        AND (
+          (lower(people.name_part) = nicknames.nickname AND lower(dup_people.name_part) = nicknames.name)
+          OR
+          (lower(people.name_part) = nicknames.name AND lower(dup_people.name_part) = nicknames.nickname)
+        )
       INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS name_male_ratios ON people.id = name_male_ratios.id
       INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS dup_name_male_ratios ON dup_people.id = dup_name_male_ratios.id
-    WHERE #{DUPS_COMMON_WHERE}
+    WHERE #{DUPS_PEOPLE_WHERE}
       AND contacts.id = dup_contacts.id
       AND lower(people.last_name) = lower(dup_people.last_name)
       AND (people.name_source = 'first' OR dup_people.name_source = 'first')
       AND (
-        (
-          lower(dup_people.name_part) = lower(people.name_part)
-          AND people.id < dup_people.id
-          AND char_length(people.name_part) > 1
-        )
-        OR lower(dup_people.name_part) = nicknames.name
+        (lower(dup_people.name_part) = lower(people.name_part) AND char_length(people.name_part) > 1)
+        OR nicknames.id IS NOT NULL
         OR (
-          char_length(dup_people.name_part) = 1
-          AND lower(dup_people.name_part) = lower(substring(people.name_part from 1 for 1))
+            (char_length(dup_people.name_part) = 1 OR char_length(people.name_part) = 1)
+          AND
+            (
+              lower(dup_people.name_part) = lower(substring(people.name_part from 1 for 1))
+              OR
+              lower(people.name_part) = lower(substring(dup_people.name_part from 1 for 1))
+            )
           AND (
             (
               (name_male_ratios.male_ratio IS NULL OR dup_name_male_ratios.male_ratio IS NULL)
@@ -283,7 +305,7 @@ class ContactDuplicatesFinder
       INNER JOIN contacts AS dup_contacts ON dup_contacts.id = dup_contact_people.contact_id
       INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS name_male_ratios ON people.id = name_male_ratios.id
       INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS dup_name_male_ratios ON dup_people.id = dup_name_male_ratios.id
-    WHERE #{DUPS_COMMON_WHERE}
+    WHERE #{DUPS_PEOPLE_WHERE}
       AND lower(email_addresses.email) = lower(dup_email_addresses.email)
       AND (
         (
@@ -308,7 +330,7 @@ class ContactDuplicatesFinder
       INNER JOIN contacts AS dup_contacts ON dup_contacts.id = dup_contact_people.contact_id
       INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS name_male_ratios ON people.id = name_male_ratios.id
       INNER JOIN #{PEOPLE_NAME_MALE_RATIOS} AS dup_name_male_ratios ON dup_people.id = dup_name_male_ratios.id
-    WHERE #{DUPS_COMMON_WHERE}
+    WHERE #{DUPS_PEOPLE_WHERE}
       AND phone_numbers.number = dup_phone_numbers.number
       AND (
         (
@@ -327,5 +349,5 @@ class ContactDuplicatesFinder
       #{DUP_PEOPLE_BY_EMAIL_SQL}
       UNION
       #{DUP_PEOPLE_BY_PHONE_SQL}
-      ORDER BY priority, nickname_id"
+      ORDER BY priority DESC, nickname_id"
 end
