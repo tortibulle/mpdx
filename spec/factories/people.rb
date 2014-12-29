@@ -3,6 +3,7 @@
 FactoryGirl.define do
   factory :person do
     first_name 'John'
+    last_name 'Smith'
     association :master_person
   end
 end

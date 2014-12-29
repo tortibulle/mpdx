@@ -13,13 +13,13 @@ describe GoogleContactsIntegrator do
 
     @contact = create(:contact, account_list: @account_list, status: 'Partner - Pray', notes: 'about')
 
-    @person = create(:person, last_name: 'Doe', occupation: 'Worker', employer: 'Company, Inc')
+    @person = create(:person, last_name: 'Google', occupation: 'Worker', employer: 'Company, Inc')
     @contact.people << @person
 
     @g_contact = GoogleContactsApi::Contact.new(
       'gd$etag' => 'a',
       'id' => { '$t' => '1' },
-      'gd$name' => { 'gd$givenName' => { '$t' => 'John' }, 'gd$familyName' => { '$t' => 'Doe' } }
+      'gd$name' => { 'gd$givenName' => { '$t' => 'John' }, 'gd$familyName' => { '$t' => 'Google' } }
     )
 
     @api_url = 'https://www.google.com/m8/feeds/contacts'
@@ -62,7 +62,7 @@ describe GoogleContactsIntegrator do
     it 'returns queried contacts for subsequent sync' do
       now = Time.now
       @integration.update_column(:contacts_last_synced, now)
-      g_contact = double(id: 'id_1', given_name: 'John', family_name: 'Doe')
+      g_contact = double(id: 'id_1', given_name: 'John', family_name: 'Google')
       expect(@account.contacts_api_user).to receive(:contacts_updated_min)
                                             .with(now, showdeleted: false).and_return([g_contact])
 
@@ -205,9 +205,9 @@ describe GoogleContactsIntegrator do
     describe 'get_or_query_g_contact' do
       it 'returns nil if a remote id is already assigned' do
         g_contact_link = double(remote_id: nil)
-        g_contact = double(id: 'id', given_name: 'John', family_name: 'Doe')
+        g_contact = double(id: 'id', given_name: 'John', family_name: 'Google')
         @integrator.cache = double
-        expect(@integrator.cache).to receive(:select_by_name).with('John', 'Doe').exactly(:twice).and_return([g_contact])
+        expect(@integrator.cache).to receive(:select_by_name).with('John', 'Google').exactly(:twice).and_return([g_contact])
 
         @integrator.assigned_remote_ids = [].to_set
         expect(@integrator.get_or_query_g_contact(g_contact_link, @person)).to eq(g_contact)
@@ -222,7 +222,7 @@ describe GoogleContactsIntegrator do
       it 'marks the remote id of a queried g_contact as assigned and adds the g_contact to the mpdx group' do
         g_contact_link = create(:google_contact, remote_id: 'id', person: @person, contact: @contact,
                                 google_account: @account)
-        g_contact = double(id: 'id', given_name: 'John', family_name: 'Doe')
+        g_contact = double(id: 'id', given_name: 'John', family_name: 'Google')
         expect(@integrator).to receive(:get_or_query_g_contact).with(g_contact_link, @person).and_return(g_contact)
 
         mpdx_group = double
@@ -339,7 +339,7 @@ describe GoogleContactsIntegrator do
       contact_name_info = <<-EOS
         <gd:name>
           <gd:givenName>John</gd:givenName>
-          <gd:familyName>Doe</gd:familyName>
+          <gd:familyName>Google</gd:familyName>
         </gd:name>
       EOS
 
@@ -392,7 +392,7 @@ describe GoogleContactsIntegrator do
       @person.reload
       expect(@person.google_contacts.count).to eq(1)
       last_data = {
-        name_prefix: nil, given_name: 'John', additional_name: nil, family_name: 'Doe', name_suffix: nil,
+        name_prefix: nil, given_name: 'John', additional_name: nil, family_name: 'Google', name_suffix: nil,
         content: 'about', emails: [], phone_numbers: [], addresses: [],
         organizations: [{ rel: 'work', primary: true, org_name: 'Company, Inc', org_title: 'Worker' }],
         websites: [], group_memberships: ['http://www.google.com/m8/feeds/groups/test.user%40cru.org/base/mpdxgroupid'],
@@ -552,7 +552,7 @@ describe GoogleContactsIntegrator do
 
     it 'retries the sync and creates a new contact on a 404 error' do
       expect(@account.contacts_api_user).to receive(:get_contact).with('1').and_return(@g_contact)
-      expect(@account.contacts_api_user).to receive(:query_contacts).with('John Doe', showdeleted: false).and_return([])
+      expect(@account.contacts_api_user).to receive(:query_contacts).with('John Google', showdeleted: false).and_return([])
 
       new_g_contact = GoogleContactsApi::Contact.new
       expect(GoogleContactsApi::Contact).to receive(:new).and_return(new_g_contact)
@@ -831,7 +831,7 @@ describe GoogleContactsIntegrator do
           '<gd:namePrefix>Mr</gd:namePrefix>\s*'\
           '<gd:givenName>John</gd:givenName>\s*'\
           '<gd:additionalName>Henry</gd:additionalName>\s*'\
-          '<gd:familyName>Doe</gd:familyName>\s*'\
+          '<gd:familyName>Google</gd:familyName>\s*'\
           '<gd:nameSuffix>III</gd:nameSuffix>\s*'\
         '</gd:name>\s*'\
         '<atom:content>about</atom:content>\s*'\
@@ -925,7 +925,7 @@ describe GoogleContactsIntegrator do
       ])
 
       last_data = {
-        name_prefix: 'Mr', given_name: 'John', additional_name: 'Henry', family_name: 'Doe', name_suffix: 'III',
+        name_prefix: 'Mr', given_name: 'John', additional_name: 'Henry', family_name: 'Google', name_suffix: 'III',
         content: 'Notes here',
         emails: [{ primary: true, rel: 'other', address: 'johnsmith@example.com' },
                  { primary: false, rel: 'home', address: 'mpdx@example.com' }],
