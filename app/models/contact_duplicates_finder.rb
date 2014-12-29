@@ -85,15 +85,14 @@ class ContactDuplicatesFinder
   # connection, so it's OK for this model to create temporary tables even if another instance somewhere else is
   # doing the same action and creating its own temp tables with the same names.
   CREATE_TEMP_TABLES = [
-    # First just scope people to the account list and filter out "anonymous" and "unknown" contacts/people.
+    # First just scope people to the account list and filter out anonymous contacts.
     "SELECT people.id, first_name, legal_first_name, middle_name, last_name
     INTO TEMP tmp_account_ppl
     FROM people
       INNER JOIN contact_people ON people.id = contact_people.person_id
       INNER JOIN contacts ON contacts.id = contact_people.contact_id
     WHERE contacts.account_list_id = :account_list_id
-      and contacts.name not like '%nonymous%'
-      and people.first_name not like '%nknow%'",
+      and contacts.name not ilike '%nonymous%'",
     'CREATE INDEX ON tmp_account_ppl (id)',
 
     # Next combine in the three name fields: first_name, legal_first_name, middle_name and track first/middle distinction.
@@ -108,6 +107,7 @@ class ContactDuplicatesFinder
     ) as people_unsplit_names_query",
 
     # Break apart various parts of names (initials, capitals, spaces, etc.) into a single table, and make names lowercase.
+    # Also filter out people with names like "Unknown" and a full name like "Friend of the ministry"
     "SELECT lower(name) as name, name_source, id, first_name, lower(last_name) as last_name
     INTO TEMP tmp_names
     FROM (
@@ -127,7 +127,8 @@ class ContactDuplicatesFinder
         SELECT regexp_split_to_table(regexp_replace(name, '(^[A-Z]|[a-z])([A-Z])', '\\1 \\2'), ' '),
           name_source, id, first_name, last_name
         FROM tmp_unsplit_names WHERE name ~ '(^[A-Z]|[a-z])([A-Z])' and name !~ '[A-Z]{3}'
-    ) as people_names_query",
+    ) as people_names_query
+    WHERE first_name not ilike '%nknow%' and first_name || last_name not ilike 'friend%of%the%ministry'",
     'CREATE INDEX ON tmp_names (id)',
     'CREATE INDEX ON tmp_names (name)',
     'CREATE INDEX ON tmp_names (last_name)',
