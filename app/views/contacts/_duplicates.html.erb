@@ -7,7 +7,7 @@
           <div class="duplicate_set">
             <% set.each do |contact| %>
               <div class="contact">
-                <%= contact %>
+                <%= link_to(contact.name, contact_path(contact), target: '_blank')  %>
               </div>
             <% end %>
             <%= check_box_tag 'merge_sets[]', set.collect(&:id).join(',') %>
@@ -24,7 +24,7 @@
           <%= link_to(_('Select all duplicates'), '#', class: 'select_all') %>
           <% @people_sets.each do |dup| %>
               <div class="duplicate_set">
-                <div class="contact-header "><%= dup.shared_contact %></div>
+                <div class="contact-header "><%= link_to(dup.shared_contact.name, contact_path(dup.shared_contact), target: '_blank')  %></div>
                 <div class="person"><%= dup.person %></div>
                 <div class="person"><%= dup.dup_person %></div>
                 <%= check_box_tag 'merge_sets[]', "#{dup.person.id},#{dup.dup_person.id}" %>
