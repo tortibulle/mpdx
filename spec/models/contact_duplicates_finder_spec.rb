@@ -62,23 +62,25 @@ describe ContactDuplicatesFinder do
     create(:name_male_ratio, name: 'florence', male_ratio: 0.003)
   end
 
-  before do
-    contact1.people << person1
-    contact2.people << person2
-  end
-
   describe '#dup_people_sets ' do
+    def dup_people
+      contacts, people = dups_finder.dup_contacts_then_people
+      expect(contacts).to be_empty
+      people
+    end
+
     it 'does not find duplicates with no shared contact' do
-      expect(dups_finder.dup_people_sets).to be_empty
+      expect(dup_people).to be_empty
     end
 
     describe 'finding duplicates with a shared contact' do
       before do
         contact1.people << person2
+        contact1.people << person1
       end
 
       def expect_people_set
-        dups = dups_finder.dup_people_sets
+        dups = dup_people
         expect(dups.size).to eq(1)
         dup = dups.first
         expect([dup.person, dup.dup_person]).to include(person1)
@@ -92,19 +94,19 @@ describe ContactDuplicatesFinder do
 
       it 'does not find duplicates if no matching info' do
         person1.update_column(:first_name, 'Notjohn')
-        expect(dups_finder.dup_people_sets).to be_empty
+        expect(dup_people).to be_empty
       end
 
       it 'does not find duplicates if people marked as not duplicated with each other' do
         person1.update_column(:not_duplicated_with, person2.id.to_s)
-        expect(dups_finder.dup_people_sets).to be_empty
+        expect(dup_people).to be_empty
       end
 
       it 'finds duplicates by nickname' do
         nickname
         person1.update_column(:first_name, 'johnny')
 
-        dups = dups_finder.dup_people_sets
+        dups = dup_people
         expect(dups.size).to eq(1)
         dup = dups.first
 
@@ -150,7 +152,7 @@ describe ContactDuplicatesFinder do
         order_preserving_matches.each do |first_fields, second_fields|
           person1.update_columns(first_fields)
           person2.update_columns(second_fields)
-          dups = dups_finder.dup_people_sets
+          dups = dup_people
           expect(dups.size).to eq(1)
           expect(dups.first.person).to eq(person1)
           expect(dups.first.dup_person).to eq(person2)
@@ -159,7 +161,7 @@ describe ContactDuplicatesFinder do
           # Reverse the order of person 1 and 2 and make sure it still works
           person2.update_columns(first_fields)
           person1.update_columns(second_fields)
-          dups = dups_finder.dup_people_sets
+          dups = dup_people
           expect(dups.size).to eq(1)
           expect(dups.first.person).to eq(person2)
           expect(dups.first.dup_person).to eq(person1)
@@ -199,7 +201,7 @@ describe ContactDuplicatesFinder do
         person2.email = 'Same@Example.com'
         person2.save
 
-        expect(dups_finder.dup_people_sets).to be_empty
+        expect(dup_people).to be_empty
       end
 
       it 'does not report duplicates by phone or email if the people have different genders and one has a gender name record' do
@@ -216,7 +218,7 @@ describe ContactDuplicatesFinder do
         person2.email = 'Same@Example.com'
         person2.save
 
-        expect(dups_finder.dup_people_sets).to be_empty
+        expect(dup_people).to be_empty
       end
 
       it 'does not report duplicates by phone or email if the people name components are strongly different genders' do
@@ -236,7 +238,7 @@ describe ContactDuplicatesFinder do
         person2.email = 'Same@Example.com'
         person2.save
 
-        expect(dups_finder.dup_people_sets).to be_empty
+        expect(dup_people).to be_empty
       end
 
       it 'does not report duplicates by name if middle name initials match but name components strongly different genders' do
@@ -253,7 +255,7 @@ describe ContactDuplicatesFinder do
         person2.gender = 'male' # sometimes the gender field data is wrong, simulate that
         person2.save
 
-        expect(dups_finder.dup_people_sets).to be_empty
+        expect(dup_people).to be_empty
       end
 
       it 'does not report duplicates by name if middle name initials match but different genders' do
@@ -267,14 +269,14 @@ describe ContactDuplicatesFinder do
         person2.gender = 'female'
         person2.save
 
-        expect(dups_finder.dup_people_sets).to be_empty
+        expect(dup_people).to be_empty
       end
 
       it 'does not report duplicates by middle name only' do
         person1.update_columns(first_name: 'Notjohn', middle_name: 'George')
         person2.update_column(:middle_name, 'George')
 
-        expect(dups_finder.dup_people_sets).to be_empty
+        expect(dup_people).to be_empty
       end
 
       it 'does not report duplicates if "first1 and first2" are in the contact name' do
@@ -290,7 +292,7 @@ describe ContactDuplicatesFinder do
         person2.email = 'Same@Example.com'
         person2.save
 
-        expect(dups_finder.dup_people_sets).to be_empty
+        expect(dup_people).to be_empty
       end
 
       it 'does not report duplicates if "first1 and first2" are in the contact name with extra names' do
@@ -306,7 +308,7 @@ describe ContactDuplicatesFinder do
         person2.email = 'Same@Example.com'
         person2.save
 
-        expect(dups_finder.dup_people_sets).to be_empty
+        expect(dup_people).to be_empty
       end
 
       it 'does not report duplicates if middle name matches first name but name genders are off' do
@@ -321,7 +323,7 @@ describe ContactDuplicatesFinder do
         person2.middle_name = 'M'
         person2.save
 
-        expect(dups_finder.dup_people_sets).to be_empty
+        expect(dup_people).to be_empty
       end
 
       def expect_matching_people(first_names)
@@ -333,7 +335,7 @@ describe ContactDuplicatesFinder do
       def expect_non_matching_people(first_names)
         person1.update_column(:first_name, first_names[0])
         person2.update_column(:first_name, first_names[1])
-        expect(dups_finder.dup_people_sets).to be_empty
+        expect(dup_people).to be_empty
       end
 
       it 'finds people by matching initials and middle names in the first name field' do
@@ -362,8 +364,17 @@ describe ContactDuplicatesFinder do
   end
 
   describe '#dup_contact_sets' do
+    before do
+      contact1.people << person1
+      contact2.people << person2
+    end
+
+    def dup_contacts
+      dups_finder.dup_contacts_then_people.first
+    end
+
     def expect_contact_set
-      dups = dups_finder.dup_contact_sets
+      dups = dup_contacts
       expect(dups.size).to eq(1)
       dup = dups.first
       expect(dup.size).to eq(2)
@@ -377,13 +388,13 @@ describe ContactDuplicatesFinder do
 
     it 'does not find duplicates if contacts have no matching info' do
       person1.update_column(:first_name, 'Notjohn')
-      expect(dups_finder.dup_contact_sets).to be_empty
+      expect(dup_contacts).to be_empty
     end
 
     it 'does not find duplicates if a contact is marked as not duplicated with the other' do
       contact1.update_column(:not_duplicated_with, contact2.id)
 
-      dups = dups_finder.dup_contact_sets
+      dups = dup_contacts
       expect(dups.size).to eq(0)
     end
 
@@ -432,7 +443,7 @@ describe ContactDuplicatesFinder do
       contact1.people << person2
       contact2.destroy
 
-      expect(dups_finder.dup_contact_sets).to be_empty
+      expect(dup_contacts).to be_empty
     end
 
     def expect_matching_contacts(first_names)
@@ -444,7 +455,7 @@ describe ContactDuplicatesFinder do
     def expect_non_matching_contacts(first_names)
       person1.update_column(:first_name, first_names[0])
       person2.update_column(:first_name, first_names[1])
-      expect(dups_finder.dup_contact_sets).to be_empty
+      expect(dup_contacts).to be_empty
     end
 
     it 'finds contacts by matching initials and middle names in the first name field' do
@@ -456,7 +467,7 @@ describe ContactDuplicatesFinder do
     it 'does not find duplicate contacts by middle_name field (too aggressive for contact match)' do
       nickname
       person1.update_columns(first_name: 'Notjohn', middle_name: 'Johnny')
-      expect(dups_finder.dup_contact_sets).to be_empty
+      expect(dup_contacts).to be_empty
     end
   end
 end

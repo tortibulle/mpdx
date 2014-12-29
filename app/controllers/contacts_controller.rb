@@ -261,8 +261,7 @@ class ContactsController < ApplicationController
       wants.html {}
       wants.js do
         dups_finder = ContactDuplicatesFinder.new(current_account_list)
-        @contact_sets = dups_finder.dup_contact_sets
-        @people_sets = dups_finder.dup_people_sets if @contact_sets.empty?
+        @contact_sets, @people_sets = dups_finder.dup_contacts_then_people
       end
     end
   end

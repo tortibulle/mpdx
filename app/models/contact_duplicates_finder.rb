@@ -8,7 +8,6 @@ class ContactDuplicatesFinder
     DROP TABLE IF EXISTS dup_ppl_by_name;
     DROP TABLE IF EXISTS dup_ppl_by_contact_info;
     DROP TABLE IF EXISTS ppl_name_male_ratios;
-    DROP TABLE IF EXISTS dup_ppl_in_contacts;
     DROP TABLE IF EXISTS dup_ppl;
 
     SELECT people.id, first_name, legal_first_name, middle_name, last_name
@@ -82,7 +81,7 @@ class ContactDuplicatesFinder
     CREATE INDEX ON dup_ppl_by_name (dup_person_id);
 
     SELECT *, true as check_genders
-    INTO dup_ppl_by_contact_info
+    INTO TEMP dup_ppl_by_contact_info
     FROM (
       SELECT ppl.id as person_id, dups.id as dup_person_id
       FROM account_ppl as ppl
@@ -108,7 +107,7 @@ class ContactDuplicatesFinder
     GROUP BY ppl_names.id;
 
     SELECT dups.*
-    INTO dup_ppl
+    INTO TEMP dup_ppl
     FROM (
       SELECT person_id, dup_person_id, nickname_id, priority, check_genders, name_source, dup_name_source
       FROM dup_ppl_by_name
@@ -174,15 +173,26 @@ class ContactDuplicatesFinder
     @account_list = account_list
   end
 
-  # The reason these are large queries and not Ruby code with loops is that as I introduced more duplicate
-  # search options, that code got painfully slow and so I re-wrote the logic as self-join queries for performance.
-
-  def dup_contact_sets
+  def dup_contacts_then_people
     statements = CREATE_TEMP_TABLES.gsub(':account_list_id', Contact.connection.quote(@account_list.id)).split(';')
     statements.each do |sql|
       Person.connection.exec_query(sql)
     end
 
+    contacts = dup_contact_sets
+    return [contacts, []] unless contacts.empty?
+
+    contacts_and_people = [[], dup_people_sets]
+
+    # Drop temp tables
+
+    contacts_and_people
+  end
+
+  # The reason these are large queries and not Ruby code with loops is that as I introduced more duplicate
+  # search options, that code got painfully slow and so I re-wrote the logic as self-join queries for performance.
+
+  def dup_contact_sets
     sql = DUP_CONTACTS_SQL.gsub(':account_list_id', Contact.connection.quote(@account_list.id))
     contact_id_pairs = Person.connection.exec_query(sql).rows
 
@@ -222,11 +232,6 @@ class ContactDuplicatesFinder
   private
 
   def dup_people_rows
-    statements = CREATE_TEMP_TABLES.gsub(':account_list_id', Contact.connection.quote(@account_list.id)).split(';')
-    statements.each do |sql|
-      Person.connection.exec_query(sql)
-    end
-
     sql = DUP_PEOPLE_NEW_SQL
     dup_rows = Person.connection.exec_query(sql).to_hash.map(&:symbolize_keys)
 

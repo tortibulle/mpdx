@@ -156,27 +156,15 @@ describe ContactsController do
     end
 
     describe '#find_duplicates' do
-      it 'does not assign people_sets if contact_sets has items' do
+      it 'does not assign contact_sets and people_sets' do
         contact_sets = [[contact, build(:contact)]]
-        people_sets = [double]
+        people_sets = []
         expect(ContactDuplicatesFinder).to receive(:new).with(user.account_lists.first)
-                                             .and_return(double(dup_contact_sets: contact_sets, dup_people_sets: people_sets))
+                                             .and_return(double(dup_contacts_then_people: [contact_sets, people_sets]))
 
         xhr :get, :find_duplicates, format: :js
         expect(response).to be_success
         expect(assigns(:contact_sets)).to eq(contact_sets)
-        expect(assigns(:people_sets)).to be_nil
-      end
-
-      it 'assigns people_sets if contact_sets is empty' do
-        contact_sets = []
-        people_sets = [double]
-        expect(ContactDuplicatesFinder).to receive(:new).with(user.account_lists.first)
-                                             .and_return(double(dup_contact_sets: contact_sets, dup_people_sets: people_sets))
-
-        xhr :get, :find_duplicates, format: :js
-        expect(response).to be_success
-        expect(assigns(:contact_sets)).to eq([])
         expect(assigns(:people_sets)).to eq(people_sets)
       end
     end
