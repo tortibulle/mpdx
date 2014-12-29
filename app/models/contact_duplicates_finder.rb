@@ -260,8 +260,12 @@ class ContactDuplicatesFinder
     FROM tmp_dups
     INNER JOIN contact_people ON contact_people.person_id = tmp_dups.person_id
     INNER JOIN contact_people dup_contact_people ON dup_contact_people.person_id = tmp_dups.dup_person_id
+    INNER JOIN people ON tmp_dups.person_id = people.id
+    INNER JOIN people AS dup_people ON tmp_dups.dup_person_id = dup_people.id
     WHERE contact_people.contact_id <> dup_contact_people.contact_id
       and coalesce(tmp_dups.name_source, '') <> 'middle' and coalesce(tmp_dups.dup_name_source, '') <> 'middle'
+      and dup_people.first_name || dup_people.last_name not ilike 'friend%of%the%ministry'
+      and people.first_name || people.last_name not ilike 'friend%of%the%ministry'
     UNION
     SELECT contacts.id, dup_contacts.id
     FROM contacts
@@ -272,9 +276,9 @@ class ContactDuplicatesFinder
         ON dup_addresses.addressable_type = 'Contact' and dup_addresses.addressable_id = dup_contacts.id
     WHERE
       contacts.account_list_id = :account_list_id and dup_contacts.account_list_id = :account_list_id
-      and contacts.name not like '%nonymous%' and dup_contacts.name not like '%nonymous%'
-      and addresses.primary_mailing_address = 't'
-      and dup_addresses.primary_mailing_address = 't'
+      and contacts.name not ilike '%nonymous%' and dup_contacts.name not ilike '%nonymous%'
+      and addresses.primary_mailing_address = 't' and dup_addresses.primary_mailing_address = 't'
+      and addresses.street not ilike '%insufficient%' and dup_addresses.street not ilike '%insufficient%'
       and addresses.master_address_id = dup_addresses.master_address_id"
   def dup_contacts_query
     exec_query(DUP_CONTACTS_SQL).rows
