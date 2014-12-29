@@ -462,10 +462,5 @@ describe ContactDuplicatesFinder do
       person1.update_columns(first_name: 'Notjohn', middle_name: 'Johnny')
       expect(dups_finder.dup_contact_sets).to be_empty
     end
-
-    it 'does not finds duplicate contacts by legal_first_name field (too aggressive for contact match)' do
-      person1.update_columns(first_name: 'Notjohn', legal_first_name: 'John')
-      expect(dups_finder.dup_contact_sets).to be_empty
-    end
   end
 end
