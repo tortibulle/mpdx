@@ -30,5 +30,22 @@ describe Nickname do
       }.to change(Nickname, :count).from(0).to(1)
       expect(Nickname.first.num_merges).to eq(1)
     end
+
+    it 'does nothing if the nickname and name are the same or one contains an initial, ., space or -' do
+      non_saved_nickname_pairs = {
+        'John' => 'john',
+        'john.' => 'John',
+        'J' => 'John',
+        'Mary Beth' => 'Mary',
+        'Hoo-tee' => 'Hootee'
+      }
+
+      expect {
+        non_saved_nickname_pairs.each do |name1, name2|
+          Nickname.find_and_increment_counter(name1, name2, :num_merges)
+          Nickname.find_and_increment_counter(name2, name1, :num_merges)
+        end
+      }.to_not change(Nickname, :count).from(0)
+    end
   end
 end

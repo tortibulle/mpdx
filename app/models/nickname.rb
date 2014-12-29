@@ -8,7 +8,12 @@ class Nickname < ActiveRecord::Base
   end
 
   def self.find_and_increment_counter(name, nickname, counter)
-    nickname = find_or_create_by(name: name.downcase, nickname: nickname.downcase)
+    name = name.downcase
+    nickname = nickname.downcase
+
+    return if name == nickname || name =~ /[\s\-\.]/  || nickname =~ /[\s\-\.]/ || name.length == 1 || nickname.length == 1
+
+    nickname = find_or_create_by(name: name, nickname: nickname)
     increment_counter(counter, nickname.id)
   end
 end
