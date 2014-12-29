@@ -1,11 +1,16 @@
 require 'async'
 require 'open-uri'
 
+if Rails.env.development?
+  HttpLogger.logger = Logger.new(STDERR)
+  HttpLogger.log_headers = true
+end
+
 class PrayerLettersAccount < ActiveRecord::Base
   include Async
   include Sidekiq::Worker
   sidekiq_options unique: true
-  SERVICE_URL = 'https://www.prayerletters.com'
+  SERVICE_URL = 'https://pls.herokuapp.com'
 
   belongs_to :account_list
 
@@ -144,8 +149,11 @@ class PrayerLettersAccount < ActiveRecord::Base
   def get_response(method, path, params = nil)
     return unless active?
 
-    RestClient::Request.execute(method: method, url: SERVICE_URL + path, payload: params, timeout: 5000,
-                                headers: { 'Authorization' => "Bearer #{ URI.encode(oauth2_token) }" })
+    headers = {
+      'Authorization' => "Bearer #{ URI.encode(oauth2_token) }"
+    }
+    headers['Content-Type'] = 'application/json' if method == :put
+    RestClient::Request.execute(method: method, url: SERVICE_URL + path, payload: params, timeout: 5000, headers: headers)
   rescue RestClient::Unauthorized
     handle_bad_token
   end
