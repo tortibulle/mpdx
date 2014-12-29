@@ -18,11 +18,9 @@ class ContactDuplicatesFinder
     contacts = dup_contact_sets
     return [contacts, []] unless contacts.empty?
 
-    contacts_and_people = [[], dup_people_sets]
-
+    [[], dup_people_sets]
+  ensure
     drop_temp_tables_if_exist
-
-    contacts_and_people
   end
 
   private
@@ -82,7 +80,12 @@ class ContactDuplicatesFinder
 
   # The reason these are large queries with temp tables and not Ruby code with loops is that as I introduced more
   # duplicate search options, that code got painfully slow and so I re-wrote the logic as self-join queries for performance.
+  #
+  # Temporary tables are unique per database connection and the Rails connection pool gives each thread a unique
+  # connection, so it's OK for this model to create temporary tables even if another instance somewhere else is
+  # doing the same action and creating its own temp tables with the same names.
   CREATE_TEMP_TABLES = [
+    # First just scope people to the account list and filter out "anonymous" and "unknown" contacts/people.
     "SELECT people.id, first_name, legal_first_name, middle_name, last_name
     INTO TEMP tmp_account_ppl
     FROM people
@@ -91,9 +94,9 @@ class ContactDuplicatesFinder
     WHERE contacts.account_list_id = :account_list_id
       and contacts.name not like '%nonymous%'
       and people.first_name not like '%nknow%'",
-
     'CREATE INDEX ON tmp_account_ppl (id)',
 
+    # Next combine in the three name fields: first_name, legal_first_name, middle_name and track first/middle distinction.
     "SELECT *
     INTO TEMP tmp_unsplit_names
     FROM (
@@ -104,37 +107,67 @@ class ContactDuplicatesFinder
         WHERE middle_name is not null and middle_name <> ''
     ) as people_unsplit_names_query",
 
+    # Break apart various parts of names (initials, capitals, spaces, etc.) into a single table, and make names lowercase.
     "SELECT lower(name) as name, name_source, id, first_name, lower(last_name) as last_name
     INTO TEMP tmp_names
     FROM (
-      SELECT replace(name, ' ', '') as name, name_source, id, first_name, last_name FROM tmp_unsplit_names
-      UNION SELECT regexp_split_to_table(regexp_replace(name, '[\\.-]+$', ''), '([\\. -]+|$)+'),
-        name_source, id, first_name, last_name
-      FROM tmp_unsplit_names WHERE name ~ '[\\. -]'
-      UNION SELECT regexp_split_to_table(regexp_replace(name, '(^[A-Z]|[a-z])([A-Z])', '\\1 \\2'), ' '),
-        name_source, id, first_name, last_name
-      FROM tmp_unsplit_names WHERE name ~ '(^[A-Z]|[a-z])([A-Z])' and name !~ '[A-Z]{3}'
+        /* Try replacing the space to match e.g. 'Marybeth' and 'Mary Beth'.
+         * This also brings in all names that don't match patterns below. */
+        SELECT replace(name, ' ', '') as name, name_source, id, first_name, last_name
+        FROM tmp_unsplit_names
+      UNION
+        /* Split the name by '-', ' ', and '.' to capture initials and multiple names like 'J.W.' or 'John Wilson'
+         * The regexp_replace is to get rid of any separator characters at the end to reduce blank rows. */
+        SELECT regexp_split_to_table(regexp_replace(name, '[\\.-]+$', ''), '([\\. -]+|$)+'),
+          name_source, id, first_name, last_name
+        FROM tmp_unsplit_names WHERE name ~ '[\\. -]'
+      UNION
+        /* Split the name by  two capitals in a row like 'JW' or a capital within a name like 'MaryBeth', but don't split
+         * three letter capitals which are common in organization acrynomys like 'CCC NEHQ' or 'City UMC'  */
+        SELECT regexp_split_to_table(regexp_replace(name, '(^[A-Z]|[a-z])([A-Z])', '\\1 \\2'), ' '),
+          name_source, id, first_name, last_name
+        FROM tmp_unsplit_names WHERE name ~ '(^[A-Z]|[a-z])([A-Z])' and name !~ '[A-Z]{3}'
     ) as people_names_query",
-
     'CREATE INDEX ON tmp_names (id)',
     'CREATE INDEX ON tmp_names (name)',
     'CREATE INDEX ON tmp_names (last_name)',
 
+    # Join the names table to itself to find duplicate names. Require a match on last name, and then a match either by
+    # matching name, a (name, nickname) pair or a matching initial. Don't allow matches just by middle names.
+    # Order the person_id, dup_person_id so that the person_id (the default winner in the merge) will have reasonable
+    # defaults for which of the two names is picked. Those defaults are reflected in the priority field.
     "SELECT ppl.id as person_id, dups.id as dup_person_id, nicknames.id as nickname_id,
       case
+        /* Nickname over the long name (Dave over David) */
         when ppl.name = nicknames.nickname then 800
+
+        /* First name over middle, (David over John David) */
         when dups.name_source = 'middle' then 700
+
+        /* Inside/first capitals (MaryBeth over Marybeth, Jo over jo) */
         when ppl.first_name ~ '^[A-Z][a-z]+[A-Z][a-z].*' then 600
+
+        /* Prefer two letter initials (CS over Clive Staples) */
         when ppl.first_name ~ '^[A-Z][A-Z]$|^[A-Z]\\.\s?[A-Z]\\.$' then 500
+
+        /* Prefer multi-word names (Mary Beth over Mary) */
         when ppl.first_name ~ '^[A-Z][a-z]+ [A-Z][a-z]' then 400
+
+        /* Prefer names over initials (Mary over M) */
         when dups.first_name ~ '([. ]|^)[A-Za-z]([. ]|$)' then 300
+
+        /* Prefer names not ending in a . (John over John.) */
         when dups.first_name ~ '.*\\.' then 200
-        when dups.id > ppl.id then 100
-        else 50
+
+        /* More arbitrary preference by id.  */
+        when dups.id > ppl.id then 100 else 50
       end as priority,
+
+      /* Verify genders if the match includes a middle name or initial as those are less certain. */
       (char_length(ppl.name) = 1 or char_length(dups.name) = 1
         or dups.name_source = 'middle' or ppl.name_source = 'middle'
       ) as check_genders,
+
       ppl.name_source, dups.name_source as dup_name_source
     INTO TEMP tmp_dups_by_name
     FROM tmp_names as ppl
@@ -149,10 +182,11 @@ class ContactDuplicatesFinder
         or (dups.name = ppl.name and char_length(ppl.name) > 1)
         or ((char_length(dups.name) = 1 or char_length(ppl.name) = 1)
           and (dups.name = substring(ppl.name from 1 for 1) or ppl.name = substring(dups.name from 1 for 1))))",
-
     'CREATE INDEX ON tmp_dups_by_name (person_id)',
     'CREATE INDEX ON tmp_dups_by_name (dup_person_id)',
 
+    # Join the emails and phone number tables together to find duplicate people by contact info.
+    # Always check gender for these matches as husband and wife often have common contact info.
     'SELECT *, true as check_genders
     INTO TEMP tmp_dups_by_contact_info
     FROM (
@@ -173,12 +207,18 @@ class ContactDuplicatesFinder
     'CREATE INDEX ON tmp_dups_by_contact_info (person_id)',
     'CREATE INDEX ON tmp_dups_by_contact_info (dup_person_id)',
 
+    # Join to the name_male_ratios table and get an average name male ratio for the various name parts of a person.
     'SELECT tmp_names.id, AVG(name_male_ratios.male_ratio) as male_ratio
     INTO TEMP tmp_name_male_ratios
     FROM tmp_names
     LEFT JOIN name_male_ratios ON tmp_names.name = name_male_ratios.name
     GROUP BY tmp_names.id',
+    'CREATE INDEX ON tmp_name_male_ratios (id)',
 
+    # Combine the duplicate people by name and contact info and join it to the name male ratios table.
+    # Only select as duplicates pairs whose name male ratios strongly agree, or pairs without that info and which
+    # match on the gender field (or don't have gender info). The gender field by itself isn't a strong enough indicator
+    # because it can often be wrong. (E.g. if in Tnt someone puts the husband and wife in opposite fields then imports.)
     "SELECT dups.*
     INTO TEMP tmp_dups
     FROM (
@@ -211,6 +251,9 @@ class ContactDuplicatesFinder
     CREATE_TEMP_TABLES.each(&method(:exec_query))
   end
 
+  # Join the duplicate people table to the contacts to find duplicate people in different contacts, but don't allow a match
+  # based on middle name as that seemed to agressive for contact to contact matching.
+  # Also try to match based on the master_address_id of the primary mailing address.
   DUP_CONTACTS_SQL = "
     SELECT contact_people.contact_id, dup_contact_people.contact_id dup_contact_id
     FROM tmp_dups
@@ -236,6 +279,10 @@ class ContactDuplicatesFinder
     exec_query(DUP_CONTACTS_SQL).rows
   end
 
+  # Join the duplicate people table to contact_people to find duplicate people in the same contact. For duplicates by
+  # contact info, preference those whose last name matches the "Last Name, .." pattern of the contact name. That would
+  # correctly preference e.g. someone who joined the contact by maiden name. Then preference a person with a last name
+  # at all. Check that the people aren't both in the contact name, i.e. don't suggest Jane and John in "Doe, John and Jane"
   DUP_PEOPLE_NEW_SQL = "
     SELECT tmp_dups.person_id, dup_person_id, nickname_id, contact_people.contact_id,
       case
