@@ -381,30 +381,18 @@ describe ContactDuplicatesFinder do
         person2.email = 'same@example.com'
         expect_people_set
       end
+
+      it 'does not match people by contact info if name like "Unknown"' do
+        person1.update_columns(first_name: 'Unknown')
+        person2.update_columns(first_name: 'unknown')
+        person1.email = 'same@example.com'
+        person2.email = 'same@example.com'
+        expect(dup_people).to be_empty
+      end
     end
   end
 
   describe '#dup_contact_sets' do
-    it 'does not match anonymous contacts together' do
-      expect_contact_set
-      contact1.update_column(:name, 'totally anonymous')
-      expect(dup_contacts).to be_empty
-    end
-
-    it 'does not match contacts by person name if like "Friend of the ministry"' do
-      person1.update_columns(first_name: 'Friends of THE', last_name: 'Ministry')
-      person2.update_columns(first_name: 'friends of the', last_name: 'ministry')
-      expect(dup_contacts).to be_empty
-    end
-
-    it 'matches contacts by contact info if person name like "Friend of the ministry"' do
-      person1.update_columns(first_name: 'Friend', last_name: 'of the Ministry')
-      person2.update_columns(first_name: 'Friend', last_name: 'of the Ministry')
-      person1.phone = '123-456-7890'
-      person2.phone = '(123) 456-7890'
-      expect_contact_set
-    end
-
     before do
       contact1.people << person1
       contact2.people << person2
@@ -508,6 +496,34 @@ describe ContactDuplicatesFinder do
     it 'does not find duplicate contacts by middle_name field (too aggressive for contact match)' do
       nickname
       person1.update_columns(first_name: 'Notjohn', middle_name: 'Johnny')
+      expect(dup_contacts).to be_empty
+    end
+
+    it 'does not match anonymous contacts together' do
+      expect_contact_set
+      contact1.update_column(:name, 'totally anonymous')
+      expect(dup_contacts).to be_empty
+    end
+
+    it 'does not match contacts by person name if like "Friend of the ministry"' do
+      person1.update_columns(first_name: 'Friends of THE', last_name: 'Ministry')
+      person2.update_columns(first_name: 'friends of the', last_name: 'ministry')
+      expect(dup_contacts).to be_empty
+    end
+
+    it 'matches contacts by contact info if person name like "Friend of the ministry"' do
+      person1.update_columns(first_name: 'Friend', last_name: 'of the Ministry')
+      person2.update_columns(first_name: 'Friend', last_name: 'of the Ministry')
+      person1.phone = '123-456-7890'
+      person2.phone = '(123) 456-7890'
+      expect_contact_set
+    end
+
+    it 'does not match contacts by people contact info if name like "Unknown"' do
+      person1.update_columns(first_name: 'Unknown')
+      person2.update_columns(first_name: 'unknown')
+      person1.email = 'same@example.com'
+      person2.email = 'same@example.com'
       expect(dup_contacts).to be_empty
     end
   end
