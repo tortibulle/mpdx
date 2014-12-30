@@ -483,6 +483,19 @@ describe ContactDuplicatesFinder do
       expect_contact_set
     end
 
+    it 'does not find duplicates by matching primary address if insufficient address' do
+      stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
+
+      person1.update_column(:first_name, 'Notjohn')
+
+      contact1.addresses_attributes = [{ street: 'Insufficient Address', primary_mailing_address: true, master_address_id: 1 }]
+      contact1.save
+      contact2.addresses_attributes = [{ street: '1 Rd', primary_mailing_address: true, master_address_id: 1 }]
+      contact2.save
+
+      expect(dup_contacts).to be_empty
+    end
+
     it 'does not find the same contact as a duplicate if the persons name would match itself' do
       person1.update_column(:first_name, 'John B')
       person2.update_column(:first_name, 'Brian')
@@ -528,12 +541,12 @@ describe ContactDuplicatesFinder do
       expect(dup_contacts).to be_empty
     end
 
-    it 'matches contacts by contact info if person name like "Friend of the ministry"' do
+    it 'does not match contacts by contact info if person name like "Friend of the ministry"' do
       person1.update_columns(first_name: 'Friend', last_name: 'of the Ministry')
       person2.update_columns(first_name: 'Friend', last_name: 'of the Ministry')
       person1.phone = '123-456-7890'
       person2.phone = '(123) 456-7890'
-      expect_contact_set
+      expect(dup_contacts).to be_empty
     end
 
     it 'does not match contacts by people contact info if name like "Unknown"' do
