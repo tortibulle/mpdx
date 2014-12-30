@@ -159,7 +159,7 @@ describe ContactsController do
       it 'does not assign contact_sets and people_sets' do
         contact_sets = [[contact, build(:contact)]]
         people_sets = []
-        expect(ContactDuplicatesFinder).to receive(:new).with(user.account_lists.first)
+        expect(ContactDuplicatesFinder).to receive(:new).with(user.account_lists.first, user)
                                              .and_return(double(dup_contacts_then_people: [contact_sets, people_sets]))
 
         xhr :get, :find_duplicates, format: :js

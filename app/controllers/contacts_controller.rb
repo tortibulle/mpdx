@@ -260,7 +260,7 @@ class ContactsController < ApplicationController
     respond_to do |wants|
       wants.html {}
       wants.js do
-        dups_finder = ContactDuplicatesFinder.new(current_account_list)
+        dups_finder = ContactDuplicatesFinder.new(current_account_list, current_user)
         @contact_sets, @people_sets = dups_finder.dup_contacts_then_people
       end
     end

@@ -2,7 +2,8 @@ require 'spec_helper'
 
 describe ContactDuplicatesFinder do
   let(:account_list) { create(:account_list) }
-  let(:dups_finder) { ContactDuplicatesFinder.new(account_list) }
+  let(:user) { create(:person) }
+  let(:dups_finder) { ContactDuplicatesFinder.new(account_list, user) }
 
   let(:person1) { create(:person, first_name: 'john', last_name: 'doe') }
   let(:person2) { create(:person, first_name: 'John', last_name: 'Doe') }

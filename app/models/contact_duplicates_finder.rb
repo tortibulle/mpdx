@@ -1,8 +1,10 @@
 require 'ostruct'
 
 class ContactDuplicatesFinder
-  def initialize(account_list)
+  # Just in case, we give the temporary tables unique names to reflect the current user
+  def initialize(account_list, user)
     @account_list = account_list
+    @user = user
   end
 
   # To help prevent merging a male person with a female person (and because the gender field can be unreliable),
@@ -75,15 +77,23 @@ class ContactDuplicatesFinder
   end
 
   def exec_query(sql)
-    Person.connection.exec_query(sql.gsub(':account_list_id', Person.connection.quote(@account_list.id)))
+    # Scope to the account list and add user id to the temp table names as defense against race conditions
+    # The id.to_i is largely uncessary since ids are integers anyway, but prevents any SQL injection should
+    # those fields ever be able to be tampered with by the user.
+    sql = sql.gsub(':account_list_id', @account_list.id.to_i.to_s).gsub('tmp_', "tmp_#{@user.id.to_i}_")
+    Person.connection.exec_query(sql)
   end
 
-  # The reason these are large queries with temp tables and not Ruby code with loops is that as I introduced more
-  # duplicate search options, that code got painfully slow and so I re-wrote the logic as self-join queries for performance.
+  # The reason these are large queries with temp tables and not Ruby code with loops is that as I
+  # introduced more duplicate search options, that code got painfully slow and so I re-wrote the logic as
+  # self-join queries for performance.
   #
-  # Temporary tables are unique per database connection and the Rails connection pool gives each thread a unique
-  # connection, so it's OK for this model to create temporary tables even if another instance somewhere else is
-  # doing the same action and creating its own temp tables with the same names.
+  # Temporary tables are unique per database connection and the Rails connection pool gives each thread
+  # a unique connection, so it's OK for this model to create temporary tables even if another instance
+  # somewhere else is doing the same action and creating its own temp tables with the same names. See:
+  # http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/ConnectionPool.html
+  # http://www.postgresql.org/docs/9.4/static/sql-createtable.html  under "Compatibility",
+  #   "Temporary Tables"
   CREATE_TEMP_TABLES = [
     # First just scope people to the account list and filter out anonymous contacts or people with name "Unknown".
     "SELECT people.id, first_name, legal_first_name, middle_name, last_name
