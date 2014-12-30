@@ -32,3 +32,4 @@ if($('#modal_task_completed_at_1i').length) {
 $('#task_modal_form').areYouSure({
   message: '<%= _('It looks like you were editting a task. If you leave before submitting, your changes will be lost.') %>'
 })
+$.mpdx.autocomplete = new google.maps.places.Autocomplete($('#modal_task_location')[0])

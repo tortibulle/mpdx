@@ -20,6 +20,7 @@
       window.current_account_list_id = <%= current_account_list.id %>;
       window.current_account_list_tester = '<%= current_account_list.tester %>';
     </script>
+    <script type="text/javascript" src="//maps.google.com/maps/api/js?v=3.13&amp;sensor=false&amp;libraries=places,geometry"></script>
   </head>
   <body id="<%= controller.controller_name %>_<%= controller.action_name %>" class="<%= controller.controller_name %>_controller" ng-app="mpdxApp">
     <%= render 'peek/bar' %>
@@ -128,5 +129,4 @@
     <div id="mini_contact_modal" title="<%= _('Contact Details') %>" style="display:none">
     </div>
   </body>
-
 </html>
