@@ -1,6 +1,6 @@
 <div class="duplicate_contacts">
   <% if @contact_sets.present? %>
-      <h2><%=  _('Step 1 of 2: Merge duplicate contacts (i.e. giving units)') %></h2>
+      <h2><%=  _('Step 1 of 2: Merge duplicate contacts (giving units)') %></h2>
       <%= form_tag merge_contacts_path do %>
         <%= link_to(_('Select all duplicates'), '#', class: 'select_all') %>
         <% @contact_sets.each do |set| %>
@@ -19,7 +19,7 @@
         <%= submit_tag _('Merge selected contacts'), class: 'btn desired_action' %>
       <% end %>
   <% elsif @people_sets.present? %>
-      <h2><%=  _('Step 2 of 2: Merge duplicate people within contacts (i.e. within giving units)') %></h2>
+      <h2><%=  _('Step 2 of 2: Merge duplicate people within contacts') %></h2>
       <%= form_tag merge_sets_people_path do %>
           <%= link_to(_('Select all duplicates'), '#', class: 'select_all') %>
           <% @people_sets.each do |dup| %>
