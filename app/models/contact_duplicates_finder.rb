@@ -99,33 +99,33 @@ class ContactDuplicatesFinder
     "SELECT *
     INTO TEMP tmp_unsplit_names
     FROM (
-      SELECT first_name as name, 'first' as name_source, id, first_name, last_name FROM tmp_account_ppl
-      UNION SELECT legal_first_name, 'first' as name_source, id, first_name, last_name FROM tmp_account_ppl
+      SELECT first_name as name, 'first' as name_field, id, first_name, last_name FROM tmp_account_ppl
+      UNION SELECT legal_first_name, 'legal_first' as name_field, id, first_name, last_name FROM tmp_account_ppl
         WHERE legal_first_name is not null and legal_first_name <> ''
-      UNION SELECT middle_name, 'middle' as name_source, id, first_name, last_name FROM tmp_account_ppl
+      UNION SELECT middle_name, 'middle' as name_field, id, first_name, last_name FROM tmp_account_ppl
         WHERE middle_name is not null and middle_name <> ''
     ) as people_unsplit_names_query",
 
     # Break apart various parts of names (initials, capitals, spaces, etc.) into a single table, and make names lowercase.
     # Also filter out people with names like "Friend of the ministry"
-    "SELECT lower(name) as name, name_source, id, first_name, lower(last_name) as last_name
+    "SELECT lower(name) as name, name_field, id, first_name, lower(last_name) as last_name
     INTO TEMP tmp_names
     FROM (
         /* Try replacing the space to match e.g. 'Marybeth' and 'Mary Beth'.
          * This also brings in all names that don't match patterns below. */
-        SELECT replace(name, ' ', '') as name, name_source, id, first_name, last_name
+        SELECT replace(name, ' ', '') as name, name_field, id, first_name, last_name
         FROM tmp_unsplit_names
       UNION
         /* Split the name by '-', ' ', and '.' to capture initials and multiple names like 'J.W.' or 'John Wilson'
          * The regexp_replace is to get rid of any separator characters at the end to reduce blank rows. */
         SELECT regexp_split_to_table(regexp_replace(name, '[\\.-]+$', ''), '([\\. -]+|$)+'),
-          name_source, id, first_name, last_name
+          name_field, id, first_name, last_name
         FROM tmp_unsplit_names WHERE name ~ '[\\. -]'
       UNION
         /* Split the name by  two capitals in a row like 'JW' or a capital within a name like 'MaryBeth', but don't split
          * three letter capitals which are common in organization acrynomys like 'CCC NEHQ' or 'City UMC'  */
         SELECT regexp_split_to_table(regexp_replace(name, '(^[A-Z]|[a-z])([A-Z])', '\\1 \\2'), ' '),
-          name_source, id, first_name, last_name
+          name_field, id, first_name, last_name
         FROM tmp_unsplit_names WHERE name ~ '(^[A-Z]|[a-z])([A-Z])' and name !~ '[A-Z]{3}'
     ) as people_names_query
     WHERE first_name || last_name not ilike 'friend%of%the%ministry'",
@@ -143,7 +143,7 @@ class ContactDuplicatesFinder
         when ppl.name = nicknames.nickname then 800
 
         /* First name over middle, (David over John David) */
-        when dups.name_source = 'middle' then 700
+        when dups.name_field = 'middle' then 700
 
         /* Inside/first capitals (MaryBeth over Marybeth, Jo over jo) */
         when ppl.first_name ~ '^[A-Z][a-z]+[A-Z][a-z].*' then 600
@@ -164,12 +164,12 @@ class ContactDuplicatesFinder
         when dups.id > ppl.id then 100 else 50
       end as priority,
 
-      /* Verify genders if the match includes a middle name or initial as those are less certain. */
+      /* Verify genders if the match used a middle (or legal first) name/initial as those are more often wrong in the data. */
       (char_length(ppl.name) = 1 or char_length(dups.name) = 1
-        or dups.name_source = 'middle' or ppl.name_source = 'middle'
+        or dups.name_field <> 'first' or ppl.name_field <> 'first'
       ) as check_genders,
 
-      ppl.name_source, dups.name_source as dup_name_source
+      ppl.name_field, dups.name_field as dup_name_field
     INTO TEMP tmp_dups_by_name
     FROM tmp_names as ppl
       INNER JOIN tmp_names as dups ON ppl.id <> dups.id
@@ -177,7 +177,7 @@ class ContactDuplicatesFinder
         and ((ppl.name = nicknames.nickname and dups.name = nicknames.name)
           or (ppl.name = nicknames.name and dups.name = nicknames.nickname))
     WHERE ppl.last_name = dups.last_name
-      and (ppl.name_source = 'first' or dups.name_source = 'first')
+      and (ppl.name_field = 'first' or dups.name_field = 'first')
       and (
         nicknames.id is not null
         or (dups.name = ppl.name and char_length(ppl.name) > 1)
@@ -223,7 +223,7 @@ class ContactDuplicatesFinder
     "SELECT dups.*
     INTO TEMP tmp_dups
     FROM (
-      SELECT person_id, dup_person_id, nickname_id, priority, check_genders, name_source, dup_name_source
+      SELECT person_id, dup_person_id, nickname_id, priority, check_genders, name_field, dup_name_field
       FROM tmp_dups_by_name
       UNION
       SELECT person_id, dup_person_id, null, null, check_genders, null, null
@@ -261,7 +261,7 @@ class ContactDuplicatesFinder
     INNER JOIN contact_people ON contact_people.person_id = tmp_dups.person_id
     INNER JOIN contact_people dup_contact_people ON dup_contact_people.person_id = tmp_dups.dup_person_id
     WHERE contact_people.contact_id <> dup_contact_people.contact_id
-      and coalesce(tmp_dups.name_source, '') <> 'middle' and coalesce(tmp_dups.dup_name_source, '') <> 'middle'
+      and coalesce(tmp_dups.name_field, '') <> 'middle' and coalesce(tmp_dups.dup_name_field, '') <> 'middle'
     UNION
     SELECT contacts.id, dup_contacts.id
     FROM contacts

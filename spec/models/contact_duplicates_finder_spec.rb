@@ -273,6 +273,23 @@ describe ContactDuplicatesFinder do
         expect(dup_people).to be_empty
       end
 
+      it 'does not report duplicates by name if legal first name matches but name genders are off' do
+        create(:name_male_ratio, name: 'thomas', male_ratio: 0.996)
+        create(:name_male_ratio, name: 'laura', male_ratio: 0.003)
+
+        # This can happen in the data that the legal first name gets set to the spouse name, so we need to check genders.
+        person1.first_name = 'Thomas'
+        person1.legal_first_name = 'Laura'
+        person1.gender = 'female'
+        person1.save
+
+        person2.first_name = 'Laura'
+        person2.gender = 'female'
+        person2.save
+
+        expect(dup_people).to be_empty
+      end
+
       it 'does not report duplicates by middle name only' do
         person1.update_columns(first_name: 'Notjohn', middle_name: 'George')
         person2.update_column(:middle_name, 'George')

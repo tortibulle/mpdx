@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141226170459) do
+ActiveRecord::Schema.define(version: 20141230003854) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -349,6 +349,34 @@ ActiveRecord::Schema.define(version: 20141226170459) do
   add_index "donor_accounts", ["organization_id"], name: "index_donor_accounts_on_organization_id", using: :btree
   add_index "donor_accounts", ["total_donations"], name: "index_donor_accounts_on_total_donations", using: :btree
 
+  create_table "dup_people", id: false, force: true do |t|
+    t.integer "person_id"
+    t.integer "dup_person_id"
+    t.integer "nickname_id"
+    t.integer "priority"
+    t.boolean "check_genders"
+    t.integer "contact_id"
+  end
+
+  create_table "dup_ppl", id: false, force: true do |t|
+    t.integer "person_id"
+    t.integer "dup_person_id"
+    t.integer "nickname_id"
+    t.integer "priority"
+    t.boolean "check_genders"
+    t.text    "name_source"
+    t.text    "dup_name_source"
+  end
+
+  create_table "dup_ppl_by_contact_info", id: false, force: true do |t|
+    t.integer "person_id"
+    t.integer "dup_person_id"
+    t.boolean "check_genders"
+  end
+
+  add_index "dup_ppl_by_contact_info", ["dup_person_id"], name: "dup_ppl_by_contact_info_dup_person_id_idx", using: :btree
+  add_index "dup_ppl_by_contact_info", ["person_id"], name: "dup_ppl_by_contact_info_person_id_idx", using: :btree
+
   create_table "email_addresses", force: true do |t|
     t.integer  "person_id"
     t.string   "email",                                 null: false
@@ -555,7 +583,7 @@ ActiveRecord::Schema.define(version: 20141226170459) do
     t.datetime "updated_at"
   end
 
-  add_index "name_male_ratios", ["name"], name: "index_name_male_ratios_on_name", using: :btree
+  add_index "name_male_ratios", ["name"], name: "index_name_male_ratios_on_name", unique: true, using: :btree
 
   create_table "nicknames", force: true do |t|
     t.string   "name",                               null: false
