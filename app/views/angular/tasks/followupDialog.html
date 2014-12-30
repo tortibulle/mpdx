@@ -416,6 +416,11 @@
                 <option value="Email">Email</option>
                 <option value="Both">Both</option></select>
         </div>
+
+        <div ng-show="followUpDialogData.updateStatus" style="padding-top:10px;">
+          <hr>
+          <input type="checkbox" ng-model="followUpDialogResult.updateContactStatus"> Update contact(s) status to "{{followUpDialogData.updateStatus}}"
+        </div>
     </div>
 
 
