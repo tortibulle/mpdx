@@ -91,9 +91,13 @@ angular.module('mpdxApp')
                             options: [],
                             callTask: true
                         };
+                        if(strContains(taskResult, 'Call for Decision')) {
+                          $scope.followUpDialogData.updateStatus = 'Call for Decision';
+                        }
 
                         $scope.followUpDialogResult = {
                             createCallTask: true,
+                            updateContactStatus: true,
                             callTask: {
                                 type: taskType,
                                 subject: taskSubject || followUpTask.subject,
@@ -106,7 +110,7 @@ angular.module('mpdxApp')
 
                         $scope.followUpSaveFunc = function () {
                             //Contact Updates
-                            if(strContains(taskResult, 'Call for Decision')) {
+                            if(strContains(taskResult, 'Call for Decision') && $scope.followUpDialogResult.updateContactStatus) {
                               angular.forEach(followUpTask.contacts, function (c) {
                                 saveContact({id: c, status: 'Call for Decision'});
                               });
