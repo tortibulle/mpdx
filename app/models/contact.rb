@@ -236,11 +236,18 @@ class Contact < ActiveRecord::Base
 
   def generated_envelope_greeting
     return name if siebel_organization?
-    if spouse_last_name.blank? || last_name == spouse_last_name
-      [[first_name, spouse_first_name].compact.join(" #{_('and')} "), last_name].compact.join(' ')
-    else
-      [[first_name, last_name].compact.join(' '), [spouse_first_name, spouse_last_name].compact.join(' ')].join(" #{_('and')} ")
+    return name unless name.to_s.include? ','
+    last_name = name.split(',')[0].strip
+    first_names = name.split(',')[1].strip
+    return first_names + ' ' + last_name unless first_names =~ /\((\w|\W)*\)/
+    first_names = first_names.split(/ & | #{_('and')} /)
+    if first_names[0] =~ /\((\w|\W)*\)/
+      first_names[0].sub!(/\((\w|\W)*\)/, '')
+      first_names[0].strip!
+      return "#{first_names[0]} #{_('and')} #{first_names[1]} #{last_name}"
     end
+    first_names[1].delete!('()')
+    "#{first_names[0]} #{last_name} #{_('and')} #{first_names[1]}"
   end
 
   def siebel_organization?

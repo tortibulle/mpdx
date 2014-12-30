@@ -3,7 +3,7 @@
 FactoryGirl.define do
   factory :contact do
     account_list
-    name 'John'
+    name 'Doe, John'
     status 'Partner - Financial'
     pledge_amount 100
     pledge_frequency 1

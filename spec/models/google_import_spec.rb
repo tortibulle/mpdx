@@ -92,7 +92,7 @@ describe GoogleImport do
     end
 
     it 'does not create a new person if their name matches' do
-      @contact.people << create(:person, last_name: 'Doe')
+      @contact.people << create(:person, first_name: 'John', last_name: 'Doe')
       expect {
         @google_import.send(:create_or_update_person, @google_contact)
       }.to_not change(Person, :count)
@@ -109,7 +109,7 @@ describe GoogleImport do
 
   describe 'overall import results' do
     def check_imported_data
-      contacts = @account_list.contacts.where(name: 'Doe, John')
+      contacts = @account_list.contacts.where(name: 'Google, John')
       expect(contacts.to_a.count).to eq(1)
       contact = contacts.first
 
@@ -118,9 +118,9 @@ describe GoogleImport do
 
       expect(contact.people).to include(person)
       expect(person.contacts).to include(contact)
-      expect(contact.name).to eq('Doe, John')
+      expect(contact.name).to eq('Google, John')
       expect(person.first_name).to eq('John')
-      expect(person.last_name).to eq('Doe')
+      expect(person.last_name).to eq('Google')
       expect(person.middle_name).to eq('Henry')
       expect(person.title).to eq('Mr')
       expect(person.suffix).to eq('III')
@@ -203,7 +203,7 @@ describe GoogleImport do
         country: 'United States', location: 'Home', primary_mailing_address: true
       }]
       @contact.save
-      @person = build(:person, last_name: 'Doe')
+      @person = build(:person, last_name: 'Google')
       @person.email_address = { email: 'existing_primary@example.com', primary: true }
       @person.phone_number = { number: '474-747-4744', primary: true }
       @person.websites << Person::Website.create(url: 'original.example.com', primary: true)
@@ -272,7 +272,7 @@ describe GoogleImport do
       @existing_contact.reload
       expect(@existing_contact.notes).to eq('Notes here')
       expect(@existing_person.first_name).to eq('John')
-      expect(@existing_person.last_name).to eq('Doe')
+      expect(@existing_person.last_name).to eq('Google')
       expect(@existing_person.middle_name).to eq('Henry')
       expect(@existing_person.title).to eq('Mr')
       expect(@existing_person.suffix).to eq('III')
@@ -318,7 +318,7 @@ describe GoogleImport do
   end
 
   it "doesn't import a picture if the person has an associated facebook account" do
-    person = build(:person, last_name: 'Doe')
+    person = build(:person)
     @contact.people << person
     create(:facebook_account, person: person)
     @google_import.import
