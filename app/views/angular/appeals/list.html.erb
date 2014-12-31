@@ -1,11 +1,11 @@
-<button ng-click="newAppeal()">Create New Appeal</button>
+<button ng-click="newAppeal()"><%= _('Create New Appeal') %></button>
 <table class="list">
     <tbody>
         <tr ng-repeat="appeal in appeals | orderBy: 'name'">
             <td>
                 <div class="actions">
-                    <a class="ico ico_edit" href ng-click="editAppeal(appeal.id)">Edit</a>
-                    <a class="ico ico_trash" href ng-click="deleteAppeal(appeal.id)">Delete</a>
+                    <a class="ico ico_edit" href ng-click="editAppeal(appeal.id)"><%= _('Edit') %></a>
+                    <a class="ico ico_trash" href ng-click="deleteAppeal(appeal.id)"><%= _('Delete') %></a>
                 </div>
             </td>
             <td style="width: 350px;">

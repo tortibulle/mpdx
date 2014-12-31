@@ -26,15 +26,15 @@
 <td class="contact-tasks" nowrap="nowrap">
     <span ng-show="contact.status !== ''">{{contact.status}}<br></span>
     <span ng-show="contact.pledge_amount > 0">{{contact.pledge_amount | currency: current_currency_symbol}} {{pledgeFrequencyStr(contact.pledge_frequency)}}<br></span>
-    <a href="/tasks?contact_ids={{contact.id}}" ng-show="contact.uncompleted_tasks_count > 0">Tasks: {{contact.uncompleted_tasks_count}}</a>
+    <a href="/tasks?contact_ids={{contact.id}}" ng-show="contact.uncompleted_tasks_count > 0"><%= _('Tasks') %>: {{contact.uncompleted_tasks_count}}</a>
 </td>
 
 <td class="qaction" id="contact_{{contact.id}}_quick">
-    <a href="#" class="btn smallbtn quick">Quick</a>
+    <a href="#" class="btn smallbtn quick"><%= _('Quick') %></a>
     <ul style="display: none;" class="quick_action_list">
-        <li><a class="none" href="/contacts/{{contact.id}}">Show</a></li>
-        <li><a class="none" href="/contacts/{{contact.id}}/edit">Edit</a></li>
-        <li><a class="none" data-behavior="hide_contact" data-method="delete" data-remote="true" href="/contacts/{{contact.id}}" rel="nofollow">Hide</a></li>
+        <li><a class="none" href="/contacts/{{contact.id}}"><%= _('Show') %></a></li>
+        <li><a class="none" href="/contacts/{{contact.id}}/edit"><%= _('Edit') %></a></li>
+        <li><a class="none" data-behavior="hide_contact" data-method="delete" data-remote="true" href="/contacts/{{contact.id}}" rel="nofollow"><%= _('Hide') %></a></li>
     </ul>
 </td>
 <td class="checks"><input type="checkbox" name="contact_ids[]" value="{{contact.id}}" /></td>
