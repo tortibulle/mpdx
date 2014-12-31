@@ -1,32 +1,32 @@
 <div class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons" style="width: 100%;">
     <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
-        <span id="ui-id-7" class="ui-dialog-title">Create New Appeal</span>
+        <span id="ui-id-7" class="ui-dialog-title"><%= _('Create New Appeal') %></span>
         <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" title="close" ng-click="cancel()">
             <span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>
-            <span class="ui-button-text">close</span>
+            <span class="ui-button-text"><%= _('close') %></span>
         </button>
     </div>
     <div class="ui-dialog-content ui-widget-content">
         <form>
             <div class="form_wrapper">
                 <div class="field">
-                    <label>Appeal Name</label>
+                    <label><%= _('Name') %></label>
                     <input autofocus="autofocus" type="text" ng-model="appeal.name">
                 </div>
 
                 <div class="field">
-                    <label>Goal</label>
+                    <label><%= _('Goal') %></label>
                     <input type="text" ng-model="appeal.amount">
                 </div>
 
                 <div class="field appealFilterCol">
-                    <label>Add contacts with the following status(es):</label>
+                    <label><%= _('Add contacts with the following status(es):') %></label>
                     <div style="margin-top: 5px;" ng-repeat="status in contactStatuses">
                         <label><input type="checkbox" ng-model="appeal.validStatus[status]"> {{status}}</label>
                     </div>
                 </div>
                 <div class="field appealFilterCol">
-                  <label>Add contacts with the following tag(s):</label>
+                  <label><%= _('Add contacts with the following tag(s):') %></label>
                   <div style="margin-top: 5px;" ng-repeat="tag in contactTags">
                     <label><input type="checkbox" ng-model="appeal.validTags[tag]"> {{tag}}</label>
                   </div>
@@ -35,10 +35,10 @@
             <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
                 <div class="ui-dialog-buttonset">
                     <button type="submit" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" ng-click="save()">
-                        <span class="ui-button-text">Create</span>
+                        <span class="ui-button-text"><%= _('Create') %></span>
                     </button>
                     <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" ng-click="cancel()">
-                        <span class="ui-button-text">Cancel</span>
+                        <span class="ui-button-text"><%= _('Cancel') %></span>
                     </button>
                 </div>
             </div>
