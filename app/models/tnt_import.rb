@@ -40,6 +40,18 @@ class TntImport
 
   private
 
+  def import_contacts
+    load_contact_group_tags
+
+    rows = Array.wrap(xml['Contact']['row'])
+    @tnt_contacts = {}
+    rows.each { |row| @tnt_contacts[row['id']] = import_contact(row) }
+
+    import_referrals(rows)
+
+    @tnt_contacts
+  end
+
   def load_contact_group_tags
     @tags_by_contact_id = {}
 
@@ -63,69 +75,55 @@ class TntImport
     end
   end
 
-  def import_contacts
-    @tnt_contacts = {}
-
-    load_contact_group_tags
-
-    rows = Array.wrap(xml['Contact']['row'])
-
-    rows.each_with_index do |row, _i|
-
-      contact = Retryable.retryable do
-        @account_list.contacts.where(tnt_id: row['id']).first
-      end
-
-      donor_accounts = add_or_update_donor_accounts(row, @designation_profile)
-
-      donor_accounts.each do |donor_account|
-        contact = donor_account.link_to_contact_for(@account_list, contact)
-      end
-
-      # Look for more ways to link a contact
-      contact ||= Retryable.retryable do
-        @account_list.contacts.where(name: row['FileAs']).first_or_create
-      end
-
-      # add additional data to contact
-      update_contact(contact, row)
-
-      primary_contact_person = add_or_update_primary_person(row, contact)
-
-      # Now the secondary person (persumably spouse)
-      if row['SpouseFirstName'].present?
-        row['SpouseLastName'] = row['LastName'] if row['SpouseLastName'].blank?
-        contact_spouse = add_or_update_spouse(row, contact)
-
-        # Wed the two peple
-        primary_contact_person.add_spouse(contact_spouse)
-      end
-
-      merge_dups_by_donor_accts(contact, donor_accounts)
-
-      @tnt_contacts[row['id']] = contact
-
-      next unless true?(row['IsOrganization'])
-      # organization
-      donor_accounts.each do |donor_account|
-        add_or_update_company(row, donor_account)
-      end
+  def import_contact(row)
+    contact = Retryable.retryable do
+      @account_list.contacts.where(tnt_id: row['id']).first
     end
 
-    # set referrals
+    donor_accounts = add_or_update_donor_accounts(row, @designation_profile)
+
+    donor_accounts.each do |donor_account|
+      contact = donor_account.link_to_contact_for(@account_list, contact)
+    end
+
+    # Look for more ways to link a contact
+    contact ||= Retryable.retryable do
+      @account_list.contacts.where(name: row['FileAs']).first_or_create
+    end
+
+    # add additional data to contact
+    update_contact(contact, row)
+
+    primary_contact_person = add_or_update_primary_person(row, contact)
+
+    # Now the secondary person (persumably spouse)
+    if row['SpouseFirstName'].present?
+      row['SpouseLastName'] = row['LastName'] if row['SpouseLastName'].blank?
+      contact_spouse = add_or_update_spouse(row, contact)
+
+      # Wed the two peple
+      primary_contact_person.add_spouse(contact_spouse)
+    end
+
+    merge_dups_by_donor_accts(contact, donor_accounts)
+
+    if true?(row['IsOrganization'])
+      donor_accounts.each { |donor_account|  add_or_update_company(row, donor_account) }
+    end
+
+    contact
+  end
+
+  def import_referrals(rows)
     # Loop over the whole list again now that we've added everyone and try to link up referrals
     rows.each do |row|
       referred_by = @tnt_contacts.find { |_tnt_id, c|
-        c.name == row['ReferredBy'] ||
-        c.full_name == row['ReferredBy'] ||
-        c.greeting == row['ReferredBy']
+        c.name == row['ReferredBy'] || c.full_name == row['ReferredBy'] || c.greeting == row['ReferredBy']
       }
       next unless referred_by
       contact = @tnt_contacts[row['id']]
       contact.referrals_to_me << referred_by[1] unless contact.referrals_to_me.include?(referred_by[1])
     end
-
-    @tnt_contacts
   end
 
   # If the user had two donor accounts in the same contact in Tnt, then  merge different contacts with those in MPDX.
@@ -278,15 +276,6 @@ class TntImport
     contact.addresses_attributes = build_address_array(row, contact, @import.override)
   end
 
-  def true?(val)
-    val.upcase == 'TRUE'
-  end
-
-  def parse_date(val)
-    Date.parse(val)
-  rescue
-  end
-
   def add_or_update_company(row, donor_account)
     master_company = MasterCompany.find_by_name(row['OrganizationName'])
     company = @user.partner_companies.where(master_company_id: master_company.id).first if master_company
@@ -404,16 +393,8 @@ class TntImport
           address.save
         end
       end
-      addresses << {
-        street: street,
-        city: city,
-        state: state,
-        postal_code: postal_code,
-        country: country,
-        location: location,
-        region: row['Region'],
-        primary_mailing_address: primary_address
-      }
+      addresses << {  street: street,  city: city,  state: state,  postal_code: postal_code,  country: country,
+        location: location,  region: row['Region'],  primary_mailing_address: primary_address  }
     end
     addresses
   end
