@@ -127,12 +127,7 @@
                         "$t": "III"
                     }
                 },
-                "gContact$relation": [
-                    {
-                        "$t": "Jane",
-                        "rel": "spouse"
-                    }
-                ],
+                "gContact$relation": [],
                 "title": {
                     "$t": "John Google"
                 },
