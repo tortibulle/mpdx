@@ -48,11 +48,13 @@ class GoogleImport
 
     person = create_or_update_person(g_contact)
     contact = create_or_update_contact(person, g_contact, tags)
+    spouse = create_spouse_if_specified(contact, person, g_contact)
 
     contact.people.reload
 
     begin
       contact.people << person unless contact.people.include?(person)
+      contact.people << spouse unless spouse.nil? || contact.people.include?(spouse)
     rescue ActiveRecord::RecordNotUnique
     end
   end
@@ -129,6 +131,29 @@ class GoogleImport
     else
       'Other'
     end
+  end
+
+  def create_spouse_if_specified(contact, person, g_contact)
+    spouse = g_contact.spouse
+    return if spouse.blank?
+
+    # This regexp makes the first name be all the words up to the last word, and the last name be the
+    # last word, so it can catch cases like, "Mary", "Mary Smith" and "Mary Beth Smith".
+    first, last = spouse.split(/\s+(?=\S*+$)/)
+
+    # Assume same last names if none specified for spouse
+    last ||= person.last_name
+
+    return unless contact.people.where(first_name: first, last_name: last).empty?
+
+    if person.last_name == last
+      name = "#{person.last_name}, #{person.first_name} and #{first}"
+    else
+      name = "#{person.last_name}, #{person.first_name} and #{first} (#{last})"
+    end
+    contact.update(name: name)
+
+    Person.create!(first_name: first, last_name: last)
   end
 
   def create_or_update_person(g_contact)
