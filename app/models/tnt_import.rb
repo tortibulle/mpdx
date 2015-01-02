@@ -211,8 +211,8 @@ class TntImport
       donation_key_attrs = {  amount: row['Amount'], donation_date: parse_date(row['GiftDate']) }
       account.donations.find_or_create_by(donation_key_attrs) do |donation|
         # Assume the currency is USD. Tnt doesn't have great currency support and USD is a decent default.
-        donation.tendered_currency = 'USD'
-        donation.tendered_amount = row['Amount']
+        donation.update(tendered_currency: 'USD', tendered_amount: row['Amount'])
+
         contact.update_donation_totals(donation)
       end
     end
@@ -227,8 +227,8 @@ class TntImport
       # plus one. If that is a collision due to a race condition, an exception will be raised as there is a
       # unique constraint on (organization_id, account_number) for donor_accounts. Just wait and try
       # again in that case.
-      max_num = org.donor_accounts.where("account_number ~ '^[0-9]+$'").maximum(:account_number)
-      org.donor_accounts.create!(account_number: (max_num.to_i + 1).to_s)
+      max = org.donor_accounts.where("account_number ~ '^[0-9]+$'").maximum('CAST(account_number AS int)')
+      org.donor_accounts.create!(account_number: (max.to_i + 1).to_s, name: contact.name)
     end
     contact.donor_accounts << donor_account
     donor_account

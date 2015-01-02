@@ -341,14 +341,16 @@ describe TntImport do
       expect(contact.donor_accounts.count).to eq(1)
       donor_account = contact.donor_accounts.first
       expect(donor_account.total_donations).to eq(75.0)
+      expect(donor_account.name).to eq('Test, Dave')
     end
 
     it 'finds a unique donor number for new contacts' do
-      @offline_org.donor_accounts.create(account_number: '1')
-      @offline_org.donor_accounts.create(account_number: '2')
+      # Make sure it does a numeric search not an alphabetic one to find 10 as the max and not 9.
+      @offline_org.donor_accounts.create(account_number: '10')
+      @offline_org.donor_accounts.create(account_number: '9')
       expect { @tnt_import.import  }.to change(Donation, :count).from(0).to(2)
       Donation.all.each do |donation|
-        expect(donation.donor_account.account_number).to eq('3')
+        expect(donation.donor_account.account_number).to eq('11')
       end
     end
 
