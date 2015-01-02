@@ -26,14 +26,13 @@ class TntImport
 
   def import
     @import.file.cache_stored_file!
+    return unless xml.present?
 
-    if xml.present?
-      tnt_contacts = import_contacts
-      import_tasks(tnt_contacts)
-      import_history(tnt_contacts)
-      import_settings
-    end
-
+    tnt_contacts = import_contacts
+    import_tasks(tnt_contacts)
+    import_history(tnt_contacts)
+    import_offline_org_gifts(tnt_contacts)
+    import_settings
   ensure
     CarrierWave.clean_cached_files!
   end
@@ -195,6 +194,44 @@ class TntImport
     end
 
     tnt_history
+  end
+
+  def import_offline_org_gifts(tnt_contacts)
+    return unless @account_list.organization_accounts.count == 1
+    org = @account_list.organization_accounts.first.organization
+    return unless org.api_class == 'OfflineOrg'
+
+    Array.wrap(xml['Gift']['row']).each do |row|
+      contact = tnt_contacts[row['ContactID']]
+      next unless contact
+      account = donor_account_for_contact(org, contact)
+
+      # If someone re-imports donations, assume that there is just one donation per date per amount;
+      # that's not a perfect assumption but it seems reasonable solution for offline orgs for now.
+      donation_key_attrs = {  amount: row['Amount'], donation_date: parse_date(row['GiftDate']) }
+      account.donations.find_or_create_by(donation_key_attrs) do |donation|
+        # Assume the currency is USD. Tnt doesn't have great currency support and USD is a decent default.
+        donation.tendered_currency = 'USD'
+        donation.tendered_amount = row['Amount']
+        contact.update_donation_totals(donation)
+      end
+    end
+  end
+
+  def donor_account_for_contact(org, contact)
+    account = contact.donor_accounts.first
+    return account if account
+
+    donor_account = Retryable.retryable(sleep: 60, tries: 3) do
+      # Find a unique donor account_number for this contact. Try the current max numeric account number
+      # plus one. If that is a collision due to a race condition, an exception will be raised as there is a
+      # unique constraint on (organization_id, account_number) for donor_accounts. Just wait and try
+      # again in that case.
+      max_num = org.donor_accounts.where("account_number ~ '^[0-9]+$'").maximum(:account_number)
+      org.donor_accounts.create!(account_number: (max_num.to_i + 1).to_s)
+    end
+    contact.donor_accounts << donor_account
+    donor_account
   end
 
   def import_settings

@@ -12,26 +12,36 @@ FactoryGirl.define do
   end
 
   factory :tnt_import, parent: :import do
-    file { File.new(Rails.root.join('spec/fixtures/tnt_export.xml')) }
+    file { File.new(Rails.root.join('spec/fixtures/tnt/tnt_export.xml')) }
     source 'tnt'
   end
 
   factory :tnt_import_non_donor, parent: :tnt_import do
-    file { File.new(Rails.root.join('spec/fixtures/tnt_export_non_donor.xml')) }
+    file { File.new(Rails.root.join('spec/fixtures/tnt/tnt_export_non_donor.xml')) }
   end
 
   factory :tnt_import_short_donor_code, parent: :tnt_import do
     association :account_list, factory: :account_list_with_designation_profile
-    file { File.new(Rails.root.join('spec/fixtures/tnt_export_short_donor_code.xml')) }
+    file { File.new(Rails.root.join('spec/fixtures/tnt/tnt_export_short_donor_code.xml')) }
   end
 
   factory :tnt_import_groups, parent: :tnt_import do
     association :account_list, factory: :account_list_with_designation_profile
-    file { File.new(Rails.root.join('spec/fixtures/tnt_export_groups.xml')) }
+    file { File.new(Rails.root.join('spec/fixtures/tnt/tnt_export_groups.xml')) }
   end
 
   factory :tnt_import_multi_donor_accounts, parent: :tnt_import do
     association :account_list, factory: :account_list_with_designation_profile
-    file { File.new(Rails.root.join('spec/fixtures/tnt_export_multi_donor_accounts.xml')) }
+    file { File.new(Rails.root.join('spec/fixtures/tnt/tnt_export_multi_donor_accounts.xml')) }
+  end
+
+  factory :tnt_import_gifts, parent: :tnt_import do
+    association :account_list
+    file { File.new(Rails.root.join('spec/fixtures/tnt/tnt_export_gifts.xml')) }
+  end
+
+  factory :tnt_import_gifts_added, parent: :tnt_import do
+    association :account_list
+    file { File.new(Rails.root.join('spec/fixtures/tnt/tnt_export_gifts_1added.xml')) }
   end
 end

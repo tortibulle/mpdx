@@ -1,0 +1,147 @@
+<Database>
+  <Application>TntMPD</Application>
+  <Version>3.0</Version>
+  <Name>Z:\home\dave\Downloads\empty_tnt.mpddb</Name>
+  <Tables>
+    <Appeal>
+    </Appeal>
+    <Contact>
+      <row id="1">
+        <LastEdit>2014-11-20 17:12:55</LastEdit>
+        <CreatedDate>2014-11-20</CreatedDate>
+        <FileAs>Test, Dave</FileAs>
+        <FileAsIsCustom>false</FileAsIsCustom>
+        <FullName>Dave Test</FullName>
+        <FullNameIsCustom>false</FullNameIsCustom>
+        <Greeting>Dave</Greeting>
+        <GreetingIsCustom>false</GreetingIsCustom>
+        <Salutation>Dear Dave,</Salutation>
+        <SalutationIsCustom>false</SalutationIsCustom>
+        <ShortName>Dave Test</ShortName>
+        <ShortNameIsCustom>false</ShortNameIsCustom>
+        <MailingAddressBlock>Dave Test
+          2222 Anywhere Way
+          Test City, VA  55577</MailingAddressBlock>
+        <MailingAddressIsDeliverable>true</MailingAddressIsDeliverable>
+        <PhoneIsValid>false</PhoneIsValid>
+        <EmailIsValid>false</EmailIsValid>
+        <IsOrganization>false</IsOrganization>
+        <FirstName>Dave</FirstName>
+        <LastName>Test</LastName>
+        <Deceased>false</Deceased>
+        <MailingAddressType>1</MailingAddressType>
+        <MailingStreetAddress>2222 Anywhere Way</MailingStreetAddress>
+        <MailingCity>Test City</MailingCity>
+        <MailingState>VA</MailingState>
+        <MailingPostalCode>55577</MailingPostalCode>
+        <HomeStreetAddress>2222 Anywhere Way</HomeStreetAddress>
+        <HomeCity>Test City</HomeCity>
+        <HomeState>VA</HomeState>
+        <HomePostalCode>55577</HomePostalCode>
+        <HomeCountryID>840</HomeCountryID>
+        <HomeCountry>United States of America</HomeCountry>
+        <HomeAddressIsDeliverable>true</HomeAddressIsDeliverable>
+        <HomeAddressBlock>Dave Test
+          2222 Anywhere Way
+          Test City, VA  55577</HomeAddressBlock>
+        <HomeAddressBlockIsCustom>false</HomeAddressBlockIsCustom>
+        <OtherCountryID>840</OtherCountryID>
+        <OtherCountry>United States of America</OtherCountry>
+        <OtherAddressIsDeliverable>false</OtherAddressIsDeliverable>
+        <OtherAddressBlockIsCustom>false</OtherAddressBlockIsCustom>
+        <BusinessCountryID>840</BusinessCountryID>
+        <BusinessCountry>United States of America</BusinessCountry>
+        <BusinessAddressIsDeliverable>false</BusinessAddressIsDeliverable>
+        <BusinessAddressBlockIsCustom>false</BusinessAddressBlockIsCustom>
+        <SpouseBusinessCountryID>840</SpouseBusinessCountryID>
+        <SpouseBusinessCountry>United States of America</SpouseBusinessCountry>
+        <SpouseBusinessAddressIsDeliverable>false</SpouseBusinessAddressIsDeliverable>
+        <SpouseBusinessAddressBlockIsCustom>false</SpouseBusinessAddressBlockIsCustom>
+        <PreferredPhoneType>0</PreferredPhoneType>
+        <PhoneIsValidMask>133693440</PhoneIsValidMask>
+        <PreferredEmailTypes>0</PreferredEmailTypes>
+        <Email1IsValid>false</Email1IsValid>
+        <Email2IsValid>false</Email2IsValid>
+        <Email3IsValid>false</Email3IsValid>
+        <SpouseEmail1IsValid>false</SpouseEmail1IsValid>
+        <SpouseEmail2IsValid>false</SpouseEmail2IsValid>
+        <SpouseEmail3IsValid>false</SpouseEmail3IsValid>
+        <FamilySideID>0</FamilySideID>
+        <FamilyLevelID>0</FamilyLevelID>
+        <MapAddressType>0</MapAddressType>
+        <MapLat>0</MapLat>
+        <MapLng>0</MapLng>
+        <PledgeAmount>0</PledgeAmount>
+        <PledgeFrequencyID>0</PledgeFrequencyID>
+        <PledgeReceived>false</PledgeReceived>
+        <PledgeStartDate>1899-12-30</PledgeStartDate>
+        <MPDPhaseID>0</MPDPhaseID>
+        <NextAsk>1899-12-30</NextAsk>
+        <NeverAsk>false</NeverAsk>
+        <LikelyToGiveID>0</LikelyToGiveID>
+        <SendNewsletter>false</SendNewsletter>
+        <NewsletterMediaPref>+P-E</NewsletterMediaPref>
+        <DirectDeposit>false</DirectDeposit>
+        <Magazine>false</Magazine>
+        <MonthlyPledge>0</MonthlyPledge>
+        <FirstGiftDate>1899-12-30</FirstGiftDate>
+        <LastGiftDate>1899-12-30</LastGiftDate>
+        <LastGiftAmount>0</LastGiftAmount>
+        <LastGiftOrganizationID>0</LastGiftOrganizationID>
+        <PrevYearTotal>0</PrevYearTotal>
+        <YearTotal>0</YearTotal>
+        <LifetimeTotal>0</LifetimeTotal>
+        <LifetimeNumberOfGifts>0</LifetimeNumberOfGifts>
+        <LargestGift>0</LargestGift>
+        <GoodUntil>1899-12-30</GoodUntil>
+        <AveMonthlyGift>0</AveMonthlyGift>
+        <LastDateInAve>1899-12-30</LastDateInAve>
+        <TwelveMonthTotal>0</TwelveMonthTotal>
+        <LastActivity>1899-12-30</LastActivity>
+        <LastAppointment>1899-12-30</LastAppointment>
+        <LastCall>1899-12-30</LastCall>
+        <LastPreCall>1899-12-30</LastPreCall>
+        <LastLetter>1899-12-30</LastLetter>
+        <LastVisit>1899-12-30</LastVisit>
+        <LastThank>1899-12-30</LastThank>
+        <LastChallenge>1899-12-30</LastChallenge>
+        <AppealsSinceLastGift>0</AppealsSinceLastGift>
+        <ChallengesSinceLastGift>0</ChallengesSinceLastGift>
+      </row>
+    </Contact>
+    <Gift>
+      <row id="1">
+        <LastEdit>2013-12-01 21:42:55</LastEdit>
+        <ContactID>1</ContactID>
+        <OrganizationID>0</OrganizationID>
+        <GiftDate>2013-11-20</GiftDate>
+        <Amount>50</Amount>
+        <PersonallyReceived>false</PersonallyReceived>
+        <AvailableOnWeb>true</AvailableOnWeb>
+        <PledgeFulfillmentType>0</PledgeFulfillmentType>
+        <AppealAmount>0</AppealAmount>
+      </row>
+      <row id="2">
+        <LastEdit>2013-12-01 21:42:55</LastEdit>
+        <ContactID>1</ContactID>
+        <OrganizationID>0</OrganizationID>
+        <GiftDate>2013-11-21</GiftDate>
+        <Amount>25</Amount>
+        <PersonallyReceived>false</PersonallyReceived>
+        <AvailableOnWeb>true</AvailableOnWeb>
+        <PledgeFulfillmentType>0</PledgeFulfillmentType>
+        <AppealAmount>0</AppealAmount>
+      </row>
+    </Gift>
+    <History>
+    </History>
+    <HistoryContact>
+    </HistoryContact>
+    <Task>
+    </Task>
+    <TaskContact>
+    </TaskContact>
+    <Property>
+    </Property>
+  </Tables>
+</Database>

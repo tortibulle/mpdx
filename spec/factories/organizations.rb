@@ -37,4 +37,9 @@ FactoryGirl.define do
     api_class 'DataServerNavigators'
     account_balance_params 'UserName=$ACCOUNT$&Password=$PASSWORD$'
   end
+
+  factory :offline_org, parent: :organization do
+    api_class 'OfflineOrg'
+    profiles_url nil
+  end
 end
