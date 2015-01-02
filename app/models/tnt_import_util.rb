@@ -68,4 +68,13 @@ module TntImportUtil
     when 3 then 'Attempted'
     end
   end
+
+  def true?(val)
+    val.upcase == 'TRUE'
+  end
+
+  def parse_date(val)
+    Date.parse(val)
+  rescue
+  end
 end

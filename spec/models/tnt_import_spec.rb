@@ -48,11 +48,11 @@ describe TntImport do
       expect(Contact.all.count).to eq(1)
     end
 
-    # it 'imports and does not merge existing contacts by donor accounts if not set to override' do
-    #   @import.update_column(:override, false)
-    #   @import.send(:import_contacts)
-    #   expect(Contact.all.count).to eq(2)
-    # end
+    it 'imports and merges existing contacts by donor accounts if not set to override' do
+      @import.update_column(:override, false)
+      @tnt_import.send(:import_contacts)
+      expect(Contact.all.count).to eq(1)
+    end
   end
 
   context '#import_contacts' do
@@ -280,7 +280,6 @@ describe TntImport do
   end
 
   context '#create_or_update_mailchimp' do
-
     it 'creates a mailchimp account' do
       expect {
         import.send(:create_or_update_mailchimp, 'asdf', 'asasdfdf-us4')
@@ -294,7 +293,92 @@ describe TntImport do
         import.send(:create_or_update_mailchimp, '1', '2')
       }.to change(tnt_import.account_list.mail_chimp_account, :api_key).from('5').to('2')
     end
+  end
 
+  context '#import gifts for offline orgs' do
+    before do
+      @account_list = create(:account_list)
+      @offline_org = create(:offline_org)
+      @user = create(:user)
+      @user.organization_accounts << create(:organization_account, organization: @offline_org)
+      @account_list.users << @user
+
+      @import = create(:tnt_import_gifts, account_list: @account_list)
+      @tnt_import = TntImport.new(@import)
+    end
+
+    it 'does not import gifts for an online org or multiple orgs' do
+      stub_request(:post, 'http://foo:bar@example.com/profiles')
+        .with(body: { 'Action' => 'Profiles', 'Password' => 'Test1234', 'UserName' => 'test@test.com' })
+        .to_return(body: '')
+
+      @user.organization_accounts.destroy_all
+
+      online_org = create(:organization)
+      @user.organization_accounts << create(:organization_account, organization: online_org)
+      expect { @tnt_import.import  }.to_not change(Donation, :count).from(0)
+
+      @user.organization_accounts.destroy_all
+      @user.organization_accounts << create(:organization_account, organization: @offline_org)
+      @user.organization_accounts << create(:organization_account, organization: create(:offline_org))
+      expect { @tnt_import.import  }.to_not change(Donation, :count).from(0)
+    end
+
+    it 'imports gifts for a single offline org' do
+      expect { @tnt_import.import  }.to change(Donation, :count).from(0).to(2)
+      contact = Contact.first
+      fields = [:donation_date, :amount, :tendered_amount, :tendered_currency]
+      donations = Donation.all.map { |d| d.attributes.symbolize_keys.slice(*fields) }
+      expect(donations).to include(donation_date: Date.new(2013, 11, 20), amount: 50,
+                                   tendered_amount: 50, tendered_currency: 'USD')
+      expect(donations).to include(donation_date: Date.new(2013, 11, 21), amount: 25,
+                                   tendered_amount: 25, tendered_currency: 'USD')
+
+      expect(contact.last_donation_date).to eq(Date.new(2013, 11, 21))
+      expect(contact.first_donation_date).to eq(Date.new(2013, 11, 20))
+      expect(contact.total_donations).to eq(75.0)
+
+      expect(contact.donor_accounts.count).to eq(1)
+      donor_account = contact.donor_accounts.first
+      expect(donor_account.total_donations).to eq(75.0)
+      expect(donor_account.name).to eq('Test, Dave')
+    end
+
+    it 'finds a unique donor number for new contacts' do
+      # Make sure it does a numeric search not an alphabetic one to find 10 as the max and not 9.
+      @offline_org.donor_accounts.create(account_number: '10')
+      @offline_org.donor_accounts.create(account_number: '9')
+      expect { @tnt_import.import  }.to change(Donation, :count).from(0).to(2)
+      Donation.all.each do |donation|
+        expect(donation.donor_account.account_number).to eq('11')
+      end
+    end
+
+    it 'does not re-import the same gifts multiple times but adds new gifts in existing donor accounts' do
+      expect { @tnt_import.import  }.to change(Donation, :count).from(0).to(2)
+
+      expect(DonorAccount.first.account_number).to eq('1')
+
+      import2 = create(:tnt_import_gifts_added, account_list: @account_list)
+      tnt_import2 = TntImport.new(import2)
+
+      expect { tnt_import2.import  }.to change(Donation, :count).from(2).to(3)
+
+      donations = Donation.all.map { |d| d.attributes.symbolize_keys.slice(:donation_date, :amount) }
+      expect(donations).to include(donation_date: Date.new(2013, 11, 20), amount: 50)
+      expect(donations).to include(donation_date: Date.new(2013, 11, 21), amount: 25)
+      expect(donations).to include(donation_date: Date.new(2013, 11, 22), amount: 100)
+
+      contact = Contact.first
+      expect(contact.last_donation_date).to eq(Date.new(2013, 11, 22))
+      expect(contact.first_donation_date).to eq(Date.new(2013, 11, 20))
+      expect(contact.total_donations).to eq(175.0)
+
+      expect(contact.donor_accounts.count).to eq(1)
+      donor_account = contact.donor_accounts.first
+      expect(donor_account.account_number).to eq('1')
+      expect(donor_account.total_donations).to eq(175.0)
+    end
   end
 
   context '#import groups' do
