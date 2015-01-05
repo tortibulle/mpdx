@@ -1,8 +1,6 @@
 sudo: false
 cache: bundler
 language: ruby
-rvm:
-- 2.0.0
 services:
 - memcache
 - redis-server
