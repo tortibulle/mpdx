@@ -96,7 +96,7 @@ class HomeController < ApplicationController
       },
       contacts: {
         active: current_account_list.contacts
-                                    .where(status: ['Never Contacted', 'Contact for Appointment', ''])
+                                    .where(status: ['Never Contacted', 'Contact for Appointment', '', nil])
                                     .count,
         referrals: current_account_list.contacts
                                        .created_between(@start_date, @end_date)
