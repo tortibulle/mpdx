@@ -1,5 +1,4 @@
 class ContactsController < ApplicationController
-  respond_to :html, :js
   before_action :find_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals, :details, :referrals]
   before_action :setup_view_options, only: [:index]
   before_action :setup_filters, only: [:index, :show]
@@ -50,8 +49,6 @@ class ContactsController < ApplicationController
     @page_title = @contact.name
 
     @filtered_contacts = filtered_contacts
-
-    respond_with(@contact)
   end
 
   def details
@@ -115,6 +112,7 @@ class ContactsController < ApplicationController
         format.html { render action: 'edit' }
         format.js { render nothing: true }
       end
+      format.json { respond_with_bip(@contact) }
     end
   end
 

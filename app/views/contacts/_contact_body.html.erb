@@ -35,7 +35,12 @@
           </h1>
           <% if contact_exhibit.status.present? %>
             <div class="contact_status">
-              <%= _('Status: %{status}').localize % {status: contact_exhibit.status } %>
+              <%= _('Status:') %>
+              <%= best_in_place(contact_exhibit, :status,
+                                as: :select,
+                                value: contact.status,
+                                collection: contact.assignable_statuses.collect { |s| [_(s), s] },
+                                display_with: :_) %>
             </div>
           <% end %>
         </div>
@@ -48,18 +53,27 @@
                 <td class="meta_data"><%= contact_exhibit.donor_ids %></td>
               </tr>
             <% end %>
-            <% if contact_exhibit.pledge_as_currency.present? %>
-              <tr>
-                <td class="meta_name"><%= _('Commitment') %></td>
-                <td class="meta_data"><%= contact_exhibit.pledge_as_currency %></td>
-              </tr>
-            <% end %>
-            <% if contact_exhibit.send_newsletter.present? %>
-              <tr>
-                <td class="meta_name"><%= _('Newsletter') %> </td>
-                <td class="meta_data"><%= contact_exhibit.send_newsletter %></td>
-              </tr>
-            <% end %>
+            <tr>
+              <td class="meta_name"><%= _('Commitment') %></td>
+              <td class="meta_data"><%= best_in_place(contact_exhibit, :pledge_amount, value: contact.pledge_amount) %></td>
+            </tr>
+            <tr>
+              <td class="meta_name"><%= _('Frequency') %></td>
+              <td class="meta_data">
+                <%= best_in_place(contact_exhibit, :pledge_frequency, value: contact.pledge_frequency,
+                    as: :select,
+                    collection: [['','']] + Contact.pledge_frequencies.invert.to_a) %></td>
+            </tr>
+            <tr>
+              <td class="meta_name"><%= _('Newsletter') %> </td>
+              <td class="meta_data">
+                <%= best_in_place(contact_exhibit, :send_newsletter,
+                                  as: :select,
+                                  value: contact.send_newsletter,
+                                  collection: [['','']] + contact.assignable_send_newsletters.collect { |s| [_(s), s] },
+                                  display_with: :_) %>
+              </td>
+            </tr>
           </table>
         </div>
         <div class="cols col_30">

@@ -7,7 +7,6 @@ msgid ""
 msgstr ""
 "Project-Id-Version: version 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-22 07:22-0700\n"
 "PO-Revision-Date: 2012-10-10 17:24-0500\n"
 "Last-Translator: Josh Starcher <josh.starcher@gmail.com>\n"
 "Language-Team: Spanish\n"
@@ -22,9 +21,6 @@ msgid " For %{contact}"
 msgstr ""
 
 msgid " It has been more than 6 months since you have called these important financial partners."
-msgstr ""
-
-msgid " and "
 msgstr ""
 
 msgid "\"Displaying #{b}%{from}#{sp}-#{sp}%{to}#{eb} of #{b}%{count}#{eb}\""
@@ -108,6 +104,24 @@ msgstr ""
 "<p> Conecte fácilmente todos tus contactos, calendarios, comunicaciones y conversaciones sociales. MPDX identificará automáticamente perfiles sociales del contacto en Facebook, LinkedIn, y </p> \n"
 "<p> Twitter para que se conecte, escuchar y participar con sus socios MINISTERIO. </p>"
 
+msgid ""
+"<p>MPDX can sync your active contacts to Google so you only have to keep your contacts up to date in\n"
+"                     one place.  (Active contacts are those whose status field indicates that they are partners or in the\n"
+"                     MPD process.)</p>\n"
+"\n"
+"                     <p>This will synchronize existing contact information as well as future updates and deletions to your contact\n"
+"                     info to and from MPDX and Google. Once the sync is active, changes in either Google or MPDX will be\n"
+"                     reflected in the other system. If you make a change in both places between syncs, MPDx changes\n"
+"                     will take precedence.</p>\n"
+"\n"
+"                     <p>If make a contact inactive in MPDX e.g. by selecting \"Not Interested\" for its status, the contact info will not\n"
+"                     be deleted in Google, but will be labeled \"Inactive\" so you can easily find those no-longer-synced contacts\n"
+"                     and delete them if you choose.</p>\n"
+"\n"
+"                     <p>If you delete a contact in Google contacts that is active in MPDX, you must also go in to MPDX and hide\n"
+"                     the contact, making it inactive in MPDX. Otherwise, it will get regenerated in Google once it syncs again.</p>"
+msgstr ""
+
 msgid "About you"
 msgstr ""
 
@@ -126,6 +140,9 @@ msgstr "Acciones"
 #, fuzzy
 msgid "Active Contacts"
 msgstr "Añadir este contacto"
+
+msgid "Add"
+msgstr ""
 
 msgid "Add %{network} Account"
 msgstr "Añadir %{network} Cuenta"
@@ -197,6 +214,19 @@ msgstr "Añadir dirección de correo electrónico"
 msgid "Add another Account"
 msgstr "Añadir otra cuenta"
 
+#, fuzzy
+msgid "Add contact"
+msgstr "Añadir este contacto"
+
+msgid "Add contact(s) to newsletter list"
+msgstr ""
+
+msgid "Add contacts with the following status(es):"
+msgstr ""
+
+msgid "Add contacts with the following tag(s):"
+msgstr ""
+
 msgid "Add some now"
 msgstr ""
 
@@ -219,6 +249,9 @@ msgstr ""
 
 msgid "All"
 msgstr "Todos"
+
+msgid "All Inactive"
+msgstr ""
 
 msgid "Always current. Contacts with status: Never Contacted, Contact for Appointment, or none."
 msgstr ""
@@ -247,6 +280,12 @@ msgstr ""
 msgid "Api Key"
 msgstr "Api Key"
 
+msgid "Appeal"
+msgstr ""
+
+msgid "Appeals"
+msgstr ""
+
 msgid "Apply Filters"
 msgstr ""
 
@@ -270,6 +309,11 @@ msgstr "¿Está seguro que desea eliminar esta conexión?"
 
 msgid "Are you sure you want to disable Google Calendar integration?"
 msgstr ""
+
+#, fuzzy
+#, fuzzy
+msgid "Are you sure you want to disable Google Contacts sync?"
+msgstr "¿Está seguro que desea eliminar esta conexión?"
 
 msgid "Are you sure you want to merge the selected contacts? This action cannot be undone!"
 msgstr "¿Estás seguro?"
@@ -518,10 +562,25 @@ msgstr ""
 msgid "Create"
 msgstr ""
 
+msgid "Create \"Appointment\" task"
+msgstr ""
+
+msgid "Create \"Setup Giving\" task"
+msgstr ""
+
+msgid "Create \"Thank\" task"
+msgstr ""
+
+msgid "Create New Appeal"
+msgstr ""
+
 msgid "Create a task"
 msgstr ""
 
 msgid "Create one now."
+msgstr ""
+
+msgid "Create task with selected:"
 msgstr ""
 
 msgid "Cultivate"
@@ -551,6 +610,9 @@ msgstr ""
 msgid "Default Account List"
 msgstr ""
 
+msgid "Defaults to contact's primary address"
+msgstr ""
+
 msgid "Delete"
 msgstr ""
 
@@ -573,10 +635,16 @@ msgstr ""
 msgid "Disable Gmail Integration"
 msgstr ""
 
+msgid "Disable Google Contacts integration"
+msgstr ""
+
 msgid "Divorced"
 msgstr ""
 
 msgid "Donation History"
+msgstr ""
+
+msgid "Donation(s)"
 msgstr ""
 
 msgid "Donations"
@@ -605,6 +673,9 @@ msgid "Dr."
 msgstr ""
 
 msgid "Due Date"
+msgstr ""
+
+msgid "Due date"
 msgstr ""
 
 msgid "Early adopter"
@@ -657,10 +728,16 @@ msgstr ""
 msgid "Enable Gmail Integration"
 msgstr ""
 
+msgid "Enable Google Contacts Integration"
+msgstr ""
+
 msgid "Engaged"
 msgstr ""
 
 msgid "Enter a name"
+msgstr ""
+
+msgid "Envelope Name Line"
 msgstr ""
 
 msgid "Error Saving!"
@@ -707,6 +784,9 @@ msgstr ""
 msgid "Fortnightly"
 msgstr ""
 
+msgid "Frequency"
+msgstr ""
+
 msgid "Gender:"
 msgstr ""
 
@@ -719,7 +799,16 @@ msgstr ""
 msgid "Gmail integration has been enabled."
 msgstr ""
 
+msgid "Goal"
+msgstr ""
+
 msgid "Good news! You don't have any pending tasks."
+msgstr ""
+
+msgid "Google Contacts integration"
+msgstr ""
+
+msgid "Google Contacts sync has been enabled."
 msgstr ""
 
 msgid "Google account needs to be refreshed"
@@ -754,6 +843,11 @@ msgstr ""
 
 msgid "Hide"
 msgstr ""
+
+#, fuzzy
+#, fuzzy
+msgid "Hide Contact"
+msgstr "Añadir este contacto"
 
 #, fuzzy
 msgid "Hide Contacts"
@@ -806,6 +900,15 @@ msgid "Invalid Username/Password Combination. Please update your information."
 msgstr ""
 
 msgid "It has been more than a year since you have thanked these important financial partners."
+msgstr ""
+
+msgid "It looks like you were adding a task. If you leave before submitting, your changes will be lost."
+msgstr ""
+
+msgid "It looks like you were adding some referrals. If you leave before submitting, your changes will be lost."
+msgstr ""
+
+msgid "It looks like you were editting a task. If you leave before submitting, your changes will be lost."
 msgstr ""
 
 msgid "Jr."
@@ -865,6 +968,19 @@ msgstr ""
 msgid "Loading"
 msgstr ""
 
+msgid "Loading contact history..."
+msgstr ""
+
+msgid "Loading contact tasks..."
+msgstr ""
+
+msgid "Loading contacts..."
+msgstr ""
+
+#, fuzzy
+msgid "Location"
+msgstr "Acción"
+
 msgid "Log Task"
 msgstr ""
 
@@ -910,6 +1026,9 @@ msgid "MPDX is currently downloading your data from the donation system. This me
 msgstr ""
 
 msgid "MPDX is currently importing your contacts from %{source}. You will receive an email when the import is complete."
+msgstr ""
+
+msgid "MPDX is now synchronizing your active contacts with your Google Contacts."
 msgstr ""
 
 msgid "MPDX is now synchronizing your history with your Gmail account."
@@ -1061,6 +1180,9 @@ msgid "Newsletter"
 msgstr ""
 
 msgid "Newsletter Recipients"
+msgstr ""
+
+msgid "Newsletter type"
 msgstr ""
 
 #, fuzzy
@@ -1219,9 +1341,6 @@ msgstr ""
 msgid "Please Wait"
 msgstr ""
 
-msgid "Please choose a file that ends with .xml"
-msgstr ""
-
 msgid "Please choose your preferred <br/> method of logging in:"
 msgstr ""
 
@@ -1232,9 +1351,6 @@ msgid ""
 msgstr ""
 
 msgid "Please watch this video to learn how to export from TNT in the specific format for MPDx."
-msgstr ""
-
-msgid "Please watch this video to see how to properly export from TntMPD."
 msgstr ""
 
 msgid "Pledge Amount"
@@ -1384,7 +1500,19 @@ msgstr ""
 msgid "See All"
 msgstr ""
 
+msgid "Select all"
+msgstr ""
+
 msgid "Select all duplicates"
+msgstr ""
+
+msgid "Select all that have donated"
+msgstr ""
+
+msgid "Select all that have not donated"
+msgstr ""
+
+msgid "Select none"
 msgstr ""
 
 msgid "Semi-Annual"
@@ -1456,7 +1584,7 @@ msgstr ""
 msgid "Status Update"
 msgstr ""
 
-msgid "Status: %{status}"
+msgid "Status:"
 msgstr ""
 
 msgid "Street Address"
@@ -1527,14 +1655,16 @@ msgstr ""
 msgid "The connection to your LinkedIn account needs to be renewed."
 msgstr ""
 
-msgid "The file you uploaded is not a valid Tnt export. %{link}"
-msgstr ""
-
 msgid ""
 "The link between MPDX and your Google account has stopped working. If you'd like to continue to have MPDX\n"
 "  automatically sync with your Google account, please go to %{link}\n"
 "  and click the 'Refresh Google Account' button.  After that, you'll need to manually re-enable any integrations\n"
 "  that you had set already."
+msgstr ""
+
+msgid ""
+"The link between MPDX and your Google account stopped working. Click \"Refresh Google Account\" to re-enable it.\n"
+"                                     After that, you'll need to manually re-enable any integrations that you had set already."
 msgstr ""
 
 msgid ""
@@ -1547,6 +1677,9 @@ msgid "The link to your facebook account needs to be refreshed. <a href=\"/auth/
 msgstr ""
 
 msgid "The link to your facebook account needs to be refreshed. Click here to re-connect to facebook."
+msgstr ""
+
+msgid "The link to your google account needs to be refreshed. Click here to re-connect to google."
 msgstr ""
 
 msgid ""
@@ -1625,6 +1758,9 @@ msgid "Unknown"
 msgstr ""
 
 msgid "Unresponsive"
+msgstr ""
+
+msgid "Update contact(s) status to"
 msgstr ""
 
 msgid "Visit Mobile Version"
@@ -1708,6 +1844,9 @@ msgstr ""
 msgid "You just merged %{count} contacts"
 msgstr ""
 
+msgid "You must specify a TntMPD .xml export file to upload to MPDX (see video linked below for more info)."
+msgstr ""
+
 msgid "You need to be connected to an organization to use MPDX."
 msgstr ""
 
@@ -1744,6 +1883,9 @@ msgstr ""
 msgid "click here to let us know"
 msgstr ""
 
+msgid "close"
+msgstr ""
+
 msgid "continue"
 msgstr ""
 
@@ -1762,30 +1904,5 @@ msgstr ""
 msgid "to"
 msgstr ""
 
-#~ msgid "Add Person"
-#~ msgstr "Añadir persona"
-#~ msgid ""
-#~ "All <strong>%{this_page}</strong> conversations on this page are selected. <a "
-#~ "data-behavior=\"select_all\">Select all <strong>%{total}</strong> contacts</a>"
-#~ msgstr ""
-#~ "Las <strong>%{this_page}</strong> conversations de seta página son seleccionad"
-#~ "os. <a data-behavior=\"select_all\">Seleccionar todos <strong>%{total}</strong> "
-#~ "contacts</a>"
-#~ msgid ""
-#~ "All <strong>%{total}</strong> contacts are selected. <a data-behavior=\"clear_s"
-#~ "election\">Clear selection</a>"
-#~ msgstr ""
-#~ "Todos los <strong>%{total}</strong> contactos están seleccionados. <a data-beh"
-#~ "avior=\"clear_selection\">Borrar selección</a>"
-#~ msgid ""
-#~ "%{contacts_count:referrals} couldn't be added because they were missing the fi"
-#~ "rst and last name."
-#~ msgstr ""
-#~ "%{contacts_count:referrals} no se puede agregar porque les faltaba el nombre y"
-#~ " el apellido."
-#~ msgid "Active/Upcoming"
-#~ msgstr "Activo/Upcoming"
-#~ msgid "Add Tag"
-#~ msgstr "Añadir etiqueta"
-#~ msgid "Call for Appointment"
-#~ msgstr "Llame para cita"
+msgid "with invalid addresses"
+msgstr ""

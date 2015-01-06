@@ -42,6 +42,7 @@
 //= require research
 //= require peek
 //= require peek/views/performance_bar
+//= require best_in_place
 
 //angular
 //= require angular

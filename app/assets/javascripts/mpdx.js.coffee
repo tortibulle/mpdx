@@ -1,4 +1,8 @@
 $ ->
+
+  # Activating Best In Place
+  $('.best_in_place').best_in_place()
+
   $(document).on 'change', '#per_page', ->
     params = $.set_param('per_page', $(this).val())
     params = $.set_param('page', 1, params)

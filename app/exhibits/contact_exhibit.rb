@@ -41,7 +41,7 @@ class ContactExhibit < DisplayCase::Exhibit
   end
 
   def pledge_frequency
-    Contact.pledge_frequencies[to_model.pledge_frequency]
+    Contact.pledge_frequencies[to_model.pledge_frequency || 1.0]
   end
 
   def avatar(size = :square)
@@ -68,14 +68,13 @@ class ContactExhibit < DisplayCase::Exhibit
     end
   end
 
-  def pledge_as_currency
-    return unless pledge_amount.present?
-    if pledge_amount % 1 > 0
-      pledge = @context.number_to_currency(pledge_amount, precision: 2)
+  def pledge_amount
+    return unless to_model.pledge_amount.present?
+    if to_model.pledge_amount % 1 > 0
+      pledge = @context.number_to_currency(to_model.pledge_amount, precision: 2)
     else
-      pledge = @context.number_to_currency(pledge_amount, precision: 0)
+      pledge = @context.number_to_currency(to_model.pledge_amount, precision: 0)
     end
-    pledge += " #{Contact.pledge_frequencies[to_model.pledge_frequency || 1.0]}"
     pledge
   end
 
