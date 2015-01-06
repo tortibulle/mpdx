@@ -62,7 +62,7 @@
               <td class="meta_data">
                 <%= best_in_place(contact_exhibit, :pledge_frequency, value: contact.pledge_frequency,
                     as: :select,
-                    collection: [['','']] + Contact.pledge_frequencies.invert.to_a) %></td>
+                    collection: [['','']] + Contact.pledge_frequencies.to_a) %></td>
             </tr>
             <tr>
               <td class="meta_name"><%= _('Newsletter') %> </td>

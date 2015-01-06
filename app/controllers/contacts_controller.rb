@@ -20,9 +20,9 @@ class ContactsController < ApplicationController
     @filtered_contacts = filtered_contacts
     @appeals = current_account_list.appeals
 
-    respond_to do |wants|
+    respond_to do |format|
 
-      wants.html do
+      format.html do
         @contacts = @filtered_contacts.includes([{ primary_person: [:facebook_account, :primary_picture] },
                                                  :tags, :primary_address,
                                                  { people: :primary_phone_number }])
@@ -30,7 +30,7 @@ class ContactsController < ApplicationController
         @contacts = @contacts.page(@view_options[:page].to_i > 0 ? @view_options[:page].to_i : 1).per_page(@view_options[:per_page].to_i > 0 ? @view_options[:per_page].to_i : 25)
       end
 
-      wants.csv do
+      format.csv do
         @contacts = @filtered_contacts.includes(:primary_person, :primary_address, people: [:email_addresses, :phone_numbers])
         @headers = ['Contact Name', 'First Name', 'Last Name', 'Spouse First Name', 'Greeting',
                     'Envelope Greeting', 'Mailing Street Address', 'Mailing City', 'Mailing State',
@@ -52,9 +52,9 @@ class ContactsController < ApplicationController
   end
 
   def details
-    respond_to do |wants|
-      wants.html { redirect_to @contact }
-      wants.js
+    respond_to do |format|
+      format.html { redirect_to @contact }
+      format.js
     end
   end
 
@@ -254,9 +254,9 @@ class ContactsController < ApplicationController
   def find_duplicates
     @page_title = _('Find Duplicates')
 
-    respond_to do |wants|
-      wants.html {}
-      wants.js do
+    respond_to do |format|
+      format.html {}
+      format.js do
         # Find sets of people with the same name
         sql = "SELECT array_to_string(array_agg(people.id), ',')
                FROM people
@@ -293,9 +293,9 @@ class ContactsController < ApplicationController
       contact.update_attributes(not_duplicated_with: not_duplicated_with)
     end
 
-    respond_to do |wants|
-      wants.html { redirect_to :back }
-      wants.js { render nothing: true }
+    respond_to do |format|
+      format.html { redirect_to :back }
+      format.js { render nothing: true }
     end
   end
 
