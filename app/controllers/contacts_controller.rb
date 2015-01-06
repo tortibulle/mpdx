@@ -59,7 +59,6 @@ class ContactsController < ApplicationController
   end
 
   def referrals
-    respond_with(@contact)
   end
 
   def new
