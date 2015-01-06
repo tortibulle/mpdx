@@ -54,7 +54,7 @@ class ContactsController < ApplicationController
   def details
     respond_to do |wants|
       wants.html { redirect_to @contact }
-      wants.js { respond_with(@contact) }
+      wants.js
     end
   end
 
