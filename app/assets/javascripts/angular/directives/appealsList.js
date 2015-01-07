@@ -170,6 +170,10 @@ angular.module('mpdxApp')
                 };
 
                 $scope.percentComplete = function(donationsTotal, goal){
+                  goal = Number(goal);
+                  if(goal === 0){
+                    return 0;
+                  }
                   return parseInt((donationsTotal / goal) * 100);
                 };
 
