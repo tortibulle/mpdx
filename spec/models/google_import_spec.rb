@@ -107,6 +107,64 @@ describe GoogleImport do
     end
   end
 
+  describe 'spouse import' do
+    def stub_g_contacts_with_spouse(spouse)
+      file = 'spec/fixtures/google_contacts.json'
+      json = JSON.parse(File.new(Rails.root.join(file)).read)
+      json['feed']['entry'][0]['gContact$relation'] = [{ 'rel' => 'spouse', '$t' => spouse }]
+      stub_request(:get, 'https://www.google.com/m8/feeds/contacts/default/full?alt=json&max-results=100000&v=3')
+        .with(headers: { 'Authorization' => "Bearer #{@account.token}" })
+        .to_return(body: json.to_json)
+    end
+
+    it 'does not import a spouse if none specified' do
+      @google_import.import
+      contact = Contact.find_by_name('Google, John')
+      expect(contact.people.count).to eq(1)
+    end
+
+    def import_and_expect_names(contact_name, person1_name, person2_name)
+      @google_import.import
+      contact = Contact.find_by_name(contact_name)
+      people_names = contact.people.map { |p| [p.first_name, p.last_name] }
+      expect(people_names.size).to eq(2)
+      expect(people_names).to include(person1_name)
+      expect(people_names).to include(person2_name)
+    end
+
+    it 'imports a spouse with a first name and assumes same last name' do
+      stub_g_contacts_with_spouse('Jane')
+      import_and_expect_names('Google, John and Jane', %w(John Google), %w(Jane Google))
+    end
+
+    it 'imports a spouse with a different last name' do
+      stub_g_contacts_with_spouse('Jane Smith')
+      import_and_expect_names('Google, John and Jane (Smith)', %w(John Google), %w(Jane Smith))
+    end
+
+    it 'imports a spouse with a compound first name and a last name' do
+      stub_g_contacts_with_spouse('Mary Beth Smith')
+      import_and_expect_names('Google, John and Mary Beth (Smith)', %w(John Google), ['Mary Beth', 'Smith'])
+    end
+
+    it 'does not import spouse or change contact name if spouse person already exists in contact' do
+      @contact.update(name: 'Google, John')
+      john = create(:person, first_name: 'John', last_name: 'Google')
+      jane = create(:person, first_name: 'Jane', last_name: 'Google', middle_name: 'Already there')
+      @contact.people << john
+      @contact.people << jane
+
+      stub_g_contacts_with_spouse('Jane')
+      @google_import.import
+      expect(Contact.count).to eq(1)
+      contact = Contact.first
+      expect(contact).to eq(@contact)
+      expect(contact.people).to include(john)
+      expect(contact.people).to include(jane)
+      expect(contact.people.map(&:middle_name)).to include('Already there')
+    end
+  end
+
   describe 'overall import results' do
     def check_imported_data
       contacts = @account_list.contacts.where(name: 'Google, John')

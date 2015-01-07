@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: https://github.com/CruGlobal/google_contacts_api
-  revision: fd0d4afc36076a8df73445293fb1dd3f5f881ec0
+  revision: ca33225d3038ce7bfc5fb11531082aa6120f7f6a
   specs:
     google_contacts_api (0.5.0)
       activesupport
@@ -99,6 +99,9 @@ GEM
     aws_cf_signer (0.1.3)
     backports (3.6.4)
     bcrypt (3.1.9)
+    best_in_place (3.0.2)
+      actionpack (>= 3.2)
+      railties (>= 3.2)
     better_errors (2.0.0)
       coderay (>= 1.0.0)
       erubis (>= 2.6.6)
@@ -260,7 +263,7 @@ GEM
       multi_xml (>= 0.5.2)
     httpauth (0.2.1)
     httpclient (2.5.3.3)
-    i18n (0.6.11)
+    i18n (0.7.0)
     inflecto (0.0.2)
     iniparse (1.1.6)
     ipaddress (0.8.0)
@@ -306,7 +309,7 @@ GEM
       thin
     method_source (0.8.2)
     mime-types (1.25.1)
-    minitest (5.4.3)
+    minitest (5.5.0)
     mock_redis (0.13.2)
     momentjs-rails (2.8.3)
       railties (>= 3.1)
@@ -609,6 +612,7 @@ DEPENDENCIES
   angularjs-rails
   assignable_values (~> 0.5.3)
   awesome_print
+  best_in_place (~> 3.0.1)
   better_errors
   binding_of_caller
   bluepill

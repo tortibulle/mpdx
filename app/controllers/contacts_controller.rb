@@ -1,5 +1,4 @@
 class ContactsController < ApplicationController
-  respond_to :html, :js
   before_action :find_contact, only: [:show, :edit, :update, :add_referrals, :save_referrals, :details, :referrals]
   before_action :setup_view_options, only: [:index]
   before_action :setup_filters, only: [:index, :show]
@@ -21,9 +20,9 @@ class ContactsController < ApplicationController
     @filtered_contacts = filtered_contacts
     @appeals = current_account_list.appeals
 
-    respond_to do |wants|
+    respond_to do |format|
 
-      wants.html do
+      format.html do
         @contacts = @filtered_contacts.includes([{ primary_person: [:facebook_account, :primary_picture] },
                                                  :tags, :primary_address,
                                                  { people: :primary_phone_number }])
@@ -31,7 +30,7 @@ class ContactsController < ApplicationController
         @contacts = @contacts.page(@view_options[:page].to_i > 0 ? @view_options[:page].to_i : 1).per_page(@view_options[:per_page].to_i > 0 ? @view_options[:per_page].to_i : 25)
       end
 
-      wants.csv do
+      format.csv do
         @contacts = @filtered_contacts.includes(:primary_person, :primary_address, people: [:email_addresses, :phone_numbers])
         @headers = ['Contact Name', 'First Name', 'Last Name', 'Spouse First Name', 'Greeting',
                     'Envelope Greeting', 'Mailing Street Address', 'Mailing City', 'Mailing State',
@@ -50,19 +49,16 @@ class ContactsController < ApplicationController
     @page_title = @contact.name
 
     @filtered_contacts = filtered_contacts
-
-    respond_with(@contact)
   end
 
   def details
-    respond_to do |wants|
-      wants.html { redirect_to @contact }
-      wants.js { respond_with(@contact) }
+    respond_to do |format|
+      format.html { redirect_to @contact }
+      format.js
     end
   end
 
   def referrals
-    respond_with(@contact)
   end
 
   def new
@@ -115,6 +111,7 @@ class ContactsController < ApplicationController
         format.html { render action: 'edit' }
         format.js { render nothing: true }
       end
+      format.json { respond_with_bip(@contact) }
     end
   end
 
@@ -257,9 +254,9 @@ class ContactsController < ApplicationController
   def find_duplicates
     @page_title = _('Find Duplicates')
 
-    respond_to do |wants|
-      wants.html {}
-      wants.js do
+    respond_to do |format|
+      format.html {}
+      format.js do
         dups_finder = ContactDuplicatesFinder.new(current_account_list, current_user)
         @contact_sets, @people_sets = dups_finder.dup_contacts_then_people
       end
@@ -273,9 +270,9 @@ class ContactsController < ApplicationController
       contact.update_attributes(not_duplicated_with: not_duplicated_with)
     end
 
-    respond_to do |wants|
-      wants.html { redirect_to :back }
-      wants.js { render nothing: true }
+    respond_to do |format|
+      format.html { redirect_to :back }
+      format.js { render nothing: true }
     end
   end
 

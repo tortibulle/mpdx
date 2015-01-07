@@ -1,8 +1,5 @@
 class GoogleIntegrationsController < ApplicationController
-  respond_to :html, :js
-
   def show
-    respond_with google_integration
   end
 
   def update

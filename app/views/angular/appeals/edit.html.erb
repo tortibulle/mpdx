@@ -3,76 +3,76 @@
         <span id="ui-id-7" class="ui-dialog-title" ng-bind="appeal.name"></span>
         <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" title="close" ng-click="cancel()">
             <span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>
-            <span class="ui-button-text">close</span>
+            <span class="ui-button-text"><%= _('close') %></span>
         </button>
     </div>
     <div class="ui-dialog-content ui-widget-content">
         <form>
             <div class="form_wrapper">
                 <div class="field">
-                    <label>Name</label>
+                    <label><%= _('Name') %></label>
                     <input autofocus="autofocus" type="text" ng-model="appeal.name">
                 </div>
 
                 <div class="field">
-                    <label>Goal</label>
+                    <label><%= _('Goal') %></label>
                     <input type="text" ng-model="appeal.amount">
                 </div>
 
                 <div class="field" style="height: 400px; overflow-y: auto; display: block;">
-                    <label>Contacts</label>
+                    <label><%= _('Contacts') %></label>
                     <table style="width:100%;">
                         <thead style="font-weight: bold;">
                             <tr>
                                 <td style="width: 5px;"></td>
-                                <td style="text-align: center;">Contact</td>
-                                <td style="width:24%; text-align: center;">Donation(s)</td>
+                                <td style="text-align: center;"><%= _('Contact') %></td>
+                                <td style="width:24%; text-align: center;"><%= _('Donation(s)') %></td>
                                 <td style="width:4%;"></td>
                             </tr>
                         </thead>
                         <tbody>
                           <tr><td colspan="4">
-                            <a href="" ng-click="selectAll('all')">Select all</a> |
-                            <a href="" ng-click="selectAll('none')">Select none</a> |
-                            <a href="" ng-click="selectAll('donated')">Select all that have donated</a> |
-                            <a href="" ng-click="selectAll('!donated')">Select all that have not donated</a>
+                            <a href="" ng-click="selectAll('all')"><%= _('Select all') %></a> |
+                            <a href="" ng-click="selectAll('none')"><%= _('Select none') %></a> |
+                            <a href="" ng-click="selectAll('donated')"><%= _('Select all that have donated') %></a> |
+                            <a href="" ng-click="selectAll('!donated')"><%= _('Select all that have not donated') %></a>
                           </td></tr>
                           <tr ng-repeat="c in appeal.contacts | orderBy:contactName">
                               <td><input type="checkbox" ng-model="$parent.checkedContacts[c]"></td>
                               <td>{{contactName(c)}}</td>
                               <td><span ng-repeat="d in listDonations(c)" style="display:block;">{{d}}</span></td>
-                              <td><a class="ico ico_trash" href ng-click="deleteContact(c)">Delete</a></td>
+                              <td><a class="ico ico_trash" href ng-click="deleteContact(c)"><%= _('Delete') %></a></td>
                           </tr>
                           <tr><td colspan="4">
-                              <a href="" ng-click="selectAll('all')">Select all</a> |
-                              <a href="" ng-click="selectAll('none')">Select none</a> |
-                              <a href="" ng-click="selectAll('donated')">Select all that have donated</a> |
-                              <a href="" ng-click="selectAll('!donated')">Select all that have not donated</a>
+                              <a href="" ng-click="selectAll('all')"><%= _('Select all') %></a> |
+                              <a href="" ng-click="selectAll('none')"><%= _('Select none') %></a> |
+                              <a href="" ng-click="selectAll('donated')"><%= _('Select all that have donated') %></a> |
+                              <a href="" ng-click="selectAll('!donated')"><%= _('Select all that have not donated') %></a>
                           </td></tr>
                         </tbody>
                     </table>
-                    <span ng-show="!contacts">Loading contacts...</span>
+                    <span ng-show="!contacts"><%= _('Loading contacts...') %></span>
                     <div ng-show="contacts.length">
-                        <strong>Add contact</strong>
+                        <strong><%= _('Add contact') %></strong>
                         <select ng-model="newContact" ng-options="c.id as c.name for c in contacts">
                         </select>
-                        <button type="button" ng-click="addContact(newContact)">Add</button>
+                        <button type="button" ng-click="addContact(newContact)"><%= _('Add') %></button>
                     </div>
 
                     <div style="margin-top: 5px;">
-                        Create task with selected:  <select ng-model="taskType" ng-options="t as t for t in taskTypes">
+                        <%= _('Create task with selected:') %>  <select ng-model="taskType" ng-options="t as t for t in taskTypes">
                         </select>
-                        <button type="button" ng-click="createTask(taskType, checkedContacts)" ng-show="taskType">Create</button>
+                        <button type="button" ng-click="createTask(taskType, checkedContacts)" ng-show="taskType"><%= _('Create') %></button>
                     </div>
                 </div>
             </div>
             <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
                 <div class="ui-dialog-buttonset">
                     <button type="submit" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" ng-click="save()">
-                        <span class="ui-button-text">Save</span>
+                        <span class="ui-button-text"><%= _('Save') %></span>
                     </button>
                     <button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" ng-click="cancel()">
-                        <span class="ui-button-text">Cancel</span>
+                        <span class="ui-button-text"><%= _('Cancel') %></span>
                     </button>
                 </div>
             </div>

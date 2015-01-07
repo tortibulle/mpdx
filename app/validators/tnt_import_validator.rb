@@ -1,18 +1,9 @@
 class TntImportValidator < ActiveModel::Validator
   include ActionView::Helpers::UrlHelper
   def validate(import)
-    if import.file.file
-      tnt_import = TntImport.new(import)
-
-      xml = tnt_import.xml
-
-      # Make sure required columns are present
-      unless xml
-        import.errors[:base] << _('The file you uploaded is not a valid Tnt export. %{link}') %
-          { link: link_to(_('Please watch this video to see how to properly export from TntMPD.'), 'http://screencast.com/t/CU4y51KbRMkr', target: '_blank') }
-      end
-    else
-      import.errors[:base] << _('Please choose a file that ends with .xml')
+    # ImportUpload makes sure the file ends in .xml, we just need to to check that it's present here
+    unless import.file.present?
+      import.errors[:base] << _('You must specify a TntMPD .xml export file to upload to MPDX (see video linked below for more info).')
     end
   end
 end
