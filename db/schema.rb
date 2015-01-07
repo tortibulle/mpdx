@@ -559,6 +559,31 @@ ActiveRecord::Schema.define(version: 20150106174739) do
   add_index "messages", ["from_id"], name: "index_messages_on_from_id", using: :btree
   add_index "messages", ["to_id"], name: "index_messages_on_to_id", using: :btree
 
+  create_table "name_male_ratios", force: true do |t|
+    t.string   "name",       null: false
+    t.float    "male_ratio", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "name_male_ratios", ["name"], name: "index_name_male_ratios_on_name", unique: true, using: :btree
+
+  create_table "nicknames", force: true do |t|
+    t.string   "name",                               null: false
+    t.string   "nickname",                           null: false
+    t.string   "source"
+    t.integer  "num_merges",         default: 0,     null: false
+    t.integer  "num_not_duplicates", default: 0,     null: false
+    t.integer  "num_times_offered",  default: 0,     null: false
+    t.boolean  "suggest_duplicates", default: false, null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "nicknames", ["name", "nickname"], name: "index_nicknames_on_name_and_nickname", unique: true, using: :btree
+  add_index "nicknames", ["name"], name: "index_nicknames_on_name", using: :btree
+  add_index "nicknames", ["nickname"], name: "index_nicknames_on_nickname", using: :btree
+
   create_table "notification_preferences", force: true do |t|
     t.integer  "notification_type_id"
     t.integer  "account_list_id"
@@ -630,7 +655,7 @@ ActiveRecord::Schema.define(version: 20150106174739) do
   add_index "organizations", ["query_ini_url"], name: "index_organizations_on_query_ini_url", unique: true, using: :btree
 
   create_table "people", force: true do |t|
-    t.string   "first_name",                                       null: false
+    t.string   "first_name",                                         null: false
     t.string   "legal_first_name"
     t.string   "last_name"
     t.integer  "birthday_month"
@@ -644,23 +669,24 @@ ActiveRecord::Schema.define(version: 20150106174739) do
     t.string   "gender"
     t.string   "marital_status"
     t.text     "preferences"
-    t.integer  "sign_in_count",                    default: 0
+    t.integer  "sign_in_count",                      default: 0
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "master_person_id",                                 null: false
+    t.integer  "master_person_id",                                   null: false
     t.string   "middle_name"
     t.string   "access_token",          limit: 32
     t.string   "profession"
-    t.boolean  "deceased",                         default: false, null: false
+    t.boolean  "deceased",                           default: false, null: false
     t.boolean  "subscribed_to_updates"
-    t.boolean  "optout_enewletter",                default: false
-    t.boolean  "optout_enewsletter",               default: false
+    t.boolean  "optout_enewletter",                  default: false
+    t.boolean  "optout_enewsletter",                 default: false
     t.string   "occupation"
     t.string   "employer"
+    t.string   "not_duplicated_with",   limit: 2000
   end
 
   add_index "people", ["access_token"], name: "index_people_on_access_token", unique: true, using: :btree
