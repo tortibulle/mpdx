@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150106174739) do
+ActiveRecord::Schema.define(version: 20141230003854) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -132,16 +132,6 @@ ActiveRecord::Schema.define(version: 20150106174739) do
   add_index "appeal_contacts", ["appeal_id", "contact_id"], name: "index_appeal_contacts_on_appeal_id_and_contact_id", using: :btree
   add_index "appeal_contacts", ["appeal_id"], name: "index_appeal_contacts_on_appeal_id", using: :btree
   add_index "appeal_contacts", ["contact_id"], name: "index_appeal_contacts_on_contact_id", using: :btree
-
-  create_table "appeal_donations", force: true do |t|
-    t.integer  "appeal_id"
-    t.integer  "donation_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "appeal_donations", ["appeal_id", "donation_id"], name: "index_appeal_donations_on_appeal_id_and_donation_id", using: :btree
-  add_index "appeal_donations", ["donation_id"], name: "index_appeal_donations_on_donation_id", using: :btree
 
   create_table "appeals", force: true do |t|
     t.string   "name"
@@ -324,7 +314,6 @@ ActiveRecord::Schema.define(version: 20150106174739) do
     t.string   "payment_type"
     t.string   "channel"
     t.integer  "appeal_id"
-    t.decimal  "appeal_amount",          precision: 8, scale: 2
   end
 
   add_index "donations", ["appeal_id"], name: "index_donations_on_appeal_id", using: :btree
@@ -359,6 +348,34 @@ ActiveRecord::Schema.define(version: 20150106174739) do
   add_index "donor_accounts", ["organization_id", "account_number"], name: "index_donor_accounts_on_organization_id_and_account_number", unique: true, using: :btree
   add_index "donor_accounts", ["organization_id"], name: "index_donor_accounts_on_organization_id", using: :btree
   add_index "donor_accounts", ["total_donations"], name: "index_donor_accounts_on_total_donations", using: :btree
+
+  create_table "dup_people", id: false, force: true do |t|
+    t.integer "person_id"
+    t.integer "dup_person_id"
+    t.integer "nickname_id"
+    t.integer "priority"
+    t.boolean "check_genders"
+    t.integer "contact_id"
+  end
+
+  create_table "dup_ppl", id: false, force: true do |t|
+    t.integer "person_id"
+    t.integer "dup_person_id"
+    t.integer "nickname_id"
+    t.integer "priority"
+    t.boolean "check_genders"
+    t.text    "name_source"
+    t.text    "dup_name_source"
+  end
+
+  create_table "dup_ppl_by_contact_info", id: false, force: true do |t|
+    t.integer "person_id"
+    t.integer "dup_person_id"
+    t.boolean "check_genders"
+  end
+
+  add_index "dup_ppl_by_contact_info", ["dup_person_id"], name: "dup_ppl_by_contact_info_dup_person_id_idx", using: :btree
+  add_index "dup_ppl_by_contact_info", ["person_id"], name: "dup_ppl_by_contact_info_person_id_idx", using: :btree
 
   create_table "email_addresses", force: true do |t|
     t.integer  "person_id"
@@ -559,6 +576,31 @@ ActiveRecord::Schema.define(version: 20150106174739) do
   add_index "messages", ["from_id"], name: "index_messages_on_from_id", using: :btree
   add_index "messages", ["to_id"], name: "index_messages_on_to_id", using: :btree
 
+  create_table "name_male_ratios", force: true do |t|
+    t.string   "name",       null: false
+    t.float    "male_ratio", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "name_male_ratios", ["name"], name: "index_name_male_ratios_on_name", unique: true, using: :btree
+
+  create_table "nicknames", force: true do |t|
+    t.string   "name",                               null: false
+    t.string   "nickname",                           null: false
+    t.string   "source"
+    t.integer  "num_merges",         default: 0,     null: false
+    t.integer  "num_not_duplicates", default: 0,     null: false
+    t.integer  "num_times_offered",  default: 0,     null: false
+    t.boolean  "suggest_duplicates", default: false, null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "nicknames", ["name", "nickname"], name: "index_nicknames_on_name_and_nickname", unique: true, using: :btree
+  add_index "nicknames", ["name"], name: "index_nicknames_on_name", using: :btree
+  add_index "nicknames", ["nickname"], name: "index_nicknames_on_nickname", using: :btree
+
   create_table "notification_preferences", force: true do |t|
     t.integer  "notification_type_id"
     t.integer  "account_list_id"
@@ -630,7 +672,7 @@ ActiveRecord::Schema.define(version: 20150106174739) do
   add_index "organizations", ["query_ini_url"], name: "index_organizations_on_query_ini_url", unique: true, using: :btree
 
   create_table "people", force: true do |t|
-    t.string   "first_name",                                       null: false
+    t.string   "first_name",                                         null: false
     t.string   "legal_first_name"
     t.string   "last_name"
     t.integer  "birthday_month"
@@ -644,23 +686,23 @@ ActiveRecord::Schema.define(version: 20150106174739) do
     t.string   "gender"
     t.string   "marital_status"
     t.text     "preferences"
-    t.integer  "sign_in_count",                    default: 0
+    t.integer  "sign_in_count",                      default: 0
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "master_person_id",                                 null: false
+    t.integer  "master_person_id",                                   null: false
     t.string   "middle_name"
     t.string   "access_token",          limit: 32
     t.string   "profession"
-    t.boolean  "deceased",                         default: false, null: false
+    t.boolean  "deceased",                           default: false, null: false
     t.boolean  "subscribed_to_updates"
-    t.boolean  "optout_enewletter",                default: false
-    t.boolean  "optout_enewsletter",               default: false
+    t.boolean  "optout_enewsletter",                 default: false
     t.string   "occupation"
     t.string   "employer"
+    t.string   "not_duplicated_with",   limit: 2000
   end
 
   add_index "people", ["access_token"], name: "index_people_on_access_token", unique: true, using: :btree

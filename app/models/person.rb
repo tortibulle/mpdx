@@ -327,6 +327,10 @@ class Person < ActiveRecord::Base
         master_person.master_person_sources.where(organization_id: source.organization_id, remote_id: source.remote_id).first_or_initialize
       end
 
+      # Assume the winner has the nickname and the loser has the full name, and increment the times merged to
+      # track which nicknames are useful and to add new nicknames over time.
+      Nickname.increment_times_merged(other.first_name, first_name)
+
       other.reload
       other.destroy
     end
@@ -353,6 +357,11 @@ class Person < ActiveRecord::Base
 
   def to_person
     self
+  end
+
+  def not_same_as?(other)
+    not_duplicated_with.to_s.split(',').include?(other.id.to_s) ||
+      other.not_duplicated_with.to_s.split(',').include?(id.to_s)
   end
 
   private
