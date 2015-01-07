@@ -40,9 +40,13 @@ $ ->
         false
 
       $(document).on 'click', '[data-behavior=not_duplicates]', ->
+        # do last check here for 1 not after remove for 0 because remove seems to take time to update counter
+        last_duplicate_visible = $('.duplicate_set:visible').length == 1
         div = $(this).closest('.duplicate_set')
         div.fadeOut('fast')
         $('input', div).remove()
+        if last_duplicate_visible
+          location.reload(true)
 
     if $('#contacts_index')[0]?
 

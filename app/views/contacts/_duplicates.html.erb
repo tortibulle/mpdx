@@ -16,6 +16,7 @@
                         remote: true, method: :put, data: {behavior: 'not_duplicates'}) %>
           </div>
         <% end %>
+        <br/>
         <%= submit_tag _('Merge selected contacts'), class: 'btn desired_action' %>
       <% end %>
   <% elsif @people_sets.present? %>
@@ -33,6 +34,7 @@
                             remote: true, method: :put, data: {behavior: 'not_duplicates'}) %>
               </div>
           <% end %>
+          <br/>
           <%= submit_tag _('Merge selected people'), class: 'btn desired_action' %>
       <% end %>
   <% else %>
