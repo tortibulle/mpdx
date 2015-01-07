@@ -67,6 +67,50 @@ class PeopleController < ApplicationController
     end
   end
 
+  def merge_sets
+    merged_people_count = 0
+
+    params[:merge_sets].each do |ids|
+      ids = ids.split(',')
+      people = current_account_list.people.where(id: ids)
+      next if people.length <= 1
+      merged_people_count += people.length
+
+      # We assume the winner is the first in the contact set. That will be the contact with the more casual nickname.
+      winner = people.find { |person| person.id.to_s == ids[0] }
+
+      Person.transaction do
+        (people - [winner]).each do |loser|
+          winner.merge(loser)
+        end
+      end
+    end if params[:merge_sets].present?
+    redirect_to :back, notice: _('You just merged %{count} people').localize % { count: merged_people_count }
+  end
+
+  def not_duplicates
+    ids = params[:ids].split(',')
+    people = current_account_list.people.where(id: ids)
+
+    people.each do |person|
+      not_duplicated_with = (person.not_duplicated_with.to_s.split(',') + params[:ids].split(',') - [person.id.to_s]).uniq.join(',')
+      person.update(not_duplicated_with: not_duplicated_with)
+    end
+
+    # Increment counters for the nicknames to track which nicknames are useful. We assume the first id is the nickname,
+    # which is how the find duplicates page does it.
+    first_person = people.find { |person| person.id == ids[0].to_i }
+    other_people = people.select { |person| person.id != first_person.id }
+    other_people.each do |other_person|
+      Nickname.increment_not_duplicates(other_person.first_name, first_person.first_name)
+    end
+
+    respond_to do |wants|
+      wants.html { redirect_to :back }
+      wants.js { render nothing: true }
+    end
+  end
+
   private
 
   def find_person
