@@ -72,7 +72,11 @@ angular.module('mpdxApp')
                                 }else{
                                     var str = [];
                                     angular.forEach(donations, function(d){
+                                      if(_.isNull(d.appeal_amount) || _.isEmpty(d.appeal_amount)){
                                         str.push(d.donation_date + ' - $' + $scope.formatNumber(d.amount));
+                                      }else{
+                                        str.push(d.donation_date + ' - $' + $scope.formatNumber(d.appeal_amount));
+                                      }
                                     });
                                     return str;
                                 }
@@ -154,18 +158,19 @@ angular.module('mpdxApp')
                 };
 
                 $scope.donationTotal = function(donations){
-                    donations = _.flatten(donations, 'amount');
-                    return donations.reduce(function(pv, cv) { return Number(pv) + Number(cv); }, 0);
+                  var sum = 0;
+                  angular.forEach(donations, function(d){
+                    if(_.isNull(d.appeal_amount) || _.isEmpty(d.appeal_amount)){
+                      sum += Number(d.amount);
+                    }else{
+                      sum += Number(d.appeal_amount);
+                    }
+                  });
+                  return sum;
                 };
 
-                $scope.percentComplete = function(donations, total){
-                    total = Number(total);
-                    if(total === 0){
-                        return 0;
-                    }
-                    donations = _.flatten(donations, 'amount');
-                    var sum = donations.reduce(function(pv, cv) { return pv + Number(cv); }, 0);
-                    return parseInt((sum / total) * 100);
+                $scope.percentComplete = function(donationsTotal, goal){
+                  return parseInt((donationsTotal / goal) * 100);
                 };
 
                 $scope.newAppeal = function(){

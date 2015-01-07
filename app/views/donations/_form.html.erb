@@ -37,6 +37,12 @@
                    :include_blank => true %>
     </div>
 
+    <div class="field">
+      <%= f.label :appeal_amount, _('Appeal Amount') %>
+      <%= f.text_field :appeal_amount %>
+      <br>Leave empty to use full donation amount
+    </div>
+
     <% if current_account_list.multiple_designations %>
       <div class="field">
         <%= f.label :designation_account_id, _('Designation Account') %>

@@ -15,7 +15,7 @@
 
             <td>
                 <div class="appealThermometer">
-                    <div class="level" ng-style="{'width': percentComplete(appeal.donations, appeal.amount) + '%'}">{{percentComplete(appeal.donations, appeal.amount)}}%
+                    <div class="level" ng-style="{'width': percentComplete(donationTotal(appeal.donations), appeal.amount) + '%'}">{{percentComplete(donationTotal(appeal.donations), appeal.amount)}}%
                     </div>
                 </div>
             </td>
