@@ -54,6 +54,5 @@ describe EmailAddress do
       person.email_addresses.first.email.should == email
       person.email_addresses.length.should == 1
     end
-
   end
 end
