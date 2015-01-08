@@ -50,24 +50,41 @@ namespace :mpdx do
     merge_donor_accounts
   end
 
-  task address_cleanup: :environment do
-    def merge_addresses(contact)
-      addresses = contact.addresses.order('addresses.created_at')
-      return unless addresses.length > 1
+  def merge_addresses(addressable)
+    addresses = addressable.addresses.order('addresses.created_at')
+    return unless addresses.length > 1
 
-      addresses.reload
-      addresses.each do |address|
-        other_address = addresses.find { |a| a.equal_to?(address) && a.id != address.id }
-        next unless other_address
-        address.merge(other_address)
-        merge_addresses(contact)
-        return
-      end
+    addresses.reload
+    addresses.each do |address|
+      other_address = addresses.find { |a| a.equal_to?(address) && a.id != address.id }
+      next unless other_address
+      address.merge(other_address)
+      merge_addresses(addressable)
+      return
     end
+  end
 
-    address_query = "addresses.id is not null AND (addresses.country is null or addresses.country = 'United States' or addresses.country = '' or addresses.country = 'United States of America')"
-    Contact.includes(:addresses).where(address_query).find_each do |c|
+  task address_cleanup: :environment do
+    us_address = "addresses.id is not null AND (addresses.country is null or addresses.country = 'United States' or addresses.country = '' or addresses.country = 'United States of America')"
+    Contact.joins(:addresses).where(us_address).find_each do |c|
       merge_addresses(c)
+    end
+  end
+
+  # We had an organization, DiscipleMakers with a lot of duplicate addresses in its contacts and donor
+  # accounts due to a difference in how their data server donor import worked and a previous iteration of
+  # MPDX accepting duplicate addresses there. This will merge dup addresses in their donor accounts and
+  # contacts.
+  task :address_cleanup_organization, [:org_name] => :environment do |_task, args|
+    org = Organization.find_by_name(args[:org_name])
+    next unless org
+    org.donor_accounts.each { |d| merge_addresses(d) }
+
+    account_lists = AccountList.joins(:users)
+                      .joins('INNER JOIN person_organization_accounts ON person_organization_accounts.id = people.id')
+                      .where( {organization_id: org.id})
+    account_lists.each do |account_list|
+      account_list.contacts.each { |c| merge_addresses(c) }
     end
   end
 
