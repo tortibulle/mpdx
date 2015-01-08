@@ -1,5 +1,7 @@
 class Contact < ActiveRecord::Base
   include AddressMethods
+  include Async # To allow batch processing of address merges
+  include Sidekiq::Worker
   acts_as_taggable
 
   has_paper_trail on: [:destroy, :update],
@@ -327,18 +329,6 @@ class Contact < ActiveRecord::Base
 
   def merge(other)
     ContactMerge.new(self, other).merge
-  end
-
-  def merge_addresses
-    ordered_addresses = addresses.order('created_at desc')
-    ordered_addresses.reload
-    ordered_addresses.each do |address|
-      other_address = ordered_addresses.find { |a| a.id != address.id && a.equal_to?(address) }
-      next unless other_address
-      address.merge(other_address)
-      merge_addresses
-      return
-    end
   end
 
   def merge_people
