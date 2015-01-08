@@ -82,7 +82,7 @@ namespace :mpdx do
 
     account_lists = AccountList.joins(:users)
                       .joins('INNER JOIN person_organization_accounts ON person_organization_accounts.id = people.id')
-                      .where(organization_id: org.id)
+                      .where(person_organization_accounts: { organization_id: org.id })
     account_lists.each do |account_list|
       account_list.contacts.each { |c| merge_addresses(c) }
     end
