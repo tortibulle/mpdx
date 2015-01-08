@@ -316,6 +316,11 @@ describe Contact do
       contact.merge(loser_contact)
       expect(contact.last_donation_date).to eq(Date.parse('2010-01-01'))
     end
+
+    it 'calls merge_people for the winner' do
+      expect(contact).to receive(:merge_people)
+      contact.merge(loser_contact)
+    end
   end
 
   context '#destroy' do
@@ -428,6 +433,45 @@ describe Contact do
       primary.update_attributes(last_name: '')
       contact.reload
       expect(contact.envelope_greeting).to eq('Fredrick & Loraine Doe')
+    end
+  end
+
+  context '#merge_people' do
+    it 'merges people with the same trimmed first and last name case insensitive' do
+      matches = {
+        { first_name: 'John', last_name: 'Doe' } => { first_name: 'John', last_name: 'Doe' },
+        { first_name: 'John ', last_name: 'Doe ' } => { first_name: 'John', last_name: 'Doe' },
+        { first_name: 'john', last_name: 'doe' } => { first_name: 'JOHN', last_name: 'Doe' },
+        { first_name: 'joHn ', last_name: 'dOe' } => { first_name: ' JOHN', last_name: ' Doe' }
+      }
+      matches.each do |person_attrs1, person_attrs2|
+        Person.destroy_all
+        contact.people << create(:person, person_attrs1)
+        contact.people << create(:person, person_attrs2)
+        expect {
+          contact.merge_people
+        }.to change(Person, :count).from(2).to(1)
+      end
+
+      non_matches = {
+        { first_name: 'Jane', last_name: 'Doe' } => { first_name: 'John', last_name: 'Doe' }
+      }
+      non_matches.each do |person_attrs1, person_attrs2|
+        Person.destroy_all
+        contact.people << create(:person, person_attrs1)
+        contact.people << create(:person, person_attrs2)
+        expect {
+          contact.merge_people
+        }.to_not change(Person, :count).from(2)
+      end
+    end
+
+    it 'does not error but merges if last name is nil (first name cannot be blank)' do
+      contact.people << create(:person, last_name: nil)
+      contact.people << create(:person, last_name: nil)
+      expect {
+        contact.merge_people
+      }.to change(Person, :count).from(2).to(1)
     end
   end
 end

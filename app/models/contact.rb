@@ -349,8 +349,8 @@ class Contact < ActiveRecord::Base
       next if merged_people.include?(person)
 
       other_people = people.select { |p|
-        p.first_name == person.first_name &&
-        p.last_name == person.last_name &&
+        p.first_name.to_s.strip.downcase == person.first_name.to_s.strip.downcase &&
+        p.last_name.to_s.strip.downcase == person.last_name.to_s.strip.downcase &&
         p.id != person.id
       }
       next unless other_people
