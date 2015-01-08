@@ -438,7 +438,7 @@ describe Contact do
         { first_name: 'John', last_name: 'Doe' } => { first_name: 'John', last_name: 'Doe' },
         { first_name: 'John ', last_name: 'Doe ' } => { first_name: 'John', last_name: 'Doe' },
         { first_name: 'john', last_name: 'doe' } => { first_name: 'JOHN', last_name: 'Doe' },
-        { first_name: 'joHn ', last_name: 'dOe' } => { first_name: ' JOHN', last_name: ' Doe' },
+        { first_name: 'joHn ', last_name: 'dOe' } => { first_name: ' JOHN', last_name: ' Doe' }
       }
       matches.each do |person_attrs1, person_attrs2|
         Person.destroy_all
@@ -460,6 +460,14 @@ describe Contact do
           contact.merge_people
         }.to_not change(Person, :count).from(2)
       end
+    end
+
+    it 'does not error but merges if last name is nil (first name cannot be blank)' do
+      contact.people << create(:person, last_name: nil)
+      contact.people << create(:person, last_name: nil)
+      expect {
+        contact.merge_people
+      }.to change(Person, :count).from(2).to(1)
     end
   end
 end
