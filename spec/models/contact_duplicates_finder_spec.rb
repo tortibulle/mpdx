@@ -471,30 +471,52 @@ describe ContactDuplicatesFinder do
       expect_contact_set
     end
 
-    it 'finds duplicates by matching primary address' do
-      stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
+    describe 'match by address' do
+      before do
+        stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
+        person1.update_column(:first_name, 'Notjohn')
+      end
 
-      person1.update_column(:first_name, 'Notjohn')
+      it 'finds duplicates by matching primary address' do
+        contact1.addresses_attributes = [{ street: '1 Road', primary_mailing_address: true, master_address_id: 1 }]
+        contact1.save
+        contact2.addresses_attributes = [{ street: '1 Rd', primary_mailing_address: true, master_address_id: 1 }]
+        contact2.save
+        expect_contact_set
+      end
 
-      contact1.addresses_attributes = [{ street: '1 Road', primary_mailing_address: true, master_address_id: 1 }]
-      contact1.save
-      contact2.addresses_attributes = [{ street: '1 Rd', primary_mailing_address: true, master_address_id: 1 }]
-      contact2.save
+      it 'does not find duplicates by matching primary address if insufficient address' do
+        contact1.addresses_attributes = [{ street: 'Insufficient Address', primary_mailing_address: true, master_address_id: 1 }]
+        contact1.save
+        contact2.addresses_attributes = [{ street: '1 Rd', primary_mailing_address: true, master_address_id: 1 }]
+        contact2.save
+        expect(dup_contacts).to be_empty
+      end
 
-      expect_contact_set
-    end
+      it 'does not find duplicates by matching primary address if street is empty string' do
+        contact1.addresses << Address.new(street: '', primary_mailing_address: true, master_address_id: 1)
+        contact2.addresses << Address.new(street: '', primary_mailing_address: true, master_address_id: 1)
+        expect(dup_contacts).to be_empty
+      end
 
-    it 'does not find duplicates by matching primary address if insufficient address' do
-      stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
+      it 'does not find duplicates by matching primary address if street is nil' do
+        contact1.addresses << Address.new(street: nil, primary_mailing_address: true, master_address_id: 1)
+        contact2.addresses << Address.new(street: nil, primary_mailing_address: true, master_address_id: 1)
+        expect(dup_contacts).to be_empty
+      end
 
-      person1.update_column(:first_name, 'Notjohn')
-
-      contact1.addresses_attributes = [{ street: 'Insufficient Address', primary_mailing_address: true, master_address_id: 1 }]
-      contact1.save
-      contact2.addresses_attributes = [{ street: '1 Rd', primary_mailing_address: true, master_address_id: 1 }]
-      contact2.save
-
-      expect(dup_contacts).to be_empty
+      it 'does not find duplicats by matching primary address if either address is deleted' do
+        a1 = Address.new(street: '1', primary_mailing_address: true, master_address_id: 1)
+        a2 = Address.new(street: '1', primary_mailing_address: true, master_address_id: 1)
+        contact1.addresses << a1
+        contact2.addresses << a2
+        expect_contact_set
+        a1.update_column(:deleted, true)
+        expect(dup_contacts).to be_empty
+        a1.update_column(:deleted, false)
+        a2.update_column(:deleted, true)
+        expect(dup_contacts).to be_empty
+      end
     end
 
     it 'does not find the same contact as a duplicate if the persons name would match itself' do

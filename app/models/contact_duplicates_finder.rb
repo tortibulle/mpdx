@@ -289,6 +289,9 @@ class ContactDuplicatesFinder
       and contacts.name not ilike '%nonymous%' and dup_contacts.name not ilike '%nonymous%'
       and addresses.primary_mailing_address = 't' and dup_addresses.primary_mailing_address = 't'
       and addresses.street not ilike '%insufficient%' and dup_addresses.street not ilike '%insufficient%'
+      and addresses.street is not null and dup_addresses.street is not null
+      and addresses.street <> '' and dup_addresses.street <> ''
+      and addresses.deleted <> 't' and dup_addresses.deleted <> 't'
       and addresses.master_address_id = dup_addresses.master_address_id"
   def dup_contacts_query
     exec_query(DUP_CONTACTS_SQL).rows
