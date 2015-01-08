@@ -50,12 +50,9 @@ namespace :mpdx do
     merge_donor_accounts
   end
 
-
   task address_cleanup: :environment do
     us_address = "addresses.id is not null AND (addresses.country is null or addresses.country = 'United States' or addresses.country = '' or addresses.country = 'United States of America')"
-    Contact.joins(:addresses).where(us_address).find_each do |c|
-      c.merge_addresses
-    end
+    Contact.joins(:addresses).where(us_address).find_each(&:merge_addresses)
   end
 
   # We had an organization, DiscipleMakers with a lot of duplicate addresses in its contacts and donor
