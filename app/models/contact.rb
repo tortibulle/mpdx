@@ -236,9 +236,11 @@ class Contact < ActiveRecord::Base
 
   def generated_envelope_greeting
     return name if siebel_organization?
-    return name unless name.to_s.include? ','
-    last_name = name.split(',')[0].strip
-    first_names = name.split(',')[1].strip
+    working_name = name.to_s.strip
+    working_name.chomp!(',') if working_name.ends_with? ','
+    return working_name unless working_name.include? ','
+    last_name = working_name.split(',')[0].strip
+    first_names = working_name.split(',')[1].strip
     return first_names + ' ' + last_name unless first_names =~ /\((\w|\W)*\)/
     first_names = first_names.split(/ & | #{_('and')} /)
     if first_names[0] =~ /\((\w|\W)*\)/
@@ -347,8 +349,8 @@ class Contact < ActiveRecord::Base
       next if merged_people.include?(person)
 
       other_people = people.select { |p|
-        p.first_name == person.first_name &&
-        p.last_name == person.last_name &&
+        p.first_name.to_s.strip.downcase == person.first_name.to_s.strip.downcase &&
+        p.last_name.to_s.strip.downcase == person.last_name.to_s.strip.downcase &&
         p.id != person.id
       }
       next unless other_people
