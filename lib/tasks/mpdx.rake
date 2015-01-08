@@ -54,6 +54,11 @@ namespace :mpdx do
     addresses = addressable.addresses.order('addresses.created_at')
     return unless addresses.length > 1
 
+    addresses.each do |address|
+      address.find_or_create_master_address
+      address.save
+    end
+
     addresses.reload
     addresses.each do |address|
       other_address = addresses.find { |a| a.equal_to?(address) && a.id != address.id }
@@ -81,7 +86,7 @@ namespace :mpdx do
     org.donor_accounts.each { |d| merge_addresses(d) }
 
     account_lists = AccountList.joins(:users)
-                      .joins('INNER JOIN person_organization_accounts ON person_organization_accounts.id = people.id')
+                      .joins('INNER JOIN person_organization_accounts ON person_organization_accounts.person_id = people.id')
                       .where(person_organization_accounts: { organization_id: org.id })
     account_lists.each do |account_list|
       account_list.contacts.each { |c| merge_addresses(c) }
