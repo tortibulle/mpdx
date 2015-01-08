@@ -399,6 +399,10 @@ describe Contact do
     it 'uses contact name' do
       contact.name = 'Smith, John & Jane'
       expect(contact.envelope_greeting).to eq 'John & Jane Smith'
+      contact.name = 'John & Jane Smith'
+      expect(contact.envelope_greeting).to eq 'John & Jane Smith'
+      contact.name = 'Smith,'
+      expect(contact.envelope_greeting).to eq 'Smith'
       contact.name = 'Smith, John T and Jane F'
       expect(contact.envelope_greeting).to eq 'John T and Jane F Smith'
       contact.name = 'Doe, John and Jane (Smith)'
