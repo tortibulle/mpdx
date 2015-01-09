@@ -74,7 +74,7 @@ class DonationsController < ApplicationController
     params.require(:donation).permit('donation_date(1i)', 'donation_date(2i)',
                                      'donation_date(3i)', 'tendered_amount',
                                      'donor_account_id', 'designation_account_id',
-                                     'appeal_id')
+                                     'appeal_id', 'appeal_amount')
   end
 
   def find_contact

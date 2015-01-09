@@ -39,7 +39,7 @@
         <%= contact_exhibit.status %><br />
       <% end %>
       <% if contact.pledge_amount.to_i > 0 %>
-        <%= _('Commitment') %>: <%= contact_exhibit.pledge_as_currency %><br />
+        <%= _('Commitment') %>: <%= contact_exhibit.pledge_amount %><br />
       <% end %>
       <%= link_to(tasks_path(contact_ids: contact.id)) do %>
         <%= _('Tasks') %>: <%= contact.uncompleted_tasks_count %><br />

@@ -1,6 +1,9 @@
 require_dependency 'address_methods'
 class DonorAccount < ActiveRecord::Base
   include AddressMethods
+  include Async # To allow batch processing of address merges
+  include Sidekiq::Worker
+  sidekiq_options retry: false, unique: true
 
   has_many :master_person_donor_accounts, dependent: :destroy
   has_many :master_people, through: :master_person_donor_accounts

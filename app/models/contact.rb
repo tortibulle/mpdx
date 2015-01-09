@@ -1,5 +1,8 @@
 class Contact < ActiveRecord::Base
   include AddressMethods
+  include Async # To allow batch processing of address merges
+  include Sidekiq::Worker
+  sidekiq_options retry: false, unique: true
   acts_as_taggable
 
   has_paper_trail on: [:destroy, :update],
@@ -236,9 +239,11 @@ class Contact < ActiveRecord::Base
 
   def generated_envelope_greeting
     return name if siebel_organization?
-    return name unless name.to_s.include? ','
-    last_name = name.split(',')[0].strip
-    first_names = name.split(',')[1].strip
+    working_name = name.to_s.strip
+    working_name.chomp!(',') if working_name.ends_with? ','
+    return working_name unless working_name.include? ','
+    last_name = working_name.split(',')[0].strip
+    first_names = working_name.split(',')[1].strip
     return first_names + ' ' + last_name unless first_names =~ /\((\w|\W)*\)/
     first_names = first_names.split(/ & | #{_('and')} /)
     if first_names[0] =~ /\((\w|\W)*\)/
@@ -281,7 +286,8 @@ class Contact < ActiveRecord::Base
   end
 
   def not_same_as?(other)
-    not_duplicated_with.to_s.split(',').include?(other.id.to_s)
+    not_duplicated_with.to_s.split(',').include?(other.id.to_s) ||
+      other.not_duplicated_with.to_s.split(',').include?(id.to_s)
   end
 
   def donor_accounts_attributes=(attribute_collection)
@@ -326,18 +332,6 @@ class Contact < ActiveRecord::Base
     ContactMerge.new(self, other).merge
   end
 
-  def merge_addresses
-    ordered_addresses = addresses.order('created_at desc')
-    ordered_addresses.reload
-    ordered_addresses.each do |address|
-      other_address = ordered_addresses.find { |a| a.id != address.id && a.equal_to?(address) }
-      next unless other_address
-      address.merge(other_address)
-      merge_addresses
-      return
-    end
-  end
-
   def merge_people
     # Merge people that have the same name
     merged_people = []
@@ -346,8 +340,8 @@ class Contact < ActiveRecord::Base
       next if merged_people.include?(person)
 
       other_people = people.select { |p|
-        p.first_name == person.first_name &&
-        p.last_name == person.last_name &&
+        p.first_name.to_s.strip.downcase == person.first_name.to_s.strip.downcase &&
+        p.last_name.to_s.strip.downcase == person.last_name.to_s.strip.downcase &&
         p.id != person.id
       }
       next unless other_people

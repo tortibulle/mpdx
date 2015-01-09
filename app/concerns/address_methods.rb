@@ -24,4 +24,36 @@ module AddressMethods
   def destroy_addresses
     addresses.map(&:destroy!)
   end
+
+  def merge_addresses
+    addresses_ordered = addresses.order('created_at desc')
+
+    return unless addresses_ordered.length > 1
+
+    addresses_ordered.each do |address|
+      next if address.master_address_id
+      address.find_or_create_master_address
+      address.save
+    end
+
+    merge_prepped_addresses(addresses_ordered)
+  end
+
+  private
+
+  # This aims to be efficient for large numbers of duplicate addresses
+  def merge_prepped_addresses(addresses)
+    merged = Set.new
+    addresses.each do |address|
+      next if merged.include?(address)
+      dups = addresses.select do |a|
+        a.equal_to?(address) && a.id != address.id && !merged.include?(a)
+      end
+      next if dups.empty?
+      dups.each do |dup|
+        merged << dup
+        address.merge(dup)
+      end
+    end
+  end
 end

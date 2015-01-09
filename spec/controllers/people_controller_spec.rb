@@ -155,4 +155,40 @@ describe PeopleController do
     end
   end
 
+  describe 'PUT not_duplicates' do
+    it 'adds the passed in ids to each persons not_duplicated_with field' do
+      person1 = @contact.people.create! valid_attributes
+      person2 = @contact.people.create! valid_attributes
+      person3 = @contact.people.create! valid_attributes
+
+      person1.update_column(:not_duplicated_with, person3.id.to_s)
+      person2.update_column(:not_duplicated_with, person3.id.to_s)
+
+      put :not_duplicates, ids: "#{person1.id},#{person2.id}", format: :js
+
+      person1.reload
+      person2.reload
+
+      expect(person1.not_duplicated_with.split(',')).to include(person3.id.to_s)
+      expect(person1.not_duplicated_with.split(',')).to include(person2.id.to_s)
+
+      expect(person2.not_duplicated_with.split(',')).to include(person3.id.to_s)
+      expect(person2.not_duplicated_with.split(',')).to include(person1.id.to_s)
+    end
+  end
+
+  describe 'POST merge_sets' do
+    it 'merges the passed in sets of people' do
+      person1 = @contact.people.create! valid_attributes
+      person2 = @contact.people.create! valid_attributes
+      person2.email = 'test_merge@example.com'
+      person2.save
+
+      request.env['HTTP_REFERER'] = '/'
+      post :merge_sets, merge_sets: ["#{person1.id},#{person2.id}"]
+
+      expect(Person.find_by_id(person2.id)).to be_nil
+      expect(person1.email.email).to eq('test_merge@example.com')
+    end
+  end
 end
