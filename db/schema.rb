@@ -19,8 +19,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
   create_table "account_list_entries", force: true do |t|
     t.integer  "account_list_id"
     t.integer  "designation_account_id"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "account_list_entries", ["account_list_id", "designation_account_id"], name: "unique_account", unique: true, using: :btree
@@ -29,8 +29,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
   create_table "account_list_users", force: true do |t|
     t.integer  "user_id"
     t.integer  "account_list_id"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "account_list_users", ["account_list_id"], name: "index_account_list_users_on_account_list_id", using: :btree
@@ -39,27 +39,12 @@ ActiveRecord::Schema.define(version: 20141203174739) do
   create_table "account_lists", force: true do |t|
     t.string   "name"
     t.integer  "creator_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.text     "settings"
   end
 
   add_index "account_lists", ["creator_id"], name: "index_account_lists_on_creator_id", using: :btree
-
-  create_table "active_admin_comments", force: true do |t|
-    t.string   "resource_id",   null: false
-    t.string   "resource_type", null: false
-    t.integer  "author_id"
-    t.string   "author_type"
-    t.text     "body"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
-    t.string   "namespace"
-  end
-
-  add_index "active_admin_comments", ["author_type", "author_id"], name: "index_active_admin_comments_on_author_type_and_author_id", using: :btree
-  add_index "active_admin_comments", ["namespace"], name: "index_active_admin_comments_on_namespace", using: :btree
-  add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_admin_notes_on_resource_type_and_resource_id", using: :btree
 
   create_table "activities", force: true do |t|
     t.integer  "account_list_id"
@@ -69,8 +54,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.datetime "start_at"
     t.datetime "end_at"
     t.string   "type"
-    t.datetime "created_at",                                           null: false
-    t.datetime "updated_at",                                           null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.boolean  "completed",                            default: false, null: false
     t.integer  "activity_comments_count",              default: 0
     t.string   "activity_type"
@@ -91,8 +76,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.integer  "activity_id"
     t.integer  "person_id"
     t.text     "body"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "activity_comments", ["activity_id"], name: "index_activity_comments_on_activity_id", using: :btree
@@ -101,8 +86,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
   create_table "activity_contacts", force: true do |t|
     t.integer  "activity_id"
     t.integer  "contact_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "activity_contacts", ["activity_id", "contact_id"], name: "index_activity_contacts_on_activity_id_and_contact_id", using: :btree
@@ -119,8 +104,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.string   "location"
     t.date     "start_date"
     t.date     "end_date"
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.boolean  "primary_mailing_address", default: false
     t.string   "addressable_type"
     t.string   "remote_id"
@@ -133,26 +118,9 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.boolean  "historic",                default: false
   end
 
-  add_index "addresses", ["addressable_id"], name: "index_addresses_on_person_id", using: :btree
+  add_index "addresses", ["addressable_id"], name: "index_addresses_on_addressable_id", using: :btree
   add_index "addresses", ["master_address_id"], name: "index_addresses_on_master_address_id", using: :btree
   add_index "addresses", ["remote_id"], name: "index_addresses_on_remote_id", using: :btree
-
-  create_table "admin_users", force: true do |t|
-    t.string   "email",                default: "", null: false
-    t.string   "guid",                              null: false
-    t.integer  "sign_in_count",        default: 0
-    t.datetime "current_sign_in_at"
-    t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip"
-    t.string   "last_sign_in_ip"
-    t.string   "authentication_token"
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
-  end
-
-  add_index "admin_users", ["authentication_token"], name: "index_admin_users_on_authentication_token", unique: true, using: :btree
-  add_index "admin_users", ["email"], name: "index_admin_users_on_email", unique: true, using: :btree
-  add_index "admin_users", ["guid"], name: "index_admin_users_on_guid", unique: true, using: :btree
 
   create_table "appeal_contacts", force: true do |t|
     t.integer  "appeal_id"
@@ -179,8 +147,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
 
   create_table "companies", force: true do |t|
     t.string   "name"
-    t.datetime "created_at",        null: false
-    t.datetime "updated_at",        null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.text     "street"
     t.string   "city"
     t.string   "state"
@@ -193,8 +161,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
   create_table "company_partnerships", force: true do |t|
     t.integer  "account_list_id"
     t.integer  "company_id"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "company_partnerships", ["account_list_id", "company_id"], name: "unique_company_account", unique: true, using: :btree
@@ -206,8 +174,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.date     "start_date"
     t.date     "end_date"
     t.string   "position"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "company_positions", ["company_id"], name: "index_company_positions_on_company_id", using: :btree
@@ -217,8 +185,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
   create_table "contact_donor_accounts", force: true do |t|
     t.integer  "contact_id"
     t.integer  "donor_account_id"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "contact_donor_accounts", ["contact_id"], name: "index_contact_donor_accounts_on_contact_id", using: :btree
@@ -228,8 +196,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.integer  "contact_id"
     t.integer  "person_id"
     t.boolean  "primary"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "contact_people", ["contact_id", "person_id"], name: "index_contact_people_on_contact_id_and_person_id", unique: true, using: :btree
@@ -238,8 +206,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
   create_table "contact_referrals", force: true do |t|
     t.integer  "referred_by_id"
     t.integer  "referred_to_id"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "contact_referrals", ["referred_by_id", "referred_to_id"], name: "referrals", using: :btree
@@ -248,8 +216,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
   create_table "contacts", force: true do |t|
     t.string   "name"
     t.integer  "account_list_id"
-    t.datetime "created_at",                                                                    null: false
-    t.datetime "updated_at",                                                                    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.decimal  "pledge_amount",                        precision: 8,  scale: 2
     t.string   "status"
     t.decimal  "total_donations",                      precision: 10, scale: 2
@@ -279,7 +247,7 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.integer  "tnt_id"
     t.string   "not_duplicated_with",     limit: 2000
     t.integer  "uncompleted_tasks_count",                                       default: 0,     null: false
-    t.integer  "prayer_letters_id"
+    t.string   "prayer_letters_id"
     t.string   "timezone"
     t.string   "envelope_greeting"
   end
@@ -291,8 +259,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
 
   create_table "designation_accounts", force: true do |t|
     t.string   "designation_number"
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "organization_id"
     t.decimal  "balance",            precision: 8, scale: 2
     t.datetime "balance_updated_at"
@@ -306,8 +274,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
   create_table "designation_profile_accounts", force: true do |t|
     t.integer  "designation_profile_id"
     t.integer  "designation_account_id"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "designation_profile_accounts", ["designation_profile_id", "designation_account_id"], name: "designation_p_to_a", unique: true, using: :btree
@@ -317,8 +285,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.integer  "user_id",                                    null: false
     t.integer  "organization_id",                            null: false
     t.string   "name"
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "code"
     t.decimal  "balance",            precision: 8, scale: 2
     t.datetime "balance_updated_at"
@@ -341,8 +309,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.decimal  "amount",                 precision: 8, scale: 2
     t.text     "memo"
     t.date     "donation_date"
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "payment_type"
     t.string   "channel"
     t.integer  "appeal_id"
@@ -356,8 +324,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
   create_table "donor_account_people", force: true do |t|
     t.integer  "donor_account_id"
     t.integer  "person_id"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "donor_account_people", ["donor_account_id"], name: "index_donor_account_people_on_donor_account_id", using: :btree
@@ -367,8 +335,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.integer  "organization_id"
     t.string   "account_number"
     t.string   "name"
-    t.datetime "created_at",                                              null: false
-    t.datetime "updated_at",                                              null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "master_company_id"
     t.decimal  "total_donations",                precision: 10, scale: 2
     t.date     "last_donation_date"
@@ -377,6 +345,7 @@ ActiveRecord::Schema.define(version: 20141203174739) do
   end
 
   add_index "donor_accounts", ["last_donation_date"], name: "index_donor_accounts_on_last_donation_date", using: :btree
+  add_index "donor_accounts", ["organization_id", "account_number"], name: "index_donor_accounts_on_organization_id_and_account_number", unique: true, using: :btree
   add_index "donor_accounts", ["organization_id"], name: "index_donor_accounts_on_organization_id", using: :btree
   add_index "donor_accounts", ["total_donations"], name: "index_donor_accounts_on_total_donations", using: :btree
 
@@ -384,8 +353,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.integer  "person_id"
     t.string   "email",                                 null: false
     t.boolean  "primary",               default: false
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "remote_id"
     t.string   "location",   limit: 50
     t.boolean  "historic",              default: false
@@ -399,8 +368,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.integer  "person_id"
     t.integer  "related_person_id"
     t.string   "relationship",      null: false
-    t.datetime "created_at",        null: false
-    t.datetime "updated_at",        null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "family_relationships", ["person_id", "related_person_id"], name: "index_family_relationships_on_person_id_and_related_person_id", unique: true, using: :btree
@@ -478,8 +447,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.text     "user_preferences"
     t.text     "account_list_settings"
     t.string   "request_type"
-    t.datetime "created_at",            null: false
-    t.datetime "updated_at",            null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "imports", force: true do |t|
@@ -487,8 +456,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.string   "source"
     t.string   "file"
     t.boolean  "importing"
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.text     "tags"
     t.boolean  "override",          default: false, null: false
     t.integer  "user_id"
@@ -507,8 +476,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.integer  "grouping_id"
     t.string   "primary_list_id"
     t.integer  "account_list_id"
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "mail_chimp_accounts", ["account_list_id"], name: "index_mail_chimp_accounts_on_account_list_id", using: :btree
@@ -521,29 +490,29 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.string   "postal_code"
     t.boolean  "verified",        default: false, null: false
     t.text     "smarty_response"
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "master_addresses", ["street", "city", "state", "country", "postal_code"], name: "all_fields", using: :btree
 
   create_table "master_companies", force: true do |t|
     t.string   "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "master_people", force: true do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "master_person_donor_accounts", force: true do |t|
     t.integer  "master_person_id"
     t.integer  "donor_account_id"
     t.boolean  "primary",          default: false, null: false
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "master_person_donor_accounts", ["donor_account_id"], name: "index_master_person_donor_accounts_on_donor_account_id", using: :btree
@@ -553,8 +522,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.integer  "master_person_id"
     t.integer  "organization_id"
     t.string   "remote_id"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "master_person_sources", ["master_person_id"], name: "index_master_person_sources_on_master_person_id", using: :btree
@@ -570,8 +539,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.string   "remote_id"
     t.integer  "contact_id"
     t.integer  "account_list_id"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "messages", ["account_list_id"], name: "index_messages_on_account_list_id", using: :btree
@@ -583,8 +552,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.integer  "notification_type_id"
     t.integer  "account_list_id"
     t.text     "actions"
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "notification_preferences", ["account_list_id"], name: "index_notification_preferences_on_account_list_id", using: :btree
@@ -593,8 +562,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
   create_table "notification_types", force: true do |t|
     t.string   "type"
     t.text     "description"
-    t.datetime "created_at",            null: false
-    t.datetime "updated_at",            null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.text     "description_for_email"
   end
 
@@ -603,8 +572,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.integer  "notification_type_id"
     t.datetime "event_date"
     t.boolean  "cleared",              default: false, null: false
-    t.datetime "created_at",                           null: false
-    t.datetime "updated_at",                           null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "donation_id"
   end
 
@@ -642,8 +611,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.string   "profiles_url"
     t.string   "profiles_params"
     t.string   "redirect_query_ini"
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "api_class"
   end
 
@@ -669,8 +638,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "master_person_id",                                 null: false
     t.string   "middle_name"
     t.string   "access_token",          limit: 32
@@ -692,8 +661,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.integer  "remote_id",        limit: 8,                 null: false
     t.string   "token"
     t.datetime "token_expires_at"
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.boolean  "valid_token",                default: false
     t.string   "first_name"
     t.string   "last_name"
@@ -712,8 +681,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.string   "refresh_token"
     t.datetime "expires_at"
     t.boolean  "valid_token",     default: false
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "email",                           null: false
     t.boolean  "authenticated",   default: false, null: false
     t.boolean  "primary",         default: false
@@ -732,8 +701,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.string   "last_name"
     t.string   "email"
     t.boolean  "authenticated", default: false, null: false
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.boolean  "primary",       default: false
     t.boolean  "downloading",   default: false, null: false
     t.datetime "last_download"
@@ -748,8 +717,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.string   "token"
     t.string   "secret"
     t.datetime "token_expires_at"
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.boolean  "valid_token",      default: false
     t.string   "first_name"
     t.string   "last_name"
@@ -767,8 +736,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.integer  "organization_id"
     t.string   "username"
     t.string   "password"
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "remote_id"
     t.boolean  "authenticated",     default: false, null: false
     t.boolean  "valid_credentials", default: false, null: false
@@ -778,7 +747,7 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.datetime "locked_at"
   end
 
-  add_index "person_organization_accounts", ["person_id", "organization_id"], name: "index_organization_accounts_on_user_id_and_organization_id", unique: true, using: :btree
+  add_index "person_organization_accounts", ["person_id", "organization_id"], name: "user_id_and_organization_id", unique: true, using: :btree
 
   create_table "person_relay_accounts", force: true do |t|
     t.integer  "person_id"
@@ -790,8 +759,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.string   "employee_id"
     t.string   "username"
     t.boolean  "authenticated", default: false, null: false
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.boolean  "primary",       default: false
     t.boolean  "downloading",   default: false, null: false
     t.datetime "last_download"
@@ -806,8 +775,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.string   "screen_name"
     t.string   "token"
     t.string   "secret"
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.boolean  "valid_token",             default: false
     t.boolean  "authenticated",           default: false, null: false
     t.boolean  "primary",                 default: false
@@ -834,8 +803,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.string   "country_code"
     t.string   "location"
     t.boolean  "primary",      default: false
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "remote_id"
   end
 
@@ -847,8 +816,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.string   "picture_of_type"
     t.string   "image"
     t.boolean  "primary",         default: false, null: false
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "pictures", ["picture_of_id", "picture_of_type"], name: "picture_of", using: :btree
@@ -857,8 +826,8 @@ ActiveRecord::Schema.define(version: 20141203174739) do
     t.string   "token"
     t.string   "secret"
     t.boolean  "valid_token",     default: true
-    t.datetime "created_at",                     null: false
-    t.datetime "updated_at",                     null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.integer  "account_list_id"
     t.string   "oauth2_token"
   end
