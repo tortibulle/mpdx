@@ -2,6 +2,7 @@ class Contact < ActiveRecord::Base
   include AddressMethods
   include Async # To allow batch processing of address merges
   include Sidekiq::Worker
+  sidekiq_options retry: false, unique: true
   acts_as_taggable
 
   has_paper_trail on: [:destroy, :update],
