@@ -2,7 +2,7 @@ class DonationSerializer < ActiveModel::Serializer
   include LocalizationHelper
 
   embed :ids, include: true
-  attributes :id, :amount, :donation_date, :contact_id, :appeal_id
+  attributes :id, :amount, :donation_date, :contact_id, :appeal_id, :appeal_amount
 
   def amount
     account_list = scope[:account_list]

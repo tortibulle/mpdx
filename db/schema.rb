@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141230003854) do
+ActiveRecord::Schema.define(version: 20150106174739) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -132,6 +132,16 @@ ActiveRecord::Schema.define(version: 20141230003854) do
   add_index "appeal_contacts", ["appeal_id", "contact_id"], name: "index_appeal_contacts_on_appeal_id_and_contact_id", using: :btree
   add_index "appeal_contacts", ["appeal_id"], name: "index_appeal_contacts_on_appeal_id", using: :btree
   add_index "appeal_contacts", ["contact_id"], name: "index_appeal_contacts_on_contact_id", using: :btree
+
+  create_table "appeal_donations", force: true do |t|
+    t.integer  "appeal_id"
+    t.integer  "donation_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "appeal_donations", ["appeal_id", "donation_id"], name: "index_appeal_donations_on_appeal_id_and_donation_id", using: :btree
+  add_index "appeal_donations", ["donation_id"], name: "index_appeal_donations_on_donation_id", using: :btree
 
   create_table "appeals", force: true do |t|
     t.string   "name"
@@ -314,6 +324,7 @@ ActiveRecord::Schema.define(version: 20141230003854) do
     t.string   "payment_type"
     t.string   "channel"
     t.integer  "appeal_id"
+    t.decimal  "appeal_amount",          precision: 8, scale: 2
   end
 
   add_index "donations", ["appeal_id"], name: "index_donations_on_appeal_id", using: :btree
@@ -348,34 +359,6 @@ ActiveRecord::Schema.define(version: 20141230003854) do
   add_index "donor_accounts", ["organization_id", "account_number"], name: "index_donor_accounts_on_organization_id_and_account_number", unique: true, using: :btree
   add_index "donor_accounts", ["organization_id"], name: "index_donor_accounts_on_organization_id", using: :btree
   add_index "donor_accounts", ["total_donations"], name: "index_donor_accounts_on_total_donations", using: :btree
-
-  create_table "dup_people", id: false, force: true do |t|
-    t.integer "person_id"
-    t.integer "dup_person_id"
-    t.integer "nickname_id"
-    t.integer "priority"
-    t.boolean "check_genders"
-    t.integer "contact_id"
-  end
-
-  create_table "dup_ppl", id: false, force: true do |t|
-    t.integer "person_id"
-    t.integer "dup_person_id"
-    t.integer "nickname_id"
-    t.integer "priority"
-    t.boolean "check_genders"
-    t.text    "name_source"
-    t.text    "dup_name_source"
-  end
-
-  create_table "dup_ppl_by_contact_info", id: false, force: true do |t|
-    t.integer "person_id"
-    t.integer "dup_person_id"
-    t.boolean "check_genders"
-  end
-
-  add_index "dup_ppl_by_contact_info", ["dup_person_id"], name: "dup_ppl_by_contact_info_dup_person_id_idx", using: :btree
-  add_index "dup_ppl_by_contact_info", ["person_id"], name: "dup_ppl_by_contact_info_person_id_idx", using: :btree
 
   create_table "email_addresses", force: true do |t|
     t.integer  "person_id"
@@ -699,6 +682,7 @@ ActiveRecord::Schema.define(version: 20141230003854) do
     t.string   "profession"
     t.boolean  "deceased",                           default: false, null: false
     t.boolean  "subscribed_to_updates"
+    t.boolean  "optout_enewletter",                  default: false
     t.boolean  "optout_enewsletter",                 default: false
     t.string   "occupation"
     t.string   "employer"
