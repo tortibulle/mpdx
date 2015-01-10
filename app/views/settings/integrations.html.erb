@@ -77,7 +77,7 @@
           </td>
           <td class="connections">
             <div class="network_button">
-              <%= link_to(_('Send Paper Newsletter List'), send_to_chalkline_contacts_path, :class => 'btn', data: {method: :post, confirm: _("Would you like to have MPDX email your newsletter list to Chalk Line and redirect you to their order page?")}) %>
+              <%= link_to(_('Send Paper Newsletter List'), '#', class: 'btn', data: {behavior: 'send_chalkline_list'}) %>
             </div>
           </td>
         </tr>

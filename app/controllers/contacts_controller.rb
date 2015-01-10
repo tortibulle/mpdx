@@ -39,7 +39,7 @@ class ContactsController < ApplicationController
 
   def send_to_chalkline
     current_account_list.async_send_chalkline_list
-    redirect_to 'http://www.chalkline.org/order_mpdx.html'
+    render text: 'OK'
   end
 
   def show

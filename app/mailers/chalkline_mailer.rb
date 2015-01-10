@@ -1,7 +1,6 @@
 class ChalklineMailer < ActionMailer::Base
-  MAILING_LIST_TO_EMAIL = 'Chalk Line <tiffany@chalkline.org>'
   TIME_ZONE = 'Central Time (US & Canada)'
-  default from: 'MPDX <support@mpdx.org>', to: MAILING_LIST_TO_EMAIL
+  default from: 'MPDX <support@mpdx.org>', to: APP_CONFIG['chalkline_newsletter_email']
 
   def mailing_list(account_list)
     @name = account_list.users_combined_name
