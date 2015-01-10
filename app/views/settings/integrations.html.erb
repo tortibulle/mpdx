@@ -77,7 +77,8 @@
           </td>
           <td class="connections">
             <div class="network_button">
-              <%= link_to(_('Send Paper Newsletter List'), '#', class: 'btn', data: {behavior: 'send_chalkline_list'}) %>
+              <%= link_to(_('Send Paper Newsletter List'), '#', id: 'chalkline_send_list', class: 'btn',
+                          data: {confirm: _('Would you like MPDX to email Chalkline your newsletter list and open their order form in a new tab?')}) %>
             </div>
           </td>
         </tr>
