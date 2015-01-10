@@ -66,6 +66,23 @@
         </tr>
       </table>
     </div>
+    <div class="network_connect">
+      <table>
+        <tr>
+          <td class="identify">
+            <div class="statusIcon statusIcon-disabled">&nbsp;</div>
+            <div class="network_logo">
+              <%= image_tag("logos/chalkline_logo.png", alt: 'Chalk Line') %>
+            </div>
+          </td>
+          <td class="connections">
+            <div class="network_button">
+              <%= link_to(_('Send Paper Newsletter List'), send_to_chalkline_contacts_path, :class => 'btn', data: {method: :post, confirm: _("Would you like to have MPDX email your newsletter list to Chalk Line and redirect you to their order page?")}) %>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
   </div>
 </div>
 

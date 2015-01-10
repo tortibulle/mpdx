@@ -1,6 +1,11 @@
-"<%== @headers.map {|h| _(h)}.join('","') %>"
+"<%==[
+    'Contact Name', 'First Name', 'Last Name', 'Spouse First Name', 'Greeting', 'Envelope Greeting',
+    'Mailing Street Address', 'Mailing City', 'Mailing State', 'Mailing Postal Code', 'Mailing Country', 'Status',
+    'Commitment Amount', 'Commitment Frequency', 'Newsletter', 'Pledge Received', 'Tags',
+    'Email 1', 'Email 2', 'Email 3', 'Email 4', 'Phone 1', 'Phone 2', 'Phone 3', 'Phone 4'
+  ].map {|h| _(h)}.join('","') %>"
 <%== CSV.generate do |csv|
-  @contacts.each do |contact|
+  contacts.each do |contact|
     row = []
     row << contact.name
     row << contact.first_name
