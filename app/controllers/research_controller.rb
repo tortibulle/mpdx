@@ -9,11 +9,10 @@ class ResearchController < ApplicationController
     account_numbers = @contact.donor_accounts.pluck(:account_number)
     @donor_data = @contact.donor_accounts.present? ? SiebelDonations::Donor.find(ids: account_numbers.join(',')) : []
     [@contact.primary_person, @contact.spouse].compact.each do |person|
-      first_name = @contact.primary_person.legal_first_name.present? ? @contact.primary_person.legal_first_name :
-        @contact.primary_person.first_name
+      first_name = person.legal_first_name.present? ? person.legal_first_name : person.first_name
 
       search = {
-        last_name: @contact.primary_person.last_name,
+        last_name: person.last_name,
         first_name: first_name
       }
       if @contact.mailing_address.state.present?
