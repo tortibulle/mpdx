@@ -8,7 +8,7 @@
     <%= text_field_tag :contact_name, '', autocomplete: 'off', placeholder: _('Type to search'), class: "search_filter" %>
   </div>
   <ul class="contact_list">
-    <% contacts_for_filter.each do |contact| %>
+    <% current_account_list.contacts.active.order('contacts.name').select(['contacts.id', 'contacts.name']).each do |contact| %>
       <li data-hook="contact"><%= link_to(truncate(contact.to_s, :length => 30), search_research_path(contact), data: {name: contact.to_s, id: contact.id}, remote: true) %></li>
     <% end %>
   </ul>

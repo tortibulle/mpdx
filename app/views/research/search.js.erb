@@ -1,4 +1,5 @@
 $('#contentbody').html('<%= j(render('contact', contact: @contact)) %>')
+$('#contentbody').append('<%= j(render('other_contact', contact: @contact)) %>')
 <% @other_contacts.each do |contact| %>
   $('#contentbody').append('<%= j(render('other_contact', contact: contact)) %>')
 <% end %>

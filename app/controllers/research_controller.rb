@@ -7,11 +7,22 @@ class ResearchController < ApplicationController
   def search
     @contact = current_account_list.contacts.find(params[:id])
     account_numbers = @contact.donor_accounts.pluck(:account_number)
-    @donor_data = if @contact.donor_accounts.present?
-                    SiebelDonations::Donor.find(ids: account_numbers.join(','))
-                  else
-                    []
-                  end
+    @donor_data = @contact.donor_accounts.present? ? SiebelDonations::Donor.find(ids: account_numbers.join(',')) : []
+    [@contact.primary_person, @contact.spouse].compact.each do |person|
+      first_name = @contact.primary_person.legal_first_name.present? ? @contact.primary_person.legal_first_name :
+        @contact.primary_person.first_name
+
+      search = {
+        last_name: @contact.primary_person.last_name,
+        first_name: first_name
+      }
+      if @contact.mailing_address.state.present?
+        search[:state] = @contact.mailing_address.state
+        search[:city] = @contact.mailing_address.city
+      end
+
+      @donor_data = SiebelDonations::Donor.find(search) if @donor_data == []
+    end
 
     @other_contacts = Contact.joins(:donor_accounts)
       .where('donor_accounts.account_number' => account_numbers)

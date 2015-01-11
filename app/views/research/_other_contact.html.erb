@@ -1,5 +1,8 @@
 <div class="wpp">
-  <h2><%= contact.name %> - <%= contact.id %></h2>
+  <h2>
+    <%= contact.name %> - <%= contact.id %>
+    <%= '(Your data)' if contact.id == @contact.id %>
+  </h2>
   <strong><%= _('People:') %></strong>
   <ul>
     <% contact.people.each do |person| %>
