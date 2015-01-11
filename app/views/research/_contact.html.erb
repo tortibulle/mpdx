@@ -4,6 +4,9 @@
   <% end %>
   <% @donor_data.each do |contact| %>
     <h2><%= contact.account_name %> - <%= contact.id %></h2>
+    <strong>Last Donation:</strong>
+    <%= SiebelDonations::Donation.find(donors: contact.id).sort_by(&:donation_date).last.donation_date %>
+    <br/>
     <strong><%= _('People:') %></strong>
     <ul>
       <% contact.contacts.each do |person| %>
