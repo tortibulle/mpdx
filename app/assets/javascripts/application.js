@@ -43,6 +43,7 @@
 //= require peek
 //= require peek/views/performance_bar
 //= require best_in_place
+//= require integrations
 
 //angular
 //= require angular
