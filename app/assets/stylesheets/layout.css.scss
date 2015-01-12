@@ -282,17 +282,6 @@ div.right {
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
 }
-.contacts-scrollable::-webkit-scrollbar {
-  width: 12px;
-}
-.contacts-scrollable::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-  border-radius: 10px;
-}
-.contacts-scrollable::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.7);
-}
 
 .contacts-map-markers>span {
   white-space: nowrap;
@@ -639,7 +628,7 @@ div.name {font-size: 14px; margin-bottom: 4px;}
     padding: 5px 8px;
   }
 
-  .checks {width: 10px; line-height: 22px;}
+  .checks {width: 22px; line-height: 22px;}
 
   td {
     padding: 8px 4px 8px 4px;
@@ -649,8 +638,11 @@ div.name {font-size: 14px; margin-bottom: 4px;}
   td.avatar {
     width: 50px;
   }
+  td.qaction{
+    width: 45px;
+  }
   td.profile {
-    width: 45%;
+    width: 320px;
     border-right: 2px solid $gray_light;
     span {display: block; }
     ul {
@@ -665,10 +657,6 @@ div.name {font-size: 14px; margin-bottom: 4px;}
       padding-right: 10px;
       width: auto;
     }
-  }
-
-  td.contact-tasks {
-    width: 40%;
   }
 }
 
