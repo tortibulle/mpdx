@@ -1,6 +1,0 @@
-$ ->
-  $('#chalkline_send_list').on 'click.rails', ->
-    if typeof $('#chalkline_send_list').data('confirm') == 'undefined'
-      $.ajax({type: 'post', url: '/contacts/send_to_chalkline'})
-      window.open('http://www.chalkline.org/order_mpdx.html','_blank')
-    true

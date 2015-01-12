@@ -80,7 +80,6 @@ Rails.application.routes.draw do
       post :merge
       get  :find_duplicates
       put :not_duplicates
-      post :send_to_chalkline
     end
     member do
       get :add_referrals
