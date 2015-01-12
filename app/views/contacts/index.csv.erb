@@ -5,6 +5,9 @@
     'Email 1', 'Email 2', 'Email 3', 'Email 4', 'Phone 1', 'Phone 2', 'Phone 3', 'Phone 4'
   ].map {|h| _(h)}.join('","') %>"
 <%== CSV.generate do |csv|
+  # Handles the assignments in contacts_controller#index and account_list#physical_newsletter_csv
+  contacts ||= @contacts
+
   contacts.each do |contact|
     row = []
     row << contact.name
