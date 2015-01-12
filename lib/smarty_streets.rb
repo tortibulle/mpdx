@@ -17,7 +17,7 @@ module SmartyStreets
              (address_hash[:city] && address_hash[:state]))
       return []
     end
-    url = 'http://api.smartystreets.com/street-address/?'
+    url = 'https://api.smartystreets.com/street-address/?'
     params = []
 
     parts = address_hash[:street].strip.split("\n").compact
