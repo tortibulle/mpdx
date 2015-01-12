@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe AccountList do
-
   context '.find_or_create_from_profile' do
     let(:org_account) { create(:organization_account) }
     let(:profile) { create(:designation_profile, user_id: org_account.person_id, organization: org_account.organization) }
@@ -91,6 +90,7 @@ describe AccountList do
     end
 
   end
+
   context '#people_with_anniversaries' do
     let(:account_list) { create(:account_list) }
     let(:contact) { create(:contact) }
@@ -108,7 +108,72 @@ describe AccountList do
     it 'handles a date range where the start and end day are in different months' do
       account_list.people_with_anniversaries(Date.new(2012, 8, 29), Date.new(2012, 9, 1)).should == [person]
     end
-
   end
 
+  context '#users_combined_name' do
+    let(:account_list) { create(:account_list, name: 'account list') }
+
+    it 'combines first and second user names and gives account list name if no uers' do
+      {
+        [] => 'account list',
+        [{ first_name: 'John' }] => 'John',
+        [{ first_name: 'John', last_name: 'Doe' }] => 'John Doe',
+        [{ first_name: 'John', last_name: 'Doe' }, { first_name: 'Jane', last_name: 'Doe' }] => 'John and Jane Doe',
+        [{ first_name: 'John', last_name: 'A' }, { first_name: 'Jane', last_name: 'B' }] => 'John A and Jane B',
+        [{ first_name: 'John' }, { first_name: 'Jane' }, { first_name: 'Paul' }] => 'John and Jane'
+      }.each do |people_attrs, name|
+        Person.destroy_all
+        people_attrs.each do |person_attrs|
+          account_list.users << create(:user, person_attrs)
+        end
+        expect(account_list.users_combined_name).to eq(name)
+      end
+    end
+  end
+
+  context '#physical_newsletter_csv' do
+    it 'does not cause an error or give an empty string' do
+      contact = create(:contact, name: 'Doe, John', send_newsletter: 'Both')
+      contact.addresses << create(:address)
+      account_list = create(:account_list)
+      account_list.contacts << contact
+
+      csv_rows = CSV.parse(account_list.physical_newsletter_csv)
+      expect(csv_rows.size).to eq(3)
+      csv_rows.each_with_index do |row, index|
+        expect(row[0]).to eq('Contact Name') if index == 0
+        expect(row[0]).to eq('Doe, John') if index == 1
+        expect(row[0]).to be_nil if index == 2
+      end
+    end
+  end
+
+  context '#user_emails_with_names' do
+    let(:account_list) { create(:account_list) }
+
+    it 'handles the no users case and no email fine' do
+      expect(account_list.user_emails_with_names).to be_empty
+      account_list.users << create(:user)
+      expect(account_list.user_emails_with_names).to be_empty
+    end
+
+    it 'gives the names of the users with the email addresses' do
+      user1 = create(:user, first_name: 'John')
+      user1.email = 'john@a.com'
+      user1.save
+      user2 = create(:user, first_name: 'Jane', last_name: 'Doe')
+      user2.email = 'jane@a.com'
+      user2.save
+      user3 = create(:user)
+
+      account_list.users << user1
+      expect(account_list.user_emails_with_names.first).to eq('John <john@a.com>')
+
+      account_list.users << user2
+      account_list.users << user3
+      expect(account_list.user_emails_with_names.size).to eq(2)
+      expect(account_list.user_emails_with_names).to include('John <john@a.com>')
+      expect(account_list.user_emails_with_names).to include('Jane Doe <jane@a.com>')
+    end
+  end
 end
