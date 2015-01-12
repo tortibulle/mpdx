@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Address do
   context '#find_master_address' do
     it 'normalized an address using smarty streets' do
-      stub_request(:get, %r{http:\/\/api\.smartystreets\.com\/street-address})
+      stub_request(:get, %r{https:\/\/api\.smartystreets\.com\/street-address})
         .with(headers: { 'Accept' => 'application/json', 'Accept-Encoding' => 'gzip, deflate', 'Content-Type' => 'application/json', 'User-Agent' => 'Ruby' })
         .to_return(status: 200, body:
           '[{"input_index":0,"candidate_index":0,"delivery_line_1":"12958 Fawns Dell Pl","last_line":"Fishers IN 46038-1026",'\

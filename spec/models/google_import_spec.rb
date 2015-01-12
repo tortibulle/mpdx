@@ -27,7 +27,7 @@ describe GoogleImport do
   end
 
   def stub_smarty_and_cloudinary
-    stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
+    stub_request(:get, %r{https://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
 
     # Based on sample from docs at http://cloudinary.com/documentation/upload_images
     cloudinary_reponse = {

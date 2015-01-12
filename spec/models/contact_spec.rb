@@ -23,7 +23,7 @@ describe Contact do
     end
 
     it 'should update an address' do
-      stub_request(:get, %r{http:\/\/api\.smartystreets\.com\/street-address})
+      stub_request(:get, %r{https:\/\/api\.smartystreets\.com\/street-address})
          .with(headers: { 'Accept' => 'application/json', 'Accept-Encoding' => 'gzip, deflate', 'Content-Type' => 'application/json', 'User-Agent' => 'Ruby' })
          .to_return(status: 200, body: '[]', headers: {})
 

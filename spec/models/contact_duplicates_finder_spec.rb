@@ -473,7 +473,7 @@ describe ContactDuplicatesFinder do
 
     describe 'match by address' do
       before do
-        stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
+        stub_request(:get, %r{https://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
         person1.update_column(:first_name, 'Notjohn')
       end
 

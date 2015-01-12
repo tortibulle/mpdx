@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe GoogleContactsIntegrator do
   before do
-    stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
+    stub_request(:get, %r{https://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
 
     @user = create(:user)
     @account = create(:google_account, person_id: @user.id)
@@ -977,7 +977,7 @@ describe GoogleContactsIntegrator do
 
       WebMock.reset!
 
-      stub_request(:get, %r{http://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
+      stub_request(:get, %r{https://api\.smartystreets\.com/street-address/.*}).to_return(body: '[]')
 
       @updated_g_contact_obj = JSON.parse(g_contact_fixture_json)['feed']['entry'][0]
       @updated_g_contact_obj['gd$email'] = [
