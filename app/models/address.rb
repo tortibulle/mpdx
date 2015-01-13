@@ -120,7 +120,7 @@ class Address < ActiveRecord::Base
   end
 
   def clean_up_master_address
-    master_address.destroy if master_address && (master_address.addresses - [self]).blank?
+    master_address.destroy if master_address && master_address.addresses.where.not(id: id).empty?
 
     true
   end

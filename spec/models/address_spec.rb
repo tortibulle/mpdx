@@ -18,4 +18,19 @@ describe Address do
       address.master_address == master_address
     end
   end
+
+  context '#clean_up_master_address' do
+    it 'cleans up the master address when destroyed if it is no longer needed by others' do
+      master = create(:master_address)
+      address1 = create(:address, master_address: master)
+      address2 = create(:address, master_address: master)
+      expect {
+        address1.destroy!
+      }.to_not change(MasterAddress, :count).from(1)
+
+      expect {
+        address2.destroy!
+      }.to change(MasterAddress, :count).from(1).to(0)
+    end
+  end
 end
