@@ -475,7 +475,9 @@ class AccountList < ActiveRecord::Base
       next unless result['success'] > 0
       result['data'].each do |row|
         next unless row['email'] && row['merges']
-        groups = row['merges']['GROUPINGS'].detect { |g| g['id'] == APP_CONFIG['mailchimp_grouping_id'] }['groups'].split(', ')
+        grouping = row['merges']['GROUPINGS'].detect { |g| g['id'] == APP_CONFIG['mailchimp_grouping_id'] }
+        next unless grouping
+        groups = grouping['groups'].split(', ')
         groups -= [group]
         vars = { GROUPINGS: [{ id: APP_CONFIG['mailchimp_grouping_id'], groups: groups.join(', ') }] }
         gb.list_update_member(id: APP_CONFIG['mailchimp_list'], email_address: row['email'], merge_vars: vars,
