@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe ContactsController do
+  render_views
+
   describe 'when signed in' do
     let(:user) { create(:user_with_account) }
     let!(:contact) { create(:contact, account_list: user.account_lists.first) }
@@ -69,6 +71,11 @@ describe ContactsController do
 
         get :index, filters: { newsletter: 'email' }
         assigns(:contacts).length.should == 1
+      end
+
+      it 'does not cause an error for the export and still assigns contact' do
+        get :index, format: 'csv'
+        expect(assigns(:contacts).size).to eq(2)
       end
     end
 
@@ -157,7 +164,7 @@ describe ContactsController do
 
     describe '#find_duplicates' do
       it 'does not assign contact_sets and people_sets' do
-        contact_sets = [[contact, build(:contact)]]
+        contact_sets = [[contact, create(:contact)]]
         people_sets = []
         expect(ContactDuplicatesFinder).to receive(:new).with(user.account_lists.first, user)
                                              .and_return(double(dup_contacts_then_people: [contact_sets, people_sets]))

@@ -32,17 +32,14 @@ class ContactsController < ApplicationController
 
       format.csv do
         @contacts = @filtered_contacts.includes(:primary_person, :primary_address, people: [:email_addresses, :phone_numbers])
-        @headers = ['Contact Name', 'First Name', 'Last Name', 'Spouse First Name', 'Greeting',
-                    'Envelope Greeting', 'Mailing Street Address', 'Mailing City', 'Mailing State',
-                    'Mailing Postal Code', 'Mailing Country', 'Status', 'Commitment Amount',
-                    'Commitment Frequency', 'Newsletter', 'Pledge Received', 'Tags',
-                    'Email 1', 'Email 2', 'Email 3', 'Email 4',
-                    'Phone 1', 'Phone 2', 'Phone 3', 'Phone 4']
-
         render_csv("contacts-#{Time.now.strftime('%Y%m%d')}")
       end
-
     end
+  end
+
+  def send_to_chalkline
+    current_account_list.async_send_chalkline_list
+    render text: 'OK'
   end
 
   def show

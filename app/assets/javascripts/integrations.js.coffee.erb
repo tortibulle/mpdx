@@ -1,0 +1,7 @@
+$ ->
+  $('#chalkline_send_list').on 'click.rails', ->
+    # Send the newsletter list to chalkline and open the order form unless the user hasn't confirmed yet
+    unless $('#chalkline_send_list').data('confirm')?
+      $.ajax({type: 'post', url: '/contacts/send_to_chalkline'})
+      window.open('http://www.chalkline.org/order_mpdx.html','_blank')
+    true
