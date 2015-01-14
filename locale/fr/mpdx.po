@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: version 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2015-01-07 16:36+0100\n"
+"PO-Revision-Date: 2015-01-14 10:09+0100\n"
 "Last-Translator: Josh Starcher <>\n"
 "Language-Team: French\n"
 "Language: fr\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.6.9\n"
-"POT-Creation-Date: 2015-01-05 21:29-0800\n"
+"POT-Creation-Date: \n"
 
 msgid " For %{contact}"
 msgstr "Pour %{contact}"
@@ -363,9 +363,9 @@ msgid "Are you sure you want to disable Google Calendar integration?"
 msgstr ""
 "Êtes vous sûr de vouloir désactiver l'intégration du calendrier Google ?"
 
-#, fuzzy
 msgid "Are you sure you want to disable Google Contacts sync?"
-msgstr "Êtes vous sûr de vouloir désactiver l'intégration de Gmail ?"
+msgstr ""
+"Êtes vous sûr de vouloir désactiver la synchronisation des contacts Google ?"
 
 msgid ""
 "Are you sure you want to merge the selected contacts? This action cannot be "
@@ -670,9 +670,8 @@ msgstr "Créer une tâche \"Rendez-vous\""
 msgid "Create \"Setup Giving\" task"
 msgstr "Créer une tâche \"mettre en place le don\""
 
-#, fuzzy
 msgid "Create \"Thank\" task"
-msgstr "Créer une tâche"
+msgstr "Créer une tâche \"Merci\""
 
 msgid "Create New Appeal"
 msgstr "Créer un nouvel appel"
@@ -741,9 +740,8 @@ msgstr "Désactiver l' intégration du calendrier"
 msgid "Disable Gmail Integration"
 msgstr "Désactiver l' intégration de Gmail"
 
-#, fuzzy
 msgid "Disable Google Contacts integration"
-msgstr "Désactiver l' intégration du calendrier"
+msgstr "Désactiver l' intégration des contacts Google"
 
 msgid "Divorced"
 msgstr "Divorcé"
@@ -751,9 +749,8 @@ msgstr "Divorcé"
 msgid "Donation History"
 msgstr "Historique des dons"
 
-#, fuzzy
 msgid "Donation(s)"
-msgstr "Dons"
+msgstr "Don(s)"
 
 msgid "Donations"
 msgstr "Dons"
@@ -834,9 +831,8 @@ msgstr "Activer l'intégration du calendrier"
 msgid "Enable Gmail Integration"
 msgstr "Activer l'intégration de Gmail"
 
-#, fuzzy
 msgid "Enable Google Contacts Integration"
-msgstr "Activer l'intégration du calendrier"
+msgstr "Activer l'intégration des contacts Google"
 
 msgid "Engaged"
 msgstr "Fiancé"
@@ -903,9 +899,8 @@ msgstr ""
 msgid "Fortnightly"
 msgstr "Bimensuel"
 
-#, fuzzy
 msgid "Frequency"
-msgstr "Fréquence de l'engagement"
+msgstr "Fréquence"
 
 msgid "Gender:"
 msgstr "Sexe :"
@@ -919,20 +914,17 @@ msgstr "Intégration de Gmail"
 msgid "Gmail integration has been enabled."
 msgstr "L'intégration de Gmail a été activée."
 
-#, fuzzy
 msgid "Goal"
-msgstr "Total"
+msgstr "Objectif"
 
 msgid "Good news! You don't have any pending tasks."
 msgstr "Bonne nouvelle ! Vous n'avez pas de tâches en attente."
 
-#, fuzzy
 msgid "Google Contacts integration"
-msgstr "Intégration du calendrier"
+msgstr "Intégration des contacts Google"
 
-#, fuzzy
 msgid "Google Contacts sync has been enabled."
-msgstr "L'intégration de Gmail a été activée."
+msgstr "La synchronisation des contacts Google a été activée."
 
 msgid "Google account needs to be refreshed"
 msgstr "Votre compte Google doit être rafraîchi"
@@ -969,9 +961,8 @@ msgstr "Salut"
 msgid "Hide"
 msgstr "Cacher"
 
-#, fuzzy
 msgid "Hide Contact"
-msgstr "Cacher les contacts"
+msgstr "Cacher le contact"
 
 msgid "Hide Contacts"
 msgstr "Cacher les contacts"
@@ -1123,17 +1114,14 @@ msgstr "Chargement en cours"
 msgid "Loading contact history..."
 msgstr "Chargement de l'historique de contact..."
 
-#, fuzzy
 msgid "Loading contact tasks..."
-msgstr "Recherche de contact..."
+msgstr "Chargement des tâches de contact ..."
 
-#, fuzzy
 msgid "Loading contacts..."
-msgstr "Recherche de contact..."
+msgstr "Chargement des contacts ..."
 
-#, fuzzy
 msgid "Location"
-msgstr "Dons"
+msgstr "Emplacement"
 
 msgid "Log Task"
 msgstr "Ajouter une tâche terminée"
@@ -1189,7 +1177,7 @@ msgid ""
 "MPDX Support Team"
 msgstr ""
 "MPDX rencontré des erreurs en essayant d'importer vos % {source} contacts.% "
-"{explanation}Merci !Équipe de soutien MPDX"
+"{explanation} Merci !Équipe de soutien MPDX"
 
 msgid "MPDX has finished importing your %{source} contacts."
 msgstr "Mdpx a finis l'importation de %{source} de vos contacts."
@@ -1208,11 +1196,10 @@ msgstr ""
 "MPDX importe actuellement vos contacts à partir de %{source}. Vous recevrez "
 "un e-mail lorsque l'importation sera terminée."
 
-#, fuzzy
 msgid ""
 "MPDX is now synchronizing your active contacts with your Google Contacts."
 msgstr ""
-"MPDX est en train de synchroniser vos tâches avec votre calendrier Google."
+"MPDX synchronise maintenant vos contacts actifs avec vos contacts Google."
 
 msgid "MPDX is now synchronizing your history with your Gmail account."
 msgstr ""
@@ -1367,9 +1354,8 @@ msgstr "Lettre de nouvelle"
 msgid "Newsletter Recipients"
 msgstr "Destinataires de la lettre de nouvelle"
 
-#, fuzzy
 msgid "Newsletter type"
-msgstr "Lettre de nouvelle"
+msgstr "Type de lettre de nouvelle"
 
 msgid "Next Action"
 msgstr "Prochaine action"
@@ -1702,9 +1688,8 @@ msgstr "Saisonnier :"
 msgid "See All"
 msgstr "Voir tout"
 
-#, fuzzy
 msgid "Select all"
-msgstr "Voir tout"
+msgstr "Tout selectionner"
 
 msgid "Select all duplicates"
 msgstr "Selectionner tous les doubles"
@@ -1787,9 +1772,8 @@ msgstr "Statut"
 msgid "Status Update"
 msgstr "Statut réactualisé "
 
-#, fuzzy
 msgid "Status:"
-msgstr "Statut"
+msgstr "Statut:"
 
 msgid "Street Address"
 msgstr "Adresse"
@@ -1921,13 +1905,12 @@ msgstr ""
 "Le lien vers votre compte Facebook a besoin d'être rafraîchi. Cliquez ici "
 "pour vous  reconnecter à Facebook."
 
-#, fuzzy
 msgid ""
 "The link to your google account needs to be refreshed. Click here to re-"
 "connect to google."
 msgstr ""
-"Le lien vers votre compte Facebook a besoin d'être rafraîchi. Cliquez ici "
-"pour vous  reconnecter à Facebook."
+"Le lien vers votre compte Google a besoin d'être rafraîchi. Cliquez ici pour "
+"vous  reconnecter à Googlz."
 
 msgid ""
 "The mailchimp API key associated with your MPDX account is no longer valid.\n"
@@ -2224,25 +2207,6 @@ msgstr "Le compte prayerletters.com doit être rafraîchi"
 msgid "to"
 msgstr "à"
 
-#, fuzzy
 msgid "with invalid addresses"
-msgstr "Avec adresse e-mail"
+msgstr "Avec une adresse e-mail valide"
 
-#~ msgid " and "
-#~ msgstr "et"
-
-#~ msgid "Please choose a file that ends with .xml"
-#~ msgstr "Veuillez choisir un fichier qui se termine par .xml"
-
-#~ msgid "Please watch this video to see how to properly export from TntMPD."
-#~ msgstr ""
-#~ "Veuillez regarder cette vidéo pour voir comment exporter correctement à "
-#~ "partir de TntMPD."
-
-#~ msgid "Status: %{status}"
-#~ msgstr "Statut: %{status}"
-
-#~ msgid "The file you uploaded is not a valid Tnt export. %{link}"
-#~ msgstr ""
-#~ "Le fichier que vous avez téléchargé n'est pas un produit d'exportation "
-#~ "Tnt valide. %{link}"
